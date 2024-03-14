@@ -1,0 +1,20 @@
+--- a/superset-frontend/src/visualizations/presets/MainPreset.js
++++ b/superset-frontend/src/visualizations/presets/MainPreset.js
+@@ -78,6 +78,7 @@ import {
+ } from 'src/filters/components';
+ import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
+ import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
++import { SupersetPluginInteractiveLineChart } from 'superset-plugin-interactive-line-chart';
+ import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
+ import TimeTableChartPlugin from '../TimeTable';
+ 
+@@ -166,6 +167,9 @@ export default class MainPreset extends Preset {
+         new EchartsSunburstChartPlugin().configure({ key: 'sunburst_v2' }),
+         new HandlebarsChartPlugin().configure({ key: 'handlebars' }),
+         new EchartsBubbleChartPlugin().configure({ key: 'bubble_v2' }),
++        new SupersetPluginInteractiveLineChart().configure({
++          key: 'superset-plugin-interactive-line-chart',
++        }),
+         ...experimentalplugins,
+       ],
+     });
