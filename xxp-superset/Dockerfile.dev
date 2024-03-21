@@ -32,9 +32,7 @@ WORKDIR /app/plugins
 
 COPY plugins/* ./
 
-# RUN find -name \*.tar.gz -exec tar --extract --gunzip --file={} \;
-RUN find -name \*.tar.gz -exec tar --extract --gunzip --file={} \; \
-    && for dir in */; do \
+RUN for dir in */; do \
         if [ -d "$dir" ]; then \
             echo "Extracted $dir"; \
             echo "Installing npm dependencies for $dir"; \
@@ -60,7 +58,6 @@ RUN patch src/visualizations/presets/MainPreset.js \
     < /app/patches/MainPreset.js.patch
 
 # Build Superset with the plugins
-# RUN npm install --save-prod /app/plugins/superset-plugin-interactive-line-chart \
 RUN for dir in /app/plugins/*/; do \
         if [ -d "$dir" ]; then \
             echo "Installing npm dependencies for $dir"; \
@@ -68,7 +65,6 @@ RUN for dir in /app/plugins/*/; do \
         fi; \
     done \
     && npm clean-install \
-    && npm run build
 
 # ===========
 # Final image
@@ -89,7 +85,7 @@ RUN rm --recursive \
     superset/static/assets
 
 COPY --from=builder \
-    /app/superset/superset/static/assets \
-    superset/static/assets
+    /app/superset/superset-frontend \
+    /app/superset-frontend 
 
 ENTRYPOINT [ "/superset-init.sh" ]

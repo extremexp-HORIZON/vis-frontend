@@ -33,8 +33,6 @@ services:
     build:
       context: ./xxp-superset
       dockerfile: Dockerfile.prod
-    volumes:
-      - plugins:/
     ports:
       - "8088:8088"
 volumes:
