@@ -23,6 +23,7 @@ services:
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
   xxp-superset:
     container_name: xxp-superset
+    command: sh -c "/app/superset-init.sh"
     env_file: docker/.env
     environment:
       - ADMIN_USERNAME=admin
@@ -32,11 +33,25 @@ services:
       disable: true
     build:
       context: ./xxp-superset
-      dockerfile: Dockerfile.prod
-    volumes:
-      - plugins:/
+      dockerfile: Dockerfile.dev     
     ports:
       - "8088:8088"
+    volumes:
+      - ./docker/superset-init.sh:/app/superset-init.sh
+  superset-node:
+    container_name: superset_node
+    command: sh -c "/app/frontend-init.sh"
+    env_file: docker/.env
+    build:
+      context: ./xxp-superset
+      dockerfile: Dockerfile.frontend
+    volumes:
+      - ./docker/frontend-init.sh:/app/frontend-init.sh
+      - type: bind
+        source: ./xxp-superset/plugins
+        target: /app/plugins
+    ports:
+      - "9000:9000"
 volumes:
   db_home:
     external: false

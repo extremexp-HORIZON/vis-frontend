@@ -11,6 +11,7 @@ ARG SUPERSET_VERSION=3.1.1
 
 # Download and extract the Superset source code to /app/superset
 WORKDIR /app
+
 RUN curl \
         --output superset.tar.gz \
         --location \
@@ -24,30 +25,12 @@ ENV SUPERSET_CONFIG_PATH /app/superset_config.py
 # Copy the patch for MainPreset.js to /app/patches
 WORKDIR /app/patches
 COPY MainPreset.js.patch .
+COPY webpack.proxy-config.js .
 
 # Copy and extract the custom visualization plugins to /app/plugins
 WORKDIR /app/plugins
 
 COPY plugins ./
-
-# RUN find -name \*.tar.gz -exec tar --extract --gunzip --file={} \;
-RUN for dir in */; do \
-        if [ -d "$dir" ]; then \
-            echo "Installing npm dependencies for $dir"; \
-            npm install --prefix $dir --force; \
-
-            echo "Building for $dir"; \
-            npm run build-cjs --prefix $dir; \
-
-            # Check if the "lib" folder exists
-            if [ -d "$dir/lib" ]; then \
-                echo "Successfully built with 'lib' folder in $dir"; \
-            else \
-                echo "Error: 'lib' folder not found in $dir"; \
-                exit 1; \
-            fi; \
-        fi; \
-    done
 
 # Register the plugins in Superset by patching MainPreset.js
 WORKDIR /app/superset/superset-frontend
@@ -55,6 +38,7 @@ WORKDIR /app/superset/superset-frontend
 RUN patch src/visualizations/presets/MainPreset.js \
     < /app/patches/MainPreset.js.patch
 
+COPY webpack.proxy-config.js .
 # Build Superset with the plugins
 RUN for dir in /app/plugins/*/; do \
         if [ -d "$dir" ]; then \
@@ -62,25 +46,6 @@ RUN for dir in /app/plugins/*/; do \
             npm install --save-prod "$dir"; \
         fi; \
     done \
-    && npm clean-install \
-    && npm run build
+    && npm clean-install 
 
-# ===========
-# Final image
-# ===========
-FROM apache/superset
-
-ENV ADMIN_USERNAME $ADMIN_USERNAME
-ENV ADMIN_EMAIL $ADMIN_EMAIL
-ENV ADMIN_PASSWORD $ADMIN_PASSWORD
-
-COPY superset_config.py /app/
-ENV SUPERSET_CONFIG_PATH /app/superset_config.py
-
-# Replace the Superset frontend with the one containing the plugins
-RUN rm --recursive \
-    superset/static/assets
-
-COPY --from=builder \
-    /app/superset/superset/static/assets \
-    superset/static/assets
+WORKDIR /app

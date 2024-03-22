@@ -23,6 +23,7 @@ services:
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
   xxp-superset:
     container_name: xxp-superset
+    command: sh -c "/app/superset-init.sh"
     env_file: docker/.env
     environment:
       - ADMIN_USERNAME=admin
@@ -33,6 +34,8 @@ services:
     build:
       context: ./xxp-superset
       dockerfile: Dockerfile.prod
+    volumes:
+      - ./docker/superset-init.sh:/app/superset-init.sh
     ports:
       - "8088:8088"
 volumes:
