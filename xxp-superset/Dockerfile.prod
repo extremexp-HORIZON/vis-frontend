@@ -30,7 +30,8 @@ WORKDIR /app/plugins
 
 COPY plugins ./
 
-# RUN find -name \*.tar.gz -exec tar --extract --gunzip --file={} \;
+# for apple sillicon
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true 
 RUN for dir in */; do \
         if [ -d "$dir" ]; then \
             echo "Installing npm dependencies for $dir"; \

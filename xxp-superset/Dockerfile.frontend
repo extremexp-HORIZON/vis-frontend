@@ -39,6 +39,7 @@ RUN patch src/visualizations/presets/MainPreset.js \
 
 # Copy webpack files to frontend 
 COPY webpack/* .
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true 
 # Build Superset with the plugins
 RUN for dir in /app/plugins/*/; do \
         if [ -d "$dir" ]; then \
