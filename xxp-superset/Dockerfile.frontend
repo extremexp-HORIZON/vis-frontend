@@ -25,7 +25,6 @@ ENV SUPERSET_CONFIG_PATH /app/superset_config.py
 # Copy the patch for MainPreset.js to /app/patches
 WORKDIR /app/patches
 COPY MainPreset.js.patch .
-COPY webpack.proxy-config.js .
 
 # Copy and extract the custom visualization plugins to /app/plugins
 WORKDIR /app/plugins
@@ -38,7 +37,8 @@ WORKDIR /app/superset/superset-frontend
 RUN patch src/visualizations/presets/MainPreset.js \
     < /app/patches/MainPreset.js.patch
 
-COPY webpack.proxy-config.js .
+# Copy webpack files to frontend 
+COPY webpack/* .
 # Build Superset with the plugins
 RUN for dir in /app/plugins/*/; do \
         if [ -d "$dir" ]; then \

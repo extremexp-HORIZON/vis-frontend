@@ -29,7 +29,7 @@
    return {};
  };
  
- const { supersetPort = 8088, superset: supersetUrl = "http://195.251.63.158:8088" } = parsedEnvArg();
+ const { supersetPort = 8088, superset: supersetUrl = "http://xxp-superset:8088" } = parsedEnvArg();
  const backend = (supersetUrl || `http://localhost:${supersetPort}`).replace(
    '//+$/',
    '',

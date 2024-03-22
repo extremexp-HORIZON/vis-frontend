@@ -45,13 +45,16 @@ services:
     build:
       context: ./xxp-superset
       dockerfile: Dockerfile.frontend
+    ports:
+      - "9000:9000"
     volumes:
       - ./docker/frontend-init.sh:/app/frontend-init.sh
       - type: bind
         source: ./xxp-superset/plugins
         target: /app/plugins
-    ports:
-      - "9000:9000"
+      - type: bind
+        source: ./xxp-superset/webpack
+        target: /app/webpack
 volumes:
   db_home:
     external: false
