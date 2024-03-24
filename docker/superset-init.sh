@@ -10,6 +10,8 @@ superset fab create-admin --username "$ADMIN_USERNAME" --firstname Superset --la
 
 superset init
 
+cd shillelagh
+pip install --upgrade --no-deps --force-reinstall .
 # Start the service
 /bin/sh -c /usr/bin/run-server.sh
 # superset run -h 0.0.0.0 -p 8088 --with-threads --reload --debugger

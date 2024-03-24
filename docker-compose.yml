@@ -38,6 +38,9 @@ services:
       - "8088:8088"
     volumes:
       - ./docker/superset-init.sh:/app/superset-init.sh
+      - type: bind
+        source: ./xxp-superset/shillelagh
+        target: /app/shillelagh
   superset-node:
     container_name: superset_node
     command: sh -c "/app/frontend-init.sh"
