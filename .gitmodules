@@ -1,0 +1,3 @@
+[submodule "xxp-superset/plugins/superset-plugin-interactive-line-chart"]
+	path = xxp-superset/plugins/superset-plugin-interactive-line-chart
+	url = https://colab-repo.intracom-telecom.com/colab-projects/extremexp/user-interaction/visualization/superset-plugins/superset-plugin-interactive-line-chart.git
