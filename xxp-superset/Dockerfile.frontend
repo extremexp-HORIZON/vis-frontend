@@ -12,41 +12,17 @@ ARG SUPERSET_VERSION=3.1.1
 # Download and extract the Superset source code to /app/superset
 WORKDIR /app
 
-RUN curl \
-        --output superset.tar.gz \
-        --location \
-        https://github.com/apache/superset/archive/refs/tags/${SUPERSET_VERSION}.tar.gz \
-    && tar --extract --gunzip --file=superset.tar.gz \
-    && mv superset-${SUPERSET_VERSION} superset
+COPY superset-frontend ./superset-frontend
 
 COPY superset_config.py .
-ENV SUPERSET_CONFIG_PATH /app/superset_config.py
 
-# Copy the patch for MainPreset.js to /app/patches
-WORKDIR /app/patches
-COPY MainPreset.js.patch .
-
-# Copy and extract the custom visualization plugins to /app/plugins
-WORKDIR /app/plugins
-
-COPY plugins ./
-
-# Register the plugins in Superset by patching MainPreset.js
-WORKDIR /app/superset/superset-frontend
-
-RUN patch src/visualizations/presets/MainPreset.js \
-    < /app/patches/MainPreset.js.patch
+WORKDIR /app/superset-frontend
 
 # Copy webpack files to frontend 
 COPY webpack/* .
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true 
 # Build Superset with the plugins
-RUN for dir in /app/plugins/*/; do \
-        if [ -d "$dir" ]; then \
-            echo "Installing npm dependencies for $dir"; \
-            npm install --save-prod "$dir"; \
-        fi; \
-    done \
-    && npm clean-install 
+
+RUN npm clean-install 
 
 WORKDIR /app

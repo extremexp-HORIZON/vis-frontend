@@ -19,6 +19,6 @@ set -e
 
 # Packages needed for puppeteer:
 apt update
-cd /app/superset/superset-frontend
+cd /app/superset-frontend
 echo "Running frontend"
 npm run dev-server
