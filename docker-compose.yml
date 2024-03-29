@@ -53,14 +53,8 @@ services:
     volumes:
       - ./docker/frontend-init.sh:/app/frontend-init.sh
       - type: bind
-        source: ./xxp-superset/plugins
-        target: /app/plugins
-      - type: bind
-        source: ./xxp-superset/superset-frontend/src
-        target: /app/superset-frontend/src
-      - type: bind
-        source: ./xxp-superset/webpack
-        target: /app/webpack
+        source: ./xxp-superset/superset-frontend
+        target: /app/superset-frontend
 volumes:
   db_home:
     external: false
