@@ -7,22 +7,15 @@ ARG NODE_VERSION=16
 
 FROM node:${NODE_VERSION} AS builder
 
-ARG SUPERSET_VERSION=3.1.1
-
 # Download and extract the Superset source code to /app/superset
 WORKDIR /app
 
-COPY superset-frontend ./superset-frontend
+# COPY superset-frontend ./superset-frontend
 
-COPY superset_config.py .
-
-WORKDIR /app/superset-frontend
+# WORKDIR /app/superset-frontend
 
 # Copy webpack files to frontend 
-COPY webpack/* .
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true 
+# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true 
 # Build Superset with the plugins
+# RUN npm clean-install 
 
-RUN npm clean-install 
-
-WORKDIR /app

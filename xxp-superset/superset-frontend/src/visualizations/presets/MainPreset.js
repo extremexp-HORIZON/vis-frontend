@@ -34,7 +34,7 @@ import TableChartPlugin from '@superset-ui/plugin-chart-table';
 import { WordCloudChartPlugin } from '@superset-ui/plugin-chart-word-cloud';
 import WorldMapChartPlugin from '@superset-ui/legacy-plugin-chart-world-map';
 // import {SupersetPluginInteractiveLineChart} from 'superset-plugin-interactive-line-chart';
-// import {SupersetPluginInteractiveLineChartCopy} from 'superset-plugin-interactive-line-chart-copy';
+import {SupersetPluginInteractiveLineChartCopy} from 'superset-plugin-interactive-line-chart-copy';
 // import {SupersetPluginInteractiveLineChartButtons} from 'superset-plugin-interactive-line-chart-buttons';
 
 
@@ -100,7 +100,7 @@ export default class MainPreset extends Preset {
       presets: [new DeckGLChartPreset()],
       plugins: [
         // new SupersetPluginInteractiveLineChart().configure({ key: 'interactive_line_chart' }),
-        // new SupersetPluginInteractiveLineChartCopy().configure({ key: 'interactive_line_chart_copy' }),
+        new SupersetPluginInteractiveLineChartCopy().configure({ key: 'interactive_line_chart_copy' }),
         // new SupersetPluginInteractiveLineChartButtons().configure({ key: 'interactive_line_chart_buttons' }),
 
 

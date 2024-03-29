@@ -4,7 +4,7 @@
  } from 'src/filters/components';
  import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
  import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
-+import { SupersetPluginInteractiveLineChart } from 'superset-plugin-interactive-line-chart';
++import { SupersetPluginInteractiveLineChartButtons } from 'superset-plugin-interactive-line-chart-buttons';
  import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
  import TimeTableChartPlugin from '../TimeTable';
  
@@ -12,8 +12,8 @@
          new EchartsSunburstChartPlugin().configure({ key: 'sunburst_v2' }),
          new HandlebarsChartPlugin().configure({ key: 'handlebars' }),
          new EchartsBubbleChartPlugin().configure({ key: 'bubble_v2' }),
-+        new SupersetPluginInteractiveLineChart().configure({
-+          key: 'superset-plugin-interactive-line-chart',
++        new SupersetPluginInteractiveLineChartButtons().configure({
++          key: 'superset-plugin-interactive-line-chart-buttons',
 +        }),
          ...experimentalplugins,
        ],
