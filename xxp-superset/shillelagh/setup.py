@@ -14,4 +14,4 @@ except VersionConflict:
 
 
 if __name__ == "__main__":
-    setup(use_pyscaffold=True)
+    setup(version="1.2.10", use_pyscaffold=True)

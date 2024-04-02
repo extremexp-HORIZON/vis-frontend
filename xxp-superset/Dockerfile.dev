@@ -15,5 +15,6 @@ ENV SUPERSET_CONFIG_PATH /app/superset_config.py
 COPY shillelagh /app/shillelagh
 
 USER root
+
 # install git / needed for shillelagh
 RUN apt-get update && apt-get install -y git 

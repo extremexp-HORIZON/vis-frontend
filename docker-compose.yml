@@ -47,7 +47,7 @@ services:
     env_file: docker/.env
     build:
       context: ./xxp-superset
-      dockerfile: Dockerfile.frontend
+      dockerfile: "Dockerfile.frontend"
     ports:
       - "9000:9000"
     volumes:
