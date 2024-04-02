@@ -1,30 +1,20 @@
 import _pt from "prop-types";
 import React, { useState } from 'react';
-import { Table, Button, Space, Collapse, Spin, Tag } from 'antd';
+import { Table, Button, Space, Collapse, Spin, Tag, Modal } from 'antd';
 export default function InteractiveTablePlugin(props) {
   var {
     data,
-    columns
+    columns,
+    tableSize
   } = props;
-  var [expandedRow, setExpandedRow] = useState(-1);
   var [computedCounterfactuals, setComputedCounterfactuals] = useState([]);
   var [loadingRows, setLoadingRows] = useState([]); // State to track loading rows
 
+  var [bottom, setBottom] = useState('bottomRight');
+  var [modalVisible, setModalVisible] = useState(false);
   var {
     Panel
   } = Collapse;
-
-  var handleRowClick = rowId => {
-    if (expandedRow === rowId) {
-      setExpandedRow(-1);
-    } else {
-      setExpandedRow(rowId);
-    }
-  };
-
-  var isExpandable = record => {
-    return computedCounterfactuals.includes(record.key); // Check if record's key is in computedCounterfactuals
-  };
 
   var computeCounterfactuals = rowId => {
     setLoadingRows([...loadingRows, rowId]); // Set loading state for the row
@@ -32,6 +22,8 @@ export default function InteractiveTablePlugin(props) {
     setTimeout(() => {
       setComputedCounterfactuals([...computedCounterfactuals, rowId]);
       setLoadingRows(loadingRows.filter(id => id !== rowId)); // Remove loading state after 500ms
+
+      setModalVisible(true); // Open the modal after computation finishes
     }, 500);
   };
 
@@ -47,7 +39,7 @@ export default function InteractiveTablePlugin(props) {
       sorter: false,
       fixed: 'right',
       render: (text, record, id) => /*#__PURE__*/React.createElement(Button, {
-        onClick: () => computeCounterfactuals(record.key)
+        onClick: () => showCounterfactualsModal(record.key)
       }, /*#__PURE__*/React.createElement(Space, null, "Counterfactuals", loadingRows.includes(record.key) && /*#__PURE__*/React.createElement(Spin, {
         size: "small"
       }), " "))
@@ -59,9 +51,9 @@ export default function InteractiveTablePlugin(props) {
     return data;
   };
 
-  var renderSubTable = record => {
+  var renderSubTable = () => {
     var subData = [{
-      key: 2,
+      key: 1,
       Model__learning_rate: 0.1,
       Model__max_depth: 2,
       Model__min_child_weight: 1,
@@ -69,7 +61,7 @@ export default function InteractiveTablePlugin(props) {
       'preprocessor__num__scaler': 'StandardScaler()',
       BinaryLabel: 1
     }, {
-      key: 3,
+      key: 2,
       Model__learning_rate: 0.01,
       Model__max_depth: 8,
       Model__min_child_weight: 1,
@@ -77,7 +69,7 @@ export default function InteractiveTablePlugin(props) {
       'preprocessor__num__scaler': 'StandardScaler()',
       BinaryLabel: 0
     }, {
-      key: 4,
+      key: 3,
       Model__learning_rate: 0.001,
       Model__max_depth: 2,
       Model__min_child_weight: 1,
@@ -85,7 +77,7 @@ export default function InteractiveTablePlugin(props) {
       'preprocessor__num__scaler': 'StandardScaler()',
       BinaryLabel: 0
     }, {
-      key: 5,
+      key: 4,
       Model__learning_rate: 0.001,
       Model__max_depth: 2,
       Model__min_child_weight: 1,
@@ -93,7 +85,7 @@ export default function InteractiveTablePlugin(props) {
       'preprocessor__num__scaler': 'StandardScaler()',
       BinaryLabel: 0
     }, {
-      key: 6,
+      key: 5,
       Model__learning_rate: 0.001,
       Model__max_depth: 2,
       Model__min_child_weight: 1,
@@ -101,7 +93,7 @@ export default function InteractiveTablePlugin(props) {
       'preprocessor__num__scaler': 'StandardScaler()',
       BinaryLabel: 0
     }, {
-      key: 7,
+      key: 6,
       Model__learning_rate: 0.001,
       Model__max_depth: 2,
       Model__min_child_weight: 1,
@@ -141,40 +133,56 @@ export default function InteractiveTablePlugin(props) {
       key: 'action',
       render: () => /*#__PURE__*/React.createElement(Button, {
         type: "link"
-      }, "Action")
+      }, "Train new model")
     }];
-    return /*#__PURE__*/React.createElement(Table, {
+    return /*#__PURE__*/React.createElement(Modal, {
+      title: "Counterfactuals",
+      visible: modalVisible,
+      onCancel: closeModal,
+      footer: null,
+      width: 800 // Set the desired width of the modal
+
+    }, /*#__PURE__*/React.createElement(Table, {
       dataSource: subData,
       columns: subColumns,
-      pagination: false
-    });
+      pagination: false,
+      size: "small",
+      scroll: {
+        y: 400
+      } // Add vertical scrolling if necessary
+
+    }));
   };
 
-  return /*#__PURE__*/React.createElement(Table, {
+  var showCounterfactualsModal = rowId => {
+    computeCounterfactuals(rowId);
+  };
+
+  var closeModal = () => {
+    setModalVisible(false);
+  };
+
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Table, {
+    size: tableSize,
     style: {
       position: "absolute",
       top: 0,
       left: 0
     },
     scroll: {
-      x: 1500,
-      y: 300
+      x: 1500
     },
     dataSource: convertToAntRecords(data),
     columns: convertToAntColumns(columns),
-    pagination: false,
-    expandable: {
-      expandedRowRender: (record, index) => renderSubTable(record),
-      fixed: true,
-      rowExpandable: record => isExpandable(record),
-      expandedRowKeys: [expandedRow],
-      onExpand: (expanded, record) => handleRowClick(record.key)
+    pagination: {
+      position: [bottom]
     }
-  });
+  }), renderSubTable());
 }
 InteractiveTablePlugin.propTypes = {
   data: _pt.arrayOf(_pt.any).isRequired,
   columns: _pt.arrayOf(_pt.any).isRequired,
   height: _pt.number.isRequired,
-  width: _pt.number.isRequired
+  width: _pt.number.isRequired,
+  tableSize: _pt.any.isRequired
 };

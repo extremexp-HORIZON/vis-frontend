@@ -55,7 +55,7 @@ export default function transformProps(chartProps) {
   var {
     boldText,
     headerFontSize,
-    headerText
+    tableSize
   } = formData;
   var data = queriesData[0].data;
   var columns = formData.cols;
@@ -68,6 +68,6 @@ export default function transformProps(chartProps) {
     // and now your control data, manipulated as needed, and passed through as props!
     boldText,
     headerFontSize,
-    headerText
+    tableSize
   };
 }

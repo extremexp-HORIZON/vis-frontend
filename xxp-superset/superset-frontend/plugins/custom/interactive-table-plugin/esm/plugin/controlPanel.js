@@ -131,15 +131,14 @@ var config = {
         description: t('A checkbox to make the ')
       }
     }], [{
-      name: 'header_font_size',
+      name: 'table_size',
       config: {
         type: 'SelectControl',
-        label: t('Font Size'),
-        default: 'xl',
-        choices: [// [value, label]
-        ['xxs', 'xx-small'], ['xs', 'x-small'], ['s', 'small'], ['m', 'medium'], ['l', 'large'], ['xl', 'x-large'], ['xxl', 'xx-large']],
+        label: t('Table Size'),
+        default: 'small',
+        choices: [['small', 'small'], ['medium', 'medium'], ['large', 'large']],
         renderTrigger: true,
-        description: t('The size of your header font')
+        description: t('The size of your table')
       }
     }]]
   }]
