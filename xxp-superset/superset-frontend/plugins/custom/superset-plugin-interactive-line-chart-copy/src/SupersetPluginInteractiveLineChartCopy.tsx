@@ -278,8 +278,8 @@ export default function SupersetPluginInteractiveLineChartCopy(props: SupersetPl
   return (
     <div>
        {/* Dropdown for selecting parent options */}
-       <div style={{ position: 'absolute', zIndex: 9999, top: '30px', width: '200px' }}>
-
+       <div style={{ position: 'absolute', zIndex: 9999, top: '30px', width: '200px',marginTop: '50px' }}>
+       
       <Select value={selectedMenu} onChange={handleSelectOption} style={{ width: '100%' }}>
         <Select.Option value="metric">Metrics</Select.Option>
         <Select.Option value="column">Columns</Select.Option>
@@ -295,15 +295,15 @@ export default function SupersetPluginInteractiveLineChartCopy(props: SupersetPl
     {/* Options for selecting metrics */}
     {showMetricsOptions && (
       <div style={{ position: 'absolute', zIndex: 9999, top: '70px' }}>
-        <Select defaultValue="Select Metric" style={{ width: 120 }} onChange={updateMetriki}>
+        <Select defaultValue="SelectMetric" style={{ width: 120 }} onChange={updateMetriki}>
           {metrikiOptions.map((option) => (
             <Option key={option} value={option}>
               {option}
             </Option>
           ))}
         </Select>
-      </div>
-    )}
+      </div>      
+       )}
      {/* {showTrainOptions && (
       <div style={{ position: 'absolute', zIndex: 9999, top: '70px' }}>
         <Button defaultValue="Train Test" style={{ width: 120 }} onChange={updateTrain}>

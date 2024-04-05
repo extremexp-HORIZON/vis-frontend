@@ -16,22 +16,190 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
-import { styled, reactify, addAlpha } from '@superset-ui/core';
+// import React, {useState} from 'react';
+// import { styled, reactify, addAlpha } from '@superset-ui/core';
+// import PropTypes from 'prop-types';
+// import Component from './ParallelCoordinates';
+
+// const ReactComponent = reactify(Component);
+
+// const ParallelCoordinates = ({ className, ...otherProps }) => (
+//   <div className={className}>
+//     <ReactComponent {...otherProps} />
+//   </div>
+// );
+
+// ParallelCoordinates.propTypes = {
+//   className: PropTypes.string.isRequired,
+// };
+
+// ParallelCoordinates.propTypes = {
+//   className: PropTypes.string.isRequired,
+// };
+
+
+/////tha to fitaksw
+
+// import React, { useState } from 'react';
+// import PropTypes from 'prop-types';
+// import Component from './ParallelCoordinates';
+// import { styled, reactify, addAlpha } from '@superset-ui/core';
+
+
+// const ReactComponent = reactify(Component);
+
+// const ParallelCoordinates = ({ className, ...otherProps }) => {
+//   const [colorMetric, setColorMetric] = useState(otherProps.colorMetric);
+  
+
+//   const handleColorMetricChange = (event) => {
+//     console.log('event',event)
+//     setColorMetric(event.target.value); // Directly set the selected column name
+//   };
+
+//   return (
+    
+//     <div className={className}>
+//       <div>
+//         <label htmlFor="colorMetricDropdown">Color Metric:</label>
+//         <select
+//           id="colorMetricDropdown"
+//           value={colorMetric}
+//           onChange={handleColorMetricChange}
+//         >
+//           {otherProps.columnNames.map(column => (
+//             <option key={column} value={column}>
+//               {column}
+//             </option>
+//           ))}
+//         </select>
+//       </div>
+//       <ReactComponent {...otherProps} colorMetric={`AVG(${colorMetric})`} /> {/* Set colorMetric back to AVG(columnName) */}
+//     </div>
+//   );
+//   console.log(colorMetric);
+// };
+
+// ParallelCoordinates.propTypes = {
+//   className: PropTypes.string.isRequired,
+//   colorMetric: PropTypes.string,
+//   columnNames: PropTypes.arrayOf(PropTypes.string).isRequired, // Use columnNames instead of secondaryMetrics
+// };
+
+// ParallelCoordinates.defaultProps = {
+//   colorMetric: '', // Set a default value here if needed
+// };
+
+
+////ME TA METRICS
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { styled, reactify, addAlpha } from '@superset-ui/core';
 import Component from './ParallelCoordinates';
+import { Button, Flex } from 'antd';
+
 
 const ReactComponent = reactify(Component);
 
-const ParallelCoordinates = ({ className, ...otherProps }) => (
-  <div className={className}>
-    <ReactComponent {...otherProps} />
-  </div>
-);
+const ParallelCoordinates = ({ className, ...otherProps }) => {
+  console.log('React Start');
+
+  const [colorMetric, setColorMetric] = useState(otherProps.colorMetric);
+  const [sortMetric,setSortMetric]=useState(otherProps.colorMetric);
+  const [sortedData, setSortedData] = useState(otherProps.data);
+
+
+
+  const handleColorMetricChange = (event) => {
+    setColorMetric(event.target.value);
+    setSortMetric(event.target.value);
+   
+  };
+  const filteredMetrics = otherProps.metrics.filter(metric => (
+    metric === 'AVG(recall)' || metric === 'AVG(accuracy)' || metric === 'AVG(precision)' || metric === 'AVG(runtime)'
+  ));
+
+  const renamedMetrics = { option1: 'AVG(recall)', option2: 'AVG(accuracy)',
+    option3: 'AVG(precision)', option4: 'AVG(runtime)',
+  };
+
+
+
+  // const handleSortData = () => {
+  //   const sorted = otherProps.data.sort((a, b) => b[sortMetric] - a[sortMetric]);
+  //   setSortedData(sorted);
+  // };
+
+  const handleSaveBestConfiguration = () => {
+    if (sortedData.length > 0) {
+      const bestConfiguration = sortedData[0];
+      const textToSave = JSON.stringify(bestConfiguration, null, 2);
+      const blob = new Blob([textToSave], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'best_configuration.txt';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } else {
+      console.error('No sorted data available.');
+    }
+  };
+
+  return (
+    <div className={className}>
+      <div style={{ marginTop: '50px' }}>
+        <label htmlFor="colorMetricDropdown">Sort by:</label>
+        <select id="colorMetricDropdown" value={colorMetric} onChange={handleColorMetricChange}>
+          {otherProps.metrics.map(metric => (
+            <option key={metric} value={metric}>{metric}</option>
+          ))}
+        </select>
+        <Button type="primary" onClick={handleSaveBestConfiguration}>Save Best Configuration</Button>
+
+      </div>
+     
+      <ReactComponent {...otherProps} colorMetric={colorMetric} sortMetric={sortMetric} />
+    </div>
+  );
+};
+
+
+//   return (
+//     <div className={className}>
+
+//       <div style={{ marginTop: '50px' }}>
+//         <label htmlFor="colorMetricDropdown">Sort by:</label>
+//         <select id="colorMetricDropdown" value={colorMetric} onChange={handleColorMetricChange}>
+//           {filteredMetrics.map(metric => (
+//             <option key={metric} value={metric}>{metric}</option>
+//           ))}
+//         </select>
+//       </div>
+//       <ReactComponent {...otherProps} colorMetric={colorMetric} sortMetric={sortMetric} />
+//     </div>
+//   );
+// };
 
 ParallelCoordinates.propTypes = {
   className: PropTypes.string.isRequired,
+  colorMetric: PropTypes.string,
+  sortMetric: PropTypes.string,
+  metrics: PropTypes.arrayOf(PropTypes.string).isRequired,
+  data: PropTypes.array.isRequired,
+
+
 };
+
+ParallelCoordinates.defaultProps = {
+  colorMetric: '', // Set a default value here if needed
+  sortMetric: '',
+
+};
+
+
 
 export default styled(ParallelCoordinates)`
   ${({ theme }) => `
