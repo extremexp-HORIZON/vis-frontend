@@ -155,6 +155,7 @@ const config: ControlPanelConfig = {
             config: queryMode,
           },
         ],
+        ['secondary_metric'],
         [
           {
             name: 'groupby',

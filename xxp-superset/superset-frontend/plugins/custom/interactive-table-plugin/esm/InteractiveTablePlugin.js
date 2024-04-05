@@ -1,6 +1,6 @@
 import _pt from "prop-types";
+import { Button, Collapse, Modal, Space, Spin, Table, Tag } from 'antd';
 import React, { useState } from 'react';
-import { Table, Button, Space, Collapse, Spin, Tag, Modal } from 'antd';
 export default function InteractiveTablePlugin(props) {
   var {
     data,
@@ -52,54 +52,62 @@ export default function InteractiveTablePlugin(props) {
   };
 
   var renderSubTable = () => {
+    // const subData = [
+    //   { key: 1, Model__learning_rate: 0.1, Model__max_depth: 2, Model__min_child_weight: 1, Model__n_estimators: 75, 'preprocessor__num__scaler': 'StandardScaler()', BinaryLabel: 1 },
+    //   { key: 2, Model__learning_rate: 0.01, Model__max_depth: 8, Model__min_child_weight: 1, Model__n_estimators: 75, 'preprocessor__num__scaler': 'StandardScaler()', BinaryLabel: 0 },
+    //   { key: 3, Model__learning_rate: 0.001, Model__max_depth: 2, Model__min_child_weight: 1, Model__n_estimators: 84, 'preprocessor__num__scaler': 'StandardScaler()', BinaryLabel: 0 },
+    //   { key: 4, Model__learning_rate: 0.001, Model__max_depth: 2, Model__min_child_weight: 1, Model__n_estimators: 48, 'preprocessor__num__scaler': 'StandardScaler()', BinaryLabel: 0 },
+    //   { key: 5, Model__learning_rate: 0.001, Model__max_depth: 2, Model__min_child_weight: 1, Model__n_estimators: 81, 'preprocessor__num__scaler': 'StandardScaler()', BinaryLabel: 0 },
+    //   { key: 6, Model__learning_rate: 0.001, Model__max_depth: 2, Model__min_child_weight: 1, Model__n_estimators: 44, 'preprocessor__num__scaler': 'StandardScaler()', BinaryLabel: 0 },
+    // ];
     var subData = [{
-      key: 1,
-      Model__learning_rate: 0.1,
-      Model__max_depth: 2,
-      Model__min_child_weight: 1,
-      Model__n_estimators: 75,
-      'preprocessor__num__scaler': 'StandardScaler()',
-      BinaryLabel: 1
+      "Model__learning_rate": 0.1,
+      "Model__max_depth": 2,
+      "Model__min_child_weight": 1,
+      "Model__n_estimators": 75,
+      "preprocessor__num__scaler": "StandardScaler()",
+      "BinaryLabel": 1,
+      "Cost": null
     }, {
-      key: 2,
-      Model__learning_rate: 0.01,
-      Model__max_depth: 8,
-      Model__min_child_weight: 1,
-      Model__n_estimators: 75,
-      'preprocessor__num__scaler': 'StandardScaler()',
-      BinaryLabel: 0
+      "Model__learning_rate": 0.001,
+      "Model__max_depth": 2,
+      "Model__min_child_weight": 1,
+      "Model__n_estimators": 75,
+      "preprocessor__num__scaler": "StandardScaler()",
+      "BinaryLabel": 0,
+      "Cost": "1.0"
     }, {
-      key: 3,
-      Model__learning_rate: 0.001,
-      Model__max_depth: 2,
-      Model__min_child_weight: 1,
-      Model__n_estimators: 84,
-      'preprocessor__num__scaler': 'StandardScaler()',
-      BinaryLabel: 0
+      "Model__learning_rate": 0.001,
+      "Model__max_depth": 2,
+      "Model__min_child_weight": 1,
+      "Model__n_estimators": 95,
+      "preprocessor__num__scaler": "StandardScaler()",
+      "BinaryLabel": 0,
+      "Cost": "1.2666666666666668"
     }, {
-      key: 4,
-      Model__learning_rate: 0.001,
-      Model__max_depth: 2,
-      Model__min_child_weight: 1,
-      Model__n_estimators: 48,
-      'preprocessor__num__scaler': 'StandardScaler()',
-      BinaryLabel: 0
+      "Model__learning_rate": 0.001,
+      "Model__max_depth": 2,
+      "Model__min_child_weight": 1,
+      "Model__n_estimators": 99,
+      "preprocessor__num__scaler": "StandardScaler()",
+      "BinaryLabel": 0,
+      "Cost": "1.32"
     }, {
-      key: 5,
-      Model__learning_rate: 0.001,
-      Model__max_depth: 2,
-      Model__min_child_weight: 1,
-      Model__n_estimators: 81,
-      'preprocessor__num__scaler': 'StandardScaler()',
-      BinaryLabel: 0
+      "Model__learning_rate": 0.1,
+      "Model__max_depth": 8,
+      "Model__min_child_weight": 1,
+      "Model__n_estimators": 26,
+      "preprocessor__num__scaler": "StandardScaler()",
+      "BinaryLabel": 0,
+      "Cost": "1.4033333333333333"
     }, {
-      key: 6,
-      Model__learning_rate: 0.001,
-      Model__max_depth: 2,
-      Model__min_child_weight: 1,
-      Model__n_estimators: 44,
-      'preprocessor__num__scaler': 'StandardScaler()',
-      BinaryLabel: 0
+      "Model__learning_rate": 0.1,
+      "Model__max_depth": 9,
+      "Model__min_child_weight": 1,
+      "Model__n_estimators": 25,
+      "preprocessor__num__scaler": "StandardScaler()",
+      "BinaryLabel": 0,
+      "Cost": "1.5416666666666665"
     }];
     var subColumns = [{
       title: 'Model__learning_rate',
@@ -117,30 +125,32 @@ export default function InteractiveTablePlugin(props) {
       title: 'Model__n_estimators',
       dataIndex: 'Model__n_estimators',
       key: 'Model__n_estimators'
-    }, {
-      title: 'preprocessor__num__scaler',
-      dataIndex: 'preprocessor__num__scaler',
-      key: 'preprocessor__num__scaler'
-    }, {
+    },
+    /*       {
+            title: 'preprocessor__num__scaler',
+            dataIndex: 'preprocessor__num__scaler',
+            key: 'preprocessor__num__scaler',
+          }, */
+    {
       title: 'BinaryLabel',
       dataIndex: 'BinaryLabel',
       key: 'BinaryLabel',
       render: value => /*#__PURE__*/React.createElement(Tag, {
         color: value === 1 ? 'red' : 'green'
-      }, value === 1 ? 'Query' : 'Counterfactual')
+      }, value === 1 ? 'Factual' : 'Counterfactual')
     }, {
       title: 'Action',
       key: 'action',
       render: () => /*#__PURE__*/React.createElement(Button, {
         type: "link"
-      }, "Train new model")
+      }, "Save configuration")
     }];
     return /*#__PURE__*/React.createElement(Modal, {
       title: "Counterfactuals",
       visible: modalVisible,
       onCancel: closeModal,
       footer: null,
-      width: 800 // Set the desired width of the modal
+      width: 1000 // Set the desired width of the modal
 
     }, /*#__PURE__*/React.createElement(Table, {
       dataSource: subData,
