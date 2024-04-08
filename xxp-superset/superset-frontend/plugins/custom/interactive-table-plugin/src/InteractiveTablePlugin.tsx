@@ -1,5 +1,6 @@
-import { Button, Collapse, Modal, Space, Spin, Table, TableProps, Tag } from 'antd';
+import { Button, Col, Collapse, Modal, Row, Space, Spin, Table, TableProps, Tag } from 'antd';
 import React, { useState } from 'react';
+import ParallelCoordinatesPlot from './ParallelCoordinatesPlot';
 
 type TablePagination<T extends object> = NonNullable<Exclude<TableProps<T>['pagination'], boolean>>;
 type TablePaginationPosition = NonNullable<TablePagination<any>['position']>[number];
@@ -150,11 +151,6 @@ export default function InteractiveTablePlugin(props: InteractiveTablePluginProp
         dataIndex: 'Model__n_estimators',
         key: 'Model__n_estimators',
       },
-/*       {
-        title: 'preprocessor__num__scaler',
-        dataIndex: 'preprocessor__num__scaler',
-        key: 'preprocessor__num__scaler',
-      }, */
       {
         title: 'BinaryLabel',
         dataIndex: 'BinaryLabel',
@@ -175,22 +171,50 @@ export default function InteractiveTablePlugin(props: InteractiveTablePluginProp
         ),
       },
     ];
+    const [displayChart, setDisplayChart] = useState(true);
+
+    const handleToggleChart = () => {
+      setDisplayChart(true);
+    };
+  
+    const handleToggleTable = () => {
+      setDisplayChart(false);
+    };
+
     return (
       <Modal
-      title="Counterfactuals"
-      visible={modalVisible}
-      onCancel={closeModal}
-      footer={null}
-      width={1000} // Set the desired width of the modal
-    >
-      <Table
-        dataSource={subData}
-        columns={subColumns}
-        pagination={false}
-        size="small"
-        scroll={{ y: 400 }} // Add vertical scrolling if necessary
-      />
-    </Modal>
+        title="Counterfactuals"
+        visible={modalVisible}
+        onCancel={closeModal}
+        footer={null}
+        width={1000}>
+        <Row gutter={16} justify="center" style={{ marginBottom: '10px' }}>
+        <Col>
+            <Button type={displayChart ? "primary" : "default"} onClick={handleToggleChart}>
+              Chart View
+            </Button>
+          </Col>
+          <Col>
+            <Button type={displayChart ? "default" : "primary"} onClick={handleToggleTable}>
+              Table View
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          {displayChart ? (
+            <ParallelCoordinatesPlot data={subData.slice(1)} />
+          ):
+            (<Table
+            dataSource={subData}
+            columns={subColumns}
+            pagination={false}
+            size="small"
+            scroll={{ y: 400 }}
+           />
+           )        
+          }
+        </Row>
+      </Modal>
     );
   };
 

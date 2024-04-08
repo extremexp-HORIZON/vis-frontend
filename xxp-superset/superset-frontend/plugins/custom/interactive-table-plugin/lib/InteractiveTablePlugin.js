@@ -1,21 +1,36 @@
-import _pt from "prop-types";
-import { Button, Col, Collapse, Modal, Row, Space, Spin, Table, Tag } from 'antd';
-import React, { useState } from 'react';
-import ParallelCoordinatesPlot from './ParallelCoordinatesPlot';
-export default function InteractiveTablePlugin(props) {
+"use strict";
+
+exports.__esModule = true;
+exports.default = InteractiveTablePlugin;
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _antd = require("antd");
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _ParallelCoordinatesPlot = _interopRequireDefault(require("./ParallelCoordinatesPlot"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function InteractiveTablePlugin(props) {
   var {
     data,
     columns,
     tableSize
   } = props;
-  var [computedCounterfactuals, setComputedCounterfactuals] = useState([]);
-  var [loadingRows, setLoadingRows] = useState([]); // State to track loading rows
+  var [computedCounterfactuals, setComputedCounterfactuals] = (0, _react.useState)([]);
+  var [loadingRows, setLoadingRows] = (0, _react.useState)([]); // State to track loading rows
 
-  var [bottom, setBottom] = useState('bottomRight');
-  var [modalVisible, setModalVisible] = useState(false);
+  var [bottom, setBottom] = (0, _react.useState)('bottomRight');
+  var [modalVisible, setModalVisible] = (0, _react.useState)(false);
   var {
     Panel
-  } = Collapse;
+  } = _antd.Collapse;
 
   var computeCounterfactuals = rowId => {
     setLoadingRows([...loadingRows, rowId]); // Set loading state for the row
@@ -39,9 +54,9 @@ export default function InteractiveTablePlugin(props) {
       key: 'action',
       sorter: false,
       fixed: 'right',
-      render: (text, record, id) => /*#__PURE__*/React.createElement(Button, {
+      render: (text, record, id) => /*#__PURE__*/_react.default.createElement(_antd.Button, {
         onClick: () => showCounterfactualsModal(record.key)
-      }, /*#__PURE__*/React.createElement(Space, null, "Counterfactuals", loadingRows.includes(record.key) && /*#__PURE__*/React.createElement(Spin, {
+      }, /*#__PURE__*/_react.default.createElement(_antd.Space, null, "Counterfactuals", loadingRows.includes(record.key) && /*#__PURE__*/_react.default.createElement(_antd.Spin, {
         size: "small"
       }), " "))
     }];
@@ -130,17 +145,17 @@ export default function InteractiveTablePlugin(props) {
       title: 'BinaryLabel',
       dataIndex: 'BinaryLabel',
       key: 'BinaryLabel',
-      render: value => /*#__PURE__*/React.createElement(Tag, {
+      render: value => /*#__PURE__*/_react.default.createElement(_antd.Tag, {
         color: value === 1 ? 'red' : 'green'
       }, value === 1 ? 'Factual' : 'Counterfactual')
     }, {
       title: 'Action',
       key: 'action',
-      render: () => /*#__PURE__*/React.createElement(Button, {
+      render: () => /*#__PURE__*/_react.default.createElement(_antd.Button, {
         type: "link"
       }, "Save configuration")
     }];
-    var [displayChart, setDisplayChart] = useState(true);
+    var [displayChart, setDisplayChart] = (0, _react.useState)(true);
 
     var handleToggleChart = () => {
       setDisplayChart(true);
@@ -150,27 +165,27 @@ export default function InteractiveTablePlugin(props) {
       setDisplayChart(false);
     };
 
-    return /*#__PURE__*/React.createElement(Modal, {
+    return /*#__PURE__*/_react.default.createElement(_antd.Modal, {
       title: "Counterfactuals",
       visible: modalVisible,
       onCancel: closeModal,
       footer: null,
       width: 1000
-    }, /*#__PURE__*/React.createElement(Row, {
+    }, /*#__PURE__*/_react.default.createElement(_antd.Row, {
       gutter: 16,
       justify: "center",
       style: {
         marginBottom: '10px'
       }
-    }, /*#__PURE__*/React.createElement(Col, null, /*#__PURE__*/React.createElement(Button, {
+    }, /*#__PURE__*/_react.default.createElement(_antd.Col, null, /*#__PURE__*/_react.default.createElement(_antd.Button, {
       type: displayChart ? "primary" : "default",
       onClick: handleToggleChart
-    }, "Chart View")), /*#__PURE__*/React.createElement(Col, null, /*#__PURE__*/React.createElement(Button, {
+    }, "Chart View")), /*#__PURE__*/_react.default.createElement(_antd.Col, null, /*#__PURE__*/_react.default.createElement(_antd.Button, {
       type: displayChart ? "default" : "primary",
       onClick: handleToggleTable
-    }, "Table View"))), /*#__PURE__*/React.createElement(Row, null, displayChart ? /*#__PURE__*/React.createElement(ParallelCoordinatesPlot, {
-      data: subData.slice(1)
-    }) : /*#__PURE__*/React.createElement(Table, {
+    }, "Table View"))), /*#__PURE__*/_react.default.createElement(_antd.Row, null, displayChart ? /*#__PURE__*/_react.default.createElement(_ParallelCoordinatesPlot.default, {
+      data: subData
+    }) : /*#__PURE__*/_react.default.createElement(_antd.Table, {
       dataSource: subData,
       columns: subColumns,
       pagination: false,
@@ -189,7 +204,7 @@ export default function InteractiveTablePlugin(props) {
     setModalVisible(false);
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Table, {
+  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_antd.Table, {
     size: tableSize,
     style: {
       position: "absolute",
@@ -206,10 +221,11 @@ export default function InteractiveTablePlugin(props) {
     }
   }), renderSubTable());
 }
+
 InteractiveTablePlugin.propTypes = {
-  data: _pt.arrayOf(_pt.any).isRequired,
-  columns: _pt.arrayOf(_pt.any).isRequired,
-  height: _pt.number.isRequired,
-  width: _pt.number.isRequired,
-  tableSize: _pt.any.isRequired
+  data: _propTypes.default.arrayOf(_propTypes.default.any).isRequired,
+  columns: _propTypes.default.arrayOf(_propTypes.default.any).isRequired,
+  height: _propTypes.default.number.isRequired,
+  width: _propTypes.default.number.isRequired,
+  tableSize: _propTypes.default.any.isRequired
 };

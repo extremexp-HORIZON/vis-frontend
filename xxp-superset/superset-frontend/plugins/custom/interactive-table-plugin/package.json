@@ -26,9 +26,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-   
-  },
   "peerDependencies": {
     "@superset-ui/chart-controls": "*",
     "@superset-ui/core": "*",
