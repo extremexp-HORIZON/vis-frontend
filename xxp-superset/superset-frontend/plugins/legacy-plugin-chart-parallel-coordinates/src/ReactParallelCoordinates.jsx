@@ -119,8 +119,11 @@ const ParallelCoordinates = ({ className, ...otherProps }) => {
     metric === 'AVG(recall)' || metric === 'AVG(accuracy)' || metric === 'AVG(precision)' || metric === 'AVG(runtime)'
   ));
 
-  const renamedMetrics = { option1: 'AVG(recall)', option2: 'AVG(accuracy)',
-    option3: 'AVG(precision)', option4: 'AVG(runtime)',
+  const renamedMetrics = {
+    'AVG(recall)': 'Average Recall',
+    'AVG(accuracy)': 'Average Accuracy',
+    'AVG(precision)': 'Average Precision',
+    'AVG(runtime)': 'Average Runtime',
   };
 
 
@@ -154,7 +157,7 @@ const ParallelCoordinates = ({ className, ...otherProps }) => {
         <label htmlFor="colorMetricDropdown">Sort by:</label>
         <select id="colorMetricDropdown" value={colorMetric} onChange={handleColorMetricChange}>
           {otherProps.metrics.map(metric => (
-            <option key={metric} value={metric}>{metric}</option>
+            <option key={metric} value={metric}>{renamedMetrics[metric]}</option>
           ))}
         </select>
         <Button type="primary" onClick={handleSaveBestConfiguration}>Save Best Configuration</Button>
