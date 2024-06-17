@@ -1,69 +1,64 @@
+
 import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 import axios from "axios";
-import { IInitialization } from "../../shared/models/initialization.model";
-
-interface IExplainability {  
-    // loading: string;
-    // initLoading: boolean;
-    // explInitialization: IInitialization | null;
-    // error: string | null;
+import { IFilter, IDataExplorationRequest } from "../../shared/models/dataexploration.model";
+// Define the interface for the slice state
+interface IExploration {  
+    loading: boolean;
+    initLoading: boolean;
+    dataExploration: IDataExplorationRequest | null;
+    error: string | null;
 }
 
-const initialState: IExplainability = {
-    // loading: "false",
-    // initLoading: false,
-    // explInitialization: null, 
-    // error: null,
+// Define the initial state of the slice
+const initialState: IExploration = {
+    loading: false,
+    initLoading: false,
+    dataExploration: null, 
+    error: null,
 };
 
-// explainabilitySlice
+// Define the API path
+const apiPath = 'api/';
+
+// Create an async thunk for fetching data exploration
+export const fetchDataExploration = createAsyncThunk(
+    'dataExploration/fetchData',
+    async (payload: IDataExplorationRequest) => {
+        const requestUrl = `${apiPath}visualization/data`;
+        return axios.post<any>(requestUrl, payload).then((response) => response.data);
+        
+    }
+);
+
+// Create the slice
 export const dataExplorationSlice = createSlice({
     name: "dataExploration",
     initialState,
     reducers: {},
     extraReducers: (builder) => {
-        // builder.addCase(fetchInitialization.fulfilled, (state, action) => {
-        //     state.explInitialization = action.payload;
-        //     state.initLoading = false;
-        // })
-        // .addCase(fetchExplanation.fulfilled, (state, action) => {
-        //     state.explInitialization = handleGetExplanation(state.explInitialization, action.payload);
-        //     state.loading = "false"
-        // })
-        // .addCase(fetchExplanation.pending, (state) => {
-        //   state.loading = "true";
-        // })
-        // .addCase(fetchExplanation.rejected, (state) => {
-        //     state.loading = "false";
-        // })
-        // .addMatcher(isPending(fetchInitialization), (state) => {
-        //     state.initLoading = true;
-        // })
-        // .addMatcher(isRejected(fetchInitialization), (state) => {
-        //     state.initLoading = false;
-        //     state.error = "Failed to fetch data";
-        // })
+        builder
+            .addCase(fetchDataExploration.fulfilled, (state, action) => {
+                state.dataExploration = action.payload;
+                state.loading = false;
+                state.error = null;  // Clearing error on success
+
+                
+            })
+            .addCase(fetchDataExploration.pending, (state) => {
+                state.loading = true;
+                state.error = null;  // Resetting the error on new request
+
+
+              
+            })
+            .addCase(fetchDataExploration.rejected, (state, action) => {
+                state.initLoading = false;
+                state.error = action.error.message || "Failed to fetch data";
+            });
     }
 });
 
-//Thunk Calls for fetching data
-
-const apiPath = 'api/';
-
-// export const fetchInitialization = createAsyncThunk('explainability/fetch_initialization', async (payload: {modelName: string} ) => {
-//     const requestUrl = apiPath + "initialization";
-//     return axios.post<any>(requestUrl, payload).then((response) => response.data);
-// });
-
-// export const fetchExplanation = createAsyncThunk('explainability/fetch_explanation', 
-// async (payload: {explanationType: string, explanationMethod: string, model: string, feature1: string, feature2: string} ) => {
-//     const requestUrl = apiPath + "explainability";
-//     return axios.post<any>(requestUrl, payload).then((response) => response.data);
-// });
-
-
-//Reducer exports
-
+// Export the actions and reducer
 export const { } = dataExplorationSlice.actions
-
-export default dataExplorationSlice.reducer
+export default dataExplorationSlice.reducer;
