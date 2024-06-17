@@ -1,0 +1,3 @@
+Passing on topbar parameters the event handler. Selectopt.tss
+Passing the options to the the additional parameters. options.ts
+Fix the Api
