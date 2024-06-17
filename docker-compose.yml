@@ -1,0 +1,8 @@
+version: "3"
+name: "xxp"
+services:
+  frontend:
+    build:
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:80"
