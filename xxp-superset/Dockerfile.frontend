@@ -1,6 +1,0 @@
-# Use the Node version which is used upstream for the given Superset version
-ARG NODE_VERSION=16
-
-FROM node:${NODE_VERSION} AS builder
-
-WORKDIR /app
