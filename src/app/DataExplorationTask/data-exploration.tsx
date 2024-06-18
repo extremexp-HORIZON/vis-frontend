@@ -42,7 +42,6 @@ const DataExploration: React.FC = () => {
 };
   
  const karfotela= "file:///I2Cat_phising/dataset/test.csv";
-//  const karfotela="file:///Users/admin/Desktop/test.csv"
 
 const parts = karfotela.split('/');
 

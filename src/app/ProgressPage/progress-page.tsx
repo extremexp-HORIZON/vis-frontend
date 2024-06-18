@@ -50,27 +50,27 @@ const ProgressPage = () => {
             xs={12}
             sx={{
               px: 2,
-              pt: 1,
               bgcolor: grey[300],
               display: "flex",
               height: "3.5rem",
-              columnGap: 0,
+              columnGap: 1,
+              alignItems: "center",
             }}
           >
             <Button
               variant="text"
               sx={{
-                borderRadius: "20px 20px 0px 0px",
+                borderRadius: 20,
                 px: 2,
+                py: 1,
                 color: "black",
                 bgcolor: value === 0 ? "white" : grey[300],
                 border: value !== 0 ? `1px solid ${grey[400]}` : "none",
-                borderBottom: "none",
+                // borderBottom: "none",
                 fontSize: "0.8rem",
                 textTransform: "none",
                 ":hover": { bgcolor: value !== 0 ? grey[400] : "white" },
                 boxShadow: "0 0 -25px 0 #001f3f",
-                zIndex: value === 0 ? 100 : 1,
               }}
               size="small"
               disableRipple
@@ -80,17 +80,16 @@ const ProgressPage = () => {
             </Button>
             <Button
               sx={{
-                borderRadius: "20px 20px 0px 0px",
+                borderRadius: 20,
                 px: 2,
+                py: 1,
                 color: "black",
                 bgcolor: value === 1 ? "white" : grey[300],
                 border: value !== 1 ? `1px solid ${grey[400]}` : "none",
-                borderBottom: "none",
+                // borderBottom: "none",
                 fontSize: "0.8rem",
                 textTransform: "none",
                 ":hover": { bgcolor: value !== 1 ? grey[400] : "white" },
-                marginLeft: -1,
-                zIndex: value === 1 ? 100 : 1,
               }}
               size="small"
               disableRipple

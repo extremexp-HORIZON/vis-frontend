@@ -9,7 +9,6 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import FeatureExplainability from "./FeatureExpl/feature-explainability"
 import HyperparameterExplainability from "./HyperparamExpl/hyperparameter-explainability"
-import DataExploration from "../DataExplorationTask/data-exploration"
 import { defaultDataExplorationRequest } from "../../shared/models/dataexploration.model"
 
 const ExplainabilityTask = () => {
@@ -61,8 +60,8 @@ const ExplainabilityTask = () => {
     <>
       <Grid
         sx={{
-          maxWidth: "100vw",
-          minHeight: "100vh",
+          // maxWidth: "100vw",
+          // minHeight: "100vh",
           flexDirection: "column",
           display: "flex",
           justifyContent: initLoading ? "center" : "start",
