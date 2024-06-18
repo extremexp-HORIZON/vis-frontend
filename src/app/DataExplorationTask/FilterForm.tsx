@@ -4,11 +4,24 @@ import { grey } from '@mui/material/colors';
 import InfoIcon from "@mui/icons-material/Info"
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import { IFilter } from '../../shared/models/dataexploration.model';
 
+interface IFilterFormProps {
+  columns: {
+    field: string;
+    headerName: string;
+  }[];
+  onAddFilter: (filter: IFilter) => void;
+  onRemoveFilter: (index: number) => void;
+  filters: IFilter[];
+  onRemoveAllFilters: () => void;
+}
 
-const FilterForm = ({ columns, onAddFilter, onRemoveFilter, filters , onRemoveAllFilters}) => {
+const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemoveFilter, filters, onRemoveAllFilters }) => {
     const [selectedColumn, setSelectedColumn] = React.useState('');
     const [filterType, setFilterType] = React.useState('equals');
+    const [filterMin, setFilterMin] = useState(''); // Min value for range
+    const [filterMax, setFilterMax] = useState(''); // Max value for range
     const [filterValue, setFilterValue] = React.useState('');
     const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
     const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
@@ -23,15 +36,14 @@ const FilterForm = ({ columns, onAddFilter, onRemoveFilter, filters , onRemoveAl
     const handleAddFilter = () => {
       let value = {};
       if (filterType === 'equals') {
-        value = { value: filterValue };
+          value = { value: filterMin }; // Use filterMin as the value for equals
       } else if (filterType === 'range') {
-        const rangeParts = filterValue.split('-').map(part => part.trim());
-        if (rangeParts.length === 2) {
-          value = { min: rangeParts[0], max: rangeParts[1] };
-        } else {
-          alert("Please enter a valid range in the format 'min-max'.");
-          return; // Exit without adding the filter if format is incorrect
-        }
+          if (filterMin && filterMax) {
+              value = { min: filterMin, max: filterMax };
+          } else {
+              alert("Please enter both minimum and maximum values.");
+              return;
+          }
       };
   
       const newFilter = {
@@ -39,6 +51,9 @@ const FilterForm = ({ columns, onAddFilter, onRemoveFilter, filters , onRemoveAl
         type: filterType,
         value: value
       };
+
+
+      console.log('filtro',filters);
 
       
 
@@ -125,15 +140,33 @@ const FilterForm = ({ columns, onAddFilter, onRemoveFilter, filters , onRemoveAl
             <MenuItem value="range">Range</MenuItem>
           </Select>
         </FormControl>
-        <TextField
-          fullWidth
-        //   label="Value"
-        label={filterType === 'equals' ? "Value" : "Range (min-max)"}
-        placeholder={filterType === 'equals' ? "Enter value" : "e.g., 0-100"}
-          value={filterValue}
-          onChange={(e) => setFilterValue(e.target.value)}
-          margin="normal"
-        />
+        {filterType === 'range' ? (
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+
+                        <TextField
+                            fullWidth
+                            label="Minimum Value"
+                            value={filterMin}
+                            onChange={(e) => setFilterMin(e.target.value)}
+                            margin="normal"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Maximum Value"
+                            value={filterMax}
+                            onChange={(e) => setFilterMax(e.target.value)}
+                            margin="normal"
+                        />
+                    </Box>
+                ) : (
+                    <TextField
+                        fullWidth
+                        label="Value"
+                        value={filterMin} // Reuse filterMin for the 'equals' case
+                        onChange={(e) => setFilterValue(e.target.value)}
+                        margin="normal"
+                    />
+                )}
         <Button onClick={handleAddFilter} variant="text" color="primary">Add Filter</Button>
         <Button onClick={resetFilters} variant="text" color="secondary" >
             Clear Filters
@@ -141,7 +174,8 @@ const FilterForm = ({ columns, onAddFilter, onRemoveFilter, filters , onRemoveAl
         <Box>
         {filters.map((filter, index) => (
           <Box key={index} sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-      {filter.column} {filter.type} {filter.type === 'equals' ? filter.value.value : `${filter.value.min} to ${filter.value.max}`}
+      {filter.column} {filter.type} {filter.type === 'equals' ? (filter.value as { value?: string | number }).value : `${(filter.value as { min?: string | number }).min} to ${(filter.value as { max?: string | number }).max}`}
+      
       <Button onClick={() => onRemoveFilter(index)}>Remove</Button>
       
           </Box>

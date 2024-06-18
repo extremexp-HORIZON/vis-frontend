@@ -1,4 +1,5 @@
 export interface IDataExplorationRequest {
+    data(data: any): unknown;
     datasetId: string;
     columns: string[];
     aggFunction: string;
@@ -23,5 +24,8 @@ export const defaultDataExplorationRequest: IDataExplorationRequest = {
     aggFunction: '',
     filters: [],
     limit: 1000,
-    scaler: ''
+    scaler: '',
+    data: function (data: any): unknown {
+        throw new Error("Function not implemented.");
+    }
 };

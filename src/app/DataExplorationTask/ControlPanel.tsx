@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Drawer, TextField, Button, Box, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-
-const ControlPanel = ({ onPathSubmit }) => {
+const ControlPanel = ({ onPathSubmit }: { onPathSubmit: (path: string) => void }) => {
   const [useCase, setUseCase] = useState('');
   const [folder, setFolder] = useState('');
   const [subfolder, setSubfolder] = useState('');
@@ -64,3 +63,7 @@ const ControlPanel = ({ onPathSubmit }) => {
 };
 
 export default ControlPanel;
+
+
+
+

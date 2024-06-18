@@ -24,14 +24,14 @@ const DataExploration: React.FC = () => {
   const [chartType, setChartType] = useState('line'); // Default to line chart
   const [originalData, setOriginalData] = useState<any[]>([]); // Store original data
   const [isFullScreen, setIsFullScreen] = useState(false); // State to manage full-screen mode
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState<any[]>([]);
 
-  const handleAddFilter = (newFilter) => {
+  const handleAddFilter = (newFilter: number) => {
     setFilters([...filters, newFilter]);
     console.log('filters',filters);
   };
 
-  const handleRemoveFilter = (index) => {
+  const handleRemoveFilter = (index: number) => {
     const newFilters = [...filters];
     newFilters.splice(index, 1);
     setFilters(newFilters);
@@ -59,6 +59,9 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
         filters: filters,
         limit: limit,
         scaler: scaler,
+        data: function (data: any): unknown {
+          throw new Error('Function not implemented.');
+        }
       };
       dispatch(fetchDataExploration(requestData));
       setInitialSelectionDone(true);
@@ -79,23 +82,28 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
       filters: filters,
       limit: 1000,
       scaler: '',
+      data: function (data: any): unknown {
+        throw new Error('Function not implemented.');
+      }
     }));
   }, [dispatch,filters]);
 
   useEffect(() => {
     if (dataExploration) {
-      console.log('dataexp',dataExploration);
+      console.log('dataexp',dataExploration['data']);
       const parsedData = JSON.parse(dataExploration.data);
       setData(parsedData);
 
       const gridColumns: GridColDef[] = dataExploration.columns.map(col => ({
-        field: col.name,
-        headerName: col.name,
+        field: typeof col === 'string' ? col : (col as { name: string }).name,
+        headerName: typeof col === 'string' ? col : (col as { name: string }).name,
         width: 200,
-        type: col.type
+        type: (typeof col === 'string' ? col : (col as { type: string }).type) as GridColDef['type'], // Add explicit type casting here
       }));
+
+
       setColumns(gridColumns);
-      const timeCols = gridColumns.filter(col => col.type === 'LOCAL_DATE_TIME');
+      const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
       setAvailableTimeColumns(timeCols.map(col => col.field));
       setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
     }
@@ -114,18 +122,12 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
     fetchData();
   }, [selectedCols, datetimeColumn,filters]);
 
-  const handleColumnChange = (event) => {
-    setSelectedCols(event.target.value);
-  };
-
-  const handleTimeColumnChange = (event) => {
-    setDatetimeColumn(event.target.value);
-  };
-
-
 
   return (
     <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography variant="h6">Dataset Exploration: {filenameWithoutExtension}</Typography>
+      </Grid>
       {/* Data Exploration Chart at the top, taking full width */}
       <Grid item xs={12}>
         {!loading && data.length > 0 && (
@@ -140,10 +142,7 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
         )}
       </Grid>
 
-      {/* Dataset name and potentially other controls */}
-      <Grid item xs={12}>
-        <Typography variant="h6">Dataset Exploration: {filenameWithoutExtension}</Typography>
-      </Grid>
+      
 
       {/* Filters section */}
       <Grid item xs={3}>

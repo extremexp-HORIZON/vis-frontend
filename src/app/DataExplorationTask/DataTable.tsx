@@ -1,11 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
-import { Box, Button, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import { grey } from '@mui/material/colors';
-import { VegaLite } from 'react-vega';
 import InfoIcon from "@mui/icons-material/Info"
 
 
@@ -24,20 +23,23 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns,onUpdateData,onRese
     id: index + 1,
     ...row,
   }));
-  const [selectedRows, setSelectedRows] = React.useState([]);
+  // const [selectedRows, setSelectedRows] = React.useState([]);
   const [isVisible, setIsVisible] = useState(true);
   const [isMaximized, setIsMaximized] = useState(false);
 
-  const handleMinimize = () => {
-    setIsVisible(!isVisible); // Toggles visibility
+  const handleToggleVisibility = () => {
+    setIsVisible(!isVisible);
   };
 
   const handleMaximize = () => {
     setIsMaximized(!isMaximized); // Toggles maximization for the table
   };
 
-  const tableStyle = isMaximized ? { height: '90vh', width: '100%' } : { height: 400, width: '99%' };
-  useEffect(() => {
+  const tableStyle = {
+    height: isMaximized ? '90vh' : isVisible ? 400 : '50px', // Minimized height should be lesser
+    width: '100%'
+  };
+    useEffect(() => {
     console.log('Data:', data); // Log the current state of data
   }, [data]);
 
@@ -45,37 +47,44 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns,onUpdateData,onRese
     console.log('Columns:', columns); // Log the current state of columns
   }, [columns]);
 
-  if (!isVisible) return <IconButton onClick={handleMinimize}><MinimizeIcon /></IconButton>;
 
-  const CustomToolbar = ({ onUpdateData, selectedRows, onResetData }) => {
+  // const CustomToolbar = ({ onUpdateData, selectedRows, onResetData }) => {
+   
+  //   return (
+  //     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 1 }}>
+  //       <GridToolbar />
+        
+  //       {/* <Button
+  //       variant="text"
+  //       color="primary"
+  //       onClick={() => onUpdateData(selectedRows)}
+  //       // style={{ margin: '0 20px' }}
+  //       size="small"
+
+  //       >
+  //         Show Selected
+  //       </Button> */}
+  //       {/* <Button
+  //       variant="text"
+  //       color="primary"
+  //       onClick={onResetData}  // This uses the onResetData function passed as a prop
+  //       // style={{ margin: '0 20px' }}
+  //       size="small"
+  //       >
+  //         Reset View
+  //       </Button> */}
+  //    </Box>
+  //   );
+  // };
+  
+  const CustomToolbar = () => {
    
     return (
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 1 }}>
         <GridToolbar />
-        
-        {/* <Button
-        variant="text"
-        color="primary"
-        onClick={() => onUpdateData(selectedRows)}
-        // style={{ margin: '0 20px' }}
-        size="small"
-
-        >
-          Show Selected
-        </Button> */}
-        {/* <Button
-        variant="text"
-        color="primary"
-        onClick={onResetData}  // This uses the onResetData function passed as a prop
-        // style={{ margin: '0 20px' }}
-        size="small"
-        >
-          Reset View
-        </Button> */}
      </Box>
     );
   };
-  
   
 
 
@@ -106,12 +115,12 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns,onUpdateData,onRese
     <InfoIcon />
   </IconButton>
 </Tooltip>
-<IconButton onClick={handleMinimize} size="large">
-        <MinimizeIcon />
-      </IconButton>
-      <IconButton onClick={handleMaximize} size="large">
-        {isMaximized ? <FullscreenIcon /> : <FullscreenIcon />}
-      </IconButton>
+<IconButton onClick={handleToggleVisibility} size="large">
+          {isVisible ? <MinimizeIcon /> : <MinimizeIcon />}
+        </IconButton>
+        <IconButton onClick={handleMaximize} size="large">
+          <FullscreenIcon />
+        </IconButton>
 </Box>
 {isVisible && (
 <Box sx={{...tableStyle  }}>
@@ -123,24 +132,22 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns,onUpdateData,onRese
         columns={columns}
         // checkboxSelection
         slots={{
-          toolbar: () => <CustomToolbar onUpdateData={onUpdateData} selectedRows={selectedRows} onResetData={onResetData}  // Pass the reset function as a prop
-          />
+          toolbar: () => <CustomToolbar />
         }}
         onRowSelectionModelChange={(ids) => {
           const selectedIDs = new Set(ids);
           const selectedRows = rows.filter((row) =>
             selectedIDs.has(row.id),
           );
-          setSelectedRows(selectedRows);
+          // setSelectedRows([...selectedRows]);
         }}
         {...rows}
       />
     </Box>
 )}
-
     </Paper>
   );
-
 };
-
 export default DataTable;
+
+

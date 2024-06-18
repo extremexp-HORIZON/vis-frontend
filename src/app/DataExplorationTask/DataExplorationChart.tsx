@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Box, Paper, Switch, FormControlLabel, Typography, FormControl, Button, InputLabel, Select, MenuItem, OutlinedInput, Chip, TextField, Tooltip, IconButton, Grid } from '@mui/material';
+import { Box, Paper, Switch, FormControlLabel, Typography, FormControl, Button, InputLabel, Select, MenuItem, OutlinedInput, Chip, TextField, Tooltip, IconButton, Grid, SelectChangeEvent, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon'
 import InfoIcon from "@mui/icons-material/Info"
 import grey from '@mui/material/colors/grey';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import ChartControls from './ChartControls';
+import StatisticsDisplay from './StatisticsDisplay';
 
 interface Column {
     field: string;
@@ -31,8 +31,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [chartType, setChartType] = useState<'line' | 'bar'>('line');
     const [statistics, setStatistics] = useState({});
-    const [showStatistics, setShowStatistics] = useState(true);
-    const [vegaStats, setVegaStats] = useState([]);
+    const [showStatistics, setShowStatistics] = useState(false);
+    const [vegaStats, setVegaStats] = useState<{ column: string; type: string; value: number; }[]>([]);
     const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
     const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
     // const [chartView, setChartView] = useState<'linechart' | 'scatter'>('linechart');
@@ -69,10 +69,16 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         setIsMaximized(!isMaximized); // Toggles maximization of the chart area
     };
 
-    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setSelectedColumns(event.target.value as string[]);
-        setOpen(false); // Close the dropdown after selection
-    };
+    // const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    //     setSelectedColumns(event.target.value as string[]);
+    //     setOpen(false); // Close the dropdown after selection
+    // };
+
+    
+   const handleChange = (event: SelectChangeEvent<string[]>, child: React.ReactElement<any, any> | null):void => {
+    setSelectedColumns(event.target.value as string[]);
+    setOpen(false); // Close the dropdown after selection
+};
 
     const handleOpen = () => {
         setOpen(true);
@@ -85,14 +91,10 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
 
     const handleReset = () => {
         setSelectedColumns([initialSelectedColumn]);
-        // setStartDate(null);
-        // setEndDate(null);
+
         setMenuMode('overlay');
     };
 
-    
-
-    
     const spec: VisualizationSpec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": "Dynamic data visualization.",
@@ -101,11 +103,10 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         "height": 400,
         "data": { "values": filteredData },
         "params": [{
-                    "name": "grid",
-                    "select": "interval",
-                    "bind": "scales",
-                    
-                }],
+    "name": "grid",
+    "select": "interval",
+    "bind": "scales"
+  }],
         "encoding": {
             "x": { "field": datetimeColumn, "type": "temporal", "title": "Timestamp" },
             "y": { "field": "value", "type": "quantitative", "title": "Value","stack": mode === 'stack' ? 'zero' : null },
@@ -121,6 +122,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
                     ]
                 }
             },
+            
         
         ],
         "transform": [
@@ -129,6 +131,9 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
                 "as": ["variable", "value"]
             }
         ]
+    };
+    const handleShowStatistics = () => {
+        setShowStatistics(!showStatistics);
     };
 
     return (
@@ -149,14 +154,6 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
                 <Typography fontSize={"1rem"} fontWeight={600}>
                     Chart Viewer
                 </Typography>
-            {/* <Typography fontSize={"1rem"} fontWeight={600}>
-                    {chartView === 'linechart' ? 'Linechart Viewer' : 'Scatter View'}
-                </Typography>
-                <FormControlLabel
-                    control={<Switch checked={chartView === 'scatter'} onChange={(event) => setChartView(event.target.checked ? 'scatter' : 'linechart')} />}
-                    label={chartView === 'linechart' ? 'Linechart' : 'Scatter View'}
-                    sx={{ marginLeft: 'auto' }} // Moves the switch to the end of the box
-                /> */}
             <Box sx={{ flex: 1 }} />
 
             <Tooltip title={"Description not available"}>
@@ -172,127 +169,40 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
             </IconButton>
             </Box>
             {isVisible && (
-
-            <Box sx={{ width: "99%", px: 1 }}>
-
-                <FormControl sx={{ minWidth: 120 }}>
-                    <InputLabel id="demo-multiple-chip-label">Select Variables</InputLabel>
-                    <Select
-                    labelId="demo-multiple-chip-label"
-                    multiple
-                    value={selectedColumns}
-                    onChange={handleChange}
-                    input={<OutlinedInput id="select-multiple-chip" label="Select Variables" />}
-                    MenuProps={{
-                        PaperProps: {
-                            style: {
-                                maxHeight: 224,
-                                width: 250,
-                            },
-                        },
-                    }}
-                    open={open}
-                    onOpen={handleOpen}
-                    onClose={handleClose}
-                    renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value) => (
-                                <Chip 
-                                key={value} 
-                                label={value} 
-                                onDelete={() => handleChange({
-                                    target: { value: selected.filter(v => v !== value) } as any
-                                } as React.ChangeEvent<{ value: unknown }>)}/>
-                            ))}
-                        </Box>
-                    )}>
-                        {selectableColumns.map((column) => (
-                            <MenuItem key={column.field} value={column.field}>
-                                {column.headerName}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                {/* <LocalizationProvider dateAdapter={AdapterLuxon}>
-                    <DatePicker
-                    label="Start Date"
-                    value={startDate}
-                    onChange={(newDate: Date | null) => setStartDate(newDate)}
-                    />
-                    <DatePicker
-                    label="End Date"
-                    value={endDate}
-                    onChange={(newDate: Date | null) => setEndDate(newDate)}
-                    />
-                </LocalizationProvider> */}
-                <FormControlLabel control={
-                    <Switch
-                    checked={mode === 'stack'}
-                    onChange={(event) => setMode(event.target.checked ? 'stack' : 'overlay')}
-                    name="modeSwitch"
-                    color="primary"
-                    />
-                }        
-                label={mode.charAt(0).toUpperCase() + mode.slice(1)} // Capitalizes the first letter of the mode
-                />
-                <FormControlLabel
-                control={<Switch checked={chartType === 'bar'} onChange={(event) => setChartType(event.target.checked ? 'bar' : 'line')} name="chartTypeSwitch" color="primary" />}
-                label={chartType.charAt(0).toUpperCase() + chartType.slice(1)}
-                />
-                <Button 
-                variant="text" 
-                onClick={handleReset} 
-                sx={{ ml: 2 }} 
-                size="small"
-                >
-                Reset View
-                </Button>
-                <Button
-                    variant="text"
-                    onClick={() => setShowStatistics(!showStatistics)}
-                    sx={{ ml: 2 }}
-                    >
-                    {showStatistics ? 'Hide Statistics' : 'Show Statistics'}
-                </Button>
-            </Box>
-            )}
+                <ChartControls 
+                selectedColumns={selectedColumns}
+                handleChange={handleChange}
+                handleOpen={handleOpen}
+                handleClose={handleClose}
+                open={open}
+                selectableColumns={selectableColumns}
+                setMode={setMode}
+                mode={mode}
+                setChartType={setChartType}
+                setShowStatistics={setShowStatistics}
+                chartType={chartType}
+                showStatistics={showStatistics}
+                handleReset={handleReset}/> )}
             {isVisible && (
             <Box sx={{ width: "99%", px: 1 }}>
                 <VegaLite
                 spec={spec} 
                 style={{ width: "100%" }} />
             </Box>
-                    )}
-
-        
-            {showStatistics && isVisible && (
-
-
-            <Box sx={{ width: "100%", px: 1, py: 1 }}>
-                {Object.keys(statistics).map(column => (
-                    <Box key={column} sx={{ mb: 2 }}>
-                        <Typography variant="h6" sx={{ mb: 1 }}>Statistics for {column}</Typography>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} sm={2}>
-                                <Typography variant="body2">Mean: {statistics[column].mean.toFixed(2)}</Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={2}>
-                            <Typography variant="body2">Median: {statistics[column].median.toFixed(2)}</Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={2}>
-                            <Typography variant="body2">Min: {statistics[column].min.toFixed(2)}</Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={2}>
-                            <Typography variant="body2">Max: {statistics[column].max.toFixed(2)}</Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={2}>
-                            <Typography variant="body2">Standard Deviation: {statistics[column].stdDeviation.toFixed(2)}</Typography>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                ))}
-            </Box>
             )}
+
+<Dialog open={showStatistics} onClose={handleShowStatistics}>
+                <DialogTitle>Statistics</DialogTitle>
+                <DialogContent>
+                    <StatisticsDisplay statistics={statistics} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleShowStatistics}>Close</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* {showStatistics && isVisible && <StatisticsDisplay statistics={statistics} />} */}
+            
 
         </Paper>
     );
@@ -305,7 +215,7 @@ function setMenuMode(arg0: string) {
 }
 
 function calculateMultipleStatistics(data: any[], columns: string[]) {
-    const stats = {};
+    const stats: { [key: string]: { mean: number, median: number, min: number, max: number, stdDeviation: number } } = {};
     columns.forEach(column => {
       const values = data.map(item => Number(item[column])).filter(item => !isNaN(item));
       const mean = values.reduce((acc, cur) => acc + cur, 0) / values.length;
@@ -320,3 +230,6 @@ function calculateMultipleStatistics(data: any[], columns: string[]) {
     });
     return stats;
   }
+
+
+
