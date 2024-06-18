@@ -8,6 +8,7 @@ import grey from "@mui/material/colors/grey"
 import ParallelCoordinatePlot from "./parallel-coordinate-plot"
 import { useState } from "react"
 import WorkflowTab from "./WorkflowTab/workflow-tab"
+import ProgressPageTabs from "./progress-page-tabs"
 
 const ProgressPage = () => {
   const [value, setValue] = useState(0)
@@ -44,60 +45,7 @@ const ProgressPage = () => {
           </Box>
         </Box>
         <Box key="progress-tabs">
-          <Grid
-            className="dashboard-title"
-            item
-            xs={12}
-            sx={{
-              px: 2,
-              bgcolor: grey[300],
-              display: "flex",
-              height: "3.5rem",
-              columnGap: 1,
-              alignItems: "center",
-            }}
-          >
-            <Button
-              variant="text"
-              sx={{
-                borderRadius: 20,
-                px: 2,
-                py: 1,
-                color: "black",
-                bgcolor: value === 0 ? "white" : grey[300],
-                border: value !== 0 ? `1px solid ${grey[400]}` : "none",
-                // borderBottom: "none",
-                fontSize: "0.8rem",
-                textTransform: "none",
-                ":hover": { bgcolor: value !== 0 ? grey[400] : "white" },
-                boxShadow: "0 0 -25px 0 #001f3f",
-              }}
-              size="small"
-              disableRipple
-              onClick={handleChange(0)}
-            >
-              Experiment Overview
-            </Button>
-            <Button
-              sx={{
-                borderRadius: 20,
-                px: 2,
-                py: 1,
-                color: "black",
-                bgcolor: value === 1 ? "white" : grey[300],
-                border: value !== 1 ? `1px solid ${grey[400]}` : "none",
-                // borderBottom: "none",
-                fontSize: "0.8rem",
-                textTransform: "none",
-                ":hover": { bgcolor: value !== 1 ? grey[400] : "white" },
-              }}
-              size="small"
-              disableRipple
-              onClick={handleChange(1)}
-            >
-              Workflow1
-            </Button>
-          </Grid>
+          <ProgressPageTabs value={value} handleChange={handleChange} />
         </Box>
         <Box sx={{px: 5, displau: "flex", flexDirection: "column", mt: 3}}>
         {value === 0 &&  <ParallelCoordinatePlot /> }

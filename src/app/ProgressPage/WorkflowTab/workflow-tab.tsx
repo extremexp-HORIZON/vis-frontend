@@ -78,7 +78,7 @@ const WorkflowTab = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 1 }}>
       <Box
         key="workflow-details"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}

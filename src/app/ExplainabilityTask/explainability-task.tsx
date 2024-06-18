@@ -10,6 +10,8 @@ import Typography from "@mui/material/Typography"
 import FeatureExplainability from "./FeatureExpl/feature-explainability"
 import HyperparameterExplainability from "./HyperparamExpl/hyperparameter-explainability"
 import { defaultDataExplorationRequest } from "../../shared/models/dataexploration.model"
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from "@mui/material/IconButton"
 
 const ExplainabilityTask = () => {
   const { explInitialization, initLoading, tabs } = useAppSelector(
@@ -66,8 +68,19 @@ const ExplainabilityTask = () => {
           display: "flex",
           justifyContent: initLoading ? "center" : "start",
           textAlign: initLoading ? "center" : "start",
+          border: `1px solid ${grey[400]}`,
+          borderRadius: 3, overflow: "hidden",
         }}
       >
+      <Box sx={{bgcolor: grey[300], display: "flex", height: "3.5rem", alignItems: "center", textAlign: "left", px: 2}}>
+        <Typography fontSize={"1.2rem"}>
+          Model Training Task
+        </Typography>
+        <Box sx={{flex: 1}}/>
+        <IconButton>
+          <CloseIcon />
+        </IconButton>
+      </Box>
         {initLoading && explInitialization === null ? (
           <Box sx={{ height: "100%", width: "100%" }}>
             <CircularProgress size={"10rem"} />
