@@ -9,3 +9,6 @@ const WorkflowPlaceholder = () => {
             </Typography>
         </Box>
     )
+}
+
+export default WorkflowPlaceholder
