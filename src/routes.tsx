@@ -1,7 +1,7 @@
 import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom"
-import ExplainabilityTask from "./app/ExplainabilityTask/explainability-task";
+import ExplainabilityTask from "./app/Tasks/ExplainabilityTask/explainability-task";
 import ProgressPage from "./app/ProgressPage/progress-page";
-import DataExploration from "./app/DataExplorationTask/data-exploration";
+import DataExploration from "./app/Tasks/DataExplorationTask/data-exploration";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(

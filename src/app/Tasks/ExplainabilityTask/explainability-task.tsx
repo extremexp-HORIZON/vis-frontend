@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
-import { fetchInitialization } from "../../store/slices/explainabilitySlice"
+import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import { fetchInitialization } from "../../../store/slices/explainabilitySlice"
 import Grid from "@mui/material/Grid"
 import grey from "@mui/material/colors/grey"
 import DashboardTitle from "./explainability-header"
@@ -9,7 +9,7 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import FeatureExplainability from "./FeatureExpl/feature-explainability"
 import HyperparameterExplainability from "./HyperparamExpl/hyperparameter-explainability"
-import { defaultDataExplorationRequest } from "../../shared/models/dataexploration.model"
+import { defaultDataExplorationRequest } from "../../../shared/models/dataexploration.model"
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from "@mui/material/IconButton"
 

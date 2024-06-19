@@ -1,12 +1,12 @@
 import { Paper, TableContainer , Grid, Typography, Box, CircularProgress } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { fetchDataExploration } from '../../store/slices/dataExplorationSlice';
 import DataTable from './DataTable';
 import DataExplorationChart from './DataExplorationChart';
-import { IDataExplorationRequest } from '../../shared/models/dataexploration.model';
 import FilterForm from './FilterForm';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { IDataExplorationRequest } from '../../../shared/models/dataexploration.model';
+import { fetchDataExploration } from '../../../store/slices/dataExplorationSlice';
 
 const DataExploration: React.FC = () => {
 

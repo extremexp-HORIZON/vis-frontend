@@ -5,7 +5,6 @@ import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
 import { VegaLite } from "react-vega"
 import InfoIcon from "@mui/icons-material/Info"
-import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import grey from "@mui/material/colors/grey"
 import { useEffect, useState } from "react"
 

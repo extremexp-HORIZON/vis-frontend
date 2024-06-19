@@ -8,11 +8,10 @@ import FormControl from "@mui/material/FormControl"
 import Select from "@mui/material/Select"
 import MenuItem from "@mui/material/MenuItem"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import grey from "@mui/material/colors/grey"
-import { Checkbox, useTheme } from "@mui/material"
 import { VegaLite } from "react-vega"
 import _ from "lodash"
+import { Checkbox, useTheme } from "@mui/material"
 
 interface IInstanceClassification {
   plotData: any

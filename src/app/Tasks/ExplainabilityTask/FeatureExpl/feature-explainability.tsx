@@ -1,13 +1,14 @@
 import Box from "@mui/material/Box"
-import { useAppDispatch, useAppSelector } from "../../../store/store"
-import LinePlot from "../ExplainabilityItems/Plots/line-plot"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import Grid from "@mui/material/Grid"
-import { Typography } from "@mui/material"
-import InstanceClassification from "../ExplainabilityItems/Plots/instance-classification"
-import ConfusionMatrix from "../ExplainabilityItems/Plots/confusion-matrix"
 import { useState } from "react"
-import CounterfactualsTable from "../ExplainabilityItems/Tables/counterfactuals-table"
-import ClassificationStatistics from "../ExplainabilityItems/Tables/model-statistics"
+import CounterfactualsTable from "../../SharedItems/Tables/counterfactuals-table"
+import ClassificationStatistics from "../../SharedItems/Tables/model-statistics"
+import InstanceClassification from "../../SharedItems/Plots/instance-classification"
+import ConfusionMatrix from "../../SharedItems/Plots/confusion-matrix"
+import LinePlot from "../../SharedItems/Plots/line-plot"
+import ModelStatistics from "../../SharedItems/Tables/model-statistics"
+import Typography from "@mui/material/Typography"
 
 interface IFeatureExplainability {
   variantId: number
@@ -47,7 +48,7 @@ const FeatureExplainability = (props: IFeatureExplainability) => {
             >
               Summary
             </Typography>
-            <ClassificationStatistics
+            <ModelStatistics
               key={`ale-plot`}
               variantId={variantId}
               plotModel={

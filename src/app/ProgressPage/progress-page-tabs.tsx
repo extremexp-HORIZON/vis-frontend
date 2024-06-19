@@ -1,7 +1,9 @@
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
 import { grey } from "@mui/material/colors";
 import { useEffect, useRef, useState } from "react";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 
 interface IProgressPageTabs {
   value: number;
@@ -66,7 +68,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
           border: value !== 0 ? `1px solid ${grey[400]}` : "none",
           fontSize: "0.8rem",
           textTransform: "none",
-          ":hover": { bgcolor: value !== 0 ? grey[400] : "white" },
+          ":hover": { bgcolor: value !== 0 ? grey[500] : "white" },
           boxShadow: "0 0 -25px 0 #001f3f",
         }}
         size="small"
@@ -85,7 +87,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
           border: value !== 1 ? `1px solid ${grey[400]}` : "none",
           fontSize: "0.8rem",
           textTransform: "none",
-          ":hover": { bgcolor: value !== 1 ? grey[400] : "white" },
+          ":hover": { bgcolor: value !== 1 ? grey[500] : "white" },
         }}
         size="small"
         disableRipple

@@ -1,12 +1,12 @@
  import Grid from "@mui/material/Grid"
 import grey from "@mui/material/colors/grey"
 import { Dispatch, SetStateAction, useRef, useState } from "react"
-import { useAppDispatch, useAppSelector } from "../../store/store"
+import { useAppDispatch, useAppSelector } from "../../../store/store"
 import Button from "@mui/material/Button"
 import StarsIcon from "@mui/icons-material/Stars"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import red from "@mui/material/colors/red"
-import { deleteTab } from "../../store/slices/explainabilitySlice"
+import { deleteTab } from "../../../store/slices/explainabilitySlice"
 import IconButton from "@mui/material/IconButton"
 
 interface IDashboardTitle {

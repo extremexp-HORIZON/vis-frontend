@@ -9,35 +9,35 @@ import Select from "@mui/material/Select"
 import MenuItem from "@mui/material/MenuItem"
 import { SetStateAction, useEffect, useState } from "react"
 import FormControl from "@mui/material/FormControl"
+import { useTheme } from "@mui/material"
+import grey from "@mui/material/colors/grey"
 import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { fetchExplanation } from "../../../../store/slices/explainabilitySlice"
-import { useTheme } from "@mui/material"
 
 interface ILineplot {
-  width: string
   plotModel: IPlotModel | null
   options: string[]
 }
 
-const getVegaliteData = (plmodel: IPlotModel | null) => {
-  if (!plmodel) return []
-  const data: { [x: string]: string }[] = []
-  plmodel.xAxis.axisValues.forEach((val, idx) => {
-    data.push({
-      [plmodel.xAxis.axisName]: val,
-      [plmodel.yAxis.axisName]: plmodel.yAxis.axisValues[idx],
-    })
-  })
-  return data
-}
-
 const LinePlot = (props: ILineplot) => {
-  const { width, plotModel, options } = props
+  const { plotModel, options } = props
   const dispatch = useAppDispatch()
   const theme = useTheme();
   const [selectedFeature, setSelectedFeature] = useState<string>("")
   const [aggregateData, setAggregateData] = useState<boolean>(false)
+
+  const getVegaliteData = (plmodel: IPlotModel | null) => {
+    if (!plmodel) return []
+    const data: { [x: string]: string }[] = []
+    plmodel.xAxis.axisValues.forEach((val, idx) => {
+      data.push({
+        [plmodel.xAxis.axisName]: val,
+        [plmodel.yAxis.axisName]: plmodel.yAxis.axisValues[idx],
+      })
+    })
+    return data
+  }
 
   useEffect(() => {
     if (options.length > 0) {
@@ -66,14 +66,15 @@ const LinePlot = (props: ILineplot) => {
       elevation={2}
       sx={{
         borderRadius: 4,
-        width: width,
+        width: "inherit",
         display: "flex",
         flexDirection: "column",
         rowGap: 0,
         minWidth: "300px",
+        height: "100%",
       }}
     >
-      <Box sx={{ px: 1.5, pt: 1.5, display: "flex", alignItems: "center" }}>
+      <Box sx={{ px: 1.5, py: 0.5, display: "flex", alignItems: "center", borderBottom: `1px solid ${grey[400]}` }}>
         <Typography fontSize={"1rem"} fontWeight={600}>
           {plotModel?.plotName || "Plot name"}
         </Typography>

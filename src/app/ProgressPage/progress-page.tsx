@@ -1,4 +1,3 @@
-import { Button, IconButton } from "@mui/material"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
@@ -30,10 +29,10 @@ const ProgressPage = () => {
         }}
       >
         <Box key={"progress-page-title"} sx={{ width: "max-content", px: 2 }}>
-          <Box sx={{ display: "flex", borderBottom: `1px solid ${grey[500]}`, px: 2 }}>
-            <IconButton>
+          <Box sx={{ display: "flex", borderBottom: `1px solid ${grey[500]}` }}>
+            {/* <IconButton>
               <EditIcon />
-            </IconButton>
+            </IconButton> */}
             <Typography fontSize={"2rem"} sx={{ fontWeight: 600 }}>
               {"Experiment1"}
             </Typography>
