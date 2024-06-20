@@ -2,25 +2,21 @@ import React, { useState } from 'react';
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, OutlinedInput, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
-interface ChartControlsProps {
+interface ScatterControlsProps {
     selectedColumns: string[];
     handleChange: (event: React.ChangeEvent<{ value: string[] }>) => void;
     selectableColumns: { field: string; headerName: string }[];
-    setMode: (mode: 'stack' | 'overlay') => void;
-    mode: 'stack' | 'overlay';
-    setChartType: (chartType: 'line' | 'bar' ) => void;
     setShowStatistics: (showStatistics: boolean) => void;
-    chartType: 'line' | 'bar';
     showStatistics: boolean;
     handleReset: () => void;
     zoomable: 'yes' | 'no';
     setZoomable: (zoomable: 'yes' | 'no') => void;
-    
 }
 
-const ChartControls: React.FC<ChartControlsProps> = ({
-    selectedColumns, handleChange, selectableColumns, setMode, mode, setChartType,
-    chartType, showStatistics, handleReset, setShowStatistics, zoomable, setZoomable
+const ScatterControls: React.FC<ScatterControlsProps> = ({
+    selectedColumns, handleChange, selectableColumns,
+     showStatistics, handleReset, setShowStatistics,
+     zoomable,setZoomable
 }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -84,39 +80,6 @@ const ChartControls: React.FC<ChartControlsProps> = ({
                     <Button onClick={handleCloseDialog}>Close</Button>
                 </DialogActions>
             </Dialog>
-
-            <Button
-                variant={mode === 'stack' ? 'contained' : 'outlined'}
-                onClick={() => setMode('stack')}
-                color="primary"
-                sx={{ ml: 1 }}
-                size="small"
-            >
-                Stack
-            </Button>
-            <Button
-                variant={mode === 'overlay' ? 'contained' : 'outlined'}
-                onClick={() => setMode('overlay')}
-                color="primary"
-                sx={{ ml: 1 }}
-                size="small"
-            >
-                Overlay
-            </Button>
-            <FormControl variant="filled" sx={{ ml: 10 , minWidth: 100 }} size="small">
-                <InputLabel id="chart-type-label">Chart Type</InputLabel>
-                <Select
-                    labelId="chart-type-label"
-                    value={chartType}
-                    label="Chart Type"
-                    onChange={(event) => setChartType(event.target.value as 'line' | 'bar' )}
-                    size="small"
-                >
-                    <MenuItem value="bar">Bar</MenuItem>
-                    <MenuItem value="line">Line</MenuItem>
-                </Select>
-            </FormControl>
-
             <Button
                 variant="text"
                 onClick={handleReset}
@@ -132,7 +95,6 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             >
                 {showStatistics ? 'Hide Statistics' : 'Show Statistics'}
             </Button>
-
             <Button
                 variant={zoomable === 'yes' ? 'contained' : 'outlined'}
                 onClick={() => setZoomable(zoomable === 'yes' ? 'no' : 'yes')}
@@ -146,4 +108,4 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     );
 };
 
-export default ChartControls;
+export default ScatterControls;

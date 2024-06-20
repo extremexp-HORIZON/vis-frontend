@@ -29,13 +29,13 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const [chartType, setChartType] = useState<'line' | 'bar'>('line');
+    const [chartType, setChartType] = useState<'line' | 'bar' >('line');
     const [statistics, setStatistics] = useState({});
     const [showStatistics, setShowStatistics] = useState(false);
     const [vegaStats, setVegaStats] = useState<{ column: string; type: string; value: number; }[]>([]);
     const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
     const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
-    // const [chartView, setChartView] = useState<'linechart' | 'scatter'>('linechart');
+    const [zoomable, setZoomable] = useState<'yes' | 'no'>('no'); // State for zoomable toggle
 
     
     
@@ -69,11 +69,6 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         setIsMaximized(!isMaximized); // Toggles maximization of the chart area
     };
 
-    // const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    //     setSelectedColumns(event.target.value as string[]);
-    //     setOpen(false); // Close the dropdown after selection
-    // };
-
     
    const handleChange = (event: SelectChangeEvent<string[]>, child: React.ReactElement<any, any> | null):void => {
     setSelectedColumns(event.target.value as string[]);
@@ -95,43 +90,46 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         setMenuMode('overlay');
     };
 
-    const spec: VisualizationSpec = {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "description": "Dynamic data visualization.",
-        "width": "container",
-        "autosize": { "type": "fit", "contains": "padding", "resize": true },
-        "height": 400,
-        "data": { "values": filteredData },
-        "params": [{
-    "name": "grid",
-    "select": "interval",
-    "bind": "scales"
-  }],
-        "encoding": {
-            "x": { "field": datetimeColumn, "type": "temporal", "title": "Timestamp" },
-            "y": { "field": "value", "type": "quantitative", "title": "Value","stack": mode === 'stack' ? 'zero' : null },
-            "color": { "field": "variable", "type": "nominal", "title": "Variable" }
+    const spec: VisualizationSpec = useMemo(() => ({
+        width: "container",
+        autosize: { type: "fit", contains: "padding", resize: true },
+        height: 400,
+        data: { values: filteredData },
+        mark: chartType === 'line' ? { type: "line" } :
+               chartType === 'bar' ? { type: "bar" } :
+               { type: "point" },
+        encoding: {
+            x: { type: "temporal", field: datetimeColumn },
+            y: { type: "quantitative", field: "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
+            color: { field: "variable", type: "nominal", title: "Variable" },
+            tooltip: [
+                { field: "variable", type: "nominal" },
+                { field: "value", type: "quantitative" }
+            ]
         },
-        "layer": [
-            {
-                "mark": chartType === 'line' ? { "type": "line", "interpolate": "linear" } : { "type": "bar" },
-                "encoding": {
-                    "tooltip": [
-                        { "field": "variable", "type": "nominal" },
-                        { "field": "value", "type": "quantitative" }
-                    ]
-                }
+        selection: zoomable === 'yes' ? {
+            grid_x: {
+                type: "interval",
+                bind: "scales",
+                zoom: "wheel![event.ctrlKey]",
+                encodings: ["x"]
             },
-            
-        
-        ],
-        "transform": [
-            {
-                "fold": selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
-                "as": ["variable", "value"]
+            grid_y: {
+                type: "interval",
+                bind: "scales",
+                zoom: "wheel![!event.ctrlKey]",
+                encodings: ["y"]
             }
-        ]
-    };
+        } : undefined,
+        transform: [
+            {
+                fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
+                as: ["variable", "value"]
+            }
+        ],
+    }), [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable]);
+
+    
     const handleShowStatistics = () => {
         setShowStatistics(!showStatistics);
     };
@@ -182,6 +180,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
                 setShowStatistics={setShowStatistics}
                 chartType={chartType}
                 showStatistics={showStatistics}
+                zoomable={zoomable}
+                setZoomable={setZoomable}
                 handleReset={handleReset}/> )}
             {isVisible && (
             <Box sx={{ width: "99%", px: 1 }}>
@@ -231,5 +231,4 @@ function calculateMultipleStatistics(data: any[], columns: string[]) {
     return stats;
   }
 
-
-
+  

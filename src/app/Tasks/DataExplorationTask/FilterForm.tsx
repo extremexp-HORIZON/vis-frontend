@@ -4,7 +4,7 @@ import { grey } from '@mui/material/colors';
 import InfoIcon from "@mui/icons-material/Info"
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import { IFilter } from '../../shared/models/dataexploration.model';
+import { IFilter } from '../../../shared/models/dataexploration.model';
 
 interface IFilterFormProps {
   columns: {
@@ -22,7 +22,7 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
     const [filterType, setFilterType] = React.useState('equals');
     const [filterMin, setFilterMin] = useState(''); // Min value for range
     const [filterMax, setFilterMax] = useState(''); // Max value for range
-    const [filterValue, setFilterValue] = React.useState('');
+    const [filterValue, setFilterValue] = useState('');
     const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
     const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
     const handleMinimize = () => {
@@ -36,7 +36,7 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
     const handleAddFilter = () => {
       let value = {};
       if (filterType === 'equals') {
-          value = { value: filterMin }; // Use filterMin as the value for equals
+          value = { value: filterValue }; // Use filterMin as the value for equals
       } else if (filterType === 'range') {
           if (filterMin && filterMax) {
               value = { min: filterMin, max: filterMax };
@@ -162,7 +162,7 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
                     <TextField
                         fullWidth
                         label="Value"
-                        value={filterMin} // Reuse filterMin for the 'equals' case
+                        value={filterValue} // Reuse filterMin for the 'equals' case
                         onChange={(e) => setFilterValue(e.target.value)}
                         margin="normal"
                     />

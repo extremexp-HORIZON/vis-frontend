@@ -7,6 +7,7 @@ import FilterForm from './FilterForm';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { IDataExplorationRequest } from '../../../shared/models/dataexploration.model';
 import { fetchDataExploration } from '../../../store/slices/dataExplorationSlice';
+import ScatterPlot from './ScatterPlot';
 
 const DataExploration: React.FC = () => {
 
@@ -14,16 +15,13 @@ const DataExploration: React.FC = () => {
   const { dataExploration, loading, error } = useAppSelector(state => state.dataExploration);
   const [columns, setColumns] = useState<GridColDef[]>([]);
   const [data, setData] = useState<any[]>([]);
-  const [selectedCols, setSelectedCols] = useState<string[]>(["dns_interlog_time_q1"]);
-  const [initialSelectionDone, setInitialSelectionDone] = useState(false);
-  const [datetimeColumn, setDatetimeColumn] = useState<string>('timestamp');
+  const [selectedCols, setSelectedCols] = useState<string[]>([]);
+  const [datetimeColumn, setDatetimeColumn] = useState<string>('');
   const [availableTimeColumns, setAvailableTimeColumns] = useState<string[]>([]);
   const [granularity, setGranularity] = useState<string>('');
   const [limit, setLimit] = useState<number>(100);
   const [scaler, setScaler] = useState<string>('');
-  const [chartType, setChartType] = useState('line'); // Default to line chart
   const [originalData, setOriginalData] = useState<any[]>([]); // Store original data
-  const [isFullScreen, setIsFullScreen] = useState(false); // State to manage full-screen mode
   const [filters, setFilters] = useState<any[]>([]);
 
   const handleAddFilter = (newFilter: number) => {
@@ -64,7 +62,6 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
         }
       };
       dispatch(fetchDataExploration(requestData));
-      setInitialSelectionDone(true);
     }
   };
   const updateData = (newData: any[]) => {
@@ -106,6 +103,7 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
       const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
       setAvailableTimeColumns(timeCols.map(col => col.field));
       setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
+      setDatetimeColumn("");
     }
   }, [dataExploration]);
 
@@ -132,17 +130,19 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
       <Grid item xs={12}>
         {!loading && data.length > 0 && (
           <Paper elevation={3}>
-            <DataExplorationChart 
+          {datetimeColumn ? (
+            <DataExplorationChart
               data={data}
               columns={columns}
               datetimeColumn={datetimeColumn}
               selectedColumns={selectedCols}
             />
-          </Paper>
+          ) : (
+         <ScatterPlot data={data} columns={columns} />
+         )}
+        </Paper>
         )}
       </Grid>
-
-      
 
       {/* Filters section */}
       <Grid item xs={3}>
