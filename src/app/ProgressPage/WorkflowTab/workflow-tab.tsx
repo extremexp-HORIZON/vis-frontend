@@ -5,10 +5,20 @@ import WorkflowDetails from "./workflow-details"
 import WorkflowSvg from "./workflow-svg"
 import { useState } from "react"
 import Typography from "@mui/material/Typography"
+import WorkflowPlaceholder from "./workflow-placeholder"
+import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
 
 const WorkflowTab = () => {
 
-  const [choosenTask, setChoosenTask] = useState(null)
+  const [chosenTask, setChosenTask] = useState<string | null>(null)
+
+  const taskProvider = (taskId: string | null) => {
+    switch (taskId) {
+      case "data-exploration": return <DataExploration />
+      case "model-analysis": return <ModelAnalysisTask variantId={71} />
+      case null: return <WorkflowPlaceholder />
+    }
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 1 }}>
@@ -45,13 +55,13 @@ const WorkflowTab = () => {
         </Box>
       </Box>
       <Box key="workflow-svg">
-        <WorkflowSvg />
+        <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask}/>
       </Box>
       <Box key="workflow-task">
-        <ModelAnalysisTask variantId={71} />
+        {taskProvider(chosenTask)}
       </Box>
     </Box>
   )
 }
 
-export default WorkflowTab
+export default WorkflowTab;

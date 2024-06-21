@@ -3,8 +3,23 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import grey from "@mui/material/colors/grey"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
+import { Dispatch, SetStateAction } from "react"
+import Button from "@mui/material/Button"
+import blue from "@mui/material/colors/blue"
 
-const WorkflowSvg = () => {
+interface IWorkflowSvg {
+  chosenTask: string | null
+  setChosenTask: Dispatch<SetStateAction<string | null>>
+}
+
+const WorkflowSvg = (props: IWorkflowSvg) => {
+
+  const { chosenTask, setChosenTask } = props
+
+  const handleChange = (taskId: string) => () => {
+    chosenTask === taskId ? setChosenTask(null) : setChosenTask(taskId)
+  }
+
   return (
     <Box
       sx={{
@@ -15,23 +30,26 @@ const WorkflowSvg = () => {
         border: "1px solid #ddd",
         borderRadius: "8px",
         backgroundColor: "#fff",
+        flexWrap: "wrap",
       }}
     >
-      <Box
+      <Button
         sx={{
-          display: "flex",
-          alignItems: "center",
-          opacity: 0.5,
           borderRadius: 16,
-          border: `1px solid ${grey[400]}`,
-          p: 6,
+          p:6,
+          color: "black",
+          bgcolor: chosenTask !== "data-exploration" ? "transparent" : blue[500],
+          border: chosenTask !== "data-exploration" ? `1px solid ${blue[500]}` : "none",
+          fontSize: "0.8rem",
+          textTransform: "none",
+          ":hover": { bgcolor: chosenTask !== "data-exploration" ? blue[500] : "white" },
         }}
+        size="small"
+        disableRipple
+        onClick={handleChange("data-exploration")}
       >
-        <GridOnIcon />
-        <Typography variant="body2" sx={{ marginLeft: "8px" }}>
-          I2Cat Phishing
-        </Typography>
-      </Box>
+        Data Exploration
+      </Button>
       <ArrowForwardIcon sx={{ opacity: 0.5 }} />
       <Box
         sx={{
@@ -59,20 +77,23 @@ const WorkflowSvg = () => {
         <Typography variant="body2">Data Augmentation</Typography>
       </Box>
       <ArrowForwardIcon />
-      <Box
+      <Button
         sx={{
-          display: "flex",
-          alignItems: "center",
           borderRadius: 16,
-          border: `1px solid ${grey[900]}`,
-          opacity: 1,
-          p: 6,
+          p:6,
+          color: "black",
+          bgcolor: chosenTask !== "model-analysis" ? "transparent" : blue[500],
+          border: chosenTask !== "model-analysis" ? `1px solid ${blue[500]}` : "none",
+          fontSize: "0.8rem",
+          textTransform: "none",
+          ":hover": { bgcolor: chosenTask !== "model-analysis" ? blue[500] : "white" },
         }}
+        size="small"
+        disableRipple
+        onClick={handleChange("model-analysis")}
       >
-        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-          Model Training
-        </Typography>
-      </Box>
+        Model Analysis
+      </Button>
     </Box>
   )
 }
