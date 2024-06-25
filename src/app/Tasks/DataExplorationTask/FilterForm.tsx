@@ -24,7 +24,9 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
     const [filterMax, setFilterMax] = useState(''); // Max value for range
     const [filterValue, setFilterValue] = useState('');
     const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
+    
     const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
+    
     const handleMinimize = () => {
         setIsVisible(!isVisible); // Toggles the visibility of the chart
     };

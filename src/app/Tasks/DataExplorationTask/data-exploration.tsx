@@ -1,4 +1,4 @@
-import { Paper, TableContainer , Grid, Typography, Box, CircularProgress } from '@mui/material';
+import { Paper, TableContainer , Grid, Typography, Box, CircularProgress, IconButton } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import DataTable from './DataTable';
@@ -8,6 +8,8 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { IDataExplorationRequest } from '../../../shared/models/dataexploration.model';
 import { fetchDataExploration } from '../../../store/slices/dataExplorationSlice';
 import ScatterPlot from './ScatterPlot';
+import CloseIcon from "@mui/icons-material/Close"
+
 
 const DataExploration: React.FC = () => {
 
@@ -103,7 +105,7 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
       const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
       setAvailableTimeColumns(timeCols.map(col => col.field));
       setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
-      setDatetimeColumn("");
+      // setDatetimeColumn("");
     }
   }, [dataExploration]);
 
@@ -122,62 +124,76 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
 
 
   return (
+    <Paper elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #ccc' }}>
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography variant="h6">Dataset Exploration: {filenameWithoutExtension}</Typography>
+        <Box sx={{ bgcolor: '#f0f0f0', display: 'flex', alignItems: 'center', height: '3.5rem', px: 2 }}>
+          <Typography variant="h6">Dataset Exploration: {filenameWithoutExtension}</Typography>
+          <Box sx={{ flex: 1 }} />
+          {/* Optionally add a close button if necessary */}
+          <IconButton>
+            <CloseIcon />
+          </IconButton>
+        </Box>
       </Grid>
-      {/* Data Exploration Chart at the top, taking full width */}
+
+      {/* Data Exploration Chart */}
       <Grid item xs={12}>
         {!loading && data.length > 0 && (
-          <Paper elevation={3}>
-          {datetimeColumn ? (
-            <DataExplorationChart
-              data={data}
-              columns={columns}
-              datetimeColumn={datetimeColumn}
-              selectedColumns={selectedCols}
-            />
-          ) : (
-         <ScatterPlot data={data} columns={columns} />
-         )}
-        </Paper>
+          <Paper elevation={0} sx={{ mb: 2 }}>
+            {datetimeColumn ? (
+              <DataExplorationChart
+                data={data}
+                columns={columns}
+                datetimeColumn={datetimeColumn}
+                selectedColumns={selectedCols}
+              />
+            ) : (
+              <ScatterPlot data={data} columns={columns} />
+            )}
+          </Paper>
         )}
+        {loading && <CircularProgress />}
+        {error && <Typography color="error">Error: {error}</Typography>}
       </Grid>
 
       {/* Filters section */}
-      <Grid item xs={3}>
-        <Paper elevation={3}>
-          <FilterForm
-            columns={columns}
-            onAddFilter={handleAddFilter}
-            onRemoveFilter={handleRemoveFilter}
-            onRemoveAllFilters={handleRemoveAllFilters}
-            filters={filters}
-          />
-        </Paper>
-      </Grid>
+      <Grid item xs={12}>
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <Paper elevation={0} sx={{ mb: 2 }}>
+              <FilterForm
+                columns={columns}
+                onAddFilter={handleAddFilter}
+                onRemoveFilter={handleRemoveFilter}
+                onRemoveAllFilters={handleRemoveAllFilters}
+                filters={filters}
+              />
+            </Paper>
+          </Grid>
 
-      {/* Data table section */}
-      <Grid item xs={9}>
-        <Paper elevation={3}>
-          <TableContainer component={Paper}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {loading && <CircularProgress />}
-              {error && <Typography color="error">Error: {error}</Typography>}
-              {data.length > 0 && (
-                <DataTable 
-                  data={data} 
-                  columns={columns}
-                  onUpdateData={updateData}
-                  onResetData={resetData}
-                />
-              )}
-            </Box>
-          </TableContainer>
-        </Paper>
+          {/* Data table section */}
+          <Grid item xs={9}>
+            <Paper elevation={0} sx={{ mb: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {loading && <CircularProgress />}
+                {error && <Typography color="error">Error: {error}</Typography>}
+                {data.length > 0 && (
+                  <DataTable
+                    data={data}
+                    columns={columns}
+                    onUpdateData={updateData}
+                    onResetData={resetData}
+                  />
+                )}
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
-  );
+  </Paper>
+);
 };
 
 export default DataExploration;

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Box, Paper, Switch, FormControlLabel, Typography, FormControl, Button, InputLabel, Select, MenuItem, OutlinedInput, Chip, TextField, Tooltip, IconButton, Grid, SelectChangeEvent, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Box, Paper, Switch, FormControlLabel, Typography, FormControl, Button, InputLabel, Select, MenuItem, OutlinedInput, Chip, TextField, Tooltip, IconButton, Grid, SelectChangeEvent, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar } from '@mui/material';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import InfoIcon from "@mui/icons-material/Info"
 import grey from '@mui/material/colors/grey';
@@ -29,16 +29,21 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const [chartType, setChartType] = useState<'line' | 'bar' >('line');
+    // const [chartType, setChartType] = useState<'line' | 'bar' >('line');
+    const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'heatmap'>('line');
+
     const [statistics, setStatistics] = useState({});
     const [showStatistics, setShowStatistics] = useState(false);
     const [vegaStats, setVegaStats] = useState<{ column: string; type: string; value: number; }[]>([]);
     const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
     const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
-    const [zoomable, setZoomable] = useState<'yes' | 'no'>('no'); // State for zoomable toggle
+    const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
 
-    
-    
+    const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
+  const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
+  
+  const [alerts, setAlerts] = useState<{ column: string, threshold: number }[]>([]);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
     useEffect(() => {
         if (selectedColumns.length && data.length) {
             const newStats = calculateMultipleStatistics(data, selectedColumns);
@@ -90,48 +95,197 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         setMenuMode('overlay');
     };
 
-    const spec: VisualizationSpec = useMemo(() => ({
-        width: "container",
-        autosize: { type: "fit", contains: "padding", resize: true },
-        height: 400,
-        data: { values: filteredData },
-        mark: chartType === 'line' ? { type: "line" } :
-               chartType === 'bar' ? { type: "bar" } :
-               { type: "point" },
-        encoding: {
+
+
+    const handleRollingAverageToggle = () => {
+        setShowRollingAverage(!showRollingAverage);
+      };
+    
+      const handleRollingAverageWindowChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRollingAverageWindow(Number(event.target.value));
+      };
+
+      
+      useEffect(() => {
+        alerts.forEach(alert => {
+          data.forEach(item => {
+            switch (alert.condition) {
+              case 'equals':
+                if (item[alert.column] === alert.value) {
+                  setAlertMessage(`Alert: ${alert.column} equals ${alert.value}`);
+                }
+                break;
+              case 'exceeds':
+                if (item[alert.column] > alert.value) {
+                  setAlertMessage(`Alert: ${alert.column} exceeds ${alert.value}`);
+                }
+                break;
+              case 'less than':
+                if (item[alert.column] < alert.value) {
+                  setAlertMessage(`Alert: ${alert.column} is less than ${alert.value}`);
+                }
+                break;
+              case 'greater than':
+                if (item[alert.column] > alert.value) {
+                  setAlertMessage(`Alert: ${alert.column} is greater than ${alert.value}`);
+                }
+                break;
+              case 'range':
+                const { min, max } = alert.value as { min: number, max: number };
+                if (item[alert.column] >= min && item[alert.column] <= max) {
+                  setAlertMessage(`Alert: ${alert.column} is in range ${min} to ${max}`);
+                }
+                break;
+              default:
+                break;
+            }
+          });
+        });
+      }, [data, alerts]);
+    
+
+      const spec: VisualizationSpec = useMemo(() => {
+        const baseTransform = [
+          {
+            fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
+            as: ["variable", "value"]
+          }
+        ];
+    
+        const rollingAverageTransform = showRollingAverage ? [
+          {
+            window: [{ op: "mean", field: "value", as: "rolling_mean" }],
+            frame: [-rollingAverageWindow + 1, 0],
+            groupby: ["variable"]
+          }
+        ] : [];
+    
+        const finalTransform = [...baseTransform, ...rollingAverageTransform];
+    
+        return {
+          width: "container",
+          autosize: { type: "fit", contains: "padding", resize: true },
+          height: 400,
+          data: { values: filteredData },
+          params: [
+            {
+              name: "interpolate",
+              value: "linear",
+              bind: {
+                input: "select",
+                options: [
+                  "basis",
+                  "linear",
+                  "natural",
+                  "step",
+                  "step-after",
+                  "step-before"
+                ]
+              }
+            },
+          ],
+          mark: chartType === 'line' ? { type: "line", interpolate: { expr: "interpolate" } } :
+            chartType === 'bar' ? { type: "bar" } :
+              chartType === 'area' ? { type: "area" } :
+                { type: "point", tooltip: true },
+          encoding: {
             x: { type: "temporal", field: datetimeColumn },
-            y: { type: "quantitative", field: "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
+            y: { type: "quantitative", field: showRollingAverage ? "rolling_mean" : "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
             color: { field: "variable", type: "nominal", title: "Variable" },
             tooltip: [
-                { field: "variable", type: "nominal" },
-                { field: "value", type: "quantitative" }
+              { field: "variable", type: "nominal" },
+              { field: showRollingAverage ? "rolling_mean" : "value", type: "quantitative" }
             ]
-        },
-        selection: zoomable === 'yes' ? {
+          },
+          selection: zoomable === 'yes' ? {
             grid_x: {
-                type: "interval",
-                bind: "scales",
-                zoom: "wheel![event.ctrlKey]",
-                encodings: ["x"]
+              type: "interval",
+              bind: "scales",
+              zoom: "wheel![event.ctrlKey]",
+              encodings: ["x"]
             },
             grid_y: {
-                type: "interval",
-                bind: "scales",
-                zoom: "wheel![!event.ctrlKey]",
-                encodings: ["y"]
+              type: "interval",
+              bind: "scales",
+              zoom: "wheel![!event.ctrlKey]",
+              encodings: ["y"]
             }
-        } : undefined,
-        transform: [
-            {
-                fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
-                as: ["variable", "value"]
-            }
-        ],
-    }), [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable]);
+          } : undefined,
+          transform: finalTransform,
+        };
+      }, [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable, showRollingAverage, rollingAverageWindow]);
+
+    //     const spec: VisualizationSpec = useMemo(() => ({
+    //         width: "container",
+    //         autosize: { type: "fit", contains: "padding", resize: true },
+    //         height: 400,
+    //         data: { values: filteredData },
+    //         params: [
+    //             {
+    //                 name: "interpolate",
+    //                 value: "linear",
+    //                 bind: {
+    //                     input: "select",
+    //                     options: [
+    //                     "basis",
+    //                     "linear",
+    //                     "natural",
+    //                     "step",
+    //                     "step-after",
+    //                     "step-before"
+    //                     ]
+    //                 }
+    //             },
+                
+        
+    //   ],
+
+    
+    //         mark: chartType === 'line' ? { type: "line",interpolate: {expr: "interpolate"}} :
+    //                chartType === 'bar' ? { type: "bar" } :
+    //                { type: "point" ,  tooltip: true},
+
+
+    //         encoding: {
+    //             x: { type: "temporal", field: datetimeColumn },
+    //             y: { type: "quantitative", field: "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
+    //             color: { field: "variable", type: "nominal", title: "Variable" },
+    //             tooltip: [
+    //                 { field: "variable", type: "nominal" },
+    //                 { field: "value", type: "quantitative" }
+    //             ]
+    //         },
+    //         selection: zoomable === 'yes' ? {
+    //             grid_x: {
+    //                 type: "interval",
+    //                 bind: "scales",
+    //                 zoom: "wheel![event.ctrlKey]",
+    //                 encodings: ["x"]
+    //             },
+    //             grid_y: {
+    //                 type: "interval",
+    //                 bind: "scales",
+    //                 zoom: "wheel![!event.ctrlKey]",
+    //                 encodings: ["y"]
+    //             }
+    //         } : undefined,
+    //         transform: [
+    //             {
+    //                 fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
+    //                 as: ["variable", "value"]
+    //             }
+    //         ],
+    //     }), [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable]);
 
     
     const handleShowStatistics = () => {
         setShowStatistics(!showStatistics);
+    };
+
+
+  
+    const handleAlertClose = () => {
+      setAlertMessage(null);
     };
 
     return (
@@ -182,7 +336,15 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
                 showStatistics={showStatistics}
                 zoomable={zoomable}
                 setZoomable={setZoomable}
-                handleReset={handleReset}/> )}
+                handleReset={handleReset}
+                handleRollingAverageWindowChange={handleRollingAverageWindowChange}
+                handleRollingAverageToggle={handleRollingAverageToggle}
+                showRollingAverage={showRollingAverage}
+          rollingAverageWindow={rollingAverageWindow}
+          alerts={alerts}
+          setAlerts={setAlerts}
+
+                /> )}
             {isVisible && (
             <Box sx={{ width: "99%", px: 1 }}>
                 <VegaLite
@@ -202,8 +364,17 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
             </Dialog>
 
             {/* {showStatistics && isVisible && <StatisticsDisplay statistics={statistics} />} */}
-            
-
+            <Snackbar
+        open={!!alertMessage}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        message={alertMessage}
+        action={
+          <Button color="inherit" size="small" onClick={handleAlertClose}>
+            Close
+          </Button>
+        }
+      />
         </Paper>
     );
 };
