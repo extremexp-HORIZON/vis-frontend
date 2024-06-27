@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, OutlinedInput, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, OutlinedInput, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, SelectChangeEvent } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 interface ScatterControlsProps {
     selectedColumns: string[];
-    handleChange: (event: React.ChangeEvent<{ value: string[] }>) => void;
+    handleChange: (event: SelectChangeEvent<string[]>) => void;
     selectableColumns: { field: string; headerName: string }[];
     setShowStatistics: (showStatistics: boolean) => void;
     showStatistics: boolean;

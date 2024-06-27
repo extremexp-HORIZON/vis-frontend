@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, OutlinedInput, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Switch, TextField, Typography, Tab, Tabs } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, OutlinedInput, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Switch, TextField, Typography, Tab, Tabs, SelectChangeEvent } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 interface ChartControlsProps {
     selectedColumns: string[];
-    handleChange: (event: React.ChangeEvent<{ value: string[] }>) => void;
+    handleChange: (event: SelectChangeEvent<string[]>) => void;
     selectableColumns: { field: string; headerName: string }[];
     setMode: (mode: 'stack' | 'overlay') => void;
     mode: 'stack' | 'overlay';

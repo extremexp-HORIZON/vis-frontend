@@ -6,7 +6,7 @@ import { IFilter, IDataExplorationRequest } from "../../shared/models/dataexplor
 interface IExploration {  
     loading: boolean;
     initLoading: boolean;
-    dataExploration: IDataExplorationRequest | null;
+    dataExploration: {data: any, [key: string]: any} | null;
     error: string | null;
 }
 

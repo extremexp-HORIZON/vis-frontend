@@ -44,7 +44,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               value: 71,
             },
           ],
-          limit: 10000,
+          limit: 1000,
         },
         modelConfusionQuery: {
           ...defaultDataExplorationRequest,
@@ -107,29 +107,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               my: "3rem",
             }}
           >
-            <Box
-              sx={{
-                width: "100%",
-                columnGap: 1,
-                rowGap: 4,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 600, fontSize: "1.5rem" }}
-              >
-                Summary
-              </Typography>
-              <ModelStatistics
-                key={`ale-plot`}
-                variantId={variantId}
-                plotModel={
-                  explInitialization.hyperparameterExplanation.pipelineMetrics
-                }
-              />
-            </Box>
             <Box
               sx={{
                 width: "100%",

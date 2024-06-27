@@ -61,6 +61,7 @@ const ContourPlot = (props: ILineplot) => {
             featureNumber === 1 ? e.target.value : selectedFeature1 || "",
           feature2:
             featureNumber === 2 ? e.target.value : selectedFeature2 || "",
+          plotType: plmodel?.plotType || "",
         }),
       )
       featureNumber === 1

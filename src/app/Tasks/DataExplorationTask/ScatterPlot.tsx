@@ -18,7 +18,7 @@ interface Column {
 interface ScatterPlotProps {
     data: any[];
     columns: Column[];
-    datetimeColumn: string;
+    // datetimeColumn: string;
 }
 
 const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, columns }) => {
@@ -61,7 +61,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, columns }) => {
         setIsMaximized(!isMaximized); // Toggles maximization of the chart area
     };
 
-    const handleChange = (event: SelectChangeEvent<string[]>, child: React.ReactElement<any, any> | null): void => {
+    const handleChange = (event: SelectChangeEvent<string[]>) => {
         setSelectedColumns(event.target.value as string[]);
         setOpen(false); // Close the dropdown after selection
     };

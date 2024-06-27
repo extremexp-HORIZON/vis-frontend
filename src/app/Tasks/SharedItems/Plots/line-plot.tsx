@@ -22,10 +22,9 @@ interface ILineplot {
 
 const LinePlot = (props: ILineplot) => {
   const { plotModel, options } = props
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const theme = useTheme();
   const [selectedFeature, setSelectedFeature] = useState<string>("")
-  const [aggregateData, setAggregateData] = useState<boolean>(false)
 
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return []
@@ -55,6 +54,7 @@ const LinePlot = (props: ILineplot) => {
           model: plmodel?.explainabilityModel || "",
           feature1: e.target.value || "",
           feature2: plmodel?.features.feature2 || "",
+          plotType: plmodel?.plotType || "",
         }),
       )
       setSelectedFeature(e.target.value)

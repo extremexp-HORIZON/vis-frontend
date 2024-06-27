@@ -11,7 +11,7 @@ interface IFilterFormProps {
     field: string;
     headerName: string;
   }[];
-  onAddFilter: (filter: IFilter) => void;
+  onAddFilter: (filter: any) => void;
   onRemoveFilter: (index: number) => void;
   filters: IFilter[];
   onRemoveAllFilters: () => void;
@@ -52,6 +52,10 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
         column: selectedColumn,
         type: filterType,
         value: value
+      } as {
+        column: string;
+        type: string;
+        value: any;
       };
 
 

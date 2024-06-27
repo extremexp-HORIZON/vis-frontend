@@ -1,21 +1,40 @@
 import { IDataExplorationRequest } from "./dataexploration.model";
-import { IInitialization } from "./initialization.model";
+import { IModelAnalysisTask } from "./modelAnalysisTask.model";
 
-export interface workflowTabModel {
+export interface IWorkflowTabModel {
+    workflowId: null | string;
     workflowDetails: {
-        data: {[key: string]: number}
+        data: {[key: string]: number} | null
         loading: boolean;
     }
     workflowMetrics: {
-        data: {[key: string]: number}
+        data: {[key: string]: number} | null
         loading: boolean;
     }
     workflowSvg: {
-        data: string;
+        data: string | null
         loading: boolean;
     }
     workflowTasks: {
-        modelAnalysis?: IInitialization;
+        modelAnalysis?: IModelAnalysisTask;
         dataExploration?: IDataExplorationRequest;
+    }
+}
+
+export const defaultWorkflowTabModel: IWorkflowTabModel = {
+    workflowId: null,
+    workflowDetails: {
+        data: null,
+        loading: true
+    },
+    workflowMetrics: {
+        data: null,
+        loading: true
+    },
+    workflowSvg: {
+        data: null,
+        loading: true
+    },
+    workflowTasks: {
     }
 }

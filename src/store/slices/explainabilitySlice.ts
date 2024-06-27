@@ -114,7 +114,7 @@ export const fetchInitialization = createAsyncThunk('explainability/fetch_initia
 });
 
 export const fetchExplanation = createAsyncThunk('explainability/fetch_explanation', 
-async (payload: {explanationType: string, explanationMethod: string, model: string, feature1: string, feature2: string} ) => {
+  async (payload: {explanationType: string, explanationMethod: string, model: string, feature1: string, feature2: string, plotType: string} ) => {
     const requestUrl = apiPath + "explainability";
     return axios.post<any>(requestUrl, payload).then((response) => response.data);
 });

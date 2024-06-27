@@ -15,7 +15,7 @@ const DataExploration: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const { dataExploration, loading, error } = useAppSelector(state => state.dataExploration);
-  const [columns, setColumns] = useState<GridColDef[]>([]);
+  const [columns, setColumns] = useState<any[]>([]);
   const [data, setData] = useState<any[]>([]);
   const [selectedCols, setSelectedCols] = useState<string[]>([]);
   const [datetimeColumn, setDatetimeColumn] = useState<string>('');
@@ -59,9 +59,9 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
         filters: filters,
         limit: limit,
         scaler: scaler,
-        data: function (data: any): unknown {
-          throw new Error('Function not implemented.');
-        }
+        // data: function (data: any): unknown {
+        //   throw new Error('Function not implemented.');
+        // }
       };
       dispatch(fetchDataExploration(requestData));
     }
@@ -81,19 +81,19 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
       filters: filters,
       limit: 1000,
       scaler: '',
-      data: function (data: any): unknown {
-        throw new Error('Function not implemented.');
-      }
+      // data: function (data: any): unknown {
+      //   throw new Error('Function not implemented.');
+      // }
     }));
   }, [dispatch,filters]);
 
   useEffect(() => {
     if (dataExploration) {
-      console.log('dataexp',dataExploration['data']);
+      // console.log('dataexp',dataExploration['data']);
       const parsedData = JSON.parse(dataExploration.data);
       setData(parsedData);
 
-      const gridColumns: GridColDef[] = dataExploration.columns.map(col => ({
+      const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
         field: typeof col === 'string' ? col : (col as { name: string }).name,
         headerName: typeof col === 'string' ? col : (col as { name: string }).name,
         width: 200,
@@ -181,7 +181,7 @@ return (
                       data={data}
                       columns={columns}
                       datetimeColumn={datetimeColumn}
-                      selectedColumns={selectedCols}
+                      // selectedColumns={selectedCols}
                     />
                   ) : (
                     <ScatterPlot data={data} columns={columns} />

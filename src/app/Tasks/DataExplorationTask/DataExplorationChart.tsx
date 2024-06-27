@@ -62,7 +62,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     });
       
     
-      const spec: VisualizationSpec = useMemo(() => {
+      const spec = useMemo(() => {
         const baseTransform = [
           {
             fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
@@ -126,7 +126,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     };
 
     
-   const handleChange = (event: SelectChangeEvent<string[]>, child: React.ReactElement<any, any> | null):void => {
+   const handleChange = (event: SelectChangeEvent<string[]>) => {
     setSelectedColumns(event.target.value as string[]);
     setOpen(false); // Close the dropdown after selection
 };
@@ -193,9 +193,9 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
                 <ChartControls 
                 selectedColumns={selectedColumns}
                 handleChange={handleChange}
-                handleOpen={handleOpen}
-                handleClose={handleClose}
-                open={open}
+                // handleOpen={handleOpen}
+                // handleClose={handleClose}
+                // open={open}
                 selectableColumns={selectableColumns}
                 setMode={setMode}
                 mode={mode}
@@ -216,7 +216,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
             {isVisible && (
             <Box sx={{ width: "99%", px: 1 }}>
                 <VegaLite
-                spec={spec} 
+                spec={spec as VisualizationSpec} 
                 style={{ width: "100%" }} />
             </Box>
             )}

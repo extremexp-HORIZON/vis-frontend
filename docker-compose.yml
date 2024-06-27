@@ -5,4 +5,4 @@ services:
     build:
       dockerfile: ./Dockerfile
     ports:
-      - "8080:80"
+      - "5173:80"
