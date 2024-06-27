@@ -1,4 +1,4 @@
-import { Paper, TableContainer , Grid, Typography, Box, CircularProgress, IconButton } from '@mui/material';
+import { Paper, TableContainer , Grid, Typography, Box, CircularProgress, IconButton, Tab, Tabs } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import DataTable from './DataTable';
@@ -123,77 +123,82 @@ const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
   }, [selectedCols, datetimeColumn,filters]);
 
 
-  return (
-    <Paper elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #ccc' }}>
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+return (
+<Paper elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #ccc' }}>
+  <Box sx={{ bgcolor: '#f0f0f0', display: 'flex', alignItems: 'center', height: '3.5rem', px: 2 }}>
+    <Typography variant="h6">Dataset Exploration: {filenameWithoutExtension}</Typography>
+    <Box sx={{ flex: 1 }} />
+        <IconButton>
+          <CloseIcon />
+        </IconButton>
+    </Box>
     <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <Box sx={{ bgcolor: '#f0f0f0', display: 'flex', alignItems: 'center', height: '3.5rem', px: 2 }}>
-          <Typography variant="h6">Dataset Exploration: {filenameWithoutExtension}</Typography>
-          <Box sx={{ flex: 1 }} />
-          {/* Optionally add a close button if necessary */}
-          <IconButton>
-            <CloseIcon />
-          </IconButton>
-        </Box>
+      <Grid item xs={12} sm={4} md={3}>
+        <FilterForm
+        columns={columns}
+        onAddFilter={handleAddFilter}
+        onRemoveFilter={handleRemoveFilter}
+        onRemoveAllFilters={handleRemoveAllFilters}
+        filters={filters}
+        />
       </Grid>
+      <Grid item xs={12} sm={8} md={9}>
+        <Tabs value={tabValue} onChange={handleChangeTab} aria-label="data tabs">
+          <Tab label="Data Table" />
+          <Tab label="Charts" />
+        </Tabs>
+        <Box sx={{ p: 3 }}>
+          {tabValue === 0 && (
+            <>
+              {loading && <CircularProgress />}
+              {error && <Typography color="error">Error: {error}</Typography>}
+              {data.length > 0 ? (
+                  <DataTable
+                  data={data}
+                  columns={columns}
+                  onUpdateData={updateData}
+                  onResetData={resetData}
+                />
+                ) : (
+                  <Typography>No data available</Typography>
+                )}
+            </>
+          )}
 
-      {/* Data Exploration Chart */}
-      <Grid item xs={12}>
-        {!loading && data.length > 0 && (
-          <Paper elevation={0} sx={{ mb: 2 }}>
-            {datetimeColumn ? (
-              <DataExplorationChart
-                data={data}
-                columns={columns}
-                datetimeColumn={datetimeColumn}
-                selectedColumns={selectedCols}
-              />
-            ) : (
-              <ScatterPlot data={data} columns={columns} />
-            )}
-          </Paper>
-        )}
-        {loading && <CircularProgress />}
-        {error && <Typography color="error">Error: {error}</Typography>}
-      </Grid>
-
-      {/* Filters section */}
-      <Grid item xs={12}>
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <Paper elevation={0} sx={{ mb: 2 }}>
-              <FilterForm
-                columns={columns}
-                onAddFilter={handleAddFilter}
-                onRemoveFilter={handleRemoveFilter}
-                onRemoveAllFilters={handleRemoveAllFilters}
-                filters={filters}
-              />
-            </Paper>
-          </Grid>
-
-          {/* Data table section */}
-          <Grid item xs={9}>
-            <Paper elevation={0} sx={{ mb: 2 }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {tabValue === 1 && (
+              <>
                 {loading && <CircularProgress />}
                 {error && <Typography color="error">Error: {error}</Typography>}
-                {data.length > 0 && (
-                  <DataTable
-                    data={data}
-                    columns={columns}
-                    onUpdateData={updateData}
-                    onResetData={resetData}
-                  />
+                {!loading && data.length > 0 && (
+                  datetimeColumn ? (
+                    <DataExplorationChart
+                      data={data}
+                      columns={columns}
+                      datetimeColumn={datetimeColumn}
+                      selectedColumns={selectedCols}
+                    />
+                  ) : (
+                    <ScatterPlot data={data} columns={columns} />
+                  )
                 )}
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Grid>
+              </>
+            )}
+      </Box>
     </Grid>
-  </Paper>
+  </Grid>
+</Paper>
 );
 };
 
 export default DataExploration;
+
+
+
+
+

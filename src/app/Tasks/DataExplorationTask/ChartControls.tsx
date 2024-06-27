@@ -19,22 +19,16 @@ interface ChartControlsProps {
   handleRollingAverageToggle: () => void;
   rollingAverageWindow: number;
   handleRollingAverageWindowChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  alerts: { column: string, threshold: number }[];
-  setAlerts: (alerts: { column: string, threshold: number }[]) => void;
+  
 }
 
 const ChartControls: React.FC<ChartControlsProps> = ({
     selectedColumns, handleChange, selectableColumns, setMode, mode, setChartType,
     chartType, showStatistics, handleReset, setShowStatistics, zoomable, setZoomable,
     showRollingAverage, handleRollingAverageToggle, rollingAverageWindow, handleRollingAverageWindowChange,
-    alerts, setAlerts
+    
 }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [alertDialogOpen, setAlertDialogOpen] = useState(false); // State for alert dialog
-    const [alertTab, setAlertTab] = useState(0);
-
-    const [alertColumn, setAlertColumn] = useState<string>('');
-    const [alertThreshold, setAlertThreshold] = useState<number>(0);
 
     const handleOpenDialog = () => {
         setDialogOpen(true);
@@ -52,30 +46,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
         handleChange({ target: { value: selectedColumns.filter(col => col !== value) } } as any);
     };
 
-    const handleAddAlert = () => {
-        setAlerts([...alerts, { column: alertColumn, threshold: alertThreshold }]);
-        setAlertColumn('');
-        setAlertThreshold(0);
-      };
-    
-      const handleRemoveAlert = (index: number) => {
-        const newAlerts = alerts.slice();
-        newAlerts.splice(index, 1);
-        setAlerts(newAlerts);
-      };
-
-      const handleOpenAlertDialog = () => {
-        setAlertDialogOpen(true);
-      };
-    
-      const handleCloseAlertDialog = () => {
-        setAlertDialogOpen(false);
-      };
-
-
-      const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-        setAlertTab(newValue);
-      };
+  
 
     return (
         <Box sx={{ width: "99%", px: 1, py:2 }}>
@@ -199,88 +170,9 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             >
                 {showStatistics ? 'Hide Statistics' : 'Show Statistics'}
             </Button>
-         <Button
-        variant="text"
-        onClick={handleOpenAlertDialog}
-        sx={{ ml: 2 }}
-        size="small"
-      >
-        Alerts
-      </Button>
+     
 
-      <Dialog open={alertDialogOpen} onClose={handleCloseAlertDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Set Alerts</DialogTitle>
-        <DialogContent>
-          <Tabs value={alertTab} onChange={handleTabChange}>
-            <Tab label="Configure Alerts" />
-            <Tab label="Active Alerts" />
-          </Tabs>
-          {alertTab === 0 && (
-            <Box>
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Column</InputLabel>
-                <Select
-                  value={alertColumn}
-                  label="Column"
-                  MenuProps={{
-                    PaperProps: {
-                        style: {
-                            maxHeight: 224,
-                            width: 250,
-                        },
-                    },
-                }}
-                  onChange={(e) => setAlertColumn(e.target.value)}
-                  input={<OutlinedInput id="alert-column" label="Column" />}
-                >
-                  {selectableColumns.map((col) => (
-                    <MenuItem key={col.field} value={col.field}>{col.headerName}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Threshold"
-                type="number"
-                value={alertThreshold}
-                onChange={(e) => setAlertThreshold(Number(e.target.value))}
-              />
-              <Button fullWidth variant="contained" color="primary" onClick={handleAddAlert}>
-                Add Alert
-              </Button>
-              <Box>
-                {alerts.map((alert, index) => (
-                  <Box key={index} sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                    {alert.column} exceeds {alert.threshold}
-                    <Button variant="outlined" color="secondary" onClick={() => handleRemoveAlert(index)} sx={{ ml: 2 }}>
-                      Remove
-                    </Button>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          )}
-          {alertTab === 1 && (
-            <Box>
-              {alerts.length === 0 ? (
-                <Typography>No active alerts.</Typography>
-              ) : (
-                alerts.map((alert, index) => (
-                  <Box key={index} sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                    <Typography>{alert.column} exceeds {alert.threshold}</Typography>
-                  </Box>
-                ))
-              )}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAlertDialog}>Close</Button>
-        </DialogActions>
-      </Dialog>
-    
-
+      
 
         </Box>
     );

@@ -29,21 +29,17 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    // const [chartType, setChartType] = useState<'line' | 'bar' >('line');
     const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'heatmap'>('line');
-
     const [statistics, setStatistics] = useState({});
     const [showStatistics, setShowStatistics] = useState(false);
     const [vegaStats, setVegaStats] = useState<{ column: string; type: string; value: number; }[]>([]);
     const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
     const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
     const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
-
     const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
-  const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
+    const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
   
-  const [alerts, setAlerts] = useState<{ column: string, threshold: number }[]>([]);
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  
     useEffect(() => {
         if (selectedColumns.length && data.length) {
             const newStats = calculateMultipleStatistics(data, selectedColumns);
@@ -64,86 +60,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         const itemDate = new Date(item[datetimeColumn]);
         return (!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate);
     });
-
-
-    const handleMinimize = () => {
-        setIsVisible(!isVisible); // Toggles the visibility of the chart
-    };
-
-    const handleMaximize = () => {
-        setIsMaximized(!isMaximized); // Toggles maximization of the chart area
-    };
-
-    
-   const handleChange = (event: SelectChangeEvent<string[]>, child: React.ReactElement<any, any> | null):void => {
-    setSelectedColumns(event.target.value as string[]);
-    setOpen(false); // Close the dropdown after selection
-};
-
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-
-    const handleReset = () => {
-        setSelectedColumns([initialSelectedColumn]);
-
-        setMenuMode('overlay');
-    };
-
-
-
-    const handleRollingAverageToggle = () => {
-        setShowRollingAverage(!showRollingAverage);
-      };
-    
-      const handleRollingAverageWindowChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRollingAverageWindow(Number(event.target.value));
-      };
-
       
-      useEffect(() => {
-        alerts.forEach(alert => {
-          data.forEach(item => {
-            switch (alert.condition) {
-              case 'equals':
-                if (item[alert.column] === alert.value) {
-                  setAlertMessage(`Alert: ${alert.column} equals ${alert.value}`);
-                }
-                break;
-              case 'exceeds':
-                if (item[alert.column] > alert.value) {
-                  setAlertMessage(`Alert: ${alert.column} exceeds ${alert.value}`);
-                }
-                break;
-              case 'less than':
-                if (item[alert.column] < alert.value) {
-                  setAlertMessage(`Alert: ${alert.column} is less than ${alert.value}`);
-                }
-                break;
-              case 'greater than':
-                if (item[alert.column] > alert.value) {
-                  setAlertMessage(`Alert: ${alert.column} is greater than ${alert.value}`);
-                }
-                break;
-              case 'range':
-                const { min, max } = alert.value as { min: number, max: number };
-                if (item[alert.column] >= min && item[alert.column] <= max) {
-                  setAlertMessage(`Alert: ${alert.column} is in range ${min} to ${max}`);
-                }
-                break;
-              default:
-                break;
-            }
-          });
-        });
-      }, [data, alerts]);
     
-
       const spec: VisualizationSpec = useMemo(() => {
         const baseTransform = [
           {
@@ -167,24 +85,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
           autosize: { type: "fit", contains: "padding", resize: true },
           height: 400,
           data: { values: filteredData },
-          params: [
-            {
-              name: "interpolate",
-              value: "linear",
-              bind: {
-                input: "select",
-                options: [
-                  "basis",
-                  "linear",
-                  "natural",
-                  "step",
-                  "step-after",
-                  "step-before"
-                ]
-              }
-            },
-          ],
-          mark: chartType === 'line' ? { type: "line", interpolate: { expr: "interpolate" } } :
+          mark: chartType === 'line' ? { type: "line" } :
             chartType === 'bar' ? { type: "bar" } :
               chartType === 'area' ? { type: "area" } :
                 { type: "point", tooltip: true },
@@ -215,77 +116,45 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         };
       }, [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable, showRollingAverage, rollingAverageWindow]);
 
-    //     const spec: VisualizationSpec = useMemo(() => ({
-    //         width: "container",
-    //         autosize: { type: "fit", contains: "padding", resize: true },
-    //         height: 400,
-    //         data: { values: filteredData },
-    //         params: [
-    //             {
-    //                 name: "interpolate",
-    //                 value: "linear",
-    //                 bind: {
-    //                     input: "select",
-    //                     options: [
-    //                     "basis",
-    //                     "linear",
-    //                     "natural",
-    //                     "step",
-    //                     "step-after",
-    //                     "step-before"
-    //                     ]
-    //                 }
-    //             },
-                
-        
-    //   ],
+    
+      const handleMinimize = () => {
+        setIsVisible(!isVisible); // Toggles the visibility of the chart
+    };
+
+    const handleMaximize = () => {
+        setIsMaximized(!isMaximized); // Toggles maximization of the chart area
+    };
 
     
-    //         mark: chartType === 'line' ? { type: "line",interpolate: {expr: "interpolate"}} :
-    //                chartType === 'bar' ? { type: "bar" } :
-    //                { type: "point" ,  tooltip: true},
+   const handleChange = (event: SelectChangeEvent<string[]>, child: React.ReactElement<any, any> | null):void => {
+    setSelectedColumns(event.target.value as string[]);
+    setOpen(false); // Close the dropdown after selection
+};
 
+    const handleOpen = () => {
+        setOpen(true);
+    };
 
-    //         encoding: {
-    //             x: { type: "temporal", field: datetimeColumn },
-    //             y: { type: "quantitative", field: "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
-    //             color: { field: "variable", type: "nominal", title: "Variable" },
-    //             tooltip: [
-    //                 { field: "variable", type: "nominal" },
-    //                 { field: "value", type: "quantitative" }
-    //             ]
-    //         },
-    //         selection: zoomable === 'yes' ? {
-    //             grid_x: {
-    //                 type: "interval",
-    //                 bind: "scales",
-    //                 zoom: "wheel![event.ctrlKey]",
-    //                 encodings: ["x"]
-    //             },
-    //             grid_y: {
-    //                 type: "interval",
-    //                 bind: "scales",
-    //                 zoom: "wheel![!event.ctrlKey]",
-    //                 encodings: ["y"]
-    //             }
-    //         } : undefined,
-    //         transform: [
-    //             {
-    //                 fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
-    //                 as: ["variable", "value"]
-    //             }
-    //         ],
-    //     }), [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable]);
-
-    
-    const handleShowStatistics = () => {
-        setShowStatistics(!showStatistics);
+    const handleClose = () => {
+        setOpen(false);
     };
 
 
-  
-    const handleAlertClose = () => {
-      setAlertMessage(null);
+    const handleReset = () => {
+        setSelectedColumns([initialSelectedColumn]);
+        setMenuMode('overlay');
+    };
+
+    const handleRollingAverageToggle = () => {
+        setShowRollingAverage(!showRollingAverage);
+      };
+    
+      const handleRollingAverageWindowChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRollingAverageWindow(Number(event.target.value));
+      };
+      
+    const handleShowStatistics = () => {
+        setShowStatistics(!showStatistics);
     };
 
     return (
@@ -340,9 +209,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
                 handleRollingAverageWindowChange={handleRollingAverageWindowChange}
                 handleRollingAverageToggle={handleRollingAverageToggle}
                 showRollingAverage={showRollingAverage}
-          rollingAverageWindow={rollingAverageWindow}
-          alerts={alerts}
-          setAlerts={setAlerts}
+                rollingAverageWindow={rollingAverageWindow}
+          
 
                 /> )}
             {isVisible && (
@@ -364,17 +232,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
             </Dialog>
 
             {/* {showStatistics && isVisible && <StatisticsDisplay statistics={statistics} />} */}
-            <Snackbar
-        open={!!alertMessage}
-        autoHideDuration={6000}
-        onClose={handleAlertClose}
-        message={alertMessage}
-        action={
-          <Button color="inherit" size="small" onClick={handleAlertClose}>
-            Close
-          </Button>
-        }
-      />
+            
         </Paper>
     );
 };
