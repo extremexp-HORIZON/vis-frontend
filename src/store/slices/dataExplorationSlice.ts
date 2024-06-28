@@ -1,4 +1,3 @@
-
 import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 import axios from "axios";
 import { IFilter, IDataExplorationRequest } from "../../shared/models/dataexploration.model";

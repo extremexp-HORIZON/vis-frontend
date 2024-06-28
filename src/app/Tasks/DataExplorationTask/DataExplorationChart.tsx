@@ -1,60 +1,62 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Box, Paper, Switch, FormControlLabel, Typography, FormControl, Button, InputLabel, Select, MenuItem, OutlinedInput, Chip, TextField, Tooltip, IconButton, Grid, SelectChangeEvent, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar } from '@mui/material';
+import React, { useMemo, useEffect, useState } from 'react';
+import { Box, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip, Typography } from '@mui/material';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import InfoIcon from "@mui/icons-material/Info"
-import grey from '@mui/material/colors/grey';
-import MinimizeIcon from '@mui/icons-material/Minimize';
-import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import ChartControls from './ChartControls';
 import StatisticsDisplay from './StatisticsDisplay';
+import { grey } from '@mui/material/colors';
+import MinimizeIcon from '@mui/icons-material/Minimize';
+import InfoIcon from '@mui/icons-material/Info';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
 interface Column {
-    field: string;
-    headerName: string;
-    width: number;
-    type: string;
+  field: string;
+  headerName: string;
+  width: number;
+  type: string;
 }
 
 interface DataExplorationChartProps {
-    data: any[];
-    columns: Column[];
-    datetimeColumn: string;
+  data: any[];
+  columns: Column[];
+  datetimeColumn: string;
+  selectedColumns: string[],
+
 }
 
-const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeColumn,}) => {
-    const selectableColumns = columns.filter(column => column.field !== datetimeColumn);
-    const initialSelectedColumn = selectableColumns[0]?.field || "";
-    const [selectedColumns, setSelectedColumns] = useState<string[]>([initialSelectedColumn]);
-    const [open, setOpen] = useState(false);
-    const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
-    const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'heatmap'>('line');
-    const [statistics, setStatistics] = useState({});
-    const [showStatistics, setShowStatistics] = useState(false);
-    const [vegaStats, setVegaStats] = useState<{ column: string; type: string; value: number; }[]>([]);
-    const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
-    const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
-    const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
-    const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
-    const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
-  
-  
-    useEffect(() => {
-        if (selectedColumns.length && data.length) {
-            const newStats = calculateMultipleStatistics(data, selectedColumns);
-            setStatistics(newStats)
-            const statsData = Object.keys(newStats).flatMap(column => [
-                { column, type: 'Mean', value: newStats[column].mean },
-                { column, type: 'Median', value: newStats[column].median },
-                { column, type: 'Min', value: newStats[column].min },
-                { column, type: 'Max', value: newStats[column].max },
-                { column, type: 'Std Deviation', value: newStats[column].stdDeviation }
-            ]);
-            setVegaStats(statsData);
-        }
-    }, [data, selectedColumns]);
 
+const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeColumn,selectedColumns}) => {
+
+
+// const DataExplorationChart = ({ data, columns, datetimeColumn, selectedColumns, handleColumnChange }) => {
+  const selectableColumns = columns.filter(column => column.field !== datetimeColumn);
+
+  const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'heatmap'>('line');
+  const [statistics, setStatistics] = useState({});
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [vegaStats, setVegaStats] = useState<{ column: string; type: string; value: number; }[]>([]);
+  const [isVisible, setIsVisible] = useState(true); // State for visibility toggle
+  const [isMaximized, setIsMaximized] = useState(false); // State for maximize toggle
+  const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
+  const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
+  const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
+  
+  useEffect(() => {
+    if (selectedColumns.length && data.length) {
+      const newStats = calculateMultipleStatistics(data, selectedColumns);
+      setStatistics(newStats)
+      const statsData = Object.keys(newStats).flatMap(column => [
+        { column, type: 'Mean', value: newStats[column].mean },
+        { column, type: 'Median', value: newStats[column].median },
+        { column, type: 'Min', value: newStats[column].min },
+        { column, type: 'Max', value: newStats[column].max },
+        { column, type: 'Std Deviation', value: newStats[column].stdDeviation }
+      ]);
+      setVegaStats(statsData);
+    }
+  }, [data, selectedColumns]);
 
     const filteredData = data.filter(item => {
         const itemDate = new Date(item[datetimeColumn]);
@@ -62,8 +64,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     });
       
     
-      const spec = useMemo(() => {
-        const baseTransform = [
+    const spec = useMemo(() => {   
+           const baseTransform = [
           {
             fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
             as: ["variable", "value"]
@@ -125,26 +127,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         setIsMaximized(!isMaximized); // Toggles maximization of the chart area
     };
 
-    
-   const handleChange = (event: SelectChangeEvent<string[]>) => {
-    setSelectedColumns(event.target.value as string[]);
-    setOpen(false); // Close the dropdown after selection
-};
-
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-
-    const handleReset = () => {
-        setSelectedColumns([initialSelectedColumn]);
-        setMenuMode('overlay');
-    };
-
+  
     const handleRollingAverageToggle = () => {
         setShowRollingAverage(!showRollingAverage);
       };
@@ -191,21 +174,12 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
             </Box>
             {isVisible && (
                 <ChartControls 
-                selectedColumns={selectedColumns}
-                handleChange={handleChange}
-                // handleOpen={handleOpen}
-                // handleClose={handleClose}
-                // open={open}
-                selectableColumns={selectableColumns}
                 setMode={setMode}
                 mode={mode}
                 setChartType={setChartType}
                 setShowStatistics={setShowStatistics}
                 chartType={chartType}
                 showStatistics={showStatistics}
-                zoomable={zoomable}
-                setZoomable={setZoomable}
-                handleReset={handleReset}
                 handleRollingAverageWindowChange={handleRollingAverageWindowChange}
                 handleRollingAverageToggle={handleRollingAverageToggle}
                 showRollingAverage={showRollingAverage}
@@ -239,13 +213,9 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
 
 export default DataExplorationChart;
 
-function setMenuMode(arg0: string) {
-    throw new Error('Function not implemented.');
-}
-
 function calculateMultipleStatistics(data: any[], columns: string[]) {
-    const stats: { [key: string]: { mean: number, median: number, min: number, max: number, stdDeviation: number } } = {};
-    columns.forEach(column => {
+  const stats: { [key: string]: { mean: number, median: number, min: number, max: number, stdDeviation: number } } = {};
+  columns.forEach(column => {
       const values = data.map(item => Number(item[column])).filter(item => !isNaN(item));
       const mean = values.reduce((acc, cur) => acc + cur, 0) / values.length;
       const sortedValues = values.slice().sort((a, b) => a - b);
@@ -256,8 +226,7 @@ function calculateMultipleStatistics(data: any[], columns: string[]) {
       const variance = sortedValues.reduce((acc, cur) => acc + Math.pow(cur - mean, 2), 0) / sortedValues.length;
       const stdDeviation = Math.sqrt(variance);
       stats[column] = { mean, median, min, max, stdDeviation };
-    });
-    return stats;
-  }
+  });
+  return stats;
+}
 
-  
