@@ -22,7 +22,7 @@ const DataExploration: React.FC = () => {
   const [datetimeColumn, setDatetimeColumn] = useState<string>('');
   const [availableTimeColumns, setAvailableTimeColumns] = useState<string[]>([]);
   const [granularity, setGranularity] = useState<string>('');
-  const [limit, setLimit] = useState<number>(100);
+  const [limit, setLimit] = useState<number>(1000);
   const [scaler, setScaler] = useState<string>('');
   const [filters, setFilters] = useState<any[]>([]);
 
@@ -46,19 +46,19 @@ const DataExploration: React.FC = () => {
   const filenameWithExtension = parts[parts.length - 1];
   const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
 
-  const fetchData = () => {
-    if (datetimeColumn) {
-      const requestData: IDataExplorationRequest = {
-        datasetId: karfotela,
-        columns: [...selectedCols, datetimeColumn],
-        aggFunction: granularity,
-        filters: filters,
-        limit: limit,
-        scaler: scaler,
-      };
-      dispatch(fetchDataExploration(requestData));
-    }
-  };
+  // const fetchData = () => {
+  //   if (datetimeColumn) {
+  //     const requestData: IDataExplorationRequest = {
+  //       datasetId: karfotela,
+  //       columns: [...selectedCols, datetimeColumn],
+  //       aggFunction: granularity,
+  //       filters: filters,
+  //       limit: limit,
+  //       scaler: scaler,
+  //     };
+  //     dispatch(fetchDataExploration(requestData));
+  //   }
+  // };
 
 
 
@@ -99,11 +99,24 @@ const DataExploration: React.FC = () => {
     }
   }, [dataExploration]);
 
-  useEffect(() => {
-    if (datetimeColumn && selectedCols.length > 0) {
-      fetchData();
+
+   useEffect(() => {
+    if (dataExploration) {
+      const parsedData = JSON.parse(dataExploration.data);
+      setData(parsedData);
+      setOriginalData(parsedData); // Set original data here
     }
-  }, [selectedCols, datetimeColumn, filters]);
+  }, [dataExploration]);
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, [selectedCols, datetimeColumn,filters]);
+
+  // useEffect(() => {
+  //   if (datetimeColumn && selectedCols.length > 0) {
+  //     fetchData();
+  //   }
+  // }, [selectedCols, datetimeColumn, filters]);
 
   const [tabValue, setTabValue] = useState(0);
 
