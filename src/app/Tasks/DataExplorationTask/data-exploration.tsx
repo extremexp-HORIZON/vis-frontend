@@ -20,11 +20,9 @@ const DataExploration: React.FC = () => {
   const [originalData, setOriginalData] = useState<any[]>([]);
   const [selectedCols, setSelectedCols] = useState<string[]>([]);
   const [datetimeColumn, setDatetimeColumn] = useState<string>('');
-  const [availableTimeColumns, setAvailableTimeColumns] = useState<string[]>([]);
-  const [granularity, setGranularity] = useState<string>('');
-  const [limit, setLimit] = useState<number>(1000);
-  const [scaler, setScaler] = useState<string>('');
   const [filters, setFilters] = useState<any[]>([]);
+  const [tabValue, setTabValue] = useState(0);
+
 
   const handleAddFilter = (newFilter: number) => {
     setFilters([...filters, newFilter]);
@@ -40,31 +38,20 @@ const DataExploration: React.FC = () => {
     setFilters([]);  // Resets the filters state to an empty array
   };
 
-  const karfotela = "file:///I2Cat_phising/dataset/test.csv";
+  const datafile = "file:///I2Cat_phising/dataset/test.csv";
+  // const datafile = 
+  // "zenoh://1/input_data/electrical_data/test.csv";
+    // "zenoh://cars/car/ca/cars.json"
 
-  const parts = karfotela.split('/');
+
+  const parts = datafile.split('/');
   const filenameWithExtension = parts[parts.length - 1];
   const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
 
-  // const fetchData = () => {
-  //   if (datetimeColumn) {
-  //     const requestData: IDataExplorationRequest = {
-  //       datasetId: karfotela,
-  //       columns: [...selectedCols, datetimeColumn],
-  //       aggFunction: granularity,
-  //       filters: filters,
-  //       limit: limit,
-  //       scaler: scaler,
-  //     };
-  //     dispatch(fetchDataExploration(requestData));
-  //   }
-  // };
-
-
-
+  
   useEffect(() => {
     dispatch(fetchDataExploration({
-      datasetId: karfotela,
+      datasetId: datafile,
       columns: [],
       aggFunction: '',
       filters: filters,
@@ -75,9 +62,11 @@ const DataExploration: React.FC = () => {
 
   useEffect(() => {
     if (dataExploration) {
+      console.log('data',dataExploration)
       const parsedData = JSON.parse(dataExploration.data);
       setData(parsedData);
       setOriginalData(parsedData); // Set original data here
+      
 
       const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
         field: typeof col === 'string' ? col : (col as { name: string }).name,
@@ -89,8 +78,8 @@ const DataExploration: React.FC = () => {
       setColumns(gridColumns);
       setOriginalColumns(gridColumns); // Set original columns here
       const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
-      setAvailableTimeColumns(timeCols.map(col => col.field));
       setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
+      // setDatetimeColumn('');
 
       // Set default selected column for the SelectColumnsComponent if not already set
       if (selectedCols.length === 0 && gridColumns.length > 0) {
@@ -100,25 +89,14 @@ const DataExploration: React.FC = () => {
   }, [dataExploration]);
 
 
-   useEffect(() => {
-    if (dataExploration) {
-      const parsedData = JSON.parse(dataExploration.data);
-      setData(parsedData);
-      setOriginalData(parsedData); // Set original data here
-    }
-  }, [dataExploration]);
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, [selectedCols, datetimeColumn,filters]);
-
-  // useEffect(() => {
-  //   if (datetimeColumn && selectedCols.length > 0) {
-  //     fetchData();
+  //  useEffect(() => {
+  //   if (dataExploration) {
+  //     const parsedData = JSON.parse(dataExploration.data);
+  //     setData(parsedData);
+  //     setOriginalData(parsedData); // Set original data here
   //   }
-  // }, [selectedCols, datetimeColumn, filters]);
+  // }, [dataExploration]);
 
-  const [tabValue, setTabValue] = useState(0);
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -163,11 +141,13 @@ const DataExploration: React.FC = () => {
                 {loading && <CircularProgress />}
                 {error && <Typography color="error">Error: {error}</Typography>}
                 {originalData.length > 0 ? (
-                  <DataTable
-                    data={originalData}
-                    columns={originalColumns}
-                  
-                  />
+                   <DataTable
+                   data={originalData}
+                   columns={originalColumns}
+                   datetimeColumn={datetimeColumn} // Pass datetimeColumn to DataTable
+
+                   selectedColumns={selectedCols} // Pass selectedCols to DataTable
+                 />
                 ) : (
                   <Typography>No data available</Typography>
                 )}
@@ -181,7 +161,7 @@ const DataExploration: React.FC = () => {
                 {!loading && data.length > 0 && (
                   datetimeColumn ? (
                     <DataExplorationChart
-                      data={data}
+                      data={originalData}
                       columns={columns}
                       datetimeColumn={datetimeColumn}
                       selectedColumns={selectedCols}
@@ -200,3 +180,34 @@ const DataExploration: React.FC = () => {
 };
 
 export default DataExploration;
+
+
+
+
+
+
+
+// const fetchData = () => {
+  //   if (datetimeColumn) {
+  //     const requestData: IDataExplorationRequest = {
+  //       datasetId: datafile,
+  //       columns: [...selectedCols, datetimeColumn],
+  //       aggFunction: granularity,
+  //       filters: filters,
+  //       limit: limit,
+  //       scaler: scaler,
+  //     };
+  //     dispatch(fetchDataExploration(requestData));
+  //   }
+  // };
+
+    // useEffect(() => {
+  //   fetchData();
+  // }, [selectedCols, datetimeColumn,filters]);
+
+  // useEffect(() => {
+  //   if (datetimeColumn && selectedCols.length > 0) {
+  //     fetchData();
+  //   }
+  // }, [selectedCols, datetimeColumn, filters]);
+

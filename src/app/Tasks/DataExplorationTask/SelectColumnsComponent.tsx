@@ -209,11 +209,12 @@ const SelectColumnsComponent: React.FC<SelectColumnsComponentProps> = ({ selecta
 
   return (
     <Box sx={{ p: 2 }}>
-      <Box sx={{ px: 1.5, py: 0.5, display: "flex", alignItems: "center", borderBottom: `1px solid ${grey[400]}` }}>
+        <Box sx={{ px: 1.5, py: 0.5, display: "flex", alignItems: "center", borderBottom: `1px solid ${grey[400]}` }}>
         <ViewWeekIcon />
-        <Typography fontSize={"1rem"} fontWeight={600} sx={{ ml: 1 }}> {/* Add margin left for spacing */}
-          Measures
-        </Typography>
+        <Typography fontSize={"1rem"} fontWeight={600} sx={{ ml: 1, textTransform:"none"}}>
+        Measures
+
+          </Typography>          
       </Box>
       <FormControl fullWidth>
         <InputLabel>Add Measure</InputLabel>

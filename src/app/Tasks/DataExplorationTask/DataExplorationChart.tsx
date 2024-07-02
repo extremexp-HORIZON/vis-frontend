@@ -339,86 +339,194 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     return (!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate);
   });
 
+
+  
   const spec = useMemo(() => {
-    const baseTransform = [
-      {
-        fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
-        as: ["variable", "value"]
+  const baseTransform = [
+    {
+      fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
+      as: ["variable", "value"]
+    }
+  ];
+
+  const rollingAverageTransform = showRollingAverage ? [
+    {
+      window: [{ op: "mean", field: "value", as: "rolling_mean" }],
+      frame: [-rollingAverageWindow + 1, 0],
+      groupby: ["variable"]
+    }
+  ] : [];
+
+  const finalTransform = [...baseTransform, ...rollingAverageTransform];
+
+  const statisticalLayers = showStatistics ? [
+    {
+      mark: { type: "errorband", extent: "stdev", opacity: 0.2 },
+      encoding: {
+        y: { field: "value", type: "quantitative" },
+        color: { field: "variable", type: "nominal" }
       }
-    ];
-
-    const rollingAverageTransform = showRollingAverage ? [
-      {
-        window: [{ op: "mean", field: "value", as: "rolling_mean" }],
-        frame: [-rollingAverageWindow + 1, 0],
-        groupby: ["variable"]
+    },
+    {
+      mark: "rule",
+      encoding: {
+        y: {
+          field: "value",
+          type: "quantitative",
+          aggregate: "mean"
+        },
+        color: { field: "variable", type: "nominal" },
+        size: { value: 3 }
       }
-    ] : [];
+    }
+  ] : [];
 
-    const finalTransform = [...baseTransform, ...rollingAverageTransform];
-
-    const statisticalLayers = showStatistics ? [
+  const commonSpec = {
+    width: "container",
+    autosize: { type: "fit", contains: "padding", resize: true },
+    data: { values: filteredData },
+    transform: finalTransform,
+    layer: [
       {
-        mark: { type: "errorband", extent: "stdev", opacity: 0.2 },
+        mark: chartType === 'line' ? { type: "line" } :
+          chartType === 'bar' ? { type: "bar" } :
+            chartType === 'area' ? { type: "area" } :
+              { type: "point", tooltip: true },
         encoding: {
-          y: { field: "value", type: "quantitative" },
-          color: { field: "variable", type: "nominal" }
-        }
-      },
-      {
-        mark: "rule",
-        encoding: {
-          y: {
-            field: "value",
-            type: "quantitative",
-            aggregate: "mean"
+          x: { type: "temporal", field: datetimeColumn },
+          y: { type: "quantitative", field: showRollingAverage ? "rolling_mean" : "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
+          color: { field: "variable", type: "nominal", title: "Variable" },
+          tooltip: [
+            { field: "variable", type: "nominal" },
+            { field: showRollingAverage ? "rolling_mean" : "value", type: "quantitative" }
+          ]
+        },
+        selection: zoomable === 'yes' ? {
+          grid_x: {
+            type: "interval",
+            bind: "scales",
+            zoom: "wheel![event.ctrlKey]",
+            encodings: ["x"]
           },
-          color: { field: "variable", type: "nominal" },
-          size: { value: 3 }
-        }
+          grid_y: {
+            type: "interval",
+            bind: "scales",
+            zoom: "wheel![!event.ctrlKey]",
+            encodings: ["y"]
+          }
+        } : undefined
+      },
+      ...statisticalLayers
+    ]
+  };
+
+  if (mode === 'overlay') {
+    return {
+      ...commonSpec,
+      // height: 400,
+    };
+  } else if (mode === 'stack') {
+    const stackedCharts = selectedColumns.map(variable => ({
+      ...commonSpec,
+      // height: 200,
+      transform: [
+        ...finalTransform,
+        { filter: { field: "variable", equal: variable } }
+      ],
+      encoding: {
+        ...commonSpec.layer[0].encoding,
+        y: { ...commonSpec.layer[0].encoding.y, title: variable }
       }
-    ] : [];
+    }));
 
     return {
-      width: "container",
-      autosize: { type: "fit", contains: "padding", resize: true },
-      height: 400,
-      data: { values: filteredData },
-      transform: finalTransform,
-      layer: [
-        {
-          mark: chartType === 'line' ? { type: "line" } :
-            chartType === 'bar' ? { type: "bar" } :
-              chartType === 'area' ? { type: "area" } :
-                { type: "point", tooltip: true },
-          encoding: {
-            x: { type: "temporal", field: datetimeColumn },
-            y: { type: "quantitative", field: showRollingAverage ? "rolling_mean" : "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
-            color: { field: "variable", type: "nominal", title: "Variable" },
-            tooltip: [
-              { field: "variable", type: "nominal" },
-              { field: showRollingAverage ? "rolling_mean" : "value", type: "quantitative" }
-            ]
-          },
-          selection: zoomable === 'yes' ? {
-            grid_x: {
-              type: "interval",
-              bind: "scales",
-              zoom: "wheel![event.ctrlKey]",
-              encodings: ["x"]
-            },
-            grid_y: {
-              type: "interval",
-              bind: "scales",
-              zoom: "wheel![!event.ctrlKey]",
-              encodings: ["y"]
-            }
-          } : undefined
-        },
-        ...statisticalLayers
-      ]
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      vconcat: stackedCharts
     };
-  }, [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable, showRollingAverage, rollingAverageWindow, showStatistics]);
+  }
+}, [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable, showRollingAverage, rollingAverageWindow, showStatistics]);
+
+
+  // const spec = useMemo(() => {
+  //   const baseTransform = [
+  //     {
+  //       fold: selectedColumns.length > 0 ? selectedColumns : selectableColumns.map(col => col.field),
+  //       as: ["variable", "value"]
+  //     }
+  //   ];
+
+  //   const rollingAverageTransform = showRollingAverage ? [
+  //     {
+  //       window: [{ op: "mean", field: "value", as: "rolling_mean" }],
+  //       frame: [-rollingAverageWindow + 1, 0],
+  //       groupby: ["variable"]
+  //     }
+  //   ] : [];
+
+  //   const finalTransform = [...baseTransform, ...rollingAverageTransform];
+
+  //   const statisticalLayers = showStatistics ? [
+  //     {
+  //       mark: { type: "errorband", extent: "stdev", opacity: 0.2 },
+  //       encoding: {
+  //         y: { field: "value", type: "quantitative" },
+  //         color: { field: "variable", type: "nominal" }
+  //       }
+  //     },
+  //     {
+  //       mark: "rule",
+  //       encoding: {
+  //         y: {
+  //           field: "value",
+  //           type: "quantitative",
+  //           aggregate: "mean"
+  //         },
+  //         color: { field: "variable", type: "nominal" },
+  //         size: { value: 3 }
+  //       }
+  //     }
+  //   ] : [];
+
+  //   return {
+  //     width: "container",
+  //     autosize: { type: "fit", contains: "padding", resize: true },
+  //     height: 400,
+  //     data: { values: filteredData },
+  //     transform: finalTransform,
+  //     layer: [
+  //       {
+  //         mark: chartType === 'line' ? { type: "line" } :
+  //           chartType === 'bar' ? { type: "bar" } :
+  //             chartType === 'area' ? { type: "area" } :
+  //               { type: "point", tooltip: true },
+  //         encoding: {
+  //           x: { type: "temporal", field: datetimeColumn },
+  //           y: { type: "quantitative", field: showRollingAverage ? "rolling_mean" : "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
+  //           color: { field: "variable", type: "nominal", title: "Variable" },
+  //           tooltip: [
+  //             { field: "variable", type: "nominal" },
+  //             { field: showRollingAverage ? "rolling_mean" : "value", type: "quantitative" }
+  //           ]
+  //         },
+  //         selection: zoomable === 'yes' ? {
+  //           grid_x: {
+  //             type: "interval",
+  //             bind: "scales",
+  //             zoom: "wheel![event.ctrlKey]",
+  //             encodings: ["x"]
+  //           },
+  //           grid_y: {
+  //             type: "interval",
+  //             bind: "scales",
+  //             zoom: "wheel![!event.ctrlKey]",
+  //             encodings: ["y"]
+  //           }
+  //         } : undefined
+  //       },
+  //       ...statisticalLayers
+  //     ]
+  //   };
+  // }, [filteredData, chartType, datetimeColumn, mode, selectedColumns, zoomable, showRollingAverage, rollingAverageWindow, showStatistics]);
 
   const handleMinimize = () => {
     setIsVisible(!isVisible); // Toggles the visibility of the chart

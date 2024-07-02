@@ -84,9 +84,9 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
         <Box sx={{ px: 1.5, py: 0.5, display: "flex", alignItems: "center", borderBottom: `1px solid ${grey[400]}` }}>
             <Button aria-describedby={id} variant="text" onClick={handlePopoverOpen} size="small">
             <FilterAltIcon/>
-            <Typography fontSize={"1rem"} fontWeight={600} sx={{ ml: 1 }}> {/* Add margin left for spacing */}
-        Filter Selection
-    </Typography>
+            <Typography fontSize={"1rem"} fontWeight={600} sx={{ ml: 1, textTransform:"none"}}>
+    Filter Selection
+</Typography>
             </Button>
             <Popover
                 id={id}
@@ -142,8 +142,10 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
     {filters.map((filter, index) => (
         <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, bgcolor: grey[200], p: 1, borderRadius: 1 }}>
             <Typography variant="body2">
-                {filter.column} {filter.type} 
-                {filter.type === 'equals' ? ` ${filter.value.value}` : ` ${filter.value.min} to ${filter.value.max}`}
+            {filter.column} {filter.type} 
+            {typeof filter.value === 'object' && filter.value !== null ? 
+            (filter.type === 'equals' ? ` ${filter.value?.value}` : ` ${filter.value.min} to ${filter.value.max}`) 
+            : filter.value}
             </Typography>
             
             <IconButton size="small" onClick={() => onRemoveFilter(index)}>
