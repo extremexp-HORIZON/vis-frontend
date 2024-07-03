@@ -1,3 +1,6 @@
 Passing on topbar parameters the event handler. Selectopt.tss
 Passing the options to the the additional parameters. options.ts
 Fix the Api
+
+
+Changed package build script from = "build": "tsc && vite build", -> "build": "vite build",
