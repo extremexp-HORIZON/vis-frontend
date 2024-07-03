@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, MouseEvent } from "react"
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
 
-const WorkflowDetails = () => {
+const WorkflowConfiguration = () => {
   const containerRef = useRef<any>(null)
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -123,4 +123,4 @@ const WorkflowDetails = () => {
   )
 }
 
-export default WorkflowDetails
+export default WorkflowConfiguration

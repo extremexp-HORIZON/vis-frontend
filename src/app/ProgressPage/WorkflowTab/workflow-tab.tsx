@@ -1,12 +1,13 @@
 import Box from "@mui/material/Box"
 import WorkflowMetrics from "./workflow-metrics"
 import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
-import WorkflowDetails from "./workflow-details"
+import WorkflowDetails from "./workflow-configuration"
 import WorkflowSvg from "./workflow-svg"
 import { useState } from "react"
 import Typography from "@mui/material/Typography"
 import WorkflowPlaceholder from "./workflow-placeholder"
 import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
+import WorkflowConfiguration from "./workflow-configuration"
 
 const WorkflowTab = () => {
 
@@ -22,20 +23,23 @@ const WorkflowTab = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 1 }}>
+      <Box key="workflow-svg">
+        <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask}/>
+      </Box>
       <Box
-        key="workflow-details"
+        key="workflow-configuration"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
       >
-        <Box key="workflow-details-title">
+        <Box key="workflow-configuration-title">
           <Typography
             variant="body1"
             sx={{ fontWeight: 600, fontSize: "1.5rem" }}
           >
-            Workflow1 details
+            Workflow1 Configuration
           </Typography>
         </Box>
-        <Box key="workflow-details-items">
-          <WorkflowDetails />
+        <Box key="workflow-configuration-items">
+          <WorkflowConfiguration />
         </Box>
       </Box>
       <Box
@@ -53,9 +57,6 @@ const WorkflowTab = () => {
         <Box key="workflow-metrics-items">
           <WorkflowMetrics />
         </Box>
-      </Box>
-      <Box key="workflow-svg">
-        <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask}/>
       </Box>
       <Box key="workflow-task">
         {taskProvider(chosenTask)}
