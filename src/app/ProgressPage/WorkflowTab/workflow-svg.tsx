@@ -1,11 +1,8 @@
-import GridOnIcon from "@mui/icons-material/GridOn"
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import grey from "@mui/material/colors/grey"
 import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
-import { Dispatch, SetStateAction } from "react"
-import Button from "@mui/material/Button"
+import { Dispatch, SetStateAction, useEffect, useRef } from "react"
 import blue from "@mui/material/colors/blue"
+import Svg from "../../../shared/data/dummy.svg?react"
 
 interface IWorkflowSvg {
   chosenTask: string | null
@@ -13,19 +10,95 @@ interface IWorkflowSvg {
 }
 
 const WorkflowSvg = (props: IWorkflowSvg) => {
-
   const { chosenTask, setChosenTask } = props
+  const chosenTaskRef = useRef(chosenTask)
+  const listeners = useRef<
+    { gElement: SVGGElement; listener: EventListener }[]
+  >([])
+  const workingTasks = ["I2Cat_Dataset", "Model_Training"]
 
-  const handleChange = (taskId: string) => () => {
-    chosenTask === taskId ? setChosenTask(null) : setChosenTask(taskId)
-  }
+  useEffect(() => {
+    const handleChange = (taskId: string | null, element: SVGGElement) => {
+      listeners.current.forEach(({ gElement, listener }) => {
+        if (gElement !== element) {
+          gElement.querySelectorAll("polygon").forEach(childElement => {
+            const element = childElement as SVGPolygonElement
+            element.style.cursor = "pointer"
+            element.style.userSelect = "none"
+            element.style.fill = "white"
+          })
+        } else {
+          if (chosenTaskRef.current === taskId) {
+            setChosenTask(null)
+            chosenTaskRef.current = null
+            element.querySelectorAll("polygon").forEach(childElement => {
+              const element = childElement as SVGPolygonElement
+              element.style.cursor = "pointer"
+              element.style.userSelect = "none"
+              element.style.fill = "white"
+            })
+          } else {
+            setChosenTask(taskId)
+            chosenTaskRef.current = taskId
+            element.querySelectorAll("polygon").forEach(childElement => {
+              const element = childElement as SVGPolygonElement
+              element.style.cursor = "pointer"
+              element.style.userSelect = "none"
+              element.style.fill = blue[500]
+            })
+          }
+        }
+      })
+    }
+
+    const graphElement = document.querySelector("#graph0")
+
+    if (graphElement) {
+      graphElement.querySelectorAll("g").forEach(gElement => {
+        if (gElement.id.includes("node")) {
+          const titleElement = gElement.querySelector("title")
+          if (
+            titleElement &&
+            titleElement.textContent &&
+            workingTasks.includes(titleElement.textContent)
+          ) {
+            const title = titleElement.textContent
+            const listener = () => handleChange(title, gElement)
+            gElement.addEventListener("click", listener)
+            listeners.current.push({ gElement, listener })
+            gElement.querySelectorAll("*").forEach(childElement => {
+              const element = childElement as HTMLElement
+              element.style.cursor = "pointer"
+              element.style.userSelect = "none"
+            })
+          } else {
+            gElement.querySelectorAll("polygon").forEach(childElement => {
+              const element = childElement as SVGPolygonElement
+              element.style.userSelect = "none"
+              element.style.stroke = grey[400]
+            })
+            gElement.querySelectorAll("text").forEach(cldEl => {
+              const element = cldEl as SVGTextElement
+              element.style.userSelect = "none"
+              element.style.fill = grey[400]
+            })
+          }
+        }
+      })
+    }
+    return () => {
+      listeners.current.forEach(({ gElement, listener }) => {
+        gElement.removeEventListener("click", listener)
+      })
+    }
+  }, [])
 
   return (
     <Box
       sx={{
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "center",
         p: 6,
         border: "1px solid #ddd",
         borderRadius: "8px",
@@ -33,67 +106,7 @@ const WorkflowSvg = (props: IWorkflowSvg) => {
         flexWrap: "wrap",
       }}
     >
-      <Button
-        sx={{
-          borderRadius: 16,
-          p:6,
-          color: "black",
-          bgcolor: chosenTask !== "data-exploration" ? "transparent" : blue[500],
-          border: chosenTask !== "data-exploration" ? `1px solid ${blue[500]}` : "none",
-          fontSize: "0.8rem",
-          textTransform: "none",
-          ":hover": { bgcolor: chosenTask !== "data-exploration" ? blue[500] : "white" },
-        }}
-        size="small"
-        disableRipple
-        onClick={handleChange("data-exploration")}
-      >
-        Data Exploration
-      </Button>
-      <ArrowForwardIcon sx={{ opacity: 0.5 }} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          borderRadius: 16,
-          border: `1px solid ${grey[400]}`,
-          opacity: 0.5,
-          p: 6,
-        }}
-      >
-        <Typography variant="body2">Data Split</Typography>
-      </Box>
-      <ArrowForwardIcon sx={{ opacity: 0.5 }} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          borderRadius: 16,
-          border: `1px solid ${grey[400]}`,
-          opacity: 0.5,
-          p: 6,
-        }}
-      >
-        <Typography variant="body2">Data Augmentation</Typography>
-      </Box>
-      <ArrowForwardIcon />
-      <Button
-        sx={{
-          borderRadius: 16,
-          p:6,
-          color: "black",
-          bgcolor: chosenTask !== "model-analysis" ? "transparent" : blue[500],
-          border: chosenTask !== "model-analysis" ? `1px solid ${blue[500]}` : "none",
-          fontSize: "0.8rem",
-          textTransform: "none",
-          ":hover": { bgcolor: chosenTask !== "model-analysis" ? blue[500] : "white" },
-        }}
-        size="small"
-        disableRipple
-        onClick={handleChange("model-analysis")}
-      >
-        Model Analysis
-      </Button>
+      <Svg />
     </Box>
   )
 }
