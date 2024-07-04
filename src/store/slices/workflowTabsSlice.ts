@@ -17,6 +17,9 @@ export const workflowTabsSlice = createSlice({
     reducers: {
         addTab: (state, action) => {
             state.tabs = [...state.tabs, initializeTab(action.payload)];
+        },
+        deleteTab: (state, action) => {
+            state.tabs = state.tabs.filter((tab) => tab.workflowId !== action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -49,11 +52,12 @@ const apiPath = 'api/';
 //Managing tabs logic
 
 const initializeTab = (workflowId: string) => {
-    const tab: IWorkflowTabModel = {...defaultWorkflowTabModel, workflowId: workflowId} 
+    const tab: IWorkflowTabModel = {...defaultWorkflowTabModel, workflowId: workflowId}
+    console.log("this is the new tab", tab)
     return tab
 }
 
 //Reducer exports
-export const {} = workflowTabsSlice.actions
+export const {addTab, deleteTab} = workflowTabsSlice.actions
 
 export default workflowTabsSlice.reducer

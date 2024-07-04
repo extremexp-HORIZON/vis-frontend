@@ -21,6 +21,8 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import { visuallyHidden } from '@mui/utils';
 import EnhancedTableHead from './enhanced-table-head';
 import ToolbarWorkflow from './toolbar-workflow-table';
+import { useAppDispatch } from '../../../store/store';
+import { addTab } from '../../../store/slices/workflowTabsSlice'
 
 
 const fractionStrToDecimal = (str: string): string => {
@@ -198,11 +200,17 @@ interface WorkFlowTableProps {
 
 export default function WorkflowTable(props: WorkFlowTableProps) {
   const { handleChange } = props;
+  const dispatch = useAppDispatch();
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('id');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleLaunchTabAction = (workflowId: number) => (e: React.SyntheticEvent) => {
+    dispatch(addTab(workflowId));
+    handleChange(workflowId);
+  }
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -329,7 +337,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                             return (
                               <TableCell key={column.id} align={column.align}>
                                 <LaunchIcon
-                                  onClick={handleChange(row.id)} // TODO: Change to row.id or row.workflowId when tabs are fully implemented
+                                  onClick={handleLaunchTabAction(row.workflowId)}
                                   sx={{ cursor: 'pointer' }}
                                   style={{ color: 'black' }} />
                                 {(currentStatus !== 'completed' && currentStatus !== 'failed') &&
@@ -350,7 +358,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
                           default:
                             value = String(row[column.id]);
-
                             return (
                               <TableCell key={column.id} align={column.align}>
                                 {value}

@@ -1,8 +1,7 @@
-import { Button, IconButton } from "@mui/material"
+import { IconButton } from "@mui/material"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
-import { Type } from "vega-lite/build/src/type"
 import EditIcon from "@mui/icons-material/Edit"
 import grey from "@mui/material/colors/grey"
 import ParallelCoordinatePlot from "./parallel-coordinate-plot"
@@ -14,7 +13,6 @@ import ScheduleTable from "./WorkFlowTables/schedule-table"
 
 const ProgressPage = () => {
   const [value, setValue] = useState(0)
-
   const handleChange = (newValue: number) => (event: React.SyntheticEvent) => {
     if (value === newValue) return
     setValue(newValue)
