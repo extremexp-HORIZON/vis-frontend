@@ -12,17 +12,16 @@ import CloseIcon from '@mui/icons-material/Close';
 import ProgressPercentage from './progress-percentage';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 // import FilterListIcon from '@mui/icons-material/FilterList';
-// import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { visuallyHidden } from '@mui/utils';
 import EnhancedTableHead from './enhanced-table-head';
 import ToolbarWorkflow from './toolbar-workflow-table';
+import { TextField } from '@mui/material';
 import { useAppDispatch } from '../../../store/store';
-import { addTab } from '../../../store/slices/workflowTabsSlice'
+import { addTab } from '../../../store/slices/workflowTabsSlice';
 
 
 const fractionStrToDecimal = (str: string): string => {
@@ -206,10 +205,11 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [filterText, setFilterText] = React.useState<{ [key: string]: string }>({});
 
-  const handleLaunchTabAction = (workflowId: number) => (e: React.SyntheticEvent) => {
-    dispatch(addTab(workflowId));
-    handleChange(workflowId);
+  const handleLaunchNewTab = (workflowId: number) => (e: React.SyntheticEvent) => {
+    dispatch(addTab(workflowId))
+    handleChange(workflowId)
   }
 
   const handleRequestSort = (
@@ -258,6 +258,24 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     setPage(0);
   };
 
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>, columnId: string) => { // NEW: Function to handle filter change
+    setFilterText({
+      ...filterText,
+      [columnId]: event.target.value,
+    });
+  };
+
+  const filteredRows = React.useMemo(() => {
+    return rows.filter((row) => {
+      return Object.keys(filterText).every((key) => {
+        return row[key as keyof Data]
+          .toString()
+          .toLowerCase()
+          .includes(filterText[key].toLowerCase());
+      });
+    });
+  }, [filterText]);
+
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -265,17 +283,17 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [order, orderBy, page, rowsPerPage],
+    [order, orderBy, page, rowsPerPage, filteredRows],
   );
 
   return (
-    <Box sx={{ width: '100%', mt: 2 }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <ToolbarWorkflow actionButtonName='Compare selected workflows' tableName="Workflow Execution" numSelected={selected.length} />
+    <Box sx={{ paddingTop: '40px' }}>
+      <Paper sx={{ mb: 4 }}>
+        <ToolbarWorkflow actionButtonName='Compare selected workflows' secondActionButtonName='Compare completed workflows' tableName="Workflow Execution" numSelected={selected.length} handleClickFunction={handleChange} />
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <EnhancedTableHead
@@ -337,7 +355,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                             return (
                               <TableCell key={column.id} align={column.align}>
                                 <LaunchIcon
-                                  onClick={handleLaunchTabAction(row.workflowId)}
+                                  onClick={handleLaunchNewTab(row.workflowId)} // TODO: Change to row.id or row.workflowId when tabs are fully implemented
                                   sx={{ cursor: 'pointer' }}
                                   style={{ color: 'black' }} />
                                 {(currentStatus !== 'completed' && currentStatus !== 'failed') &&
@@ -358,6 +376,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
                           default:
                             value = String(row[column.id]);
+
                             return (
                               <TableCell key={column.id} align={column.align}>
                                 {value}

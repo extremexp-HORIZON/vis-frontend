@@ -53,7 +53,7 @@ const ProgressPage = () => {
         <Box key="progress-tabs">
           <ProgressPageTabs value={value} handleChange={handleChange} />
         </Box>
-        <Box sx={{ px: 5, displau: "flex", flexDirection: "column", mt: 3 }}>
+        <Box sx={{ px: 5, display: "flex", flexDirection: "column", mt: 3 }}>
           {value === 0 && (
             <>
               <ParallelCoordinatePlot />

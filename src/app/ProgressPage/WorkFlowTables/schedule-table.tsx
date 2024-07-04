@@ -16,44 +16,7 @@ import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Close } from '@mui/icons-material';
 import ToolBarWorkflow from './toolbar-workflow-table';
-
-
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-export type Order = 'asc' | 'desc';
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string | boolean },
-  b: { [key in Key]: number | string | boolean },
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
+import FilterBar from './FilterBar';
 export interface Column {
   id: keyof Data;
   label: string;
@@ -137,6 +100,13 @@ const columns: Column[] = [
   },
 ];
 
+const operators = [
+  { id: 'contains', label: 'contains' },
+  { id: 'equals', label: 'equals' },
+  { id: 'startsWith', label: 'starts with' },
+  { id: 'endsWith', label: 'ends with' },
+];
+
 export interface Data {
   id: number;
   workflowId: number;
@@ -185,6 +155,12 @@ export default function ScheduleTable() {
   const [page, setPage] = React.useState(0);
   const [rows, setRows] = React.useState<Data[]>(firstRows);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [filterText, setFilterText] = React.useState<{ [key: string]: string }>({});
+
+  const removeSelected = (list: Number[]) => {
+    // Removed scheduled selected values
+
+  }
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
@@ -214,6 +190,25 @@ export default function ScheduleTable() {
     setPage(0);
   };
 
+  const handleFilterChange = (column: string, operator: string, value: string) => {
+    console.log(column);
+    setFilterText({
+      ...filterText,
+      [column]: value,
+    });
+  };
+
+
+  const filteredRows = React.useMemo(() => {
+    return rows.filter((row) => {
+      return Object.keys(filterText).every((key) => {
+        const cellValue = row[key as keyof Data]?.toString().toLowerCase();
+        const filterValue = filterText[key]?.toLowerCase();
+        return cellValue?.includes(filterValue);
+      });
+    });
+  }, [filterText]);
+
   const isStartRow = (id: number): string => {
     if (id === 1) {
       return "#e0e0e0";
@@ -228,9 +223,7 @@ export default function ScheduleTable() {
   }
   function handleIndexChange(indexChange: number, id: number) {
     const rowIndex = rows.findIndex((row) => row.id === id);
-    console.log(rowIndex, indexChange)
     const newIndex = rowIndex + indexChange;
-    console.log(newIndex, 'newIndex')
     if (newIndex < 0 || newIndex >= rows.length) {
       return null;
     } else {
@@ -253,9 +246,10 @@ export default function ScheduleTable() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ paddingTop: '20px' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <ToolBarWorkflow actionButtonName='Cancel selected workflows' numSelected={selected.length} tableName={"Scheduled Workflows"} />
+        <ToolBarWorkflow actionButtonName='Cancel selected workflows' numSelected={selected.length} tableName={"Scheduled Workflows"} handleClickFunction={removeSelected} />
+        <FilterBar onFilterChange={handleFilterChange} /> {/* Added FilterBar */}
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
@@ -305,7 +299,7 @@ export default function ScheduleTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows
+              {filteredRows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id);
