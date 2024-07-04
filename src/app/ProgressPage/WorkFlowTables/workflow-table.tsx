@@ -20,7 +20,7 @@ import { visuallyHidden } from '@mui/utils';
 import EnhancedTableHead from './enhanced-table-head';
 import ToolbarWorkflow from './toolbar-workflow-table';
 import { TextField } from '@mui/material';
-import { useAppDispatch } from '../../../store/store';
+import { RootState, useAppDispatch, useAppSelector } from '../../../store/store';
 import { addTab } from '../../../store/slices/workflowTabsSlice';
 
 
@@ -200,6 +200,7 @@ interface WorkFlowTableProps {
 export default function WorkflowTable(props: WorkFlowTableProps) {
   const { handleChange } = props;
   const dispatch = useAppDispatch();
+  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs);
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('id');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
@@ -208,6 +209,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const [filterText, setFilterText] = React.useState<{ [key: string]: string }>({});
 
   const handleLaunchNewTab = (workflowId: number) => (e: React.SyntheticEvent) => {
+    if(tabs.find(tab => tab.workflowId === workflowId)) return
     dispatch(addTab(workflowId))
     handleChange(workflowId)
   }
