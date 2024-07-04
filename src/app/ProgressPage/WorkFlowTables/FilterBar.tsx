@@ -18,38 +18,23 @@ const operators = [
 
 interface FilterBarProps {
   onFilterChange: (column: string, operator: string, value: string) => void;
+  onColumnChange: (columnSelected: string) => void;
+  onOperatorChange: (operatorSelected: string) => void;
+  onValueChange: (valueSelected: string) => void;
+  filterValue: string;
+  selectedColumn: string;
+  selectedOperator: string;
 }
 
-export default function FilterBar({ onFilterChange }: FilterBarProps) {
-  const [selectedColumn, setSelectedColumn] = React.useState('');
-  const [selectedOperator, setSelectedOperator] = React.useState('');
-  const [filterValue, setFilterValue] = React.useState('');
-
-  const handleColumnChange = (columnSelected: string) => {
-    setSelectedColumn(columnSelected);
-  };
-
-  const handleOperatorChange = (operatorSelected: string) => {
-    setSelectedOperator(operatorSelected);
-  };
-
-  const handleValueChange = (valueSelected: string) => {
-    setFilterValue(valueSelected);
-  };
-
-  React.useEffect(() => {
-    if (selectedColumn && selectedOperator && (filterValue || filterValue === '')) {
-      onFilterChange(selectedColumn, selectedOperator, filterValue);
-    }
-  }, [selectedColumn, selectedOperator, filterValue]);
+export default function FilterBar({ onFilterChange, onColumnChange, onOperatorChange, onValueChange, selectedColumn, selectedOperator, filterValue }: FilterBarProps) {
 
   return (
     <Box display="flex" gap={2} alignItems="center" >
       <FormControl sx={{ width: '200px' }} >
         <InputLabel>Columns</InputLabel>
-        <Select value={selectedColumn} onChange={() => handleColumnChange}>
+        <Select value={selectedColumn} onChange={() => onColumnChange}>
           {columns.map((column) => (
-            <MenuItem onClick={() => handleColumnChange(column.id)} key={column.id} value={column.id}>
+            <MenuItem onClick={() => onColumnChange(column.id)} key={column.id} value={column.id}>
               {column.label}
             </MenuItem>
           ))}
@@ -57,9 +42,9 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
       </FormControl>
       <FormControl sx={{ width: '200px' }}>
         <InputLabel>Operator</InputLabel>
-        <Select value={selectedOperator} onChange={(event) => handleOperatorChange}>
+        <Select value={selectedOperator} onChange={(event) => onOperatorChange}>
           {operators.map((operator) => (
-            <MenuItem onClick={() => handleOperatorChange(operator.id)} key={operator.id} value={operator.id}>
+            <MenuItem onClick={() => onOperatorChange(operator.id)} key={operator.id} value={operator.id}>
               {operator.label}
             </MenuItem>
           ))}
@@ -68,7 +53,7 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
       <TextField
         label="Value"
         value={filterValue}
-        onChange={(event) => handleValueChange(event.target.value)}
+        onChange={(event) => onValueChange(event.target.value)}
         variant="outlined"
       />
     </Box >

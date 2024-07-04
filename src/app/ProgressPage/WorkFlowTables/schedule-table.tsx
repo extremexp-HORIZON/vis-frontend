@@ -13,10 +13,10 @@ import Checkbox from '@mui/material/Checkbox';
 import ArrowUp from '@mui/icons-material/KeyboardArrowUp';
 import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
 // import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import LaunchIcon from '@mui/icons-material/Launch';
 import { Close } from '@mui/icons-material';
 import ToolBarWorkflow from './toolbar-workflow-table';
 import FilterBar from './FilterBar';
+import { Popover } from '@mui/material';
 export interface Column {
   id: keyof Data;
   label: string;
@@ -156,6 +156,16 @@ export default function ScheduleTable() {
   const [rows, setRows] = React.useState<Data[]>(firstRows);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterText, setFilterText] = React.useState<{ [key: string]: string }>({});
+  const [selectedColumn, setSelectedColumn] = React.useState('');
+  const [selectedOperator, setSelectedOperator] = React.useState('');
+  const [filterValue, setFilterValue] = React.useState('');
+  const [isFilterOpen, setFilterOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setFilterOpen(!isFilterOpen);
+    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
+  }
 
   const removeSelected = (list: Number[]) => {
     // Removed scheduled selected values
@@ -197,6 +207,24 @@ export default function ScheduleTable() {
       [column]: value,
     });
   };
+
+  const handleColumnChange = (columnSelected: string) => {
+    setSelectedColumn(columnSelected);
+  };
+
+  const handleOperatorChange = (operatorSelected: string) => {
+    setSelectedOperator(operatorSelected);
+  };
+
+  const handleValueChange = (valueSelected: string) => {
+    setFilterValue(valueSelected);
+  };
+
+  React.useEffect(() => {
+    if (selectedColumn && selectedOperator && (filterValue || filterValue === '')) {
+      handleFilterChange(selectedColumn, selectedOperator, filterValue);
+    }
+  }, [selectedColumn, selectedOperator, filterValue]);
 
 
   const filteredRows = React.useMemo(() => {
@@ -248,8 +276,21 @@ export default function ScheduleTable() {
   return (
     <Box sx={{ paddingTop: '20px' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <ToolBarWorkflow actionButtonName='Cancel selected workflows' numSelected={selected.length} tableName={"Scheduled Workflows"} handleClickFunction={removeSelected} />
-        <FilterBar onFilterChange={handleFilterChange} /> {/* Added FilterBar */}
+        <ToolBarWorkflow filterClickedFunction={filterClicked} actionButtonName='Cancel selected workflows' numSelected={selected.length} tableName={"Scheduled Workflows"} handleClickedFunction={removeSelected} />
+        <Popover
+          id={"Filters"}
+          open={isFilterOpen}
+          anchorEl={anchorEl}
+          onClose={() => setFilterOpen(false)}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <FilterBar selectedColumn={selectedColumn} filterValue={filterValue} selectedOperator={selectedOperator} onColumnChange={handleColumnChange} onOperatorChange={handleOperatorChange} onValueChange={handleValueChange} onFilterChange={handleFilterChange} /> {/* Added FilterBar */}
+          </Box>
+        </Popover>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>

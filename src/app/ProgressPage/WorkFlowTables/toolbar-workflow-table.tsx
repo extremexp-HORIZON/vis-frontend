@@ -1,22 +1,28 @@
-import * as React from 'react';
+import type * as React from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
-import { Button, Divider, Stack } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 
 interface ToolBarWorkflowProps {
   numSelected: number;
   tableName: string;
   actionButtonName: string;
   secondActionButtonName?: string;
-  handleClickFunction: Function
+  handleClickedFunction: (list: Number[]) => void;
+  filterClickedFunction: (event: React.MouseEvent<HTMLButtonElement>) => void;
+
 }
 
+
+
+
+
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
-  const { numSelected, tableName, actionButtonName, secondActionButtonName, handleClickFunction } = props;
+  const { numSelected, tableName, actionButtonName, secondActionButtonName, handleClickedFunction, filterClickedFunction } = props;
 
   return (
     <Toolbar
@@ -50,6 +56,9 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           component="div"
         >
           {tableName}
+          <IconButton onClick={(event) => filterClickedFunction(event)}>
+            <FilterListIcon />
+          </IconButton>
         </Typography>
       )}
       {numSelected > 0 ? (
@@ -60,7 +69,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             variant="contained"
             disabled={numSelected < 2 && tableName === "Workflow Execution"}
             style={{ fontSize: "11px" }}
-            onClick={handleClickFunction("cancel or compare selected")} // TODO: Get the selected and get right value to open new tab or cancel scheduled
+            onClick={() => handleClickedFunction([])} // TODO: Get the selected and get right value to open new tab or cancel scheduled
           >
             {actionButtonName}
 
@@ -76,13 +85,10 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 variant="outlined"
                 color="success"
                 style={{ fontSize: "11px", fontWeight: 'bold' }}
-                onClick={handleClickFunction("all completed")} // TODO: Get all the completed and get right value to open new tab
+                onClick={() => handleClickedFunction([])} // TODO: Get all the completed and get right value to open new tab
               >
                 {secondActionButtonName}
               </Button> : ''}
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
           </Stack>
         </Tooltip>
       )}

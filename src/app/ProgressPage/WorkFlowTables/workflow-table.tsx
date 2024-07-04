@@ -295,7 +295,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   return (
     <Box sx={{ paddingTop: '40px' }}>
       <Paper sx={{ mb: 4 }}>
-        <ToolbarWorkflow actionButtonName='Compare selected workflows' secondActionButtonName='Compare completed workflows' tableName="Workflow Execution" numSelected={selected.length} handleClickFunction={handleChange} />
+        <ToolbarWorkflow actionButtonName='Compare selected workflows' secondActionButtonName='Compare completed workflows' tableName="Workflow Execution" numSelected={selected.length} handleClickedFunction={handleChange} />
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <EnhancedTableHead
