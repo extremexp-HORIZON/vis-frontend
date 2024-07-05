@@ -1,15 +1,13 @@
 import { Paper, Grid, Typography, Box, CircularProgress, IconButton, Tab, Tabs } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import React, { ChangeEvent, SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DataTable from './DataTable';
 import DataExplorationChart from './DataExplorationChart';
 import FilterForm from './FilterForm';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { IDataExplorationRequest } from '../../../shared/models/dataexploration.model';
 import { fetchDataExploration } from '../../../store/slices/dataExplorationSlice';
 import ScatterPlot from './ScatterPlot';
 import CloseIcon from "@mui/icons-material/Close"
-import SelectColumnsComponent from './SelectColumnsComponent';
 
 const DataExploration: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -102,9 +100,7 @@ const DataExploration: React.FC = () => {
     setTabValue(newValue);
   };
 
-  const handleColumnChange = (event: ChangeEvent<{ value: unknown; }>) => {
-    setSelectedCols(event.target.value as SetStateAction<string[]>);
-  };
+  
 
   return (
     <Paper sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #ccc' }}>
