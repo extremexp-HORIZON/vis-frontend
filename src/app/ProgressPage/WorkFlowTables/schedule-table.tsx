@@ -15,7 +15,7 @@ import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
 // import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import { Close } from '@mui/icons-material';
 import ToolBarWorkflow from './toolbar-workflow-table';
-import FilterBar from './FilterBar';
+import FilterBar from './filter-bar';
 import { Popover } from '@mui/material';
 export interface Column {
   id: keyof Data;
@@ -155,12 +155,10 @@ export default function ScheduleTable() {
   const [page, setPage] = React.useState(0);
   const [rows, setRows] = React.useState<Data[]>(firstRows);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [filterText, setFilterText] = React.useState<{ [key: string]: string }>({});
-  const [selectedColumn, setSelectedColumn] = React.useState('');
-  const [selectedOperator, setSelectedOperator] = React.useState('');
-  const [filterValue, setFilterValue] = React.useState('');
+  const [filters, setFilters] = React.useState([{ column: '', operator: '', value: '' }])
   const [isFilterOpen, setFilterOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [filterCounter, setFilterCounter] = React.useState(0);
 
   const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
     setFilterOpen(!isFilterOpen);
@@ -200,42 +198,51 @@ export default function ScheduleTable() {
     setPage(0);
   };
 
-  const handleFilterChange = (column: string, operator: string, value: string) => {
-    console.log(column);
-    setFilterText({
-      ...filterText,
-      [column]: value,
-    });
+  const handleFilterChange = (index: number, column: string, operator: string, value: string) => {
+    const newFilters = [...filters];
+    newFilters[index] = { column, operator, value };
+    setFilters(newFilters);
   };
 
-  const handleColumnChange = (columnSelected: string) => {
-    setSelectedColumn(columnSelected);
+  const handleAddFilter = () => {
+    setFilters([...filters, { column: '', operator: '', value: '' }]);
   };
 
-  const handleOperatorChange = (operatorSelected: string) => {
-    setSelectedOperator(operatorSelected);
+  const handleRemoveFilter = (index: number) => {
+    const newFilters = filters.filter((_, i) => i !== index);
+    setFilters(newFilters);
   };
 
-  const handleValueChange = (valueSelected: string) => {
-    setFilterValue(valueSelected);
-  };
-
-  React.useEffect(() => {
-    if (selectedColumn && selectedOperator && (filterValue || filterValue === '')) {
-      handleFilterChange(selectedColumn, selectedOperator, filterValue);
+  React.useMemo(() => {
+    let counter = 0;
+    for (let i = 0; i < filters.length; i++) {
+      if (filters[i].value !== '') {
+        counter++;
+        setFilterCounter(counter);
+      }
     }
-  }, [selectedColumn, selectedOperator, filterValue]);
+    setRows(firstRows.filter((row) => {
+      return filters.every((filter) => {
+        if (filter.value === '') return true;
+        const cellValue = row[filter.column as keyof Data]?.toString().toLowerCase();
+        const filterValue = filter.value.toLowerCase();
+        if (!cellValue) return false;
 
-
-  const filteredRows = React.useMemo(() => {
-    return rows.filter((row) => {
-      return Object.keys(filterText).every((key) => {
-        const cellValue = row[key as keyof Data]?.toString().toLowerCase();
-        const filterValue = filterText[key]?.toLowerCase();
-        return cellValue?.includes(filterValue);
+        switch (filter.operator) {
+          case 'contains':
+            return cellValue.includes(filterValue);
+          case 'equals':
+            return cellValue === filterValue;
+          case 'startsWith':
+            return cellValue.startsWith(filterValue);
+          case 'endsWith':
+            return cellValue.endsWith(filterValue);
+          default:
+            return true;
+        }
       });
-    });
-  }, [filterText]);
+    }));
+  }, [filters]);
 
   const isStartRow = (id: number): string => {
     if (id === 1) {
@@ -276,7 +283,7 @@ export default function ScheduleTable() {
   return (
     <Box sx={{ paddingTop: '20px' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <ToolBarWorkflow filterClickedFunction={filterClicked} actionButtonName='Cancel selected workflows' numSelected={selected.length} tableName={"Scheduled Workflows"} handleClickedFunction={removeSelected} />
+        <ToolBarWorkflow filterNumbers={filterCounter} filterClickedFunction={filterClicked} actionButtonName='Cancel selected workflows' numSelected={selected.length} tableName={"Scheduled Workflows"} handleClickedFunction={removeSelected} />
         <Popover
           id={"Filters"}
           open={isFilterOpen}
@@ -288,7 +295,12 @@ export default function ScheduleTable() {
           }}
         >
           <Box sx={{ p: 2 }}>
-            <FilterBar selectedColumn={selectedColumn} filterValue={filterValue} selectedOperator={selectedOperator} onColumnChange={handleColumnChange} onOperatorChange={handleOperatorChange} onValueChange={handleValueChange} onFilterChange={handleFilterChange} /> {/* Added FilterBar */}
+            <FilterBar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onAddFilter={handleAddFilter}
+              onRemoveFilter={handleRemoveFilter}
+            />
           </Box>
         </Popover>
         <TableContainer sx={{ maxHeight: 440 }}>
@@ -340,7 +352,7 @@ export default function ScheduleTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows
+              {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id);

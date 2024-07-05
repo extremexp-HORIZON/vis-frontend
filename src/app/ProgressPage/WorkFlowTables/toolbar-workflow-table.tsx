@@ -8,6 +8,7 @@ import { alpha } from '@mui/material/styles';
 import { Button, Stack } from '@mui/material';
 
 interface ToolBarWorkflowProps {
+  filterNumbers: number;
   numSelected: number;
   tableName: string;
   actionButtonName: string;
@@ -17,12 +18,8 @@ interface ToolBarWorkflowProps {
 
 }
 
-
-
-
-
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
-  const { numSelected, tableName, actionButtonName, secondActionButtonName, handleClickedFunction, filterClickedFunction } = props;
+  const { filterNumbers, numSelected, tableName, actionButtonName, secondActionButtonName, handleClickedFunction, filterClickedFunction } = props;
 
   return (
     <Toolbar
@@ -58,6 +55,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           {tableName}
           <IconButton onClick={(event) => filterClickedFunction(event)}>
             <FilterListIcon />
+            <Typography gap={5}> {filterNumbers > 0 ? ` (${filterNumbers})` : ''}</Typography>
           </IconButton>
         </Typography>
       )}

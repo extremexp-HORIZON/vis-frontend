@@ -16,12 +16,13 @@ import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 // import FilterListIcon from '@mui/icons-material/FilterList';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { visuallyHidden } from '@mui/utils';
 import EnhancedTableHead from './enhanced-table-head';
 import ToolbarWorkflow from './toolbar-workflow-table';
-import { TextField } from '@mui/material';
-import { RootState, useAppDispatch, useAppSelector } from '../../../store/store';
+import { Popover } from '@mui/material';
+import type { RootState } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { addTab } from '../../../store/slices/workflowTabsSlice';
+import FilterBar from './filter-bar';
 
 
 const fractionStrToDecimal = (str: string): string => {
@@ -206,10 +207,19 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [filterText, setFilterText] = React.useState<{ [key: string]: string }>({});
+  const [filters, setFilters] = React.useState([{ column: '', operator: '', value: '' }])
+  const [isFilterOpen, setFilterOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [filterCounter, setFilterCounter] = React.useState(0);
+  const [filteredRows, setFilteredRows] = React.useState(rows);
+
+  const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setFilterOpen(!isFilterOpen);
+    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
+  }
 
   const handleLaunchNewTab = (workflowId: number) => (e: React.SyntheticEvent) => {
-    if(tabs.find(tab => tab.workflowId === workflowId)) return
+    if (tabs.find(tab => tab.workflowId === workflowId)) return
     dispatch(addTab(workflowId))
     handleChange(workflowId)
   }
@@ -260,25 +270,55 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     setPage(0);
   };
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>, columnId: string) => { // NEW: Function to handle filter change
-    setFilterText({
-      ...filterText,
-      [columnId]: event.target.value,
-    });
+  const handleFilterChange = (index: number, column: string, operator: string, value: string) => {
+    const newFilters = [...filters];
+    newFilters[index] = { column, operator, value };
+    setFilters(newFilters);
   };
 
-  const filteredRows = React.useMemo(() => {
-    return rows.filter((row) => {
-      return Object.keys(filterText).every((key) => {
-        return row[key as keyof Data]
-          .toString()
-          .toLowerCase()
-          .includes(filterText[key].toLowerCase());
+  const handleAddFilter = () => {
+    setFilters([...filters, { column: '', operator: '', value: '' }]);
+  };
+
+  const handleRemoveFilter = (index: number) => {
+    const newFilters = filters.filter((_, i) => i !== index);
+    setFilters(newFilters);
+  };
+
+  React.useMemo(() => {
+    let counter = 0;
+    for (let i = 0; i < filters.length; i++) {
+      if (filters[i].value !== '') {
+        counter++;
+        setFilterCounter(counter);
+      }
+    }
+    setFilteredRows(rows.filter((row) => {
+      return filters.every((filter) => {
+        if (filter.value === '') return true;
+        const cellValue = row[filter.column as keyof Data]?.toString().toLowerCase();
+        const filterValue = filter.value.toLowerCase();
+        if (!cellValue) return false;
+
+        switch (filter.operator) {
+          case 'contains':
+            return cellValue.includes(filterValue);
+          case 'equals':
+            return cellValue === filterValue;
+          case 'startsWith':
+            return cellValue.startsWith(filterValue);
+          case 'endsWith':
+            return cellValue.endsWith(filterValue);
+          default:
+            return true;
+        }
       });
-    });
-  }, [filterText]);
+    }));
+  }, [filters]);
+
 
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
+
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
@@ -295,7 +335,30 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   return (
     <Box sx={{ paddingTop: '40px' }}>
       <Paper sx={{ mb: 4 }}>
-        <ToolbarWorkflow actionButtonName='Compare selected workflows' secondActionButtonName='Compare completed workflows' tableName="Workflow Execution" numSelected={selected.length} handleClickedFunction={handleChange} />
+        <ToolbarWorkflow actionButtonName='Compare selected workflows' secondActionButtonName='Compare completed workflows' tableName="Workflow Execution"
+          numSelected={selected.length}
+          filterNumbers={filterCounter} filterClickedFunction={filterClicked}
+          handleClickedFunction={() => handleChange} />
+        <Popover
+          id={"Filters"}
+          open={isFilterOpen}
+          anchorEl={anchorEl}
+          onClose={() => setFilterOpen(false)}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <FilterBar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onAddFilter={handleAddFilter}
+              onRemoveFilter={handleRemoveFilter}
+            />
+          </Box>
+        </Popover>
+
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <EnhancedTableHead
@@ -396,7 +459,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         {rows.length > 5 && <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={rows.length}
+          count={filteredRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
