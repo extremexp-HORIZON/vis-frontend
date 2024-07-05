@@ -26,7 +26,6 @@ interface FilterBarProps {
 }
 
 export default function FilterBar({ filters, onFilterChange, onAddFilter, onRemoveFilter }: FilterBarProps) {
-  const [filterRowNumber, setFilterRowNumber] = React.useState(1);
   return (
     <Box>
       {filters.map((filter, index) => (

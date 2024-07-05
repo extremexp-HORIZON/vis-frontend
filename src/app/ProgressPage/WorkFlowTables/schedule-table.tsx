@@ -100,13 +100,6 @@ const columns: Column[] = [
   },
 ];
 
-const operators = [
-  { id: 'contains', label: 'contains' },
-  { id: 'equals', label: 'equals' },
-  { id: 'startsWith', label: 'starts with' },
-  { id: 'endsWith', label: 'ends with' },
-];
-
 export interface Data {
   id: number;
   workflowId: number;
