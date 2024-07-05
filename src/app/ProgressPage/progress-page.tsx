@@ -65,7 +65,7 @@ const ProgressPage = () => {
               <ScheduleTable />
             </>
           )}
-          {value === 1 && <WorkflowTab />}
+          {value !== 0 && <WorkflowTab workflowId={value} />}
         </Box>
       </Grid>
     </>

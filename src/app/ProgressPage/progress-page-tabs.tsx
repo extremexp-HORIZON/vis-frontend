@@ -123,20 +123,19 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
             px: 2,
             py: 1,
             color: "black",
-            bgcolor: value === 1 ? "white" : grey[300],
-            border: value !== 1 ? `1px solid ${grey[400]}` : "none",
+            bgcolor: value === tab.workflowId ? "white" : grey[300],
+            border: value !== tab.workflowId ? `1px solid ${grey[400]}` : "none",
             fontSize: "0.8rem",
             textTransform: "none",
             display: "flex",
             columnGap: 1,
-            ":hover": { bgcolor: value !== 1 ? grey[300] : "white" },
+            ":hover": { bgcolor: value !== tab.workflowId ? grey[300] : "white" },
           }}
           size="small"
           disableRipple
-          onClick={handleChange(1)}
+          onClick={handleChange(tab.workflowId as number)}
         >
           Workflow{tab.workflowId}
-          {/* <IconButton aria-label="delete" size="small" sx={{zIndex: 999}} > */}
           <CloseIcon
             fontSize="inherit"
             onClick={handleRemoveTab(tab.workflowId)}
