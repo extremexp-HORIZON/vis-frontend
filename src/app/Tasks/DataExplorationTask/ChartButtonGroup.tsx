@@ -4,7 +4,6 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 
-
 interface ChartButtonGroupProps {
   chartType: 'line' | 'bar' | 'area' | 'heatmap';
   setChartType: (chartType: 'line' | 'bar' | 'area' | 'heatmap') => void;
@@ -12,7 +11,7 @@ interface ChartButtonGroupProps {
 
 const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChartType }) => {
   return (
-    <ButtonGroup variant="contained" aria-label="Chart button group">
+    <ButtonGroup variant="contained" aria-label="Chart button group" size="small">
       <Button
         variant={chartType === 'line' ? 'contained' : 'outlined'}
         onClick={() => setChartType('line')}
@@ -25,7 +24,6 @@ const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChart
       >
         <BarChartIcon />
       </Button>
-      
       <Button
         variant={chartType === 'heatmap' ? 'contained' : 'outlined'}
         onClick={() => setChartType('heatmap')}

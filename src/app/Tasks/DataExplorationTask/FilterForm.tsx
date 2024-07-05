@@ -83,7 +83,7 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
         <Button aria-describedby={id} variant="text" onClick={handlePopoverOpen} size="small" type="button">
           <FilterAltIcon/>
           <Typography fontSize={"1rem"} fontWeight={600} sx={{ ml: 1, textTransform:"none"}}>
-            Filter Selection
+            Filters
           </Typography>
         </Button>
         <Popover
