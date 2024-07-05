@@ -10,9 +10,11 @@ import WorkflowTab from "./WorkflowTab/workflow-tab"
 import ProgressPageTabs from "./progress-page-tabs"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
+import { RootState, useAppSelector } from "../../store/store"
 
 const ProgressPage = () => {
   const [value, setValue] = useState(0)
+  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const handleChange = (newValue: number) => (event: React.SyntheticEvent) => {
     if (value === newValue) return
     setValue(newValue)
@@ -20,6 +22,7 @@ const ProgressPage = () => {
 
   return (
     <>
+    {console.log(tabs)}
       <Grid
         sx={{
           maxWidth: "100vw",

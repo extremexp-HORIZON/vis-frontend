@@ -4,11 +4,11 @@ import { IModelAnalysisTask } from "./modelAnalysisTask.model";
 export interface IWorkflowTabModel {
     workflowId: null | string | number;
     workflowDetails: {
-        data: {[key: string]: number} | null
+        data: {[key: string]: number | string} | null
         loading: boolean;
     }
     workflowMetrics: {
-        data: {[key: string]: number} | null
+        data: {[key: string]: number | string} | null
         loading: boolean;
     }
     workflowSvg: {

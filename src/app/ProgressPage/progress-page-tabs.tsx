@@ -21,6 +21,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
 
   const handleRemoveTab = (workflowId: number | string | null) => () => {
     dispatch(deleteTab(workflowId))
+    handleChange(0)(null as any)
   }
 
   useEffect(() => {
@@ -84,7 +85,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
       >
         Experiment Overview
       </Button>
-      <Button
+      {/* <Button
         sx={{
           borderRadius: 3,
           px: 2,
@@ -103,7 +104,6 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
         onClick={handleChange(1)}
       >
         Workflow{1}
-        {/* <IconButton aria-label="delete" size="small" sx={{zIndex: 999}} > */}
         <CloseIcon
           fontSize="inherit"
           onClick={handleRemoveTab(1)}
@@ -114,8 +114,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
             ":hover": { bgcolor: grey[400], zIndex: 99999 },
           }}
         />
-        {/* </IconButton> */}
-      </Button>
+      </Button> */}
       {tabs.map((tab, index) => (
         <Button
           key={`tab-${tab.workflowId}`}

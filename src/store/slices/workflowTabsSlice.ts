@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 import { IWorkflowTabModel, defaultWorkflowTabModel } from "../../shared/models/workflow.tab.model";
+import workflows from '../../shared/data/workflows.json';
 import { add } from "lodash";
 
 interface IWorkflowTab {  
@@ -51,9 +52,11 @@ const apiPath = 'api/';
 
 //Managing tabs logic
 
-const initializeTab = (workflowId: string) => {
-    const tab: IWorkflowTabModel = {...defaultWorkflowTabModel, workflowId: workflowId}
-    console.log("this is the new tab", tab)
+const initializeTab = (workflowId: number) => {
+    const workflow = workflows.find((workflow) => workflow.workflowId === workflowId);
+    const tab: IWorkflowTabModel = {...defaultWorkflowTabModel, workflowId: workflowId, 
+        workflowDetails: {data : workflow?.variabilityPoints || null, loading: false},
+        workflowMetrics: {data : workflow?.metrics || null, loading: false}};
     return tab
 }
 
