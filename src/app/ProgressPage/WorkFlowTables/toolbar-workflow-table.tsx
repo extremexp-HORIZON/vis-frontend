@@ -15,6 +15,7 @@ interface ToolBarWorkflowProps {
   secondActionButtonName?: string;
   handleClickedFunction: (list: Number[]) => void;
   filterClickedFunction: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  // handleLaunchNewTab: (workflowId: number) => React.SyntheticEvent;
 
 }
 
@@ -60,7 +61,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
         </Typography>
       )}
       {numSelected > 0 ? (
-        <Tooltip title="CompareCancelSelected">
+        <Tooltip title="">
           <Button
             sx={{ padding: 1, margin: 2 }}
             size="small"
@@ -74,7 +75,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           </Button>
         </Tooltip>
       ) : (
-        <Tooltip title="Filterlist">
+        <Tooltip title="">
           <Stack spacing={2} direction="row">
             {secondActionButtonName ?
               <Button
