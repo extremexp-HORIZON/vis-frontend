@@ -316,7 +316,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     }));
   }, [filters]);
 
-
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -398,8 +397,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                       {columns.map((column) => {
                         let value: string;
                         const currentStatus = row.status;
-
-
                         switch (column.id) {
                           case 'runtime':
                             value = String(row[column.id]);
@@ -453,10 +450,19 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                     </TableRow>
                   );
                 })}
+              {emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: 53 * emptyRows,
+                  }}
+                >
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
-        {rows.length > 5 && <TablePagination
+        {filteredRows.length > 5 && <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={filteredRows.length}
