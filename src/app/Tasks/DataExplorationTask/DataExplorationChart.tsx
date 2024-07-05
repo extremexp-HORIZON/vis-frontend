@@ -318,6 +318,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
   const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
   const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
   const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
+  const [xAxis, setXAxis] = useState(columns[0].field);
+    const [yAxis, setYAxis] = useState([columns[1].field]);
   
   useEffect(() => {
     if (selectedColumns.length && data.length) {
@@ -423,12 +425,12 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
   if (mode === 'overlay') {
     return {
       ...commonSpec,
-      // height: 400,
+      height: 400,
     };
   } else if (mode === 'stack') {
     const stackedCharts = selectedColumns.map(variable => ({
       ...commonSpec,
-      // height: 200,
+      height: 400,
       transform: [
         ...finalTransform,
         { filter: { field: "variable", equal: variable } }
@@ -561,23 +563,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         minWidth: "300px",
         height: "100%",
       }}>
-      <Box sx={{ px: 1.5, py: 0.5, display: "flex", alignItems: "center", borderBottom: `1px solid ${grey[400]}` }}>
-        <Typography fontSize={"1rem"} fontWeight={600}>
-          Chart Viewer
-        </Typography>
-        <Box sx={{ flex: 1 }} />
-        <Tooltip title={"Description not available"}>
-          <IconButton>
-            <InfoIcon />
-          </IconButton>
-        </Tooltip>
-        <IconButton onClick={handleMinimize}>
-          <MinimizeIcon />
-        </IconButton>
-        <IconButton onClick={handleMaximize}>
-          <FullscreenIcon />
-        </IconButton>
-      </Box>
+      
       {isVisible && (
         <ChartControls 
           setMode={setMode}
@@ -589,8 +575,13 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
           handleRollingAverageWindowChange={handleRollingAverageWindowChange}
           handleRollingAverageToggle={handleRollingAverageToggle}
           showRollingAverage={showRollingAverage}
-          rollingAverageWindow={rollingAverageWindow}
-        />
+          rollingAverageWindow={rollingAverageWindow} 
+          availableColumns={columns} 
+          xAxis={xAxis}
+          setXAxis={setXAxis}
+          yAxis={yAxis}
+          setYAxis={setYAxis}
+          />
       )}
       {isVisible && (
         <Box sx={{ width: "99%", px: 1 }}>

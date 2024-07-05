@@ -107,7 +107,7 @@ const DataExploration: React.FC = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #ccc' }}>
+    <Paper sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #ccc' }}>
       <Box sx={{ bgcolor: '#f0f0f0', display: 'flex', alignItems: 'center', height: '3.5rem', px: 2 }}>
         <Typography variant="h6">Dataset Exploration: {filenameWithoutExtension}</Typography>
         <Box sx={{ flex: 1 }} />
@@ -115,7 +115,7 @@ const DataExploration: React.FC = () => {
           <CloseIcon />
         </IconButton>
       </Box>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} >
         <Grid item xs={12} sm={4} md={3}>
           <FilterForm
             columns={columns}
@@ -124,23 +124,25 @@ const DataExploration: React.FC = () => {
             onRemoveAllFilters={handleRemoveAllFilters}
             filters={filters}
           />
+          {/* {tabValue === 1 &&(
           <SelectColumnsComponent
             selectableColumns={columns}
             selectedColumns={selectedCols}
             handleColumnChange={handleColumnChange}
-          />
+          />)} */}
         </Grid>
         <Grid item xs={12} sm={8} md={9}>
-          <Tabs value={tabValue} onChange={handleChangeTab} aria-label="data tabs">
+          <Tabs value={tabValue} onChange={handleChangeTab} aria-label="data tabs" centered>
             <Tab label="Data Table" />
             <Tab label="Charts" />
           </Tabs>
-          <Box sx={{ p: 3 }}>
+          
+
             {tabValue === 0 && (
               <>
                 {loading && <CircularProgress />}
                 {error && <Typography color="error">Error: {error}</Typography>}
-                {originalData.length > 0 ? (
+                {!loading && (
                    <DataTable
                    data={originalData}
                    columns={originalColumns}
@@ -148,9 +150,7 @@ const DataExploration: React.FC = () => {
 
                    selectedColumns={selectedCols} // Pass selectedCols to DataTable
                  />
-                ) : (
-                  <Typography>No data available</Typography>
-                )}
+                ) }
               </>
             )}
 
@@ -158,7 +158,7 @@ const DataExploration: React.FC = () => {
               <>
                 {loading && <CircularProgress />}
                 {error && <Typography color="error">Error: {error}</Typography>}
-                {!loading && data.length > 0 && (
+                {!loading && (
                   datetimeColumn ? (
                     <DataExplorationChart
                       data={originalData}
@@ -172,7 +172,7 @@ const DataExploration: React.FC = () => {
                 )}
               </>
             )}
-          </Box>
+           
         </Grid>
       </Grid>
     </Paper>

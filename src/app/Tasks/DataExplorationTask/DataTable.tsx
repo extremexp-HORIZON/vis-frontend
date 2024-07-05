@@ -83,7 +83,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { Box, Paper, Button } from '@mui/material';
 
 interface DataTableProps {
@@ -111,20 +111,20 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns, selectedColumns, d
     console.log('Columns:', columns);
   }, [columns]);
 
-  const CustomToolbar = () => {
-    const toggleColumns = () => {
-      setShowAllColumns(!showAllColumns);
-    };
+  // const CustomToolbar = () => {
+  //   const toggleColumns = () => {
+  //     setShowAllColumns(!showAllColumns);
+  //   };
 
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 1 }}>
-        <GridToolbar />
-        <Button onClick={toggleColumns} variant="text" color="primary" size="small">
-          {showAllColumns ? 'Show Selected Columns' : 'Show All Columns'}
-        </Button>
-      </Box>
-    );
-  };
+  //   return (
+  //     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 1 }}>
+  //       <GridToolbar />
+  //       <Button onClick={toggleColumns} variant="text" color="primary" size="small">
+  //         {showAllColumns ? 'Show Selected Columns' : 'Show All Columns'}
+  //       </Button>
+  //     </Box>
+  //   );
+  // };
 
   const rows = data.map((row, index) => ({
     id: row[datetimeColumn] ?? index, // Use index as fallback if datetimeColumn is null or undefined
@@ -132,7 +132,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns, selectedColumns, d
   }));
 
   return (
-    <Paper className="Category-Item" elevation={2} sx={{
+    <Paper className="Category-Item" sx={{
       borderRadius: 2,
       width: "inherit",
       display: "flex",
@@ -154,7 +154,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns, selectedColumns, d
                   ]
             }
             slots={{
-              toolbar: () => <CustomToolbar />
+              toolbar: CustomToolbar,
             }}
           />
         </Box>
@@ -164,3 +164,25 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns, selectedColumns, d
 };
 
 export default DataTable;
+
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarColumnsButton slotProps={{
+         
+          button: { variant: 'outlined' },
+        }} />
+      {/* <GridToolbarFilterButton /> */}
+      {/* <GridToolbarDensitySelector
+        slotProps={{ tooltip: { title: 'Change density' } }}
+      /> */}
+      {/* <Box sx={{ flexGrow: 1 }} /> */}
+      <GridToolbarExport
+        slotProps={{
+          tooltip: { title: 'Export data' },
+          button: { variant: 'outlined' },
+        }}
+      />
+    </GridToolbarContainer>
+  );
+}

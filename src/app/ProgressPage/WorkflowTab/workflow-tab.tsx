@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography"
 import WorkflowPlaceholder from "./workflow-placeholder"
 import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
 import WorkflowConfiguration from "./workflow-configuration"
+import TaskConfiguration from "../task-configuration"
 import { RootState, useAppSelector } from "../../../store/store"
 
 interface IWorkflowTab {
@@ -52,7 +53,23 @@ const WorkflowTab = (props: IWorkflowTab) => {
         </Box>
       </Box>
       <Box
-        key="metric-summary"
+        key="task-configuration"
+        sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
+      >
+        <Box key="task-configuration-title">
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+          >
+            Task Configuration
+          </Typography>
+        </Box>
+        <Box key="task-configuration-items">
+          <TaskConfiguration />
+        </Box>
+      </Box>
+      <Box
+        key="workflow-metrics"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
       >
         <Box key="metric-summary-title">
