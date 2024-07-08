@@ -8,21 +8,19 @@ import { alpha } from '@mui/material/styles';
 import { Button, Stack } from '@mui/material';
 
 interface ToolBarWorkflowProps {
+  filterNumbers: number;
   numSelected: number;
   tableName: string;
   actionButtonName: string;
   secondActionButtonName?: string;
   handleClickedFunction: (list: Number[]) => void;
   filterClickedFunction: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  // handleLaunchNewTab: (workflowId: number) => React.SyntheticEvent;
 
 }
 
-
-
-
-
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
-  const { numSelected, tableName, actionButtonName, secondActionButtonName, handleClickedFunction, filterClickedFunction } = props;
+  const { filterNumbers, numSelected, tableName, actionButtonName, secondActionButtonName, handleClickedFunction, filterClickedFunction } = props;
 
   return (
     <Toolbar
@@ -58,11 +56,12 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           {tableName}
           <IconButton onClick={(event) => filterClickedFunction(event)}>
             <FilterListIcon />
+            <Typography gap={5}> {filterNumbers > 0 ? ` (${filterNumbers})` : ''}</Typography>
           </IconButton>
         </Typography>
       )}
       {numSelected > 0 ? (
-        <Tooltip title="CompareCancelSelected">
+        <Tooltip title="">
           <Button
             sx={{ padding: 1, margin: 2 }}
             size="small"
@@ -76,7 +75,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           </Button>
         </Tooltip>
       ) : (
-        <Tooltip title="Filterlist">
+        <Tooltip title="">
           <Stack spacing={2} direction="row">
             {secondActionButtonName ?
               <Button

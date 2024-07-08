@@ -76,7 +76,8 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
             // align={headCell.numeric ? 'right' : 'left'}
             // padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
-          >
+          > {headCell.id === 'action' ? headCell.label
+            :
             <TableSortLabel
               active={headCell.sortable}
               direction={orderBy === headCell.id ? order : 'asc'}
@@ -84,11 +85,12 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
             >
               {headCell.label}
               {/* {orderBy === headCell.id ? ( */}
-              {headCell.sortable && <Box component="span" sx={visuallyHidden}>
-                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-              </Box>}
+              {headCell.sortable &&
+                <Box component="span" sx={visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </Box>}
               {/* ) : null} */}
-            </TableSortLabel>
+            </TableSortLabel>}
           </TableCell>
         ))}
       </TableRow>
