@@ -7,7 +7,6 @@ import { useState } from "react"
 import Typography from "@mui/material/Typography"
 import WorkflowPlaceholder from "./workflow-placeholder"
 import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
-import WorkflowConfiguration from "./workflow-configuration"
 import TaskConfiguration from "./task-configuration"
 import { RootState, useAppSelector } from "../../../store/store"
 
@@ -30,7 +29,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
         return <WorkflowPlaceholder />
     }
   }
-
+ 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 1 }}>
       <Box key="workflow-svg">
@@ -84,7 +83,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
           <WorkflowMetrics metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} />
         </Box>
         <Box key="summary-items">
-          <WorkflowDetails/>
+          <WorkflowDetails metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} workflowId={workflowId}  />
         </Box>
       </Box>
       {chosenTask ? (
