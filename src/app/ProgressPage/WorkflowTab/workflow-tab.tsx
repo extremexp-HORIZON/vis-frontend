@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import WorkflowMetrics from "./workflow-metrics"
 import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
-import WorkflowDetails from "./workflow-configuration"
+import WorkflowDetails from "./WorkflowDetails"
 import WorkflowSvg from "./workflow-svg"
 import { useState } from "react"
 import Typography from "@mui/material/Typography"
@@ -82,6 +82,9 @@ const WorkflowTab = (props: IWorkflowTab) => {
         </Box>
         <Box key="metric-summary-items">
           <WorkflowMetrics metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} />
+        </Box>
+        <Box key="summary-items">
+          <WorkflowDetails/>
         </Box>
       </Box>
       {chosenTask ? (
