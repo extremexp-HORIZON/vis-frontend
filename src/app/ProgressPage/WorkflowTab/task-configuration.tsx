@@ -1,28 +1,35 @@
-// TaskConfiguration.tsx
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
+import Table from "@mui/material/Table"
+import TableBody from "@mui/material/TableBody"
+import TableCell from "@mui/material/TableCell"
+import TableContainer from "@mui/material/TableContainer"
+import TableHead from "@mui/material/TableHead"
+import TableRow from "@mui/material/TableRow"
+import Paper from "@mui/material/Paper"
 
-const TaskConfiguration = () => {
+interface ITaskConfiguration {
+  variants: { [key: string]: number | string } | null
+}
+
+const TaskConfiguration = (props: ITaskConfiguration) => {
+  const { variants } = props
+
   const tasks = [
     { task: "Data Split", variant: "-", parameters: "-" },
     { task: "Data Augmentation", variant: "-", parameters: "-" },
     {
       task: "Model Training",
       variant: "TrainNN",
-      parameters: "batch_size: 4, max_depth: 100, split_proportion: 3",
+      parameters:
+        Object.entries(variants as object)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(", ") || null,
     },
-  ];
+  ]
 
   return (
     <Box>
-      
       <TableContainer component={Paper}>
         <Table aria-label="task configuration table">
           <TableHead>
@@ -44,8 +51,7 @@ const TaskConfiguration = () => {
         </Table>
       </TableContainer>
     </Box>
-  );
-};
+  )
+}
 
-export default TaskConfiguration;
-
+export default TaskConfiguration

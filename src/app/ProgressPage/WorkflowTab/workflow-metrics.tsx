@@ -4,20 +4,15 @@ import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
 import green from "@mui/material/colors/green"
 import red from "@mui/material/colors/red"
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 
-const WorkflowMetrics = () => {
-  const statistics = {
-    row1: [
-      { name: "Precision", value: 0.8, avgDiff: 0.2 },
-      { name: "Runtime", value: 2.002, avgDiff: 10.2 },
-    ],
-    row2: [
-      { name: "Recall", value: 2, avgDiff: 1.2 },
-      { name: "Accuracy", value: 0.8, avgDiff: 0.3 },
-    ],
-  } as any
+interface IWorkflowMetrics {
+  metrics: { [key: string]: number | string }[] | null
+}
+
+const WorkflowMetrics = (props: IWorkflowMetrics) => {
+  const { metrics } = props
 
   return (
     <>
@@ -45,18 +40,16 @@ const WorkflowMetrics = () => {
           </Tooltip>
         </Box> */}
         <Grid sx={{ p: 2 }} container spacing={3}>
-          {Object.keys(statistics).map((key: string, index: number) => (
-            <Grid
-              xs={12}
-              md={12}
-              lg={6}
-              key={`statistics-row-${index}`}
-              item
-              container
-              spacing={2}
-            >
-              {statistics[key].map((metric: any) => (
-                <Grid key={`statistics-${metric.name}`} xs={12} md={6} item>
+          {metrics
+            ? metrics.map((metric: any) => (
+                <Grid
+                  key={`statistics-${metric.name}`}
+                  xs={12}
+                  sm={12}
+                  md={6}
+                  lg={3}
+                  item
+                >
                   <Paper sx={{ p: 2 }}>
                     <Box
                       sx={{
@@ -91,9 +84,8 @@ const WorkflowMetrics = () => {
                     </Box>
                   </Paper>
                 </Grid>
-              ))}
-            </Grid>
-          ))}
+              ))
+            : null}
         </Grid>
       </Box>
     </>

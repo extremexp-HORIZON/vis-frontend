@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography"
 import WorkflowPlaceholder from "./workflow-placeholder"
 import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
 import WorkflowConfiguration from "./workflow-configuration"
-import TaskConfiguration from "../task-configuration"
+import TaskConfiguration from "./task-configuration"
 import { RootState, useAppSelector } from "../../../store/store"
 
 interface IWorkflowTab {
@@ -36,7 +36,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
       <Box key="workflow-svg">
         <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
       </Box>
-      <Box
+      {/* <Box
         key="workflow-configuration"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
       >
@@ -51,7 +51,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
         <Box key="workflow-configuration-items">
           <WorkflowConfiguration />
         </Box>
-      </Box>
+      </Box> */}
       <Box
         key="task-configuration"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
@@ -65,11 +65,11 @@ const WorkflowTab = (props: IWorkflowTab) => {
           </Typography>
         </Box>
         <Box key="task-configuration-items">
-          <TaskConfiguration />
+          <TaskConfiguration  variants={tabs.find(tab => tab.workflowId === workflowId)?.workflowConfiguration.data || null}/>
         </Box>
       </Box>
       <Box
-        key="workflow-metrics"
+        key="metric-summary"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
       >
         <Box key="metric-summary-title">
@@ -81,7 +81,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
           </Typography>
         </Box>
         <Box key="metric-summary-items">
-          <WorkflowMetrics />
+          <WorkflowMetrics metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} />
         </Box>
       </Box>
       {chosenTask ? (

@@ -3,12 +3,12 @@ import { IModelAnalysisTask } from "./modelAnalysisTask.model";
 
 export interface IWorkflowTabModel {
     workflowId: null | string | number;
-    workflowDetails: {
+    workflowConfiguration: {
         data: {[key: string]: number | string} | null
         loading: boolean;
     }
     workflowMetrics: {
-        data: {[key: string]: number | string} | null
+        data: { name: string, value: number, avgDiff: number}[] | null
         loading: boolean;
     }
     workflowSvg: {
@@ -23,7 +23,7 @@ export interface IWorkflowTabModel {
 
 export const defaultWorkflowTabModel: IWorkflowTabModel = {
     workflowId: null,
-    workflowDetails: {
+    workflowConfiguration: {
         data: null,
         loading: true
     },
