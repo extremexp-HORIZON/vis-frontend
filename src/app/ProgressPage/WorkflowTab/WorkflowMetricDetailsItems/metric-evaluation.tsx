@@ -11,7 +11,7 @@ interface Metric {
 
 interface IMetricEvaluation {
   availableMetrics: Metric[] | null
-  workflowId: number
+  workflowId: number | string
 }
 
 const MetricEvaluation = (props: IMetricEvaluation) => {

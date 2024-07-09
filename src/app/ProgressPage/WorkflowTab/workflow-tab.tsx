@@ -8,9 +8,11 @@ import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
 import { RootState, useAppSelector } from "../../../store/store"
 import WorkflowMetricDetails from "./workflow-metric-details"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
+import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
+import { ICompareCompletedTab } from "../../../shared/models/compare.completed.tab.model"
 
 interface IWorkflowTab {
-  workflowId: number
+  workflowId: number | string
 }
 
 const WorkflowTab = (props: IWorkflowTab) => {
@@ -28,7 +30,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
         return null
     }
   }
- 
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 1 }}>
       <Box key="workflow-svg">
@@ -49,8 +51,11 @@ const WorkflowTab = (props: IWorkflowTab) => {
         <Box key="task-configuration-items">
           <WorkflowTaskConfiguration
             variants={
-              tabs.find(tab => tab.workflowId === workflowId)
-                ?.workflowConfiguration.data || null
+              (
+                tabs.find(
+                  tab => tab.workflowId === workflowId,
+                ) as IWorkflowTabModel
+              )?.workflowConfiguration.data || null
             }
           />
         </Box>
@@ -68,7 +73,15 @@ const WorkflowTab = (props: IWorkflowTab) => {
           </Typography>
         </Box>
         <Box key="metric-summary-items">
-          <WorkflowMetrics metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} />
+          <WorkflowMetrics
+            metrics={
+              (
+                tabs.find(
+                  tab => tab.workflowId === workflowId,
+                ) as IWorkflowTabModel
+              )?.workflowMetrics.data || null
+            }
+          />
         </Box>
       </Box>
       {chosenTask ? (
@@ -87,7 +100,16 @@ const WorkflowTab = (props: IWorkflowTab) => {
             </Typography>
           </Box>
           <Box key="workflow-metric-details-items">
-          <WorkflowMetricDetails metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} workflowId={workflowId}  />
+            <WorkflowMetricDetails
+              metrics={
+                (
+                  tabs.find(
+                    tab => tab.workflowId === workflowId,
+                  ) as IWorkflowTabModel
+                )?.workflowMetrics.data || null
+              }
+              workflowId={workflowId}
+            />
           </Box>
         </Box>
       )}

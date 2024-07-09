@@ -6,11 +6,11 @@ import CloseIcon from "@mui/icons-material/Close"
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { deleteTab } from "../../store/slices/workflowTabsSlice"
 import Box from "@mui/material/Box"
-import { IconButton } from "@mui/material"
+import { IconButton, useTheme } from "@mui/material"
 
 interface IProgressPageTabs {
-  value: number
-  handleChange: (newValue: number) => (event: React.SyntheticEvent) => void
+  value: number | string
+  handleChange: (newValue: number | string) => (event: React.SyntheticEvent) => void
 }
 
 const ProgressPageTabs = (props: IProgressPageTabs) => {
@@ -20,9 +20,11 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
   const progressPageTabsRef = useRef<HTMLDivElement>(null)
   const initialOffsetTopRef = useRef<number>(0)
   const [isSticky, setIsSticky] = useState(false)
+  const theme = useTheme();
 
   const handleRemoveTab = (workflowId: number | string | null) => () => {
-    handleChange(workflowId === value ? 0 : Number(workflowId))
+    if (workflowId === null) return
+    handleChange(workflowId === value ? 0 : workflowId)
     dispatch(deleteTab(workflowId))
   }
 
@@ -87,7 +89,59 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
         Experiment Overview
       </Button>
       {tabs.map((tab, index) => (
-        <Box
+        tab.workflowId === "compare-completed" ? <Box
+        key={`tab-${tab.workflowId}`}
+        sx={{
+          borderRadius: 3,
+          border: `2px solid ${theme.palette.success.main}`,
+          pr: 1,
+          bgcolor: value === tab.workflowId ? "white" : grey[300],
+          fontSize: "0.8rem",
+          textTransform: "none",
+          display: "flex",
+          columnGap: 1,
+          alignItems: "center",
+          ":hover": {
+            bgcolor: value !== tab.workflowId ? grey[300] : "white",
+          },
+        }}
+      >
+        <Button
+          size="small"
+          sx={{
+            textTransform: "none",
+            ":hover": {
+              bgcolor: "transparent",
+            },
+            fontSize: "0.8rem",
+            p: 0,
+            color: theme.palette.success.main,
+            pl: 2,
+            py: 1,
+            borderRadius: 3,
+          }}
+          disableRipple
+          disableFocusRipple
+          disableTouchRipple
+          onClick={handleChange(tab.workflowId)}
+        >
+          Workflow Comparative Analysis
+        </Button>
+        <IconButton
+          sx={{ p: 0, height: "max-content" }}
+          onClick={handleRemoveTab(tab.workflowId)}
+        >
+          <CloseIcon
+            fontSize="inherit"
+            sx={{
+              borderRadius: 8,
+              fontSize: "1rem",
+              p: 0.1,
+              ":hover": { bgcolor: grey[400] },
+            }}
+          />
+        </IconButton>
+      </Box> : <Box
           key={`tab-${tab.workflowId}`}
           sx={{
             borderRadius: 3,
@@ -134,7 +188,6 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
                 borderRadius: 8,
                 fontSize: "1rem",
                 p: 0.1,
-                zIndex: 99999,
                 ":hover": { bgcolor: grey[400] },
               }}
             />

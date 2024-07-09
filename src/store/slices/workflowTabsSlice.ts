@@ -11,9 +11,11 @@ import {
 } from "../../shared/models/workflow.tab.model"
 import workflows from "../../shared/data/workflows.json"
 import { add } from "lodash"
+import { ICompareCompletedTab } from "../../shared/models/compare.completed.tab.model"
+import WorkflowMetrics from "../../app/ProgressPage/WorkflowTab/workflow-metrics"
 
 interface IWorkflowTab {
-  tabs: IWorkflowTabModel[]
+  tabs: (IWorkflowTabModel | ICompareCompletedTab)[]
 }
 
 const initialState: IWorkflowTab = {
@@ -27,6 +29,9 @@ export const workflowTabsSlice = createSlice({
   reducers: {
     addTab: (state, action) => {
       state.tabs = [...state.tabs, initializeTab(action.payload)]
+    },
+    addCompareCompletedTab: (state) => {
+      state.tabs = [...state.tabs, initializeCompareCompleteTab()]
     },
     deleteTab: (state, action) => {
       state.tabs = state.tabs.filter(tab => tab.workflowId !== action.payload)
@@ -68,16 +73,25 @@ const workflowMetricsInitializer = (
     workflow => workflow.workflowInfo.status === "completed",
   )
   const metricNames = ["accuracy", "precision", "recall", "runtime"]
-  return Object.keys(metrics).filter(metricName => metricNames.includes(metricName)).map(metric => {
+  return Object.keys(metrics)
+    .filter(metricName => metricNames.includes(metricName))
+    .map(metric => {
       const metricsSum = finishedWorkflows.reduce((acc, workflow) => {
-        return acc + (workflow.metrics ? workflow.metrics[metric as keyof typeof workflow.metrics] : 0)
+        return (
+          acc +
+          (workflow.metrics
+            ? workflow.metrics[metric as keyof typeof workflow.metrics]
+            : 0)
+        )
       }, 0)
       return {
         name: metric,
         value: metrics[metric],
-        avgDiff: ((metrics[metric] * 100) / (metricsSum / finishedWorkflows.length) - 100),
+        avgDiff:
+          (metrics[metric] * 100) / (metricsSum / finishedWorkflows.length) -
+          100,
       }
-  })
+    })
 }
 
 const initializeTab = (workflowId: number) => {
@@ -100,7 +114,22 @@ const initializeTab = (workflowId: number) => {
   return tab
 }
 
+const initializeCompareCompleteTab = () => {
+  const compWorkflows = workflows.filter(
+    workflow => workflow.workflowInfo.status === "completed",
+  )
+
+  const tab: ICompareCompletedTab = {
+    workflowId: "compare-completed",
+    completedWorkflows: compWorkflows.map(element => ({
+     workflowId: element.workflowId,
+     WorkflowMetrics: element.metrics   
+    }))
+  }
+  return tab
+}
+
 //Reducer exports
-export const { addTab, deleteTab } = workflowTabsSlice.actions
+export const { addTab, deleteTab, addCompareCompletedTab } = workflowTabsSlice.actions
 
 export default workflowTabsSlice.reducer

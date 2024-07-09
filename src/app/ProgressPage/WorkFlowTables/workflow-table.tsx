@@ -194,7 +194,7 @@ const rows = workflows.map((workflow) =>
 
 
 interface WorkFlowTableProps {
-  handleChange: (newValue: number) => (event: React.SyntheticEvent) => void;
+  handleChange: (newValue: number | string) => (event: React.SyntheticEvent) => void;
 }
 
 
@@ -218,7 +218,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
   }
 
-  const handleLaunchNewTab = (workflowId: number) => (e: React.SyntheticEvent) => {
+  const handleLaunchNewTab = (workflowId: number | string) => (e: React.SyntheticEvent) => {
     if (tabs.find(tab => tab.workflowId === workflowId)) return
     dispatch(addTab(workflowId))
     handleChange(workflowId)
@@ -337,7 +337,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         <ToolbarWorkflow actionButtonName='Compare selected workflows' secondActionButtonName='Compare completed workflows' tableName="Workflow Execution"
           numSelected={selected.length}
           filterNumbers={filterCounter} filterClickedFunction={filterClicked}
-          handleClickedFunction={() => handleChange} />
+          handleClickedFunction={handleLaunchNewTab} />
         <Popover
           id={"Filters"}
           open={isFilterOpen}
