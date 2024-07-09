@@ -12,7 +12,7 @@ interface Column {
 interface ChartControlsProps {
     setMode: (mode: 'stack' | 'overlay') => void;
     mode: 'stack' | 'overlay';
-    setChartType: (chartType: 'line' | 'bar' | 'area' | 'heatmap') => void;
+setChartType: (chartType: 'line' | 'area' | 'heatmap' | 'bar') => void
     chartType: 'line' | 'bar' | 'area' | 'heatmap';
     setShowStatistics: (showStatistics: boolean) => void;
     showStatistics: boolean;
@@ -25,6 +25,10 @@ interface ChartControlsProps {
     setXAxis: (column: string) => void;
     yAxis: string[];
     setYAxis: (columns: string[]) => void;
+    aggFunction: 'None' | 'Min' | 'Max' | 'Avg'; // Initialize with 'None'
+    setAggFunction: (aggFunction: 'None' | 'Min' | 'Max' | 'Avg') => void;
+    category: string;
+    setCategory: (category: string) => void;
 }
 
 const ChartControls: React.FC<ChartControlsProps> = ({
@@ -42,7 +46,11 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     xAxis,
     setXAxis,
     yAxis,
-    setYAxis
+    setYAxis,
+    aggFunction,
+    setAggFunction,
+    category,
+    setCategory,
 }) => {
     const handleXAxisChange = (event: SelectChangeEvent<string>) => {
         setXAxis(event.target.value as string);
@@ -52,7 +60,37 @@ const ChartControls: React.FC<ChartControlsProps> = ({
         const value = event.target.value as string[];
         setYAxis(value);
     };
-    
+
+    const handleAggFunctionChange = (event: SelectChangeEvent<string>) => {
+        setAggFunction(event.target.value as 'None' | 'Min' | 'Max' | 'Avg');
+    };
+    const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCategory(event.target.value);
+    };
+
+    let additionalControl = null;
+
+    if (chartType === 'bar') {
+        additionalControl = (
+            <TextField
+                label="Category"
+                value={category}
+                onChange={handleCategoryChange}
+                sx={{ m: 1, minWidth: 120 }}
+                size="small"
+            />
+        );
+    } else if (chartType === 'heatmap') {
+        additionalControl = (
+            <TextField
+                label="Color By"
+                value={category}
+                onChange={handleCategoryChange}
+                sx={{ m: 1, minWidth: 120 }}
+                size="small"
+            />
+        );
+    }
     return (
     <Box sx={{ width: "90%", px: 1, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: "flex", flexWrap: "wrap" }}>
@@ -112,6 +150,35 @@ const ChartControls: React.FC<ChartControlsProps> = ({
                             ))}
                         </Select>
                     </FormControl>
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+                    <Typography fontSize={"0.8rem"}>grouping function:</Typography>
+                    <FormControl
+                        sx={{ m: 1, minWidth: 120 }}
+                        size="small"
+                    >
+                        <Select
+                            value={aggFunction}
+                            onChange={handleAggFunctionChange}
+                            sx={{ fontSize: "0.8rem" }}
+                            MenuProps={{
+                                PaperProps: {
+                                    style: {
+                                        maxHeight: 250,
+                                        maxWidth: 300,
+                                    },
+                                },
+                            }}
+                        >
+                            <MenuItem value="None">None</MenuItem>
+                            <MenuItem value="min">Min</MenuItem>
+                            <MenuItem value="max">Max</MenuItem>
+                            <MenuItem value="avg">Avg</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {additionalControl}
+
                 </Box>
         </Box>
             {/* <Button variant={showRollingAverage ? 'contained' : 'outlined'} onClick={handleRollingAverageToggle}  

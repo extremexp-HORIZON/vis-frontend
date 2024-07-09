@@ -20,7 +20,7 @@ interface DataExplorationChartProps {
 
 const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeColumn }) => {
   const selectableColumns = columns.filter(column => column.field !== datetimeColumn);
-
+  console.log('colsdialge',selectableColumns);
   const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -39,7 +39,14 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
     return (!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate);
   });
 
+  const getVegaLiteType = (type: string) => {
+    if (type === 'LOCAL_DATE_TIME') return 'temporal';
+    if (type === 'DOUBLE') return 'quantitative';
+    return 'nominal'; // default to nominal if type is not recognized
+  };
   const spec = useMemo(() => {
+    const xAxisType = getVegaLiteType(columns.find(column => column.field === xAxis)?.type || 'nominal');
+    const yAxisType = getVegaLiteType(columns.find(column => column.field === yAxis[0])?.type || 'quantitative');
     const baseTransform = [
       {
         fold: yAxis.length > 0 ? yAxis : selectableColumns.map(col => col.field),
@@ -70,7 +77,7 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         encoding: {
           y: {
             field: "value",
-            type: "quantitative",
+            type: yAxisType,
             aggregate: "mean"
           },
           color: { field: "variable", type: "nominal" },
@@ -91,8 +98,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
               chartType === 'area' ? { type: "area" } :
                 { type: "point", tooltip: true },
           encoding: {
-            x: { type: "temporal", field: xAxis },
-            y: { type: "quantitative", field: showRollingAverage ? "rolling_mean" : "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
+            x: { type: xAxisType, field: xAxis },
+            y: { type: yAxisType, field: showRollingAverage ? "rolling_mean" : "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
             color: { field: "variable", type: "nominal", title: "Variable" },
             tooltip: [
               { field: "variable", type: "nominal" },
@@ -168,22 +175,25 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         height: "100%",
       }}>
         <ChartControls 
-          setMode={setMode}
-          mode={mode}
-          setChartType={setChartType}
-          setShowStatistics={setShowStatistics}
-          chartType={chartType}
-          showStatistics={showStatistics}
-          handleRollingAverageWindowChange={handleRollingAverageWindowChange}
-          handleRollingAverageToggle={handleRollingAverageToggle}
-          showRollingAverage={showRollingAverage}
-          rollingAverageWindow={rollingAverageWindow} 
-          availableColumns={columns} 
-          xAxis={xAxis}
-          setXAxis={setXAxis}
-          yAxis={yAxis}
-          setYAxis={setYAxis}
-        />
+        setMode={setMode}
+        mode={mode}
+        setChartType={setChartType}
+        setShowStatistics={setShowStatistics}
+        chartType={chartType}
+        showStatistics={showStatistics}
+        handleRollingAverageWindowChange={handleRollingAverageWindowChange}
+        handleRollingAverageToggle={handleRollingAverageToggle}
+        showRollingAverage={showRollingAverage}
+        rollingAverageWindow={rollingAverageWindow}
+        availableColumns={columns}
+        xAxis={xAxis}
+        setXAxis={setXAxis}
+        yAxis={yAxis}
+        setYAxis={setYAxis} aggFunction={'None'} setAggFunction={function (aggFunction: 'None' | 'Min' | 'Max' | 'Avg'): void {
+          throw new Error('Function not implemented.');
+        } } category={''} setCategory={function (category: string): void {
+          throw new Error('Function not implemented.');
+        } }        />
         <Box sx={{ width: "99%", px: 1 }}>
           <VegaLite
             spec={spec as VisualizationSpec}
