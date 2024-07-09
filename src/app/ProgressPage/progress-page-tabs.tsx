@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { deleteTab } from "../../store/slices/workflowTabsSlice"
+import Box from "@mui/material/Box"
+import { IconButton } from "@mui/material"
 
 interface IProgressPageTabs {
   value: number
@@ -20,8 +22,8 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
   const [isSticky, setIsSticky] = useState(false)
 
   const handleRemoveTab = (workflowId: number | string | null) => () => {
+    handleChange(workflowId === value ? 0 : Number(workflowId))
     dispatch(deleteTab(workflowId))
-    handleChange(0)(null as any)
   }
 
   useEffect(() => {
@@ -73,7 +75,6 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
           py: 1,
           color: "black",
           bgcolor: value === 0 ? "white" : grey[300],
-          border: value !== 0 ? `1px solid ${grey[400]}` : "none",
           fontSize: "0.8rem",
           textTransform: "none",
           ":hover": { bgcolor: value !== 0 ? grey[500] : "white" },
@@ -85,68 +86,60 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
       >
         Experiment Overview
       </Button>
-      {/* <Button
-        sx={{
-          borderRadius: 3,
-          px: 2,
-          py: 1,
-          color: "black",
-          bgcolor: value === 1 ? "white" : grey[300],
-          border: value !== 1 ? `1px solid ${grey[400]}` : "none",
-          fontSize: "0.8rem",
-          textTransform: "none",
-          display: "flex",
-          columnGap: 1,
-          ":hover": { bgcolor: value !== 1 ? grey[300] : "white" },
-        }}
-        size="small"
-        disableRipple
-        onClick={handleChange(1)}
-      >
-        Workflow{1}
-        <CloseIcon
-          fontSize="inherit"
-          onClick={handleRemoveTab(1)}
-          sx={{
-            borderRadius: 8,
-            fontSize: "1rem",
-            p: 0.1,
-            ":hover": { bgcolor: grey[400], zIndex: 99999 },
-          }}
-        />
-      </Button> */}
       {tabs.map((tab, index) => (
-        <Button
+        <Box
           key={`tab-${tab.workflowId}`}
           sx={{
             borderRadius: 3,
-            px: 2,
-            py: 1,
-            color: "black",
+            pr: 1,
             bgcolor: value === tab.workflowId ? "white" : grey[300],
-            border: value !== tab.workflowId ? `1px solid ${grey[400]}` : "none",
             fontSize: "0.8rem",
             textTransform: "none",
             display: "flex",
             columnGap: 1,
-            ":hover": { bgcolor: value !== tab.workflowId ? grey[300] : "white" },
+            alignItems: "center",
+            ":hover": {
+              bgcolor: value !== tab.workflowId ? grey[300] : "white",
+            },
           }}
-          size="small"
-          disableRipple
-          onClick={handleChange(tab.workflowId as number)}
         >
-          Workflow{tab.workflowId}
-          <CloseIcon
-            fontSize="inherit"
-            onClick={handleRemoveTab(tab.workflowId)}
+          <Button
+            size="small"
             sx={{
-              borderRadius: 8,
-              fontSize: "1rem",
-              p: 0.1,
-              ":hover": { bgcolor: grey[400] },
+              textTransform: "none",
+              ":hover": {
+                bgcolor: "transparent",
+              },
+              fontSize: "0.8rem",
+              p: 0,
+              color: "black",
+              pl: 2,
+              py: 1,
+              borderRadius: 3,
             }}
-          />
-        </Button>
+            disableRipple
+            disableFocusRipple
+            disableTouchRipple
+            onClick={handleChange(tab.workflowId as number)}
+          >
+            Workflow{tab.workflowId}
+          </Button>
+          <IconButton
+            sx={{ p: 0, height: "max-content" }}
+            onClick={handleRemoveTab(tab.workflowId)}
+          >
+            <CloseIcon
+              fontSize="inherit"
+              sx={{
+                borderRadius: 8,
+                fontSize: "1rem",
+                p: 0.1,
+                zIndex: 99999,
+                ":hover": { bgcolor: grey[400] },
+              }}
+            />
+          </IconButton>
+        </Box>
       ))}
     </Grid>
   )

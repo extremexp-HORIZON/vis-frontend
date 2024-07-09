@@ -12,7 +12,7 @@ interface ITaskConfiguration {
   variants: { [key: string]: number | string } | null
 }
 
-const TaskConfiguration = (props: ITaskConfiguration) => {
+const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
   const { variants } = props
 
   const tasks = [
@@ -54,4 +54,4 @@ const TaskConfiguration = (props: ITaskConfiguration) => {
   )
 }
 
-export default TaskConfiguration
+export default WorkflowTaskConfiguration

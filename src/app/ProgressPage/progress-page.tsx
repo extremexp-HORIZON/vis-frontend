@@ -37,12 +37,9 @@ const ProgressPage = () => {
             sx={{
               display: "flex",
               borderBottom: `1px solid ${grey[500]}`,
-              px: 2,
+              px: 0,
             }}
           >
-            <IconButton>
-              <EditIcon />
-            </IconButton>
             <Typography fontSize={"2rem"} sx={{ fontWeight: 600 }}>
               {"Experiment1"}
             </Typography>

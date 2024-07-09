@@ -111,7 +111,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               sx={{
                 width: "100%",
                 display: "flex",
-                alignItems: "center",
+                flexDirection: "column",
+                alignItems: "start",
                 columnGap: 1,
               }}
             >
@@ -119,9 +120,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                 variant="body1"
                 sx={{ fontWeight: 600, fontSize: "1.5rem" }}
               >
-                Experiment Variant {variantId}:
+                Classification Report
               </Typography>
-              <Typography variant="body1">Classification Report</Typography>
+              <Typography variant="body1">Test set classified instances and Confusion Matrix</Typography>
             </Box>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -158,7 +159,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               sx={{
                 width: "100%",
                 display: "flex",
-                alignItems: "center",
+                flexDirection: "column",
+                alignItems: "start",
                 columnGap: 1,
               }}
             >
@@ -166,9 +168,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                 variant="body1"
                 sx={{ fontWeight: 600, fontSize: "1.5rem" }}
               >
-                Experiment Variant {variantId}:
+                Expainability:
               </Typography>
-              <Typography variant="body1">Features Explainability</Typography>
+              <Typography variant="body1">Feature based explanations for this variant</Typography>
             </Box>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>

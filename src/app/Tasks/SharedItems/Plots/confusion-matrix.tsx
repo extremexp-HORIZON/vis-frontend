@@ -42,7 +42,7 @@ const ConfusionMatrix = (props: ILineplot) => {
         flexDirection: "column",
         rowGap: 0,
         minWidth: "300px",
-        height: "70%",
+        height: "100%",
       }}
     >
       <Box

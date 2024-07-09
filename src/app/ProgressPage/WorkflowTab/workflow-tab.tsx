@@ -1,14 +1,13 @@
 import Box from "@mui/material/Box"
 import WorkflowMetrics from "./workflow-metrics"
 import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
-import WorkflowDetails from "./WorkflowDetails"
 import WorkflowSvg from "./workflow-svg"
 import { useState } from "react"
 import Typography from "@mui/material/Typography"
-import WorkflowPlaceholder from "./workflow-placeholder"
 import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
-import TaskConfiguration from "./task-configuration"
 import { RootState, useAppSelector } from "../../../store/store"
+import WorkflowMetricDetails from "./workflow-metric-details"
+import WorkflowTaskConfiguration from "./workflow-task-configuration"
 
 interface IWorkflowTab {
   workflowId: number
@@ -26,7 +25,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
       case "Model_Training":
         return <ModelAnalysisTask variantId={71} />
       case null:
-        return <WorkflowPlaceholder />
+        return null
     }
   }
  
@@ -35,22 +34,6 @@ const WorkflowTab = (props: IWorkflowTab) => {
       <Box key="workflow-svg">
         <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
       </Box>
-      {/* <Box
-        key="workflow-configuration"
-        sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
-      >
-        <Box key="workflow-configuration-title">
-          <Typography
-            variant="body1"
-            sx={{ fontWeight: 600, fontSize: "1.5rem" }}
-          >
-            Workflow1 Configuration
-          </Typography>
-        </Box>
-        <Box key="workflow-configuration-items">
-          <WorkflowConfiguration />
-        </Box>
-      </Box> */}
       <Box
         key="task-configuration"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
@@ -64,7 +47,12 @@ const WorkflowTab = (props: IWorkflowTab) => {
           </Typography>
         </Box>
         <Box key="task-configuration-items">
-          <TaskConfiguration  variants={tabs.find(tab => tab.workflowId === workflowId)?.workflowConfiguration.data || null}/>
+          <WorkflowTaskConfiguration
+            variants={
+              tabs.find(tab => tab.workflowId === workflowId)
+                ?.workflowConfiguration.data || null
+            }
+          />
         </Box>
       </Box>
       <Box
@@ -82,14 +70,26 @@ const WorkflowTab = (props: IWorkflowTab) => {
         <Box key="metric-summary-items">
           <WorkflowMetrics metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} />
         </Box>
-        <Box key="summary-items">
-          <WorkflowDetails metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} workflowId={workflowId}  />
-        </Box>
       </Box>
       {chosenTask ? (
         <Box key="workflow-task">{taskProvider(chosenTask)}</Box>
       ) : (
-        <Box key="metric-details"><WorkflowPlaceholder /></Box>
+        <Box
+          key="workflow-metric-details"
+          sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
+        >
+          <Box key="workflow-metric-details-title">
+            <Typography
+              variant="body1"
+              sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+            >
+              Metric Details
+            </Typography>
+          </Box>
+          <Box key="workflow-metric-details-items">
+          <WorkflowMetricDetails metrics={tabs.find(tab => tab.workflowId === workflowId)?.workflowMetrics.data || null} workflowId={workflowId}  />
+          </Box>
+        </Box>
       )}
     </Box>
   )
