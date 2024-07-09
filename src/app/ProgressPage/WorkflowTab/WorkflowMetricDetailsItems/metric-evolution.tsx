@@ -92,9 +92,9 @@ const MetricEvolution = () => {
         y: { field: "value", type: "quantitative" },
       },
     },
-    config: {
-      facet: { spacing: 10 },
-    },
+    // config: {
+    //   facet: { spacing: 10 },
+    // },
   } as VisualizationSpec
 
   return (

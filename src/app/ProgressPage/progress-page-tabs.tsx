@@ -10,7 +10,7 @@ import { IconButton, useTheme } from "@mui/material"
 
 interface IProgressPageTabs {
   value: number | string
-  handleChange: (newValue: number | string) => (event: React.SyntheticEvent) => void
+  handleChange: (newValue: number | string) => (event: any) => void
 }
 
 const ProgressPageTabs = (props: IProgressPageTabs) => {
@@ -24,7 +24,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
 
   const handleRemoveTab = (workflowId: number | string | null) => () => {
     if (workflowId === null) return
-    handleChange(workflowId === value ? 0 : workflowId)
+    workflowId === value && handleChange(0)(null)
     dispatch(deleteTab(workflowId))
   }
 

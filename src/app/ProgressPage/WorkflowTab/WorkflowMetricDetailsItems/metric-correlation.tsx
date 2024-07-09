@@ -9,7 +9,7 @@ import {
   Paper,
   Tooltip,
 } from "@mui/material"
-import { VegaLite } from "react-vega"
+import { Vega, VegaLite } from "react-vega"
 import InfoIcon from "@mui/icons-material/Info"
 import grey from "@mui/material/colors/grey"
 
@@ -26,8 +26,8 @@ interface IMetricCorrelation {
 
 const MetricCorrelation = (props: IMetricCorrelation) => {
   const { availableMetrics, workflowId } = props
-  const [xMetric, setXMetric] = useState("Precision")
-  const [yMetric, setYMetric] = useState("Accuracy")
+  const [xMetric, setXMetric] = useState("precision")
+  const [yMetric, setYMetric] = useState("accuracy")
 
   const handleAxisSelection =
     (axis: string) => (e: { target: { value: string } }) => {
@@ -116,12 +116,9 @@ const MetricCorrelation = (props: IMetricCorrelation) => {
           actions={false}
           style={{ width: "90%" }}
           spec={{
-            $schema: "https://vega.github.io/schema/vega/v5.json",
-            description: "A correlation plot between selected metrics.",
-            width: 800,
+            width: 500,
             height: 765,
             padding: 110,
-            autosize: { type: "none", contains: "padding", resize: true },
             data: [
               {
                 name: "table",
