@@ -21,7 +21,7 @@ interface Metric {
 
 interface IMetricCorrelation {
   availableMetrics: Metric[] | null;
-  workflowId: number;
+  workflowId: number | string;
 }
 
 const MetricCorrelation = (props: IMetricCorrelation) => {

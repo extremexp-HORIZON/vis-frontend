@@ -2,7 +2,7 @@ import { IDataExplorationRequest } from "./dataexploration.model";
 import { IModelAnalysisTask } from "./modelAnalysisTask.model";
 
 export interface IWorkflowTabModel {
-    workflowId: null | string | number;
+    workflowId: string | number;
     workflowConfiguration: {
         data: {[key: string]: number | string} | null
         loading: boolean;
@@ -22,7 +22,7 @@ export interface IWorkflowTabModel {
 }
 
 export const defaultWorkflowTabModel: IWorkflowTabModel = {
-    workflowId: null,
+    workflowId: 0,
     workflowConfiguration: {
         data: null,
         loading: true

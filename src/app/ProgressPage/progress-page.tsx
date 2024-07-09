@@ -11,11 +11,13 @@ import ProgressPageTabs from "./progress-page-tabs"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
 import { RootState, useAppSelector } from "../../store/store"
+import CompareCompleted from "./CompareTab/CompareCompleted/compare-completed"
 
 const ProgressPage = () => {
-  const [value, setValue] = useState(0)
+  const [value, setValue] = useState<number | string>(0)
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
-  const handleChange = (newValue: number) => (event: React.SyntheticEvent) => {
+
+  const handleChange = (newValue: number | string) => (event: React.SyntheticEvent) => {
     if (value === newValue) return
     setValue(newValue)
   }
@@ -62,7 +64,8 @@ const ProgressPage = () => {
               <ScheduleTable />
             </>
           )}
-          {value !== 0 && <WorkflowTab workflowId={value} />}
+          {value !== 0 && value !== "compare-completed" && <WorkflowTab workflowId={value} />}
+          {value === "compare-completed" && <CompareCompleted />}
         </Box>
       </Grid>
     </>

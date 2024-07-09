@@ -13,7 +13,7 @@ interface ToolBarWorkflowProps {
   tableName: string;
   actionButtonName: string;
   secondActionButtonName?: string;
-  handleClickedFunction: (list: Number[]) => void;
+  handleClickedFunction: (workflowId: number | string) => (e: React.SyntheticEvent) => void;
   filterClickedFunction: (event: React.MouseEvent<HTMLButtonElement>) => void;
   // handleLaunchNewTab: (workflowId: number) => React.SyntheticEvent;
 
@@ -68,7 +68,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             variant="contained"
             disabled={numSelected < 2 && tableName === "Workflow Execution"}
             style={{ fontSize: "11px" }}
-            onClick={() => handleClickedFunction([])} // TODO: Get the selected and get right value to open new tab or cancel scheduled
+            onClick={handleClickedFunction("compare-completed")} // TODO: Get the selected and get right value to open new tab or cancel scheduled
           >
             {actionButtonName}
 
@@ -84,7 +84,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 variant="outlined"
                 color="success"
                 style={{ fontSize: "11px", fontWeight: 'bold' }}
-                onClick={() => handleClickedFunction([])} // TODO: Get all the completed and get right value to open new tab
+                onClick={handleClickedFunction("compare-completed")} // TODO: Get all the completed and get right value to open new tab
               >
                 {secondActionButtonName}
               </Button> : ''}

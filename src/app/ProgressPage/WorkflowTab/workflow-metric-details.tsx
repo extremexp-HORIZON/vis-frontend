@@ -10,7 +10,7 @@ interface Metric {
 }
 interface IWorkflowMetricDetails {
   metrics: Metric[] | null;
-  workflowId: number;
+  workflowId: number | string;
 }
 
 const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
