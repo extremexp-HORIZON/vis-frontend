@@ -332,8 +332,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   );
 
   return (
-    <Box sx={{ paddingTop: '40px' }}>
-      <Paper sx={{ mb: 4 }}>
+    <Box>
+      <Paper elevation={2}>
         <ToolbarWorkflow actionButtonName='Compare selected workflows' secondActionButtonName='Compare completed workflows' tableName="Workflow Execution"
           numSelected={selected.length}
           filterNumbers={filterCounter} filterClickedFunction={filterClicked}

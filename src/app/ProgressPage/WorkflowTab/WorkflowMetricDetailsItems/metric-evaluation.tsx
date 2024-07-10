@@ -78,8 +78,8 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
           actions={false}
           style={{ width: "90%" }}
           spec={{
-            width: 850,
-            height: 850,
+            width: 550,
+            height: 500,
             padding: 0,
             autosize: { type: "none", contains: "padding", resize: true },
 

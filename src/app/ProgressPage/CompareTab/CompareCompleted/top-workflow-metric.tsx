@@ -21,7 +21,7 @@ const TopWorkflowMetric = () => {
   const topTenWorkflows = getTopTenWorkflowsByMetric(workflows, metric);
  
   const spec = {
-    width: 800,
+    width: "container",
     height: 400,
     mark: "bar",
     encoding: {
@@ -59,7 +59,7 @@ const TopWorkflowMetric = () => {
         }}
       >
         <Typography fontSize={"1rem"} fontWeight={600}>
-          {"Metric Correlation"}
+          {"Top 10 Workflows By Metric"}
         </Typography>
         <Box sx={{ flex: 1 }} />
         <Tooltip title={"Description not available."}>
@@ -87,8 +87,8 @@ const TopWorkflowMetric = () => {
           </Select>
         </FormControl>
       </Box>
-      <Box sx={{ px: 1.5, py: 1, flex: 1 }}>
-        <VegaLite actions={false} spec={spec as VisualizationSpec} />
+      <Box sx={{ px: 1.5, py: 1, flex: 1, width: "99%" }}>
+        <VegaLite actions={false} style={{width: "90%"}} spec={spec as VisualizationSpec} />
       </Box>
     </Paper>
   );

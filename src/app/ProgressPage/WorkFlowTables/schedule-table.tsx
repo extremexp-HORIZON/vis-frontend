@@ -274,8 +274,8 @@ export default function ScheduleTable() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   return (
-    <Box sx={{ paddingTop: '20px' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
+    <Box>
+      <Paper sx={{ width: '100%', mb: 2 }} elevation={2}>
         <ToolBarWorkflow filterNumbers={filterCounter} filterClickedFunction={filterClicked} actionButtonName='Cancel selected workflows' numSelected={selected.length} tableName={"Scheduled Workflows"} handleClickedFunction={removeSelected} />
         <Popover
           id={"Filters"}

@@ -12,6 +12,7 @@ import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
 import { RootState, useAppSelector } from "../../store/store"
 import CompareCompleted from "./CompareTab/CompareCompleted/compare-completed"
+import ProgressPageBar from "./progress-page-bar"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>(0)
@@ -54,9 +55,10 @@ const ProgressPage = () => {
         <Box key="progress-tabs">
           <ProgressPageTabs value={value} handleChange={handleChange} />
         </Box>
-        <Box sx={{ px: 5, display: "flex", flexDirection: "column", mt: 3 }}>
+        <Box sx={{ px: 5, display: "flex", flexDirection: "column", mt: 2, rowGap: 6 }}>
           {value === 0 && (
             <>
+              <ProgressPageBar />
               <ParallelCoordinatePlot />
               <WorkflowTable handleChange={handleChange} />
               {/* <Divider sx={{ margin: '20px' }} /> */}

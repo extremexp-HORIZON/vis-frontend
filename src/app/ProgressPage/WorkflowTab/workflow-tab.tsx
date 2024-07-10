@@ -45,7 +45,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
             variant="body1"
             sx={{ fontWeight: 600, fontSize: "1.5rem" }}
           >
-            Task Configuration
+            Workflow Configuration
           </Typography>
         </Box>
         <Box key="task-configuration-items">
