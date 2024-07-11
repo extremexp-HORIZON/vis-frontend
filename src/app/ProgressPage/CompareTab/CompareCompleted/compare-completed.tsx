@@ -2,6 +2,8 @@ import Box from "@mui/material/Box"
 import MetricsDistribution from "./metrics-distribution"
 import TopWorkflowMetric from "./top-workflow-metric"
 import { Grid, Typography } from "@mui/material"
+import VariabilityPointCharts from "./variability-point-charts"
+import VariabilityPointHeatmap from "./variability-point-heatmap"
 
 const CompareCompleted = () => {
   return (
@@ -28,7 +30,14 @@ const CompareCompleted = () => {
           <Grid item xs={12} md={6}>
             <TopWorkflowMetric />
           </Grid>
+          
         </Grid>
+        <Box>
+            <VariabilityPointCharts />
+          </Box>
+          <Box>
+            <VariabilityPointHeatmap />
+          </Box>
       </Box>
     </Box>
   )
