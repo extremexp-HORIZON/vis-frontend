@@ -1,0 +1,79 @@
+import React, { useState, useEffect } from 'react';
+import { Box, Typography } from '@mui/material';
+import { GaugeContainer, GaugeValueArc, GaugeReferenceArc } from '@mui/x-charts/Gauge';
+import workflows from '../../shared/data/workflows.json';
+
+interface MetricGaugeProps {
+  title: string;
+  value: number;
+  isTime?: boolean;
+}
+
+const MetricGauge: React.FC<MetricGaugeProps> = ({ title, value, isTime = false }) => {
+    // If isTime, display as seconds, otherwise assume the value is from 0 to 1 and convert to percentage.
+    const displayValue = isTime ? `${value.toFixed(3)} sec` : `${(value).toFixed(3)}`;
+    const maxValue = isTime ? 5 : 100; // Set max to 5 for time values and 100 for percentages
+
+
+    return (
+        <Box sx={{ margin: 2, textAlign: 'center' }}>
+            <Typography variant="h6">Avg. {title} per Workflow</Typography>
+            <GaugeContainer width={200} height={200} startAngle={-110} endAngle={110} value={isTime ? value : value * 100}>
+                <GaugeReferenceArc min={0} max={maxValue} />
+                <GaugeValueArc />
+                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="20" fill="black">
+                    {displayValue}
+                </text>
+            </GaugeContainer>
+        </Box>
+    );
+};
+
+interface Metrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  runtime: number;
+}
+
+const ProgressPageGauges: React.FC = () => {
+    const [metrics, setMetrics] = useState<Metrics>({
+        accuracy: 0,
+        precision: 0,
+        recall: 0,
+        runtime: 0
+    });
+
+    useEffect(() => {
+        const completedWorkflows = workflows.filter(workflow => workflow.workflowInfo.status === "completed");
+        const extractedMetrics = completedWorkflows.map(workflow => ({
+            accuracy: workflow.metrics?.accuracy ?? 0,
+            precision: workflow.metrics?.precision ?? 0,
+            recall: workflow.metrics?.recall ?? 0,
+            runtime: workflow.metrics?.runtime ?? 0
+        }));
+
+        const calculateAverage = (metric: keyof Metrics) => {
+            const values = extractedMetrics.map(m => m[metric]);
+            return values.length > 0 ? values.reduce((acc, cur) => acc + cur, 0) / values.length : 0;
+        };
+
+        setMetrics({
+            accuracy: calculateAverage('accuracy'),
+            precision: calculateAverage('precision'),
+            recall: calculateAverage('recall'),
+            runtime: calculateAverage('runtime')
+        });
+    }, []);
+
+    return (
+        <Box display="flex" justifyContent="center" flexWrap="wrap">
+            <MetricGauge title="Accuracy" value={metrics.accuracy} />
+            <MetricGauge title="Precision" value={metrics.precision} />
+            <MetricGauge title="Recall" value={metrics.recall} />
+            <MetricGauge title="Runtime" value={metrics.runtime} isTime={false} />
+        </Box>
+    );
+};
+
+export default ProgressPageGauges;
