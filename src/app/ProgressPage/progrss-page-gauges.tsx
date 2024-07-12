@@ -29,6 +29,23 @@ const MetricGauge: React.FC<MetricGaugeProps> = ({ title, value, isTime = false 
     );
 };
 
+
+const RuntimeDisplay: React.FC<{ value: number }> = ({ value }) => {
+    return (
+        <Box sx={{ margin: 2, textAlign: 'center' }}>
+            <Typography variant="h6" sx={{ marginBottom: 8 }}> {/* Added marginBottom here */}
+                Avg. Runtime per Workflow
+            </Typography>
+            <Typography variant="h4" sx={{
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+            }}>
+                {value.toFixed(2)}s
+            </Typography>
+        </Box>
+    );
+};
+
+
 interface Metrics {
   accuracy: number;
   precision: number;
@@ -71,7 +88,8 @@ const ProgressPageGauges: React.FC = () => {
             <MetricGauge title="Accuracy" value={metrics.accuracy} />
             <MetricGauge title="Precision" value={metrics.precision} />
             <MetricGauge title="Recall" value={metrics.recall} />
-            <MetricGauge title="Runtime" value={metrics.runtime} isTime={false} />
+            <RuntimeDisplay value={metrics.runtime} />
+
         </Box>
     );
 };
