@@ -41,7 +41,8 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
 
   const getVegaLiteType = (type: string) => {
     if (type === 'LOCAL_DATE_TIME') return 'temporal';
-    if (type === 'DOUBLE') return 'quantitative';
+    if (type === 'DOUBLE' || type === 'INTEGER') 
+      return 'quantitative';
     return 'nominal'; // default to nominal if type is not recognized
   };
   const spec = useMemo(() => {

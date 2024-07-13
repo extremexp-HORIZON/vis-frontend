@@ -155,17 +155,16 @@ const DataExploration: React.FC = () => {
                 {loading && <CircularProgress />}
                 {error && <Typography color="error">Error: {error}</Typography>}
                 {!loading && (
-                  datetimeColumn ? (
+                 
                     <DataExplorationChart
                       data={originalData}
                       columns={columns}
                       datetimeColumn={datetimeColumn}
                       selectedColumns={selectedCols}
                     />
-                  ) : (
-                    <ScatterPlot data={data} columns={columns} />
-                  )
-                )}
+                  ) 
+                  
+                }
               </>
             )}
            
