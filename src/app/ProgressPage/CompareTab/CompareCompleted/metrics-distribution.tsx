@@ -14,10 +14,39 @@ import {
 } from "@mui/material"
 import { grey } from "@mui/material/colors"
 import InfoIcon from "@mui/icons-material/Info"
+import workflows from "../../../../shared/data/workflows.json"; // Adjust the import based on your project structure
+interface Workflow {
+  workflowId: string;
+  workflowInfo: {
+    status: string;
+  };
+  metrics: {
+    [key: string]: number;
+  };
+  variabilityPoints: {
+    [key: string]: number;
+  };
+}
+
+
 
 const MetricsDistribution = () => {
+
+  const getData = (workflows: Workflow[], metric: string) => {
+    const completedWorkflows = workflows.filter(workflow => 
+      workflow.metrics && workflow.metrics[metric] !== undefined
+    );
+    completedWorkflows.sort((a, b) => b.metrics[metric] - a.metrics[metric]);
+    const chartData = completedWorkflows.map(workflow => ({
+      metricName: metric, 
+      value: workflow.metrics[metric],
+    }));
+  
+    console.log(chartData);
+    return chartData;
+  };
   const metrics = ["accuracy", "precision", "recall"]
-  const [selectedMetrics, setSelectedMetrics] = useState(["accuracy"])
+  const [selectedMetrics, setSelectedMetrics] = useState(["recall"])
 
   const handleMetricChange = (event: any) => {
     const {
@@ -25,27 +54,6 @@ const MetricsDistribution = () => {
     } = event
     setSelectedMetrics(typeof value === "string" ? value.split(",") : value)
   }
-
-  // Dummy data
-  const data = [
-    { metricName: "accuracy", value: 0.7 },
-    { metricName: "accuracy", value: 0.8 },
-    { metricName: "accuracy", value: 0.65 },
-    { metricName: "precision", value: 0.6 },
-    { metricName: "precision", value: 0.7 },
-    { metricName: "precision", value: 0.55 },
-    { metricName: "recall", value: 0.5 },
-    { metricName: "recall", value: 0.6 },
-    { metricName: "recall", value: 0.45 },
-    { metricName: "runtime", value: 1.2 },
-    { metricName: "runtime", value: 1.5 },
-    { metricName: "runtime", value: 1.1 },
-  ]
-
-  const getFilteredData = (metric: any) => {
-    return  data.filter(d => d.metricName === metric)
-  }
-
   return (
     <Paper
       className="Category-Item"
@@ -114,8 +122,8 @@ const MetricsDistribution = () => {
             actions={false}
             style={{ width: "max-content" }}
             spec={{
-              width: 300,
-              height: 200,
+              width: 400,
+              height: 300,
               padding: 5,
               config: {
                 axisBand: {
@@ -133,7 +141,7 @@ const MetricsDistribution = () => {
               data: [
                 {
                   name: "dummyData",
-                  values: getFilteredData(metric),
+                  values: getData(workflows as unknown as Workflow[], metric),
                 },
                 {
                   name: "density",
@@ -237,15 +245,20 @@ const MetricsDistribution = () => {
                           fill: {
                             scale: "color",
                             field: { parent: "metricName" },
+
                           },
                           orient: { value: "horizontal" },
+                          tooltip: { signal: "{'Metric': parent.metricName, 'Value': datum.value, 'Density': datum.density}" }
+
                         },
                         update: {
                           y: { scale: "yscale", field: "value" },
                           xc: { signal: "plotWidth / 2" },
                           width: { scale: "hscale", field: "density" },
                         },
+
                       },
+
                     },
                     {
                       type: "rect",
@@ -253,13 +266,16 @@ const MetricsDistribution = () => {
                       encode: {
                         enter: {
                           fill: { value: "black" },
-                          width: { value: 5 },
+                          width: { value: 2 },
+                          tooltip: { signal: "{'Metric': parent.metricName, 'Q1': datum.q1, 'Q3': datum.q3}" }
+
                         },
                         update: {
                           y: { scale: "yscale", field: "q1" },
                           y2: { scale: "yscale", field: "q3" },
                           xc: { signal: "plotWidth / 2" },
                         },
+
                       },
                     },
                     {
@@ -268,13 +284,16 @@ const MetricsDistribution = () => {
                       encode: {
                         enter: {
                           fill: { value: "black" },
-                          height: { value: 20 },
-                          width: { value: 20 },
+                          height: { value: 10 },
+                          width: { value: 10 },
+                          tooltip: { signal: "{'Metric': parent.metricName, 'Median': datum.median}" }
+
                         },
                         update: {
                           y: { scale: "yscale", field: "median" },
                           xc: { signal: "plotWidth / 2" },
                         },
+
                       },
                     },
                   ],

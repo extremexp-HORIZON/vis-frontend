@@ -134,7 +134,7 @@ const VariabilityPointHeatmap: React.FC = () => {
         </FormControl>
       </Box>
 
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mt: 2 }}>
         <VegaLite spec={{
           width: 500,
           height: 500,

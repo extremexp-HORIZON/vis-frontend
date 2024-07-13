@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { VegaLite} from "react-vega";
 import { Paper, Box, Typography, FormControl, Select, MenuItem, Chip, IconButton, Tooltip, SelectChangeEvent } from "@mui/material";
 import workflows from "../../../../shared/data/workflows.json"; // Adjust the import based on your project structure
@@ -47,6 +47,8 @@ const getYAxisDomain = (data: ChartData[]) => {
 const VariabilityPointCharts = () => {
   const [selectedMetric, setSelectedMetric] = useState("accuracy");
   const [selectedVariabilityPoints, setSelectedVariabilityPoints] = useState(["learning_rate"]);
+  const [chartWidth, setChartWidth] = useState(250); // Default width
+
 
   const chartData = processData(workflows as unknown as Workflow[], selectedMetric, selectedVariabilityPoints);
   const yAxisDomain = getYAxisDomain(chartData);
@@ -69,6 +71,21 @@ const VariabilityPointCharts = () => {
       },
     },
   };
+  useEffect(() => {
+    const handleResize = () => {
+      const chartContainerWidth = (document.querySelector('.chart-container') as HTMLElement | null)?.offsetWidth || 300;
+      if (chartContainerWidth) {
+        setChartWidth(Math.max(300, chartContainerWidth / selectedVariabilityPoints.length - 20)); // 20px for margin
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial call to set width
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [selectedVariabilityPoints.length]); // Depend on the numbe
 
   return (
     <Paper
@@ -145,12 +162,12 @@ const VariabilityPointCharts = () => {
           </Select>
         </FormControl>
       </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, p: 2, className: 'chart-container' }}>
         {selectedVariabilityPoints.map(point => (
-          <Box key={point} sx={{ width: '30%', mb: 2 }}>
+          <Box key={point} sx={{ width: `${100 / selectedVariabilityPoints.length}%`, minWidth: '300px' }}>
             <VegaLite spec={{
-              width: 400,
-              height: 400,
+              width: chartWidth,
+              height: 300,
               mark: { type: "point", tooltip: true },
               encoding: {
                 x: { field: "x", type: "nominal", title: point },
