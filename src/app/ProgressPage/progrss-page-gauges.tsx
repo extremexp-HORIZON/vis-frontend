@@ -16,9 +16,9 @@ const MetricGauge: React.FC<MetricGaugeProps> = ({ title, value, isTime = false 
 
 
     return (
-        <Box sx={{ margin: 2, textAlign: 'center' }}>
+        <Box sx={{ display: "flex", flexDirection: "column", textAlign: "center" }}>
             <Typography variant="h6">Avg. {title} per Workflow</Typography>
-            <GaugeContainer width={200} height={200} startAngle={-110} endAngle={110} value={isTime ? value : value * 100}>
+            <GaugeContainer width={200} height={200} sx={{alignSelf: "center"}} startAngle={-110} endAngle={110} value={isTime ? value : value * 100}>
                 <GaugeReferenceArc min={0} max={maxValue} />
                 <GaugeValueArc />
                 <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="20" fill="black">
@@ -32,12 +32,17 @@ const MetricGauge: React.FC<MetricGaugeProps> = ({ title, value, isTime = false 
 
 const RuntimeDisplay: React.FC<{ value: number }> = ({ value }) => {
     return (
-        <Box sx={{ margin: 2, textAlign: 'center' }}>
-            <Typography variant="h6" sx={{ marginBottom: 8 }}> {/* Added marginBottom here */}
+        <Box sx={{textAlign: 'center', display: "flex", flexDirection: 'column', alignItems: "center" }}>
+            <Typography variant="h6"> {/* Added marginBottom here */}
                 Avg. Runtime per Workflow
             </Typography>
             <Typography variant="h4" sx={{
-                textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                height: "200px",
+                width: "200px",
+                alignItems: "center",
+                display: "flex",
+                justifyContent: "center",
             }}>
                 {value.toFixed(2)}s
             </Typography>
@@ -84,12 +89,11 @@ const ProgressPageGauges: React.FC = () => {
     }, []);
 
     return (
-        <Box display="flex" justifyContent="center" flexWrap="wrap">
+        <Box sx={{display: "flex", justifyContent: "center", columnGap: 5, flexWrap: "wrap"}}>
             <MetricGauge title="Accuracy" value={metrics.accuracy} />
             <MetricGauge title="Precision" value={metrics.precision} />
             <MetricGauge title="Recall" value={metrics.recall} />
             <RuntimeDisplay value={metrics.runtime} />
-
         </Box>
     );
 };
