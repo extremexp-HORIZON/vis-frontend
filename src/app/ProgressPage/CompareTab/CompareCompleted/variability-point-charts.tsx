@@ -162,10 +162,10 @@ const VariabilityPointCharts = () => {
           </Select>
         </FormControl>
       </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, p: 2, className: 'chart-container' }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, p: 2, className: 'chart-container', alignItems: "center", flex: 1 }}>
         {selectedVariabilityPoints.map(point => (
-          <Box key={point} sx={{ width: `${100 / selectedVariabilityPoints.length}%`, minWidth: '300px' }}>
-            <VegaLite spec={{
+          <Box key={point} sx={{ width: `max-content`, minWidth: '300px' }}>
+            <VegaLite actions={false} spec={{
               width: chartWidth,
               height: 300,
               mark: { type: "point", tooltip: true },

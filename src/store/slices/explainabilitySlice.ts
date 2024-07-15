@@ -106,7 +106,7 @@ export const explainabilitySlice = createSlice({
 const apiPath = 'api/';
 
 export const fetchInitialization = createAsyncThunk('explainability/fetch_initialization', 
-  async (payload: {modelName: string, pipelineQuery: IDataExplorationRequest, modelInstancesQuery: IDataExplorationRequest, modelConfusionQuery: IDataExplorationRequest} ) => {
+  async (payload: {modelName: string, pipelineQuery: IDataExplorationRequest | null, modelInstancesQuery: IDataExplorationRequest | null, modelConfusionQuery: IDataExplorationRequest | null} ) => {
     const requestUrl = apiPath + "initialization";
     //TODO: This should be changed in order to make dynamic calls
     

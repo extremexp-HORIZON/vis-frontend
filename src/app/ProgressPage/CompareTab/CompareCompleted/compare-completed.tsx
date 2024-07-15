@@ -6,6 +6,7 @@ import VariabilityPointCharts from "./variability-point-charts"
 import VariabilityPointHeatmap from "./variability-point-heatmap"
 import CompareCompletedSvg from "./compare-completed-svg"
 import { useState } from "react"
+import ExplainabilityTaskCompare from "../Tasks/ExplainabilityTask/explainability-task-compare"
 
 const CompareCompleted = () => {
   const [chosenTask, setChosenTask] = useState<string | null>(null)
@@ -85,7 +86,7 @@ const CompareCompleted = () => {
             </Box>
           </Box>
         </>
-      ) : null}
+      ) : <ExplainabilityTaskCompare />}
     </Box>
   )
 }
