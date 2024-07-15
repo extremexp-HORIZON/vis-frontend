@@ -13,16 +13,19 @@ import ScheduleTable from "./WorkFlowTables/schedule-table"
 import { RootState, useAppSelector } from "../../store/store"
 import CompareCompleted from "./CompareTab/CompareCompleted/compare-completed"
 import ProgressPageBar from "./progress-page-bar"
-import ProgressPageGauges from "./progrss-page-gauges"
+import ProgressPageGauges from "./progress-page-gauges"
+import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>(0)
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
 
-  const handleChange = (newValue: number | string) => (event: React.SyntheticEvent) => {
-    if (value === newValue) return
-    setValue(newValue)
-  }
+  const handleChange =
+    (newValue: number | string) => (event: React.SyntheticEvent) => {
+      if (value === newValue) return
+      setValue(newValue)
+    }
 
   return (
     <>
@@ -35,39 +38,65 @@ const ProgressPage = () => {
           rowGap: 3,
         }}
       >
-        <Box key={"progress-page-title"} sx={{ width: "max-content", px: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              borderBottom: `1px solid ${grey[500]}`,
-              px: 0,
-            }}
-          >
-            <Typography fontSize={"2rem"} sx={{ fontWeight: 600 }}>
-              {"Experiment1"}
-            </Typography>
+        <Box key={"progress-page-title"} sx={{ width: "inherit", px: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box className={"progress-page-description"}>
+            <Box
+              sx={{
+                display: "flex",
+                borderBottom: `1px solid ${grey[500]}`,
+              }}
+            >
+              <Typography fontSize={"2rem"} sx={{ fontWeight: 600 }}>
+                {"Experiment1"}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography fontSize={"1rem"}>
+                {"Experiment Description"}
+              </Typography>
+            </Box>
           </Box>
-          <Box>
-            <Typography fontSize={"1rem"}>
-              {"Experiment Description"}
-            </Typography>
+          <Box className={"progress-page-actions"}>
+            <PauseIcon
+              sx={{ cursor: "pointer" }}
+              onClick={() => console.log("clicked")}
+              style={{ color: "black" }}
+              fontSize="large"
+            />
+
+            <StopIcon
+              sx={{ cursor: "pointer" }}
+              onClick={() => console.log("clicked")}
+              style={{ color: "black" }}
+              fontSize="large"
+            />
           </Box>
         </Box>
         <Box key="progress-tabs">
           <ProgressPageTabs value={value} handleChange={handleChange} />
         </Box>
-        <Box sx={{ px: 5, display: "flex", flexDirection: "column", mt: 2, rowGap: 6 }}>
+        <Box
+          sx={{
+            px: 5,
+            display: "flex",
+            flexDirection: "column",
+            mt: 2,
+            rowGap: 6,
+          }}
+        >
           {value === 0 && (
             <>
               <ProgressPageBar />
-              <ProgressPageGauges/>
+              <ProgressPageGauges />
               <ParallelCoordinatePlot />
               <WorkflowTable handleChange={handleChange} />
               {/* <Divider sx={{ margin: '20px' }} /> */}
               <ScheduleTable />
             </>
           )}
-          {value !== 0 && value !== "compare-completed" && <WorkflowTab workflowId={value} />}
+          {value !== 0 && value !== "compare-completed" && (
+            <WorkflowTab workflowId={value} />
+          )}
           {value === "compare-completed" && <CompareCompleted />}
         </Box>
       </Grid>

@@ -18,7 +18,7 @@ import StopIcon from '@mui/icons-material/Stop';
 import LaunchIcon from '@mui/icons-material/Launch';
 import EnhancedTableHead from './enhanced-table-head';
 import ToolbarWorkflow from './toolbar-workflow-table';
-import { Popover } from '@mui/material';
+import { Popover, useTheme } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { addTab } from '../../../store/slices/workflowTabsSlice';
@@ -199,6 +199,7 @@ interface WorkFlowTableProps {
 
 
 export default function WorkflowTable(props: WorkFlowTableProps) {
+  const theme = useTheme();
   const { handleChange } = props;
   const dispatch = useAppDispatch();
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs);
@@ -417,9 +418,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                             return (
                               <TableCell key={column.id} align={column.align}>
                                 <LaunchIcon
-                                  onClick={handleLaunchNewTab(row.workflowId)} // TODO: Change to row.id or row.workflowId when tabs are fully implemented
-                                  sx={{ cursor: 'pointer' }}
-                                  style={{ color: 'black' }} />
+                                  onClick={currentStatus !== "completed" ? () => {} : handleLaunchNewTab(row.workflowId)} // TODO: Change to row.id or row.workflowId when tabs are fully implemented
+                                  sx={{ cursor: currentStatus !== "completed" ? "default" : 'pointer' }}
+                                  style={{ color: currentStatus !== "completed" ? theme.palette.action.disabled : 'black' }} />
                                 {(currentStatus !== 'completed' && currentStatus !== 'failed') &&
                                   <span>
                                     <PauseIcon
