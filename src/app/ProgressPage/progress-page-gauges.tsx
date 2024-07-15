@@ -18,7 +18,7 @@ const MetricGauge: React.FC<MetricGaugeProps> = ({ title, value, isTime = false 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", textAlign: "center" }}>
             <Typography variant="h6">Avg. {title} per Workflow</Typography>
-            <GaugeContainer width={200} height={200} sx={{alignSelf: "center"}} startAngle={-110} endAngle={110} value={isTime ? value : value * 100}>
+            <GaugeContainer width={150} height={150} sx={{alignSelf: "center"}} startAngle={-110} endAngle={110} value={isTime ? value : value * 100}>
                 <GaugeReferenceArc min={0} max={maxValue} />
                 <GaugeValueArc />
                 <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="20" fill="black">
@@ -38,8 +38,8 @@ const RuntimeDisplay: React.FC<{ value: number }> = ({ value }) => {
             </Typography>
             <Typography variant="h4" sx={{
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                height: "200px",
-                width: "200px",
+                height: "100px",
+                width: "100px",
                 alignItems: "center",
                 display: "flex",
                 justifyContent: "center",

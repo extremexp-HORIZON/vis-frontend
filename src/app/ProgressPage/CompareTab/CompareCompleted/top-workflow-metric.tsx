@@ -20,36 +20,22 @@ const TopWorkflowMetric = () => {
  
   const topTenWorkflows = getTopTenWorkflowsByMetric(workflows, metric);
  
-  const spec = {
-    width: "container",
-    height: 400,
-    mark: "bar",
-    encoding: {
-      y: { // Switched to 'y' for workflow IDs
-        field: "workflowId",
-        type: "ordinal",
-        title: "Workflow ID",
-        sort: { field: "metricValue", order: "descending" } // Sorting so highest values appear on top
-      },
-      x: { // Switched to 'x' for metric values
-        field: "metricValue",
-        type: "quantitative",
-        title: `Top 10 Workflows by ${metric}`
-      },
-      tooltip: [
-        { field: "workflowId", type: "nominal", title: "Workflow ID" },
-        { field: "metricValue", type: "quantitative", title: `${metric} Value` }
-      ]
-    },
-    data: { values: topTenWorkflows },
-  };
   // const spec = {
   //   width: "container",
   //   height: 400,
   //   mark: "bar",
   //   encoding: {
-  //     x: { field: "workflowId", type: "ordinal", title: "Workflow ID" , sort: { field: "metricValue", order: "ascending" } },
-  //     y: { field: "metricValue", type: "quantitative", title: `Top 10 Workflows by ${metric}` },
+  //     y: { // Switched to 'y' for workflow IDs
+  //       field: "workflowId",
+  //       type: "ordinal",
+  //       title: "Workflow ID",
+  //       sort: { field: "metricValue", order: "descending" } // Sorting so highest values appear on top
+  //     },
+  //     x: { // Switched to 'x' for metric values
+  //       field: "metricValue",
+  //       type: "quantitative",
+  //       title: `Top 10 Workflows by ${metric}`
+  //     },
   //     tooltip: [
   //       { field: "workflowId", type: "nominal", title: "Workflow ID" },
   //       { field: "metricValue", type: "quantitative", title: `${metric} Value` }
@@ -57,6 +43,20 @@ const TopWorkflowMetric = () => {
   //   },
   //   data: { values: topTenWorkflows },
   // };
+  const spec = {
+    width: "container",
+    height: 400,
+    mark: "bar",
+    encoding: {
+      x: { field: "workflowId", type: "ordinal", title: "Workflow ID" , sort: { field: "metricValue", order: "descending" } },
+      y: { field: "metricValue", type: "quantitative", title: `Top 10 Workflows by ${metric}` },
+      tooltip: [
+        { field: "workflowId", type: "nominal", title: "Workflow ID" },
+        { field: "metricValue", type: "quantitative", title: `${metric} Value` }
+      ]
+    },
+    data: { values: topTenWorkflows },
+  };
  
   const handleMetricChange = (e: any) => {
     setMetric(e.target.value);

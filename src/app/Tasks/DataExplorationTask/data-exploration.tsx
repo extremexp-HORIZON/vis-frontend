@@ -6,7 +6,6 @@ import DataExplorationChart from './DataExplorationChart';
 import FilterForm from './FilterForm';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { fetchDataExploration } from '../../../store/slices/dataExplorationSlice';
-import ScatterPlot from './ScatterPlot';
 import CloseIcon from "@mui/icons-material/Close"
 
 const DataExploration: React.FC = () => {
@@ -36,7 +35,8 @@ const DataExploration: React.FC = () => {
     setFilters([]);  // Resets the filters state to an empty array
   };
 
-  const datafile = "file:///I2Cat_phising/dataset/test.csv";
+  const datafile = "file:///I2Cat_phising/dataset/I2Cat_phising_dataset.csv";
+
   // const datafile = 
   // "zenoh://1/input_data/electrical_data/test.csv";
     // "zenoh://cars/car/ca/cars.json"
@@ -79,22 +79,11 @@ const DataExploration: React.FC = () => {
       setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
       // setDatetimeColumn('');
 
-      // Set default selected column for the SelectColumnsComponent if not already set
       if (selectedCols.length === 0 && gridColumns.length > 0) {
         setSelectedCols([gridColumns[1].field]);
       }
     }
   }, [dataExploration]);
-
-
-  //  useEffect(() => {
-  //   if (dataExploration) {
-  //     const parsedData = JSON.parse(dataExploration.data);
-  //     setData(parsedData);
-  //     setOriginalData(parsedData); // Set original data here
-  //   }
-  // }, [dataExploration]);
-
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -120,12 +109,6 @@ const DataExploration: React.FC = () => {
             onRemoveAllFilters={handleRemoveAllFilters}
             filters={filters}
           />
-          {/* {tabValue === 1 &&(
-          <SelectColumnsComponent
-            selectableColumns={columns}
-            selectedColumns={selectedCols}
-            handleColumnChange={handleColumnChange}
-          />)} */}
         </Grid>
         <Grid item xs={12} sm={8} md={9}>
           <Tabs value={tabValue} onChange={handleChangeTab} aria-label="data tabs" centered>
@@ -177,32 +160,4 @@ const DataExploration: React.FC = () => {
 export default DataExploration;
 
 
-
-
-
-
-
-// const fetchData = () => {
-  //   if (datetimeColumn) {
-  //     const requestData: IDataExplorationRequest = {
-  //       datasetId: datafile,
-  //       columns: [...selectedCols, datetimeColumn],
-  //       aggFunction: granularity,
-  //       filters: filters,
-  //       limit: limit,
-  //       scaler: scaler,
-  //     };
-  //     dispatch(fetchDataExploration(requestData));
-  //   }
-  // };
-
-    // useEffect(() => {
-  //   fetchData();
-  // }, [selectedCols, datetimeColumn,filters]);
-
-  // useEffect(() => {
-  //   if (datetimeColumn && selectedCols.length > 0) {
-  //     fetchData();
-  //   }
-  // }, [selectedCols, datetimeColumn, filters]);
 
