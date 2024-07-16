@@ -66,17 +66,18 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
       </Box>
       {availableMetrics ? <Box
         sx={{
-          width: "99%",
+          width: "98%",
           px: 1,
           py: 1,
           display: "flex",
           alignItems: "center",
           height: "100%",
+          textAlign: "center",
         }}
       >
         <VegaLite
           actions={false}
-          style={{ width: "90%" }}
+          style={{ width: "100%" }}
           spec={{
             width: 550,
             height: 500,
