@@ -22,24 +22,22 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
       onRequestSort(event, property);
     };
   return (
-    <TableHead sx={{
-      bgcolor: "red",
-    }}>
+    <TableHead>
       <TableRow sx={{
         "& th": {
-          backgroundColor: "#F2F2FA"
+          backgroundColor: theme => theme.palette.customGrey.main
         }
       }}>
         <TableCell align="right" colSpan={1} />
         <TableCell align="right" colSpan={1} />
-        <TableCell style={{ borderBottom: "2px solid #bdbdbd" }} align="center" colSpan={2}>
+        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}` }} align="center" colSpan={1}>
           Task Variant
         </TableCell>
-        <TableCell style={{ borderBottom: "2px solid #bdbdbd" }} align="center" colSpan={2}>
+        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.dark}` }} align="center" colSpan={3}>
           Parameters
         </TableCell>
         <TableCell align="right" colSpan={1} />
-        <TableCell style={{ borderBottom: "2px solid #bdbdbd" }} align="center" colSpan={1}>
+        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}` }} align="center" colSpan={1}>
           Constraints
         </TableCell>
         <TableCell align="right" colSpan={1} />
@@ -47,7 +45,7 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
       <TableRow
         sx={{
           "& th": {
-            backgroundColor: "#F2F2FA"
+            backgroundColor: theme => theme.palette.customGrey.main
           }
         }}
       >
@@ -58,7 +56,7 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
           style={{ top: 57, minWidth: "50" }}
         >
           <Checkbox
-            color="primary"
+            sx={{color: theme => theme.palette.primary.main}}
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
@@ -71,8 +69,7 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
           <TableCell
             key={headCell.id}
             align={headCell.align}
-            style={{ top: 57, minWidth: headCell.minWidth }}
-
+            sx={{ top: 57, minWidth: headCell.minWidth }}
             // align={headCell.numeric ? 'right' : 'left'}
             // padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
@@ -82,6 +79,7 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
               active={headCell.sortable}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
+              sx={{"& .MuiTableSortLabel-icon": {color: theme => `${theme.palette.primary.main} !important`}}}
             >
               {headCell.label}
               {/* {orderBy === headCell.id ? ( */}

@@ -16,6 +16,7 @@ import ProgressPageBar from "./progress-page-bar"
 import ProgressPageGauges from "./progress-page-gauges"
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
+import theme from "../../mui-theme"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>(0)
@@ -58,16 +59,14 @@ const ProgressPage = () => {
           </Box>
           <Box className={"progress-page-actions"}>
             <PauseIcon
-              sx={{ cursor: "pointer" }}
               onClick={() => console.log("clicked")}
-              style={{ color: "black" }}
+              sx={{ cursor: "pointer", color: theme => theme.palette.primary.main }}
               fontSize="large"
             />
 
             <StopIcon
-              sx={{ cursor: "pointer" }}
               onClick={() => console.log("clicked")}
-              style={{ color: "black" }}
+              sx={{ cursor: "pointer", color: theme => theme.palette.primary.main }}
               fontSize="large"
             />
           </Box>

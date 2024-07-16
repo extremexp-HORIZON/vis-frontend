@@ -12,7 +12,7 @@ import { set } from "lodash"
 const ParallelCoordinatePlot = () => {
   const [completedWorkflows, setCompletedWorkflows] = useState<any>(null)
   const [options, setOptions] = useState<string[]>([])
-  const [selectedMetric, setSelectedMetric] = useState("accuracy")
+  const [selectedMetric, setSelectedMetric] = useState("")
 
   useEffect(() => {
     if (workflows) {
@@ -83,7 +83,7 @@ const ParallelCoordinatePlot = () => {
           </FormControl>
         </Box>
         <Box sx={{ width: "99%", px: 1 }}>
-          <VegaLite
+          {completedWorkflows && <VegaLite
             actions={false}
             onNewView={handleNewView}
             style={{ width: "100%" }}
@@ -132,18 +132,12 @@ const ParallelCoordinatePlot = () => {
                   mark: "line",
                   encoding: {
                     color: {
-                      field: "accuracy",
+                      field: selectedMetric,
                       type: "quantitative",
                       scale: {
                         range: [
-                          "#F4FAD4",
-                          "#D7F1AC",
-                          "#A9E3AF",
-                          "#82CDBB",
-                          "#63C1BF",
-                          "#1DA8C9",
-                          "#2367AC",
-                          "#2B2D84",
+                          "#6BBC8C",
+                          "#3766AF"
                         ],
                       },
                     },
@@ -268,7 +262,7 @@ const ParallelCoordinatePlot = () => {
                 },
               },
             }}
-          />
+          />}
         </Box>
       </Paper>
     </>

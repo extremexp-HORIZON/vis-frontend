@@ -3,33 +3,23 @@ import { Vega, VisualizationSpec } from 'react-vega';
 import { Paper, Box, Typography, IconButton, Tooltip, FormControl, Select, MenuItem } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import workflows from '../../../../shared/data/workflows.json';
-
-interface Workflow {
-    workflowId: number;
-    workflowInfo: {
-        status: string;
-    };
-    metrics: {
-        [key: string]: number;
-    };
-}
-
+ 
 interface Props {
     workflowIds?: number[];
 }
-
-const MetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
+ 
+const CompletedMetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
     let filteredWorkflows = workflows.filter(wf => wf.workflowInfo.status === "completed");
     if (workflowIds && workflowIds.length > 0) {
         filteredWorkflows = filteredWorkflows.filter(wf => workflowIds.includes(wf.workflowId));
     }
-
+ 
     const availableMetrics = ['accuracy', 'precision', 'recall', 'f1_score', 'f1_macro', 'false_negatives', 'false_positives', 'true_negatives', 'true_positives', 'runtime'];
-
+ 
     const [xMetric, setXMetric] = useState<string>("precision");
     const [yMetric, setYMetric] = useState<string>("accuracy");
-
-    const handleAxisSelection = (axis: 'x' | 'y') => (event: React.ChangeEvent<{ value: unknown }>) => {
+ 
+    const handleAxisSelection = (axis: string) => (event: any) => {
         const value = event.target.value as string;
         if (axis === "x") {
             setXMetric(value);
@@ -37,9 +27,9 @@ const MetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
             setYMetric(value);
         }
     };
-
+ 
     const showLegend = filteredWorkflows.length < 9;
-
+ 
     const spec: VisualizationSpec = {
         width: 400,
         height: 400,
@@ -47,7 +37,7 @@ const MetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
         data: [
             {
                 name: "table",
-                values: filteredWorkflows.map(wf => ({
+                values: filteredWorkflows.map((wf: any) => ({
                     x: wf.metrics[xMetric],
                     y: wf.metrics[yMetric],
                     category: `Workflow ${wf.workflowId}`
@@ -100,7 +90,7 @@ const MetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
             }
         ] : []
     };
-
+ 
     return (
         <Paper
             elevation={2}
@@ -160,5 +150,5 @@ const MetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
         </Paper>
     );
 };
-
-export default MetricCorrelation;
+ 
+export default CompletedMetricCorrelation;

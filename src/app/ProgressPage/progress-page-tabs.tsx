@@ -57,7 +57,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
       xs={12}
       sx={{
         px: 2,
-        bgcolor: grey[400],
+        bgcolor: theme => theme.palette.customGrey.dark,
         display: "flex",
         height: "3.5rem",
         columnGap: 1,
@@ -93,7 +93,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
         key={`tab-${tab.workflowId}`}
         sx={{
           borderRadius: 3,
-          border: `2px solid ${theme.palette.success.main}`,
+          border: `2px solid ${theme.palette.secondary.main}`,
           pr: 1,
           bgcolor: value === tab.workflowId ? "white" : grey[300],
           fontSize: "0.8rem",
@@ -115,7 +115,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
             },
             fontSize: "0.8rem",
             p: 0,
-            color: theme.palette.success.main,
+            color: theme.palette.secondary.dark,
             pl: 2,
             py: 1,
             borderRadius: 3,

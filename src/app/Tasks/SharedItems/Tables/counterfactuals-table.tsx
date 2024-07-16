@@ -11,86 +11,139 @@ import TableRow from "@mui/material/TableRow"
 import TableCell, { tableCellClasses } from "@mui/material/TableCell"
 import TableBody from "@mui/material/TableBody"
 import { IPlotModel } from "../../../../shared/models/plotmodel.model"
-import { styled } from "@mui/styles"
 import grey from "@mui/material/colors/grey"
+import ThumbUpIcon from "@mui/icons-material/ThumbUp"
+import { styled } from "@mui/material/styles"
 
 interface ITableComponent {
   plotModel: IPlotModel | null
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}))
+
+const FixedTableCell = styled(TableCell)(({ theme }) => ({
+  position: "sticky",
+  right: 0,
+  backgroundColor: theme.palette.customGrey.light,
+  zIndex: 100,
+  borderLeft: `1px solid ${grey[300]}`,
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.customGrey.light,
+  },
+}))
 
 const CounterfactualsTable = (props: ITableComponent) => {
   const { plotModel } = props
 
-
   return (
     <>
-    {console.log("counterfactuals", plotModel)}
-    <Paper
-      className="Category-Item"
-      elevation={2}
-      sx={{
-        borderRadius: 4,
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 0,
-        minWidth: "300px",
-        overflow: "hidden"
-      }}
-    >
-      <Box sx={{ px: 1.5,
+      {console.log("counterfactuals", plotModel)}
+      <Paper
+        className="Category-Item"
+        elevation={2}
+        sx={{
+          borderRadius: 4,
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          rowGap: 0,
+          minWidth: "300px",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            px: 1.5,
             py: 0.5,
             display: "flex",
             alignItems: "center",
-            borderBottom: `1px solid ${grey[400]}` }}>
-        <Typography fontSize={"1rem"} fontWeight={600}>
-          {plotModel?.plotName || "Plot name"}
-        </Typography>
-        <Box sx={{ flex: 1 }} />
-        <Tooltip title={plotModel?.plotDescr || "This is a description"}>
-          <IconButton>
-            <InfoIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      {props.children || null}
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-        <TableContainer component={Paper} sx={{width: "99%"}}>
-          <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                {Object.keys(plotModel?.tableContents || {}).map(
-                  (key, index) => (
-                    <TableCell key={`table-header-${key}-${index}`}>
-                      {key}
-                    </TableCell>
-                  ),
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {plotModel?.tableContents[Object.keys(plotModel.tableContents)[0]].values.map(
-                (value, index) => {
+            borderBottom: `1px solid ${grey[400]}`,
+          }}
+        >
+          <Typography fontSize={"1rem"} fontWeight={600}>
+            {plotModel?.plotName || "Plot name"}
+          </Typography>
+          <Box sx={{ flex: 1 }} />
+          <Tooltip title={plotModel?.plotDescr || "This is a description"}>
+            <IconButton>
+              <InfoIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {props.children || null}
+        <Box
+          sx={{
+            width: "99%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            p: 1
+          }}
+        >
+          <TableContainer
+            component={Paper}
+            sx={{ width: "99%", overflowX: "auto" }}
+          >
+            <Table
+              stickyHeader
+              sx={{ minWidth: 650 }}
+              aria-label="simple table"
+              size="small"
+            >
+              <TableHead>
+                <TableRow>
+                  {Object.keys(plotModel?.tableContents || {}).map(
+                    (key, index) => (
+                      <TableCell key={`table-header-${key}-${index}`} sx={{fontWeight: 600}}>
+                        {key}
+                      </TableCell>
+                    ),
+                  )}
+                  <FixedTableCell key="table-header-static" sx={{fontWeight: 600}}>
+                    Actions
+                  </FixedTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {plotModel?.tableContents[
+                  Object.keys(plotModel.tableContents)[0]
+                ].values.map((value, index) => {
                   return (
-                    <TableRow key={`table-row-${index}`}>
+                    <StyledTableRow key={`table-row-${index}`}>
                       {Object.keys(plotModel?.tableContents || {}).map(
                         (key, idx) => (
                           <TableCell key={`table-cell-${key}-${index}`}>
-                            {plotModel?.tableContents[Object.keys(plotModel.tableContents)[idx]].values[index]}
+                            {
+                              plotModel?.tableContents[
+                                Object.keys(plotModel.tableContents)[idx]
+                              ].values[index]
+                            }
                           </TableCell>
                         ),
                       )}
-                    </TableRow>
+                      <FixedTableCell key={`table-cell-static-${index}`} align="center">
+                        <Tooltip title="Save Configuration">
+                          <IconButton color="primary">
+                            <ThumbUpIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </FixedTableCell>
+                    </StyledTableRow>
                   )
-                },
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Paper>
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Paper>
     </>
   )
 }
+
 export default CounterfactualsTable

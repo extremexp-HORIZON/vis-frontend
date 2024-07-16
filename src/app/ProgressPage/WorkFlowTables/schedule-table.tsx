@@ -237,17 +237,17 @@ export default function ScheduleTable() {
     }));
   }, [filters]);
 
-  const isStartRow = (id: number): string => {
+  const isStartRow = (id: number): boolean => {
     if (id === 1) {
-      return "#e0e0e0";
+      return true;
     }
-    return "black";
+    return false;
   }
-  const isEndRow = (id: number): string => {
+  const isEndRow = (id: number): boolean => {
     if (id === rows.length) {
-      return "#e0e0e0";
+      return true;
     }
-    return "black";
+    return false;
   }
   function handleIndexChange(indexChange: number, id: number) {
     const rowIndex = rows.findIndex((row) => row.id === id);
@@ -302,27 +302,26 @@ export default function ScheduleTable() {
               <TableRow
                 sx={{
                   "& th": {
-                    backgroundColor: "#F2F2FA"
+                    backgroundColor: theme => theme.palette.customGrey.main
                   }
                 }} >
                 <TableCell align="right" colSpan={1} />
                 <TableCell align="right" colSpan={1} />
-                <TableCell style={{ borderBottom: "2px solid #bdbdbd" }} align="center" colSpan={2}>
+                <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}` }} align="center" colSpan={1}>
                   Task Variant
                 </TableCell>
-                <TableCell style={{ borderBottom: "2px solid #bdbdbd" }} align="center" colSpan={2}>
+                <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.dark}` }} align="center" colSpan={3}>
                   Parameters
                 </TableCell>
                 <TableCell align="right" colSpan={1} />
-                <TableCell align="left" colSpan={1}>
+                <TableCell align="left" colSpan={1} />
 
-                </TableCell>
                 <TableCell align="right" colSpan={1} />
               </TableRow >
               <TableRow
                 sx={{
                   "& th": {
-                    backgroundColor: "#F2F2FA"
+                    backgroundColor: theme => theme.palette.customGrey.main
                   }
                 }}
               >
@@ -337,7 +336,7 @@ export default function ScheduleTable() {
                   <TableCell
                     key={headCell.id}
                     align={headCell.align}
-                    style={{ top: 57, minWidth: headCell.minWidth }}
+                    sx={{ top: 57, minWidth: headCell.minWidth }}
                   >
                     {headCell.label}
                   </TableCell>
@@ -362,8 +361,7 @@ export default function ScheduleTable() {
                       <TableCell padding="checkbox">
                         <Checkbox
                           onClick={(event) => handleClick(event, row.id)}
-                          color="primary"
-                          sx={{ cursor: 'pointer' }}
+                          sx={{ cursor: 'pointer', color: theme => theme.palette.primary.main }}
                           checked={isItemSelected}
                           inputProps={{
                             'aria-labelledby': labelId,
@@ -383,19 +381,16 @@ export default function ScheduleTable() {
                               <TableCell key={column.id} align={column.align}>
                                 <span>
                                   <ArrowUp
-                                    sx={{ cursor: 'pointer' }}
                                     onClick={() => handleIndexChange(-1, row.id)}
-                                    style={{ color: isStartRow(currentScheduledPosition) }} />
+                                    sx={{ cursor: 'pointer', color: theme => isStartRow(currentScheduledPosition) ? theme.palette.text.disabled : theme.palette.primary.main }} />
 
                                   <ArrowDown
-                                    sx={{ cursor: 'pointer' }}
                                     onClick={() => handleIndexChange(1, row.id)}
-                                    style={{ color: isEndRow(currentScheduledPosition) }} />
+                                    sx={{ cursor: 'pointer', color: theme => isEndRow(currentScheduledPosition) ? theme.palette.text.disabled : theme.palette.primary.main }} />
                                 </span>
                                 <Close
                                   // onClick={handleCloseScheduled(row.id)} // TODO: Create function deleting the workflow (delete from scheduled? Or from whole database?)
-                                  sx={{ cursor: 'pointer' }}
-                                  style={{ color: 'black' }} />
+                                  sx={{ cursor: 'pointer', color: theme => theme.palette.primary.main }} />
                               </TableCell>
                             );
 
@@ -403,7 +398,7 @@ export default function ScheduleTable() {
                             value = String(row[column.id]);
 
                             return (
-                              <TableCell key={column.id} align={column.align}>
+                              <TableCell key={column.id} align={column.align} sx={{color: theme => theme.palette.customGrey.text}}>
                                 {value}
                               </TableCell>
                             );

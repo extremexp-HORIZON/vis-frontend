@@ -79,11 +79,10 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           <Stack spacing={2} direction="row">
             {secondActionButtonName ?
               <Button
-                sx={{ padding: 1, margin: 2 }}
                 size="small"
                 variant="outlined"
-                color="success"
-                style={{ fontSize: "11px", fontWeight: 'bold' }}
+                color='secondary'
+                sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold' }}
                 onClick={handleClickedFunction("compare-completed")} // TODO: Get all the completed and get right value to open new tab
               >
                 {secondActionButtonName}

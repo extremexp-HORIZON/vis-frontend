@@ -9,7 +9,7 @@ import { RootState, useAppSelector } from "../../../store/store"
 import WorkflowMetricDetails from "./workflow-metric-details"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
-import { ICompareCompletedTab } from "../../../shared/models/compare.completed.tab.model"
+import { ICompareCompletedTab } from "../../../shared/models/compare.tab.model"
 
 interface IWorkflowTab {
   workflowId: number | string

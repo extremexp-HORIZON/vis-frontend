@@ -3,6 +3,7 @@ import Box from "@mui/material/Box"
 import { Dispatch, SetStateAction, useEffect, useRef } from "react"
 import blue from "@mui/material/colors/blue"
 import Svg from "../../../shared/data/dummy.svg?react"
+import { useTheme } from "@mui/material"
 
 interface IWorkflowSvg {
   chosenTask: string | null
@@ -12,6 +13,7 @@ interface IWorkflowSvg {
 const WorkflowSvg = (props: IWorkflowSvg) => {
   const { chosenTask, setChosenTask } = props
   const chosenTaskRef = useRef(chosenTask)
+  const theme = useTheme();
   const listeners = useRef<
     { gElement: SVGGElement; listener: EventListener }[]
   >([])
@@ -44,7 +46,7 @@ const WorkflowSvg = (props: IWorkflowSvg) => {
               const element = childElement as SVGPolygonElement
               element.style.cursor = "pointer"
               element.style.userSelect = "none"
-              element.style.fill = blue[500]
+              element.style.fill = theme.palette.primary.light
             })
           }
         }

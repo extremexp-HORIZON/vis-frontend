@@ -2,6 +2,8 @@ import { Box, Typography, IconButton, Paper, Tooltip } from "@mui/material"
 import { VegaLite } from "react-vega"
 import InfoIcon from "@mui/icons-material/Info"
 import grey from "@mui/material/colors/grey"
+import workflows from "../../../../shared/data/workflows.json"
+import { useState } from "react"
 
 interface Metric {
   name: string
@@ -11,25 +13,24 @@ interface Metric {
 
 interface IMetricEvaluation {
   availableMetrics: Metric[] | null
-  workflowId: number | string
+  workflowIds: number[]
 }
 
-const MetricEvaluation = (props: IMetricEvaluation) => {
-  const { availableMetrics, workflowId } = props
+const CompletedMetricEvaluation = ({ availableMetrics, workflowIds }: IMetricEvaluation) => {
+  // Aggregate all radar data from multiple workflows
+  const [allRadarData, setAllRadarData] = useState<any[]>([])
 
-  const radarData = availableMetrics ? availableMetrics.map(metric => ({
-    key: metric.name,
-    value: metric.value.toFixed(3),
-    category: `Workflow ${workflowId}`,
-  })) : []
+  workflowIds.forEach((id) => {
+    const workflow = workflows.find(wf => wf.workflowId === id);
+    const radarData = availableMetrics?.map(metric => {
+      const value = workflow?.metrics ? workflow.metrics[metric.name as keyof typeof workflow.metrics] : 0;
+      const category = `Workflow ${workflow ? workflow.workflowId : 'Unavailable'}`;
+      return { key: metric.name, value, category };
+    }) || [];
 
-  // Example additional category, adjust as necessary
-  const experimentAverage = availableMetrics ? availableMetrics.map(metric => ({
-    key: metric.name,
-    // Calculate the average value as an adjusted percentage of the original value
-    value: (metric.value * (1 + metric.avgDiff / 100)).toFixed(3),
-    category: "Experiments Average",
-  })) : []
+    setAllRadarData(prev => ([...prev, ...radarData]));
+  });
+
 
   return (
     <Paper
@@ -64,19 +65,20 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
           </IconButton>
         </Tooltip>
       </Box>
-      {availableMetrics ? <Box
+       <Box
         sx={{
-          width: "99%",
+          width: "98%",
           px: 1,
           py: 1,
           display: "flex",
           alignItems: "center",
           height: "100%",
+          textAlign: "center",
         }}
       >
-        <VegaLite
+        {allRadarData.length > 0 && <VegaLite
           actions={false}
-          style={{ width: "90%" }}
+          style={{ width: "100%" }}
           spec={{
             width: 550,
             height: 500,
@@ -88,7 +90,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
             data: [
               {
                 name: "table",
-                values: [...radarData, ...experimentAverage],
+                values: allRadarData,
               },
               {
                 name: "keys",
@@ -100,6 +102,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                   },
                 ],
               },
+              
             ],
 
             scales: [
@@ -113,7 +116,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
               {
                 name: "radial",
                 type: "linear",
-                range: { signal: "[0, radius-5]" },
+                range: { signal: "[0, radius]" },
                 zero: true,
                 nice: true,
                 domain: { data: "table", field: "value" },
@@ -130,10 +133,11 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
             legends: [
               {
                 fill: "color",
-                orient: "top",
+                orient: "none",
+                direction:"horizontal",
                 title: "",
                 encode: {
-                  legend: { update: { x: { value: 300 }, y: { value: -300 } } },
+                  legend: { update: { x: { value: -250 }, y: { value: -255 } } },
                 },
               },
             ],
@@ -146,6 +150,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
             },
 
             marks: [
+             
               {
                 type: "group",
                 name: "categories",
@@ -174,9 +179,9 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                             "scale('radial', datum.value) * sin(scale('angular', datum.key))",
                         },
                         stroke: { scale: "color", field: "category" },
-                        strokeWidth: { value: 5 },
+                        strokeWidth: { value: 2 },
                         fill: { scale: "color", field: "category" },
-                        fillOpacity: { value: 0.3 },
+                        fillOpacity: { value: 0.1 },
                         //   "tooltip": {
                         //   "signal": "{'Metric': datum.key, 'Value': datum.datum.value, 'Category': datum.datum.category}"
                         // }
@@ -196,8 +201,8 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                         align: { value: "center" },
                         baseline: { value: "middle" },
                         fill: { value: "black" },
-                        fillOpacity: { value: 1.0 },
-                        strokeWidth: { value: 1 },
+                        fillOpacity: { value: 0.0 },
+                        strokeWidth: { value: 0 },
                         tooltip: {
                           signal:
                             "{'Metric': datum.datum.key, 'Value': datum.datum.value, 'Category': datum.datum.category}",
@@ -218,11 +223,12 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                     y: { value: 0 },
                     x2: { signal: "radius * cos(scale('angular', datum.key))" },
                     y2: { signal: "radius * sin(scale('angular', datum.key))" },
-                    stroke: { value: "lightgray" },
+                    stroke: { value: "lightgrey" },
                     strokeWidth: { value: 1 },
-                    // "tooltip": {
-                    //   "signal": "{'Key': datum.key}"
-                    // }
+                    
+                    
+
+                   
                   },
                 },
               },
@@ -234,10 +240,10 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                 encode: {
                   enter: {
                     x: {
-                      signal: "(radius + 5) * cos(scale('angular', datum.key))",
+                      signal: "(radius) * cos(scale('angular', datum.key))",
                     },
                     y: {
-                      signal: "(radius + 5) * sin(scale('angular', datum.key))",
+                      signal: "(radius) * sin(scale('angular', datum.key))",
                     },
                     text: { field: "key" },
                     align: [
@@ -265,7 +271,8 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                     fill: { value: "black" },
                     fontWeight: { value: "bold" },
                     fillOpacity: { value: 1.0 },
-                    strokeWidth: { value: 10 },
+                    strokeWidth: { value: 1 },
+                    
                   },
                 },
               },
@@ -278,17 +285,21 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                     interpolate: { value: "linear-closed" },
                     x: { field: "x2" },
                     y: { field: "y2" },
-                    stroke: { value: "lightgray" },
+                    stroke: { value: "lightergrey" },
                     strokeWidth: { value: 1 },
+                    fill: { value: "lightgrey" },
+                    fillOpacity: { value: 0.1 },
+                  
+                    
                   },
                 },
               },
             ],
           }}
-        />
-      </Box> : <Typography>Metrics Not available</Typography>}
+        />}
+      </Box> 
     </Paper>
   )
 }
 
-export default MetricEvaluation
+export default CompletedMetricEvaluation

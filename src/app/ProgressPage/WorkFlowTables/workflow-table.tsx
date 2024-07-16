@@ -387,8 +387,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                       <TableCell padding="checkbox">
                         <Checkbox
                           onClick={(event) => handleClick(event, row.id)}
-                          color="primary"
-                          sx={{ cursor: 'pointer' }}
+                          sx={{ cursor: 'pointer', color: theme => theme.palette.primary.main }}
                           checked={isItemSelected}
                           inputProps={{
                             'aria-labelledby': labelId,
@@ -410,28 +409,28 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                           case 'status':
                             value = row[column.id];
                             return (
-                              <TableCell key={column.id} align={column.align}>
+                              <TableCell key={column.id} align={column.align} sx={{color: theme => theme.palette.customGrey.text}}>
                                 <ProgressPercentage progressNumber={fractionStrToDecimal(value)} />
                               </TableCell>
                             );
                           case 'action':
                             return (
-                              <TableCell key={column.id} align={column.align}>
+                              <TableCell key={column.id} align={column.align} sx={{color: theme => theme.palette.customGrey.text}}>
                                 <LaunchIcon
                                   onClick={currentStatus !== "completed" ? () => {} : handleLaunchNewTab(row.workflowId)} // TODO: Change to row.id or row.workflowId when tabs are fully implemented
                                   sx={{ cursor: currentStatus !== "completed" ? "default" : 'pointer' }}
-                                  style={{ color: currentStatus !== "completed" ? theme.palette.action.disabled : 'black' }} />
+                                  style={{ color: currentStatus !== "completed" ? theme.palette.action.disabled : theme.palette.primary.main }} />
                                 {(currentStatus !== 'completed' && currentStatus !== 'failed') &&
                                   <span>
                                     <PauseIcon
                                       sx={{ cursor: 'pointer' }}
                                       onClick={() => console.log("clicked")}
-                                      style={{ color: 'black' }} />
+                                      style={{ color: theme.palette.primary.main }} />
 
                                     <StopIcon
                                       sx={{ cursor: 'pointer' }}
                                       onClick={() => console.log("clicked")}
-                                      style={{ color: 'black' }} />
+                                      style={{ color: theme.palette.primary.main }} />
                                     {/* </Button> */}
                                   </span>}
                               </TableCell>
@@ -441,7 +440,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                             value = String(row[column.id]);
 
                             return (
-                              <TableCell key={column.id} align={column.align}>
+                              <TableCell key={column.id} align={column.align} sx={{color: theme => theme.palette.customGrey.text}}>
                                 {value}
                               </TableCell>
                             );

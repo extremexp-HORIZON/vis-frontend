@@ -5,12 +5,12 @@ import App from "./App"
 import { store } from "./store/store"
 import "./index.css"
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import theme from "./mui-theme"
 
 const container = document.getElementById("root")
 
 if (container) {
   const root = createRoot(container)
-  const theme = createTheme();
 
   root.render(
     // <React.StrictMode>

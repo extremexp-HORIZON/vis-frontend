@@ -1,6 +1,5 @@
 import { Box, Grid } from "@mui/material"
 import MetricEvaluation from "./WorkflowMetricDetailsItems/metric-evaluation"
-import MetricCorrelation from "../CompareTab/CompareCompleted/MetricCorrelation"
 import MetricEvolution from "./WorkflowMetricDetailsItems/metric-evolution"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition";
 
@@ -22,7 +21,7 @@ const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={3} justifyContent="center">
         <Grid item xs={12} md={6}>
-        <MetricEvaluation availableMetrics={metrics} workflowIds={[222, 197, 195, 193,209]} />
+        <MetricEvaluation availableMetrics={metrics} workflowId={workflowId} />
         </Grid>
         <Grid item xs={12} md={6}>
           <RuntimeDecomposition availableMetrics={metrics} workflowId={workflowId} />

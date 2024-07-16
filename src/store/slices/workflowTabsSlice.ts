@@ -11,7 +11,7 @@ import {
 } from "../../shared/models/workflow.tab.model"
 import workflows from "../../shared/data/workflows.json"
 import { add } from "lodash"
-import { ICompareCompletedTab } from "../../shared/models/compare.completed.tab.model"
+import { ICompareCompletedTab } from "../../shared/models/compare.tab.model"
 import WorkflowMetrics from "../../app/ProgressPage/WorkflowTab/workflow-metrics"
 
 interface IWorkflowTab {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { GaugeContainer, GaugeValueArc, GaugeReferenceArc } from '@mui/x-charts/Gauge';
 import workflows from '../../shared/data/workflows.json';
 
@@ -10,39 +10,54 @@ interface MetricGaugeProps {
 }
 
 const MetricGauge: React.FC<MetricGaugeProps> = ({ title, value, isTime = false }) => {
-    // If isTime, display as seconds, otherwise assume the value is from 0 to 1 and convert to percentage.
-    const displayValue = isTime ? `${value.toFixed(3)} sec` : `${(value).toFixed(3)}`;
-    const maxValue = isTime ? 5 : 100; // Set max to 5 for time values and 100 for percentages
-
-
-    return (
-        <Box sx={{ display: "flex", flexDirection: "column", textAlign: "center" }}>
-            <Typography variant="h6">Avg. {title} per Workflow</Typography>
-            <GaugeContainer width={150} height={150} sx={{alignSelf: "center"}} startAngle={-110} endAngle={110} value={isTime ? value : value * 100}>
-                <GaugeReferenceArc min={0} max={maxValue} />
-                <GaugeValueArc />
-                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="20" fill="black">
-                    {displayValue}
-                </text>
-            </GaugeContainer>
-        </Box>
-    );
+  const displayValue = isTime ? `${value.toFixed(3)} sec` : `${(value).toFixed(3)}`;
+  const maxValue = isTime ? 5 : 100; // Set max to 5 for time values and 100 for percentages
+  const theme = useTheme();
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", textAlign: "center" }}>
+      <Typography variant="h6">Avg. {title} per Workflow</Typography>
+      <GaugeContainer width={150} height={150} sx={{ alignSelf: "center" }} startAngle={-110} endAngle={110} value={isTime ? value : value * 100}>
+        {/* <svg width="0" height="0">
+          <defs>
+            <linearGradient id="gaugeGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" style={{ stopColor: '#F4FAD4', stopOpacity: 1 }} />
+              <stop offset="14.29%" style={{ stopColor: '#D7F1AC', stopOpacity: 1 }} />
+              <stop offset="28.57%" style={{ stopColor: '#A9E3AF', stopOpacity: 1 }} />
+              <stop offset="42.86%" style={{ stopColor: '#82CDBB', stopOpacity: 1 }} />
+              <stop offset="57.14%" style={{ stopColor: '#63C1BF', stopOpacity: 1 }} />
+              <stop offset="71.43%" style={{ stopColor: '#1DA8C9', stopOpacity: 1 }} />
+              <stop offset="85.71%" style={{ stopColor: '#2367AC', stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: '#2B2D84', stopOpacity: 1 }} />
+            </linearGradient>
+          </defs>
+        </svg> */}
+        <GaugeReferenceArc min={0} max={maxValue} />
+        <GaugeValueArc style={{ fill: theme.palette.primary.main }} />
+        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="20" fill={theme.palette.text.primary} fontWeight={600}>
+          {displayValue}
+        </text>
+      </GaugeContainer>
+    </Box>
+  );
 };
 
 
 const RuntimeDisplay: React.FC<{ value: number }> = ({ value }) => {
     return (
-        <Box sx={{textAlign: 'center', display: "flex", flexDirection: 'column', alignItems: "center" }}>
-            <Typography variant="h6"> {/* Added marginBottom here */}
+        <Box sx={{ textAlign: 'center', display: "flex", flexDirection: 'column', alignItems: "center" }}>
+            <Typography variant="h6">
                 Avg. Runtime per Workflow
             </Typography>
             <Typography variant="h4" sx={{
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                fontWeight: 600,
                 height: "100px",
                 width: "100px",
                 alignItems: "center",
                 display: "flex",
                 justifyContent: "center",
+                flex: 1,
+                color: theme => theme.palette.primary.main
             }}>
                 {value.toFixed(2)}s
             </Typography>
