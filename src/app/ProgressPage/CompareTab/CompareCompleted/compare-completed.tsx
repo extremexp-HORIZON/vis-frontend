@@ -13,7 +13,7 @@ const CompareCompleted = () => {
   return (
     <Box
       key="compare-completed"
-      sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
+      sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}
     >
       <Box key="compare-completed-svg">
         <CompareCompletedSvg

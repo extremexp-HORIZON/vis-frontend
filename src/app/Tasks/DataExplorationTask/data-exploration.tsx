@@ -36,7 +36,6 @@ const DataExploration: React.FC = () => {
   };
 
   const datafile = "file:///I2Cat_phising/dataset/I2Cat_phising_dataset.csv";
-
   // const datafile = 
   // "zenoh://1/input_data/electrical_data/test.csv";
     // "zenoh://cars/car/ca/cars.json"

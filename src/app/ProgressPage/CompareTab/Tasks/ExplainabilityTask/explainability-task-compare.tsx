@@ -28,24 +28,30 @@ const ExplainabilityTaskCompare = () => {
 
   return (
     <Box sx={{ mb: "2rem" }}>
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "start",
-          columnGap: 1,
-        }}
-      >
-        <Typography
-          variant="body1"
-          sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+      <Box sx={{ display: "flex", alignItems: "center", columnGap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "start",
+            columnGap: 1,
+          }}
         >
-          Model Training Task
-        </Typography>
-        <Typography variant="body1">Explainability</Typography>
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+          >
+            Model Training Task
+          </Typography>
+          <Typography variant="body1">Explainability</Typography>
+        </Box>
+        {initLoading && (
+          <Box>
+            <CircularProgress sx={{ fontSize: "1rem" }} />
+          </Box>
+        )}
       </Box>
-      {explInitialization && !initLoading ? (
+      {explInitialization && !initLoading && (
         <Box
           sx={{
             px: 5,
@@ -100,13 +106,6 @@ const ExplainabilityTaskCompare = () => {
               </Grid>
             </Grid>
           </Grid>
-        </Box>
-      ) : (
-        <Box sx={{ height: "100%", width: "100%", textAlign: "center" }}>
-          <CircularProgress size={"10rem"} />
-          <Typography fontSize={"1.5rem"} color={grey[500]}>
-            Processing Data...
-          </Typography>
         </Box>
       )}
     </Box>

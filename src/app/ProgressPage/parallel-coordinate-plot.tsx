@@ -1,8 +1,40 @@
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
 import { VegaLite } from "react-vega"
+import workflows from "../../shared/data/workflows.json"
+import { useEffect, useState } from "react"
+import Typography from "@mui/material/Typography"
+import FormControl from "@mui/material/FormControl"
+import Select, { SelectChangeEvent } from "@mui/material/Select"
+import MenuItem from "@mui/material/MenuItem"
+import { set } from "lodash"
 
 const ParallelCoordinatePlot = () => {
+  const [completedWorkflows, setCompletedWorkflows] = useState<any>(null)
+  const [options, setOptions] = useState<string[]>([])
+  const [selectedMetric, setSelectedMetric] = useState("accuracy")
+
+  useEffect(() => {
+    if (workflows) {
+      setCompletedWorkflows(
+        workflows
+          .filter(workflow => workflow.workflowInfo.status === "completed")
+          .map(workflow => ({
+            ...workflow.variabilityPoints,
+            ...workflow.metrics,
+            workflowId: workflow.workflowId,
+          })),
+      )
+    }
+    const metricOptions = Object.keys(workflows
+      .find(workflow => workflow.workflowInfo.status === "completed")?.metrics || [])
+    setSelectedMetric(metricOptions[0])
+    setOptions(metricOptions)
+  }, [])
+
+  const handleMetricSelection = (event: SelectChangeEvent) => {
+    setSelectedMetric(event.target.value as string)
+  }
 
   const handleNewView = (view: any) => {
     view.addEventListener("click", (event: any, item: any) => {
@@ -16,7 +48,40 @@ const ParallelCoordinatePlot = () => {
 
   return (
     <>
+      {console.log("completed", completedWorkflows)}
       <Paper elevation={2}>
+        <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+          <Typography fontSize={"0.8rem"}>
+            Color by:
+          </Typography>
+          <FormControl
+            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
+            size="small"
+          >
+            <Select
+              value={selectedMetric}
+              sx={{ fontSize: "0.8rem" }}
+              onChange={handleMetricSelection}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 250,
+                    maxWidth: 300,
+                  },
+                },
+              }}
+            >
+              {options.map(feature => (
+                <MenuItem
+                  key={`${feature}`}
+                  value={feature}
+                >
+                  {feature}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
         <Box sx={{ width: "99%", px: 1 }}>
           <VegaLite
             actions={false}
@@ -26,92 +91,7 @@ const ParallelCoordinatePlot = () => {
               width: "container",
               height: 300,
               data: {
-                values: [
-                  {
-                    learning_rate: 0.01,
-                    max_depth: 10,
-                    min_child_weight: 1,
-                    split_proportion: 0.1,
-                    accuracy: 0.65,
-                  },
-                  {
-                    learning_rate: 0.01,
-                    max_depth: 9,
-                    min_child_weight: 2,
-                    split_proportion: 0.2,
-                    accuracy: 0.66,
-                  },
-                  {
-                    learning_rate: 0.01,
-                    max_depth: 8,
-                    min_child_weight: 3,
-                    split_proportion: 0.3,
-                    accuracy: 0.67,
-                  },
-                  {
-                    learning_rate: 0.01,
-                    max_depth: 7,
-                    min_child_weight: 4,
-                    split_proportion: 0.4,
-                    accuracy: 0.68,
-                  },
-                  {
-                    learning_rate: 0.01,
-                    max_depth: 6,
-                    min_child_weight: 5,
-                    split_proportion: 0.5,
-                    accuracy: 0.69,
-                  },
-                  {
-                    learning_rate: 0.01,
-                    max_depth: 5,
-                    min_child_weight: 6,
-                    split_proportion: 0.6,
-                    accuracy: 0.7,
-                  },
-                  {
-                    learning_rate: 0.02,
-                    max_depth: 10,
-                    min_child_weight: 1,
-                    split_proportion: 0.1,
-                    accuracy: 0.65,
-                  },
-                  {
-                    learning_rate: 0.02,
-                    max_depth: 9,
-                    min_child_weight: 2,
-                    split_proportion: 0.2,
-                    accuracy: 0.66,
-                  },
-                  {
-                    learning_rate: 0.02,
-                    max_depth: 8,
-                    min_child_weight: 3,
-                    split_proportion: 0.3,
-                    accuracy: 0.67,
-                  },
-                  {
-                    learning_rate: 0.02,
-                    max_depth: 7,
-                    min_child_weight: 4,
-                    split_proportion: 0.4,
-                    accuracy: 0.68,
-                  },
-                  {
-                    learning_rate: 0.02,
-                    max_depth: 6,
-                    min_child_weight: 5,
-                    split_proportion: 0.5,
-                    accuracy: 0.69,
-                  },
-                  {
-                    learning_rate: 0.02,
-                    max_depth: 5,
-                    min_child_weight: 6,
-                    split_proportion: 0.6,
-                    accuracy: 0.7,
-                  },
-                ],
+                values: completedWorkflows,
               },
               transform: [
                 { window: [{ op: "count", as: "index" }] },
@@ -120,7 +100,7 @@ const ParallelCoordinatePlot = () => {
                     "learning_rate",
                     "max_depth",
                     "min_child_weight",
-                    "split_proportion",
+                    "n_estimators",
                   ],
                 },
                 {
@@ -193,11 +173,7 @@ const ParallelCoordinatePlot = () => {
                       },
                       {
                         type: "quantitative",
-                        field: "split_proportion",
-                      },
-                      {
-                        type: "quantitative",
-                        field: "accuracy",
+                        field: "n_estimators",
                       },
                     ],
                   },

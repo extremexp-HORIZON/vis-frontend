@@ -32,7 +32,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 1 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}>
       <Box key="workflow-svg">
         <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
       </Box>
