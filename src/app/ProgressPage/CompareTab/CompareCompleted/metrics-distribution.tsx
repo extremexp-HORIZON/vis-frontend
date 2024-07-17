@@ -33,20 +33,21 @@ interface Workflow {
 const MetricsDistribution = () => {
 
   const getData = (workflows: Workflow[], metric: string) => {
+    const lowercaseMetric = metric.toLowerCase();
     const completedWorkflows = workflows.filter(workflow => 
-      workflow.metrics && workflow.metrics[metric] !== undefined
+      workflow.metrics && workflow.metrics[lowercaseMetric] !== undefined
     );
-    completedWorkflows.sort((a, b) => b.metrics[metric] - a.metrics[metric]);
+    completedWorkflows.sort((a, b) => b.metrics[metric] - a.metrics[lowercaseMetric]);
     const chartData = completedWorkflows.map(workflow => ({
       metricName: metric, 
-      value: workflow.metrics[metric],
+      value: workflow.metrics[lowercaseMetric],
     }));
   
     console.log(chartData);
     return chartData;
   };
-  const metrics = ["accuracy", "precision", "recall"]
-  const [selectedMetrics, setSelectedMetrics] = useState(["recall"])
+  const metrics = ["Accuracy", "Precision", "Recall"]
+  const [selectedMetrics, setSelectedMetrics] = useState(["Recall"])
 
   const handleMetricChange = (event: any) => {
     const {
