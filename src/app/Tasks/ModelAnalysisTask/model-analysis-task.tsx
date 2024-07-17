@@ -2,14 +2,13 @@ import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
-import ModelStatistics from "../SharedItems/Tables/model-statistics"
 import InstanceClassification from "../SharedItems/Plots/instance-classification"
 import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
 import CounterfactualsTable from "../SharedItems/Tables/counterfactuals-table"
 import LinePlot from "../SharedItems/Plots/line-plot"
 import CloseIcon from "@mui/icons-material/Close"
 import grey from "@mui/material/colors/grey"
-import { fetchInitialization } from "../../../store/slices/explainabilitySlice"
+import { fetchInitialization, fetchMultipleTimeseries, fetchMultipleTimeseriesMetadata } from "../../../store/slices/explainabilitySlice"
 import { defaultDataExplorationRequest } from "../../../shared/models/dataexploration.model"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
@@ -26,6 +25,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
+    dispatch(fetchMultipleTimeseries());
+    dispatch(fetchMultipleTimeseriesMetadata());
     dispatch(
       fetchInitialization({
         modelName: "I2Cat_Phising_model",

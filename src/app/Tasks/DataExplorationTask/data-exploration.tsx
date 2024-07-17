@@ -59,12 +59,10 @@ const DataExploration: React.FC = () => {
 
   useEffect(() => {
     if (dataExploration) {
-      console.log('data',dataExploration)
       const parsedData = JSON.parse(dataExploration.data);
       setData(parsedData);
       setOriginalData(parsedData); // Set original data here
       
-
       const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
         field: typeof col === 'string' ? col : (col as { name: string }).name,
         headerName: typeof col === 'string' ? col : (col as { name: string }).name,

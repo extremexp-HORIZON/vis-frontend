@@ -49,6 +49,8 @@ interface IExplainability {
     error: string | null;
     tabs: any[];
     misclassifiedInstances: any[];
+    multipleTimeSeries: any[];
+    multipleTimeSeriesMetadata: any;
 }
 
 const initialState: IExplainability = {
@@ -58,6 +60,8 @@ const initialState: IExplainability = {
     error: null,
     tabs: [],
     misclassifiedInstances: [],
+    multipleTimeSeries: [],
+    multipleTimeSeriesMetadata: {},
 };
 
 // explainabilitySlice
@@ -85,6 +89,17 @@ export const explainabilitySlice = createSlice({
             state.misclassifiedInstances = action.payload;
             state.loading = "false"
         })
+        .addCase(fetchMultipleTimeseries.fulfilled, (state, action) => {
+          state.multipleTimeSeries = action.payload;
+          state.loading = "false"
+        })
+        .addCase(fetchMultipleTimeseriesMetadata.fulfilled, (state, action) => {
+          state.multipleTimeSeriesMetadata = action.payload;
+          state.loading = "false"
+        })
+        .addCase(fetchMultipleTimeseriesMetadata.pending, (state, action) => {
+          state.loading = "true"
+        })
         .addCase(fetchExplanation.pending, (state) => {
           state.loading = "true";
         })
@@ -109,7 +124,6 @@ export const fetchInitialization = createAsyncThunk('explainability/fetch_initia
   async (payload: {modelName: string, pipelineQuery: IDataExplorationRequest | null, modelInstancesQuery: IDataExplorationRequest | null, modelConfusionQuery: IDataExplorationRequest | null} ) => {
     const requestUrl = apiPath + "initialization";
     //TODO: This should be changed in order to make dynamic calls
-    
     return axios.post<any>(requestUrl, payload).then((response) => response.data);
 });
 
@@ -119,6 +133,28 @@ export const fetchExplanation = createAsyncThunk('explainability/fetch_explanati
     return axios.post<any>(requestUrl, payload).then((response) => response.data);
 });
 
+export const fetchMultipleTimeseries = createAsyncThunk('explainability/fetch_multiple_timeseries',
+  async () => {
+    const payload = {
+        datasetId: "folder://IDEKO/datasets",
+        columns: [],
+        filters: [],
+      }
+      const requestUrl = apiPath + "visualization/data";
+    return axios.post<any>(requestUrl, payload).then((response) => response.data);
+});
+
+export const fetchMultipleTimeseriesMetadata = createAsyncThunk('explainability/fetch_multiple_timeseries_metadata',
+  async () => {
+    const payload = {
+        datasetId: "file://IDEKO/metadata.csv",
+        columns: [],
+        filters: [],
+      }
+      const requestUrl = apiPath + "visualization/data";
+    return axios.post<any>(requestUrl, payload).then((response) => response.data);
+});
+  
 export const fetchMisclassifiedInstances = createAsyncThunk('explainability/fetch_misclassified_instances', 
 async () => {
 // TODO: make this dynamic

@@ -26,7 +26,6 @@ export const fetchDataExploration = createAsyncThunk(
     async (payload: IDataExplorationRequest) => {
         const requestUrl = `${apiPath}visualization/data`;
         return axios.post<any>(requestUrl, payload).then((response) => response.data);
-        
     }
 );
 
@@ -41,15 +40,11 @@ export const dataExplorationSlice = createSlice({
                 state.dataExploration = action.payload;
                 state.loading = false;
                 state.error = null;  // Clearing error on success
-
-                
             })
             .addCase(fetchDataExploration.pending, (state) => {
                 state.loading = true;
                 state.error = null;  // Resetting the error on new request
 
-
-              
             })
             .addCase(fetchDataExploration.rejected, (state, action) => {
                 state.initLoading = false;
