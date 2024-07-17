@@ -16,7 +16,7 @@ const getTopTenWorkflowsByMetric = (workflows: any[], metric: string) => {
 };
  
 const TopWorkflowMetric = () => {
-  const [metric, setMetric] = useState("accuracy");
+  const [metric, setMetric] = useState("precision");
  
   const topTenWorkflows = getTopTenWorkflowsByMetric(workflows, metric);
  
