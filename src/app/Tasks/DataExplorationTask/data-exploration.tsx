@@ -60,7 +60,7 @@ const DataExploration: React.FC = () => {
   useEffect(() => {
     if (dataExploration) {
       console.log('data',dataExploration)
-      const parsedData = JSON.parse(dataExploration.data);
+      const parsedData = JSON.parse(dataExploration.data)[0];
       setData(parsedData);
       setOriginalData(parsedData); // Set original data here
       
