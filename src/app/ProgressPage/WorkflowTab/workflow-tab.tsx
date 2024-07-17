@@ -25,7 +25,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
       case "I2Cat_Dataset":
         return <DataExploration />
       case "Model_Training":
-        return <ModelAnalysisTask variantId={71} />
+        return <ModelAnalysisTask workflowId={workflowId} />
       case null:
         return null
     }
@@ -36,7 +36,12 @@ const WorkflowTab = (props: IWorkflowTab) => {
       <Box key="workflow-svg">
         <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
       </Box>
-      <Box
+      
+      {chosenTask ? (
+        <Box key="workflow-task">{taskProvider(chosenTask)}</Box>
+      ) : (
+        <>
+        <Box
         key="task-configuration"
         sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
       >
@@ -84,9 +89,6 @@ const WorkflowTab = (props: IWorkflowTab) => {
           />
         </Box>
       </Box>
-      {chosenTask ? (
-        <Box key="workflow-task">{taskProvider(chosenTask)}</Box>
-      ) : (
         <Box
           key="workflow-metric-details"
           sx={{ display: "flex", flexDirection: "column", rowGap: 2 }}
@@ -112,6 +114,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
             />
           </Box>
         </Box>
+        </>
       )}
     </Box>
   )

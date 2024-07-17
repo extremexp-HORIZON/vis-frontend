@@ -35,7 +35,7 @@ const DataExploration: React.FC = () => {
     setFilters([]);  // Resets the filters state to an empty array
   };
 
-  const datafile = "file:///I2Cat_phising/dataset/I2Cat_phising_dataset.csv";
+  const datafile = "file:///I2Cat_phising/workflows.json";
   // const datafile = 
   // "zenoh://1/input_data/electrical_data/test.csv";
     // "zenoh://cars/car/ca/cars.json"
@@ -60,7 +60,7 @@ const DataExploration: React.FC = () => {
   useEffect(() => {
     if (dataExploration) {
       console.log('data',dataExploration)
-      const parsedData = JSON.parse(dataExploration.data)[0];
+      const parsedData = JSON.parse(dataExploration.data);
       setData(parsedData);
       setOriginalData(parsedData); // Set original data here
       

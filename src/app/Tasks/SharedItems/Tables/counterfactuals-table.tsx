@@ -14,10 +14,24 @@ import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import grey from "@mui/material/colors/grey"
 import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
+import Modal from "@mui/material/Modal"
+import { Dispatch, SetStateAction } from "react"
+
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 1,
+};
 
 interface ITableComponent {
   plotModel: IPlotModel | null
   children?: React.ReactNode
+  point: any;
+  setPoint: Dispatch<SetStateAction<any>>
 }
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -38,28 +52,39 @@ const FixedTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 const CounterfactualsTable = (props: ITableComponent) => {
-  const { plotModel } = props
+  const { plotModel, point, setPoint } = props
+
+  const handleClose = () => {
+    setPoint(null)
+  }
 
   return (
     <>
       {console.log("counterfactuals", plotModel)}
+      <Modal
+        open={point}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
       <Paper
         className="Category-Item"
         elevation={2}
         sx={{
           borderRadius: 4,
-          width: "100%",
+          width: "90%",
           display: "flex",
           flexDirection: "column",
           rowGap: 0,
           minWidth: "300px",
           overflow: "hidden",
+          ...style
         }}
       >
         <Box
           sx={{
-            px: 1.5,
-            py: 0.5,
+            // px: 1.5,
+            // py: 0.5,
             display: "flex",
             alignItems: "center",
             borderBottom: `1px solid ${grey[400]}`,
@@ -83,7 +108,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
-            p: 1
+            p: 1,
           }}
         >
           <TableContainer
@@ -100,12 +125,18 @@ const CounterfactualsTable = (props: ITableComponent) => {
                 <TableRow>
                   {Object.keys(plotModel?.tableContents || {}).map(
                     (key, index) => (
-                      <TableCell key={`table-header-${key}-${index}`} sx={{fontWeight: 600}}>
+                      <TableCell
+                        key={`table-header-${key}-${index}`}
+                        sx={{ fontWeight: 600 }}
+                      >
                         {key}
                       </TableCell>
                     ),
                   )}
-                  <FixedTableCell key="table-header-static" sx={{fontWeight: 600}}>
+                  <FixedTableCell
+                    key="table-header-static"
+                    sx={{ fontWeight: 600 }}
+                  >
                     Actions
                   </FixedTableCell>
                 </TableRow>
@@ -127,7 +158,10 @@ const CounterfactualsTable = (props: ITableComponent) => {
                           </TableCell>
                         ),
                       )}
-                      <FixedTableCell key={`table-cell-static-${index}`} align="center">
+                      <FixedTableCell
+                        key={`table-cell-static-${index}`}
+                        align="center"
+                      >
                         <Tooltip title="Save Configuration">
                           <IconButton color="primary">
                             <ThumbUpIcon />
@@ -142,6 +176,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
           </TableContainer>
         </Box>
       </Paper>
+      </Modal>
     </>
   )
 }

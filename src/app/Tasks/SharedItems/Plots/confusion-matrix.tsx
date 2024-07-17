@@ -10,17 +10,17 @@ import { useEffect, useState } from "react"
 
 interface ILineplot {
   metrics: any
-  variantId: number
+  workflowId: number | string
 }
 
 const ConfusionMatrix = (props: ILineplot) => {
-  const { metrics, variantId } = props
+  const { metrics, workflowId } = props
   const [plotData, setPlotData] = useState<any>(null)
 
   useEffect(() => {
     if (metrics) {
       const filteredData = metrics.filter(
-        (plot: any) => plot.id === variantId,
+        (plot: any) => plot.id === workflowId,
       )[0]
       setPlotData([
         { actual: 1, predicted: 1, count: filteredData.true_positives },

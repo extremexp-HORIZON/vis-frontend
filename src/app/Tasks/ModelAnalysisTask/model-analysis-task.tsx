@@ -16,12 +16,12 @@ import IconButton from "@mui/material/IconButton"
 import CircularProgress from "@mui/material/CircularProgress"
 
 interface IFeatureExplainability {
-  variantId: number
+  workflowId: number | string
 }
 
 const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const { explInitialization } = useAppSelector(state => state.explainability)
-  const { variantId } = props
+  const { workflowId } = props
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
 
@@ -31,20 +31,20 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         modelName: "I2Cat_Phising_model",
         pipelineQuery: {
           ...defaultDataExplorationRequest,
-          datasetId: "file:///I2Cat_phising/metrics/I2Cat_phising_metrics.csv",
+          datasetId: "file:///I2Cat_phising/metrics/Real_I2Cat_metrics.csv",
         },
         modelInstancesQuery: {
           ...defaultDataExplorationRequest,
           datasetId:
-            "file:///I2Cat_phising/metrics/I2Cat_phising_instances.csv",
+            "file:///I2Cat_phising/metrics/Real_I2Cat_instances.csv",
           filters: [
             {
               column: "id",
               type: "equals",
-              value: 71,
+              value: workflowId,
             },
           ],
-          limit: 1000,
+          limit: 10000,
         },
         modelConfusionQuery: {
           ...defaultDataExplorationRequest,
@@ -54,7 +54,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             {
               column: "id",
               type: "equals",
-              value: 71,
+              value: workflowId,
             },
           ],
         },
@@ -141,7 +141,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   metrics={
                     explInitialization.hyperparameterExplanation.pipelineMetrics
                   }
-                  variantId={variantId}
+                  workflowId={workflowId}
                 />
               </Grid>
             </Grid>
@@ -149,6 +149,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               {point && (
                 <CounterfactualsTable
                   key={`counterfactuals-table`}
+                  point={point}
+                  setPoint={setPoint}
                   plotModel={
                     explInitialization.featureExplanation.tables.counterfactuals
                   }
