@@ -7,6 +7,7 @@ import FilterForm from './FilterForm';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { fetchDataExploration } from '../../../store/slices/dataExplorationSlice';
 import CloseIcon from "@mui/icons-material/Close"
+import Testing from './Testing';
 
 const DataExploration: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -59,10 +60,12 @@ const DataExploration: React.FC = () => {
 
   useEffect(() => {
     if (dataExploration) {
+      console.log('data',dataExploration)
       const parsedData = JSON.parse(dataExploration.data);
       setData(parsedData);
       setOriginalData(parsedData); // Set original data here
       
+
       const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
         field: typeof col === 'string' ? col : (col as { name: string }).name,
         headerName: typeof col === 'string' ? col : (col as { name: string }).name,
@@ -136,7 +139,7 @@ const DataExploration: React.FC = () => {
                 {error && <Typography color="error">Error: {error}</Typography>}
                 {!loading && (
                  
-                    <DataExplorationChart
+                    <Testing
                       data={originalData}
                       columns={columns}
                       datetimeColumn={datetimeColumn}

@@ -25,8 +25,8 @@ setChartType: (chartType: 'line' | 'area' | 'heatmap' | 'bar') => void
     setXAxis: (column: string) => void;
     yAxis: string[];
     setYAxis: (columns: string[]) => void;
-    aggFunction: 'None' | 'Min' | 'Max' | 'Avg'; // Initialize with 'None'
-    setAggFunction: (aggFunction: 'None' | 'Min' | 'Max' | 'Avg') => void;
+    aggFunction: 'None' | 'Min' | 'Max' | 'Mean'| 'Sum'; // Initialize with 'None'
+    setAggFunction: (aggFunction: 'None' | 'Min' | 'Max' | 'Mean'| 'Sum') => void;
     category: string;
     setCategory: (category: string) => void;
 }
@@ -62,7 +62,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     };
 
     const handleAggFunctionChange = (event: SelectChangeEvent<string>) => {
-        setAggFunction(event.target.value as 'None' | 'Min' | 'Max' | 'Avg');
+        setAggFunction(event.target.value as 'None' | 'Min' | 'Max' | 'Mean'|'Sum');
     };
     const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCategory(event.target.value);
@@ -174,7 +174,9 @@ const ChartControls: React.FC<ChartControlsProps> = ({
                             <MenuItem value="None">None</MenuItem>
                             <MenuItem value="min">Min</MenuItem>
                             <MenuItem value="max">Max</MenuItem>
-                            <MenuItem value="avg">Avg</MenuItem>
+                            <MenuItem value="mean">Mean</MenuItem>
+                            <MenuItem value="sum">Sum</MenuItem>
+
                         </Select>
                     </FormControl>
                     {additionalControl}
