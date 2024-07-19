@@ -23,24 +23,16 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
   const selectableColumns = columns.filter(column => column.field !== datetimeColumn);
   console.log('colsdialge',selectableColumns);
   const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
   const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'heatmap'>('line');
   const [showStatistics, setShowStatistics] = useState(false);
   const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
   const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
   const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
-  const [xAxis, setXAxis] = useState(columns[0].field);
-  const [yAxis, setYAxis] = useState([columns[1].field]);
+  const [xAxis, setXAxis] = useState(columns[columns.length - 1].field);
+  const [yAxis, setYAxis] = useState([columns[0].field]);
   const [aggFunction, setAggFunction] = useState<'None' | 'Min' | 'Max' | 'Mean'|'Sum'>('None');
 
 
- 
-
-  const filteredData = data.filter(item => {
-    const itemDate = new Date(item[datetimeColumn]);
-    return (!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate);
-  });
 
   const getVegaLiteType = (type: string) => {
     if (type === 'LOCAL_DATE_TIME') return 'temporal';
@@ -78,7 +70,7 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
     const commonSpec = {
       width: "container",
       autosize: { type: "fit", contains: "padding", resize: true },
-      data: { values: filteredData },
+      data: { values: data },
       transform: finalTransform,
       layer: [
         {
@@ -132,7 +124,7 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
         vconcat: stackedCharts
       };
     }
-  }, [filteredData, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable,]);
+  }, [data, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable,]);
 
 
   const handleRollingAverageToggle = () => {
