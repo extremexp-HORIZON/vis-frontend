@@ -1,5 +1,5 @@
 import React, { useMemo,  useState } from 'react';
-import { Box, Paper, tabClasses, Tooltip, Typography } from '@mui/material';
+import { Box, MenuItem, Paper, Select, tabClasses, Tooltip, Typography } from '@mui/material';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import ChartControls from './ChartControls';
 import { transform } from 'lodash';
@@ -23,24 +23,16 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
   const selectableColumns = columns.filter(column => column.field !== datetimeColumn);
   console.log('colsdialge',selectableColumns);
   const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
   const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'heatmap'>('line');
   const [showStatistics, setShowStatistics] = useState(false);
   const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
   const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
   const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
-  const [xAxis, setXAxis] = useState(columns[0].field);
-  const [yAxis, setYAxis] = useState([columns[1].field]);
-  const [aggFunction, setAggFunction] = useState<'None' | 'Min' | 'Max' | 'Avg'>('None');
+  const [xAxis, setXAxis] = useState(columns[columns.length - 1].field);
+  const [yAxis, setYAxis] = useState([columns[0].field]);
+  const [aggFunction, setAggFunction] = useState<'None' | 'Min' | 'Max' | 'Mean'|'Sum'>('None');
 
 
- 
-
-  const filteredData = data.filter(item => {
-    const itemDate = new Date(item[datetimeColumn]);
-    return (!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate);
-  });
 
   const getVegaLiteType = (type: string) => {
     if (type === 'LOCAL_DATE_TIME') return 'temporal';
@@ -68,7 +60,7 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
           field: "value",
           as: "aggregated_value"
         }],
-        groupby: [xAxis]
+        groupby: [xAxis,"variable"]
       }
     ] : [];
     const finalTransform = [...baseTransform, ...aggregationTransform];
@@ -78,14 +70,8 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
     const commonSpec = {
       width: "container",
       autosize: { type: "fit", contains: "padding", resize: true },
-      data: { values: filteredData },
+      data: { values: data },
       transform: finalTransform,
-      // transform: [
-      //   {
-      //     fold: yAxis,
-      //     as: ["variable", "value"]
-      //   }
-      // ],
       layer: [
         {
           mark: chartType === 'line' ? { type: "line" } :
@@ -101,29 +87,13 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
                     { field: aggFunction !== 'None' ? "aggregated_value" : "value", type: "quantitative" }
                   ]
                 },
-                
-          // encoding: {
-          //   x: { type: xAxisType, field: xAxis },
-          //   y: { type: yAxisType, field:  "value", stack: mode === 'stack' ? 'zero' : null },
-          //   color: { field: "variable", type: "nominal", title: "Variable" },
-          //   tooltip: [
-          //     { field: "variable", type: "nominal" },
-          //     { field: "value", type: "quantitative" }
-          //   ]
-          // },
           selection: zoomable === 'yes' ? {
             grid_x: {
               type: "interval",
               bind: "scales",
-              zoom: "wheel![event.ctrlKey]",
+              zoom: "wheel",
               encodings: ["x"]
             },
-            grid_y: {
-              type: "interval",
-              bind: "scales",
-              zoom: "wheel![!event.ctrlKey]",
-              encodings: ["y"]
-            }
           } : undefined
         },
       ]
@@ -154,7 +124,7 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
         vconcat: stackedCharts
       };
     }
-  }, [filteredData, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable,]);
+  }, [data, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable,]);
 
 
   const handleRollingAverageToggle = () => {
@@ -197,7 +167,9 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
         setYAxis={setYAxis} aggFunction={aggFunction} setAggFunction={setAggFunction}
          category={''} setCategory={function (category: string): void {
           throw new Error('Function not implemented.');
-        } }        />
+        } }  
+              />
+            
         <Box sx={{ width: "99%", px: 1 }}>
           <VegaLite
             spec={spec as VisualizationSpec}
