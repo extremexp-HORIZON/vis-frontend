@@ -1,6 +1,7 @@
 import { Paper, Grid, Typography, Box, CircularProgress, IconButton, Tab, Tabs } from '@mui/material';
-import { GridColDef } from '@mui/x-data-grid';
-import React, { useEffect, useState } from 'react';
+import type { GridColDef } from '@mui/x-data-grid';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import DataTable from './DataTable';
 import DataExplorationChart from './DataExplorationChart';
 import FilterForm from './FilterForm';

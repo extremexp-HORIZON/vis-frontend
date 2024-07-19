@@ -7,10 +7,10 @@ import { AddTask } from "@mui/icons-material";
 
 const handleInitialization = (payload: IInitialization) => {
   const newPayload = {featureExplanation: {
-    ...payload.featureExplanation, modelInstances: JSON.parse(payload.featureExplanation.modelInstances),
-    modelConfusionMatrix: JSON.parse(payload.featureExplanation.modelConfusionMatrix)
+    ...payload.featureExplanation, modelInstances: JSON.parse(payload.featureExplanation.modelInstances)[0],
+    modelConfusionMatrix: JSON.parse(payload.featureExplanation.modelConfusionMatrix)[0]
   }, hyperparameterExplanation: {
-    ...payload.hyperparameterExplanation, pipelineMetrics: JSON.parse(payload.hyperparameterExplanation.pipelineMetrics)
+    ...payload.hyperparameterExplanation, pipelineMetrics: JSON.parse(payload.hyperparameterExplanation.pipelineMetrics)[0]
   }
 }
   return newPayload
@@ -40,6 +40,16 @@ const handleGetExplanation = (
   } else {
     return null
   }
+}
+
+const handleMultiTimeSeriesData = (payload : any) => {
+  const fileData = JSON.parse(payload).data;
+  return fileData.map((row: any)=> ({
+    ...row,
+    timestamp: new Date(row.timestamp), // Ensure timestamp is parsed as Date object
+    value: +row.f3, // Ensure value is a number
+    // series: file.replace('.csv', '') // Strip the .csv extension for series name
+  }));
 }
 
 interface IExplainability {  
@@ -90,7 +100,7 @@ export const explainabilitySlice = createSlice({
             state.loading = "false"
         })
         .addCase(fetchMultipleTimeseries.fulfilled, (state, action) => {
-          state.multipleTimeSeries = action.payload;
+          state.multipleTimeSeries = handleMultiTimeSeriesData(action.payload);
           state.loading = "false"
         })
         .addCase(fetchMultipleTimeseriesMetadata.fulfilled, (state, action) => {

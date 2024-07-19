@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { ButtonGroup, Button } from '@mui/material';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
