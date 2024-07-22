@@ -1,49 +1,32 @@
 import Box from "@mui/material/Box"
 import LinearProgress from "@mui/material/LinearProgress"
 import Typography from "@mui/material/Typography"
-import workflows from "../../shared/data/workflows.json"
 import { useEffect, useState } from "react"
 import grey from "@mui/material/colors/grey"
-import theme from "../../mui-theme"
-
-interface IexperimentStats {
-  total: number
-  completed: number
-  running: number
-  failed: number
-  progress: number
-}
-
-const experimentStatsDefault = {
-  total: 0,
-  completed: 0,
-  running: 0,
-  failed: 0,
-  progress: 0,
-}
+import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
+import { setProgressBarData } from "../../store/slices/progressPageSlice"
 
 const ProgressPageBar = () => {
-  const [experimentStats, setExperimentStats] = useState<IexperimentStats>(
-    experimentStatsDefault,
-  )
+  const { workflows, progressBar } = useAppSelector((state: RootState) => state.progressPage);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (workflows) {
-      const total = workflows.length
-      const completed = workflows.filter(
+    if (workflows.data.length > 0) {
+      const total = workflows.data.length
+      const completed = workflows.data.filter(
         workflow => workflow.workflowInfo.status === "completed",
       ).length
       const running =
-        workflows.filter(
+        workflows.data.filter(
           workflow => workflow.workflowInfo.status === "scheduled",
         ).length +
-        workflows.filter(workflow => workflow.workflowInfo.status === "running")
+        workflows.data.filter(workflow => workflow.workflowInfo.status === "running")
           .length
-      const failed = workflows.filter(
+      const failed = workflows.data.filter(
         workflow => workflow.workflowInfo.status === "failed",
       ).length
       const progress = Math.round(((completed + failed) / total) * 100)
-      setExperimentStats({ total, completed, running, failed, progress })
+      dispatch(setProgressBarData({ total, completed, running, failed, progress }))
     }
   }, [workflows])
 
@@ -61,7 +44,7 @@ const ProgressPageBar = () => {
           <Typography
             fontSize={"1.4rem"}
             color="text.primary"
-          >{`Progress: ${Math.round(experimentStats.progress)}%`}</Typography>
+          >{`Progress: ${Math.round(progressBar.progress)}%`}</Typography>
         </Box>
         <Box
           sx={{ minWidth: 35, display: "flex", columnGap: 1, flexWrap: "wrap" }}
@@ -69,21 +52,21 @@ const ProgressPageBar = () => {
           <Typography
             variant="body1"
             color="text.primary"
-          >{`Completed: ${experimentStats.completed}/${experimentStats.total}`}</Typography>
+          >{`Completed: ${progressBar.completed}/${progressBar.total}`}</Typography>
           <Typography
             variant="body1"
             color="text.primary"
-          >{`Running: ${experimentStats.running}/${experimentStats.total}`}</Typography>
+          >{`Running: ${progressBar.running}/${progressBar.total}`}</Typography>
           <Typography
             variant="body1"
             color="text.primary"
-          >{`Failed: ${experimentStats.failed}/${experimentStats.total}`}</Typography>
+          >{`Failed: ${progressBar.failed}/${progressBar.total}`}</Typography>
         </Box>
       </Box>
       <Box sx={{ width: "100%", mr: 1 }}>
         <LinearProgress
           variant="determinate"
-          value={Math.round(experimentStats.progress)}
+          value={Math.round(progressBar.progress)}
           sx={{
             height: "1rem",
             borderRadius: 4,

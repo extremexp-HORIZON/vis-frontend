@@ -8,7 +8,7 @@ const routes = createBrowserRouter(
     <>
         <Route path="/explainability" element={<ExplainabilityTask />} />
         <Route path="/dataexploration" element={<DataExploration />} />
-        <Route path="/" element={<ProgressPage />} />
+        <Route path="/:experimentId" element={<ProgressPage />} />
     </>
   ));
 
