@@ -22,9 +22,9 @@ const WorkflowTab = (props: IWorkflowTab) => {
 
   const taskProvider = (taskId: string | null) => {
     switch (taskId) {
-      case "I2Cat_Dataset":
+      case "LG600B6_100636_IDK":
         return <DataExploration />
-      case "Model_Training":
+      case "TrainModel":
         return <ModelAnalysisTask workflowId={workflowId} />
       case null:
         return null

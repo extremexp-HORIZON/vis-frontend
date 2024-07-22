@@ -241,7 +241,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
     if (tabs.find(tab => tab.workflowId === workflowId)) return
     dispatch(addTab(workflowId))
-    handleChange(workflowId)
+    handleChange(workflowId)(e)
   }
 
   const handleRequestSort = (

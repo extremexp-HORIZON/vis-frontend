@@ -21,7 +21,6 @@ import { fetchExperimentWorkflows } from "../../store/slices/progressPageSlice"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>(0)
-  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
 
@@ -35,10 +34,12 @@ const ProgressPage = () => {
     (newValue: number | string) => (event: React.SyntheticEvent) => {
       if (value === newValue) return
       setValue(newValue)
+      window.scrollTo(0, 0)
     }
 
   return (
     <>
+    {console.log(value)}
       <Grid
         sx={{
           maxWidth: "100vw",
