@@ -200,7 +200,7 @@ export default function ScheduleTable() {
     !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
   }
 
-  const removeSelected = (list: Number[]) => {
+  const removeSelected = (list: Number[] | string) => (e: React.SyntheticEvent) => {
     // TODO: Removed scheduled selected values
   }
 
