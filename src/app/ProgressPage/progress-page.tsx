@@ -20,7 +20,7 @@ import { useParams } from "react-router-dom"
 import { fetchExperimentWorkflows } from "../../store/slices/progressPageSlice"
 
 const ProgressPage = () => {
-  const [value, setValue] = useState<number | string>(0)
+  const [value, setValue] = useState<number | string>("progress")
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
 
@@ -93,7 +93,7 @@ const ProgressPage = () => {
             rowGap: 6,
           }}
         >
-          {value === 0 && (
+          {value === "progress" && (
             <>
               <ProgressPageBar />
               <ProgressPageGauges />
@@ -103,7 +103,7 @@ const ProgressPage = () => {
               <ScheduleTable />
             </>
           )}
-          {value !== 0 && value !== "compare-completed" && (
+          {value !== "progress" && value !== "compare-completed" && (
             <WorkflowTab workflowId={value} />
           )}
           {value === "compare-completed" && <CompareCompleted />}
