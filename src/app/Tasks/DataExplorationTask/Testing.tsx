@@ -124,7 +124,7 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
         vconcat: stackedCharts
       };
     }
-  }, [data, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable,]);
+  }, [data, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable,aggFunction]);
 
 
   const handleRollingAverageToggle = () => {
