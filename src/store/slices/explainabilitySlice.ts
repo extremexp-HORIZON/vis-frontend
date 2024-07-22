@@ -7,10 +7,10 @@ import { AddTask } from "@mui/icons-material";
 
 const handleInitialization = (payload: IInitialization) => {
   const newPayload = {featureExplanation: {
-    ...payload.featureExplanation, modelInstances: JSON.parse(payload.featureExplanation.modelInstances)[0],
-    modelConfusionMatrix: JSON.parse(payload.featureExplanation.modelConfusionMatrix)[0]
+    ...payload.featureExplanation, modelInstances: JSON.parse(payload.featureExplanation.modelInstances),
+    modelConfusionMatrix: JSON.parse(payload.featureExplanation.modelConfusionMatrix)
   }, hyperparameterExplanation: {
-    ...payload.hyperparameterExplanation, pipelineMetrics: JSON.parse(payload.hyperparameterExplanation.pipelineMetrics)[0]
+    ...payload.hyperparameterExplanation, pipelineMetrics: JSON.parse(payload.hyperparameterExplanation.pipelineMetrics)
   }
 }
   return newPayload

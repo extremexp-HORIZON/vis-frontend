@@ -5,22 +5,31 @@ import Typography from "@mui/material/Typography"
 import EditIcon from "@mui/icons-material/Edit"
 import grey from "@mui/material/colors/grey"
 import ParallelCoordinatePlot from "./parallel-coordinate-plot"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import WorkflowTab from "./WorkflowTab/workflow-tab"
 import ProgressPageTabs from "./progress-page-tabs"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
-import { RootState, useAppSelector } from "../../store/store"
+import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import CompareCompleted from "./CompareTab/CompareCompleted/compare-completed"
 import ProgressPageBar from "./progress-page-bar"
 import ProgressPageGauges from "./progress-page-gauges"
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
-import theme from "../../mui-theme"
+import { useParams } from "react-router-dom"
+import { fetchExperimentWorkflows } from "../../store/slices/progressPageSlice"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>(0)
-  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  const { experimentId } = useParams();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if(experimentId){
+      dispatch(fetchExperimentWorkflows(experimentId));
+    }
+  }, [])
 
   const handleChange =
     (newValue: number | string) => (event: React.SyntheticEvent) => {
@@ -48,7 +57,7 @@ const ProgressPage = () => {
               }}
             >
               <Typography fontSize={"2rem"} sx={{ fontWeight: 600 }}>
-                {"Experiment1"}
+                {experimentId}
               </Typography>
             </Box>
             <Box>
