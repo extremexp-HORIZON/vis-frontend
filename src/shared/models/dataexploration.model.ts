@@ -2,10 +2,10 @@ export interface IDataExplorationRequest {
     // data(data: any): unknown;
     datasetId: string;
     columns: string[];
-    aggFunction: string;
     filters: IFilter[];
-    limit: number;
-    scaler: string;
+    aggFunction?: string;
+    limit?: number;
+    scaler?: string;
 }
 
 export interface IFilter {

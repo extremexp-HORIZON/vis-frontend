@@ -156,25 +156,15 @@ export const fetchExplanation = createAsyncThunk('explainability/fetch_explanati
 });
 
 export const fetchMultipleTimeseries = createAsyncThunk('explainability/fetch_multiple_timeseries',
-  async () => {
-    const payload = {
-        datasetId: "folder://IDEKO/datasets",
-        columns: [],
-        filters: [],
-      }
-      const requestUrl = apiPath + "visualization/data";
-    return axios.post<any>(requestUrl, payload).then((response) => response.data);
+  async (payload: {dataQuery: IDataExplorationRequest} ) => {
+    const requestUrl = apiPath + "visualization/data";
+    return axios.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
 });
 
 export const fetchMultipleTimeseriesMetadata = createAsyncThunk('explainability/fetch_multiple_timeseries_metadata',
-  async () => {
-    const payload = {
-        datasetId: "file://IDEKO/metadata.csv",
-        columns: [],
-        filters: [],
-      }
-      const requestUrl = apiPath + "visualization/data";
-    return axios.post<any>(requestUrl, payload).then((response) => response.data);
+  async (payload: {dataQuery: IDataExplorationRequest} ) => {
+    const requestUrl = apiPath + "visualization/data";
+    return axios.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
 });
   
 export const fetchMisclassifiedInstances = createAsyncThunk('explainability/fetch_misclassified_instances', 

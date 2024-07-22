@@ -47,7 +47,7 @@ const ExplainabilityTaskCompare = () => {
         </Box>
         {initLoading && (
           <Box>
-            <CircularProgress sx={{ fontSize: "1rem" }} />
+            <CircularProgress sx={{ size: "5rem" }} />
           </Box>
         )}
       </Box>

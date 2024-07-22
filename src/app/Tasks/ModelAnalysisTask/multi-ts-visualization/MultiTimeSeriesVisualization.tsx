@@ -6,8 +6,10 @@ import useMousePosition from './useMousePosition';
 import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
-import Container from "@mui/material/Container";
+import InfoIcon from "@mui/icons-material/Info"
 import { getVegaLiteSpec } from './vegaLiteSpec';
+import { IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import grey from "@mui/material/colors/grey"
 
 interface Metadata {
   id: string;
@@ -256,11 +258,40 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   }
   
   return (
-    <Container
-      sx={{width: "100%", minWidth: "300px",}}
+    <Paper
+      className="Category-Item"
+      elevation={2}
+      sx={{
+        borderRadius: 4,
+        width: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 0,
+        minWidth: "300px",
+        height: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          px: 1.5,
+          py: 0.5,
+          display: "flex",
+          alignItems: "center",
+          borderBottom: `1px solid ${grey[400]}`,
+        }}
       >
-      <Box sx={{  display: 'flex' , flexDirection: 'column', flexWrap: 'wrap',  justifyContent: 'center'}}>
-        <Box sx = {{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+        <Typography fontSize={"1rem"} fontWeight={600}>
+          {"Instance Classification"}
+        </Typography>
+        <Box sx={{ flex: 1 }} />
+        <Tooltip title={""}>
+          <IconButton>
+            <InfoIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Box sx={{width:"100%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap', p:2}}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
           <ToggleButtonGroup
             color="primary"
             value={alignment}
@@ -272,22 +303,22 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
             <ToggleButton size="small" value="compare">Compare</ToggleButton>
           </ToggleButtonGroup>
         </Box>
-        <Box sx={{ display: 'flex' , flexDirection: 'row', flexWrap: 'wrap',  justifyContent: 'center' }}>
+        <Box sx={{width:"90%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
           <VegaLite
             key={`multi-ts-visualization`}
             spec={vlSpec}
+            style={{ width: "100%" }}
             actions={false} // hides 3 dots action button
-            data={{ 
-              chartData: chartData, 
+            data={{
+              chartData: chartData,
               condensedChartData: condensedChartData,
-              fileRegions: fileRegions 
+              fileRegions: fileRegions
             }}
             onNewView={handleNewView}
             signalListeners={{
               brush: handleBrush,
               category: handleCategoryChange,
               zoomPan: handleZoomPan,
-              // highlight: handleHighlight,
             }}
           />
           {tooltipVisible && (
@@ -310,8 +341,8 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
           )}
         </Box>
       </Box>
-    </Container>
-  );
+    </Paper>
+  );  
 };
 
 export default MultiTimeSeriesVisualization;

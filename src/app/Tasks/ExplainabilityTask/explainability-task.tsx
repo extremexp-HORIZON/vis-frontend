@@ -83,7 +83,7 @@ const ExplainabilityTask = () => {
       </Box>
         {initLoading && explInitialization === null ? (
           <Box sx={{ height: "100%", width: "100%" }}>
-            <CircularProgress size={"10rem"} />
+            <CircularProgress size={"5rem"} />
             <Typography fontSize={"1.5rem"} color={grey[500]}>
               Initializing page...
             </Typography>

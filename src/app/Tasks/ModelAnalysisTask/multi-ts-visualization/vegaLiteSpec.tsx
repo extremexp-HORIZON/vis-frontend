@@ -1,10 +1,11 @@
 const viewVlSpec = {
-  // "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
   "vconcat": [
     // Main Chart
     {
-      "width": 1200,
+      "width": "container",
       "height": 400,
+      "autosize": { type: "fit", contains: "padding", resize: true },
       "data": { "name": "chartData" },
       "mark": "line",
       "encoding": {
@@ -20,7 +21,7 @@ const viewVlSpec = {
       },
     },
     {
-      "width": 1200,
+      "width": "container",
       "height": 100,
       "layer": [
         // File bars
@@ -108,11 +109,11 @@ const viewVlSpec = {
 };
 
 const compareVlSpec = {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
   "vconcat": [
     // Main Chart
     {
-      "width": 1200,
+      "width": "container",
       "height": 400,
       "data": { "name": "chartData" },
       "mark": "line",
@@ -180,7 +181,7 @@ const compareVlSpec = {
     },
     // File Regions and Condensed Chart
     {
-      "width": 1200,
+      "width": "container",
       "height": 100,
       "layer": [
         // File Regions Bars

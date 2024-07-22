@@ -120,7 +120,7 @@ const DataExploration: React.FC = () => {
 
             {tabValue === 0 && (
               <>
-                {loading && <CircularProgress />}
+                {loading && <CircularProgress size={"5rem"} /> }
                 {error && <Typography color="error">Error: {error}</Typography>}
                 {!loading && (
                    <DataTable
@@ -136,7 +136,7 @@ const DataExploration: React.FC = () => {
 
             {tabValue === 1 && (
               <>
-                {loading && <CircularProgress />}
+                {loading && <CircularProgress size={"5rem"} />}
                 {error && <Typography color="error">Error: {error}</Typography>}
                 {!loading && (
                  

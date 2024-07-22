@@ -12,6 +12,9 @@ import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import CircularProgress from "@mui/material/CircularProgress"
 import MultiTimeSeriesVisualization from "./multi-ts-visualization/MultiTimeSeriesVisualization"
+import { useLocation } from "react-router-dom"
+import InstanceClassification from "../SharedItems/Plots/instance-classification"
+import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
 
 interface IFeatureExplainability {
   workflowId: number | string
@@ -22,10 +25,21 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const { workflowId } = props
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
+  const dataset = useLocation().pathname;
 
   useEffect(() => {
-    dispatch(fetchMultipleTimeseries());
-    dispatch(fetchMultipleTimeseriesMetadata());
+    if(dataset.includes("ideko")){
+      dispatch(fetchMultipleTimeseries({dataQuery: {
+        datasetId: "folder://ideko/datasets/LG600B6-100636-IDK",
+        columns: [],
+        filters: [],   
+      }}));
+      dispatch(fetchMultipleTimeseriesMetadata({ dataQuery: {
+        datasetId: "file://ideko/metadata.csv",
+        columns: [],
+        filters: [],
+      }}));
+    }
     dispatch(
       fetchInitialization({
         modelName: "I2Cat_Phising_model",
@@ -92,7 +106,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             </IconButton>
           </Box>
         {!explInitialization ? <Box sx={{ height: "100%", width: "100%" }}>
-          <CircularProgress size={"10rem"} />
+          <CircularProgress size={"5rem"} />
           <Typography fontSize={"1.5rem"} color={grey[500]}>
             Initializing page...
           </Typography>
@@ -124,7 +138,25 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               </Typography>
               <Typography variant="body1">Test set classified instances and Confusion Matrix</Typography>
             </Box>
-            {/* <Grid container spacing={2}>
+            { (multipleTimeSeries && multipleTimeSeriesMetadata) ?
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={8}>
+                  <MultiTimeSeriesVisualization 
+                    data={structuredClone(multipleTimeSeries)} 
+                    metadata={structuredClone(multipleTimeSeriesMetadata)}/>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <ConfusionMatrix
+                    key={`confusion-matrix`}
+                    metrics={
+                      explInitialization.hyperparameterExplanation.pipelineMetrics
+                    }
+                    workflowId={workflowId}
+                  />
+                </Grid>
+              </Grid> 
+              :
+              <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <InstanceClassification
                   key={`instance-classification`}
@@ -144,11 +176,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   workflowId={workflowId}
                 />
               </Grid>
-            </Grid> */}
-            {multipleTimeSeries && multipleTimeSeriesMetadata &&
-              <MultiTimeSeriesVisualization 
-                data={structuredClone(multipleTimeSeries)} 
-                metadata={structuredClone(multipleTimeSeriesMetadata)}/>
+            </Grid>
             }
             <Box>
               {point && (
