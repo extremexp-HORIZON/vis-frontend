@@ -1,4 +1,3 @@
-import { IconButton, Divider } from "@mui/material"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
@@ -39,7 +38,6 @@ const ProgressPage = () => {
 
   return (
     <>
-    {console.log(value)}
       <Grid
         sx={{
           maxWidth: "100vw",
