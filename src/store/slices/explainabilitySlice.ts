@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 import axios from "axios";
-import { IInitialization } from "../../shared/models/initialization.model";
-import { IPlotModel } from "../../shared/models/plotmodel.model";
-import { IDataExplorationRequest } from "../../shared/models/dataexploration.model";
+import type { IInitialization } from "../../shared/models/initialization.model";
+import type { IPlotModel } from "../../shared/models/plotmodel.model";
+import type { IDataExplorationRequest } from "../../shared/models/dataexploration.model";
 import { AddTask } from "@mui/icons-material";
 
 const handleInitialization = (payload: IInitialization) => {
@@ -43,13 +43,25 @@ const handleGetExplanation = (
 }
 
 const handleMultiTimeSeriesData = (payload : any) => {
-  const fileData = JSON.parse(payload).data;
-  return fileData.map((row: any)=> ({
-    ...row,
-    timestamp: new Date(row.timestamp), // Ensure timestamp is parsed as Date object
-    value: +row.f3, // Ensure value is a number
-    // series: file.replace('.csv', '') // Strip the .csv extension for series name
-  }));
+  const fileData = JSON.parse(payload.data);
+  const seriesData = payload.fileNames;
+  const flatFileData =  fileData.flatMap((file: any, id:number)=> {
+    return file.map((row: any) => {
+      return { 
+        ...row,
+        timestamp: new Date(row.timestamp), // Ensure timestamp is parsed as Date object
+        value: +row.f3, // Ensure value is a number
+        series: seriesData[id].replace('.csv', '') // Strip the .csv extension for series name
+      };
+    });
+  });
+  return flatFileData;
+}
+
+const handleMultiTimeSeriesMetaData = (payload : any) => {
+  const metadata = JSON.parse(payload.data);
+  return metadata;
+
 }
 
 interface IExplainability {  
@@ -104,7 +116,7 @@ export const explainabilitySlice = createSlice({
           state.loading = "false"
         })
         .addCase(fetchMultipleTimeseriesMetadata.fulfilled, (state, action) => {
-          state.multipleTimeSeriesMetadata = action.payload;
+          state.multipleTimeSeriesMetadata = handleMultiTimeSeriesMetaData(action.payload);
           state.loading = "false"
         })
         .addCase(fetchMultipleTimeseriesMetadata.pending, (state, action) => {

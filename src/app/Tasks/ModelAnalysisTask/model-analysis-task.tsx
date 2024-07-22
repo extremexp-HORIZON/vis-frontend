@@ -2,8 +2,6 @@ import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
-import InstanceClassification from "../SharedItems/Plots/instance-classification"
-import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
 import CounterfactualsTable from "../SharedItems/Tables/counterfactuals-table"
 import LinePlot from "../SharedItems/Plots/line-plot"
 import CloseIcon from "@mui/icons-material/Close"
@@ -13,13 +11,14 @@ import { defaultDataExplorationRequest } from "../../../shared/models/dataexplor
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import CircularProgress from "@mui/material/CircularProgress"
+import MultiTimeSeriesVisualization from "./multi-ts-visualization/MultiTimeSeriesVisualization"
 
 interface IFeatureExplainability {
   workflowId: number | string
 }
 
 const ModelAnalysisTask = (props: IFeatureExplainability) => {
-  const { explInitialization } = useAppSelector(state => state.explainability)
+  const { explInitialization, multipleTimeSeries, multipleTimeSeriesMetadata } = useAppSelector(state => state.explainability)
   const { workflowId } = props
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
@@ -125,7 +124,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               </Typography>
               <Typography variant="body1">Test set classified instances and Confusion Matrix</Typography>
             </Box>
-            <Grid container spacing={2}>
+            {/* <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <InstanceClassification
                   key={`instance-classification`}
@@ -145,7 +144,12 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   workflowId={workflowId}
                 />
               </Grid>
-            </Grid>
+            </Grid> */}
+            {multipleTimeSeries && multipleTimeSeriesMetadata &&
+              <MultiTimeSeriesVisualization 
+                data={structuredClone(multipleTimeSeries)} 
+                metadata={structuredClone(multipleTimeSeriesMetadata)}/>
+            }
             <Box>
               {point && (
                 <CounterfactualsTable

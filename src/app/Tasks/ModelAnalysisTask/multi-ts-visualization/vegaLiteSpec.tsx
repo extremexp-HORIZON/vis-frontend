@@ -1,13 +1,9 @@
 const viewVlSpec = {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": "container",
-  "autosize": {
-    "type": "fit",
-    "contains": "padding"
-  },
+  // "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "vconcat": [
     // Main Chart
     {
+      "width": 1200,
       "height": 400,
       "data": { "name": "chartData" },
       "mark": "line",
@@ -24,7 +20,7 @@ const viewVlSpec = {
       },
     },
     {
-      "width": "container",
+      "width": 1200,
       "height": 100,
       "layer": [
         // File bars
@@ -113,14 +109,10 @@ const viewVlSpec = {
 
 const compareVlSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": "container",
-  "autosize": {
-    "type": "fit",
-    "contains": "padding"
-  },
   "vconcat": [
     // Main Chart
     {
+      "width": 1200,
       "height": 400,
       "data": { "name": "chartData" },
       "mark": "line",
@@ -188,6 +180,7 @@ const compareVlSpec = {
     },
     // File Regions and Condensed Chart
     {
+      "width": 1200,
       "height": 100,
       "layer": [
         // File Regions Bars
@@ -269,7 +262,7 @@ const compareVlSpec = {
 
 
 
-export const getVegaLiteSpec = (type: any) => {
+export const getVegaLiteSpec = (type: string) => {
     switch (type){
         case "view":
             return viewVlSpec;
@@ -278,5 +271,4 @@ export const getVegaLiteSpec = (type: any) => {
         default:
             return null; 
     }
-
 }

@@ -9,7 +9,6 @@ import ToggleButton from "@mui/material/ToggleButton";
 import Container from "@mui/material/Container";
 import { getVegaLiteSpec } from './vegaLiteSpec';
 
-
 interface Metadata {
   id: string;
   category: string;
@@ -36,7 +35,7 @@ interface MultiTimeSeriesVisualizationProps {
 
 const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> = ({ data, metadata }) => {
   const [condensedChartData, setCondensedChartData] = useState<Data[]>(data); // line chart data in navigator
-  const [chartData, setChartData] = useState<Data[]>([]); // main chart data 
+  const [chartData, setChartData] = useState<Data[]>(); // main chart data 
   const [fileRegions, setFileRegions] = useState<FileRegion[]>([]); // file regions on navigator
   const [fileCategoryMap, setFileCategoryMap] = useState<any>(null);
   const [zoomState, setZoomState] = useState<any>(null); // zoom state of navigator [start, end]
@@ -81,6 +80,14 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   useEffect(() => {
     const regions: FileRegion[] = [];
     const newFileCategoryMap: { [key: string]: string } = {};
+
+    // Check if metadata is extensible
+    if (!Object.isExtensible(data)) {
+      console.warn('Metadata is non-extensible:', metadata);
+    }
+    if (!Object.isExtensible(metadata)) {
+      console.warn('Metadata is non-extensible:', metadata);
+    }
     if (Array.isArray(metadata)) {
       metadata.forEach(({ id, category }) => {
         newFileCategoryMap[id.replace('.csv', '')] = category;
@@ -111,8 +118,9 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     } else {
       console.error('Metadata is not an array:', metadata);
     }
-    updateFileRegions(regions);
+    // updateFileRegions(regions);
     setFileRegions(regions);
+    setChartData(data);
     setCondensedChartData(data);
     setFileCategoryMap(newFileCategoryMap);
     setVlSpec(getVegaLiteSpec(alignment) as VisualizationSpec);
@@ -266,6 +274,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
         </Box>
         <Box sx={{ display: 'flex' , flexDirection: 'row', flexWrap: 'wrap',  justifyContent: 'center' }}>
           <VegaLite
+            key={`multi-ts-visualization`}
             spec={vlSpec}
             actions={false} // hides 3 dots action button
             data={{ 
@@ -278,7 +287,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
               brush: handleBrush,
               category: handleCategoryChange,
               zoomPan: handleZoomPan,
-              highlight: handleHighlight,
+              // highlight: handleHighlight,
             }}
           />
           {tooltipVisible && (
