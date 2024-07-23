@@ -134,7 +134,10 @@ export default function ScheduleTable() {
   }
 
   const removeSelected = (list: Number[] | string) => (e: React.SyntheticEvent) => {
-    // TODO: Removed scheduled selected values
+    const filteredWorkflows = progressScheduledTable.rows.filter(
+      row => !progressScheduledTable.selectedWorkflows.includes(row.id),
+    )
+    dispatch(setProgressScheduledTable({ rows: filteredWorkflows, visibleRows: filteredWorkflows, selectedWorkflows: [] }))
   }
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
