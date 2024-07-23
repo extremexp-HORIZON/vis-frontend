@@ -2,7 +2,7 @@ import grey from "@mui/material/colors/grey"
 import Box from "@mui/material/Box"
 import { Dispatch, SetStateAction, useEffect, useRef } from "react"
 import blue from "@mui/material/colors/blue"
-import Svg from "../../../shared/data/dummy.svg?react"
+import Svg from "../../../shared/data/new.svg?react"
 import { useTheme } from "@mui/material"
 
 interface IWorkflowSvg {
@@ -17,7 +17,7 @@ const WorkflowSvg = (props: IWorkflowSvg) => {
   const listeners = useRef<
     { gElement: SVGGElement; listener: EventListener }[]
   >([])
-  const workingTasks = ["I2Cat_Dataset", "Model_Training"]
+  const workingTasks = ["LG600B6_100636_IDK", "TrainModel"]
 
   useEffect(() => {
     const handleChange = (taskId: string | null, element: SVGGElement) => {

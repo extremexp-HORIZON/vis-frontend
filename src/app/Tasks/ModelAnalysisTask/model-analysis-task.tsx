@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import CircularProgress from "@mui/material/CircularProgress"
 import MultiTimeSeriesVisualization from "./multi-ts-visualization/MultiTimeSeriesVisualization"
-import { useLocation } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import InstanceClassification from "../SharedItems/Plots/instance-classification"
 import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
 
@@ -22,6 +22,7 @@ interface IFeatureExplainability {
 
 const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const { explInitialization, multipleTimeSeries, multipleTimeSeriesMetadata } = useAppSelector(state => state.explainability)
+  const { experimentId } = useParams();
   const { workflowId } = props
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
@@ -30,12 +31,12 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   useEffect(() => {
     if(dataset.includes("ideko")){
       dispatch(fetchMultipleTimeseries({dataQuery: {
-        datasetId: "folder://ideko/datasets/LG600B6-100636-IDK",
+        datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
         columns: [],
         filters: [],   
       }}));
       dispatch(fetchMultipleTimeseriesMetadata({ dataQuery: {
-        datasetId: "file://ideko/metadata.csv",
+        datasetId: `file://${experimentId}/metadata.csv`,
         columns: [],
         filters: [],
       }}));

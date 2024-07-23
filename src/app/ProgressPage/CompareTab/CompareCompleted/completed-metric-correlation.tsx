@@ -2,18 +2,22 @@ import React, { useState } from 'react';
 import { Vega, VisualizationSpec } from 'react-vega';
 import { Paper, Box, Typography, IconButton, Tooltip, FormControl, Select, MenuItem } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import workflows from '../../../../shared/data/workflows.json';
+import { useAppSelector, useAppDispatch, RootState } from '../../../../store/store';
  
 interface Props {
     workflowIds?: number[];
 }
  
 const CompletedMetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
-    let filteredWorkflows = workflows.filter(wf => wf.workflowInfo.status === "completed");
+    const { workflows  } = useAppSelector(
+        (state: RootState) => state.progressPage,
+      )
+    const dispatch = useAppDispatch();
+    let filteredWorkflows = workflows.data.filter(wf => wf.workflowInfo.status === "completed");
     if (workflowIds && workflowIds.length > 0) {
         filteredWorkflows = filteredWorkflows.filter(wf => workflowIds.includes(wf.workflowId));
     }
- 
+    
     const availableMetrics = ['accuracy', 'precision', 'recall', 'f1_score', 'f1_macro', 'false_negatives', 'false_positives', 'true_negatives', 'true_positives', 'runtime'];
  
     const [xMetric, setXMetric] = useState<string>("precision");

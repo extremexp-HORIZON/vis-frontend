@@ -24,7 +24,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
 
   const handleRemoveTab = (workflowId: number | string | null) => () => {
     if (workflowId === null) return
-    workflowId === value && handleChange(0)(null)
+    workflowId === value && handleChange("progress")(null)
     dispatch(deleteTab(workflowId))
   }
 
@@ -84,7 +84,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
         }}
         size="small"
         disableRipple
-        onClick={handleChange(0)}
+        onClick={handleChange("progress")}
       >
         Experiment Overview
       </Button>

@@ -2,7 +2,8 @@ import grey from "@mui/material/colors/grey"
 import Box from "@mui/material/Box"
 import { Dispatch, SetStateAction, useEffect, useRef } from "react"
 import blue from "@mui/material/colors/blue"
-import Svg from "../../../../shared/data/top-level.svg?react"
+import Svg from "../../../../shared/data/new-top.svg?react"
+import { useTheme } from "@mui/material"
 
 interface IWorkflowSvg {
   chosenTask: string | null
@@ -10,12 +11,13 @@ interface IWorkflowSvg {
 }
 
 const CompareCompletedSvg = (props: IWorkflowSvg) => {
+  const theme = useTheme();
   const { chosenTask, setChosenTask } = props
   const chosenTaskRef = useRef(chosenTask)
   const listeners = useRef<
     { gElement: SVGGElement; listener: EventListener }[]
   >([])
-  const workingTasks = ["I2Cat_Dataset", "Model_Training"]
+  const workingTasks = ["I2Cat_Dataset", "TrainModel"]
 
   useEffect(() => {
     const handleChange = (taskId: string | null, element: SVGGElement) => {
@@ -44,7 +46,7 @@ const CompareCompletedSvg = (props: IWorkflowSvg) => {
               const element = childElement as SVGPolygonElement
               element.style.cursor = "pointer"
               element.style.userSelect = "none"
-              element.style.fill = blue[500]
+              element.style.fill = theme.palette.primary.light
             })
           }
         }

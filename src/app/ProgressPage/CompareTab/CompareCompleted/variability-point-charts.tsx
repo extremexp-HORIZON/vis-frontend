@@ -1,21 +1,8 @@
-import React, {useEffect, useState} from "react";
-import { VegaLite} from "react-vega";
+import { useEffect, useState } from "react";
+import { VegaLite } from "react-vega";
 import { Paper, Box, Typography, FormControl, Select, MenuItem, Chip, IconButton, Tooltip, SelectChangeEvent } from "@mui/material";
-import workflows from "../../../../shared/data/workflows.json"; // Adjust the import based on your project structure
 import InfoIcon from '@mui/icons-material/Info';
-
-interface Workflow {
-  workflowId: string;
-  workflowInfo: {
-    status: string;
-  };
-  metrics: {
-    [key: string]: number;
-  };
-  variabilityPoints: {
-    [key: string]: number;
-  };
-}
+import { useAppSelector, RootState, useAppDispatch } from "../../../../store/store";
 
 interface ChartData {
   x: number;
@@ -24,33 +11,43 @@ interface ChartData {
   point: string;
 }
 
-const processData = (workflows: Workflow[], selectedMetric: string, variabilityPoints: string[]) => {
-  return variabilityPoints.flatMap(point =>
-    workflows
-      .filter(workflow => workflow.workflowInfo.status === "completed" && workflow.metrics)
-      .map(workflow => ({
-        x: workflow.variabilityPoints[point],
-        y: workflow.metrics[selectedMetric],
-        id: workflow.workflowId,
-        point
-      }))
-  );
-};
-
-const getYAxisDomain = (data: ChartData[]) => {
-  const values = data.map(d => d.y);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  return { min, max };
-};
-
 const VariabilityPointCharts = () => {
-  const [selectedMetric, setSelectedMetric] = useState("accuracy");
-  const [selectedVariabilityPoints, setSelectedVariabilityPoints] = useState(["learning_rate"]);
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage);
+  const dispatch = useAppDispatch();
+
+  // Extract unique metrics and variability points from workflows
+  const metrics = workflows.data ? Array.from(new Set(workflows.data.flatMap(workflow => workflow.metrics ? Object.keys(workflow.metrics) : []))) : [];
+  const variabilityPoints = workflows.data ? Array.from(new Set(workflows.data.flatMap(workflow => workflow.variabilityPoints["Model Training"] ? Object.keys(workflow.variabilityPoints["Model Training"].Parameters) : []))) : [];
+
+  const processData = (selectedMetric: string, variabilityPoints: string[]) => {
+    if (!workflows.data) return [];
+
+    return variabilityPoints.flatMap(point =>
+      workflows.data
+        .filter(workflow => workflow.workflowInfo?.status === "completed" && workflow.metrics && workflow.variabilityPoints["Model Training"])
+        .map(workflow => ({
+          x: workflow.variabilityPoints["Model Training"].Parameters[point],
+          y: workflow.metrics[selectedMetric],
+          id: workflow.workflowId,
+          point
+        }))
+    );
+  };
+
+  const getYAxisDomain = (data: ChartData[]) => {
+    if (data.length === 0) return { min: 0, max: 1 };
+
+    const values = data.map(d => d.y);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    return { min, max };
+  };
+
+  const [selectedMetric, setSelectedMetric] = useState(metrics[0] || "accuracy");
+  const [selectedVariabilityPoints, setSelectedVariabilityPoints] = useState(variabilityPoints.slice(0, 1));
   const [chartWidth, setChartWidth] = useState(250); // Default width
 
-
-  const chartData = processData(workflows as unknown as Workflow[], selectedMetric, selectedVariabilityPoints);
+  const chartData = processData(selectedMetric, selectedVariabilityPoints);
   const yAxisDomain = getYAxisDomain(chartData);
 
   const handleMetricChange = (event: SelectChangeEvent<string>) => {
@@ -71,6 +68,7 @@ const VariabilityPointCharts = () => {
       },
     },
   };
+
   useEffect(() => {
     const handleResize = () => {
       const chartContainerWidth = (document.querySelector('.chart-container') as HTMLElement | null)?.offsetWidth || 300;
@@ -85,7 +83,7 @@ const VariabilityPointCharts = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [selectedVariabilityPoints.length]); // Depend on the numbe
+  }, [selectedVariabilityPoints.length]);
 
   return (
     <Paper
@@ -139,11 +137,9 @@ const VariabilityPointCharts = () => {
             )}
             MenuProps={MenuProps}
           >
-            <MenuItem value="learning_rate">Learning Rate</MenuItem>
-            <MenuItem value="max_depth">Max Depth</MenuItem>
-            <MenuItem value="min_child_weight">Min Child Weight</MenuItem>
-            <MenuItem value="n_estimators">N Estimators</MenuItem>
-            <MenuItem value="scaler">Scaler</MenuItem>
+            {variabilityPoints.map(point => (
+              <MenuItem key={point} value={point}>{point}</MenuItem>
+            ))}
           </Select>
         </FormControl>
         
@@ -155,10 +151,9 @@ const VariabilityPointCharts = () => {
             value={selectedMetric}
             onChange={handleMetricChange}
           >
-            <MenuItem value="accuracy">Accuracy</MenuItem>
-            <MenuItem value="precision">Precision</MenuItem>
-            <MenuItem value="recall">Recall</MenuItem>
-            <MenuItem value="f1_score">F1 Score</MenuItem>
+            {metrics.map(metric => (
+              <MenuItem key={metric} value={metric}>{metric.charAt(0).toUpperCase() + metric.slice(1)}</MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>

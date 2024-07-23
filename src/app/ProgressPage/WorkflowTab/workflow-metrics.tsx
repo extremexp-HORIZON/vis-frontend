@@ -41,7 +41,7 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
         </Box> */}
         <Grid sx={{ p: 2 }} container spacing={3}>
           {metrics
-            ? metrics.map((metric: any) => (
+            ? metrics.map(metric => (
                 <Grid
                   key={`statistics-${metric.name}`}
                   xs={12}
@@ -61,27 +61,27 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
                     >
                       <Typography fontWeight={600}>{metric.name}:</Typography>
                       <Typography>
-                        {parseFloat(metric.value).toFixed(3)}
-                        {metric.name === "Runtime" && "s"}
+                      {typeof metric.value === 'string' ? parseFloat(metric.value).toFixed(3) : metric.value.toFixed(3)}
+                      {metric.name === "runtime" && "s"}
                       </Typography>
                     </Box>
-                    <Box
+                     <Box
                       sx={{
                         textAlign: "center",
                         display: "flex",
                         justifyContent: "center",
                       }}
                     >
-                      {metric.avgDiff > 0 ? (
+                      {metric.avgDiff as number > 0 ? (
                         <ArrowDropUpIcon sx={{ color: green[400] }} />
                       ) : (
                         <ArrowDropDownIcon sx={{ color: red[400] }} />
                       )}
                       <Typography sx={{ mr: 0.5 }}>
-                        {parseInt(metric.avgDiff)}%
+                        {parseInt(metric.avgDiff.toString())}%
                       </Typography>
                       <Typography>vs. experiment average</Typography>
-                    </Box>
+                    </Box> 
                   </Paper>
                 </Grid>
               ))

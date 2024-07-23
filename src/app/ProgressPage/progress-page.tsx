@@ -1,4 +1,3 @@
-import { IconButton, Divider } from "@mui/material"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
@@ -20,8 +19,7 @@ import { useParams } from "react-router-dom"
 import { fetchExperimentWorkflows } from "../../store/slices/progressPageSlice"
 
 const ProgressPage = () => {
-  const [value, setValue] = useState<number | string>(0)
-  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  const [value, setValue] = useState<number | string>("progress")
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
 
@@ -35,6 +33,7 @@ const ProgressPage = () => {
     (newValue: number | string) => (event: React.SyntheticEvent) => {
       if (value === newValue) return
       setValue(newValue)
+      window.scrollTo(0, 0)
     }
 
   return (
@@ -92,7 +91,7 @@ const ProgressPage = () => {
             rowGap: 6,
           }}
         >
-          {value === 0 && (
+          {value === "progress" && (
             <>
               <ProgressPageBar />
               <ProgressPageGauges />
@@ -102,7 +101,7 @@ const ProgressPage = () => {
               <ScheduleTable />
             </>
           )}
-          {value !== 0 && value !== "compare-completed" && (
+          {value !== "progress" && value !== "compare-completed" && (
             <WorkflowTab workflowId={value} />
           )}
           {value === "compare-completed" && <CompareCompleted />}

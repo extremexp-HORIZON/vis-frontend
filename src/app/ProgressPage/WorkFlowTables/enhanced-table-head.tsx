@@ -6,6 +6,7 @@ import { visuallyHidden } from '@mui/utils';
 
 interface EnhancedTableProps {
   columns: Column[];
+  parametersLength: number;
   numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,7 +16,7 @@ interface EnhancedTableProps {
 }
 
 export default function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, columns, order, orderBy, numSelected, rowCount, onRequestSort } =
+  const { onSelectAllClick, columns, order, orderBy, numSelected, rowCount, onRequestSort, parametersLength } =
     props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
@@ -33,7 +34,7 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
         <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}` }} align="center" colSpan={1}>
           Task Variant
         </TableCell>
-        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.dark}` }} align="center" colSpan={3}>
+        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.dark}` }} align="center" colSpan={parametersLength}>
           Parameters
         </TableCell>
         <TableCell align="right" colSpan={1} />

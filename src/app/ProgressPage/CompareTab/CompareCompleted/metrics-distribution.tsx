@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Vega, VegaLite } from "react-vega"
 import {
   Box,
@@ -14,40 +14,47 @@ import {
 } from "@mui/material"
 import { grey } from "@mui/material/colors"
 import InfoIcon from "@mui/icons-material/Info"
-import workflows from "../../../../shared/data/workflows.json"; // Adjust the import based on your project structure
-interface Workflow {
-  workflowId: string;
-  workflowInfo: {
-    status: string;
-  };
-  metrics: {
-    [key: string]: number;
-  };
-  variabilityPoints: {
-    [key: string]: number;
-  };
-}
-
-
+import {
+  RootState,
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../store/store"
 
 const MetricsDistribution = () => {
-
-  const getData = (workflows: Workflow[], metric: string) => {
-    const lowercaseMetric = metric.toLowerCase();
-    const completedWorkflows = workflows.filter(workflow => 
-      workflow.metrics && workflow.metrics[lowercaseMetric] !== undefined
-    );
-    completedWorkflows.sort((a, b) => b.metrics[metric] - a.metrics[lowercaseMetric]);
-    const chartData = completedWorkflows.map(workflow => ({
-      metricName: metric, 
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  const availableMetrics = useMemo(() => {
+    if (!workflows.data || workflows.data.length === 0) return []
+    const metricsSet = new Set<string>()
+    workflows.data.forEach(workflow => {
+      if (workflow.metrics) {
+        Object.keys(workflow.metrics).forEach(metric => {
+          metricsSet.add(metric)
+        })
+      }
+    })
+    return Array.from(metricsSet)
+  }, [workflows.data])
+  const getData = (metric: string) => {
+    const lowercaseMetric = metric.toLowerCase()
+    const completedWorkflows = workflows.data.filter(
+      workflow =>
+        workflow.metrics &&
+        workflow.metrics[lowercaseMetric] !== undefined &&
+        workflow.workflowInfo.status === "completed",
+    )
+    completedWorkflows.sort(
+      (a, b) =>
+        (b.metrics[lowercaseMetric] || 0) - (a.metrics[lowercaseMetric] || 0),
+    )
+    return completedWorkflows.map(workflow => ({
+      metricName: metric,
       value: workflow.metrics[lowercaseMetric],
-    }));
-  
-    console.log(chartData);
-    return chartData;
-  };
-  const metrics = ["Accuracy", "Precision", "Recall"]
-  const [selectedMetrics, setSelectedMetrics] = useState(["Recall"])
+    }))
+  }
+
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([
+    availableMetrics[0],
+  ])
 
   const handleMetricChange = (event: any) => {
     const {
@@ -55,6 +62,7 @@ const MetricsDistribution = () => {
     } = event
     setSelectedMetrics(typeof value === "string" ? value.split(",") : value)
   }
+  console.log("last", workflows.data)
   return (
     <Paper
       className="Category-Item"
@@ -98,10 +106,12 @@ const MetricsDistribution = () => {
             onChange={handleMetricChange}
             renderValue={selected => (selected as string[]).join(", ")}
           >
-            {metrics.map(metric => (
+            {availableMetrics.map(metric => (
               <MenuItem key={metric} value={metric}>
                 <Checkbox checked={selectedMetrics.indexOf(metric) > -1} />
-                <ListItemText primary={metric} />
+                <ListItemText
+                  primary={metric.charAt(0).toUpperCase() + metric.slice(1)}
+                />
               </MenuItem>
             ))}
           </Select>
@@ -142,7 +152,7 @@ const MetricsDistribution = () => {
               data: [
                 {
                   name: "dummyData",
-                  values: getData(workflows as unknown as Workflow[], metric),
+                  values: getData(metric),
                 },
                 {
                   name: "density",
@@ -246,20 +256,19 @@ const MetricsDistribution = () => {
                           fill: {
                             scale: "color",
                             field: { parent: "metricName" },
-
                           },
                           orient: { value: "horizontal" },
-                          tooltip: { signal: "{'Metric': parent.metricName, 'Value': datum.value, 'Density': datum.density}" }
-
+                          tooltip: {
+                            signal:
+                              "{'Metric': parent.metricName, 'WorkflowId': parent.workflowId,'Value': datum.value, 'Density': datum.density}",
+                          },
                         },
                         update: {
                           y: { scale: "yscale", field: "value" },
                           xc: { signal: "plotWidth / 2" },
                           width: { scale: "hscale", field: "density" },
                         },
-
                       },
-
                     },
                     {
                       type: "rect",
@@ -268,15 +277,16 @@ const MetricsDistribution = () => {
                         enter: {
                           fill: { value: "black" },
                           width: { value: 2 },
-                          tooltip: { signal: "{'Metric': parent.metricName, 'Q1': datum.q1, 'Q3': datum.q3}" }
-
+                          tooltip: {
+                            signal:
+                              "{'Metric': parent.metricName,'WorkflowId': parent.workflowId, 'Q1': datum.q1, 'Q3': datum.q3}",
+                          },
                         },
                         update: {
                           y: { scale: "yscale", field: "q1" },
                           y2: { scale: "yscale", field: "q3" },
                           xc: { signal: "plotWidth / 2" },
                         },
-
                       },
                     },
                     {
@@ -287,14 +297,15 @@ const MetricsDistribution = () => {
                           fill: { value: "black" },
                           height: { value: 10 },
                           width: { value: 10 },
-                          tooltip: { signal: "{'Metric': parent.metricName, 'Median': datum.median}" }
-
+                          tooltip: {
+                            signal:
+                              "{'Metric': parent.metricName,'WorkflowId': parent.workflowId, 'Median': datum.median}",
+                          },
                         },
                         update: {
                           y: { scale: "yscale", field: "median" },
                           xc: { signal: "plotWidth / 2" },
                         },
-
                       },
                     },
                   ],

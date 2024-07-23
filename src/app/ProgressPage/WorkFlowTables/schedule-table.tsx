@@ -6,7 +6,6 @@ import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TablePagination from "@mui/material/TablePagination"
 import TableRow from "@mui/material/TableRow"
-import workflows from "../../../shared/data/workflows.json"
 import Box from "@mui/material/Box"
 import Checkbox from "@mui/material/Checkbox"
 import ArrowUp from "@mui/icons-material/KeyboardArrowUp"
@@ -17,7 +16,7 @@ import ToolBarWorkflow from "./toolbar-workflow-table"
 import FilterBar from "./filter-bar"
 import { Popover } from "@mui/material"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { setProgressScheduledTable } from "../../../store/slices/progressPageSlice"
 export interface Column {
   id: keyof Data
@@ -29,134 +28,13 @@ export interface Column {
   // format?: (value: number) => string;
 }
 
-const columns: Column[] = [
-  {
-    id: "workflowId",
-    numeric: true,
-    label: "Workflow ID",
-    // align: 'center',
-    minWidth: 50,
-    sortable: true,
-  },
-  {
-    id: "train_model",
-    label: "Train Model",
-    minWidth: 50,
-    numeric: false,
-    align: "center",
-    sortable: true,
-  },
-  {
-    id: "split_proportion",
-    label: "split_proportion",
-    minWidth: 50,
-    numeric: true,
-    align: "center",
-    sortable: true,
-  },
-  {
-    id: "max_depth",
-    label: "max_depth",
-    minWidth: 50,
-    numeric: true,
-    align: "center",
-    sortable: true,
-    // format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: "batch_size",
-    label: "batch_size",
-    minWidth: 50,
-    align: "center",
-    numeric: true,
-    sortable: true,
-    // format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: "status",
-    label: "",
-    minWidth: 50,
-    align: "center",
-    sortable: true,
-    numeric: false,
-    // format: (value: number) => value.toFixed(2),
-  },
-  {
-    id: "runtime",
-    label: "",
-    minWidth: 80,
-    align: "center",
-    numeric: false,
-    sortable: true,
-
-    // format: (value: number) => value.toFixed(2),
-  },
-  {
-    id: "action",
-    label: "Action",
-    minWidth: 50,
-    align: "center",
-    sortable: false,
-    // format: (value: number) => value.toFixed(2),
-  },
-]
+let columns: Column[] = []
 
 export interface Data {
-  id: number
-  workflowId: number
-  split_proportion: number
-  train_model: string
-  max_depth: number
-  batch_size: number
-  status: string
-  runtime: string
-  action: string
-}
-
-function createData(
-  id: number,
-  workflowId: number,
-  split_proportion: number,
-  train_model: string,
-  max_depth: number,
-  batch_size: number,
-  status: string,
-  runtime: string,
-  action: string,
-): Data {
-  return {
-    id,
-    workflowId,
-    split_proportion,
-    train_model,
-    max_depth,
-    batch_size,
-    status,
-    runtime,
-    action,
-  }
+  [key: string]: string | number | boolean
 }
 
 let idCounter = 0
-
-const firstRows = workflows
-  .filter(element => element.workflowInfo.status === "scheduled")
-  .map(workflow =>
-    createData(
-      workflow.workflowInfo.scheduledPosition
-        ? workflow.workflowInfo.scheduledPosition + 1
-        : idCounter++,
-      workflow.workflowId,
-      workflow.variabilityPoints.n_estimators,
-      workflow.variabilityPoints.scaler,
-      workflow.variabilityPoints.max_depth,
-      workflow.variabilityPoints.min_child_weight,
-      "",
-      "",
-      "",
-    ),
-  )
-  .sort((a, b) => a.id - b.id)
 
 // interface ScheduleTableProps {
 //   handleChange: (newValue: number) => (event: React.SyntheticEvent) => void;
@@ -170,27 +48,35 @@ export default function ScheduleTable() {
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [isFilterOpen, setFilterOpen] = useState(false)
+  const paramLength = useRef(0)
 
   useEffect(() => {
     if (workflows.data.length > 0) {
+      //find unique parameters of each workflow -> model traning task
+      const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
       const rows = workflows.data
-        .filter(element => element.workflowInfo.status === "scheduled")
-        .map(workflow =>
-          createData(
-            workflow.workflowInfo.scheduledPosition
-              ? workflow.workflowInfo.scheduledPosition + 1
-              : idCounter++,
-            workflow.workflowId,
-            workflow.variabilityPoints.n_estimators,
-            workflow.variabilityPoints.scaler,
-            workflow.variabilityPoints.max_depth,
-            workflow.variabilityPoints.min_child_weight,
-            "",
-            "",
-            "",
-          ),
-        )
-        .sort((a, b) => a.id - b.id)
+      .filter(element => element.workflowInfo.status === "scheduled")
+      .map(workflow => ({
+        id: idCounter++,
+        workflowId: workflow.workflowId,
+        "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+        ...Array.from(uniqueParameters).reduce((acc, variant) => {
+          acc[variant] = workflow.variabilityPoints["Model Training"].Parameters[variant] || ""
+          return acc
+        }, {}),
+        // status: workflow.workflowInfo.status === "running" ? workflow.workflowInfo.completedTasks ?? "running" : workflow.workflowInfo.status,
+        // constrains: Object.values(workflow.constraints).every((value: any) => value === true),
+        action: ""
+      })).sort((a, b) => a.id - b.id)
+      columns = Object.keys(rows[0]).filter(key => key !== "id").map(key => ({
+        id: key,
+        label: key,
+        minWidth: key === "action" ? 100 : 50,
+        numeric: typeof rows[0][key] === "number" ? true : false,
+        align: "center",
+        sortable: key !== "action" ? true : false,
+      }))
+      paramLength.current = uniqueParameters.size
       dispatch(setProgressScheduledTable({ rows, visibleRows: rows }))
     }
   }, [workflows])
@@ -272,7 +158,7 @@ export default function ScheduleTable() {
         counter++
       }
     }
-    const newRows = firstRows.filter(row => {
+    const newRows = progressScheduledTable.rows.filter(row => {
       return progressScheduledTable.filters.every(filter => {
         if (filter.value === "") return true
         const cellValue = row[filter.column as keyof Data]
@@ -401,13 +287,10 @@ export default function ScheduleTable() {
                       `2px solid ${theme.palette.primary.dark}`,
                   }}
                   align="center"
-                  colSpan={3}
+                  colSpan={paramLength.current}
                 >
                   Parameters
                 </TableCell>
-                <TableCell align="right" colSpan={1} />
-                <TableCell align="left" colSpan={1} />
-
                 <TableCell align="right" colSpan={1} />
               </TableRow>
               <TableRow

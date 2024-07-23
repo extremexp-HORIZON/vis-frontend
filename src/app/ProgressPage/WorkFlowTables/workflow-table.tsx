@@ -81,119 +81,14 @@ export interface Column {
   // format?: (value: number) => string;
 }
 
-const columns: Column[] = [
-  {
-    id: "workflowId",
-    numeric: true,
-    label: "Workflow ID",
-    // align: 'center',
-    minWidth: 50,
-    sortable: true,
-  },
-  {
-    id: "train_model",
-    label: "Train Model",
-    minWidth: 50,
-    numeric: false,
-    align: "center",
-    sortable: true,
-  },
-  {
-    id: "split_proportion",
-    label: "split_proportion",
-    minWidth: 50,
-    numeric: true,
-    align: "center",
-    sortable: true,
-  },
-  {
-    id: "max_depth",
-    label: "max_depth",
-    minWidth: 50,
-    // align: 'right',
-    numeric: true,
-    align: "center",
-    sortable: true,
-    // format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: "batch_size",
-    label: "batch_size",
-    minWidth: 50,
-    // align: 'right',
-    align: "center",
-    numeric: true,
-    sortable: true,
-    // format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: "status",
-    label: "Status",
-    minWidth: 50,
-    // align: 'right',
-    align: "center",
-    sortable: true,
-    numeric: false,
-    // format: (value: number) => value.toFixed(2),
-  },
-  {
-    id: "runtime",
-    label: "runtime < 3s",
-    minWidth: 80,
-    // align: 'right',
-    align: "center",
-    numeric: false,
-    sortable: true,
-
-    // format: (value: number) => value.toFixed(2),
-  },
-  {
-    id: "action",
-    label: "Action",
-    minWidth: 50,
-    align: "center",
-    sortable: false,
-    // format: (value: number) => value.toFixed(2),
-  },
-]
+let columns: Column[] = [];
 
 export interface Data {
-  id: number
-  workflowId: number
-  split_proportion: number
-  train_model: string
-  max_depth: number
-  batch_size: number
-  status: string
-  runtime: boolean
-  action: string
-}
-
-function createData(
-  id: number,
-  workflowId: number,
-  split_proportion: number,
-  train_model: string,
-  max_depth: number,
-  batch_size: number,
-  status: string,
-  runtime: boolean,
-  action: string,
-): Data {
-  return {
-    id,
-    workflowId,
-    split_proportion,
-    train_model,
-    max_depth,
-    batch_size,
-    status,
-    runtime,
-    action,
-  }
+  [key: string]: any
 }
 
 let idCounter = 1
+let paramlength = 0
 
 interface WorkFlowTableProps {
   handleChange: (
@@ -214,21 +109,30 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   useEffect(() => {
     if (workflows.data.length > 0) {
-      const rows = workflows.data.map(workflow =>
-        createData(
-          idCounter++,
-          workflow.workflowId,
-          workflow.variabilityPoints.n_estimators,
-          workflow.variabilityPoints.scaler,
-          workflow.variabilityPoints.max_depth,
-          workflow.variabilityPoints.min_child_weight,
-          workflow.workflowInfo.status === "running"
-            ? workflow.workflowInfo.completedTasks ?? "running"
-            : workflow.workflowInfo.status,
-          workflow.constraints.runtimeLess1sec,
-          "",
-        ),
-      )
+      //find unique parameters of each workflow -> model traning task
+      const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
+
+      const rows = workflows.data.map(workflow => ({
+        id: idCounter++,
+        workflowId: workflow.workflowId,
+        "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+        ...Array.from(uniqueParameters).reduce((acc, variant) => {
+          acc[variant] = workflow.variabilityPoints["Model Training"].Parameters[variant] || ""
+          return acc
+        }, {}),
+        status: workflow.workflowInfo.status === "running" ? workflow.workflowInfo.completedTasks ?? "running" : workflow.workflowInfo.status,
+        constrains: Object.values(workflow.constraints).every((value: any) => value === true),
+        action: ""
+      }))
+      columns = Object.keys(rows[0]).filter(key => key !== "id").map(key => ({
+        id: key,
+        label: key,
+        minWidth: key === "action" ? 100 : 50,
+        numeric: typeof rows[0][key] === "number" ? true : false,
+        align: "center",
+        sortable: key !== "action" ? true : false,
+      }))
+      paramlength = uniqueParameters.size
       dispatch(setProgressWokflowsTable({ rows, filteredRows: rows }))
     }
   }, [workflows])
@@ -240,8 +144,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
     if (tabs.find(tab => tab.workflowId === workflowId)) return
-    dispatch(addTab(workflowId))
-    handleChange(workflowId)
+    dispatch(addTab({workflowId, workflows}))
+    handleChange(workflowId)(e)
   }
 
   const handleRequestSort = (
@@ -374,16 +278,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const isSelected = (id: number) =>
     progressWokflowsTable.selectedWorkflows.indexOf(id) !== -1
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  // const emptyRows =
-  //   progressWokflowsTable.page > 0
-  //     ? Math.max(
-  //         0,
-  //         (1 + progressWokflowsTable.page) * progressWokflowsTable.rowsPerPage -
-  //           progressWokflowsTable.rows.length,
-  //       )
-  //     : 0
-
   useEffect(() => {
     const visibleRows = stableSort(
       progressWokflowsTable.filteredRows,
@@ -434,10 +328,11 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             </Box>
           </Popover>
 
-          <TableContainer sx={{ maxHeight: 440 }}>
+          {columns.length > 0 && <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table">
               <EnhancedTableHead
                 columns={columns}
+                parametersLength={paramlength}
                 numSelected={progressWokflowsTable.selectedWorkflows.length}
                 order={progressWokflowsTable.order}
                 orderBy={progressWokflowsTable.orderBy}
@@ -475,7 +370,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                         let value: string
                         const currentStatus = row.status
                         switch (column.id) {
-                          case "runtime":
+                          case "constrains":
                             value = String(row[column.id])
                             return (
                               <TableCell key={column.id} align={column.align}>
@@ -572,18 +467,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                     </TableRow>
                   )
                 })}
-                {/* {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: 53 * emptyRows,
-                    }}
-                  >
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )} */}
               </TableBody>
             </Table>
-          </TableContainer>
+          </TableContainer>}
           {progressWokflowsTable.filteredRows.length > 5 && (
             <TablePagination
               rowsPerPageOptions={[10, 25, 100]}
