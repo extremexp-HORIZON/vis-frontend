@@ -76,7 +76,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
           px: 2,
           py: 1,
           color: "black",
-          bgcolor: value === 0 ? "white" : grey[300],
+          bgcolor: value === "progress" ? "white" : grey[300],
           fontSize: "0.8rem",
           textTransform: "none",
           ":hover": { bgcolor: value !== 0 ? grey[500] : "white" },

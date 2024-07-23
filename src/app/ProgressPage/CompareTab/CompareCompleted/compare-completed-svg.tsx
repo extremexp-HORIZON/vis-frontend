@@ -17,7 +17,7 @@ const CompareCompletedSvg = (props: IWorkflowSvg) => {
   const listeners = useRef<
     { gElement: SVGGElement; listener: EventListener }[]
   >([])
-  const workingTasks = ["I2Cat_Dataset"]
+  const workingTasks = ["I2Cat_Dataset", "TrainModel"]
 
   useEffect(() => {
     const handleChange = (taskId: string | null, element: SVGGElement) => {

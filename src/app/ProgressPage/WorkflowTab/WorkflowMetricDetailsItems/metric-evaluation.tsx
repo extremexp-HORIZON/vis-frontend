@@ -3,53 +3,44 @@ import { Box, Typography, IconButton, Paper, Tooltip, Checkbox, FormControlLabel
 import { VegaLite } from "react-vega";
 import InfoIcon from "@mui/icons-material/Info";
 import grey from "@mui/material/colors/grey";
-
+ 
 interface Metric {
   name: string;
   value: number;
   avgDiff: number;
-  avgValue: number;
 }
-
+ 
 interface IMetricEvaluation {
   availableMetrics: Metric[] | null;
   workflowId: number | string;
 }
-
+ 
 const MetricEvaluation = (props: IMetricEvaluation) => {
   const { availableMetrics, workflowId } = props;
   const [selectedMetrics, setSelectedMetrics] = useState<Metric[]>(availableMetrics || []);
-
+ 
   const handleMetricChange = (event: any, newValue: Metric[]) => {
     setSelectedMetrics(newValue);
   };
   
-
+ 
   const radarData = selectedMetrics.map(metric => ({
     key: metric.name,
     value: metric.value.toFixed(3),
     category: `Workflow ${workflowId}`,
   }));
-
+ 
   const experimentAverage = selectedMetrics.map(metric => ({
     key: metric.name,
-    value: metric.avgValue.toFixed(3),
+    value: (metric.value * (1 + metric.avgDiff / 100)).toFixed(3),
     category: "Experiments Average",
   }));
-
+ 
   return (
     <Paper
       className="Category-Item"
       elevation={2}
-      sx={{
-        borderRadius: 4,
-        width: "inherit",
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 0,
-        minWidth: "300px",
-        height: "100%",
-      }}
+      sx={{ borderRadius: 4, width: "100%", display: "flex", flexDirection: "column", minHeight: "300px" }}
     >
       <Box
         sx={{
@@ -70,18 +61,10 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
           </IconButton>
         </Tooltip>
       </Box>
-
+ 
      
-        <Box
-          sx={{
-            px: 1,
-            py: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            height: "100%",
-          }}
-        >
+      <Box sx={{ px: 1, py: 1, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+ 
           {availableMetrics && (
             
           <Autocomplete
@@ -143,7 +126,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                   range: { scheme: "category10" },
                 },
               ],
-
+ 
               legends: [
                 {
                   fill: "color",
@@ -154,14 +137,14 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                   },
                 },
               ],
-
+ 
               encode: {
                 enter: {
                   x: { signal: "radius" },
                   y: { signal: "radius" },
                 },
               },
-
+ 
               marks: [
                 {
                   type: "group",
@@ -197,7 +180,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                         },
                       },
                     },
-
+ 
                     {
                       type: "text",
                       name: "value-text",
@@ -301,5 +284,5 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
     </Paper>
   );
 };
-
+ 
 export default MetricEvaluation;

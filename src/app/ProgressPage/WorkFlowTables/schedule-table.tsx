@@ -135,7 +135,7 @@ export default function ScheduleTable() {
 
   const removeSelected = (list: Number[] | string) => (e: React.SyntheticEvent) => {
     let filteredWorkflows;
-    if(list.length > 0){
+    if(typeof list !== "string"){
       filteredWorkflows = progressScheduledTable.rows.filter(
         row => !list.includes(row.id))
     }else{

@@ -22,7 +22,7 @@ const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12} md={6}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: "100%" }}>
             <MetricEvaluation availableMetrics={metrics} workflowId={workflowId} />
           </Box>
         </Grid>
