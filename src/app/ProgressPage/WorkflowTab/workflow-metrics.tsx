@@ -41,9 +41,9 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
         </Box> */}
         <Grid sx={{ p: 2 }} container spacing={3}>
           {metrics
-            ? metrics.map((metric: any) => (
+            ? Object.entries(metrics).map(([name, value]) => (
                 <Grid
-                  key={`statistics-${metric.name}`}
+                  key={`statistics-${name}`}
                   xs={12}
                   sm={12}
                   md={6}
@@ -59,29 +59,29 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
                         columnGap: 1,
                       }}
                     >
-                      <Typography fontWeight={600}>{metric.name}:</Typography>
+                      <Typography fontWeight={600}>{name}:</Typography>
                       <Typography>
-                        {parseFloat(metric.value).toFixed(3)}
-                        {metric.name === "Runtime" && "s"}
+                      {typeof value === 'string' ? parseFloat(value).toFixed(3) : value.toFixed(3)}
+                      {name === "runtime" && "s"}
                       </Typography>
                     </Box>
-                    <Box
+                     <Box
                       sx={{
                         textAlign: "center",
                         display: "flex",
                         justifyContent: "center",
                       }}
                     >
-                      {metric.avgDiff > 0 ? (
+                      {/* {metric.avgDiff > 0 ? (
                         <ArrowDropUpIcon sx={{ color: green[400] }} />
                       ) : (
                         <ArrowDropDownIcon sx={{ color: red[400] }} />
                       )}
                       <Typography sx={{ mr: 0.5 }}>
                         {parseInt(metric.avgDiff)}%
-                      </Typography>
+                      </Typography> */}
                       <Typography>vs. experiment average</Typography>
-                    </Box>
+                    </Box> 
                   </Paper>
                 </Grid>
               ))

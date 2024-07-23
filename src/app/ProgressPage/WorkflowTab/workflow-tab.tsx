@@ -19,6 +19,9 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const { workflowId } = props
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const [chosenTask, setChosenTask] = useState<string | null>(null)
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  console.log('workf',workflows.data)
+
 
   const taskProvider = (taskId: string | null) => {
     switch (taskId) {
@@ -55,13 +58,12 @@ const WorkflowTab = (props: IWorkflowTab) => {
         </Box>
         <Box key="task-configuration-items">
           <WorkflowTaskConfiguration
-            variants={
-              (
-                tabs.find(
-                  tab => tab.workflowId === workflowId,
-                ) as IWorkflowTabModel
-              )?.workflowConfiguration.data || null
-            }
+                  variants={(
+                    workflows.data.find(workflow => workflow.workflowId === workflowId)?.variabilityPoints["Model Training"]?.Parameters
+                  )} 
+                  model={
+                    workflows.data.find(workflow => workflow.workflowId === workflowId)?.variabilityPoints["Model Training"]?.Variant
+                    }          
           />
         </Box>
       </Box>
@@ -81,10 +83,8 @@ const WorkflowTab = (props: IWorkflowTab) => {
           <WorkflowMetrics
             metrics={
               (
-                tabs.find(
-                  tab => tab.workflowId === workflowId,
-                ) as IWorkflowTabModel
-              )?.workflowMetrics.data || null
+                workflows.data.find(workflow => workflow.workflowId === workflowId)?.metrics)
+
             }
           />
         </Box>

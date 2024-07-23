@@ -10,17 +10,20 @@ import Paper from "@mui/material/Paper"
 
 interface ITaskConfiguration {
   variants: { [key: string]: number | string } | null
+  model: string | null; // Adjusted to directly be a string
 }
 
+
 const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
-  const { variants } = props
+  const { variants,model } = props
+
 
   const tasks = [
     { task: "Data Split", variant: "-", parameters: "-" },
     { task: "Data Augmentation", variant: "-", parameters: "-" },
     {
       task: "Model Training",
-      variant: "TrainNN",
+      variant: model || "-",
       parameters:
         Object.entries(variants as object)
           .map(([key, value]) => `${key}: ${value}`)
