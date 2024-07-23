@@ -100,25 +100,8 @@ export const selectionChartSpec = {
           "condition": { "test": "datum['selected'] === true", "value": 0.6 },
           "value": 0.2,
         },
-        "color": {
-          "field": "category",
-          "type": "nominal",
-          "scale": {
-            "domain": ["no anomaly", "mechanical anomaly", "electrical anomaly"],
-            "range": ["green", "#4C78A8", "orange"]
-          },
-          "legend": {
-            "title": "Anomaly Type",
-            "orient": "top"
-          }
-        }
       },
       "selection": {
-        "headerCategory": {
-          "type": "point", 
-          "fields": ["category"],
-          "bind": "legend",
-        },
         "zoomPan": {
           "type": "interval",
           "bind": "scales",

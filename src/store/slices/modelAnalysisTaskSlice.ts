@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { IModelAnalysisTask, defaultModelAnalysisTask } from "../../shared/models/modelAnalysisTask.model";
+import type { IModelAnalysisTask} from "../../shared/models/modelAnalysisTask.model";
+import { defaultModelAnalysisTask } from "../../shared/models/modelAnalysisTask.model";
 import axios from "axios";
-import { IDataExplorationRequest, defaultDataExplorationRequest } from "../../shared/models/dataexploration.model";
+import type { IDataExplorationRequest} from "../../shared/models/dataexploration.model";
+import { defaultDataExplorationRequest } from "../../shared/models/dataexploration.model";
 import { IPlotModel } from "../../shared/models/plotmodel.model";
 
 

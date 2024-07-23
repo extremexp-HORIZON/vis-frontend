@@ -1,6 +1,8 @@
-import React, { useMemo,  useState } from 'react';
+import type React from 'react';
+import { useMemo,  useState } from 'react';
 import { Box, Paper, Tooltip, Typography } from '@mui/material';
-import { VegaLite, VisualizationSpec } from 'react-vega';
+import type { VisualizationSpec } from 'react-vega';
+import { VegaLite } from 'react-vega';
 import ChartControls from './ChartControls';
 
 

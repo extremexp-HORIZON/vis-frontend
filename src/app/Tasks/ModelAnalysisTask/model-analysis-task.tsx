@@ -11,7 +11,7 @@ import { defaultDataExplorationRequest } from "../../../shared/models/dataexplor
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import CircularProgress from "@mui/material/CircularProgress"
-import MultiTimeSeriesVisualization from "./multi-ts-visualization/MultiTimeSeriesVisualization"
+import MultiTimeSeriesVisualizationWithCategories from "./multi-ts-visualization/MultiTimeSeriesVisualizationWithCategories"
 import { useLocation, useParams } from "react-router-dom"
 import InstanceClassification from "../SharedItems/Plots/instance-classification"
 import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
@@ -26,10 +26,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const { workflowId } = props
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
-  const dataset = useLocation().pathname;
 
   useEffect(() => {
-    if(dataset.includes("ideko")){
+    if(experimentId && experimentId.includes("ideko")){
       dispatch(fetchMultipleTimeseries({dataQuery: {
         datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
         columns: [],
@@ -142,7 +141,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             { (multipleTimeSeries && multipleTimeSeriesMetadata) ?
               <Grid container spacing={2}>
                 <Grid item xs={12} md={8}>
-                  <MultiTimeSeriesVisualization 
+                  <MultiTimeSeriesVisualizationWithCategories 
                     data={structuredClone(multipleTimeSeries)} 
                     metadata={structuredClone(multipleTimeSeriesMetadata)}/>
                 </Grid>

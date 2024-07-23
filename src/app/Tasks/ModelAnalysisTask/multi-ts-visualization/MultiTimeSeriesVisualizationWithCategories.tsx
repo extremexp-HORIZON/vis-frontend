@@ -7,8 +7,9 @@ import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import InfoIcon from "@mui/icons-material/Info"
-import {getSpecConcat } from './vegaLiteSpec';
-import { Button, IconButton, MenuItem, Paper, Select, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
+import { getSpecConcat } from './vegaLiteSpec';
+import type { SelectChangeEvent} from '@mui/material';
+import { Button, IconButton, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
 import grey from "@mui/material/colors/grey"
 
 interface Metadata {
@@ -30,12 +31,12 @@ interface FileRegion {
   selected: boolean;
 }
 
-interface MultiTimeSeriesVisualizationProps {
+interface MultiTimeSeriesVisualizationWithCategoriesProps {
   data: Data[];
-  metadata: Metadata[];
+  metadata?: Metadata[];
 }
 
-const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> = ({ data, metadata }) => {
+const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisualizationWithCategoriesProps> = ({ data, metadata }) => {
   const [condensedChartData, setCondensedChartData] = useState<Data[]>(data); // line chart data in navigator
   const [chartData, setChartData] = useState<Data[]>(); // main chart data 
   const [fileRegions, setFileRegions] = useState<FileRegion[]>([]); // file regions on navigator
@@ -95,35 +96,35 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     if (!Object.isExtensible(metadata)) {
       console.warn('Metadata is non-extensible:', metadata);
     }
+
+    const fileDataMap: { [key: string]: { start: number; end: number } } = {};
+    data.forEach(d => {
+      const series = d.series;
+      const timestamp = new Date(d.timestamp).getTime();
+
+      if (!fileDataMap[series]) {
+        fileDataMap[series] = { start: timestamp, end: timestamp };
+      } else {
+        fileDataMap[series].start = Math.min(fileDataMap[series].start, timestamp);
+        fileDataMap[series].end = Math.max(fileDataMap[series].end, timestamp);
+      }
+    });
+
     if (Array.isArray(metadata)) {
       metadata.forEach(({ id, category }) => {
         newFileCategoryMap[id.replace('.csv', '')] = category;
       });
-
-      const fileDataMap: { [key: string]: { start: number; end: number } } = {};
-      data.forEach(d => {
-        const series = d.series;
-        const timestamp = new Date(d.timestamp).getTime();
-
-        if (!fileDataMap[series]) {
-          fileDataMap[series] = { start: timestamp, end: timestamp };
-        } else {
-          fileDataMap[series].start = Math.min(fileDataMap[series].start, timestamp);
-          fileDataMap[series].end = Math.max(fileDataMap[series].end, timestamp);
-        }
-      });
-
-      for (const series in fileDataMap) {
-        regions.push({
-          series,
-          start: new Date(fileDataMap[series].start),
-          end: new Date(fileDataMap[series].end),
-          category: newFileCategoryMap[series],
-          selected: false
-        });
-      }
     } else {
-      console.error('Metadata is not an array:', metadata);
+      console.log('No metadata provided', metadata);
+    }
+    for (const series in fileDataMap) {
+      regions.push({
+        series,
+        start: new Date(fileDataMap[series].start),
+        end: new Date(fileDataMap[series].end),
+        category: newFileCategoryMap[series],
+        selected: false
+      });
     }
     setFileRegions(regions);
     setChartData(data);
@@ -229,7 +230,6 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     if(newAlignment) setAlignment(newAlignment);
   };
 
-
   // Updates file regions data for navigator.
   // Each object contains a boolean selected parameter that triggers the file's visualization parameters.
   const updateFileRegions = (updatedFileRegions: FileRegion[]) => {
@@ -274,7 +274,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   const reset = () => {
     setTooltipVisible(false);
   }
-  
+
   return (
     <Paper
       className="Category-Item"
@@ -299,7 +299,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
         }}
       >
         <Typography fontSize={"1rem"} fontWeight={600}>
-          {"Instance Classification"}
+          { "Instance Classification" }
         </Typography>
         <Box sx={{ flex: 1 }} />
         <Tooltip title={""}>
@@ -308,7 +308,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
           </IconButton>
         </Tooltip>
       </Box>
-      <Box sx={{width:"100%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap', p:2}}>
+      <Box sx={{width:"100%", display: 'flex', flexDirection: 'column', flexWrap: 'wrap', p:2}}>
         <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start', pb: 2}}>
           <ToggleButtonGroup
             color="primary"
@@ -320,7 +320,8 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
             <ToggleButton size="small" value="view">View</ToggleButton>
             <ToggleButton size="small" value="compare">Compare</ToggleButton>
           </ToggleButtonGroup>
-          <Box sx={{ display: 'flex', flexDirection: 'row',  pl: 10, flexWrap: 'wrap'}}>
+          {
+          /* <Box sx={{ display: 'flex', flexDirection: 'row',  pl: 10, flexWrap: 'wrap'}}>
             <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap'}}>
               <Typography fontSize={"1em"} fontWeight={600} textAlign={"left"}>
                 {"Selected File Categories"}
@@ -345,6 +346,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
               Update Category
             </Button>
           </Box>
+          */}
         </Box>
         <Box sx={{width:"90%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
           <VegaLite
@@ -395,4 +397,4 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   );  
 };
 
-export default MultiTimeSeriesVisualization;
+export default MultiTimeSeriesVisualizationWithCategories;
