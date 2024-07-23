@@ -183,7 +183,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                 <CounterfactualsTable
                   key={`counterfactuals-table`}
                   point={point}
-                  setPoint={setPoint}
+                  handleClose={() => setPoint(null)}
                   plotModel={
                     explInitialization.featureExplanation.tables.counterfactuals
                   }

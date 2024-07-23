@@ -49,7 +49,12 @@ export const compareChartSpec = {
     },
     "color": {
       "condition": {
-        "param": "brushLines",
+        "test": {
+          "or": [
+            // {"param": "brushLines"},
+            {"param": "highlight"}
+          ]
+        },
         "field": "series",
         "type": "nominal",
         "legend": null
@@ -58,7 +63,7 @@ export const compareChartSpec = {
     },
     "opacity": {
       "condition": {
-        "param": "brushLines",
+        "param": "highlight",
         "value": 1
       },
       "value": 0.2
@@ -71,6 +76,12 @@ export const compareChartSpec = {
     ]
   },
   "selection": {
+    "highlight": {
+      "type": "point",
+      "on": "click",
+      "empty": "click",
+      "fields": ["series"]
+    },
     "brushLines": {
       "type": "interval",
       "encodings": ["y"],
@@ -81,102 +92,114 @@ export const compareChartSpec = {
   }
 };
 
-export const selectionChartSpec = {
-  "width": "container",
-  "height": 100,
-  "layer": [
-    // File bars
-    {
-      "data": { "name": "fileRegions" },
-      "mark": "rect",
-      "encoding": {
-        "x": { 
-          "field": "start",
-          "type": "temporal",
+// Function to generate selectionChartSpec based on misclassified parameter
+const getSelectionChartSpec = (misclassified: boolean) => {
+  const colorEncoding = misclassified
+    ? {
+        "condition": {
+          "test": "datum['misclassified'] === true",
+          "value": "red"
         },
-        "x2": { "field": "end", "type": "temporal" },
-        "stroke": { "value": "rgba(0, 0, 0, 0.2)" },
-        "opacity": {
-          "condition": { "test": "datum['selected'] === true", "value": 0.6 },
-          "value": 0.2,
+        "value": "grey"
+      }
+    : {
+        "field": "category",
+        "type": "nominal",
+        "scale": {
+          "domain": ["no anomaly", "mechanical anomaly", "electrical anomaly"],
+          "range": ["green", "#4C78A8", "orange"]
         },
-        "color": {
-          "field": "category",
-          "type": "nominal",
-          "scale": {
-            "domain": ["no anomaly", "mechanical anomaly", "electrical anomaly"],
-            "range": ["green", "#4C78A8", "orange"]
+        "legend": {
+          "title": "Anomaly Type",
+          "orient": "top"
+        }
+      };
+
+  return {
+    "width": "container",
+    "height": 100,
+    "layer": [
+      // File bars
+      {
+        "data": { "name": "fileRegions" },
+        "mark": "rect",
+        "encoding": {
+          "x": {
+            "field": "start",
+            "type": "temporal"
           },
-          "legend": {
-            "title": "Anomaly Type",
-            "orient": "top"
+          "x2": { "field": "end", "type": "temporal" },
+          "stroke": { "value": "rgba(0, 0, 0, 0.2)" },
+          "opacity": {
+            "condition": { "test": "datum['selected'] === true", "value": 0.6 },
+            "value": 0.2
+          },
+          "color": colorEncoding
+        },
+        "selection": {
+          "headerCategory": {
+            "type": "point",
+            "fields": ["category"],
+            "bind": "legend"
+          },
+          "zoomPan": {
+            "type": "interval",
+            "bind": "scales",
+            "translate": "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!"
+          },
+          "brushRegions": {
+            "type": "interval",
+            "zoom": null,
+            "on": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+            "translate": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+            "clear": [{ "type": "mouseup" }, { "signal": "zoomPan" }],
+            "resolve": "union",
+            "mark": {
+              "fill": "blue",
+              "fillOpacity": 0.1,
+              "stroke": "grey",
+              "strokeWidth": 1
+            }
           }
         }
       },
-      "selection": {
-        "headerCategory": {
-          "type": "point", 
-          "fields": ["category"],
-          "bind": "legend",
-        },
-        "zoomPan": {
-          "type": "interval",
-          "bind": "scales",
-          "translate": "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!",
-        },
-        "brushRegions": {
-          "type": "interval",
-          "zoom": null,
-          "on": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
-          "translate": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
-          "clear": [{"type": "mouseup"}, {"signal": "zoomPan"}], // remove brush on mouseup or zoom
-          "resolve": "union",
-          "mark": {
-            "fill": "blue",
-            "fillOpacity": 0.1,
-            "stroke": "grey",
-            "strokeWidth": 1
+      // Layer of smaller time series view
+      {
+        "mark": "line",
+        "data": { "name": "condensedChartData" },
+        "encoding": {
+          "x": {
+            "field": "timestamp",
+            "type": "temporal",
+            "axis": { "grid": false }
+          },
+          "y": {
+            "field": "value",
+            "type": "quantitative",
+            "axis": { "grid": false }
           }
-        },
-      },
-    },
-    // Layer of smaller time series view
-    {
-      "mark": "line",
-      "data": { "name": "condensedChartData" },
-      "encoding": {
-        "x": {
-          "field": "timestamp",
-          "type": "temporal",
-          "axis": { "grid": false },    
-        },
-        "y": { 
-          "field": "value", 
-          "type": "quantitative",
-          "axis": { "grid": false } ,
-        },
-      },
-    }
-  ],
-  "encoding": {
-    "x": {
-      "axis": {
-        "grid": false, // Disable grid for the secondary chart
+        }
       }
-    },
-    "y": {
-      "axis": {
-        "grid": false // Disable grid for the secondary chart
+    ],
+    "encoding": {
+      "x": {
+        "axis": {
+          "grid": false
+        }
+      },
+      "y": {
+        "axis": {
+          "grid": false
+        }
       }
     }
-  },
+  };
 };
 
-
-
-export const getSpecConcat = (alignment: string) => {
-  if(alignment === 'view'){
-    return [viewChartSpec, selectionChartSpec];
+export const getSpecConcat = (alignment: string, misclassified: boolean) => {
+  if (alignment === 'view') {
+    return [viewChartSpec, getSelectionChartSpec(misclassified)];
+  } else {
+    return [compareChartSpec, getSelectionChartSpec(misclassified)];
   }
-  else return [compareChartSpec, selectionChartSpec];
-}
+};

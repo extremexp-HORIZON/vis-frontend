@@ -9,8 +9,9 @@ import ToggleButton from "@mui/material/ToggleButton";
 import InfoIcon from "@mui/icons-material/Info"
 import { getSpecConcat } from './vegaLiteSpec';
 import type { SelectChangeEvent} from '@mui/material';
-import { Button, IconButton, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
+import { Button, Checkbox, IconButton, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
 import grey from "@mui/material/colors/grey"
+import CounterfactualsTable from '../../SharedItems/Tables/counterfactuals-table';
 
 interface Metadata {
   id: string;
@@ -27,6 +28,7 @@ interface FileRegion {
   series: string;
   start: Date;
   end: Date;
+  misclassified: boolean;
   category: string;
   selected: boolean;
 }
@@ -34,6 +36,12 @@ interface FileRegion {
 interface MultiTimeSeriesVisualizationWithCategoriesProps {
   data: Data[];
   metadata?: Metadata[];
+}
+
+var seed = 42;
+function random() {
+    var x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
 }
 
 const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisualizationWithCategoriesProps> = ({ data, metadata }) => {
@@ -45,6 +53,9 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   const [brushedSeries, setBrushedSeries] = useState<string[]>([]); // files that have been brushed
   const [clickedFile, setClickedFile] = useState<string | null>(null); // file that has been clicked
   const [alignment, setAlignment] = React.useState<string>('view'); // toggle view
+  const [misclassifiedInstances, setMisclassifiedInstances] = useState<boolean>(false)
+  const [selectedSeries, setSelectedSeries] = useState<string>();
+  const [showCounterfactuals, setShowCounterfactuals] = useState<boolean>();
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState<string>('');
@@ -123,6 +134,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
         start: new Date(fileDataMap[series].start),
         end: new Date(fileDataMap[series].end),
         category: newFileCategoryMap[series],
+        misclassified: random() < 0.05,
         selected: false
       });
     }
@@ -141,7 +153,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
     const currentSelection = fileRegions.filter(region => region.selected).map(region => region.series);
     const newSelection = Array.from(new Set([...currentSelection, ...brushedSeries]));
     updateSelection(newSelection);
-    setTooltipVisible(false);
+    hideTooltip();
   };
 
   // Removes brushed datapoints from the selection
@@ -149,20 +161,20 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
     const currentSelection = fileRegions.filter(region => region.selected).map(region => region.series);
     const newSelection = currentSelection.filter(item => !brushedSeries.includes(item));
     updateSelection(newSelection);
-    setTooltipVisible(false);
+    hideTooltip();
   };
 
   // Handles brushing. Sets brushed file names and opens the tooltip.
   const handleBrushRegions = (name: string, value: any) => {
     if (!value.start) return;
+    reset();
     const [start, end] = value.start;
     const brushedFiles = fileRegions.filter(file => {
       return (file.start <= end && file.end >= start) || (file.start >= start && file.end <= end);
     });
     if (brushedFiles.length > 0) {
       setBrushedSeries(brushedFiles.map(file => file.series));
-      setTooltipVisible(true);
-      setTooltipPosition(mousePosition);
+      showTooltip();
     }
   }
 
@@ -201,6 +213,28 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
     console.log(value);
   }
 
+  const handleHighlight = (name: string, value: any) => {
+    setSelectedSeries(value.series);
+    if(value.series){
+      showTooltip();
+    }
+  }
+
+  const handleMisclassifiedInstancesCheckboxChange = (event: React.ChangeEvent) => {
+    const checked = (event.target as HTMLInputElement).checked;
+    setMisclassifiedInstances(checked);
+    const updatedFileRegions = fileRegions.map(region => {
+      const newRegion = structuredClone(region);
+      newRegion.selected = checked ? (newRegion.misclassified) : false;
+      return newRegion;
+    });
+    updateFileRegions(updatedFileRegions);
+  }
+
+  const handleCounterfactuals = () => {
+    setShowCounterfactuals(true);
+  }
+
   // Initialization
   const handleNewView = (view: View) => {
     viewRef.current = view;
@@ -229,6 +263,11 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   const handleViewChange = (event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
     if(newAlignment) setAlignment(newAlignment);
   };
+
+
+  const handleCounterfactualsClose = () => {
+    reset();
+  }
 
   // Updates file regions data for navigator.
   // Each object contains a boolean selected parameter that triggers the file's visualization parameters.
@@ -270,9 +309,20 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
     updateFileRegions(updatedFileRegions);
   };
 
+  const hideTooltip = () => {
+    setTooltipVisible(false);
+  }
+
+  const showTooltip = () => {
+    setTooltipVisible(true);
+    setTooltipPosition(mousePosition);
+  }
+
   // Removes uneeded objects from screen
   const reset = () => {
-    setTooltipVisible(false);
+    hideTooltip();
+    setSelectedSeries(undefined);
+    setShowCounterfactuals(false);
   }
 
   return (
@@ -320,33 +370,42 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
             <ToggleButton size="small" value="view">View</ToggleButton>
             <ToggleButton size="small" value="compare">Compare</ToggleButton>
           </ToggleButtonGroup>
-          {
-          /* <Box sx={{ display: 'flex', flexDirection: 'row',  pl: 10, flexWrap: 'wrap'}}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap'}}>
-              <Typography fontSize={"1em"} fontWeight={600} textAlign={"left"}>
-                {"Selected File Categories"}
-              </Typography>
-              <Typography fontSize={"1em"} fontWeight={300} textAlign={"left"}>
-                {selectedCategories.length === 0 ? "None" : (selectedCategories.length === 1 ? selectedCategories[0] : "Multiple")}
-              </Typography>
-            </Box>
-            <Select
-              value={newCategory}
-              onChange={handleCategoryChangeFromSelection}
-              displayEmpty
-              size='small'
-              inputProps={{ 'aria-label': 'Without label' }}
-              sx={{ ml: 2, width: 200 }}
-            >
-              <MenuItem value={'no anomaly'}>No Anomaly</MenuItem>
-              <MenuItem value={'mechanical anomaly'}>Mechanical Anomaly</MenuItem>
-              <MenuItem value={'electrical anomaly'}>Electrical Anomaly</MenuItem>
-            </Select>
-            <Button variant="contained" onClick={updateCategories} sx={{ ml: 2 }} size='small'>
-              Update Category
-            </Button>
+           <Box sx={{ display: 'flex', flexDirection: 'row',  pl: 10, flexWrap: 'wrap'}}>
+              {/* <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap'}}>
+                <Typography fontSize={"1em"} fontWeight={600} textAlign={"left"}>
+                  {"Selected File Categories"}
+                </Typography>
+                <Typography fontSize={"1em"} fontWeight={300} textAlign={"left"}>
+                  {selectedCategories.length === 0 ? "None" : (selectedCategories.length === 1 ? selectedCategories[0] : "Multiple")}
+                </Typography>
+              </Box>
+              <Select
+                value={newCategory}
+                onChange={handleCategoryChangeFromSelection}
+                displayEmpty
+                size='small'
+                inputProps={{ 'aria-label': 'Without label' }}
+                sx={{ ml: 2, width: 200 }}
+              >
+                <MenuItem value={'no anomaly'}>No Anomaly</MenuItem>
+                <MenuItem value={'mechanical anomaly'}>Mechanical Anomaly</MenuItem>
+                <MenuItem value={'electrical anomaly'}>Electrical Anomaly</MenuItem>
+              </Select>
+              <Button variant="contained" onClick={updateCategories} sx={{ ml: 2 }} size='small'>
+                Update Category
+              </Button>*/}
+              <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                px: 1.5,
+              }}
+              >
+            <Typography fontSize={"0.8rem"}>Misclasified Instances:</Typography>
+            <Checkbox checked={misclassifiedInstances} onChange={handleMisclassifiedInstancesCheckboxChange} />
+              </Box>
           </Box>
-          */}
         </Box>
         <Box sx={{width:"90%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
           <VegaLite
@@ -354,7 +413,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
             spec={
               {
                 "width": "container",  
-                "vconcat": getSpecConcat(alignment),
+                "vconcat": getSpecConcat(alignment, misclassifiedInstances),
                 "resolve": {"scale": {"color": "independent"}},
               }
             }
@@ -371,6 +430,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
               brushLines: handleBrushLines,
               headerCategory: handleHeaderCategoryChange,
               zoomPan: handleZoomPan,
+              highlight: handleHighlight,
             }}
           />
           {tooltipVisible && (
@@ -387,10 +447,27 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
                 zIndex: 100,
               }}
             >
-              <button onClick={handleBrushAdd}>Add</button>
-              <button onClick={handleBrushRemove}>Remove</button>
+              {
+              selectedSeries ? 
+              <>
+              <button onClick={handleCounterfactuals}>Counterfactuals</button>
+              </>
+              :
+              <>
+                <button onClick={handleBrushAdd}>Add</button>
+                <button onClick={handleBrushRemove}>Remove</button>
+              </>
+              }
             </Box>
           )}
+          {showCounterfactuals && (
+           <CounterfactualsTable
+             key={`counterfactuals-table`}
+             point={selectedSeries}
+             handleClose={handleCounterfactualsClose}
+             plotModel={null}
+           />
+           )}
         </Box>
       </Box>
     </Paper>

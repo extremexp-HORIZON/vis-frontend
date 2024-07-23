@@ -31,7 +31,7 @@ interface ITableComponent {
   plotModel: IPlotModel | null
   children?: React.ReactNode
   point: any;
-  setPoint: Dispatch<SetStateAction<any>>
+  handleClose: any;
 }
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -52,11 +52,7 @@ const FixedTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 const CounterfactualsTable = (props: ITableComponent) => {
-  const { plotModel, point, setPoint } = props
-
-  const handleClose = () => {
-    setPoint(null)
-  }
+  const { plotModel, point, handleClose } = props
 
   return (
     <>
