@@ -7,10 +7,14 @@ import VariabilityPointHeatmap from "./variability-point-heatmap"
 import CompareCompletedSvg from "./compare-completed-svg"
 import { useState } from "react"
 import ExplainabilityTaskCompare from "../Tasks/ExplainabilityTask/explainability-task-compare"
+import { RootState, useAppSelector } from "../../../../store/store"
 
 const CompareCompleted = () => {
+  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const [chosenTask, setChosenTask] = useState<string | null>(null)
   return (
+    <>
+    {console.log(tabs)}
     <Box
       key="compare-completed"
       sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}
@@ -88,6 +92,7 @@ const CompareCompleted = () => {
         </>
       ) : <ExplainabilityTaskCompare />}
     </Box>
+    </>
   )
 }
 

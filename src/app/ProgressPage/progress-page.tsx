@@ -56,12 +56,12 @@ const ProgressPage = () => {
               }}
             >
               <Typography fontSize={"2rem"} sx={{ fontWeight: 600 }}>
-                {experimentId}
+                {experimentId && experimentId.charAt(0).toUpperCase() + experimentId.slice(1)}
               </Typography>
             </Box>
             <Box>
               <Typography fontSize={"1rem"}>
-                {"Experiment Description"}
+                {"Improve accuracy in the anomaly prediction classification"}
               </Typography>
             </Box>
           </Box>

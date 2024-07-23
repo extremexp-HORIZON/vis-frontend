@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import Paper from "@mui/material/Paper"
 import Table from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
-import TableCell from "@mui/material/TableCell"
+import TableCell, { tableCellClasses } from "@mui/material/TableCell"
 import TableContainer from "@mui/material/TableContainer"
 import TablePagination from "@mui/material/TablePagination"
 import TableRow from "@mui/material/TableRow"
@@ -18,12 +18,25 @@ import StopIcon from "@mui/icons-material/Stop"
 import LaunchIcon from "@mui/icons-material/Launch"
 import EnhancedTableHead from "./enhanced-table-head"
 import ToolbarWorkflow from "./toolbar-workflow-table"
-import { Popover, useTheme } from "@mui/material"
+import { Popover, styled, useTheme } from "@mui/material"
 import type { RootState } from "../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
-import { addTab } from "../../../store/slices/workflowTabsSlice"
+import { addCompareCompletedTab, addTab } from "../../../store/slices/workflowTabsSlice"
 import FilterBar from "./filter-bar"
 import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
+import { grey } from "@mui/material/colors"
+
+const FixedTableCell = styled(TableCell)(({ theme }) => ({
+  position: "sticky",
+  right: 0,
+  backgroundColor: theme.palette.customGrey.light,
+  zIndex: 10,
+  overflow: "hidden",
+  borderLeft: `1px solid ${grey[300]}`,
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.customGrey.light,
+  },
+}))
 
 const fractionStrToDecimal = (str: string): string => {
   const [numerator, denominator] = str.split("/").map(Number)
@@ -112,7 +125,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       //find unique parameters of each workflow -> model traning task
       const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
 
-      const rows = workflows.data.map(workflow => ({
+      const rows = workflows.data
+      .filter(workflow => workflow.workflowInfo.status !== "scheduled")
+      .map(workflow => ({
         id: idCounter++,
         workflowId: workflow.workflowId,
         "Train Model": workflow.variabilityPoints["Model Training"].Variant,
@@ -121,7 +136,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           return acc
         }, {}),
         status: workflow.workflowInfo.status === "running" ? workflow.workflowInfo.completedTasks ?? "running" : workflow.workflowInfo.status,
-        constrains: Object.values(workflow.constraints).every((value: any) => value === true),
+        "runtime < 3s": Object.values(workflow.constraints).every((value: any) => value === true),
         action: ""
       }))
       columns = Object.keys(rows[0]).filter(key => key !== "id").map(key => ({
@@ -145,6 +160,12 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
     if (tabs.find(tab => tab.workflowId === workflowId)) return
     dispatch(addTab({workflowId, workflows}))
+    handleChange(workflowId)(e)
+  }
+  
+  const handleLaunchCompletedTab = (workflowId: any) => (e: React.SyntheticEvent) => {
+    if (tabs.find(tab => tab.workflowId === workflowId)) return
+    dispatch(addCompareCompletedTab(workflows))
     handleChange(workflowId)(e)
   }
 
@@ -306,7 +327,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             numSelected={progressWokflowsTable.selectedWorkflows.length}
             filterNumbers={progressWokflowsTable.filtersCounter}
             filterClickedFunction={filterClicked}
-            handleClickedFunction={handleLaunchNewTab}
+            handleClickedFunction={handleLaunchCompletedTab}
           />
           <Popover
             id={"Filters"}
@@ -320,6 +341,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           >
             <Box sx={{ p: 2 }}>
               <FilterBar
+                columns={columns}
                 filters={progressWokflowsTable.filters}
                 onFilterChange={handleFilterChange}
                 onAddFilter={handleAddFilter}
@@ -370,7 +392,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                         let value: string
                         const currentStatus = row.status
                         switch (column.id) {
-                          case "constrains":
+                          case "runtime < 3s":
                             value = String(row[column.id])
                             return (
                               <TableCell key={column.id} align={column.align}>
@@ -398,7 +420,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                             )
                           case "action":
                             return (
-                              <TableCell
+                              <FixedTableCell
                                 key={column.id}
                                 align={column.align}
                                 sx={{
@@ -445,7 +467,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                       {/* </Button> */}
                                     </span>
                                   )}
-                              </TableCell>
+                              </FixedTableCell>
                             )
 
                           default:

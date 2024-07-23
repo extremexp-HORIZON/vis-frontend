@@ -177,8 +177,8 @@ const MetricGauge = ({ title, value, isTime = false }: any) => {
 const RuntimeDisplay = (props: { value: number }) => {
   const { value } = props
   const displayValue = value > 60 
-    ? `${(value / 60).toFixed(2)}m` 
-    : `${value.toFixed(2)}s`;
+    ? `${(value / 60).toFixed(2)}min` 
+    : `${value.toFixed(2)}sec`;
 
   return (
     <Box

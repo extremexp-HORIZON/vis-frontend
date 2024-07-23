@@ -62,7 +62,6 @@ const MetricsDistribution = () => {
     } = event
     setSelectedMetrics(typeof value === "string" ? value.split(",") : value)
   }
-  console.log("last", workflows.data)
   return (
     <Paper
       className="Category-Item"
