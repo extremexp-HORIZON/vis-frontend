@@ -79,7 +79,7 @@ const workflowMetricsInitializer = ({
   const finishedWorkflows = workflows.data.filter(
     workflow => workflow.workflowInfo.status === "completed",
   )
-  const metricNames = ["accuracy", "precision", "recall", "runtime"]
+  const metricNames = ["accuracy", "precision", "recall", "loss"]
   return Object.keys(metrics)
     .filter(metricName => metricNames.includes(metricName))
     .map(metric => {
@@ -94,6 +94,7 @@ const workflowMetricsInitializer = ({
       return {
         name: metric,
         value: metrics[metric],
+        avgValue: metricsSum / finishedWorkflows.length,
         avgDiff:
           (metrics[metric] * 100) / (metricsSum / finishedWorkflows.length) -
           100,

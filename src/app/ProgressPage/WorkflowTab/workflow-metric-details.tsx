@@ -7,6 +7,7 @@ interface Metric {
   name: string;
   value: number;
   avgDiff: number;
+  avgValue: number;
 }
 interface IWorkflowMetricDetails {
   metrics: Metric[] | null;
