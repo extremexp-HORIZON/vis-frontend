@@ -134,9 +134,15 @@ export default function ScheduleTable() {
   }
 
   const removeSelected = (list: Number[] | string) => (e: React.SyntheticEvent) => {
-    const filteredWorkflows = progressScheduledTable.rows.filter(
+    let filteredWorkflows;
+    if(list.length > 0){
+      filteredWorkflows = progressScheduledTable.rows.filter(
+        row => !list.includes(row.id))
+    }else{
+   filteredWorkflows = progressScheduledTable.rows.filter(
       row => !progressScheduledTable.selectedWorkflows.includes(row.id),
     )
+  }
     dispatch(setProgressScheduledTable({ rows: filteredWorkflows, visibleRows: filteredWorkflows, selectedWorkflows: [] }))
   }
 
@@ -458,7 +464,7 @@ export default function ScheduleTable() {
                                   />
                                 </span>
                                 <Close
-                                  // onClick={handleCloseScheduled(row.id)} // TODO: Create function deleting the workflow (delete from scheduled? Or from whole database?)
+                                  onClick={removeSelected([row.id])} // TODO: Create function deleting the workflow (delete from scheduled? Or from whole database?)
                                   sx={{
                                     cursor: "pointer",
                                     color: theme => theme.palette.primary.main,

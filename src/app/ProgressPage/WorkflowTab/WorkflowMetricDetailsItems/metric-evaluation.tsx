@@ -8,6 +8,7 @@ interface Metric {
   name: string;
   value: number;
   avgDiff: number;
+  avgValue: number;
 }
 
 interface IMetricEvaluation {
@@ -32,7 +33,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
 
   const experimentAverage = selectedMetrics.map(metric => ({
     key: metric.name,
-    value: (metric.value * (1 + metric.avgDiff / 100)).toFixed(3),
+    value: metric.avgValue.toFixed(3),
     category: "Experiments Average",
   }));
 
@@ -40,7 +41,15 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
     <Paper
       className="Category-Item"
       elevation={2}
-      sx={{ borderRadius: 4, width: "100%", display: "flex", flexDirection: "column", minHeight: "300px" }}
+      sx={{
+        borderRadius: 4,
+        width: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 0,
+        minWidth: "300px",
+        height: "100%",
+      }}
     >
       <Box
         sx={{
@@ -63,8 +72,16 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
       </Box>
 
      
-      <Box sx={{ px: 1, py: 1, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
-
+        <Box
+          sx={{
+            px: 1,
+            py: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            height: "100%",
+          }}
+        >
           {availableMetrics && (
             
           <Autocomplete
