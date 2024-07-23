@@ -51,7 +51,6 @@ const ParallelCoordinatePlot = () => {
   }
 
   const handleNewView = (view: any) => {
-    console.log(view)
     view.addEventListener("click", (event: any, item: any) => {
       if (item && item.datum) {
         console.log(item.datum)

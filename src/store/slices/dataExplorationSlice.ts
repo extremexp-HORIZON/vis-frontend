@@ -15,7 +15,7 @@ interface IExploration {
 // Define the initial state of the slice
 const initialState: IExploration = {
     loading: false,
-    initLoading: false,
+    initLoading: true,
     dataExploration: null, 
     error: null,
     multipleTimeSeries: [],
@@ -66,6 +66,8 @@ export const dataExplorationSlice = createSlice({
             .addCase(fetchDataExploration.fulfilled, (state, action) => {
                 state.dataExploration = action.payload;
                 state.loading = false;
+                ////Added this
+                state.initLoading = false;  // Update initLoading state
                 state.error = null;  // Clearing error on success
             })
             .addCase(fetchDataExploration.pending, (state) => {
@@ -75,11 +77,26 @@ export const dataExplorationSlice = createSlice({
             .addCase(fetchMultipleTimeseries.fulfilled, (state, action) => {
                 state.loading = false;
                 state.multipleTimeSeries = handleMultiTimeSeriesData(action.payload);
+                state.initLoading = false;  // Update initLoading state
               })
+              ////added this
+              .addCase(fetchMultipleTimeseries.pending, (state) => {
+                state.loading = true;
+            })
             .addCase(fetchDataExploration.rejected, (state, action) => {
                 state.initLoading = false;
+                ////Added This
+                state.loading = false;
                 state.error = action.error.message || "Failed to fetch data";
-            });
+            })
+            ////Added This
+            .addCase(fetchMultipleTimeseries.rejected, (state, action) => {
+              state.loading = false;
+              state.initLoading = false;
+              state.error = action.error.message || "Failed to fetch timeseries data";
+          });
+
+            
     }
 });
 

@@ -116,7 +116,6 @@ const initializeTab = ({
   const workflow = workflows.data.find(
     workflow => workflow.workflowId === workflowId,
   )
-  console.log(workflow)
   const tab: IWorkflowTabModel = {
     ...defaultWorkflowTabModel,
     workflowId: workflowId,

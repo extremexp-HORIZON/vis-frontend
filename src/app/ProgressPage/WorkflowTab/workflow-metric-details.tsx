@@ -20,17 +20,19 @@ const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Grid container spacing={3} justifyContent="center">
+      <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12} md={6}>
-        <MetricEvaluation availableMetrics={metrics} workflowId={workflowId} />
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <MetricEvaluation availableMetrics={metrics} workflowId={workflowId} />
+          </Box>
         </Grid>
         <Grid item xs={12} md={6}>
-          <RuntimeDecomposition availableMetrics={metrics} workflowId={workflowId} />
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 2 }}>
+            <RuntimeDecomposition availableMetrics={metrics} workflowId={workflowId} />
+            <MetricEvolution/>
+          </Box>
         </Grid>
-        
-        <Grid item xs={12} md={6}/>
       </Grid>
-      <MetricEvolution />
     </Box>
   )
 }

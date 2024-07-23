@@ -3,13 +3,23 @@ import { Select, MenuItem, TextField, Box, FormControl, InputLabel, IconButton }
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 
-const columns = [
-  { id: 'workflowId', label: 'Workflow ID' },
-  { id: 'train_model', label: 'Train Model' },
-  { id: 'split_proportion', label: 'split_proportion' },
-  { id: 'max_depth', label: 'max_depth' },
-  { id: 'batch_size', label: 'batch_size' },
-];
+interface Column {
+  id: number | string
+  label: string
+  minWidth?: number
+  align?: "right" | "left" | "center" | "inherit" | "justify" | undefined
+  numeric?: boolean
+  sortable?: boolean
+  // format?: (value: number) => string;
+}
+
+// const columns = [
+//   { id: 'workflowId', label: 'Workflow ID' },
+//   { id: 'train_model', label: 'Train Model' },
+//   { id: 'split_proportion', label: 'split_proportion' },
+//   { id: 'max_depth', label: 'max_depth' },
+//   { id: 'batch_size', label: 'batch_size' },
+// ];
 
 const operators = [
   { id: 'contains', label: 'contains' },
@@ -19,13 +29,14 @@ const operators = [
 ];
 
 interface FilterBarProps {
+  columns: Column[];
   filters: { column: string, operator: string, value: string }[];
   onFilterChange: (index: number, column: string, operator: string, value: string) => void;
   onAddFilter: () => void;
   onRemoveFilter: (index: number) => void;
 }
 
-export default function FilterBar({ filters, onFilterChange, onAddFilter, onRemoveFilter }: FilterBarProps) {
+export default function FilterBar({ columns, filters, onFilterChange, onAddFilter, onRemoveFilter }: FilterBarProps) {
   return (
     <Box>
       {filters.map((filter, index) => (

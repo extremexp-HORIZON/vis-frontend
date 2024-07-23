@@ -29,3 +29,5 @@ export const defaultModelAnalysisTask: IModelAnalysisTask = {
   modelInstances: { data: null, columns: null, loading: false, error: null },
   modelConfusionMatrix: { data: null, columns: null, loading: false, error: null },
 }
+
+const hyperparametersNames = ['model__units','model__activation_function','batch_size','epochs']

@@ -7,6 +7,7 @@ import MetricsDistribution from "../CompareCompleted/metrics-distribution"
 import TopWorkflowMetric from "../CompareCompleted/top-workflow-metric"
 import VariabilityPointCharts from "../CompareCompleted/variability-point-charts"
 import VariabilityPointHeatmap from "../CompareCompleted/variability-point-heatmap"
+import CompareSelectedSvg from "./compare-selected-svg"
 
 const CompareSelected = () => {
   const [chosenTask, setChosenTask] = useState<string | null>(null)
@@ -16,7 +17,7 @@ const CompareSelected = () => {
       sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}
     >
       <Box key="compare-completed-svg">
-        <CompareCompletedSvg
+        <CompareSelectedSvg
           setChosenTask={setChosenTask}
           chosenTask={chosenTask}
         />

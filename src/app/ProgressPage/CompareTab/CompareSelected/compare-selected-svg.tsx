@@ -10,14 +10,14 @@ interface IWorkflowSvg {
   setChosenTask: Dispatch<SetStateAction<string | null>>
 }
 
-const CompareCompletedSvg = (props: IWorkflowSvg) => {
+const CompareSelectedSvg = (props: IWorkflowSvg) => {
   const theme = useTheme();
   const { chosenTask, setChosenTask } = props
   const chosenTaskRef = useRef(chosenTask)
   const listeners = useRef<
     { gElement: SVGGElement; listener: EventListener }[]
   >([])
-  const workingTasks = ["I2Cat_Dataset"]
+  const workingTasks = ["TrainModel"]
 
   useEffect(() => {
     const handleChange = (taskId: string | null, element: SVGGElement) => {
@@ -113,4 +113,4 @@ const CompareCompletedSvg = (props: IWorkflowSvg) => {
   )
 }
 
-export default CompareCompletedSvg
+export default CompareSelectedSvg
