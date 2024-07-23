@@ -174,7 +174,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
             px: 1.5,
           }}
         >
-          <Typography fontSize={"0.8rem"}>Missclasified Instances:</Typography>
+          <Typography fontSize={"0.8rem"}>Misclasified Instances:</Typography>
           <Checkbox checked={checkbox} onChange={handleCheckboxChange} />
         </Box>
         <Box sx={{ width: "99%", px: 1 }}>

@@ -130,7 +130,13 @@ export const selectionChartSpec = {
           "on": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
           "translate": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
           "clear": [{"type": "mouseup"}, {"signal": "zoomPan"}], // remove brush on mouseup or zoom
-          "resolve": "union"
+          "resolve": "union",
+          "mark": {
+            "fill": "blue",
+            "fillOpacity": 0.1,
+            "stroke": "grey",
+            "strokeWidth": 1
+          }
         },
       },
     },
@@ -165,6 +171,7 @@ export const selectionChartSpec = {
     }
   },
 };
+
 
 
 export const getSpecConcat = (alignment: string) => {

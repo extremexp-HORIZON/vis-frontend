@@ -95,11 +95,14 @@ export const selectionChartSpec = {
           "type": "temporal",
         },
         "x2": { "field": "end", "type": "temporal" },
-        "stroke": { "value": "rgba(0, 0, 0, 0.2)" },
-        "opacity": {
-          "condition": { "test": "datum['selected'] === true", "value": 0.6 },
-          "value": 0.2,
-        },
+        "stroke": { "value": "rgba(0, 0, 0, 0.1)" },
+        "color": {
+          "condition": {
+            "test": "datum['selected'] === true",
+            "value": "lightgray"
+          },
+          "value": "white" 
+        }
       },
       "selection": {
         "zoomPan": {
@@ -113,7 +116,13 @@ export const selectionChartSpec = {
           "on": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
           "translate": "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
           "clear": [{"type": "mouseup"}, {"signal": "zoomPan"}], // remove brush on mouseup or zoom
-          "resolve": "union"
+          "resolve": "union",
+          "mark": {
+            "fill": "blue",
+            "fillOpacity": 0.3,
+            "stroke": "grey",
+            "strokeWidth": 1
+          }
         },
       },
     },

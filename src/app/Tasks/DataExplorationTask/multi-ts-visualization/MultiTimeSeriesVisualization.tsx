@@ -34,7 +34,6 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   const [brushedSeries, setBrushedSeries] = useState<string[]>([]); // files that have been brushed
   const [clickedFile, setClickedFile] = useState<string | null>(null); // file that has been clicked
   const [alignment, setAlignment] = React.useState<string>('view'); // toggle view
-
   const mousePosition = useMousePosition(); // position of the user's mouse
 
   // Tooltip that contains add/remove brush functionality
@@ -74,9 +73,8 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
 
     // Check if metadata is extensible
     if (!Object.isExtensible(data)) {
-      console.warn('Data is non-extensible:', data);
+      console.warn('Metadata is non-extensible:', data);
     }
-
     const fileDataMap: { [key: string]: { start: number; end: number } } = {};
     data.forEach(d => {
       const series = d.series;
@@ -138,6 +136,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     }
   }
 
+
   // Handles navigator zooming / panning
   const handleZoomPan = (name: string, value: any) => {
     setZoomState(value);
@@ -177,7 +176,6 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     if(newAlignment) setAlignment(newAlignment);
   };
 
-
   // Updates file regions data for navigator.
   // Each object contains a boolean selected parameter that triggers the file's visualization parameters.
   const updateFileRegions = (updatedFileRegions: FileRegion[]) => {
@@ -206,6 +204,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     }
     updateFileRegions(updatedFileRegions);    
   };
+
 
   // Removes uneeded objects from screen
   const reset = () => {
@@ -240,6 +239,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
             actions={false} // hides 3 dots action button
             data={{
               chartData: chartData,
+              fileRegions: fileRegions,
               condensedChartData: condensedChartData,
             }}
             onNewView={handleNewView}
