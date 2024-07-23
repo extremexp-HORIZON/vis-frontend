@@ -141,7 +141,7 @@ import { setProgressGauges } from "../../store/slices/progressPageSlice"
 
 const MetricGauge = ({ title, value, isTime = false }: any) => {
   const displayValue = isTime
-    ? `${value.toFixed(3)} sec`
+    ? `${value.toFixed(3)}s`
     : `${value.toFixed(3)}`
   const maxValue = isTime ? 5 : 100 // Set max to 5 for time values and 100 for percentages
   const theme = useTheme()
@@ -177,7 +177,7 @@ const MetricGauge = ({ title, value, isTime = false }: any) => {
 const RuntimeDisplay = (props: { value: number }) => {
   const { value } = props
   const displayValue = value > 60 
-    ? `${(value / 60).toFixed(2)} min` 
+    ? `${(value / 60).toFixed(2)}m` 
     : `${value.toFixed(2)}s`;
 
   return (
@@ -196,7 +196,7 @@ const RuntimeDisplay = (props: { value: number }) => {
           textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
           fontWeight: 600,
           height: "100px",
-          width: "100px",
+          // width: "100px",
           alignItems: "center",
           display: "flex",
           justifyContent: "center",
