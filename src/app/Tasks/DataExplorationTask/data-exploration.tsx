@@ -14,7 +14,7 @@ import MultiTimeSeriesVisualization from './multi-ts-visualization/MultiTimeSeri
 
 const DataExploration: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { dataExploration, loading, error, multipleTimeSeries} = useAppSelector(state => state.dataExploration);
+  const {loading, error, multipleTimeSeries,dataExploration} = useAppSelector(state => state.dataExploration);
   const [columns, setColumns] = useState<any[]>([]);
   const [originalColumns, setOriginalColumns] = useState<any[]>([]);
   const [data, setData] = useState<any[]>([]);
@@ -58,40 +58,44 @@ const DataExploration: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    dispatch(fetchDataExploration({
-      datasetId: datafile,
-      columns: [],
-      aggFunction: '',
-      filters: filters,
-      limit: 1000,
-      scaler: '',
-    }));
-  }, [dispatch, filters]);
+  ////Commented out those
 
-  useEffect(() => {
-    if (dataExploration) {
-      const parsedData = JSON.parse(dataExploration.data);
-      setData(parsedData);
-      setOriginalData(parsedData); // Set original data here
+  // useEffect(() => {
+  //   dispatch(fetchDataExploration({
+  //     datasetId: datafile,
+  //     columns: [],
+  //     aggFunction: '',
+  //     filters: filters,
+  //     limit: 1000,
+  //     scaler: '',
+  //   }));
+  // }, [dispatch, filters]);
+
+  // useEffect(() => {
+  //   if (dataExploration) {
+  //     const parsedData = JSON.parse(dataExploration.data);
+  //     setData(parsedData);
+  //     setOriginalData(parsedData); // Set original data here
       
-      const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
-        field: typeof col === 'string' ? col : (col as { name: string }).name,
-        headerName: typeof col === 'string' ? col : (col as { name: string }).name,
-        width: 200,
-        type: (typeof col === 'string' ? col : (col as { type: string }).type) as GridColDef['type'], // Add explicit type casting here
-      }));
+  //     const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
+  //       field: typeof col === 'string' ? col : (col as { name: string }).name,
+  //       headerName: typeof col === 'string' ? col : (col as { name: string }).name,
+  //       width: 200,
+  //       type: (typeof col === 'string' ? col : (col as { type: string }).type) as GridColDef['type'], // Add explicit type casting here
+  //     }));
 
-      setColumns(gridColumns);
-      setOriginalColumns(gridColumns); // Set original columns here
-      const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
-      setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
+  //     setColumns(gridColumns);
+  //     setOriginalColumns(gridColumns); // Set original columns here
+  //     const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
+  //     setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
 
-      if (selectedCols.length === 0 && gridColumns.length > 0) {
-        setSelectedCols([gridColumns[1].field]);
-      }
-    }
-  }, [dataExploration]);
+  //     if (selectedCols.length === 0 && gridColumns.length > 0) {
+  //       setSelectedCols([gridColumns[1].field]);
+  //     }
+  //   }
+  // }, [dataExploration]);
+
+  
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -119,7 +123,9 @@ const DataExploration: React.FC = () => {
               px: 2,
             }}
           >
-            <Typography fontSize={"1.2rem"}>Dataset Exploration: {filenameWithoutExtension}</Typography>
+            {/* <Typography fontSize={"1.2rem"}>Dataset Exploration: {filenameWithoutExtension}</Typography> */}
+            <Typography fontSize={"1.2rem"}>Dataset Exploration: LG600B6-100636-IDK</Typography>
+
             <Box sx={{ flex: 1 }} />
             <IconButton>
               <CloseIcon />
