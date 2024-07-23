@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import type { VisualizationSpec, View } from 'react-vega';
+import type { View } from 'react-vega';
 import { VegaLite } from 'react-vega';
 import * as vega from "vega";
 import useMousePosition from './useMousePosition';
@@ -7,8 +7,8 @@ import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import InfoIcon from "@mui/icons-material/Info"
-import { getVegaLiteSpec } from './vegaLiteSpec';
-import { IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import {getSpecConcat } from './vegaLiteSpec';
+import { Button, IconButton, MenuItem, Paper, Select, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
 import grey from "@mui/material/colors/grey"
 
 interface Metadata {
@@ -44,8 +44,9 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   const [brushedSeries, setBrushedSeries] = useState<string[]>([]); // files that have been brushed
   const [clickedFile, setClickedFile] = useState<string | null>(null); // file that has been clicked
   const [alignment, setAlignment] = React.useState<string>('view'); // toggle view
-  const [vlSpec, setVlSpec] = useState<VisualizationSpec>({}); // vega lite specification
 
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [newCategory, setNewCategory] = useState<string>('');
   const mousePosition = useMousePosition(); // position of the user's mouse
 
   // Tooltip that contains add/remove brush functionality
@@ -74,6 +75,10 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     if (viewRef.current) {
       const selectedSeries = fileRegions.filter(region => region.selected).map(region => region.series);
       const filteredData = data.filter(d => selectedSeries.includes(d.series));
+      const selectedFileCategories = fileRegions
+        .filter(region => region.selected)
+        .map(region => region.category);
+      setSelectedCategories([...new Set(selectedFileCategories)]);
       updateData(filteredData);
     }
   }, [fileRegions]);
@@ -120,16 +125,14 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     } else {
       console.error('Metadata is not an array:', metadata);
     }
-    // updateFileRegions(regions);
     setFileRegions(regions);
     setChartData(data);
     setCondensedChartData(data);
     setFileCategoryMap(newFileCategoryMap);
-    setVlSpec(getVegaLiteSpec(alignment) as VisualizationSpec);
   }, [data, metadata]);
 
   useEffect(() => {
-    setVlSpec(getVegaLiteSpec(alignment) as VisualizationSpec);
+    // setVlSpec(getVegaLiteSpec(alignment) as VisualizationSpec);
   }, [alignment]);
 
   // Adds brushed datapoints to the selection
@@ -149,7 +152,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   };
 
   // Handles brushing. Sets brushed file names and opens the tooltip.
-  const handleBrush = (name: string, value: any) => {
+  const handleBrushRegions = (name: string, value: any) => {
     if (!value.start) return;
     const [start, end] = value.start;
     const brushedFiles = fileRegions.filter(file => {
@@ -163,13 +166,13 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   }
 
   /// Handles category change from the legend
-  const handleCategoryChange = (_: any, value: any) => {
-    const selectedCategories = value.category;
+  const handleHeaderCategoryChange = (_: any, value: any) => {
+    const headerCategories = value.category;
     let updatedFileRegions = fileRegions;
-    if(selectedCategories){
+    if(headerCategories){
       updatedFileRegions = fileRegions.map(region => {
         const newRegion = structuredClone(region);
-        newRegion.selected = selectedCategories.includes(region.category);
+        newRegion.selected = headerCategories.includes(region.category);
         return newRegion;
       });
     }
@@ -183,14 +186,18 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
     updateFileRegions(updatedFileRegions);
   }
 
+  const handleCategoryChangeFromSelection = (event: SelectChangeEvent<string>) => {
+    setNewCategory(event.target.value as string);
+  };
+  
   // Handles navigator zooming / panning
   const handleZoomPan = (name: string, value: any) => {
     setZoomState(value);
     reset();
   }
 
-  const handleHighlight = (name: string, value: any) => {
-    // console.log(fileCategoryMap[value.series]);
+  const handleBrushLines = (name: string, value: any) => {
+    console.log(value);
   }
 
   // Initialization
@@ -240,16 +247,27 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
 
   // Updates the selected value of fileRegions
   // Updates the main chart view
-    const updateSelection = (selection: string | string[]) => {
-      const updatedFileRegions = fileRegions.map(region => {
-        const newRegion = structuredClone(region);
-        newRegion.selected = selection.includes(region.series);
-        return newRegion;
-      });
-      if(viewRef.current){
-        viewRef.current.change("brush_store", vega.changeset().remove((v: any) => true)).run();
+  const updateSelection = (selection: string | string[]) => {
+    const updatedFileRegions = fileRegions.map(region => {
+      const newRegion = structuredClone(region);
+      newRegion.selected = selection.includes(region.series);
+      return newRegion;
+    });
+    if(viewRef.current){
+      viewRef.current.change("brushRegions_store", vega.changeset().remove((v: any) => true)).run();
+    }
+    updateFileRegions(updatedFileRegions);    
+  };
+
+  const updateCategories = () => {
+    const updatedFileRegions = fileRegions.map(region => {
+      const newRegion = structuredClone(region);
+      if (newRegion.selected) {
+        newRegion.category = newCategory;
       }
-      updateFileRegions(updatedFileRegions);    
+      return newRegion;
+    });
+    updateFileRegions(updatedFileRegions);
   };
 
   // Removes uneeded objects from screen
@@ -291,7 +309,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
         </Tooltip>
       </Box>
       <Box sx={{width:"100%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap', p:2}}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start', pb: 2}}>
           <ToggleButtonGroup
             color="primary"
             value={alignment}
@@ -302,11 +320,42 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
             <ToggleButton size="small" value="view">View</ToggleButton>
             <ToggleButton size="small" value="compare">Compare</ToggleButton>
           </ToggleButtonGroup>
+          <Box sx={{ display: 'flex', flexDirection: 'row',  pl: 10, flexWrap: 'wrap'}}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap'}}>
+              <Typography fontSize={"1em"} fontWeight={600} textAlign={"left"}>
+                {"Selected File Categories"}
+              </Typography>
+              <Typography fontSize={"1em"} fontWeight={300} textAlign={"left"}>
+                {selectedCategories.length === 0 ? "None" : (selectedCategories.length === 1 ? selectedCategories[0] : "Multiple")}
+              </Typography>
+            </Box>
+            <Select
+              value={newCategory}
+              onChange={handleCategoryChangeFromSelection}
+              displayEmpty
+              size='small'
+              inputProps={{ 'aria-label': 'Without label' }}
+              sx={{ ml: 2, width: 200 }}
+            >
+              <MenuItem value={'no anomaly'}>No Anomaly</MenuItem>
+              <MenuItem value={'mechanical anomaly'}>Mechanical Anomaly</MenuItem>
+              <MenuItem value={'electrical anomaly'}>Electrical Anomaly</MenuItem>
+            </Select>
+            <Button variant="contained" onClick={updateCategories} sx={{ ml: 2 }} size='small'>
+              Update Category
+            </Button>
+          </Box>
         </Box>
         <Box sx={{width:"90%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
           <VegaLite
             key={`multi-ts-visualization`}
-            spec={vlSpec}
+            spec={
+              {
+                "width": "container",  
+                "vconcat": getSpecConcat(alignment),
+                "resolve": {"scale": {"color": "independent"}},
+              }
+            }
             style={{ width: "100%" }}
             actions={false} // hides 3 dots action button
             data={{
@@ -316,8 +365,9 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
             }}
             onNewView={handleNewView}
             signalListeners={{
-              brush: handleBrush,
-              category: handleCategoryChange,
+              brushRegions: handleBrushRegions,
+              brushLines: handleBrushLines,
+              headerCategory: handleHeaderCategoryChange,
               zoomPan: handleZoomPan,
             }}
           />
