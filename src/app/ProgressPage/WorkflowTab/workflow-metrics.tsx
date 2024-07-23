@@ -41,9 +41,9 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
         </Box> */}
         <Grid sx={{ p: 2 }} container spacing={3}>
           {metrics
-            ? Object.entries(metrics).map(([name, value]) => (
+            ? metrics.map(metric => (
                 <Grid
-                  key={`statistics-${name}`}
+                  key={`statistics-${metric.name}`}
                   xs={12}
                   sm={12}
                   md={6}
@@ -59,10 +59,10 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
                         columnGap: 1,
                       }}
                     >
-                      <Typography fontWeight={600}>{name}:</Typography>
+                      <Typography fontWeight={600}>{metric.name}:</Typography>
                       <Typography>
-                      {typeof value === 'string' ? parseFloat(value).toFixed(3) : value.toFixed(3)}
-                      {name === "runtime" && "s"}
+                      {typeof metric.value === 'string' ? parseFloat(metric.value).toFixed(3) : metric.value.toFixed(3)}
+                      {metric.name === "runtime" && "s"}
                       </Typography>
                     </Box>
                      <Box
@@ -72,14 +72,14 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
                         justifyContent: "center",
                       }}
                     >
-                      {/* {metric.avgDiff > 0 ? (
+                      {metric.avgDiff as number > 0 ? (
                         <ArrowDropUpIcon sx={{ color: green[400] }} />
                       ) : (
                         <ArrowDropDownIcon sx={{ color: red[400] }} />
                       )}
                       <Typography sx={{ mr: 0.5 }}>
-                        {parseInt(metric.avgDiff)}%
-                      </Typography> */}
+                        {parseInt(metric.avgDiff.toString())}%
+                      </Typography>
                       <Typography>vs. experiment average</Typography>
                     </Box> 
                   </Paper>
