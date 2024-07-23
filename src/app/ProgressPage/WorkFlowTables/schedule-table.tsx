@@ -81,7 +81,7 @@ export interface Data {
   [key: string]: string | number | boolean
 }
 
-let idCounter = 0
+let idCounter = 1
 
 // interface ScheduleTableProps {
 //   handleChange: (newValue: number) => (event: React.SyntheticEvent) => void;
@@ -263,7 +263,7 @@ export default function ScheduleTable() {
         ...row,
         id: index + 1,
       }))
-      dispatch(setProgressScheduledTable({ rows: newRows }))
+      dispatch(setProgressScheduledTable({ rows: newRows, visibleRows: newRows }))
     }
   }
 
