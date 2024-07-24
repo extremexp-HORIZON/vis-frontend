@@ -124,7 +124,7 @@ const DataExploration: React.FC = () => {
             }}
           >
             {/* <Typography fontSize={"1.2rem"}>Dataset Exploration: {filenameWithoutExtension}</Typography> */}
-            <Typography fontSize={"1.2rem"}>Dataset Exploration: LG600B6-100636-IDK</Typography>
+            <Typography fontSize={"1.2rem"}>Dataset Exploration: LG600B6_100636_IDK</Typography>
 
             <Box sx={{ flex: 1 }} />
             <IconButton>
