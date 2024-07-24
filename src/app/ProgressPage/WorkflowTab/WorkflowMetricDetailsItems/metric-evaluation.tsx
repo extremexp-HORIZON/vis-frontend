@@ -8,6 +8,7 @@ interface Metric {
   name: string;
   value: number;
   avgDiff: number;
+  avgValue: number;
 }
  
 interface IMetricEvaluation {
@@ -32,7 +33,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
  
   const experimentAverage = selectedMetrics.map(metric => ({
     key: metric.name,
-    value: (metric.value * (1 + metric.avgDiff / 100)).toFixed(3),
+    value: metric.avgValue.toFixed(3),
     category: "Experiments Average",
   }));
  

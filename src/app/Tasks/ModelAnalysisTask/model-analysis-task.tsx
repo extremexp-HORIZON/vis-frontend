@@ -6,7 +6,12 @@ import CounterfactualsTable from "../SharedItems/Tables/counterfactuals-table"
 import LinePlot from "../SharedItems/Plots/line-plot"
 import CloseIcon from "@mui/icons-material/Close"
 import grey from "@mui/material/colors/grey"
-import { fetchInitialization, fetchMultipleTimeseries, fetchMultipleTimeseriesMetadata } from "../../../store/slices/explainabilitySlice"
+import {
+  fetchConfusionMatrix,
+  fetchInitialization,
+  fetchMultipleTimeseries,
+  fetchMultipleTimeseriesMetadata,
+} from "../../../store/slices/explainabilitySlice"
 import { defaultDataExplorationRequest } from "../../../shared/models/dataexploration.model"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
@@ -21,96 +26,88 @@ interface IFeatureExplainability {
 }
 
 const ModelAnalysisTask = (props: IFeatureExplainability) => {
-  const { explInitialization, multipleTimeSeries, multipleTimeSeriesMetadata } = useAppSelector(state => state.explainability)
-  const { experimentId } = useParams();
+  const {
+    explInitialization,
+    multipleTimeSeries,
+    multipleTimeSeriesMetadata,
+    confusionMatrix,
+    initLoading,
+    loading,
+  } = useAppSelector(state => state.explainability)
+  const { experimentId } = useParams()
   const { workflowId } = props
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if(experimentId && experimentId.includes("ideko")){
-      dispatch(fetchMultipleTimeseries({dataQuery: {
-        datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
-        columns: [],
-        filters: [],   
-      }}));
-      dispatch(fetchMultipleTimeseriesMetadata({ dataQuery: {
-        datasetId: `file://${experimentId}/metadata.csv`,
-        columns: [],
-        filters: [],
-      }}));
+    if (experimentId && experimentId.includes("ideko")) {
+      // if (
+      //   multipleTimeSeries.length === 0 &&
+      //   multipleTimeSeriesMetadata.length === 0
+      // ) {
+        dispatch(
+          fetchMultipleTimeseries({
+            dataQuery: {
+              datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
+              columns: [],
+              filters: [],
+            },
+          }),
+        )
+        dispatch(
+          fetchMultipleTimeseriesMetadata({
+            dataQuery: {
+              datasetId: `file://${experimentId}/metadata.csv`,
+              columns: [],
+              filters: [],
+            },
+          }),
+        )
+      }
+    // }
+    if (confusionMatrix.length === 0) {
+      dispatch(fetchConfusionMatrix(workflowId))
     }
-    dispatch(
-      fetchInitialization({
-        modelName: "I2Cat_Phising_model",
-        pipelineQuery: {
-          ...defaultDataExplorationRequest,
-          datasetId: "file:///I2Cat_phising/metrics/Real_I2Cat_metrics.csv",
-        },
-        modelInstancesQuery: {
-          ...defaultDataExplorationRequest,
-          datasetId:
-            "file:///I2Cat_phising/metrics/Real_I2Cat_instances.csv",
-          filters: [
-            {
-              column: "id",
-              type: "equals",
-              value: workflowId,
-            },
-          ],
-          limit: 10000,
-        },
-        modelConfusionQuery: {
-          ...defaultDataExplorationRequest,
-          datasetId:
-            "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
-          filters: [
-            {
-              column: "id",
-              type: "equals",
-              value: workflowId,
-            },
-          ],
-        },
-      }),
-    )
   }, [])
 
   return (
     <>
-        <Grid
+      {console.log(confusionMatrix)}
+      <Grid
+        sx={{
+          flexDirection: "column",
+          display: "flex",
+          justifyContent: !explInitialization ? "center" : "start",
+          textAlign: !explInitialization ? "center" : "start",
+          border: `1px solid ${grey[400]}`,
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
+      >
+        <Box
           sx={{
-            flexDirection: "column",
+            bgcolor: grey[300],
             display: "flex",
-            justifyContent: !explInitialization ? "center" : "start",
-            textAlign: !explInitialization ? "center" : "start",
-            border: `1px solid ${grey[400]}`,
-            borderRadius: 3,
-            overflow: "hidden",
+            height: "3.5rem",
+            alignItems: "center",
+            textAlign: "left",
+            px: 2,
           }}
         >
-          <Box
-            sx={{
-              bgcolor: grey[300],
-              display: "flex",
-              height: "3.5rem",
-              alignItems: "center",
-              textAlign: "left",
-              px: 2,
-            }}
-          >
-            <Typography fontSize={"1.2rem"}>Model Training Task</Typography>
-            <Box sx={{ flex: 1 }} />
-            <IconButton>
-              <CloseIcon />
-            </IconButton>
+          <Typography fontSize={"1.2rem"}>Model Training Task</Typography>
+          <Box sx={{ flex: 1 }} />
+          <IconButton>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        {initLoading && loading ? (
+          <Box sx={{ height: "100%", width: "100%" }}>
+            <CircularProgress size={"5rem"} />
+            <Typography fontSize={"1.5rem"} color={grey[500]}>
+              Initializing page...
+            </Typography>
           </Box>
-        {!explInitialization ? <Box sx={{ height: "100%", width: "100%" }}>
-          <CircularProgress size={"5rem"} />
-          <Typography fontSize={"1.5rem"} color={grey[500]}>
-            Initializing page...
-          </Typography>
-        </Box> : 
+        ) : (
           <Box
             sx={{
               px: 5,
@@ -136,49 +133,56 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               >
                 Classification Report
               </Typography>
-              <Typography variant="body1">Test set classified instances and Confusion Matrix</Typography>
+              <Typography variant="body1">
+                Test set classified instances and Confusion Matrix
+              </Typography>
             </Box>
-            { (multipleTimeSeries && multipleTimeSeriesMetadata) ?
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={8}>
-                  <MultiTimeSeriesVisualizationWithCategories 
-                    data={structuredClone(multipleTimeSeries)} 
-                    metadata={structuredClone(multipleTimeSeriesMetadata)}/>
+            {
+              multipleTimeSeries &&
+              multipleTimeSeriesMetadata &&
+              confusionMatrix.length > 0 ? (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={8}>
+                    <MultiTimeSeriesVisualizationWithCategories
+                      data={structuredClone(multipleTimeSeries)}
+                      metadata={structuredClone(multipleTimeSeriesMetadata)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <ConfusionMatrix
+                      key={`confusion-matrix`}
+                      metrics={confusionMatrix}
+                      workflowId={workflowId}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} md={4}>
-                  <ConfusionMatrix
-                    key={`confusion-matrix`}
-                    metrics={
-                      explInitialization.hyperparameterExplanation.pipelineMetrics
-                    }
-                    workflowId={workflowId}
-                  />
-                </Grid>
-              </Grid> 
-              :
-              <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <InstanceClassification
-                  key={`instance-classification`}
-                  point={point}
-                  setPoint={setPoint}
-                  plotData={
-                    explInitialization.featureExplanation.modelInstances
-                  }
-                />
-              </Grid>
-              <Grid item md={6} xs={12}>
-                <ConfusionMatrix
-                  key={`confusion-matrix`}
-                  metrics={
-                    explInitialization.hyperparameterExplanation.pipelineMetrics
-                  }
-                  workflowId={workflowId}
-                />
-              </Grid>
-            </Grid>
+              ) : null
+              // (
+              //   <Grid container spacing={2}>
+              //     <Grid item xs={12} md={6}>
+              //       <InstanceClassification
+              //         key={`instance-classification`}
+              //         point={point}
+              //         setPoint={setPoint}
+              //         plotData={
+              //           explInitialization.featureExplanation.modelInstances
+              //         }
+              //       />
+              //     </Grid>
+              //     <Grid item md={6} xs={12}>
+              //       <ConfusionMatrix
+              //         key={`confusion-matrix`}
+              //         metrics={
+              //           explInitialization.hyperparameterExplanation
+              //             .pipelineMetrics
+              //         }
+              //         workflowId={workflowId}
+              //       />
+              //     </Grid>
+              //   </Grid>
+              // )
             }
-            <Box>
+            {/* <Box>
               {point && (
                 <CounterfactualsTable
                   key={`counterfactuals-table`}
@@ -189,8 +193,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   }
                 />
               )}
-            </Box>
-            <Box
+            </Box> */}
+            {/* <Box
               sx={{
                 width: "100%",
                 display: "flex",
@@ -205,7 +209,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               >
                 Expainability:
               </Typography>
-              <Typography variant="body1">Feature based explanations for this variant</Typography>
+              <Typography variant="body1">
+                Feature based explanations for this variant
+              </Typography>
             </Box>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -226,9 +232,10 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   options={explInitialization.featureExplanation.featureNames}
                 />
               </Grid>
-            </Grid>
-          </Box>}
-        </Grid>
+            </Grid> */}
+          </Box>
+        )}
+      </Grid>
     </>
   )
 }
