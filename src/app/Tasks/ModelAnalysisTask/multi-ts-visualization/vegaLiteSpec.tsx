@@ -28,14 +28,6 @@ export const compareChartSpec = {
       "window": [{ "op": "row_number", "as": "index" }],
       "groupby": ["series"]
     },
-    {
-      "filter": {
-        "or": [
-          { "param": "brushLines" },
-          { "not": { "param": "brushLines" } }
-        ]
-      }
-    },
   ],
   "encoding": {
     "x": {
@@ -59,7 +51,13 @@ export const compareChartSpec = {
         "type": "nominal",
         "legend": null
       },
-      "value": "grey"
+      // "field": "category",
+      // "type": "nominal",
+      // "scale": {
+      //   "domain": ["no anomaly", "mechanical anomaly", "electrical anomaly"],
+      //   "range": ["green", "#4C78A8", "orange"]
+      // },
+      // "legend": null,
     },
     "opacity": {
       "condition": {
@@ -196,10 +194,12 @@ const getSelectionChartSpec = (misclassified: boolean) => {
   };
 };
 
-export const getSpecConcat = (alignment: string, misclassified: boolean) => {
-  if (alignment === 'view') {
-    return [viewChartSpec, getSelectionChartSpec(misclassified)];
-  } else {
-    return [compareChartSpec, getSelectionChartSpec(misclassified)];
+
+
+export const getVlSpec = (alignment: string, misclassified: boolean) => {
+  return {
+    "width": "container",  
+    "vconcat": [alignment === 'view' ? viewChartSpec : compareChartSpec, getSelectionChartSpec(misclassified)],
+    "resolve": {"scale": {"color": "independent"}},
   }
 };

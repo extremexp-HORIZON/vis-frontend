@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import type { View } from 'react-vega';
+import type { View , VisualizationSpec } from 'react-vega';
 import { VegaLite } from 'react-vega';
 import * as vega from "vega";
 import useMousePosition from './useMousePosition';
@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import InfoIcon from "@mui/icons-material/Info"
-import { getSpecConcat } from './vegaLiteSpec';
+import { getVlSpec } from './vegaLiteSpec';
 import type { SelectChangeEvent} from '@mui/material';
 import { Button, Checkbox, IconButton, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
 import grey from "@mui/material/colors/grey"
@@ -22,6 +22,7 @@ interface Data {
   series: string;
   timestamp: string;
   value: number;
+  category: string;
 }
 
 interface FileRegion {
@@ -45,7 +46,7 @@ function random() {
 }
 
 const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisualizationWithCategoriesProps> = ({ data, metadata }) => {
-  const [condensedChartData, setCondensedChartData] = useState<Data[]>(data); // line chart data in navigator
+  const [condensedChartData, setCondensedChartData] = useState<Data[]>(); // line chart data in navigator
   const [chartData, setChartData] = useState<Data[]>(); // main chart data 
   const [fileRegions, setFileRegions] = useState<FileRegion[]>([]); // file regions on navigator
   const [fileCategoryMap, setFileCategoryMap] = useState<any>(null);
@@ -56,11 +57,12 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   const [misclassifiedInstances, setMisclassifiedInstances] = useState<boolean>(false)
   const [selectedSeries, setSelectedSeries] = useState<string>();
   const [showCounterfactuals, setShowCounterfactuals] = useState<boolean>();
+  const [vlSpec, setVlSpec] = useState<VisualizationSpec>({});
+  const [signalListeners, setSignalListeners] = useState({});
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState<string>('');
   const mousePosition = useMousePosition(); // position of the user's mouse
-
   // Tooltip that contains add/remove brush functionality
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false); // tooltip visibility
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 }); // tooltip position  
@@ -70,7 +72,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
 
   // Handles File click
   useEffect(() => {
-    setTooltipVisible(false);
+    reset();
     // Toggle the selected state of the clicked series
     const updatedFileRegions = fileRegions.map(region => {
       const newRegion = structuredClone(region);
@@ -99,13 +101,20 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   useEffect(() => {
     const regions: FileRegion[] = [];
     const newFileCategoryMap: { [key: string]: string } = {};
-
     // Check if metadata is extensible
     if (!Object.isExtensible(data)) {
       console.warn('Metadata is non-extensible:', metadata);
     }
     if (!Object.isExtensible(metadata)) {
       console.warn('Metadata is non-extensible:', metadata);
+    }
+
+    if (Array.isArray(metadata)) {
+      metadata.forEach(({ id, category }) => {
+        newFileCategoryMap[id.replace('.csv', '')] = category;
+      });
+    } else {
+      console.log('No metadata provided', metadata);
     }
 
     const fileDataMap: { [key: string]: { start: number; end: number } } = {};
@@ -120,14 +129,6 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
         fileDataMap[series].end = Math.max(fileDataMap[series].end, timestamp);
       }
     });
-
-    if (Array.isArray(metadata)) {
-      metadata.forEach(({ id, category }) => {
-        newFileCategoryMap[id.replace('.csv', '')] = category;
-      });
-    } else {
-      console.log('No metadata provided', metadata);
-    }
     for (const series in fileDataMap) {
       regions.push({
         series,
@@ -138,6 +139,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
         selected: false
       });
     }
+    setVlSpec(getVlSpec('view', false) as VisualizationSpec);
     setFileRegions(regions);
     setChartData(data);
     setCondensedChartData(data);
@@ -145,8 +147,28 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   }, [data, metadata]);
 
   useEffect(() => {
-    // setVlSpec(getVegaLiteSpec(alignment) as VisualizationSpec);
-  }, [alignment]);
+    reset();
+    setVlSpec(getVlSpec(alignment, misclassifiedInstances) as VisualizationSpec);
+  }, [alignment, misclassifiedInstances]);
+
+  useEffect(() => {
+    setSignalListeners(alignment === 'view' ? {
+      brushRegions: handleBrushRegions,
+      headerCategory: handleHeaderCategoryChange,
+      zoomPan: handleZoomPan,
+    } :
+    {
+      brushRegions: handleBrushRegions,
+      headerCategory: handleHeaderCategoryChange,
+      zoomPan: handleZoomPan,
+      brushLines: handleBrushLines,
+      highlight: handleHighlight,
+    });
+  }, [vlSpec]);
+
+  useEffect(() => {
+    setTooltipPosition(mousePosition);
+  }, [brushedSeries, selectedSeries])
 
   // Adds brushed datapoints to the selection
   const handleBrushAdd = () => {
@@ -315,7 +337,6 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
 
   const showTooltip = () => {
     setTooltipVisible(true);
-    setTooltipPosition(mousePosition);
   }
 
   // Removes uneeded objects from screen
@@ -408,15 +429,10 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
           </Box>
         </Box>
         <Box sx={{width:"90%", display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
+         {vlSpec && 
           <VegaLite
             key={`multi-ts-visualization`}
-            spec={
-              {
-                "width": "container",  
-                "vconcat": getSpecConcat(alignment, misclassifiedInstances),
-                "resolve": {"scale": {"color": "independent"}},
-              }
-            }
+            spec={vlSpec}
             style={{ width: "100%" }}
             actions={false} // hides 3 dots action button
             data={{
@@ -425,14 +441,9 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
               fileRegions: fileRegions
             }}
             onNewView={handleNewView}
-            signalListeners={{
-              brushRegions: handleBrushRegions,
-              brushLines: handleBrushLines,
-              headerCategory: handleHeaderCategoryChange,
-              zoomPan: handleZoomPan,
-              highlight: handleHighlight,
-            }}
+            signalListeners={signalListeners}
           />
+          }
           {tooltipVisible && (
             <Box
               style={{
@@ -450,7 +461,13 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
               {
               selectedSeries ? 
               <>
-              <button onClick={handleCounterfactuals}>Counterfactuals</button>
+              <div style = {{display: "flex", flexDirection:"column", padding:2}}>
+                <span><b>Name:</b> {selectedSeries}</span>
+                <span><b>Category:</b> {fileCategoryMap[selectedSeries]}</span>
+                <div style = {{display: "flex", flexDirection:"column", padding:2}}>
+                  {misclassifiedInstances && <button onClick={handleCounterfactuals}>Counterfactuals</button>}
+                </div>
+              </div>
               </>
               :
               <>
