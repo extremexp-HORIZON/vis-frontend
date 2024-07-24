@@ -24,6 +24,8 @@ const DataExploration: React.FC = () => {
   const [filters, setFilters] = useState<any[]>([]);
   const [tabValue, setTabValue] = useState(0);
   const { experimentId } = useParams();
+  const [filenameWithoutExtension, setFilenameWithoutExtension] = useState('');
+
 
   const handleAddFilter = (newFilter: number) => {
     setFilters([...filters, newFilter]);
@@ -36,18 +38,13 @@ const DataExploration: React.FC = () => {
   };
 
   const handleRemoveAllFilters = () => {
-    setFilters([]);  // Resets the filters state to an empty array
+    setFilters([]); 
   };
 
-  const datafile = "file:///I2Cat_phising/dataset/I2Cat_phising_dataset.csv";
   // const datafile = 
   // "zenoh://1/input_data/electrical_data/test.csv";
   // "zenoh://cars/car/ca/cars.json"
-
-  const parts = datafile.split('/');
-  const filenameWithExtension = parts[parts.length - 1];
-  const filenameWithoutExtension = filenameWithExtension.replace('.csv', '');
-
+ 
   useEffect(() => {
     if(experimentId && experimentId.includes("ideko")){
       dispatch(fetchMultipleTimeseries({dataQuery: {
@@ -55,45 +52,49 @@ const DataExploration: React.FC = () => {
         columns: [],
         filters: [],   
       }}));
+      setFilenameWithoutExtension('LG600B6_100636_IDK');
+
+    }else if(experimentId && experimentId.includes("I2Cat_phising")){
+      const datafile = "file:///I2Cat_phising/dataset/I2Cat_phising_dataset.csv";
+
+      dispatch(fetchDataExploration({
+        datasetId: datafile,
+        columns: [],
+        aggFunction: '',
+        filters: filters,
+        limit: 1000,
+        scaler: '',
+      }));
+      const parts = datafile.split('/');
+      const filenameWithExtension = parts[parts.length - 1];
+      setFilenameWithoutExtension(filenameWithExtension.replace('.csv', ''));
+
     }
-  }, []);
-
-  ////Commented out those
-
-  // useEffect(() => {
-  //   dispatch(fetchDataExploration({
-  //     datasetId: datafile,
-  //     columns: [],
-  //     aggFunction: '',
-  //     filters: filters,
-  //     limit: 1000,
-  //     scaler: '',
-  //   }));
-  // }, [dispatch, filters]);
-
-  // useEffect(() => {
-  //   if (dataExploration) {
-  //     const parsedData = JSON.parse(dataExploration.data);
-  //     setData(parsedData);
-  //     setOriginalData(parsedData); // Set original data here
+  }, [filters,experimentId,dispatch]);
+console.log('data',dataExploration)
+  useEffect(() => {
+    if (dataExploration) {
+      const parsedData = JSON.parse(dataExploration.data);
+      setData(parsedData);
+      setOriginalData(parsedData); 
       
-  //     const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
-  //       field: typeof col === 'string' ? col : (col as { name: string }).name,
-  //       headerName: typeof col === 'string' ? col : (col as { name: string }).name,
-  //       width: 200,
-  //       type: (typeof col === 'string' ? col : (col as { type: string }).type) as GridColDef['type'], // Add explicit type casting here
-  //     }));
+      const gridColumns: any[] = dataExploration.columns.map((col: any) => ({
+        field: typeof col === 'string' ? col : (col as { name: string }).name,
+        headerName: typeof col === 'string' ? col : (col as { name: string }).name,
+        width: 200,
+        type: (typeof col === 'string' ? col : (col as { type: string }).type) as GridColDef['type'], 
+      }));
 
-  //     setColumns(gridColumns);
-  //     setOriginalColumns(gridColumns); // Set original columns here
-  //     const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
-  //     setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
+      setColumns(gridColumns);
+      setOriginalColumns(gridColumns); 
+      const timeCols = gridColumns.filter(col => col.type !== undefined && col.type === 'LOCAL_DATE_TIME');
+      setDatetimeColumn(timeCols.length > 0 ? timeCols[0].field : '');
 
-  //     if (selectedCols.length === 0 && gridColumns.length > 0) {
-  //       setSelectedCols([gridColumns[1].field]);
-  //     }
-  //   }
-  // }, [dataExploration]);
+      if (selectedCols.length === 0 && gridColumns.length > 0) {
+        setSelectedCols([gridColumns[1].field]);
+      }
+    }
+  }, [dataExploration]);
 
   
 
@@ -124,7 +125,7 @@ const DataExploration: React.FC = () => {
             }}
           >
             {/* <Typography fontSize={"1.2rem"}>Dataset Exploration: {filenameWithoutExtension}</Typography> */}
-            <Typography fontSize={"1.2rem"}>Dataset Exploration: LG600B6_100636_IDK</Typography>
+            <Typography fontSize={"1.2rem"}>Dataset Exploration: {filenameWithoutExtension}</Typography>
 
             <Box sx={{ flex: 1 }} />
             <IconButton>
@@ -169,8 +170,8 @@ const DataExploration: React.FC = () => {
                   <DataTable
                    data={originalData}
                    columns={originalColumns}
-                   datetimeColumn={datetimeColumn} // Pass datetimeColumn to DataTable
-                   selectedColumns={selectedCols} // Pass selectedCols to DataTable
+                   datetimeColumn={datetimeColumn} 
+                   selectedColumns={selectedCols}
                  />
               </>
             )}

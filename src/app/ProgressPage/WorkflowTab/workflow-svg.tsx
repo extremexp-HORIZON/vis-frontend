@@ -19,6 +19,16 @@ const WorkflowSvg = (props: IWorkflowSvg) => {
   >([])
   const workingTasks = ["LG600B6_100636_IDK", "TrainModel"]
 
+  ////I let this for next time when I have time dynamic svg Panos///
+  // const experimentId=useParams().experimentId
+  // const workingTasks = useMemo(() => {
+  //   if (experimentId && experimentId.includes("ideko")) {
+  //     return ["LG600B6_100636_IDK", "TrainModel"];
+  //   } else {
+  //     return [experimentId, "TrainModel"];
+  //   }
+  // }, [experimentId]);
+
   useEffect(() => {
     const handleChange = (taskId: string | null, element: SVGGElement) => {
       listeners.current.forEach(({ gElement, listener }) => {
