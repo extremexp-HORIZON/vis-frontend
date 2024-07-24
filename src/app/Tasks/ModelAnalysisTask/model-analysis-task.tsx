@@ -17,7 +17,7 @@ import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import CircularProgress from "@mui/material/CircularProgress"
 import MultiTimeSeriesVisualizationWithCategories from "./multi-ts-visualization/MultiTimeSeriesVisualizationWithCategories"
-import { useLocation, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import InstanceClassification from "../SharedItems/Plots/instance-classification"
 import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
 import _ from "lodash"
@@ -41,26 +41,64 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (experimentId === "ideko" && multipleTimeSeries.length === 0 && _.isEmpty(multipleTimeSeriesMetadata)) {
-        dispatch(
-          fetchMultipleTimeseries({
-            dataQuery: {
-              datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
-              columns: [],
-              filters: [],
-            },
-          }),
-        )
-        dispatch(
-          fetchMultipleTimeseriesMetadata({
-            dataQuery: {
-              datasetId: `file://${experimentId}/metadata.csv`,
-              columns: [],
-              filters: [],
-            },
-          }),
-        )
-      }
+    if (
+      experimentId === "ideko" &&
+      multipleTimeSeries.length === 0 &&
+      _.isEmpty(multipleTimeSeriesMetadata)
+    ) {
+      dispatch(
+        fetchMultipleTimeseries({
+          dataQuery: {
+            datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
+            columns: [],
+            filters: [],
+          },
+        }),
+      )
+      dispatch(
+        fetchMultipleTimeseriesMetadata({
+          dataQuery: {
+            datasetId: `file://${experimentId}/metadata.csv`,
+            columns: [],
+            filters: [],
+          },
+        }),
+      )
+    } else if (experimentId !== "ideko" && !explInitialization) {
+      dispatch(
+        fetchInitialization({
+          modelName: "I2Cat_Phising_model",
+          pipelineQuery: {
+            ...defaultDataExplorationRequest,
+            datasetId: "file:///I2Cat_phising/metrics/Real_I2Cat_metrics.csv",
+          },
+          modelInstancesQuery: {
+            ...defaultDataExplorationRequest,
+            datasetId: "file:///I2Cat_phising/metrics/Real_I2Cat_instances.csv",
+            filters: [
+              {
+                column: "id",
+                type: "equals",
+                value: workflowId,
+              },
+            ],
+            limit: 1000,
+          },
+          modelConfusionQuery: {
+            ...defaultDataExplorationRequest,
+            datasetId:
+              "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
+            filters: [
+              {
+                column: "id",
+                type: "equals",
+                value: workflowId,
+              },
+            ],
+          },
+        }),
+      )
+    }
     if (confusionMatrix.length === 0) {
       dispatch(fetchConfusionMatrix(workflowId))
     }
@@ -95,7 +133,10 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             <CloseIcon />
           </IconButton>
         </Box>
-        {initLoading || loading || confusionMatrix.length === 0 || multipleTimeSeries.length === 0 ? (
+        {initLoading ||
+        loading ||
+        confusionMatrix.length === 0 ||
+        multipleTimeSeries.length === 0 ? (
           <Box sx={{ height: "100%", width: "100%" }}>
             <CircularProgress size={"5rem"} />
             <Typography fontSize={"1.5rem"} color={grey[500]}>
@@ -132,53 +173,55 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                 Test set classified instances and Confusion Matrix
               </Typography>
             </Box>
-            {
-              multipleTimeSeries &&
-              multipleTimeSeriesMetadata &&
-              confusionMatrix.length > 0 ? (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={8}>
-                    <MultiTimeSeriesVisualizationWithCategories
-                      data={structuredClone(multipleTimeSeries)}
-                      metadata={structuredClone(multipleTimeSeriesMetadata)}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <ConfusionMatrix
-                      key={`confusion-matrix`}
-                      metrics={confusionMatrix}
-                      workflowId={workflowId}
-                    />
-                  </Grid>
+            {multipleTimeSeries &&
+            multipleTimeSeriesMetadata &&
+            confusionMatrix.length > 0 &&
+            experimentId === "ideko" ? (
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={8}>
+                  <MultiTimeSeriesVisualizationWithCategories
+                    data={structuredClone(multipleTimeSeries)}
+                    metadata={structuredClone(multipleTimeSeriesMetadata)}
+                  />
                 </Grid>
-              ) : null
-              // (
-              //   <Grid container spacing={2}>
-              //     <Grid item xs={12} md={6}>
-              //       <InstanceClassification
-              //         key={`instance-classification`}
-              //         point={point}
-              //         setPoint={setPoint}
-              //         plotData={
-              //           explInitialization.featureExplanation.modelInstances
-              //         }
-              //       />
-              //     </Grid>
-              //     <Grid item md={6} xs={12}>
-              //       <ConfusionMatrix
-              //         key={`confusion-matrix`}
-              //         metrics={
-              //           explInitialization.hyperparameterExplanation
-              //             .pipelineMetrics
-              //         }
-              //         workflowId={workflowId}
-              //       />
-              //     </Grid>
-              //   </Grid>
-              // )
-            }
-            {/* <Box>
-              {point && (
+                <Grid item xs={12} md={4}>
+                  <ConfusionMatrix
+                    key={`confusion-matrix`}
+                    metrics={confusionMatrix}
+                    workflowId={workflowId}
+                  />
+                </Grid>
+              </Grid>
+            ) : (
+              <Grid container spacing={2}>
+                {explInitialization && (
+                  <>
+                    <Grid item xs={12} md={6}>
+                      <InstanceClassification
+                        key={`instance-classification`}
+                        point={point}
+                        setPoint={setPoint}
+                        plotData={
+                          explInitialization.featureExplanation.modelInstances
+                        }
+                      />
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                      <ConfusionMatrix
+                        key={`confusion-matrix`}
+                        metrics={
+                          explInitialization.hyperparameterExplanation
+                            .pipelineMetrics
+                        }
+                        workflowId={workflowId}
+                      />
+                    </Grid>
+                  </>
+                )}
+              </Grid>
+            )}
+            <Box>
+              {point && explInitialization && (
                 <CounterfactualsTable
                   key={`counterfactuals-table`}
                   point={point}
@@ -188,46 +231,54 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   }
                 />
               )}
-            </Box> */}
-            {/* <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "start",
-                columnGap: 1,
-              }}
-            >
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 600, fontSize: "1.5rem" }}
-              >
-                Expainability:
-              </Typography>
-              <Typography variant="body1">
-                Feature based explanations for this variant
-              </Typography>
             </Box>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <LinePlot
-                  key={`pdp-plot`}
-                  plotModel={
-                    explInitialization.featureExplanation.plots.pdp || null
-                  }
-                  options={explInitialization.featureExplanation.featureNames}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <LinePlot
-                  key={`ale-plot`}
-                  plotModel={
-                    explInitialization.featureExplanation.plots.ale || null
-                  }
-                  options={explInitialization.featureExplanation.featureNames}
-                />
-              </Grid>
-            </Grid> */}
+            {experimentId !== "ideko" && explInitialization && (
+              <>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    columnGap: 1,
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+                  >
+                    Expainability:
+                  </Typography>
+                  <Typography variant="body1">
+                    Feature based explanations for this variant
+                  </Typography>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <LinePlot
+                      key={`pdp-plot`}
+                      plotModel={
+                        explInitialization.featureExplanation.plots.pdp || null
+                      }
+                      options={
+                        explInitialization.featureExplanation.featureNames
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <LinePlot
+                      key={`ale-plot`}
+                      plotModel={
+                        explInitialization.featureExplanation.plots.ale || null
+                      }
+                      options={
+                        explInitialization.featureExplanation.featureNames
+                      }
+                    />
+                  </Grid>
+                </Grid>
+              </>
+            )}
           </Box>
         )}
       </Grid>

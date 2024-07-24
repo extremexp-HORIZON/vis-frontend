@@ -13,32 +13,35 @@ import grey from "@mui/material/colors/grey"
 import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { fetchExplanation } from "../../../../store/slices/explainabilitySlice"
+import { AsyncThunk } from "@reduxjs/toolkit"
 
-interface ILineplot {
+interface IContourplot {
   plotModel: IPlotModel | null
   options: string[]
+  fetchFunction: AsyncThunk<any, any, any>
 }
 
-const ContourPlot = (props: ILineplot) => {
+const ContourPlot = (props: IContourplot) => {
   
-  const { plotModel, options } = props
+  const { plotModel, options, fetchFunction } = props
   const dispatch = useAppDispatch()
   const [selectedFeature1, setSelectedFeature1] = useState<string>("")
   const [selectedFeature2, setSelectedFeature2] = useState<string>("")
 
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return []
-    const data: { [x: string]: string }[] = []
+    const data: { [x: string]: string | number }[] = []
     plmodel.xAxis.axisValues.map((xval, idx) => {
       plmodel.yAxis.axisValues.map((yVal, yIdx) => {
         data.push({
-          [plmodel.xAxis.axisName]: parseFloat(xval),
-          [plmodel.yAxis.axisName]: parseFloat(yVal),
+          [plmodel.xAxis.axisName]: xval,
+          [plmodel.yAxis.axisName]: yVal,
           [plmodel.zAxis.axisName === null ? "value" : plmodel.zAxis.axisName]:
-            JSON.parse(plmodel.zAxis.axisValues[idx])[yIdx],
+            parseFloat(JSON.parse(plmodel.zAxis.axisValues[yIdx])[idx]),
         })
       })
     })
+    console.log(data)
     return data;
   }
 
@@ -49,11 +52,19 @@ const ContourPlot = (props: ILineplot) => {
     }
   }, [])
 
+  const getAxisType = (axisType: string) => {
+    if(axisType === "categorical"){
+      return "nominal"
+    }else{
+      return "quantitative"
+    }
+  }
+
   const handleFeatureSelection =
     (plmodel: IPlotModel | null, featureNumber: number) =>
     (e: { target: { value: string } }) => {
       dispatch(
-        fetchExplanation({
+        fetchFunction({
           explanationType: plmodel?.explainabilityType || "",
           explanationMethod: plmodel?.explanationMethod || "",
           model: plmodel?.explainabilityModel || "",
@@ -61,7 +72,7 @@ const ContourPlot = (props: ILineplot) => {
             featureNumber === 1 ? e.target.value : selectedFeature1 || "",
           feature2:
             featureNumber === 2 ? e.target.value : selectedFeature2 || "",
-          plotType: plmodel?.plotType || "",
+          modelId: 1,
         }),
       )
       featureNumber === 1
@@ -173,15 +184,15 @@ const ContourPlot = (props: ILineplot) => {
             data: {
               values: getVegaliteData(plotModel),
             },
-            mark: { type: "rect" },
+            mark: { type: "rect", tooltip: {content: "data"} },
             encoding: {
               x: {
                 field: plotModel?.xAxis.axisName || "xAxis default",
-                type: "ordinal",
+                type: "nominal",
               },
               y: {
                 field: plotModel?.yAxis.axisName || "yAxis default",
-                type: "ordinal",
+                type: "nominal",
               },
               color: {
                 field:
@@ -190,11 +201,7 @@ const ContourPlot = (props: ILineplot) => {
                     : plotModel?.zAxis.axisName,
                 type: "quantitative",
               },
-              tooltip: [
-                {
-                  field: "value",
-                }
-              ]
+              // tooltip: true,
             },
             config: {
               axis: { grid: true, tickBand: "extent" },

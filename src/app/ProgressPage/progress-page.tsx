@@ -61,7 +61,7 @@ const ProgressPage = () => {
             </Box>
             <Box>
               <Typography fontSize={"1rem"}>
-                {"Improve accuracy in the anomaly prediction classification"}
+                {"Description: Improve accuracy in the anomaly prediction classification"}
               </Typography>
             </Box>
           </Box>

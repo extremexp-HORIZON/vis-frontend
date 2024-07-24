@@ -9,12 +9,10 @@ import {
   IWorkflowTabModel,
   defaultWorkflowTabModel,
 } from "../../shared/models/workflow.tab.model"
-import { add } from "lodash"
-import { ICompareCompletedTab } from "../../shared/models/compare.tab.model"
-import WorkflowMetrics from "../../app/ProgressPage/WorkflowTab/workflow-metrics"
+import { explainabilityDefault, explainabilityReducers } from "../../shared/models/tasks/explainability.model"
 
-interface IWorkflowTab {
-  tabs: (IWorkflowTabModel | ICompareCompletedTab)[]
+export interface IWorkflowTab {
+  tabs: IWorkflowTabModel[]
 }
 
 const initialState: IWorkflowTab = {
@@ -30,37 +28,16 @@ export const workflowTabsSlice = createSlice({
       state.tabs = [...state.tabs, initializeTab(action.payload)]
     },
     addCompareCompletedTab: (state, action) => {
-      state.tabs = [...state.tabs, initializeCompareCompleteTab(action.payload)]
+      state.tabs = [...state.tabs, initializeCompareCompleteTab()]
     },
     deleteTab: (state, action) => {
       state.tabs = state.tabs.filter(tab => tab.workflowId !== action.payload)
     },
   },
   extraReducers: builder => {
-    // .addCase(fetchExplanation.fulfilled, (state, action) => {
-    //     state.explInitialization = handleGetExplanation(state.explInitialization, action.payload);
-    //     state.loading = "false"
-    // })
-    // .addCase(fetchExplanation.pending, (state) => {
-    //   state.loading = "true";
-    // })
-    // .addCase(fetchExplanation.rejected, (state) => {
-    //     state.loading = "false";
-    // })
+    explainabilityReducers(builder)
   },
 })
-
-//Thunk Calls for fetching data
-
-const apiPath = "api/"
-
-// export const fetchInitialization = createAsyncThunk('explainability/fetch_initialization',
-//   async (payload: {modelName: string, pipelineQuery: IDataExplorationRequest, modelInstancesQuery: IDataExplorationRequest, modelConfusionQuery: IDataExplorationRequest} ) => {
-//     const requestUrl = apiPath + "initialization";
-//     //TODO: This should be changed in order to make dynamic calls
-
-//     return axios.post<any>(requestUrl, payload).then((response) => response.data);
-// });
 
 //Managing tabs logic
 
@@ -134,21 +111,13 @@ const initializeTab = ({
   return tab
 }
 
-const initializeCompareCompleteTab = (workflows: {
-  data: { [key: string]: any }[]
-  loading: boolean
-  error: string | null
-}) => {
-  const compWorkflows = workflows.data.filter(
-    workflow => workflow.workflowInfo.status === "completed",
-  )
-
-  const tab: ICompareCompletedTab = {
+const initializeCompareCompleteTab = () => {
+  const tab: IWorkflowTabModel = {
+    ...defaultWorkflowTabModel,
     workflowId: "compare-completed",
-    completedWorkflows: compWorkflows.map(element => ({
-      workflowId: element.workflowId,
-      WorkflowMetrics: element.metrics,
-    })),
+    compareCompletedTasks: {
+      explainabilityTask: explainabilityDefault,
+    },
   }
   return tab
 }

@@ -14,14 +14,16 @@ import grey from "@mui/material/colors/grey"
 import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { fetchExplanation } from "../../../../store/slices/explainabilitySlice"
+import { AsyncThunk } from "@reduxjs/toolkit"
 
 interface ILineplot {
   plotModel: IPlotModel | null
   options: string[]
+  fetchFunction: AsyncThunk<any, any, any>
 }
 
 const LinePlot = (props: ILineplot) => {
-  const { plotModel, options } = props
+  const { plotModel, options, fetchFunction } = props
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const [selectedFeature, setSelectedFeature] = useState<string>("")
@@ -48,13 +50,13 @@ const LinePlot = (props: ILineplot) => {
     (plmodel: IPlotModel | null) =>
     (e: { target: { value: string } }) => {
       dispatch(
-        fetchExplanation({
+        fetchFunction({
           explanationType: plmodel?.explainabilityType || "",
           explanationMethod: plmodel?.explanationMethod || "",
           model: plmodel?.explainabilityModel || "",
           feature1: e.target.value || "",
           feature2: plmodel?.features.feature2 || "",
-          plotType: plmodel?.plotType || "",
+          modelId: 1,
         }),
       )
       setSelectedFeature(e.target.value)
