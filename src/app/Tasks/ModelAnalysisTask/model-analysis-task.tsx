@@ -20,6 +20,7 @@ import MultiTimeSeriesVisualizationWithCategories from "./multi-ts-visualization
 import { useLocation, useParams } from "react-router-dom"
 import InstanceClassification from "../SharedItems/Plots/instance-classification"
 import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
+import _ from "lodash"
 
 interface IFeatureExplainability {
   workflowId: number | string
@@ -40,11 +41,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (experimentId && experimentId.includes("ideko")) {
-      // if (
-      //   multipleTimeSeries.length === 0 &&
-      //   multipleTimeSeriesMetadata.length === 0
-      // ) {
+    if (experimentId === "ideko" && multipleTimeSeries.length === 0 && _.isEmpty(multipleTimeSeriesMetadata)) {
         dispatch(
           fetchMultipleTimeseries({
             dataQuery: {
@@ -64,7 +61,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           }),
         )
       }
-    // }
     if (confusionMatrix.length === 0) {
       dispatch(fetchConfusionMatrix(workflowId))
     }
@@ -72,7 +68,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
 
   return (
     <>
-      {console.log(confusionMatrix)}
       <Grid
         sx={{
           flexDirection: "column",
@@ -100,7 +95,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             <CloseIcon />
           </IconButton>
         </Box>
-        {initLoading && loading ? (
+        {initLoading || loading || confusionMatrix.length === 0 || multipleTimeSeries.length === 0 ? (
           <Box sx={{ height: "100%", width: "100%" }}>
             <CircularProgress size={"5rem"} />
             <Typography fontSize={"1.5rem"} color={grey[500]}>
