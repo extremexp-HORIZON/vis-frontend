@@ -31,7 +31,6 @@ const WorkflowTab = (props: IWorkflowTab) => {
         return null
     }
   }
-
   return (
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}>
         <Box key="workflow-svg">
@@ -111,6 +110,9 @@ const WorkflowTab = (props: IWorkflowTab) => {
                     )?.workflowMetrics.data || null
                   }
                   workflowId={workflowId}
+                  info={(
+                    workflows.data.find(workflow=>workflow.workflowId === workflowId) as any
+                  )?.workflowInfo.tasks || null}
                 />
               </Box>
             </Box>

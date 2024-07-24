@@ -8,15 +8,24 @@ interface Metric {
   value: number;
   avgDiff: number;
   avgValue: number;
+
 }
+
+interface Task {
+  taskName: string;
+  startTime: string;
+  endTime: string;
+}
+
 interface IWorkflowMetricDetails {
   metrics: Metric[] | null;
   workflowId: number | string;
+  info: Task[] | null;
 }
 
 const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
   // const metrics = ["Accuracy", "Precision", "Recall", "Runtime"]
-  const  { metrics, workflowId } = props
+  const  { metrics, workflowId,info } = props
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -28,7 +37,7 @@ const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
         </Grid>
         <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 2 }}>
-            <RuntimeDecomposition availableMetrics={metrics} workflowId={workflowId} />
+            <RuntimeDecomposition availableMetrics={metrics} workflowId={workflowId} tasks={info} />
             <MetricEvolution/>
           </Box>
         </Grid>
