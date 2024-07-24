@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } fro
 import axios from "axios";
 import type { IInitialization } from "../../shared/models/initialization.model";
 import type { IPlotModel } from "../../shared/models/plotmodel.model";
-import type { IDataExplorationRequest } from "../../shared/models/dataexploration.model";
+import { defaultDataExplorationRequest, type IDataExplorationRequest } from "../../shared/models/dataexploration.model";
 import { AddTask } from "@mui/icons-material";
 
 const handleInitialization = (payload: IInitialization) => {
@@ -65,23 +65,25 @@ const handleMultiTimeSeriesMetaData = (payload : any) => {
 }
 
 interface IExplainability {  
-    loading: string;
+    loading: boolean;
     initLoading: boolean;
     explInitialization: IInitialization | null;
     error: string | null;
     tabs: any[];
     misclassifiedInstances: any[];
+    confusionMatrix: any[];
     multipleTimeSeries: any[];
     multipleTimeSeriesMetadata: any;
 }
 
 const initialState: IExplainability = {
-    loading: "false",
+    loading: false,
     initLoading: false,
     explInitialization: null, 
     error: null,
     tabs: [],
     misclassifiedInstances: [],
+    confusionMatrix: [],
     multipleTimeSeries: [],
     multipleTimeSeriesMetadata: {},
 };
@@ -105,33 +107,33 @@ export const explainabilitySlice = createSlice({
         })
         .addCase(fetchExplanation.fulfilled, (state, action) => {
             state.explInitialization = handleGetExplanation(state.explInitialization, action.payload);
-            state.loading = "false"
+            state.loading = false
         })
-        .addCase(fetchMisclassifiedInstances.fulfilled, (state, action) => {
-            state.misclassifiedInstances = action.payload;
-            state.loading = "false"
+        .addCase(fetchConfusionMatrix.fulfilled, (state, action) => {
+            state.confusionMatrix = JSON.parse(action.payload.data);
+            state.initLoading = false
         })
         .addCase(fetchMultipleTimeseries.fulfilled, (state, action) => {
           state.multipleTimeSeries = handleMultiTimeSeriesData(action.payload);
-          state.loading = "false"
+          state.loading = false
         })
         .addCase(fetchMultipleTimeseriesMetadata.fulfilled, (state, action) => {
           state.multipleTimeSeriesMetadata = handleMultiTimeSeriesMetaData(action.payload);
-          state.loading = "false"
+          state.loading = false
         })
         .addCase(fetchMultipleTimeseriesMetadata.pending, (state, action) => {
-          state.loading = "true"
+          state.loading = true
         })
         .addCase(fetchExplanation.pending, (state) => {
-          state.loading = "true";
+          state.loading = true;
         })
         .addCase(fetchExplanation.rejected, (state) => {
-            state.loading = "false";
+            state.loading = false;
         })
-        .addMatcher(isPending(fetchInitialization, fetchMisclassifiedInstances), (state) => {
+        .addMatcher(isPending(fetchInitialization, fetchConfusionMatrix), (state) => {
             state.initLoading = true;
         })
-        .addMatcher(isRejected(fetchInitialization, fetchMisclassifiedInstances), (state) => {
+        .addMatcher(isRejected(fetchInitialization, fetchConfusionMatrix), (state) => {
             state.initLoading = false;
             state.error = "Failed to fetch data";
         })
@@ -167,17 +169,19 @@ export const fetchMultipleTimeseriesMetadata = createAsyncThunk('explainability/
     return axios.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
 });
   
-export const fetchMisclassifiedInstances = createAsyncThunk('explainability/fetch_misclassified_instances', 
-async () => {
-// TODO: make this dynamic
-// async (payload: IDataExplorationRequest) => {
+export const fetchConfusionMatrix = createAsyncThunk('explainability/fetch_misclassified_instances', 
+async (id: number | string) => {
     const payload = {
-      datasetId: "file:///home/pgidarakos/OLDIES/CSVSXXP/misclassified_instances.csv",
-      columns: [],
-      aggFunction:"ll",
-      filters: [],
-      scaler: "z",
-      limit: 10
+      ...defaultDataExplorationRequest,
+      datasetId:
+        "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
+      filters: [
+        {
+          column: "id",
+          type: "equals",
+          value: id,
+        },
+      ],
     }
     const requestUrl = apiPath + "visualization/data";
     return axios.post<any>(requestUrl, payload).then((response) => response.data);
