@@ -4,6 +4,7 @@ import type { IInitialization } from "../../shared/models/initialization.model";
 import type { IPlotModel } from "../../shared/models/plotmodel.model";
 import { defaultDataExplorationRequest, type IDataExplorationRequest } from "../../shared/models/dataexploration.model";
 import { AddTask } from "@mui/icons-material";
+import { FetchExplainabilityPlotPayload } from "../../shared/models/tasks/explainability.model";
 
 const handleInitialization = (payload: IInitialization) => {
   const newPayload = {featureExplanation: {
@@ -71,6 +72,7 @@ interface IExplainability {
     error: string | null;
     tabs: any[];
     misclassifiedInstances: any[];
+    counterfactuals: {data: IPlotModel | null, loading: boolean, error: String | null};
     confusionMatrix: any[];
     multipleTimeSeries: any[];
     multipleTimeSeriesMetadata: any;
@@ -83,6 +85,7 @@ const initialState: IExplainability = {
     error: null,
     tabs: [],
     misclassifiedInstances: [],
+    counterfactuals: {data: null, loading: false, error: null},
     confusionMatrix: [],
     multipleTimeSeries: [],
     multipleTimeSeriesMetadata: {},
@@ -113,6 +116,11 @@ export const explainabilitySlice = createSlice({
             state.confusionMatrix = JSON.parse(action.payload.data);
             state.initLoading = false
         })
+        .addCase(fetchCounterfactuals.fulfilled, (state, action) => {
+            state.counterfactuals.data = action.payload;
+            state.counterfactuals.loading = false
+            state.counterfactuals.error = null
+        })
         .addCase(fetchMultipleTimeseries.fulfilled, (state, action) => {
           state.multipleTimeSeries = handleMultiTimeSeriesData(action.payload);
           state.loading = false
@@ -129,6 +137,13 @@ export const explainabilitySlice = createSlice({
         })
         .addCase(fetchExplanation.rejected, (state) => {
             state.loading = false;
+        })
+        .addCase(fetchCounterfactuals.pending, (state) => {
+          state.counterfactuals.loading = true;
+        })
+        .addCase(fetchCounterfactuals.rejected, (state) => {
+          state.counterfactuals.loading = false;
+          state.counterfactuals.error = "Failed to fetch data";
         })
         .addMatcher(isPending(fetchInitialization, fetchConfusionMatrix), (state) => {
             state.initLoading = true;
@@ -170,11 +185,13 @@ export const fetchMultipleTimeseriesMetadata = createAsyncThunk('explainability/
 });
   
 export const fetchConfusionMatrix = createAsyncThunk('explainability/fetch_misclassified_instances', 
-async (id: number | string) => {
-    const payload = {
+async (payload: {experimentId: number | string, id: number | string}) => {
+  const { id, experimentId } = payload;
+    const request = {
       ...defaultDataExplorationRequest,
       datasetId:
-        "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
+        // `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
+        `file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv`,
       filters: [
         {
           column: "id",
@@ -184,6 +201,19 @@ async (id: number | string) => {
       ],
     }
     const requestUrl = apiPath + "visualization/data";
+    return axios.post<any>(requestUrl, request).then((response) => response.data);
+});
+
+export const fetchCounterfactuals = createAsyncThunk('explainability/fetch_counterfactuals', 
+async (payload: {
+  explanationType: string
+  explanationMethod: string
+  model: string
+  modelId: number
+  feature1: string
+  feature2: string
+}) => {
+    const requestUrl = apiPath + "explainability";
     return axios.post<any>(requestUrl, payload).then((response) => response.data);
 });
 

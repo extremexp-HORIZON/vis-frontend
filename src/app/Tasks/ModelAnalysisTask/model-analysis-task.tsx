@@ -8,6 +8,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import grey from "@mui/material/colors/grey"
 import {
   fetchConfusionMatrix,
+  fetchExplanation,
   fetchInitialization,
   fetchMultipleTimeseries,
   fetchMultipleTimeseriesMetadata,
@@ -100,7 +101,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       )
     }
     if (confusionMatrix.length === 0) {
-      dispatch(fetchConfusionMatrix(workflowId))
+      dispatch(fetchConfusionMatrix({experimentId: experimentId || "", id: workflowId}))
     }
   }, [])
 
@@ -221,14 +222,11 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               </Grid>
             )}
             <Box>
-              {point && explInitialization && (
+              {point && (
                 <CounterfactualsTable
                   key={`counterfactuals-table`}
                   point={point}
                   handleClose={() => setPoint(null)}
-                  plotModel={
-                    explInitialization.featureExplanation.tables.counterfactuals
-                  }
                 />
               )}
             </Box>
@@ -263,6 +261,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       options={
                         explInitialization.featureExplanation.featureNames
                       }
+                      fetchFunction={fetchExplanation}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -274,6 +273,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       options={
                         explInitialization.featureExplanation.featureNames
                       }
+                      fetchFunction={fetchExplanation}
                     />
                   </Grid>
                 </Grid>

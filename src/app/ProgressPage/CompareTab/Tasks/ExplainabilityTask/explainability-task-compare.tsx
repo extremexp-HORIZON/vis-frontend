@@ -14,6 +14,7 @@ import {
   fetchExplainabilityPlot,
   IExplainability,
 } from "../../../../../shared/models/tasks/explainability.model"
+import { useParams } from "react-router-dom"
 
 interface IExplainabilityTaskCompare {
   taskVariables: IExplainability
@@ -21,6 +22,7 @@ interface IExplainabilityTaskCompare {
 
 const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
   const { taskVariables } = props
+  const { experimentId } = useParams()
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const dispatch = useAppDispatch()
 

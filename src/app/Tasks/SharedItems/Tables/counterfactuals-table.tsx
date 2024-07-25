@@ -12,10 +12,13 @@ import TableCell, { tableCellClasses } from "@mui/material/TableCell"
 import TableBody from "@mui/material/TableBody"
 import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import grey from "@mui/material/colors/grey"
-import ThumbUpIcon from "@mui/icons-material/ThumbUp"
+// import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
 import Modal from "@mui/material/Modal"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect } from "react"
+import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
+import { fetchCounterfactuals } from "../../../../store/slices/explainabilitySlice"
+import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -28,7 +31,6 @@ const style = {
 };
 
 interface ITableComponent {
-  plotModel: IPlotModel | null
   children?: React.ReactNode
   point: any;
   handleClose: any;
@@ -52,13 +54,26 @@ const FixedTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 const CounterfactualsTable = (props: ITableComponent) => {
-  const { plotModel, point, handleClose } = props
+  const { point, handleClose } = props
+  const { counterfactuals } = useAppSelector((state: RootState) => state.explainability)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(fetchCounterfactuals({
+    explanationType:"hyperparameterExplanation",
+    explanationMethod:"counterfactuals",
+    model:"Ideko_model",
+    modelId: 1,
+    feature1: "",
+    feature2: ""
+    }))
+  }, [])
 
   return (
     <>
-      {console.log("counterfactuals", plotModel)}
+    {console.log(counterfactuals)}
       <Modal
-        open={point}
+        open={point !== null}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -87,10 +102,10 @@ const CounterfactualsTable = (props: ITableComponent) => {
           }}
         >
           <Typography fontSize={"1rem"} fontWeight={600}>
-            {plotModel?.plotName || "Plot name"}
+            {counterfactuals.data?.plotName || "Plot name"}
           </Typography>
           <Box sx={{ flex: 1 }} />
-          <Tooltip title={plotModel?.plotDescr || "This is a description"}>
+          <Tooltip title={counterfactuals.data?.plotDescr || "This is a description"}>
             <IconButton>
               <InfoIcon />
             </IconButton>
@@ -119,7 +134,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             >
               <TableHead>
                 <TableRow>
-                  {Object.keys(plotModel?.tableContents || {}).map(
+                  {Object.keys(counterfactuals.data?.tableContents || {}).map(
                     (key, index) => (
                       <TableCell
                         key={`table-header-${key}-${index}`}
@@ -132,23 +147,24 @@ const CounterfactualsTable = (props: ITableComponent) => {
                   <FixedTableCell
                     key="table-header-static"
                     sx={{ fontWeight: 600 }}
+                    align="center"
                   >
                     Actions
                   </FixedTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {plotModel?.tableContents[
-                  Object.keys(plotModel.tableContents)[0]
-                ].values.map((value, index) => {
+                {counterfactuals.data?.tableContents[
+                  Object.keys(counterfactuals.data?.tableContents)[0]
+                ].values.map((value: any, index: number) => {
                   return (
                     <StyledTableRow key={`table-row-${index}`}>
-                      {Object.keys(plotModel?.tableContents || {}).map(
+                      {Object.keys(counterfactuals.data?.tableContents || {}).map(
                         (key, idx) => (
                           <TableCell key={`table-cell-${key}-${index}`}>
                             {
-                              plotModel?.tableContents[
-                                Object.keys(plotModel.tableContents)[idx]
+                              counterfactuals.data?.tableContents[
+                                Object.keys(counterfactuals.data?.tableContents)[idx]
                               ].values[index]
                             }
                           </TableCell>
@@ -160,7 +176,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
                       >
                         <Tooltip title="Save Configuration">
                           <IconButton color="primary">
-                            <ThumbUpIcon />
+                            <ModelTrainingIcon />
                           </IconButton>
                         </Tooltip>
                       </FixedTableCell>
