@@ -139,14 +139,17 @@ const CounterfactualsTable = (props: ITableComponent) => {
               <TableHead>
                 <TableRow>
                   {Object.keys(counterfactuals.data?.tableContents || {}).map(
-                    (key, index) => (
+                    (key, index) => {
+                      const orderedColumn = Object.entries(counterfactuals.data?.tableContents || {}).find(([key, value]) => (value.index === index + 1))
+                      return(
                       <TableCell
                         key={`table-header-${key}-${index}`}
                         sx={{ fontWeight: 600 }}
                       >
-                        {key}
+                        {orderedColumn?.[0]}
                       </TableCell>
-                    ),
+                      )
+                    },
                   )}
                   <FixedTableCell
                     key="table-header-static"
@@ -164,15 +167,15 @@ const CounterfactualsTable = (props: ITableComponent) => {
                   return (
                     <StyledTableRow key={`table-row-${index}`}>
                       {Object.keys(counterfactuals.data?.tableContents || {}).map(
-                        (key, idx) => (
+                        (key, idx) => {
+                          const orderedColumn = Object.entries(counterfactuals.data?.tableContents || {}).find(([key, value]) => (value.index === idx + 1))
+                          return(
                           <TableCell key={`table-cell-${key}-${index}`}>
                             {
-                              counterfactuals.data?.tableContents[
-                                Object.keys(counterfactuals.data?.tableContents)[idx]
-                              ].values[index]
+                              orderedColumn?.[1].values[index]
                             }
                           </TableCell>
-                        ),
+                        )},
                       )}
                       <FixedTableCell
                         key={`table-cell-static-${index}`}

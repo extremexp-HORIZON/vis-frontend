@@ -20,4 +20,5 @@ export interface IPlotModel {
 
   interface IValues {
     values: string[];
+    index: number;
   }
