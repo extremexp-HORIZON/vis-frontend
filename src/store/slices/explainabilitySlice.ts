@@ -73,7 +73,7 @@ interface IExplainability {
     tabs: any[];
     misclassifiedInstances: any[];
     counterfactuals: {data: IPlotModel | null, loading: boolean, error: String | null};
-    confusionMatrix: any[];
+    confusionMatrix: {[key: string]: any}[];
     multipleTimeSeries: any[];
     multipleTimeSeriesMetadata: any;
 }
@@ -190,8 +190,7 @@ async (payload: {experimentId: number | string, id: number | string}) => {
     const request = {
       ...defaultDataExplorationRequest,
       datasetId:
-        // `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
-        `file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv`,
+        `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
       filters: [
         {
           column: "id",

@@ -100,9 +100,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         }),
       )
     }
-    if (confusionMatrix.length === 0) {
+    // if (confusionMatrix.length === 0) {
       dispatch(fetchConfusionMatrix({experimentId: experimentId || "", id: workflowId}))
-    }
+    // }
   }, [])
 
   return (

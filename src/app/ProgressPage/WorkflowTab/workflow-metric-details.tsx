@@ -38,7 +38,7 @@ const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
         <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 2 }}>
             <RuntimeDecomposition availableMetrics={metrics} workflowId={workflowId} tasks={info} />
-            <MetricEvolution/>
+            {/* <MetricEvolution/> */}
           </Box>
         </Grid>
       </Grid>

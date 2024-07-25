@@ -110,16 +110,8 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
             >
               {/* <Box sx={{ display: "flex", gap: 4, flexFlow: "wrap" }}> */}
               <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <ContourPlot
-                    key={`2dpdp-plot`}
-                    plotModel={taskVariables["2dpdp"].data}
-                    options={taskVariables.hyperparametersNames}
-                    fetchFunction={fetchExplainabilityPlot}
-                  />
-                </Grid>
-                <Grid container item xs={12} md={6} spacing={2}>
-                  <Grid item xs={12}>
+                <Grid container item xs={12} md={12} spacing={2}>
+                  <Grid item xs={12} md={6}>
                     <LinePlot
                       key={`pdp-plot`}
                       plotModel={taskVariables.pdp.data}
@@ -127,7 +119,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                       fetchFunction={fetchExplainabilityPlot}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} md={6}>
                     <LinePlot
                       key={`ale-plot`}
                       plotModel={taskVariables.ale.data}
@@ -135,6 +127,14 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                       fetchFunction={fetchExplainabilityPlot}
                     />
                   </Grid>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <ContourPlot
+                    key={`2dpdp-plot`}
+                    plotModel={taskVariables["2dpdp"].data}
+                    options={taskVariables.hyperparametersNames}
+                    fetchFunction={fetchExplainabilityPlot}
+                  />
                 </Grid>
               </Grid>
             </Box>

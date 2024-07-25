@@ -124,6 +124,7 @@ const LinePlot = (props: ILineplot) => {
           style={{ width: "90%" }}
           spec={{
             width: "container",
+            height: 300,
             autosize: { type: "fit", contains: "padding", resize: true },
             data: {
               values: getVegaliteData(plotModel),

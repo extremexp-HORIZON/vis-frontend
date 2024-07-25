@@ -24,6 +24,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
     setSelectedMetrics(newValue);
   };
   
+  window.dispatchEvent(new Event('resize'))
  
   const radarData = selectedMetrics.map(metric => ({
     key: metric.name,
@@ -64,7 +65,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
       </Box>
  
      
-      <Box sx={{ px: 1, py: 1, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ px: 1, py: 2, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', justifyContent: 'center', flex: 1 }}>
  
           {availableMetrics && (
             
@@ -80,12 +81,11 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
         )}
           <VegaLite
             actions={false}
-            style={{ width: "100%", flexGrow: 1 }}
+            style={{ width: "max-content" }}
             spec={{
-              width: 550,
+              width: 500,
               height: 500,
-              padding: 0,
-              autosize: { type: "none", contains: "padding", resize: true },
+              autosize: { type: "none", contains: "padding" },
               signals: [{ name: "radius", update: "width / 2" }],
               data: [
                 {

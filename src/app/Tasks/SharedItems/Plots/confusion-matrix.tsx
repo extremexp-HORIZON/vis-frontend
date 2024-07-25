@@ -18,18 +18,25 @@ const ConfusionMatrix = (props: ILineplot) => {
   const [plotData, setPlotData] = useState<any>(null)
 
   useEffect(() => {
-    if (metrics) {
-      const filteredData = metrics.filter(
-        (plot: any) => plot.id === workflowId,
-      )[0]
-      setPlotData([
-        { actual: 1, predicted: 1, count: filteredData.true_positives },
-        { actual: 1, predicted: 0, count: filteredData.true_negatives },
-        { actual: 0, predicted: 1, count: filteredData.false_positives },
-        { actual: 0, predicted: 0, count: filteredData.false_negatives },
-      ])
+    if (metrics.length > 0) {
+      const matrix = metrics[0]
+      const formattedData: any = []
+
+      Object.keys(matrix).forEach(key => {
+        if (key.startsWith('tp') || key.startsWith('fp')) {
+          const actual = parseInt(key[2])
+          const predicted = parseInt(key[3])
+          formattedData.push({
+            actual,
+            predicted,
+            count: matrix[key]
+          })
+        }
+      })
+
+      setPlotData(formattedData)
     }
-  }, [])
+  }, [metrics])
 
   return (
     <Paper

@@ -176,7 +176,7 @@ const ContourPlot = (props: IContourplot) => {
       <Box sx={{ width: "99%", px: 2, flex: 1 }}>
         <Vega
           actions={false}
-          style={{ width: "95%", height: 500 }}
+          style={{ width: "95%", height: 400 }}
           spec={{
             width: "container",
             height: "container",
