@@ -19,6 +19,7 @@ import { Dispatch, SetStateAction, useEffect } from "react"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
 import { fetchCounterfactuals } from "../../../../store/slices/explainabilitySlice"
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
+import CircularProgress from "@mui/material/CircularProgress"
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -122,6 +123,9 @@ const CounterfactualsTable = (props: ITableComponent) => {
             p: 1,
           }}
         >
+          {counterfactuals.loading ? <Box sx={{width: 650, height: 300, display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <CircularProgress sx={{fontSize: "2rem"}} />
+          </Box> : 
           <TableContainer
             component={Paper}
             sx={{ width: "99%", overflowX: "auto" }}
@@ -185,7 +189,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
                 })}
               </TableBody>
             </Table>
-          </TableContainer>
+          </TableContainer>}
         </Box>
       </Paper>
       </Modal>

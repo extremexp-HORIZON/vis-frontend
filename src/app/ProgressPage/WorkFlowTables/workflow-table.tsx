@@ -21,7 +21,10 @@ import ToolbarWorkflow from "./toolbar-workflow-table"
 import { Popover, styled, useTheme } from "@mui/material"
 import type { RootState } from "../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
-import { addCompareCompletedTab, addTab } from "../../../store/slices/workflowTabsSlice"
+import {
+  addCompareCompletedTab,
+  addTab,
+} from "../../../store/slices/workflowTabsSlice"
 import FilterBar from "./filter-bar"
 import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
 import { grey } from "@mui/material/colors"
@@ -91,10 +94,11 @@ export interface Column {
   align?: "right" | "left" | "center" | "inherit" | "justify" | undefined
   numeric?: boolean
   sortable?: boolean
+  constraint?: boolean
   // format?: (value: number) => string;
 }
 
-let columns: Column[] = [];
+let columns: Column[] = []
 
 export interface Data {
   [key: string]: any
@@ -123,30 +127,52 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   useEffect(() => {
     if (workflows.data.length > 0) {
       //find unique parameters of each workflow -> model traning task
-      const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
+      const uniqueParameters = new Set(
+        workflows.data.reduce(
+          (acc: any[], workflow) => [
+            ...acc,
+            ...Object.keys(
+              workflow.variabilityPoints["Model Training"].Parameters,
+            ),
+          ],
+          [],
+        ),
+      )
 
       const rows = workflows.data
-      .filter(workflow => workflow.workflowInfo.status !== "scheduled")
-      .map(workflow => ({
-        id: idCounter++,
-        workflowId: workflow.workflowId,
-        "Train Model": workflow.variabilityPoints["Model Training"].Variant,
-        ...Array.from(uniqueParameters).reduce((acc, variant) => {
-          acc[variant] = workflow.variabilityPoints["Model Training"].Parameters[variant] || ""
-          return acc
-        }, {}),
-        status: workflow.workflowInfo.status === "running" ? workflow.workflowInfo.completedTasks ?? "running" : workflow.workflowInfo.status,
-        "runtime < 3s": Object.values(workflow.constraints).every((value: any) => value === true),
-        action: ""
-      }))
-      columns = Object.keys(rows[0]).filter(key => key !== "id").map(key => ({
-        id: key,
-        label: key,
-        minWidth: key === "action" ? 100 : 50,
-        numeric: typeof rows[0][key] === "number" ? true : false,
-        align: "center",
-        sortable: key !== "action" ? true : false,
-      }))
+        .filter(workflow => workflow.workflowInfo.status !== "scheduled")
+        .map(workflow => ({
+          id: idCounter++,
+          workflowId: workflow.workflowId,
+          "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+          ...Array.from(uniqueParameters).reduce((acc, variant) => {
+            acc[variant] =
+              workflow.variabilityPoints["Model Training"].Parameters[
+                variant
+              ] || ""
+            return acc
+          }, {}),
+          status:
+            workflow.workflowInfo.status === "running"
+              ? workflow.workflowInfo.completedTasks ?? "running"
+              : workflow.workflowInfo.status,
+          ...Object.keys(workflow.constraints)
+            .map(key => ({ [key]: workflow.constraints[key] }))
+            .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+          action: "",
+        }))
+        const constrainsNames = Object.keys(workflows.data[0].constraints)
+      columns = Object.keys(rows[0])
+        .filter(key => key !== "id")
+        .map(key => ({
+          id: key,
+          label: key,
+          minWidth: key === "action" ? 100 : 50,
+          numeric: typeof rows[0][key] === "number" ? true : false,
+          align: "center",
+          sortable: key !== "action" ? true : false,
+          constraint: constrainsNames.includes(key) ? true : false
+        }))
       paramlength = uniqueParameters.size
       dispatch(setProgressWokflowsTable({ rows, filteredRows: rows }))
     }
@@ -159,15 +185,16 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
     if (tabs.find(tab => tab.workflowId === workflowId)) return
-    dispatch(addTab({workflowId, workflows}))
+    dispatch(addTab({ workflowId, workflows }))
     handleChange(workflowId)(e)
   }
-  
-  const handleLaunchCompletedTab = (workflowId: any) => (e: React.SyntheticEvent) => {
-    if (tabs.find(tab => tab.workflowId === workflowId)) return
-    dispatch(addCompareCompletedTab(workflows))
-    handleChange(workflowId)(e)
-  }
+
+  const handleLaunchCompletedTab =
+    (workflowId: any) => (e: React.SyntheticEvent) => {
+      if (tabs.find(tab => tab.workflowId === workflowId)) return
+      dispatch(addCompareCompletedTab(workflows))
+      handleChange(workflowId)(e)
+    }
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -318,39 +345,40 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   ])
 
   return (
-      <Box>
-        <Paper elevation={2}>
-          <ToolbarWorkflow
-            actionButtonName="Compare selected workflows"
-            secondActionButtonName="Compare completed workflows"
-            tableName="Workflow Execution"
-            numSelected={progressWokflowsTable.selectedWorkflows.length}
-            filterNumbers={progressWokflowsTable.filtersCounter}
-            filterClickedFunction={filterClicked}
-            handleClickedFunction={handleLaunchCompletedTab}
-          />
-          <Popover
-            id={"Filters"}
-            open={isFilterOpen}
-            anchorEl={anchorEl}
-            onClose={() => setFilterOpen(false)}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-          >
-            <Box sx={{ p: 2 }}>
-              <FilterBar
-                columns={columns}
-                filters={progressWokflowsTable.filters}
-                onFilterChange={handleFilterChange}
-                onAddFilter={handleAddFilter}
-                onRemoveFilter={handleRemoveFilter}
-              />
-            </Box>
-          </Popover>
+    <Box>
+      <Paper elevation={2}>
+        <ToolbarWorkflow
+          actionButtonName="Compare selected workflows"
+          secondActionButtonName="Compare completed workflows"
+          tableName="Workflow Execution"
+          numSelected={progressWokflowsTable.selectedWorkflows.length}
+          filterNumbers={progressWokflowsTable.filtersCounter}
+          filterClickedFunction={filterClicked}
+          handleClickedFunction={handleLaunchCompletedTab}
+        />
+        <Popover
+          id={"Filters"}
+          open={isFilterOpen}
+          anchorEl={anchorEl}
+          onClose={() => setFilterOpen(false)}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <FilterBar
+              columns={columns}
+              filters={progressWokflowsTable.filters}
+              onFilterChange={handleFilterChange}
+              onAddFilter={handleAddFilter}
+              onRemoveFilter={handleRemoveFilter}
+            />
+          </Box>
+        </Popover>
 
-          {columns.length > 0 && <TableContainer sx={{ maxHeight: 440 }}>
+        {columns.length > 0 && (
+          <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table">
               <EnhancedTableHead
                 columns={columns}
@@ -391,99 +419,103 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                       {columns.map(column => {
                         let value: string
                         const currentStatus = row.status
-                        switch (column.id) {
-                          case "runtime < 3s":
-                            value = String(row[column.id])
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {value === "true" ? (
-                                  <CheckIcon style={{ color: "green" }} />
-                                ) : (
-                                  <CloseIcon style={{ color: "red" }} />
-                                )}
-                              </TableCell>
-                            )
-                          case "status":
-                            value = row[column.id]
-                            return (
-                              <TableCell
-                                key={column.id}
-                                align={column.align}
-                                sx={{
-                                  color: theme => theme.palette.customGrey.text,
-                                }}
-                              >
-                                <ProgressPercentage
-                                  progressNumber={fractionStrToDecimal(value)}
-                                />
-                              </TableCell>
-                            )
-                          case "action":
-                            return (
-                              <FixedTableCell
-                                key={column.id}
-                                align={column.align}
-                                sx={{
-                                  color: theme => theme.palette.customGrey.text,
-                                }}
-                              >
-                                <LaunchIcon
-                                  onClick={
-                                    currentStatus !== "completed"
-                                      ? () => {}
-                                      : handleLaunchNewTab(row.workflowId)
-                                  } // TODO: Change to row.id or row.workflowId when tabs are fully implemented
+                        if (column.constraint) {
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {Boolean(row[column.id]) ? (
+                                <CheckIcon style={{ color: "green" }} />
+                              ) : (
+                                <CloseIcon style={{ color: "red" }} />
+                              )}
+                            </TableCell>
+                          )
+                        } else {
+                          switch (column.id) {
+                            case "status":
+                              value = row[column.id]
+                              return (
+                                <TableCell
+                                  key={column.id}
+                                  align={column.align}
                                   sx={{
-                                    cursor:
-                                      currentStatus !== "completed"
-                                        ? "default"
-                                        : "pointer",
+                                    color: theme =>
+                                      theme.palette.customGrey.text,
                                   }}
-                                  style={{
-                                    color:
-                                      currentStatus !== "completed"
-                                        ? theme.palette.action.disabled
-                                        : theme.palette.primary.main,
+                                >
+                                  <ProgressPercentage
+                                    progressNumber={fractionStrToDecimal(value)}
+                                  />
+                                </TableCell>
+                              )
+                            case "action":
+                              return (
+                                <FixedTableCell
+                                  key={column.id}
+                                  align={column.align}
+                                  sx={{
+                                    color: theme =>
+                                      theme.palette.customGrey.text,
                                   }}
-                                />
-                                {currentStatus !== "completed" &&
-                                  currentStatus !== "failed" && (
-                                    <span>
-                                      <PauseIcon
-                                        sx={{ cursor: "pointer" }}
-                                        onClick={() => console.log("clicked")}
-                                        style={{
-                                          color: theme.palette.primary.main,
-                                        }}
-                                      />
+                                >
+                                  <LaunchIcon
+                                    onClick={
+                                      currentStatus !== "completed"
+                                        ? () => {}
+                                        : handleLaunchNewTab(row.workflowId)
+                                    } // TODO: Change to row.id or row.workflowId when tabs are fully implemented
+                                    sx={{
+                                      cursor:
+                                        currentStatus !== "completed"
+                                          ? "default"
+                                          : "pointer",
+                                    }}
+                                    style={{
+                                      color:
+                                        currentStatus !== "completed"
+                                          ? theme.palette.action.disabled
+                                          : theme.palette.primary.main,
+                                    }}
+                                  />
+                                  {currentStatus !== "completed" &&
+                                    currentStatus !== "failed" && (
+                                      <span>
+                                        <PauseIcon
+                                          sx={{ cursor: "pointer" }}
+                                          onClick={() => console.log("clicked")}
+                                          style={{
+                                            color: theme.palette.primary.main,
+                                          }}
+                                        />
 
-                                      <StopIcon
-                                        sx={{ cursor: "pointer" }}
-                                        onClick={() => console.log("clicked")}
-                                        style={{
-                                          color: theme.palette.primary.main,
-                                        }}
-                                      />
-                                      {/* </Button> */}
-                                    </span>
-                                  )}
-                              </FixedTableCell>
-                            )
+                                        <StopIcon
+                                          sx={{ cursor: "pointer" }}
+                                          onClick={() => console.log("clicked")}
+                                          style={{
+                                            color: theme.palette.primary.main,
+                                          }}
+                                        />
+                                        {/* </Button> */}
+                                      </span>
+                                    )}
+                                </FixedTableCell>
+                              )
 
-                          default:
-                            value = String(row[column.id])
+                            default:
+                              value = String(row[column.id])
 
-                            return (
-                              <TableCell
-                                key={column.id}
-                                align={column.align}
-                                sx={{
-                                  color: theme => theme.palette.customGrey.text,
-                                }}
-                              >
-                                {value}
-                              </TableCell>
-                            )
+                              return (
+                                <TableCell
+                                  key={column.id}
+                                  align={column.align}
+                                  sx={{
+                                    color: theme =>
+                                      theme.palette.customGrey.text,
+                                  }}
+                                >
+                                  {value}
+                                </TableCell>
+                              )
+                          }
                         }
                       })}
                     </TableRow>
@@ -491,19 +523,20 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                 })}
               </TableBody>
             </Table>
-          </TableContainer>}
-          {progressWokflowsTable.filteredRows.length > 5 && (
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={progressWokflowsTable.filteredRows.length}
-              rowsPerPage={progressWokflowsTable.rowsPerPage}
-              page={progressWokflowsTable.page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          )}
-        </Paper>
-      </Box>
+          </TableContainer>
+        )}
+        {progressWokflowsTable.filteredRows.length > 5 && (
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={progressWokflowsTable.filteredRows.length}
+            rowsPerPage={progressWokflowsTable.rowsPerPage}
+            page={progressWokflowsTable.page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        )}
+      </Paper>
+    </Box>
   )
 }
