@@ -482,7 +482,6 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
              key={`counterfactuals-table`}
              point={selectedSeries}
              handleClose={handleCounterfactualsClose}
-             plotModel={null}
            />
            )}
         </Box>
