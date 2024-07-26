@@ -1,4 +1,4 @@
-import React, { useMemo,  useState } from 'react';
+import React, { useEffect, useMemo,  useState } from 'react';
 import { Box, MenuItem, Paper, Select, tabClasses, Tooltip, Typography } from '@mui/material';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import ChartControls from './ChartControls';
@@ -31,7 +31,10 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
   const [xAxis, setXAxis] = useState(columns[columns.length - 1].field);
   const [yAxis, setYAxis] = useState([columns[0].field]);
   const [aggFunction, setAggFunction] = useState<'None' | 'Min' | 'Max' | 'Mean'|'Sum'>('None');
-
+  const [category, setCategory] = useState('');
+  const [colorBy, setColorBy] = useState('None');
+  
+  
 
 
   const getVegaLiteType = (type: string) => {
@@ -40,9 +43,21 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
       return 'quantitative';
     return 'nominal'; // default to nominal if type is not recognized
   };
+
+  const xAxisType = useMemo(() => getVegaLiteType(columns.find(column => column.field === xAxis)?.type || 'nominal'), [xAxis, columns]);
+  useEffect(() => {
+    if (xAxisType === 'nominal') {
+      setChartType('bar');
+    }else if (xAxisType === 'temporal') {
+      setChartType('line');
+    }
+  }, [xAxisType]);
+
   const spec = useMemo(() => {
     const xAxisType = getVegaLiteType(columns.find(column => column.field === xAxis)?.type || 'nominal');
     const yAxisType = getVegaLiteType(columns.find(column => column.field === yAxis[0])?.type || 'quantitative');
+    console.log('xAxisType',xAxisType);
+    console.log('yAxisType',yAxisType);
     const baseTransform = [
       {
         fold: yAxis,
@@ -50,10 +65,8 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
       }
     ];
 
-    
-
-    // const finalTransform = [...baseTransform,];
-    const aggregationTransform = aggFunction !== 'None' ? [
+    const applyAggregation = chartType !== 'heatmap' && aggFunction !== 'None';
+    const aggregationTransform = applyAggregation ? [
       {
         aggregate: [{
           op: aggFunction.toLowerCase(), // 'min', 'max', 'avg'
@@ -80,8 +93,8 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
                 { type: "point", tooltip: true },
                 encoding: {
                   x: { field: xAxis, type: xAxisType },
-                  y: { field: aggFunction !== 'None' ? "aggregated_value" : "value", type: yAxisType, title: "Value", stack: mode === 'stack' ? 'zero' : null },
-                  color: { field: "variable", type: "nominal", title: "Variable" },
+                  y: { field:applyAggregation ? "aggregated_value" : "value", type: yAxisType, title: "Value", stack: mode === 'stack' ? 'zero' : null },
+                  color: colorBy && colorBy !== "None" && chartType === 'heatmap' ? { field: colorBy, type: getVegaLiteType(columns.find(column => column.field === colorBy)?.type || 'nominal'), title: colorBy } : { field: "variable", type: "nominal", title: "Variable" },
                   tooltip: [
                     { field: "variable", type: "nominal" },
                     { field: aggFunction !== 'None' ? "aggregated_value" : "value", type: "quantitative" }
@@ -124,7 +137,7 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
         vconcat: stackedCharts
       };
     }
-  }, [data, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable,aggFunction]);
+  }, [data, chartType, mode, yAxis, xAxis,zoomable,aggFunction,colorBy]);
 
 
   const handleRollingAverageToggle = () => {
@@ -165,10 +178,12 @@ const Testing: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeC
         setXAxis={setXAxis}
         yAxis={yAxis}
         setYAxis={setYAxis} aggFunction={aggFunction} setAggFunction={setAggFunction}
-         category={''} setCategory={function (category: string): void {
+        category={''} 
+        setCategory={function (category: string): void {
           throw new Error('Function not implemented.');
-        } }  
-              />
+        } } 
+        colorBy={colorBy} 
+        setColorBy={setColorBy}              />
             
         <Box sx={{ width: "99%", px: 1 }}>
           <VegaLite

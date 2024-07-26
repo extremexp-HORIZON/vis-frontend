@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Checkbox, FormControl, ListItemText, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
+import { Box, Button, Checkbox, collapseClasses, FormControl, ListItemText, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import ChartButtonGroup from './ChartButtonGroup';
 
 interface Column {
@@ -29,6 +29,8 @@ setChartType: (chartType: 'line' | 'area' | 'heatmap' | 'bar') => void
     setAggFunction: (aggFunction: 'None' | 'Min' | 'Max' | 'Mean'| 'Sum') => void;
     category: string;
     setCategory: (category: string) => void;
+    colorBy: string;
+    setColorBy: (colorBy: string) => void;
 }
 
 const ChartControls: React.FC<ChartControlsProps> = ({
@@ -51,6 +53,8 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     setAggFunction,
     category,
     setCategory,
+    colorBy,
+    setColorBy
 }) => {
     const handleXAxisChange = (event: SelectChangeEvent<string>) => {
         setXAxis(event.target.value as string);
@@ -67,6 +71,9 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCategory(event.target.value);
     };
+    const handleColorByChange = (event: SelectChangeEvent<string>) => {
+        setColorBy(event.target.value as string);
+    }
 
     let additionalControl = null;
 
@@ -82,13 +89,34 @@ const ChartControls: React.FC<ChartControlsProps> = ({
         );
     } else if (chartType === 'heatmap') {
         additionalControl = (
-            <TextField
-                label="Color By"
-                value={category}
-                onChange={handleCategoryChange}
-                sx={{ m: 1, minWidth: 120 }}
+            <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+                <Typography fontSize={"0.8rem"}>Color by:</Typography>
+                <FormControl
+                sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
                 size="small"
-            />
+                >
+                    <Select
+                        value={colorBy}
+                        onChange={handleColorByChange}
+                        sx={{ fontSize: "0.8rem" }}
+                        MenuProps={{
+                            PaperProps: {
+                            style: {
+                                maxHeight: 250,
+                                maxWidth: 300,
+                            },
+                            },
+                        }}
+                    >
+                        <MenuItem value="None">None</MenuItem> 
+                        {availableColumns.map((column) => (
+                            <MenuItem key={column.field} value={column.field}>
+                                {column.headerName}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
         );
     }
     return (
@@ -152,7 +180,8 @@ const ChartControls: React.FC<ChartControlsProps> = ({
                     </FormControl>
                 </Box>
 
-                <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+                {chartType!=='heatmap' &&(<Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+                    
                     <Typography fontSize={"0.8rem"}>grouping function:</Typography>
                     <FormControl
                         sx={{ m: 1, minWidth: 120 }}
@@ -179,9 +208,10 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 
                         </Select>
                     </FormControl>
-                    {additionalControl}
+                    
 
-                </Box>
+                </Box>)}
+                {additionalControl}
         </Box>
             {/* <Button variant={showRollingAverage ? 'contained' : 'outlined'} onClick={handleRollingAverageToggle}  
                 sx={{ ml: 2 }}
