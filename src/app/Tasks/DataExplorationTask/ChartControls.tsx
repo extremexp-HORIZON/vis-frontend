@@ -27,8 +27,6 @@ setChartType: (chartType: 'line' | 'area' | 'heatmap' | 'bar') => void
     setYAxis: (columns: string[]) => void;
     aggFunction: 'None' | 'Min' | 'Max' | 'Mean'| 'Sum'; // Initialize with 'None'
     setAggFunction: (aggFunction: 'None' | 'Min' | 'Max' | 'Mean'| 'Sum') => void;
-    category: string;
-    setCategory: (category: string) => void;
     colorBy: string;
     setColorBy: (colorBy: string) => void;
 }
@@ -51,8 +49,6 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     setYAxis,
     aggFunction,
     setAggFunction,
-    category,
-    setCategory,
     colorBy,
     setColorBy
 }) => {
@@ -68,26 +64,21 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     const handleAggFunctionChange = (event: SelectChangeEvent<string>) => {
         setAggFunction(event.target.value as 'None' | 'Min' | 'Max' | 'Mean'|'Sum');
     };
-    const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setCategory(event.target.value);
-    };
+    
     const handleColorByChange = (event: SelectChangeEvent<string>) => {
         setColorBy(event.target.value as string);
     }
 
+    const getAxisLabel = (axis: string, isXAxis: boolean) => {
+        if (chartType === 'bar') {
+            return isXAxis ? 'category' : 'value';
+        }
+        return axis;
+    };
+
     let additionalControl = null;
 
-    if (chartType === 'bar') {
-        additionalControl = (
-            <TextField
-                label="Category"
-                value={category}
-                onChange={handleCategoryChange}
-                sx={{ m: 1, minWidth: 120 }}
-                size="small"
-            />
-        );
-    } else if (chartType === 'heatmap') {
+    if (chartType === 'heatmap') {
         additionalControl = (
             <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
                 <Typography fontSize={"0.8rem"}>Color by:</Typography>
@@ -123,8 +114,8 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     <Box sx={{ width: "90%", px: 1, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: "flex", flexWrap: "wrap" }}>
             <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
-                <Typography fontSize={"0.8rem"}>x-axis:</Typography>
-                <FormControl
+            <Typography fontSize={"0.8rem"}>{getAxisLabel('x-axis', true)}:</Typography>
+            <FormControl
                 sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
                 size="small"
                 >
@@ -150,8 +141,8 @@ const ChartControls: React.FC<ChartControlsProps> = ({
                 </FormControl>
             </Box>
                 <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
-                    <Typography fontSize={"0.8rem"}>y-axis:</Typography>
-                    <FormControl
+                <Typography fontSize={"0.8rem"}>{getAxisLabel('y-axis', false)}:</Typography>
+                <FormControl
                     sx={{ m: 1, minWidth: 120,width:200 }}
                     size="small">
                         <Select

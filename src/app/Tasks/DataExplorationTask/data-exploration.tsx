@@ -71,7 +71,6 @@ const DataExploration: React.FC = () => {
 
     }
   }, [filters,experimentId,dispatch]);
-console.log('data',dataExploration)
   useEffect(() => {
     if (dataExploration) {
       const parsedData = JSON.parse(dataExploration.data);
@@ -179,11 +178,10 @@ console.log('data',dataExploration)
               <>
                 {error && <Typography color="error">Error: {error}</Typography>}
                 <Testing
-                      data={originalData}
-                      columns={columns}
-                      datetimeColumn={datetimeColumn}
-                      selectedColumns={selectedCols}
-                  />
+                        data={originalData}
+                        columns={columns}
+                        datetimeColumn={datetimeColumn} 
+                        />
               </>
             )}
           </Grid>
