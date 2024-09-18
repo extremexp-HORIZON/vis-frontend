@@ -68,6 +68,7 @@ const handleMultiTimeSeriesMetaData = (payload : any) => {
 interface IExplainability {  
     loading: boolean;
     initLoading: boolean;
+    confMatrixLoading: boolean;
     explInitialization: IInitialization | null;
     error: string | null;
     tabs: any[];
@@ -81,6 +82,7 @@ interface IExplainability {
 const initialState: IExplainability = {
     loading: false,
     initLoading: false,
+    confMatrixLoading: false,
     explInitialization: null, 
     error: null,
     tabs: [],
@@ -114,7 +116,7 @@ export const explainabilitySlice = createSlice({
         })
         .addCase(fetchConfusionMatrix.fulfilled, (state, action) => {
             state.confusionMatrix = JSON.parse(action.payload.data);
-            state.initLoading = false
+            state.confMatrixLoading = false
         })
         .addCase(fetchCounterfactuals.fulfilled, (state, action) => {
             state.counterfactuals.data = action.payload;
@@ -145,11 +147,18 @@ export const explainabilitySlice = createSlice({
           state.counterfactuals.loading = false;
           state.counterfactuals.error = "Failed to fetch data";
         })
-        .addMatcher(isPending(fetchInitialization, fetchConfusionMatrix), (state) => {
+        .addCase(fetchInitialization.pending, (state) => {
             state.initLoading = true;
         })
-        .addMatcher(isRejected(fetchInitialization, fetchConfusionMatrix), (state) => {
+        .addCase(fetchConfusionMatrix.pending, (state) => {
+            state.confMatrixLoading = true;
+        })
+        .addCase(fetchInitialization.rejected, (state) => {
             state.initLoading = false;
+            state.error = "Failed to fetch data";
+        })
+        .addCase(fetchConfusionMatrix.rejected, (state) => {
+            state.confMatrixLoading = false;
             state.error = "Failed to fetch data";
         })
     }

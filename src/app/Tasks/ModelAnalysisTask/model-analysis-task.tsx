@@ -34,6 +34,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
     multipleTimeSeriesMetadata,
     confusionMatrix,
     initLoading,
+    confMatrixLoading,
     loading,
   } = useAppSelector(state => state.explainability)
   const { experimentId } = useParams()
@@ -88,7 +89,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           modelConfusionQuery: {
             ...defaultDataExplorationRequest,
             datasetId:
-              "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
+            "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
             filters: [
               {
                 column: "id",
@@ -107,6 +108,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
 
   return (
     <>
+    {console.log(confusionMatrix)}
       <Grid
         sx={{
           flexDirection: "column",
@@ -134,10 +136,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             <CloseIcon />
           </IconButton>
         </Box>
-        {initLoading ||
-        loading ||
-        confusionMatrix.length === 0 ||
-        multipleTimeSeries.length === 0 ? (
+        {(initLoading || confMatrixLoading) || 
+        (experimentId === "ideko" &&
+        (loading || multipleTimeSeries.length === 0)) ? (
           <Box sx={{ height: "100%", width: "100%" }}>
             <CircularProgress size={"5rem"} />
             <Typography fontSize={"1.5rem"} color={grey[500]}>
@@ -211,8 +212,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       <ConfusionMatrix
                         key={`confusion-matrix`}
                         metrics={
-                          explInitialization.hyperparameterExplanation
-                            .pipelineMetrics
+                          confusionMatrix
                         }
                         workflowId={workflowId}
                       />

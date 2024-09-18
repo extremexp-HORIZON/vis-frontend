@@ -39,6 +39,8 @@ const ConfusionMatrix = (props: ILineplot) => {
   }, [metrics])
 
   return (
+    <>
+    {console.log(plotData)}
     <Paper
       className="Category-Item"
       elevation={2}
@@ -120,6 +122,7 @@ const ConfusionMatrix = (props: ILineplot) => {
         />
       </Box>
     </Paper>
+    </>
   )
 }
 
