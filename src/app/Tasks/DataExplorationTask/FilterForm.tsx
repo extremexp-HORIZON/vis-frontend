@@ -42,7 +42,7 @@ const FilterForm: React.FC<IFilterFormProps> = ({ columns, onAddFilter, onRemove
   const handleAddFilter = () => {
     let value = {};
     if (filterType === 'equals') {
-      value = { value: filterValue };
+      value =  filterValue ? filterValue : '';
     } else if (filterType === 'range') {
       if (filterMin && filterMax) {
         value = { min: filterMin, max: filterMax };
