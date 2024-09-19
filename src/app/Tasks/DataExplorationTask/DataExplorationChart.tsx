@@ -1,9 +1,8 @@
-import type React from 'react';
-import { useMemo,  useState } from 'react';
-import { Box, Paper, Tooltip, Typography } from '@mui/material';
-import type { VisualizationSpec } from 'react-vega';
-import { VegaLite } from 'react-vega';
+import React, { useEffect, useMemo,  useState } from 'react';
+import { Box, MenuItem, Paper, Select, tabClasses, Tooltip, Typography } from '@mui/material';
+import { VegaLite, VisualizationSpec } from 'react-vega';
 import ChartControls from './ChartControls';
+import { transform } from 'lodash';
 
 
 interface Column {
@@ -12,34 +11,28 @@ interface Column {
   width: number;
   type: string;
 }
-
 interface DataExplorationChartProps {
   data: any[];
   columns: Column[];
   datetimeColumn: string;
-  selectedColumns: string[],
 }
 
-const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeColumn }) => {
-  const selectableColumns = columns.filter(column => column.field !== datetimeColumn);
-  console.log('colsdialge',selectableColumns);
+const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, columns, datetimeColumn, }) => {
+ 
   const [mode, setMode] = useState<'overlay' | 'stack'>('overlay');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
   const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'heatmap'>('line');
   const [showStatistics, setShowStatistics] = useState(false);
   const [zoomable, setZoomable] = useState<'yes' | 'no'>('yes'); // State for zoomable toggle
   const [showRollingAverage, setShowRollingAverage] = useState(false); // State for rolling average
   const [rollingAverageWindow, setRollingAverageWindow] = useState(7); // Rolling average window size
-  const [xAxis, setXAxis] = useState(columns[0].field);
-  const [yAxis, setYAxis] = useState([columns[1].field]);
+  const [xAxis, setXAxis] = useState(columns[columns.length - 1].field);
+  const [yAxis, setYAxis] = useState([columns[0].field]);
+  const [aggFunction, setAggFunction] = useState<'None' | 'Min' | 'Max' | 'Mean'|'Sum'>('None');
+  const [colorBy, setColorBy] = useState('None');
+  console.log(yAxis)
 
- 
 
-  const filteredData = data.filter(item => {
-    const itemDate = new Date(item[datetimeColumn]);
-    return (!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate);
-  });
+  
 
   const getVegaLiteType = (type: string) => {
     if (type === 'LOCAL_DATE_TIME') return 'temporal';
@@ -47,52 +40,46 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
       return 'quantitative';
     return 'nominal'; // default to nominal if type is not recognized
   };
+
+  const xAxisType = useMemo(() => 
+    getVegaLiteType(columns.find(column => column.field === xAxis)?.type || 'nominal'),
+  [xAxis, columns]);
+
+  useEffect(() => {
+    if (xAxisType === 'nominal') {
+      setChartType('bar');
+    }else if (xAxisType === 'temporal') {
+      setChartType('line');
+    }
+  }, [xAxisType]);
+
   const spec = useMemo(() => {
     const xAxisType = getVegaLiteType(columns.find(column => column.field === xAxis)?.type || 'nominal');
     const yAxisType = getVegaLiteType(columns.find(column => column.field === yAxis[0])?.type || 'quantitative');
     const baseTransform = [
       {
-        fold: yAxis.length > 0 ? yAxis : selectableColumns.map(col => col.field),
+        fold: yAxis,
         as: ["variable", "value"]
       }
     ];
 
-    const rollingAverageTransform = showRollingAverage ? [
+    const applyAggregation = chartType !== 'heatmap' && aggFunction !== 'None';
+    const aggregationTransform = applyAggregation ? [
       {
-        window: [{ op: "mean", field: "value", as: "rolling_mean" }],
-        frame: [-rollingAverageWindow + 1, 0],
-        groupby: ["variable"]
+        aggregate: [{
+          op: aggFunction.toLowerCase(), // 'min', 'max', 'avg'
+          field: "value",
+          as: "aggregated_value"
+        }],
+        groupby: [xAxis,"variable"]
       }
     ] : [];
-
-    const finalTransform = [...baseTransform, ...rollingAverageTransform];
-
-    const statisticalLayers = showStatistics ? [
-      {
-        mark: { type: "errorband", extent: "stdev", opacity: 0.2 },
-        encoding: {
-          y: { field: "value", type: "quantitative" },
-          color: { field: "variable", type: "nominal" }
-        }
-      },
-      {
-        mark: "rule",
-        encoding: {
-          y: {
-            field: "value",
-            type: yAxisType,
-            aggregate: "mean"
-          },
-          color: { field: "variable", type: "nominal" },
-          size: { value: 3 }
-        }
-      }
-    ] : [];
-
+    const finalTransform = [...baseTransform, ...aggregationTransform];
+////~~~~~~~~~~~~~
     const commonSpec = {
-      width: "container",
+      width: "1000",
       autosize: { type: "fit", contains: "padding", resize: true },
-      data: { values: filteredData },
+      data: { values: data },
       transform: finalTransform,
       layer: [
         {
@@ -100,46 +87,65 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
             chartType === 'bar' ? { type: "bar" } :
               chartType === 'area' ? { type: "area" } :
                 { type: "point", tooltip: true },
-          encoding: {
-            x: { type: xAxisType, field: xAxis },
-            y: { type: yAxisType, field: showRollingAverage ? "rolling_mean" : "value", title: "Value", stack: mode === 'stack' ? 'zero' : null },
-            color: { field: "variable", type: "nominal", title: "Variable" },
-            tooltip: [
-              { field: "variable", type: "nominal" },
-              { field: showRollingAverage ? "rolling_mean" : "value", type: "quantitative" }
-            ]
-          },
+                encoding: chartType === 'bar' ? {
+                  y: { field: xAxis, type: xAxisType },
+                  x: { field:applyAggregation ? "aggregated_value" : "value", type: yAxisType, title: "Value", stack: mode === 'stack' ? 'zero' : null },
+                  color: colorBy && colorBy !== "None" && chartType === 'heatmap' ? { field: colorBy, type: getVegaLiteType(columns.find(column => column.field === colorBy)?.type || 'nominal'), title: colorBy } : { field: "variable", type: "nominal", title: "Variable" },
+                  tooltip: [
+                    { field: "variable", type: "nominal" },
+                    { field: xAxis, type: "nominal" },
+
+                    { field: aggFunction !== 'None' ? "aggregated_value" : "value", type: "quantitative" }
+                  ]
+                }:{
+                  x: { field: xAxis, type: xAxisType },
+                  y: { field:applyAggregation ? "aggregated_value" : "value", type: yAxisType, title: "", stack: mode === 'stack' ? 'zero' : null },
+                  color: colorBy && colorBy !== "None" && chartType === 'heatmap' ? { field: colorBy, type: getVegaLiteType(columns.find(column => column.field === colorBy)?.type || 'nominal'), title: colorBy } : { field: "variable", type: "nominal", title: "Variable" },
+                  tooltip: [
+                    { field: "variable", type: "nominal" },
+                    { field: xAxis, type: "nominal" },
+
+                    { field: aggFunction !== 'None' ? "aggregated_value" : "value", type: "quantitative" }
+                  ]
+                },
           selection: zoomable === 'yes' ? {
             grid_x: {
               type: "interval",
               bind: "scales",
-              zoom: "wheel![event.ctrlKey]",
+              zoom: "wheel",
               encodings: ["x"]
             },
-            grid_y: {
-              type: "interval",
-              bind: "scales",
-              zoom: "wheel![!event.ctrlKey]",
-              encodings: ["y"]
-            }
           } : undefined
         },
-        ...statisticalLayers
+        ...(chartType === 'line' ? [{
+          mark: { type: "point", filled: true },
+          encoding: {
+            x: { field: xAxis, type: xAxisType },
+            y: { field: applyAggregation ? "aggregated_value" : "value", type: yAxisType },
+            color: { field: "variable", type: "nominal" },
+            tooltip: [
+              { field: "variable", type: "nominal" },
+              { field: xAxis, type: xAxisType },
+              { field: applyAggregation ? "aggregated_value" : "value", type: yAxisType }
+            ]
+          }
+        }] : [])
       ]
     };
 
     if (mode === 'overlay') {
       return {
         ...commonSpec,
-        height: 400,
+        height: 500,
       };
     } else if (mode === 'stack') {
-      const stackedCharts = yAxis.map(variable => ({
+      const stackedCharts = yAxis.map((variable,index) => ({
         ...commonSpec,
-        // height: 200,
+        height: 500/yAxis.length,
         transform: [
-          ...finalTransform,
-          { filter: { field: "variable", equal: variable } }
+          ...commonSpec.transform,
+          { filter: `datum.variable === '${variable}'` }
+
         ],
         encoding: {
           ...commonSpec.layer[0].encoding,
@@ -149,10 +155,11 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
 
       return {
         $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-        vconcat: stackedCharts
-      };
+        vconcat: stackedCharts,
+        width: "container",
+        };
     }
-  }, [filteredData, chartType, datetimeColumn, mode, yAxis, xAxis,zoomable, showRollingAverage, rollingAverageWindow, showStatistics]);
+  }, [data, chartType, mode, yAxis, xAxis,zoomable,aggFunction,colorBy]);
 
 
   const handleRollingAverageToggle = () => {
@@ -192,15 +199,16 @@ const DataExplorationChart: React.FC<DataExplorationChartProps> = ({ data, colum
         xAxis={xAxis}
         setXAxis={setXAxis}
         yAxis={yAxis}
-        setYAxis={setYAxis} aggFunction={'None'} setAggFunction={function (aggFunction: 'None' | 'Min' | 'Max' | 'Avg'): void {
-          throw new Error('Function not implemented.');
-        } } category={''} setCategory={function (category: string): void {
-          throw new Error('Function not implemented.');
-        } }        />
+        setYAxis={setYAxis} aggFunction={aggFunction} setAggFunction={setAggFunction}
+        colorBy={colorBy} 
+        setColorBy={setColorBy}              
+        />
+            
         <Box sx={{ width: "99%", px: 1 }}>
           <VegaLite
             spec={spec as VisualizationSpec}
             style={{ width: "99%" }} />
+          
         </Box>
       
     </Paper>

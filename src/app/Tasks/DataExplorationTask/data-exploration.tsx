@@ -8,9 +8,10 @@ import FilterForm from './FilterForm';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { fetchDataExploration, fetchMultipleTimeseries } from '../../../store/slices/dataExplorationSlice';
 import CloseIcon from "@mui/icons-material/Close"
-import Testing from './Testing';
 import { useParams } from 'react-router-dom';
 import MultiTimeSeriesVisualization from './multi-ts-visualization/MultiTimeSeriesVisualization';
+import DataExplorationChart from './DataExplorationChart';
+import Testing from './Testing';
 
 const DataExploration: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -172,6 +173,7 @@ const DataExploration: React.FC = () => {
                    datetimeColumn={datetimeColumn} 
                    selectedColumns={selectedCols}
                  />
+                  
               </>
             )}
             {tabValue === 1 && (
@@ -182,6 +184,7 @@ const DataExploration: React.FC = () => {
                         columns={columns}
                         datetimeColumn={datetimeColumn} 
                         />
+                        
               </>
             )}
           </Grid>

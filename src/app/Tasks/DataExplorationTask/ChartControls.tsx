@@ -58,6 +58,9 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 
     const handleYAxisChange = (event: SelectChangeEvent<string[]>) => {
         const value = event.target.value as string[];
+        if (value.length === 0) {
+            return; // Prevent deselecting the last item
+        }
         setYAxis(value);
     };
 
@@ -152,7 +155,8 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 
                             onChange={handleYAxisChange}
                             renderValue={(selected) => (selected as string[]).join(', ')}
-                            MenuProps={{
+                            MenuProps={{disableScrollLock: true,
+                                keepMounted: true, disablePortal: true ,
                                 PaperProps: {
                                 style: {
                                     maxHeight: 250,
