@@ -12,6 +12,10 @@ import { useParams } from 'react-router-dom';
 import MultiTimeSeriesVisualization from './multi-ts-visualization/MultiTimeSeriesVisualization';
 import DataExplorationChart from './DataExplorationChart';
 import Testing from './Testing';
+import FacettedSearch from './Deprecated/Ideas';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import TableChartIcon from '@mui/icons-material/TableChartSharp';
+import AddchartIcon from '@mui/icons-material/Addchart';
 
 const DataExploration: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -27,6 +31,31 @@ const DataExploration: React.FC = () => {
   const { experimentId } = useParams();
   const [filenameWithoutExtension, setFilenameWithoutExtension] = useState('');
 
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#1976d2',
+      },
+      secondary: {
+        main: '#dc004e',
+      },
+    },
+    typography: {
+      fontFamily: 'Arial',
+      h6: {
+        fontWeight: 600,
+      },
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: '20px',  // Example of button customization
+          },
+        },
+      },
+    },
+  });
 
   const handleAddFilter = (newFilter: number) => {
     setFilters([...filters, newFilter]);
@@ -151,18 +180,30 @@ const DataExploration: React.FC = () => {
         :
         (<>
           <Grid item xs={12} sm={4} md={3}>
-            <FilterForm
+          <ThemeProvider theme={theme}>
+
+            {/* <FilterForm
               columns={columns}
               onAddFilter={handleAddFilter}
               onRemoveFilter={handleRemoveFilter}
               onRemoveAllFilters={handleRemoveAllFilters}
               filters={filters}
-            />
+            /> */}
+            <FilterForm
+  columns={columns}
+  data={originalData}  
+  onAddFilter={handleAddFilter}
+  onRemoveFilter={handleRemoveFilter}
+  onRemoveAllFilters={handleRemoveAllFilters}
+  filters={filters}
+/>
+            </ThemeProvider>
+
           </Grid>
           <Grid item xs={12} sm={8} md={9}>
             <Tabs value={tabValue} onChange={handleChangeTab} aria-label="data tabs" centered>
-              <Tab label="Data Table" />
-              <Tab label="Charts" />
+              <Tab label="Data Table" icon={<TableChartIcon/>} />
+              <Tab label="Charts" icon={<AddchartIcon/>} />
             </Tabs>
             {tabValue === 0 && (
               <>
@@ -184,6 +225,10 @@ const DataExploration: React.FC = () => {
                         columns={columns}
                         datetimeColumn={datetimeColumn} 
                         />
+                            {/* <ThemeProvider theme={theme}>
+
+                        <FacettedSearch/>
+                        </ThemeProvider> */}
                         
               </>
             )}
