@@ -1,27 +1,23 @@
-# vite-template-redux
+# ExtremeXP Visualization Page
 
-Uses [Vite](https://vitejs.dev/), [Vitest](https://vitest.dev/), and [React Testing Library](https://github.com/testing-library/react-testing-library) to create a modern [React](https://react.dev/) app compatible with [Create React App](https://create-react-app.dev/)
+## Installation
 
-```sh
-npx degit reduxjs/redux-templates/packages/vite-template-redux my-app
-```
-
-## Goals
-
-- Easy migration from Create React App or Vite
-- As beginner friendly as Create React App
-- Optimized performance compared to Create React App
-- Customizable without ejecting
+1. Install nodejs verision 16+
+2. Install npm
+3. Run `npm install --force` on the root folder of this project
+4. Run `npm start` to start the dev server
 
 ## Scripts
 
-- `dev`/`start` - start dev server and open browser
-- `build` - build for production
-- `preview` - locally preview production build
-- `test` - launch test runner
+- `npm dev`/`npm start` - start dev server and open browser
+- `npm build` - build for production
+- `npm preview` - locally preview production build
+- `npm test` - launch test runner
 
-## Inspiration
+### Libraries used
 
-- [Create React App](https://github.com/facebook/create-react-app/tree/main/packages/cra-template)
-- [Vite](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react)
-- [Vitest](https://github.com/vitest-dev/vitest/tree/main/examples/react-testing-lib)
+- React - https://react.dev/ 
+- Redux-toolkit - https://redux-toolkit.js.org/ (store-manager)
+- Axios - https://axios-http.com (API calls etc)
+- Vega/Vega-lite - https://vega.github.io/vega-lite/ (data visualization)
+- MUI - https://mui.com/material-ui/ (theming/ui components)
