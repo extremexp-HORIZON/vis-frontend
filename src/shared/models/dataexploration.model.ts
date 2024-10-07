@@ -1,15 +1,22 @@
 export interface IDataExplorationRequest {
     // data(data: any): unknown;
     datasetId: string;
-    columns: string[];
-    filters: IFilter[];
-    aggFunction?: string;
-    limit?: number;
-    scaler?: string;
+    columns?: string[];
+    filters?: IFilter[];
+    limit: number;
+    offset?:number;
+    groupBy?: string[]; // Optional, added
+
+    aggregation?: {      // Optional, a map of columns to an array of aggregation functions
+        [column: string]: string[]; // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
+    };
 }
 
+
+
+
 export interface IFilter {
-    column: string;
+    column?: string;
     type: string;
     value: {
         min?: number | string;
@@ -21,11 +28,9 @@ export interface IFilter {
 export const defaultDataExplorationRequest: IDataExplorationRequest = {
     datasetId: '',
     columns: [],
-    aggFunction: '',
     filters: [],
-    limit: 1000,
-    scaler: '',
-    // data: function (data: any): unknown {
-    //     throw new Error("Function not implemented.");
-    // }
+    limit: 2000,
+    offset: 0,       // Adding default for `offset`
+    groupBy: [],     // Adding default for `groupBy`
+    aggregation: {}  // Adding default for `aggregation`
 };

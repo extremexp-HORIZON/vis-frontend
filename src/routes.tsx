@@ -4,12 +4,13 @@ import ProgressPage from "./app/ProgressPage/progress-page";
 import DataExploration from "./app/Tasks/DataExplorationTask/data-exploration";
 import ErrorPage from "./error-page";
 import NotFound from "./not-found";
+import DataExplorationComponent from "./app/Tasks/DataExplorationTask/DataExplorationComponent";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <>
         <Route path="/explainability" element={<ExplainabilityTask />} />
-        <Route path="/dataexploration" element={<DataExploration />} />
+        <Route path="/dataexploration" element={<DataExplorationComponent />} />
         <Route path="/:experimentId" element={<ProgressPage />} errorElement={<ErrorPage />} />
         <Route path="*" element={<NotFound />} errorElement={<NotFound />} />
     </>
