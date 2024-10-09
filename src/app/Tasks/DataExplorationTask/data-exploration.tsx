@@ -2,7 +2,7 @@ import { Paper, Grid, Typography, Box, CircularProgress, IconButton, Tab, Tabs }
 import type { GridColDef } from '@mui/x-data-grid';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import DataTable from './DataTable';
+import DataTable from './DataTable/DataTable';
 import grey from "@mui/material/colors/grey"
 import FilterForm from './FilterForm';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
