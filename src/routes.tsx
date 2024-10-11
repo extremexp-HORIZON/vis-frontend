@@ -10,7 +10,9 @@ const routes = createBrowserRouter(
   createRoutesFromElements(
     <>
         <Route path="/explainability" element={<ExplainabilityTask />} />
-        <Route path="/dataexploration" element={<DataExplorationComponent />} />
+        <Route path="/dataexploration" element={<DataExploration />} />
+        <Route path="/testing" element={<DataExplorationComponent />} />
+
         <Route path="/:experimentId" element={<ProgressPage />} errorElement={<ErrorPage />} />
         <Route path="*" element={<NotFound />} errorElement={<NotFound />} />
     </>

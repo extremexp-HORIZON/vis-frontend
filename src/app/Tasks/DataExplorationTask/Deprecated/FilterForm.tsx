@@ -12,7 +12,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import { IFilter } from '../../../shared/models/dataexploration.model';
+import { IFilter } from '../../../../shared/models/dataexploration.model';
 import { createTheme,ThemeProvider } from '@mui/material';
 
 interface IFilterFormProps {

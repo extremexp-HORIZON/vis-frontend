@@ -4,7 +4,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import DataTable from './DataTable/DataTable';
 import grey from "@mui/material/colors/grey"
-import FilterForm from './FilterForm';
+import FilterForm from './Deprecated/FilterForm';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { fetchDataExploration, fetchMultipleTimeseries } from '../../../store/slices/dataExplorationSlice';
 import CloseIcon from "@mui/icons-material/Close"
@@ -190,13 +190,13 @@ const DataExploration: React.FC = () => {
               filters={filters}
             /> */}
             <FilterForm
-  columns={columns}
-  data={originalData}  
-  onAddFilter={handleAddFilter}
-  onRemoveFilter={handleRemoveFilter}
-  onRemoveAllFilters={handleRemoveAllFilters}
-  filters={filters}
-/>
+              columns={columns}
+              data={originalData}  
+              onAddFilter={handleAddFilter}
+              onRemoveFilter={handleRemoveFilter}
+              onRemoveAllFilters={handleRemoveAllFilters}
+              filters={filters}
+            />
             </ThemeProvider>
 
           </Grid>
@@ -246,3 +246,114 @@ export default DataExploration;
 
 
 
+
+
+
+// <>
+// <Grid
+//     sx={{
+//       flexDirection: "column",
+//       display: "flex",
+//       justifyContent: "center",
+//       textAlign: "center",
+//       border: `1px solid ${grey[400]}`,
+//       borderRadius: 3,
+//       overflow: "hidden",
+//     }}
+//   >
+//     <Box
+//       sx={{
+//         bgcolor: grey[300],
+//         display: "flex",
+//         height: "3.5rem",
+//         alignItems: "center",
+//         textAlign: "left",
+//         px: 2,
+//       }}
+//     >
+//       {/* <Typography fontSize={"1.2rem"}>Dataset Exploration: {filenameWithoutExtension}</Typography> */}
+//       <Typography fontSize={"1.2rem"}>Dataset Exploration: {filenameWithoutExtension}</Typography>
+
+//       <Box sx={{ flex: 1 }} />
+//       <IconButton>
+//         <CloseIcon />
+//       </IconButton>
+//     </Box>
+// {loading ? 
+//   <Box sx={{ height: "100%", width: "100%" }}>
+//   <CircularProgress size={"5rem"} />
+//   <Typography fontSize={"1.5rem"} color={grey[500]}>
+//     Initializing page...
+//   </Typography>
+// </Box> :
+// <Grid container spacing={2} >
+// { experimentId && experimentId.includes("ideko") ?
+//  <Grid container spacing={2}>
+//   <Grid item xs={12} md={12}>
+//     <MultiTimeSeriesVisualization 
+//       data={structuredClone(multipleTimeSeries)}
+//     />
+//   </Grid>
+// </Grid> 
+//   :
+//   (<>
+//     <Grid item xs={12} sm={4} md={3}>
+//     <ThemeProvider theme={theme}>
+
+//       {/* <FilterForm
+//         columns={columns}
+//         onAddFilter={handleAddFilter}
+//         onRemoveFilter={handleRemoveFilter}
+//         onRemoveAllFilters={handleRemoveAllFilters}
+//         filters={filters}
+//       /> */}
+//       <FilterForm
+//         columns={columns}
+//         data={originalData}  
+//         onAddFilter={handleAddFilter}
+//         onRemoveFilter={handleRemoveFilter}
+//         onRemoveAllFilters={handleRemoveAllFilters}
+//         filters={filters}
+//       />
+//       </ThemeProvider>
+
+//     </Grid>
+//     <Grid item xs={12} sm={8} md={9}>
+//       <Tabs value={tabValue} onChange={handleChangeTab} aria-label="data tabs" centered>
+//         <Tab label="Data Table" icon={<TableChartIcon/>} />
+//         <Tab label="Charts" icon={<AddchartIcon/>} />
+//       </Tabs>
+//       {tabValue === 0 && (
+//         <>
+//           {error && <Typography color="error">Error: {error}</Typography>}
+//             <DataTable
+//              data={originalData}
+//              columns={originalColumns}
+//              datetimeColumn={datetimeColumn} 
+//              selectedColumns={selectedCols}
+//            />
+            
+//         </>
+//       )}
+//       {tabValue === 1 && (
+//         <>
+//           {error && <Typography color="error">Error: {error}</Typography>}
+//           <Testing
+//                   data={originalData}
+//                   columns={columns}
+//                   datetimeColumn={datetimeColumn} 
+//                   />
+//                       {/* <ThemeProvider theme={theme}>
+
+//                   <FacettedSearch/>
+//                   </ThemeProvider> */}
+                  
+//         </>
+//       )}
+//     </Grid>
+//   </>)
+// }
+// </Grid>
+// }
+// </Grid>
+// </>
