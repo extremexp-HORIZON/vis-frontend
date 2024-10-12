@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo,  useState } from 'react';
 import { Box, MenuItem, Paper, Select, tabClasses, Tooltip, Typography } from '@mui/material';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import ChartControls from './ChartControls';
+import ChartControls from './ChartControls/ChartControls';
 import { transform } from 'lodash';
 
 

@@ -177,6 +177,7 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
                 disableColumnMenu
                 disableColumnFilter
                 disableColumnSorting
+                disableColumnSelector
               />
             </>
           ) : (
