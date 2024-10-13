@@ -4,7 +4,7 @@ import ProgressPage from "./app/ProgressPage/progress-page";
 import DataExploration from "./app/Tasks/DataExplorationTask/data-exploration";
 import ErrorPage from "./error-page";
 import NotFound from "./not-found";
-import DataExplorationComponent from "./app/Tasks/DataExplorationTask/DataExplorationComponent";
+import DataExplorationComponent from "./app/Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(

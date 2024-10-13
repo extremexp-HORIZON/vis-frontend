@@ -99,18 +99,7 @@ const ControlPanel = ({
         return selectedColumns.join(', '); // Show selected columns
     };
 
-    const handleEasterFilter = () => {
-        // Create a new filter based on the IFilter interface
-        const newFilter = {
-            column: 'country',   // column from state
-            type: 'equals',         // type is "equals"
-            value: 'Federated States of Micronesia'             // value is "MS"
-        };
-
-        // Update filters with the new filter
-        setFilters([...filters, newFilter]);
-        setSelectedColumns(['name','iata'])
-    };
+    
     
 
     
@@ -139,12 +128,15 @@ const ControlPanel = ({
                         </Tooltip>
                     </Typography>
                 </Box>
+                <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
+
                 {showColumnDropdown && (
                     <FormControl fullWidth>
                         <InputLabel id="column-select-label">Select Columns</InputLabel>
                         <Select
                         labelId="column-select-label"
                         multiple
+                        label="Select Columns"
                         value={selectedColumns}
                         onChange={handleChange}
                         renderValue={getDisplayValue} // Use the new display function
@@ -161,7 +153,7 @@ const ControlPanel = ({
                 )}
                 <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
 
-                <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: `1px solid ${grey[400]}` }}>
+                {/* <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: `1px solid ${grey[400]}` }}>
                     <TableRowsIcon />
                     <Typography 
                     variant="h6" 
@@ -189,17 +181,10 @@ const ControlPanel = ({
 
                         </Select>
                     </FormControl>   
-                )}
+                )} */}
               
                     <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-                    <Button 
-                    variant="contained" 
-                    color="secondary" 
-                    onClick={handleEasterFilter} 
-                    sx={{ marginTop: 2 }}
-                >
-                    XP Filter
-                </Button>
+                   
                 <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
                 <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: `1px solid ${grey[400]}` }}>
                     <FilterAltIcon />
@@ -221,6 +206,7 @@ const ControlPanel = ({
                                <Select
                                    labelId="column-select-label"
                                    value={filterColumn}
+                                   label="Select Column"
                                    onChange={(e) => setFilterColumn(e.target.value)}
                                    MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
        
@@ -237,6 +223,7 @@ const ControlPanel = ({
                                <InputLabel id="type-select-label">Select Filter Type</InputLabel>
                                <Select
                                    labelId="type-select-label"
+                                   label="Select Filter Type"
                                    value={filterType}
                                    onChange={(e) => setFilterType(e.target.value)}
                                    MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
@@ -252,6 +239,8 @@ const ControlPanel = ({
                                    <InputLabel id="value-select-label">Select Value</InputLabel>
                                    <Select
                                        labelId="value-select-label"
+                                       id="value-select"
+                                       label="Select Value"
                                        value={filterValue}
                                        onChange={(e) => setFilterValue(e.target.value)}
                                        MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
@@ -278,20 +267,7 @@ const ControlPanel = ({
                                     <Typography>Max: {filterValue.max}</Typography>
                                 </Box>
 
-                            //    <Box sx={{ mt: 2 }}>
-                            //        <Typography>Min</Typography>
-                            //        <input
-                            //            type="number"
-                            //            value={filterValue.min || ''}
-                            //            onChange={(e) => setFilterValue({ ...filterValue, min: e.target.value })}
-                            //        />
-                            //        <Typography>Max</Typography>
-                            //        <input
-                            //            type="number"
-                            //            value={filterValue.max || ''}
-                            //            onChange={(e) => setFilterValue({ ...filterValue, max: e.target.value })}
-                            //        />
-                            //    </Box>
+                          
                            )}
        
                            <Button variant="contained" color="primary" onClick={handleAddFilter} sx={{ mt: 2 }}>

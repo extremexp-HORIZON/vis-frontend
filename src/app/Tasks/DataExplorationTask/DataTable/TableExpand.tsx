@@ -129,6 +129,7 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
             onCellClick={handleCellClick} // Handle cell click for statistics
             disableColumnMenu
             hideFooter
+            disableColumnSelector
 
             slots={{
               toolbar: CustomToolbar,
