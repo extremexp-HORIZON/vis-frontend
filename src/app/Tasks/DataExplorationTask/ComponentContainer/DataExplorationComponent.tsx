@@ -28,6 +28,8 @@ const DataExplorationComponent = () => {
   const [xAxis, setXAxis] = useState<string>('');
   const [yAxis, setYAxis] = useState<string[]>([]);
   const [groupFunction, setGroupFunction] = useState<string>('sum');
+  const [barGroupBy, setBarGroupBy] = useState<string[]>([]); // State for bar chart grouping
+  const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
   
 
   
@@ -144,7 +146,12 @@ const DataExplorationComponent = () => {
           viewMode={viewMode}
           setViewMode={setViewMode}
           groupFunction={groupFunction}
-          setGroupFunction={setGroupFunction} />
+          setGroupFunction={setGroupFunction}
+          barGroupBy={barGroupBy}
+          setBarGroupBy={setBarGroupBy}
+          barAggregation={barAggregation}
+          setBarAggregation={setBarAggregation}
+           />
           )}
       </Box>
     </Box>

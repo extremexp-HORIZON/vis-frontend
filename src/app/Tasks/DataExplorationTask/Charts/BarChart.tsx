@@ -7,13 +7,17 @@ import { Vega } from 'react-vega';
 const BarChart = ({ dataExploration }) => {
   // Parse the data string from the dataExploration object
   const parsedData = JSON.parse(dataExploration.data);
-  
+
   // Extract the columns information
   const columns = dataExploration.columns;
-  
+
   // Identify the column for the x-axis (which should be a string)
   const xAxisColumn = columns.find(col => col.type === 'STRING').name;
-  
+
+  // Identify all other categorical columns
+  const categoricalColumns = columns
+    .filter(col => col.type === 'STRING' && col.name !== xAxisColumn);
+
   // Identify the columns for the y-axis (which should be numeric, DOUBLE)
   const yAxisColumns = columns.filter(col => col.type === 'DOUBLE').map(col => col.name);
 
@@ -23,16 +27,17 @@ const BarChart = ({ dataExploration }) => {
       [xAxisColumn]: item[xAxisColumn],
       type: col, // Each numeric column becomes a type/category
       value: item[col], // The value for each column
+      ...Object.fromEntries(categoricalColumns.map(catCol => [catCol.name, item[catCol.name]])), // Include all categorical values
     }))
   );
 
   // Create a dynamic Vega specification
   const specification = {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "description": "A grouped bar chart showing different numeric values by state.",
+    "description": "A grouped bar chart showing different numeric values by category.",
     "autosize": { "type": "fit", "contains": "padding", "resize": true },
     "width": "container",
-    "height":500,
+    "height": 500,
     "data": {
       "values": transformedData,
     },
@@ -42,7 +47,7 @@ const BarChart = ({ dataExploration }) => {
         "field": xAxisColumn,
         "type": "nominal",
         "axis": { "labelAngle": 0 },
-        "sort": null,  // Sort by the x-axis values (states)
+        "sort": null,  // Sort by the x-axis values
       },
       "y": {
         "field": "value",
@@ -52,9 +57,6 @@ const BarChart = ({ dataExploration }) => {
       "color": {
         "field": "type",
         "type": "nominal",
-        // "scale": {
-        //   "range": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"], // Color scale for each type
-        // },
         "title": "Metric",
       },
       "xOffset": {
@@ -62,37 +64,40 @@ const BarChart = ({ dataExploration }) => {
         "type": "nominal",
       },
       "tooltip": [
-        { "field": xAxisColumn, "type": "nominal", "title": "State" },
+        { "field": xAxisColumn, "type": "nominal", "title": xAxisColumn},
+        ...categoricalColumns.map(col => ({
+          "field": col.name,
+          "type": "nominal",
+          "title": col.name // Use the column name as the tooltip title
+        })),
         { "field": "value", "type": "quantitative", "title": "Value" },
         { "field": "type", "type": "nominal", "title": "Metric" },
       ],
     }
   };
-  console.log('spec',specification)
 
   return (
     <Paper
-className="Category-Item"
-elevation={2}
-sx={{
-  borderRadius: 4,
-  width: "inherit",
-  display: "flex",
-  flexDirection: "column",
-  rowGap: 0,
-  minWidth: "300px",
-  height: "100%",
-  overflow: 'auto', // Allow scrolling if content is larger than container
-  overscrollBehavior: 'contain', // Prevent the bounce effect at the edges
-  scrollBehavior: 'smooth', // Enable smooth scrolling (optional)
-}}>
-    <Vega
-      spec={specification}
-      
-    />
+      className="Category-Item"
+      elevation={2}
+      sx={{
+        borderRadius: 4,
+        width: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 0,
+        minWidth: "300px",
+        height: "100%",
+        overflow: 'auto', // Allow scrolling if content is larger than container
+        overscrollBehavior: 'contain', // Prevent the bounce effect at the edges
+        scrollBehavior: 'smooth', // Enable smooth scrolling (optional)
+      }}
+    >
+      <Vega
+        spec={specification}
+      />
     </Paper>
   );
 };
 
 export default BarChart;
-

@@ -24,7 +24,11 @@ const GraphContainer = ({
   viewMode,
   setViewMode,
   groupFunction,
-  setGroupFunction
+  setGroupFunction,
+  barGroupBy,
+  setBarGroupBy,
+  barAggregation,
+  setBarAggregation
 }: {
   dataexp: any[];
   filters: IFilter[];
@@ -38,12 +42,17 @@ const GraphContainer = ({
   setViewMode: React.Dispatch<React.SetStateAction<'overlay' | 'stacked'>>;
   groupFunction: string;
   setGroupFunction: React.Dispatch<React.SetStateAction<string>>;
+  barGroupBy: string[];
+  setBarGroupBy: React.Dispatch<React.SetStateAction<string[]>>;
+  barAggregation: any;
+  setBarAggregation: React.Dispatch<React.SetStateAction<any>>;
 }) => {
   const dispatch = useAppDispatch(); // Initialize the dispatch
 
 
-  const [barGroupBy, setBarGroupBy] = useState<string[]>([]); // State for bar chart grouping
-  const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
+
+  // const [barGroupBy, setBarGroupBy] = useState<string[]>([]); // State for bar chart grouping
+  // const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
   const [barChartData, setBarChartData] = useState<any[]>([]); // Separate state for bar chart data
 
   useEffect(() => {
@@ -54,7 +63,7 @@ const GraphContainer = ({
   const handleFetchBarChartData = () => {
     const payload = {
       datasetId: 'file:///Users/admin/Desktop/airports.csv',
-      limit: 10000,
+      limit: 100,
       offset: 0,
       filters: filters,
       groupBy: barGroupBy,
@@ -135,7 +144,7 @@ const GraphContainer = ({
       {/* Conditionally Render Chart Based on Selected Type */}
       <Box sx={{ marginTop: '2rem' }}>
         {chartType === 'line' && <LineChart viewMode={viewMode} data={lineChartData} xAxis={xAxis} yAxis={yAxis} groupFunction={''} />}
-        {chartType === 'bar' && (<BarChart dataExploration={dataexp}/>)}
+        {chartType === 'bar' && (<BarChart dataExploration={dataexp} viewMode={viewMode}/>)}
         {chartType === 'scatter' && <p>Scatter Plot</p>}
       </Box>
     </Box>
