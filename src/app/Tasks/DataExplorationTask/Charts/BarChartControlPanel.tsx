@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, TextField, MenuItem, Chip, Button } from '@mui/material';
+import { Box, TextField, MenuItem, Chip, Button, createTheme, ThemeProvider } from '@mui/material';
 
 interface BarChartControlPanelProps {
   originalColumns: Array<{ name: string; type: string }>;
@@ -52,8 +52,34 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
   };
 
   const aggregationOptions = getAggregationOptions();
-
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#1976d2',
+      },
+      secondary: {
+        main: '#dc004e',
+      },
+    },
+    typography: {
+      fontFamily: 'Arial',
+      h6: {
+        fontWeight: 600,
+      },
+   },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: '20px',  // Example of button customization
+          },
+        },
+      },
+    },
+  });
   return (
+    <ThemeProvider theme={theme}>
+
     <Box sx={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <Box sx={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <TextField
@@ -127,13 +153,15 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
             </TextField>
           </Box>
         )}
-        <Button variant="contained" onClick={onFetchBarChartData}>
-          Fetch Bar Chart Data
+        <Button variant="contained" color="primary"  onClick={onFetchBarChartData}>
+          Aggregate
         </Button>
       </Box>
 
     </Box>
+    </ThemeProvider>
   );
 };
 
 export default BarChartControlPanel;
+

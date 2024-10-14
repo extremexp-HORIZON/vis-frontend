@@ -135,7 +135,7 @@ const GraphContainer = ({
       {/* Conditionally Render Chart Based on Selected Type */}
       <Box sx={{ marginTop: '2rem' }}>
         {chartType === 'line' && <LineChart viewMode={viewMode} data={lineChartData} xAxis={xAxis} yAxis={yAxis} groupFunction={''} />}
-        {chartType === 'bar' && (<BarChart/>)}
+        {chartType === 'bar' && (<BarChart dataExploration={dataexp}/>)}
         {chartType === 'scatter' && <p>Scatter Plot</p>}
       </Box>
     </Box>
