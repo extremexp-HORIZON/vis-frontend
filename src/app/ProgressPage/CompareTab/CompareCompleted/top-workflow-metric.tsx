@@ -1,18 +1,17 @@
 import { useState, useMemo } from "react"
-import { VegaLite, VisualizationSpec } from "react-vega"
+import { VisualizationSpec } from "react-vega"
 import {
-  Paper,
   Box,
   Typography,
-  Tooltip,
-  IconButton,
   FormControl,
   Select,
   MenuItem,
   SelectChangeEvent,
 } from "@mui/material"
-import InfoIcon from "@mui/icons-material/Info"
 import { useAppSelector, RootState } from "../../../../store/store"
+import WorkflowCard from "../../../../shared/components/workflow-card"
+import ChartParameters from "./chart-parameters"
+import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 
 const TopWorkflowMetric = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -48,8 +47,6 @@ const TopWorkflowMetric = () => {
   const topTenWorkflows = getTopTenWorkflowsByMetric(metric)
 
   const spec = {
-    width: "container",
-    height: 400,
     mark: "bar",
     encoding: {
       x: {
@@ -80,39 +77,11 @@ const TopWorkflowMetric = () => {
   }
 
   return (
-    <Paper
-      className="Category-Item"
-      elevation={2}
-      sx={{
-        borderRadius: 4,
-        width: "inherit",
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 0,
-        minWidth: "300px",
-        height: "100%",
-      }}
+    <WorkflowCard
+      title="Top 10 Workflows By Metric"
+      description="Description not available"
     >
-      <Box
-        sx={{
-          px: 1.5,
-          py: 0.5,
-          display: "flex",
-          alignItems: "center",
-          borderBottom: `1px solid grey`,
-        }}
-      >
-        <Typography fontSize={"1rem"} fontWeight={600}>
-          {"Top 10 Workflows By Metric"}
-        </Typography>
-        <Box sx={{ flex: 1 }} />
-        <Tooltip title={"Description not available."}>
-          <IconButton>
-            <InfoIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", px: 1.5, py: 1 }}>
+      <ChartParameters>
         <Typography fontSize={"0.8rem"}>Metric:</Typography>
         <FormControl sx={{ m: 1, minWidth: 120, maxHeight: 120 }} size="small">
           <Select
@@ -127,15 +96,16 @@ const TopWorkflowMetric = () => {
             ))}
           </Select>
         </FormControl>
-      </Box>
-      <Box sx={{ px: 1.5, py: 1, flex: 1, width: "99%" }}>
-        <VegaLite
+      </ChartParameters>
+      <Box sx={{ textAlign: "center", m: 2 }}>
+        <ResponsiveVegaLite
+          minWidth={100}
+          aspectRatio={2 / 1}
           actions={false}
-          style={{ width: "90%" }}
           spec={spec as VisualizationSpec}
         />
       </Box>
-    </Paper>
+    </WorkflowCard>
   )
 }
 
