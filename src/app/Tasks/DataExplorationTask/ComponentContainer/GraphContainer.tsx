@@ -53,14 +53,13 @@ const GraphContainer = ({
 
   // const [barGroupBy, setBarGroupBy] = useState<string[]>([]); // State for bar chart grouping
   // const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
-  const [barChartData, setBarChartData] = useState<any[]>([]); // Separate state for bar chart data
 
-  useEffect(() => {
-    console.log('Current chart type:', chartType); // Debugging the chartType
-  }, [chartType,barChartData]);
+
+
 
   // Fetch Bar Chart Data and ensure chartType doesn't reset
   const handleFetchBarChartData = () => {
+    console.log('Fetching Bar Chart Data...');
     const payload = {
       datasetId: 'file:///Users/admin/Desktop/airports.csv',
       limit: 100,
@@ -71,24 +70,21 @@ const GraphContainer = ({
     };
 
     console.log('Fetch Bar Chart Data Payload:', payload);
-    console.log('filters', filters);
 
     // Ensure that the chartType is 'bar' BEFORE dispatch
-    setChartType('bar');
+    // setChartType('bar');
 
     // Fetch bar chart data without resetting the chart type
     dispatch(fetchDataExploration(payload)).then((response) => {
-      if (response.payload) {
-        const parsedData = JSON.parse(response.payload.data);
-        setBarChartData(parsedData); // Update bar chart data
-      }
+      console.log('Bar Chart Data:', response);
+     
     });
 
     // Ensure the chartType doesn't reset here
   };
   const lineChartData = JSON.parse(dataexp?.data || '[]');
-    const columns=dataexp.columns
-  console.log("bar",barChartData)
+  const columns=dataexp.columns
+
 
   
   return (

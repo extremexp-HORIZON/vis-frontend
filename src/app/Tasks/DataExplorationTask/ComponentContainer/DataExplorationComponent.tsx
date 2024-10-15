@@ -23,8 +23,10 @@ const DataExplorationComponent = () => {
   const[activeChartTab,setActiveChartTab]=useState(0)
   const[filters, setFilters] = useState<IFilter[]>([]);
   const[uniqueColumnValues, setUniqueColumnValues] = useState<string[]>([]);
+
   const [viewMode, setViewMode] = useState<'overlay' | 'stacked'>('overlay');
   const [chartType, setChartType] = useState<'line' | 'bar' | 'scatter'>('line');
+
   const [xAxis, setXAxis] = useState<string>('');
   const [yAxis, setYAxis] = useState<string[]>([]);
   const [groupFunction, setGroupFunction] = useState<string>('sum');
@@ -69,7 +71,7 @@ const DataExplorationComponent = () => {
         setSelectedColumns(defaultColumns);
       }
     }
-  }, [dataExploration, selectedColumns]); // Listen for new dataExploration responses
+  }, [dataExploration, selectedColumns,filters,barGroupBy,barAggregation,columns,originalColumns,xAxis,yAxis]); // Listen for new dataExploration responses
 
   // Function to handle fetching data when the user clicks the button
   const handleFetchData = () => {

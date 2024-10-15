@@ -19,8 +19,7 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
   onFetchBarChartData,
 }) => {
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null); // State to hold the selected column
-console.log('barGroupBy', barGroupBy)
-console.log('barAggregation', barAggregation)
+
   const handleAggregationChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string[]; // Get the selected aggregation rules
     if (!selectedColumn) return;

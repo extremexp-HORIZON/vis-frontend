@@ -43,13 +43,13 @@ const BarChart = ({ dataExploration }) => {
     },
     "mark": "bar",
     "encoding": {
-      "x": {
+      "y": {
         "field": xAxisColumn,
         "type": "nominal",
         "axis": { "labelAngle": 0 },
         "sort": null,  // Sort by the x-axis values
       },
-      "y": {
+      "x": {
         "field": "value",
         "type": "quantitative",
         "title": "Value",
