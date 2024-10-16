@@ -62,7 +62,7 @@ const GraphContainer = ({
     console.log('Fetching Bar Chart Data...');
     const payload = {
       datasetId: 'file:///Users/admin/Desktop/airports.csv',
-      limit: 100,
+      limit: 1000,
       offset: 0,
       filters: filters,
       groupBy: barGroupBy,

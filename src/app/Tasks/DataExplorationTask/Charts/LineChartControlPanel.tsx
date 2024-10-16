@@ -15,6 +15,8 @@ const LineChartControlPanel = ({ columns, xAxis, setXAxis, yAxis, setYAxis, grou
             setXAxis(selectedColumn); // Set the entire column object as xAxis
           }}
           label="X-Axis"
+          MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+
         >
           {columns.map((col) => (
             <MenuItem key={col.name} value={col.name}>
@@ -37,6 +39,8 @@ const LineChartControlPanel = ({ columns, xAxis, setXAxis, yAxis, setYAxis, grou
           }}
           input={<OutlinedInput label="Y-Axis" />}
           renderValue={(selected) => selected.join(', ')}
+          MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+
         >
           {columns.map((col) => (
             <MenuItem key={col.name} value={col.name}>

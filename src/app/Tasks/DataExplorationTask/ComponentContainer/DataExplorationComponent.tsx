@@ -125,7 +125,7 @@ const DataExplorationComponent = () => {
         setFilters={setFilters}
         uniqueValues={uniqueColumnValues}
       />
-      <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
 
         <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
           <Tabs value={activeChartTab} onChange={(e, newValue) => setActiveChartTab(newValue)}>
@@ -134,7 +134,9 @@ const DataExplorationComponent = () => {
           </Tabs>
         </Box>
         {activeChartTab === 0 && (
+            <Box sx={{ width: '100%', height: '100%', overflowX: 'auto' }}> {/* Enable horizontal scroll */}
           <TableExpand data={data} columns={columns} datetimeColumn="" />
+          </Box>
           )}
         {activeChartTab === 1 && (
           <GraphContainer dataexp={dataExploration ?? []}

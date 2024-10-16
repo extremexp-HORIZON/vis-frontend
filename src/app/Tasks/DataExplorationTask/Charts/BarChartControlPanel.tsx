@@ -46,7 +46,7 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
     if (!column) return [];
 
     // Return aggregation options based on column type
-    return column.type === 'DOUBLE' || column.type === 'FLOAT' 
+    return column.type === 'DOUBLE' || column.type === 'FLOAT' || column.type === 'INTEGER'
       ? ['avg', 'min', 'max', 'count'] 
       : ['count'];
   };
@@ -88,6 +88,8 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
           value={barGroupBy}
           onChange={(e) => handleGroupByChange(e.target.value as string[])}
           variant="outlined"
+          MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+
           SelectProps={{
             multiple: true,
             renderValue: (selected) => (
@@ -115,6 +117,8 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
             value={selectedColumn}
             onChange={(e) => setSelectedColumn(e.target.value)}
             variant="outlined"
+            MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+
             sx={{ width: '300px' }} // Set a fixed width for the Value dropdown
           >
             {originalColumns.map((col) => (

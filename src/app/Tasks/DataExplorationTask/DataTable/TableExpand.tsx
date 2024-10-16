@@ -113,7 +113,7 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
       height: "100%",
     }}>
       {isVisible && (
-        <Box sx={{ ...tableStyle }}>
+        <Box sx={{ ...tableStyle, overflowX: 'auto' }}> {/* Enable horizontal scrolling */}
           <DataGrid
             rows={rows}
             columns={
@@ -121,6 +121,7 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
                 field: typeof col === 'string' ? col : (col as { name: string }).name,
                 headerName: typeof col === 'string' ? col : (col as { name: string }).name,
                 width: 200,
+
                 type: (typeof col === 'string' ? 'string' : (col as { type: 'string' | 'number' | 'date' | 'boolean' }).type),
               }))
             }
@@ -171,14 +172,14 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
                   { field: "avg", headerName: "Avg", width: 80 },
                   { field: "std", headerName: "Std", width: 80 }
                 ]}
-                autoHeight
-                hideFooter
-                hideFooterSelectedRowCount
-                hideFooterPagination
-                disableColumnMenu
-                disableColumnFilter
-                disableColumnSorting
-                disableColumnSelector
+                // autoHeight
+                // hideFooter
+                // hideFooterSelectedRowCount
+                // hideFooterPagination
+                // disableColumnMenu
+                // disableColumnFilter
+                // disableColumnSorting
+                // disableColumnSelector
               />
             </>
           ) : (
