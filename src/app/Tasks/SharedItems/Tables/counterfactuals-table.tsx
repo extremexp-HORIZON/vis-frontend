@@ -10,16 +10,15 @@ import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import TableCell, { tableCellClasses } from "@mui/material/TableCell"
 import TableBody from "@mui/material/TableBody"
-import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import grey from "@mui/material/colors/grey"
 // import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
 import Modal from "@mui/material/Modal"
-import { Dispatch, SetStateAction, useEffect } from "react"
+import { useEffect } from "react"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
-import { fetchCounterfactuals } from "../../../../store/slices/explainabilitySlice"
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import CircularProgress from "@mui/material/CircularProgress"
+import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -60,7 +59,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(fetchCounterfactuals({
+    dispatch(fetchModelAnalysisExplainabilityPlot({
     explanationType:"hyperparameterExplanation",
     explanationMethod:"counterfactuals",
     model:"Ideko_model",
@@ -72,7 +71,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
 
   return (
     <>
-    {console.log(counterfactuals)}
       <Modal
         open={point !== null}
         onClose={handleClose}

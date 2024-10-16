@@ -9,7 +9,7 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import FeatureExplainability from "./FeatureExpl/feature-explainability"
 import HyperparameterExplainability from "./HyperparamExpl/hyperparameter-explainability"
-import { defaultDataExplorationRequest } from "../../../shared/models/dataexploration.model"
+import { defaultDataExplorationQuery } from "../../../shared/models/dataexploration.model"
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from "@mui/material/IconButton"
 
@@ -24,11 +24,11 @@ const ExplainabilityTask = () => {
       fetchInitialization({
         modelName: "I2Cat_Phising_model",
         pipelineQuery: {
-          ...defaultDataExplorationRequest,
+          ...defaultDataExplorationQuery,
           datasetId: "file:///I2Cat_phising/metrics/I2Cat_phising_metrics.csv",
         },
         modelInstancesQuery: {
-          ...defaultDataExplorationRequest,
+          ...defaultDataExplorationQuery,
           datasetId:
             "file:///I2Cat_phising/metrics/I2Cat_phising_instances.csv",
             filters: [
@@ -41,7 +41,7 @@ const ExplainabilityTask = () => {
             limit: 10000
         },
         modelConfusionQuery: {
-          ...defaultDataExplorationRequest,
+          ...defaultDataExplorationQuery,
           datasetId:
             "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
             filters: [

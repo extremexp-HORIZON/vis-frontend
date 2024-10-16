@@ -7,16 +7,23 @@ import InfoIcon from "@mui/icons-material/Info"
 import FormControl from "@mui/material/FormControl"
 import Select from "@mui/material/Select"
 import MenuItem from "@mui/material/MenuItem"
-import type { Dispatch, SetStateAction} from "react";
+import type { Dispatch, SetStateAction } from "react"
 import { useEffect, useState } from "react"
 import grey from "@mui/material/colors/grey"
 import { VegaLite } from "react-vega"
 import _ from "lodash"
-import { Checkbox, useTheme } from "@mui/material"
+import { Checkbox, CircularProgress, LinearProgress, Skeleton, useTheme } from "@mui/material"
+import { IDataExplorationResponse } from "../../../../shared/models/dataexploration.model"
+import { green } from "@mui/material/colors"
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 interface IInstanceClassification {
-  plotData: any
-  point: any;
+  plotData: {
+    data: IDataExplorationResponse | null
+    loading: boolean
+    error: string | null
+  } | null
+  point: any
   setPoint: Dispatch<SetStateAction<any>>
 }
 
@@ -37,10 +44,10 @@ const InstanceClassification = (props: IInstanceClassification) => {
   }
 
   useEffect(() => {
-    if (plotData.length > 0) {
-      setOptions(Object.keys(plotData[0]))
+    if (plotData && plotData.data) {
+      setOptions(Object.keys(plotData.data.data[0]))
     }
-  }, [])
+  }, [plotData])
 
   useEffect(() => {
     if (options.length > 0) {
@@ -75,6 +82,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
 
   return (
     <>
+    {console.log(options)}
       <Paper
         className="Category-Item"
         elevation={2}
@@ -101,11 +109,28 @@ const InstanceClassification = (props: IInstanceClassification) => {
             {"Instance Classification"}
           </Typography>
           <Box sx={{ flex: 1 }} />
-          <Tooltip title={"An instance classification plot is a visualization used to depict the performance of a classification model on individual data instances."}>
-            <IconButton>
-              <InfoIcon />
-            </IconButton>
+          <Box sx={{ position: 'relative' }}>
+          <Tooltip
+          sx={{}}
+            title={
+              "An instance classification plot is a visualization used to depict the performance of a classification model on individual data instances."
+            }
+          >
+              <InfoIcon sx={{padding: 1, zIndex: 100, color: grey[600]}}/>
           </Tooltip>
+          {(plotData?.loading || !plotData) && 
+          <CircularProgress
+            size={28}
+            sx={{
+              // color: green[500],
+              position: 'absolute',
+              top: 6,
+              left: 6,
+              zIndex: 0,
+            }}
+          /> 
+          }
+          </Box>
         </Box>
         <Box sx={{ display: "flex", flexWrap: "wrap" }}>
           <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
@@ -116,6 +141,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
             >
               <Select
                 value={xAxisOption}
+                disabled={plotData?.loading || !plotData?.data}
                 sx={{ fontSize: "0.8rem" }}
                 onChange={handleAxisSelection("x")}
                 MenuProps={{
@@ -146,6 +172,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
               <Select
                 value={yAxisOption}
                 sx={{ fontSize: "0.8rem" }}
+                disabled={plotData?.loading || !plotData?.data}
                 onChange={handleAxisSelection("y")}
                 MenuProps={{
                   PaperProps: {
@@ -176,10 +203,12 @@ const InstanceClassification = (props: IInstanceClassification) => {
           }}
         >
           <Typography fontSize={"0.8rem"}>Misclasified Instances:</Typography>
-          <Checkbox checked={checkbox} onChange={handleCheckboxChange} />
+          <Checkbox checked={checkbox} onChange={handleCheckboxChange} disabled={plotData?.loading || !plotData?.data}/>
         </Box>
-        <Box sx={{ width: "99%", px: 1 }}>
-          {options && (
+        <Box sx={{ width: "99%", px: 1, display: "flex", justifyContent: 'center', pb: !plotData?.data ? 2 : 0 }}>
+          {!plotData?.data ?
+          <Skeleton variant="rounded" width={"90%"} height={450} /> :
+           (
             <VegaLite
               actions={false}
               style={{ width: "90%", height: 500 }}
@@ -189,7 +218,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
                 height: "container",
                 autosize: { type: "fit", contains: "padding", resize: true },
                 data: {
-                  values: getVegaData(plotData),
+                  values: getVegaData(plotData?.data?.data ?? []),
                 },
                 params: [
                   {

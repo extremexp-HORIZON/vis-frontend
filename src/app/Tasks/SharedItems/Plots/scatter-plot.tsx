@@ -55,7 +55,6 @@ const LinePlot = (props: ILineplot) => {
           model: plmodel?.explainabilityModel || "",
           feature1: e.target.value || "",
           feature2: plmodel?.features.feature2 || "",
-          plotType: plmodel?.plotType || "",
         }),
       )
       setSelectedFeature(e.target.value)

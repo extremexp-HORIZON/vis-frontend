@@ -68,7 +68,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
 
   return (
     <>
-      {console.log(taskVariables)}
+      {console.log(tabs)}
       <Box sx={{ mb: "2rem" }}>
         <Box sx={{ display: "flex", alignItems: "center", columnGap: 2 }}>
           <Box

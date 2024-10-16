@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } fro
 import axios from "axios";
 import type { IInitialization } from "../../shared/models/initialization.model";
 import type { IPlotModel } from "../../shared/models/plotmodel.model";
-import { defaultDataExplorationRequest, type IDataExplorationRequest } from "../../shared/models/dataexploration.model";
+import { defaultDataExplorationQuery, IDataExplorationQuery } from "../../shared/models/dataexploration.model";
 import { AddTask } from "@mui/icons-material";
 import { FetchExplainabilityPlotPayload } from "../../shared/models/tasks/explainability.model";
 
@@ -169,26 +169,26 @@ export const explainabilitySlice = createSlice({
 const apiPath = 'api/';
 
 export const fetchInitialization = createAsyncThunk('explainability/fetch_initialization', 
-  async (payload: {modelName: string, pipelineQuery: IDataExplorationRequest | null, modelInstancesQuery: IDataExplorationRequest | null, modelConfusionQuery: IDataExplorationRequest | null} ) => {
+  async (payload: {modelName: string, pipelineQuery: IDataExplorationQuery | null, modelInstancesQuery: IDataExplorationQuery | null, modelConfusionQuery: IDataExplorationQuery | null} ) => {
     const requestUrl = apiPath + "initialization";
     //TODO: This should be changed in order to make dynamic calls
     return axios.post<any>(requestUrl, payload).then((response) => response.data);
 });
 
 export const fetchExplanation = createAsyncThunk('explainability/fetch_explanation', 
-  async (payload: {explanationType: string, explanationMethod: string, model: string, feature1: string, feature2: string, plotType: string} ) => {
+  async (payload: {explanationType: string, explanationMethod: string, model: string, feature1: string, feature2: string} ) => {
     const requestUrl = apiPath + "explainability";
     return axios.post<any>(requestUrl, payload).then((response) => response.data);
 });
 
 export const fetchMultipleTimeseries = createAsyncThunk('explainability/fetch_multiple_timeseries',
-  async (payload: {dataQuery: IDataExplorationRequest} ) => {
+  async (payload: {dataQuery: IDataExplorationQuery} ) => {
     const requestUrl = apiPath + "visualization/data";
     return axios.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
 });
 
 export const fetchMultipleTimeseriesMetadata = createAsyncThunk('explainability/fetch_multiple_timeseries_metadata',
-  async (payload: {dataQuery: IDataExplorationRequest} ) => {
+  async (payload: {dataQuery: IDataExplorationQuery} ) => {
     const requestUrl = apiPath + "visualization/data";
     return axios.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
 });
@@ -197,7 +197,7 @@ export const fetchConfusionMatrix = createAsyncThunk('explainability/fetch_miscl
 async (payload: {experimentId: number | string, id: number | string}) => {
   const { id, experimentId } = payload;
     const request = {
-      ...defaultDataExplorationRequest,
+      ...defaultDataExplorationQuery,
       datasetId:
         `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
       filters: [

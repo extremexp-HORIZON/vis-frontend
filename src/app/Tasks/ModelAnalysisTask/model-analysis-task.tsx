@@ -6,14 +6,7 @@ import CounterfactualsTable from "../SharedItems/Tables/counterfactuals-table"
 import LinePlot from "../SharedItems/Plots/line-plot"
 import CloseIcon from "@mui/icons-material/Close"
 import grey from "@mui/material/colors/grey"
-import {
-  fetchConfusionMatrix,
-  fetchExplanation,
-  fetchInitialization,
-  fetchMultipleTimeseries,
-  fetchMultipleTimeseriesMetadata,
-} from "../../../store/slices/explainabilitySlice"
-import { defaultDataExplorationRequest } from "../../../shared/models/dataexploration.model"
+import { defaultDataExplorationQuery } from "../../../shared/models/dataexploration.model"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import CircularProgress from "@mui/material/CircularProgress"
@@ -22,9 +15,14 @@ import { useParams } from "react-router-dom"
 import InstanceClassification from "../SharedItems/Plots/instance-classification"
 import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
 import _ from "lodash"
+import {
+  fetchModelAnalysisData,
+  fetchModelAnalysisExplainabilityPlot,
+} from "../../../shared/models/tasks/model-analysis.model"
+import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
 
 interface IFeatureExplainability {
-  workflowId: number | string
+  workflow: IWorkflowTabModel
 }
 
 const ModelAnalysisTask = (props: IFeatureExplainability) => {
@@ -37,8 +35,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
     confMatrixLoading,
     loading,
   } = useAppSelector(state => state.explainability)
+  const { tabs } = useAppSelector(state => state.workflowTabs)
   const { experimentId } = useParams()
-  const { workflowId } = props
+  const { workflow } = props
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
 
@@ -49,66 +48,107 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       _.isEmpty(multipleTimeSeriesMetadata)
     ) {
       dispatch(
-        fetchMultipleTimeseries({
-          dataQuery: {
+        fetchModelAnalysisData({
+          query: {
             datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
             columns: [],
             filters: [],
           },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "multipleTimeSeries",
+          },
         }),
       )
       dispatch(
-        fetchMultipleTimeseriesMetadata({
-          dataQuery: {
+        fetchModelAnalysisData({
+          query: {
             datasetId: `file://${experimentId}/metadata.csv`,
             columns: [],
             filters: [],
+          },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "multipleTimeSeriesMetadata",
           },
         }),
       )
     } else if (experimentId !== "ideko" && !explInitialization) {
       dispatch(
-        fetchInitialization({
-          modelName: "I2Cat_Phising_model",
-          pipelineQuery: {
-            ...defaultDataExplorationRequest,
-            datasetId: "file:///I2Cat_phising/metrics/Real_I2Cat_metrics.csv",
+        fetchModelAnalysisData({
+          query: {
+            ...defaultDataExplorationQuery,
+            datasetId: `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
+            filters: [{ column: "id", type: "equals", value: workflow.workflowId }],
           },
-          modelInstancesQuery: {
-            ...defaultDataExplorationRequest,
-            datasetId: "file:///I2Cat_phising/metrics/Real_I2Cat_instances.csv",
-            filters: [
-              {
-                column: "id",
-                type: "equals",
-                value: workflowId,
-              },
-            ],
-            limit: 1000,
-          },
-          modelConfusionQuery: {
-            ...defaultDataExplorationRequest,
-            datasetId:
-            "file:///I2Cat_phising/metrics/I2Cat_phising_confusion_matrix.csv",
-            filters: [
-              {
-                column: "id",
-                type: "equals",
-                value: workflowId,
-              },
-            ],
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "modelConfusionMatrix",
           },
         }),
       )
+      dispatch(
+        fetchModelAnalysisData({
+          query: {
+            ...defaultDataExplorationQuery,
+            datasetId: `file:///${experimentId}/metrics/${experimentId}_instances.csv`,
+            filters: [{ column: "id", type: "equals", value: workflow.workflowId }],
+          },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "modelInstances",
+          },
+        }),
+      )
+      dispatch(
+        fetchModelAnalysisExplainabilityPlot({
+          explanationType: "featureExplanation",
+          explanationMethod: "pdp",
+          model: "I2Cat_Phising_model",
+          feature1:
+            workflow.workflowTasks.modelAnalysis?.featureNames[0] ||
+            "feature1",
+          feature2: "",
+          modelId: workflow.workflowId,
+        }),
+      )
+      dispatch(
+        fetchModelAnalysisExplainabilityPlot({
+          explanationType: "featureExplanation",
+          explanationMethod: "ale",
+          model: "I2Cat_Phising_model",
+          feature1:
+            workflow.workflowTasks.modelAnalysis?.featureNames[0] ||
+            "feature1",
+          feature2: "",
+          modelId: workflow.workflowId,
+        }),
+      )
     }
-    // if (confusionMatrix.length === 0) {
-      dispatch(fetchConfusionMatrix({experimentId: experimentId || "", id: workflowId}))
-    // }
+    dispatch(
+      fetchModelAnalysisData({
+        query: {
+          ...defaultDataExplorationQuery,
+          datasetId: `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
+          filters: [
+            {
+              column: "id",
+              type: "equals",
+              value: workflow.workflowId,
+            },
+          ],
+        },
+        metadata: {
+          workflowId: workflow.workflowId,
+          queryCase: "modelConfusionMatrix",
+        },
+      }),
+    )
   }, [])
 
   return (
     <>
-    {console.log(confusionMatrix)}
+      {console.log(tabs)}
       <Grid
         sx={{
           flexDirection: "column",
@@ -136,9 +176,10 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             <CloseIcon />
           </IconButton>
         </Box>
-        {(initLoading || confMatrixLoading) || 
+        {initLoading ||
+        confMatrixLoading ||
         (experimentId === "ideko" &&
-        (loading || multipleTimeSeries.length === 0)) ? (
+          (loading || multipleTimeSeries.length === 0)) ? (
           <Box sx={{ height: "100%", width: "100%" }}>
             <CircularProgress size={"5rem"} />
             <Typography fontSize={"1.5rem"} color={grey[500]}>
@@ -190,34 +231,30 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   <ConfusionMatrix
                     key={`confusion-matrix`}
                     metrics={confusionMatrix}
-                    workflowId={workflowId}
+                    workflowId={workflow.workflowId}
                   />
                 </Grid>
               </Grid>
             ) : (
               <Grid container spacing={2}>
-                {explInitialization && (
-                  <>
                     <Grid item xs={12} md={6}>
                       <InstanceClassification
                         key={`instance-classification`}
                         point={point}
                         setPoint={setPoint}
                         plotData={
-                          explInitialization.featureExplanation.modelInstances
+                          workflow.workflowTasks.modelAnalysis?.modelInstances || null
                         }
                       />
                     </Grid>
+                    {explInitialization && (
                     <Grid item md={6} xs={12}>
                       <ConfusionMatrix
                         key={`confusion-matrix`}
-                        metrics={
-                          confusionMatrix
-                        }
-                        workflowId={workflowId}
+                        metrics={confusionMatrix}
+                        workflowId={workflow.workflowId}
                       />
                     </Grid>
-                  </>
                 )}
               </Grid>
             )}
@@ -261,7 +298,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       options={
                         explInitialization.featureExplanation.featureNames
                       }
-                      fetchFunction={fetchExplanation}
+                      fetchFunction={fetchModelAnalysisExplainabilityPlot}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -273,7 +310,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       options={
                         explInitialization.featureExplanation.featureNames
                       }
-                      fetchFunction={fetchExplanation}
+                      fetchFunction={fetchModelAnalysisExplainabilityPlot}
                     />
                   </Grid>
                 </Grid>

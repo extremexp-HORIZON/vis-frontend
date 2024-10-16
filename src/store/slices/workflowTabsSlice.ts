@@ -10,6 +10,7 @@ import {
   defaultWorkflowTabModel,
 } from "../../shared/models/workflow.tab.model"
 import { explainabilityDefault, explainabilityReducers } from "../../shared/models/tasks/explainability.model"
+import { modelAnalysisDefault, modelAnalysisReducers } from "../../shared/models/tasks/model-analysis.model"
 
 export interface IWorkflowTab {
   tabs: IWorkflowTabModel[]
@@ -35,7 +36,8 @@ export const workflowTabsSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    explainabilityReducers(builder)
+    explainabilityReducers(builder),
+    modelAnalysisReducers(builder)
   },
 })
 
@@ -107,6 +109,9 @@ const initializeTab = ({
       }),
       loading: false,
     },
+    workflowTasks: {
+      modelAnalysis: modelAnalysisDefault,
+    }
   }
   return tab
 }
