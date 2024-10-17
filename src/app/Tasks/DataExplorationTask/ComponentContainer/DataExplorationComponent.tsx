@@ -45,7 +45,7 @@ const DataExplorationComponent = () => {
   // Fetch initial data when the component mounts
   useEffect(() => {
     const initialPayload = {
-      datasetId: 'file:///Users/admin/Desktop/airports.csv',
+      datasetId: 'file:///opt/data/airports.csv',
       limit: rowLimit, // Default row limit
       columns: [], // Fetch all columns by default
       filters:[],
@@ -76,7 +76,7 @@ const DataExplorationComponent = () => {
   // Function to handle fetching data when the user clicks the button
   const handleFetchData = () => {
     const payload = {
-      datasetId: 'file:///Users/admin/Desktop/airports.csv',
+      datasetId: 'file:///opt/data/airports.csv',
       limit: rowLimit,
       columns: selectedColumns, // Include selected columns in the payload
       filters:filters

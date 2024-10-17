@@ -61,7 +61,7 @@ const GraphContainer = ({
   const handleFetchBarChartData = () => {
     console.log('Fetching Bar Chart Data...');
     const payload = {
-      datasetId: 'file:///Users/admin/Desktop/airports.csv',
+      datasetId: 'file://opt/data/airports.csv',
       limit: 1000,
       offset: 0,
       filters: filters,
