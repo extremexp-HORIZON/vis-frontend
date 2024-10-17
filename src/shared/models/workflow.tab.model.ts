@@ -19,10 +19,8 @@ export interface IWorkflowTabModel {
     workflowTasks: {
         modelAnalysis?: IModelAnalysis;
         dataExploration?: IDataExplorationQuery;
-    }
-    compareCompletedTasks: {
         explainabilityTask?: IExplainability;
-    } 
+    }
 }
 
 export const defaultWorkflowTabModel: IWorkflowTabModel = {
@@ -41,6 +39,4 @@ export const defaultWorkflowTabModel: IWorkflowTabModel = {
     },
     workflowTasks: {
     },
-    compareCompletedTasks: {
-    }
 }

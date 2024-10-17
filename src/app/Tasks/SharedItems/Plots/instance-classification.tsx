@@ -82,7 +82,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
 
   return (
     <>
-    {console.log(options)}
       <Paper
         className="Category-Item"
         elevation={2}
@@ -111,7 +110,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
           <Box sx={{ flex: 1 }} />
           <Box sx={{ position: 'relative' }}>
           <Tooltip
-          sx={{}}
             title={
               "An instance classification plot is a visualization used to depict the performance of a classification model on individual data instances."
             }

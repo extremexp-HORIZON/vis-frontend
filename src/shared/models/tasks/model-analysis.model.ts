@@ -12,6 +12,22 @@ const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   data: JSON.parse(payload.data),
 })
 
+const handleMultiTimeSeriesData = (payload : any) => {
+  const fileData = JSON.parse(payload.data);
+  const seriesData = payload.fileNames;
+  const flatFileData =  fileData.flatMap((file: any, id:number)=> {
+    return file.map((row: any) => {
+      return { 
+        ...row,
+        timestamp: new Date(row.timestamp), // Ensure timestamp is parsed as Date object
+        value: +row.f3, // Ensure value is a number
+        series: seriesData[id].replace('.csv', '') // Strip the .csv extension for series name
+      };
+    });
+  });
+  return {...payload, data: flatFileData};
+}
+
 export interface IModelAnalysis {
   featureNames: string[]
   pdp: { data: IPlotModel | null; loading: boolean; error: string | null }
@@ -148,7 +164,8 @@ export const modelAnalysisReducers = (
         const compareCompletedTask = state.tabs.find(
           tab => tab.workflowId === action.meta.arg.modelId,
         )?.workflowTasks.modelAnalysis
-        const plotType = action.payload.explanationMethod as keyof IModelAnalysis;
+        const plotType = action.meta.arg.explanationMethod as keyof IModelAnalysis;
+        console.log(compareCompletedTask, plotType)
         if (compareCompletedTask && plotType !== 'featureNames') {
               compareCompletedTask[plotType].data = action.payload
               compareCompletedTask[plotType].loading = false
@@ -162,7 +179,7 @@ export const modelAnalysisReducers = (
       )?.workflowTasks.modelAnalysis
       const queryCase = action.meta.arg.metadata.queryCase as keyof IModelAnalysis
       if (compareCompletedTask && queryCase !== 'featureNames') {
-        compareCompletedTask[queryCase].data = prepareDataExplorationResponse(action.payload)
+        compareCompletedTask[queryCase].data = queryCase === "multipleTimeSeries" ? handleMultiTimeSeriesData(action.payload) : prepareDataExplorationResponse(action.payload)
         compareCompletedTask[queryCase].loading = false
         compareCompletedTask[queryCase].error = null
       }

@@ -120,7 +120,7 @@ const initializeCompareCompleteTab = () => {
   const tab: IWorkflowTabModel = {
     ...defaultWorkflowTabModel,
     workflowId: "compare-completed",
-    compareCompletedTasks: {
+    workflowTasks: {
       explainabilityTask: explainabilityDefault,
     },
   }

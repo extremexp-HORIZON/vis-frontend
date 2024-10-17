@@ -92,10 +92,9 @@ const CompareCompleted = () => {
           </>
         ) : (
           <ExplainabilityTaskCompare
-            taskVariables={
-              tabs.find(tab => tab.workflowId === "compare-completed")
-                ?.compareCompletedTasks.explainabilityTask ||
-              explainabilityDefault
+            workflow={
+              tabs.find(tab => tab.workflowId === "compare-completed") ||
+              null
             }
           />
         )}

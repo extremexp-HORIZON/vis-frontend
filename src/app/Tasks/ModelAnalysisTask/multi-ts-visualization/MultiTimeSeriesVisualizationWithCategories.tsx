@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, SetStateAction, Dispatch } from 'react';
 import type { View , VisualizationSpec } from 'react-vega';
 import { VegaLite } from 'react-vega';
 import * as vega from "vega";
@@ -9,9 +9,9 @@ import ToggleButton from "@mui/material/ToggleButton";
 import InfoIcon from "@mui/icons-material/Info"
 import { getVlSpec } from './vegaLiteSpec';
 import type { SelectChangeEvent} from '@mui/material';
-import { Button, Checkbox, IconButton, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
+import { Checkbox, CircularProgress, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import grey from "@mui/material/colors/grey"
-import CounterfactualsTable from '../../SharedItems/Tables/counterfactuals-table';
+import { IDataExplorationResponse } from '../../../../shared/models/dataexploration.model';
 
 interface Metadata {
   id: string;
@@ -35,8 +35,17 @@ interface FileRegion {
 }
 
 interface MultiTimeSeriesVisualizationWithCategoriesProps {
-  data: Data[];
-  metadata?: Metadata[];
+  multipleTimeSeries: {
+    data: IDataExplorationResponse | null;
+    loading: boolean;
+    error: string | null;
+  } | null;
+  multipleTimeSeriesMetadata?: {
+    data: IDataExplorationResponse | null;
+    loading: boolean;
+    error: string | null;
+  } | null;
+  setPoint: Dispatch<SetStateAction<any>>
 }
 
 var seed = 42;
@@ -45,7 +54,8 @@ function random() {
     return x - Math.floor(x);
 }
 
-const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisualizationWithCategoriesProps> = ({ data, metadata }) => {
+const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisualizationWithCategoriesProps> = (props) => {
+  const { multipleTimeSeries, multipleTimeSeriesMetadata, setPoint } = props;
   const [condensedChartData, setCondensedChartData] = useState<Data[]>(); // line chart data in navigator
   const [chartData, setChartData] = useState<Data[]>(); // main chart data 
   const [fileRegions, setFileRegions] = useState<FileRegion[]>([]); // file regions on navigator
@@ -56,7 +66,6 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   const [alignment, setAlignment] = React.useState<string>('view'); // toggle view
   const [misclassifiedInstances, setMisclassifiedInstances] = useState<boolean>(false)
   const [selectedSeries, setSelectedSeries] = useState<string>();
-  const [showCounterfactuals, setShowCounterfactuals] = useState<boolean>();
   const [vlSpec, setVlSpec] = useState<VisualizationSpec>({});
   const [signalListeners, setSignalListeners] = useState({});
 
@@ -86,9 +95,10 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   // Handles fileRegions update
   // Occurs on single click selection / brush / category selection from legend
   useEffect(() => {
-    if (viewRef.current) {
+    if (viewRef.current && multipleTimeSeries) {
+      const data = structuredClone(multipleTimeSeries.data?.data);
       const selectedSeries = fileRegions.filter(region => region.selected).map(region => region.series);
-      const filteredData = data.filter(d => selectedSeries.includes(d.series));
+      const filteredData = data.filter((d: any) => selectedSeries.includes(d.series));
       const selectedFileCategories = fileRegions
         .filter(region => region.selected)
         .map(region => region.category);
@@ -99,6 +109,10 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
 
   // Updates the view when data or metadata changes
   useEffect(() => {
+    if(multipleTimeSeries && multipleTimeSeriesMetadata && multipleTimeSeries.data && multipleTimeSeriesMetadata.data)
+    {
+    const data = structuredClone(multipleTimeSeries.data.data); 
+    const metadata = structuredClone(multipleTimeSeriesMetadata.data.data); 
     const regions: FileRegion[] = [];
     const newFileCategoryMap: { [key: string]: string } = {};
     // Check if metadata is extensible
@@ -118,7 +132,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
     }
 
     const fileDataMap: { [key: string]: { start: number; end: number } } = {};
-    data.forEach(d => {
+    multipleTimeSeries?.data?.data.forEach((d: any) => {
       const series = d.series;
       const timestamp = new Date(d.timestamp).getTime();
 
@@ -143,8 +157,8 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
     setFileRegions(regions);
     setChartData(data);
     setCondensedChartData(data);
-    setFileCategoryMap(newFileCategoryMap);
-  }, [data, metadata]);
+    setFileCategoryMap(newFileCategoryMap);}
+  }, [multipleTimeSeries, multipleTimeSeriesMetadata]);
 
   useEffect(() => {
     reset();
@@ -254,7 +268,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   }
 
   const handleCounterfactuals = () => {
-    setShowCounterfactuals(true);
+    setPoint(true);
   }
 
   // Initialization
@@ -343,10 +357,11 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
   const reset = () => {
     hideTooltip();
     setSelectedSeries(undefined);
-    setShowCounterfactuals(false);
+    setPoint(null);
   }
 
   return (
+    <>
     <Paper
       className="Category-Item"
       elevation={2}
@@ -373,11 +388,25 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
           { "Instance Classification" }
         </Typography>
         <Box sx={{ flex: 1 }} />
+        <Box sx={{ position: "relative" }}>
         <Tooltip title={""}>
           <IconButton>
             <InfoIcon />
           </IconButton>
         </Tooltip>
+        {multipleTimeSeries && (multipleTimeSeries.loading || !multipleTimeSeries.data) && (
+            <CircularProgress
+              size={28}
+              sx={{
+                // color: green[500],
+                position: "absolute",
+                top: 6,
+                left: 6,
+                zIndex: 0,
+              }}
+            />
+          )}
+        </Box>
       </Box>
       <Box sx={{width:"100%", display: 'flex', flexDirection: 'column', flexWrap: 'wrap', p:2}}>
         <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start', pb: 2}}>
@@ -477,16 +506,10 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
               }
             </Box>
           )}
-          {showCounterfactuals && (
-           <CounterfactualsTable
-             key={`counterfactuals-table`}
-             point={selectedSeries}
-             handleClose={handleCounterfactualsClose}
-           />
-           )}
         </Box>
       </Box>
     </Paper>
+    </>
   );  
 };
 
