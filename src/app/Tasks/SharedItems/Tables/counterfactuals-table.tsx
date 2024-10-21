@@ -10,16 +10,16 @@ import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import TableCell, { tableCellClasses } from "@mui/material/TableCell"
 import TableBody from "@mui/material/TableBody"
-import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import grey from "@mui/material/colors/grey"
 // import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
 import Modal from "@mui/material/Modal"
-import { Dispatch, SetStateAction, useEffect } from "react"
+import { useEffect } from "react"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
-import { fetchCounterfactuals } from "../../../../store/slices/explainabilitySlice"
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import CircularProgress from "@mui/material/CircularProgress"
+import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
+import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -35,6 +35,11 @@ interface ITableComponent {
   children?: React.ReactNode
   point: any;
   handleClose: any;
+  counterfactuals: {
+    data: IPlotModel | null;
+    loading: boolean;
+    error: string | null;
+  } | null
 }
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -55,12 +60,11 @@ const FixedTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 const CounterfactualsTable = (props: ITableComponent) => {
-  const { point, handleClose } = props
-  const { counterfactuals } = useAppSelector((state: RootState) => state.explainability)
+  const { point, handleClose, counterfactuals } = props
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(fetchCounterfactuals({
+    dispatch(fetchModelAnalysisExplainabilityPlot({
     explanationType:"hyperparameterExplanation",
     explanationMethod:"counterfactuals",
     model:"Ideko_model",
@@ -72,7 +76,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
 
   return (
     <>
-    {console.log(counterfactuals)}
       <Modal
         open={point !== null}
         onClose={handleClose}
@@ -103,10 +106,10 @@ const CounterfactualsTable = (props: ITableComponent) => {
           }}
         >
           <Typography fontSize={"1rem"} fontWeight={600}>
-            {counterfactuals.data?.plotName || "Plot name"}
+            {counterfactuals?.data?.plotName || "Plot name"}
           </Typography>
           <Box sx={{ flex: 1 }} />
-          <Tooltip title={counterfactuals.data?.plotDescr || "This is a description"}>
+          <Tooltip title={counterfactuals?.data?.plotDescr || "This is a description"}>
             <IconButton>
               <InfoIcon />
             </IconButton>
@@ -123,7 +126,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             p: 1,
           }}
         >
-          {counterfactuals.loading ? <Box sx={{width: 650, height: 300, display: "flex", justifyContent: "center", alignItems: "center"}}>
+          {counterfactuals?.loading ? <Box sx={{width: 650, height: 300, display: "flex", justifyContent: "center", alignItems: "center"}}>
             <CircularProgress sx={{fontSize: "2rem"}} />
           </Box> : 
           <TableContainer
@@ -138,9 +141,9 @@ const CounterfactualsTable = (props: ITableComponent) => {
             >
               <TableHead>
                 <TableRow>
-                  {Object.keys(counterfactuals.data?.tableContents || {}).map(
+                  {Object.keys(counterfactuals?.data?.tableContents || {}).map(
                     (key, index) => {
-                      const orderedColumn = Object.entries(counterfactuals.data?.tableContents || {}).find(([key, value]) => (value.index === index + 1))
+                      const orderedColumn = Object.entries(counterfactuals?.data?.tableContents || {}).find(([key, value]) => (value.index === index + 1))
                       return(
                       <TableCell
                         key={`table-header-${key}-${index}`}
@@ -161,7 +164,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {counterfactuals.data?.tableContents[
+                {counterfactuals?.data?.tableContents[
                   Object.keys(counterfactuals.data?.tableContents)[0]
                 ].values.map((value: any, index: number) => {
                   return (

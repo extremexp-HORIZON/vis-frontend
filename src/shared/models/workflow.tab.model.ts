@@ -1,5 +1,7 @@
-import { IDataExplorationRequest } from "./dataexploration.model";
+import { IDataExplorationQuery } from "./dataexploration.model";
+import { IDataExploration } from "./tasks/data-exploration-task.model";
 import { IExplainability } from "./tasks/explainability.model";
+import { IModelAnalysis } from "./tasks/model-analysis.model";
 
 export interface IWorkflowTabModel {
     workflowId: string | number;
@@ -16,12 +18,10 @@ export interface IWorkflowTabModel {
         loading: boolean;
     }
     workflowTasks: {
-        modelAnalysis?: any;
-        dataExploration?: IDataExplorationRequest;
-    }
-    compareCompletedTasks: {
+        modelAnalysis?: IModelAnalysis;
+        dataExploration?: IDataExploration;
         explainabilityTask?: IExplainability;
-    } 
+    }
 }
 
 export const defaultWorkflowTabModel: IWorkflowTabModel = {
@@ -40,6 +40,4 @@ export const defaultWorkflowTabModel: IWorkflowTabModel = {
     },
     workflowTasks: {
     },
-    compareCompletedTasks: {
-    }
 }

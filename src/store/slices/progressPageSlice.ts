@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { defaultDataExplorationRequest } from "../../shared/models/dataexploration.model"
+import { defaultDataExplorationQuery } from "../../shared/models/dataexploration.model"
 import axios from "axios"
 import { set } from "lodash"
 
@@ -136,8 +136,8 @@ export const fetchExperimentWorkflows = createAsyncThunk(
   "progressPage/fetch_experiment_workflows",
   async (experimentId: string) => {
     const request = {
-      ...defaultDataExplorationRequest,
-      datasetId: `file:///${experimentId}/workflows.json`,
+      ...defaultDataExplorationQuery,
+      datasetId: `file://${experimentId}/workflows.json`,
     }
     const requestUrl = apiPath + "visualization/data"
     return axios.post<any>(requestUrl, request).then(response => response.data)

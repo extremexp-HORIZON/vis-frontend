@@ -12,65 +12,62 @@ import Typography from "@mui/material/Typography"
 import CircularProgress from "@mui/material/CircularProgress"
 import {
   fetchExplainabilityPlot,
-  IExplainability,
 } from "../../../../../shared/models/tasks/explainability.model"
 import { useParams } from "react-router-dom"
+import { IWorkflowTabModel } from "../../../../../shared/models/workflow.tab.model"
 
 interface IExplainabilityTaskCompare {
-  taskVariables: IExplainability
+  workflow: IWorkflowTabModel | null
 }
 
 const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
-  const { taskVariables } = props
+  const { workflow } = props
   const { experimentId } = useParams()
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (
-      // taskVariables &&
-      !taskVariables["2dpdp"].data &&
-      !taskVariables.ale.data &&
-      !taskVariables.pdp.data
-    ) {
-      dispatch(
-        fetchExplainabilityPlot({
-          explanationType: "hyperparameterExplanation",
-          explanationMethod: "2dpdp",
-          model: "Ideko_model",
-          feature1: taskVariables.hyperparametersNames[0] || "feature1",
-          feature2: taskVariables.hyperparametersNames[1] || "feature2",
-          modelId: 1,
-        }),
-      )
-      dispatch(
-        fetchExplainabilityPlot({
-          explanationType: "hyperparameterExplanation",
-          explanationMethod: "pdp",
-          model: "Ideko_model",
-          feature1: taskVariables.hyperparametersNames[0] || "feature1",
-          feature2: taskVariables.hyperparametersNames[1] || "feature2",
-          modelId: 1,
-        }),
-      )
-      dispatch(
-        fetchExplainabilityPlot({
-          explanationType: "hyperparameterExplanation",
-          explanationMethod: "ale",
-          model: "Ideko_model",
-          feature1: taskVariables.hyperparametersNames[0] || "feature1",
-          feature2: taskVariables.hyperparametersNames[1] || "feature2",
-          modelId: 1,
-        }),
-      )
-    }
+    if(workflow){
+      const taskVariables = workflow.workflowTasks.explainabilityTask || null
+      if(!taskVariables?.["2dpdp"].data){
+    dispatch(
+      fetchExplainabilityPlot({
+        explanationType: "hyperparameterExplanation",
+        explanationMethod: "2dpdp",
+        model: "Ideko_model",
+        feature1: taskVariables?.hyperparametersNames[0] || "feature1",
+        feature2: taskVariables?.hyperparametersNames[1] || "feature2",
+        modelId: 0,
+      }),
+    )
+  }
+    dispatch(
+      fetchExplainabilityPlot({
+        explanationType: "hyperparameterExplanation",
+        explanationMethod: "pdp",
+        model: "Ideko_model",
+        feature1: taskVariables?.hyperparametersNames[0] || "feature1",
+        feature2: taskVariables?.hyperparametersNames[1] || "feature2",
+        modelId: 0,
+      }),
+    )
+    dispatch(
+      fetchExplainabilityPlot({
+        explanationType: "hyperparameterExplanation",
+        explanationMethod: "ale",
+        model: "Ideko_model",
+        feature1: taskVariables?.hyperparametersNames[0] || "feature1",
+        feature2: taskVariables?.hyperparametersNames[1] || "feature2",
+        modelId: 0,
+      }),
+    )
+  }
   }, [])
 
   return (
     <>
-      {console.log(taskVariables)}
+      {console.log(tabs)}
       <Box sx={{ mb: "2rem" }}>
-        <Box sx={{ display: "flex", alignItems: "center", columnGap: 2 }}>
           <Box
             sx={{
               display: "flex",
@@ -87,17 +84,6 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
             </Typography>
             <Typography variant="body1">Explainability</Typography>
           </Box>
-          {taskVariables["2dpdp"].loading ||
-            taskVariables.ale.loading ||
-            taskVariables.pdp.loading ? (
-              <Box>
-                <CircularProgress sx={{ size: "5rem" }} />
-              </Box>
-            ) : null}
-        </Box>
-        {taskVariables["2dpdp"].data &&
-          taskVariables.ale.data &&
-          taskVariables.pdp.data && (
             <Box
               sx={{
                 px: 5,
@@ -114,31 +100,33 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                   <Grid item xs={12} md={6}>
                     <LinePlot
                       key={`pdp-plot`}
-                      plotModel={taskVariables.pdp.data}
-                      options={taskVariables.hyperparametersNames}
+                      plotModel={workflow?.workflowTasks.explainabilityTask?.pdp || null}
+                      options={workflow?.workflowTasks.explainabilityTask?.hyperparametersNames || null}
                       fetchFunction={fetchExplainabilityPlot}
+                      workflowId={0}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
                     <LinePlot
                       key={`ale-plot`}
-                      plotModel={taskVariables.ale.data}
-                      options={taskVariables.hyperparametersNames}
+                      plotModel={workflow?.workflowTasks.explainabilityTask?.ale || null} 
+                      options={workflow?.workflowTasks.explainabilityTask?.hyperparametersNames || null}
                       fetchFunction={fetchExplainabilityPlot}
+                      workflowId={0}
                     />
                   </Grid>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <ContourPlot
                     key={`2dpdp-plot`}
-                    plotModel={taskVariables["2dpdp"].data}
-                    options={taskVariables.hyperparametersNames}
+                    plotModel={workflow?.workflowTasks.explainabilityTask?.["2dpdp"] || null}
+                    options={workflow?.workflowTasks.explainabilityTask?.hyperparametersNames || null}
                     fetchFunction={fetchExplainabilityPlot}
+                    workflowId={0}
                   />
                 </Grid>
               </Grid>
             </Box>
-          )}
       </Box>
     </>
   )

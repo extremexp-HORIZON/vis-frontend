@@ -4,12 +4,11 @@ import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task
 import WorkflowSvg from "./workflow-svg"
 import { useState } from "react"
 import Typography from "@mui/material/Typography"
-import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
+import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 import { RootState, useAppSelector } from "../../../store/store"
 import WorkflowMetricDetails from "./workflow-metric-details"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
-import { ICompareCompletedTab } from "../../../shared/models/compare.tab.model"
 
 interface IWorkflowTab {
   workflowId: number | string
@@ -24,9 +23,9 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const taskProvider = (taskId: string | null) => {
     switch (taskId) {
       case "LG600B6_100636_IDK":
-        return <DataExploration />
+        return <DataExplorationComponent workflow={tabs.find(tab => tab.workflowId === workflowId) || null} />
       case "TrainModel":
-        return <ModelAnalysisTask workflowId={workflowId} />
+        return <ModelAnalysisTask workflow={tabs.find(tab => tab.workflowId === workflowId) || null} />
       case null:
         return null
     }

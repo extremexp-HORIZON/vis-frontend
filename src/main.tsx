@@ -1,10 +1,9 @@
-import React from "react"
+import { ThemeProvider } from '@mui/material/styles';
 import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 import App from "./App"
 import { store } from "./store/store"
 import "./index.css"
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import theme from "./mui-theme"
 
 const container = document.getElementById("root")

@@ -10,7 +10,17 @@ import { IDataExplorationRequest, IFilter } from '../../../../shared/models/data
 import TableChartIcon from '@mui/icons-material/TableChartSharp';
 import AddchartIcon from '@mui/icons-material/Addchart';
 import GraphContainer from './GraphContainer';
-const DataExplorationComponent = () => {
+import { useParams } from 'react-router-dom';
+import { IWorkflowTabModel } from '../../../../shared/models/workflow.tab.model';
+import { fetchDataExplorationData } from '../../../../shared/models/tasks/data-exploration-task.model';
+
+interface IDataExplorationComponent { 
+  workflow: IWorkflowTabModel | null
+}
+
+
+const DataExplorationComponent = (props: IDataExplorationComponent) => {
+  const { workflow } = props;
   const dispatch = useAppDispatch();
   const { dataExploration, loading, error } = useAppSelector((state) => state.dataExploration);
 
@@ -23,9 +33,8 @@ const DataExplorationComponent = () => {
   const[activeChartTab,setActiveChartTab]=useState(0)
   const[filters, setFilters] = useState<IFilter[]>([]);
   const[uniqueColumnValues, setUniqueColumnValues] = useState<string[]>([]);
-
-  const [viewMode, setViewMode] = useState<'overlay' | 'stacked'>('overlay');
-  const [chartType, setChartType] = useState<'line' | 'bar' | 'scatter'>('line');
+  const { experimentId } = useParams()
+  
 
   const [xAxis, setXAxis] = useState<string>('');
   const [yAxis, setYAxis] = useState<string[]>([]);
@@ -34,7 +43,8 @@ const DataExplorationComponent = () => {
   const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
   
 
-  
+  const [viewMode, setViewMode] = useState<'overlay' | 'stacked'>('overlay');
+  const [chartType, setChartType] = useState<'line' | 'bar' | 'scatter'>('line');
 
 
   // Function to fetch data based on selected columns and row limit
@@ -45,17 +55,19 @@ const DataExplorationComponent = () => {
   // Fetch initial data when the component mounts
   useEffect(() => {
     const initialPayload = {
-      datasetId: 'file:///opt/data/airports.csv',
+      datasetId: `file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv`,
       limit: rowLimit, // Default row limit
       columns: [], // Fetch all columns by default
       filters:[],
       groupBy:[],
       aggregation: {},
       offset:0
-
     };
     fetchData(initialPayload); // Fetch initial data
-  }, [dispatch, rowLimit]); // Dependency on rowLimit to re-fetch if it changes
+    if(workflow){
+    dispatch(fetchDataExplorationData({query: initialPayload, metadata: {workflowId: workflow?.workflowId, queryCase: 'lineChart'}}));
+    }
+  }, [rowLimit]); // Dependency on rowLimit to re-fetch if it changes
 
   // Update data and columns when new data comes in
   useEffect(() => {
@@ -76,7 +88,7 @@ const DataExplorationComponent = () => {
   // Function to handle fetching data when the user clicks the button
   const handleFetchData = () => {
     const payload = {
-      datasetId: 'file:///opt/data/airports.csv',
+      datasetId: 'file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv',
       limit: rowLimit,
       columns: selectedColumns, // Include selected columns in the payload
       filters:filters
@@ -109,6 +121,8 @@ const DataExplorationComponent = () => {
     return <Typography color="error">Error: {error}</Typography>;
   }
   return (
+    <>
+    {console.log(workflow)}
   <Paper>
     <Box sx={{ display: 'flex', height: '100vh' }}>
       {/* Control Panel */}
@@ -161,7 +175,7 @@ const DataExplorationComponent = () => {
     </Box>
 
   </Paper>
-   
+  </>
   );
 };
 

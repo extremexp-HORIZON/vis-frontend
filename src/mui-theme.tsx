@@ -1,6 +1,6 @@
 // Import necessary modules
 import { grey } from "@mui/material/colors"
-import { createTheme, Theme } from "@mui/material/styles"
+import { createTheme } from "@mui/material/styles"
 
 // Extend the existing palette interface to include custom properties
 declare module "@mui/material/styles" {

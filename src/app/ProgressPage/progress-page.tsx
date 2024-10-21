@@ -1,7 +1,6 @@
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
-import EditIcon from "@mui/icons-material/Edit"
 import grey from "@mui/material/colors/grey"
 import ParallelCoordinatePlot from "./parallel-coordinate-plot"
 import { useEffect, useState } from "react"

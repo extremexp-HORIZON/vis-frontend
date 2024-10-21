@@ -1,5 +1,6 @@
-export interface IDataExplorationRequest {
-    // data(data: any): unknown;
+import { IModelAnalysis } from "./tasks/model-analysis.model"
+
+export interface IDataExplorationQuery {
     datasetId: string;
     columns?: string[];
     filters?: IFilter[];
@@ -14,23 +15,50 @@ export interface IDataExplorationRequest {
 
 
 
-
-export interface IFilter {
-    column?: string;
-    type: string;
-    value: {
-        min?: number | string;
-        max?: number | string;
-        value?: number | string;
-    } | number | string;
+export interface IDataExplorationRequest {
+  query: IDataExplorationQuery
+  metadata: {
+    workflowId: string | number
+    queryCase: any
+  }
 }
 
-export const defaultDataExplorationRequest: IDataExplorationRequest = {
-    datasetId: '',
-    columns: [],
-    filters: [],
-    limit: 2000,
-    offset: 0,       // Adding default for `offset`
-    groupBy: [],     // Adding default for `groupBy`
-    aggregation: {}  // Adding default for `aggregation`
-};
+export interface VisualColumn {
+  name: string;
+  type: string;
+  // Add any other properties specific to the column metadata
+}
+
+// Model for TabularResults
+export interface IDataExplorationResponse {
+  data: string;
+  fileNames: string[];
+  columns: VisualColumn[]; 
+  originalColumns: VisualColumn[];
+  timestampColumn?: string;
+  totalItems: number;
+  querySize: number;
+  uniqueColumnNames: any;
+}
+
+
+
+
+export interface IFilter {
+  column: string
+  type: string
+  value:
+    | {
+        min?: number | string
+        max?: number | string
+        value?: number | string
+      }
+    | number
+    | string
+}
+
+export const defaultDataExplorationQuery: IDataExplorationQuery = {
+  datasetId: "",
+  limit: 1000,
+  columns: [],
+}

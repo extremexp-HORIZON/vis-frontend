@@ -10,6 +10,8 @@ import {
   defaultWorkflowTabModel,
 } from "../../shared/models/workflow.tab.model"
 import { explainabilityDefault, explainabilityReducers } from "../../shared/models/tasks/explainability.model"
+import { modelAnalysisDefault, modelAnalysisReducers } from "../../shared/models/tasks/model-analysis.model"
+import { additionalReducers, dataExplorationDefault, explainabilityExtraReducers } from "../../shared/models/tasks/data-exploration-task.model"
 
 export interface IWorkflowTab {
   tabs: IWorkflowTabModel[]
@@ -33,9 +35,12 @@ export const workflowTabsSlice = createSlice({
     deleteTab: (state, action) => {
       state.tabs = state.tabs.filter(tab => tab.workflowId !== action.payload)
     },
+    ...additionalReducers
   },
   extraReducers: builder => {
-    explainabilityReducers(builder)
+    explainabilityReducers(builder),
+    modelAnalysisReducers(builder),
+    explainabilityExtraReducers(builder)
   },
 })
 
@@ -107,6 +112,10 @@ const initializeTab = ({
       }),
       loading: false,
     },
+    workflowTasks: {
+      modelAnalysis: modelAnalysisDefault,
+      dataExploration: dataExplorationDefault
+    }
   }
   return tab
 }
@@ -115,7 +124,7 @@ const initializeCompareCompleteTab = () => {
   const tab: IWorkflowTabModel = {
     ...defaultWorkflowTabModel,
     workflowId: "compare-completed",
-    compareCompletedTasks: {
+    workflowTasks: {
       explainabilityTask: explainabilityDefault,
     },
   }
@@ -123,7 +132,7 @@ const initializeCompareCompleteTab = () => {
 }
 
 //Reducer exports
-export const { addTab, deleteTab, addCompareCompletedTab } =
+export const { addTab, deleteTab, addCompareCompletedTab, updateFilters, updateColumns, updateChartData } =
   workflowTabsSlice.actions
 
 export default workflowTabsSlice.reducer

@@ -1,69 +1,107 @@
-import React, { useState, useMemo } from "react";
-import { VegaLite, VisualizationSpec } from "react-vega";
-import { Paper, Box, FormControl, Select, MenuItem, IconButton, Tooltip, Typography, SelectChangeEvent } from "@mui/material";
-import InfoIcon from '@mui/icons-material/Info';
-import { useAppSelector, useAppDispatch, RootState } from "../../../../store/store";
+import React, { useState, useMemo } from "react"
+import { VegaLite, VisualizationSpec } from "react-vega"
+import {
+  FormControl,
+  Select,
+  MenuItem,
+  Typography,
+  SelectChangeEvent,
+  Box,
+} from "@mui/material"
+import {
+  useAppSelector,
+  useAppDispatch,
+  RootState,
+} from "../../../../store/store"
+import WorkflowCard from "../../../../shared/components/workflow-card"
+import ChartParameters from "./chart-parameters"
+import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 
 interface ChartData {
-  x: number;
-  y: number;
-  value: number;
-  id: string;
+  x: number
+  y: number
+  value: number
+  id: string
 }
 
 const VariabilityPointHeatmap: React.FC = () => {
-  const { workflows } = useAppSelector((state: RootState) => state.progressPage);
-  const dispatch = useAppDispatch();
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  const dispatch = useAppDispatch()
 
   // Derive available metrics and variability points from the workflows data
   const metrics = useMemo(() => {
-    if (!workflows.data || workflows.data.length === 0) return [];
-    const allMetrics = workflows.data.flatMap(workflow => 
-      workflow.metrics ? Object.keys(workflow.metrics) : []
-    );
-    return Array.from(new Set(allMetrics));
-  }, [workflows.data]);
+    if (!workflows.data || workflows.data.length === 0) return []
+    const allMetrics = workflows.data.flatMap(workflow =>
+      workflow.metrics ? Object.keys(workflow.metrics) : [],
+    )
+    return Array.from(new Set(allMetrics))
+  }, [workflows.data])
 
   const variabilityPoints = useMemo(() => {
-    if (!workflows.data || workflows.data.length === 0) return [];
-    const allPoints = workflows.data.flatMap(workflow => 
-      workflow.variabilityPoints?.["Model Training"]?.["Parameters"] ? Object.keys(workflow.variabilityPoints["Model Training"]["Parameters"]) : []
-    );
-    return Array.from(new Set(allPoints));
-  }, [workflows.data]);
+    if (!workflows.data || workflows.data.length === 0) return []
+    const allPoints = workflows.data.flatMap(workflow =>
+      workflow.variabilityPoints?.["Model Training"]?.["Parameters"]
+        ? Object.keys(
+            workflow.variabilityPoints["Model Training"]["Parameters"],
+          )
+        : [],
+    )
+    return Array.from(new Set(allPoints))
+  }, [workflows.data])
 
-  const processData = (selectedMetric: string, xVarPoint: string, yVarPoint: string): ChartData[] => {
+  const processData = (
+    selectedMetric: string,
+    xVarPoint: string,
+    yVarPoint: string,
+  ): ChartData[] => {
     return workflows.data
-      .filter(workflow => workflow.workflowInfo.status === "completed" && workflow.metrics)
+      .filter(
+        workflow =>
+          workflow.workflowInfo.status === "completed" && workflow.metrics,
+      )
       .map(workflow => ({
-        x: workflow.variabilityPoints["Model Training"]["Parameters"][xVarPoint] || 0,
-        y: workflow.variabilityPoints["Model Training"]["Parameters"][yVarPoint] || 0,
+        x:
+          workflow.variabilityPoints["Model Training"]["Parameters"][
+            xVarPoint
+          ] || 0,
+        y:
+          workflow.variabilityPoints["Model Training"]["Parameters"][
+            yVarPoint
+          ] || 0,
         value: workflow.metrics[selectedMetric] || 0,
-        id: workflow.workflowId
-      }));
-  };
+        id: workflow.workflowId,
+      }))
+  }
 
-  const [selectedMetric, setSelectedMetric] = useState<string>(metrics[0] || "accuracy");
-  const [selectedXVarPoint, setSelectedXVarPoint] = useState<string>(variabilityPoints[0] );
-  const [selectedYVarPoint, setSelectedYVarPoint] = useState<string>(variabilityPoints[1] );
+  const [selectedMetric, setSelectedMetric] = useState<string>(
+    metrics[0] || "accuracy",
+  )
+  const [selectedXVarPoint, setSelectedXVarPoint] = useState<string>(
+    variabilityPoints[0],
+  )
+  const [selectedYVarPoint, setSelectedYVarPoint] = useState<string>(
+    variabilityPoints[1],
+  )
 
-  const chartData = processData(selectedMetric, selectedXVarPoint, selectedYVarPoint);
+  const chartData = processData(
+    selectedMetric,
+    selectedXVarPoint,
+    selectedYVarPoint,
+  )
 
   const handleMetricChange = (event: SelectChangeEvent<string>) => {
-    setSelectedMetric(event.target.value as string);
-  };
+    setSelectedMetric(event.target.value as string)
+  }
 
   const handleXVarPointChange = (event: SelectChangeEvent<string>) => {
-    setSelectedXVarPoint(event.target.value as string);
-  };
+    setSelectedXVarPoint(event.target.value as string)
+  }
 
   const handleYVarPointChange = (event: SelectChangeEvent<string>) => {
-    setSelectedYVarPoint(event.target.value as string);
-  };
+    setSelectedYVarPoint(event.target.value as string)
+  }
 
   const spec: VisualizationSpec = {
-    width: 500,
-    height: 500,
     mark: { type: "rect", tooltip: true },
     encoding: {
       x: { field: "x", type: "nominal", title: selectedXVarPoint },
@@ -73,47 +111,18 @@ const VariabilityPointHeatmap: React.FC = () => {
         { field: "id", type: "nominal", title: "Workflow ID" },
         { field: "x", type: "nominal", title: selectedXVarPoint },
         { field: "y", type: "nominal", title: selectedYVarPoint },
-        { field: "value", type: "quantitative", title: selectedMetric }
-      ]
+        { field: "value", type: "quantitative", title: selectedMetric },
+      ],
     },
-    data: { values: chartData }
-  };
+    data: { values: chartData },
+  }
 
   return (
-    <Paper
-      className="Category-Item"
-      elevation={2}
-      sx={{
-        borderRadius: 4,
-        width: "inherit",
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 0,
-        minWidth: "300px",
-        height: "100%",
-      }}
+    <WorkflowCard
+      title="Impact of Variability Points on Metrics (Heatmap)"
+      description="Description not available"
     >
-      <Box
-        sx={{
-          px: 1.5,
-          py: 0.5,
-          display: "flex",
-          alignItems: "center",
-          borderBottom: `1px solid grey`,
-        }}
-      >
-        <Typography fontSize={"1rem"} fontWeight={600}>
-          {"Impact of Variability Points on Metrics (Heatmap)"}
-        </Typography>
-        <Box sx={{ flex: 1 }} />
-        <Tooltip title={"Description not available."}>
-          <IconButton>
-            <InfoIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-
-      <Box sx={{ display: "flex", alignItems: "center", px: 1.5, py: 1 }}>
+      <ChartParameters>
         <Typography fontSize={"0.8rem"}>Metric</Typography>
         <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
           <Select
@@ -129,7 +138,9 @@ const VariabilityPointHeatmap: React.FC = () => {
           </Select>
         </FormControl>
 
-        <Typography fontSize={"0.8rem"} sx={{ ml: 2 }}>x-Axis</Typography>
+        <Typography fontSize={"0.8rem"} sx={{ ml: 2 }}>
+          x-Axis
+        </Typography>
         <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
           <Select
             labelId="x-var-point-select-label"
@@ -144,7 +155,9 @@ const VariabilityPointHeatmap: React.FC = () => {
           </Select>
         </FormControl>
 
-        <Typography fontSize={"0.8rem"} sx={{ ml: 2 }}>y-Axis</Typography>
+        <Typography fontSize={"0.8rem"} sx={{ ml: 2 }}>
+          y-Axis
+        </Typography>
         <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
           <Select
             labelId="y-var-point-select-label"
@@ -158,13 +171,24 @@ const VariabilityPointHeatmap: React.FC = () => {
             ))}
           </Select>
         </FormControl>
-      </Box>
+      </ChartParameters>
 
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mt: 2 }}>
-        <VegaLite spec={spec} />
+      <Box
+        sx={{
+          textAlign: "center",
+          m: 2,
+        }}
+      >
+        <ResponsiveVegaLite
+          minWidth={100}
+          minHeight={100}
+          aspectRatio={1 / 0.75}
+          actions={false}
+          spec={spec}
+        />
       </Box>
-    </Paper>
-  );
-};
+    </WorkflowCard>
+  )
+}
 
-export default VariabilityPointHeatmap;
+export default VariabilityPointHeatmap

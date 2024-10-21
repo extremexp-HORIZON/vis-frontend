@@ -1,13 +1,11 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
 import { configureStore } from "@reduxjs/toolkit"
-import { explainabilitySlice } from "./slices/explainabilitySlice"
 import { dataExplorationSlice } from "./slices/dataExplorationSlice"
 import { workflowTabsSlice } from "./slices/workflowTabsSlice"
 import { progressPageSlice } from "./slices/progressPageSlice"
 
 export const store = configureStore({
   reducer: {
-    explainability: explainabilitySlice.reducer,
     dataExploration: dataExplorationSlice.reducer,
     workflowTabs: workflowTabsSlice.reducer,
     progressPage: progressPageSlice.reducer,
