@@ -4,11 +4,12 @@ import { Box, Paper ,IconButton, Popper, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close'; // Import close icon
 
 import { mean, std, min, max, } from 'mathjs'; // Use this library for numeric calculations
+import { VisualColumn } from '../../../../shared/models/dataexploration.model';
 
 
 interface DataTableProps {
-  data: any[];
-  columns: any[];
+  data: any;
+  columns: VisualColumn[];
   datetimeColumn: string;
 //   onFilteredDataChange?: (filteredData: any[]) => void;  // New prop to notify filtered data
 }
@@ -46,13 +47,13 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
     );
   };
 
-  const rows = data.map((row, index) => ({
+  const rows = data.map((row: any, index: number) => ({
     id: row[datetimeColumn] ?? index, // Use index as fallback if datetimeColumn is null or undefined
     ...row,
   }));
 
   const calculateStatistics = (field: string) => {
-    const columnData = rows.map((row) => row[field]).filter((value) => value !== undefined);
+    const columnData = rows.map((row: any) => row[field]).filter((value: any) => value !== undefined);
     return {
       min: min(columnData) as number,
       max: max(columnData) as number,
@@ -66,13 +67,13 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
     const columnDefinition = columns.find((col) => col.name === columnField);
     const cellAnchor = event.currentTarget;
 
-    if (columnDefinition?.type === 'DOUBLE' || columnDefinition?.type === 'FLOAT') {
+    if (columnDefinition?.type === 'DOUBLE' || columnDefinition?.type === 'FLOAT' || columnDefinition?.type === 'INTEGER') {
       setStatistics(calculateStatistics(columnField)); // Calculate statistics for numeric columns
       setColumnType(columnDefinition.type); // Store the column type
       setAnchorEl(cellAnchor);
     } else {
       setStatistics(null); // Clear statistics for non-numeric columns
-      setColumnType(columnDefinition.type)
+      setColumnType(columnDefinition ? columnDefinition.type : "N/A");
       setAnchorEl(cellAnchor);
     }
   };

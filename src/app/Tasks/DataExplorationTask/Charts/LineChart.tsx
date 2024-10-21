@@ -1,17 +1,13 @@
 import { Paper, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { VegaLite } from 'react-vega';
-
-interface Column {
-  name: string;
-  type: 'STRING' | 'DOUBLE'; // Assuming the column type can be either STRING or DOUBLE
-}
+import { VisualColumn } from '../../../../shared/models/dataexploration.model';
 
 interface LineChartProps {
   viewMode: 'overlay' | 'stacked';
   data: any[];
-  xAxis: Column | null;
-  yAxis: Column[]; // Accept array of columns for Y-Axis
+  xAxis: VisualColumn | null;
+  yAxis: VisualColumn[]; // Accept array of columns for Y-Axis
   groupFunction: string;
 }
 

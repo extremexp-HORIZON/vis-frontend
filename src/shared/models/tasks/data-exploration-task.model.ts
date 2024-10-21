@@ -8,88 +8,86 @@ import {
   VisualColumn,
 } from "../dataexploration.model"
 import {
-  handleMultiTimeSeriesData,
   prepareDataExplorationResponse,
 } from "./model-analysis.model"
-import { IWorkflowTabModel } from "../workflow.tab.model"
 
 export interface IDataExploration {
   multipleTimeSeries: any[]
-  filters: IFilter[]
-  columns: VisualColumn[]
+  // filters: IFilter[]
+  // columns: VisualColumn[]
   lineChart: {
-    data: any
+    data: IDataExplorationResponse | null
     loading: boolean
     error: string | null
-    xAxis: string
-    yAxis: string[]
+    // xAxis: string
+    // yAxis: string[]
   }
   barChart: {
-    data: any
+    data: IDataExplorationResponse | null
     loading: boolean
     error: string | null
-    aggregations: {
-      xAxis: string
-      yAxis: string[] | null
-      groupFunction: string[]
-    }[]
+    // aggregations: {
+    //   xAxis: string
+    //   yAxis: string[] | null
+    //   groupFunction: string[]
+    // }[]
   }
 }
 
 // Define the initial state of the slice
 export const dataExplorationDefault: IDataExploration = {
   multipleTimeSeries: [],
-  filters: [],
-  columns: [],
+  // filters: [],
+  // columns: [],
   lineChart: {
-    data: [],
+    data: null,
     loading: false,
     error: null,
-    xAxis: "",
-    yAxis: [],
+    // xAxis: "",
+    // yAxis: [],
   },
   barChart: {
-    data: [],
+    data: null,
     loading: false,
     error: null,
-    aggregations: [],
+    // aggregations: [],
   },
 }
 
-export const additionalReducers = {
-  updateFilters: (state: IWorkflowTab, action: PayloadAction<{ filter: IFilter, workflowId: any }>) => {
-    const compareCompletedTask = state.tabs.find(
-      tab => tab.workflowId === action.payload.workflowId
-    )?.workflowTasks?.dataExploration;
-    if (compareCompletedTask) {
-      compareCompletedTask.filters = [...compareCompletedTask.filters, action.payload.filter];
-    }
-  },
-  updateColumns: (state: IWorkflowTab, action: PayloadAction<{ columns: VisualColumn[], workflowId: any }>) => {
-    const compareCompletedTask = state.tabs.find(
-      tab => tab.workflowId === action.payload.workflowId
-    )?.workflowTasks?.dataExploration;
-    if (compareCompletedTask) {
-      compareCompletedTask.columns = action.payload.columns;
-    }
-  },
-  updateChartData: (state: IWorkflowTab, action: PayloadAction<{ chartType: "lineChart" | "barChart", data: {xAxis?: string, yAxis?: string[], 
-    aggregations?: {
-    xAxis: string
-    yAxis: string[] | null
-    groupFunction: string[]
-  }[]}, workflowId: any }>) => {
-    const compareCompletedTask = state.tabs.find(
-      tab => tab.workflowId === action.payload.workflowId
-    )?.workflowTasks?.dataExploration;
-    if (compareCompletedTask && action.payload.chartType === "lineChart") {
-      compareCompletedTask[action.payload.chartType] = {...compareCompletedTask[action.payload.chartType], ...action.payload.data};
-    }else if (compareCompletedTask && action.payload.chartType === "barChart") {
-      compareCompletedTask[action.payload.chartType] = {...compareCompletedTask[action.payload.chartType], ...action.payload.data};
-    }
-  },
-  // Add more reducers as needed
-};
+// export const additionalReducers = {
+//   updateFilters: (state: IWorkflowTab, action: PayloadAction<{ filter: IFilter, workflowId: any }>) => {
+//     const compareCompletedTask = state.tabs.find(
+//       tab => tab.workflowId === action.payload.workflowId
+//     )?.workflowTasks?.dataExploration;
+//     if (compareCompletedTask) {
+//       compareCompletedTask.filters = [...compareCompletedTask.filters, action.payload.filter];
+//     }
+//   },
+//   updateColumns: (state: IWorkflowTab, action: PayloadAction<{ columns: VisualColumn[], workflowId: any }>) => {
+//     const compareCompletedTask = state.tabs.find(
+//       tab => tab.workflowId === action.payload.workflowId
+//     )?.workflowTasks?.dataExploration;
+//     if (compareCompletedTask) {
+//       compareCompletedTask.columns = action.payload.columns;
+//     }
+//   },
+//   updateChartData: (state: IWorkflowTab, action: PayloadAction<{ chartType: "lineChart" | "barChart", data: {xAxis?: string, yAxis?: string[], 
+//     aggregations?: {
+//     xAxis: string
+//     yAxis: string[] | null
+//     groupFunction: string[]
+//   }[]}, workflowId: any }>) => {
+//     const compareCompletedTask = state.tabs.find(
+//       tab => tab.workflowId === action.payload.workflowId
+//     )?.workflowTasks?.dataExploration;
+//     if (compareCompletedTask && action.payload.chartType === "lineChart") {
+//       compareCompletedTask[action.payload.chartType] = {...compareCompletedTask[action.payload.chartType], ...action.payload.data};
+//     }else if (compareCompletedTask && action.payload.chartType === "barChart") {
+//       compareCompletedTask[action.payload.chartType] = {...compareCompletedTask[action.payload.chartType], ...action.payload.data};
+//     }
+//   },
+//   // Add more reducers as needed
+// };
 
 export const explainabilityExtraReducers = (
   builder: ActionReducerMapBuilder<IWorkflowTab>,

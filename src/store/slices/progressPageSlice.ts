@@ -138,6 +138,7 @@ export const fetchExperimentWorkflows = createAsyncThunk(
     const request = {
       ...defaultDataExplorationQuery,
       datasetId: `file://${experimentId}/workflows.json`,
+      limit: 1000
     }
     const requestUrl = apiPath + "visualization/data"
     return axios.post<any>(requestUrl, request).then(response => response.data)

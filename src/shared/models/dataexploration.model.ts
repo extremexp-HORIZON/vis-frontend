@@ -38,7 +38,7 @@ export interface IDataExplorationResponse {
   timestampColumn?: string;
   totalItems: number;
   querySize: number;
-  uniqueColumnNames: any;
+  uniqueColumnValues: any;
 }
 
 
@@ -59,6 +59,6 @@ export interface IFilter {
 
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
   datasetId: "",
-  limit: 1000,
+  limit: -1,
   columns: [],
 }

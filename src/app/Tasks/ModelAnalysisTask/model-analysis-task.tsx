@@ -19,7 +19,6 @@ import {
   fetchModelAnalysisExplainabilityPlot,
 } from "../../../shared/models/tasks/model-analysis.model"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
-import { updateChartData, updateColumns, updateFilters } from "../../../store/slices/workflowTabsSlice"
 
 interface IFeatureExplainability {
   workflow: IWorkflowTabModel | null
@@ -86,6 +85,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             filters: [
               { column: "id", type: "equals", value: workflow.workflowId },
             ],
+            limit: 1000
           },
           metadata: {
             workflowId: workflow.workflowId,
@@ -135,9 +135,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         },
       }),
     )
-    dispatch(updateFilters({ filter: { column: "id", type: "equals", value: 3 }, workflowId: workflow.workflowId }))
-    dispatch(updateColumns({ columns: [{name: "dskj", type: "integer"}], workflowId: workflow.workflowId }))
-    dispatch(updateChartData({ chartType: "lineChart", data: {xAxis: "ok", yAxis: ["tapame"]}, workflowId: workflow.workflowId }))
   }, [])
 
   return (

@@ -1,101 +1,158 @@
+import React, { useEffect, useState } from "react"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import { fetchDataExploration } from "../../../../store/slices/dataExplorationSlice"
+import TableExpand from "../DataTable/TableExpand"
+import ControlPanel from "../ChartControls/ControlPanel" // Import the new ControlPanel component
+import {
+  Box,
+  CircularProgress,
+  Paper,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material"
+import { grey } from "@mui/material/colors"
+import {
+  IDataExplorationRequest,
+  IFilter,
+  VisualColumn,
+} from "../../../../shared/models/dataexploration.model" // Ensure correct path
+import TableChartIcon from "@mui/icons-material/TableChartSharp"
+import AddchartIcon from "@mui/icons-material/Addchart"
+import GraphContainer from "./GraphContainer"
+import { useParams } from "react-router-dom"
+import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
+import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 
-import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import { fetchDataExploration } from "../../../../store/slices/dataExplorationSlice";
-import TableExpand from '../DataTable/TableExpand';
-import ControlPanel from '../ChartControls/ControlPanel'; // Import the new ControlPanel component
-import { Box, CircularProgress, Paper, Tab, Tabs, Typography } from '@mui/material';
-import { grey } from '@mui/material/colors';
-import { IDataExplorationRequest, IFilter } from '../../../../shared/models/dataexploration.model'; // Ensure correct path
-import TableChartIcon from '@mui/icons-material/TableChartSharp';
-import AddchartIcon from '@mui/icons-material/Addchart';
-import GraphContainer from './GraphContainer';
-import { useParams } from 'react-router-dom';
-import { IWorkflowTabModel } from '../../../../shared/models/workflow.tab.model';
-import { fetchDataExplorationData } from '../../../../shared/models/tasks/data-exploration-task.model';
-
-interface IDataExplorationComponent { 
+interface IDataExplorationComponent {
   workflow: IWorkflowTabModel | null
 }
 
-
 const DataExplorationComponent = (props: IDataExplorationComponent) => {
-  const { workflow } = props;
-  const dispatch = useAppDispatch();
-  const { dataExploration, loading, error } = useAppSelector((state) => state.dataExploration);
+  const { workflow } = props
+  const dispatch = useAppDispatch()
+  const { dataExploration, loading, error } = useAppSelector(
+    state => state.dataExploration,
+  )
+  const {} = useAppSelector(state => state.workflowTabs)
 
-  const [data, setData] = useState([]);
-  const [columns, setColumns] = useState<any[]>([]);
-  const [originalColumns, setOriginalColumns] = useState([]);
-  const [selectedColumns, setSelectedColumns] = useState([]);
-  const [rowLimit, setRowLimit] = useState(1000);
-  const [activeTab, setActiveTab] = useState(0); // 0 for Raw Records, 1 for Aggregate
-  const[activeChartTab,setActiveChartTab]=useState(0)
-  const[filters, setFilters] = useState<IFilter[]>([]);
-  const[uniqueColumnValues, setUniqueColumnValues] = useState<string[]>([]);
+  const [data, setData] = useState([])
+  const [columns, setColumns] = useState<any[]>([])
+  const [originalColumns, setOriginalColumns] = useState<any>([])
+  const [selectedColumns, setSelectedColumns] = useState<any>([])
+  const [rowLimit, setRowLimit] = useState(1000)
+  const [activeChartTab, setActiveChartTab] = useState(0)
+  const [filters, setFilters] = useState<IFilter[]>([])
+  const [uniqueColumnValues, setUniqueColumnValues] = useState<string[]>([])
   const { experimentId } = useParams()
-  
 
-  const [xAxis, setXAxis] = useState<string>('');
-  const [yAxis, setYAxis] = useState<string[]>([]);
-  const [groupFunction, setGroupFunction] = useState<string>('sum');
-  const [barGroupBy, setBarGroupBy] = useState<string[]>([]); // State for bar chart grouping
-  const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
-  
+  const [xAxis, setXAxis] = useState<VisualColumn>({ name: "", type: "" })
+  const [yAxis, setYAxis] = useState<VisualColumn[]>([])
+  const [groupFunction, setGroupFunction] = useState<string>("sum")
+  const [barGroupBy, setBarGroupBy] = useState<string[]>([]) // State for bar chart grouping
+  const [barAggregation, setBarAggregation] = useState<any>({}) // State for bar chart aggregation
 
-  const [viewMode, setViewMode] = useState<'overlay' | 'stacked'>('overlay');
-  const [chartType, setChartType] = useState<'line' | 'bar' | 'scatter'>('line');
+  const [viewMode, setViewMode] = useState<"overlay" | "stacked">("overlay")
+  const [chartType, setChartType] = useState<"line" | "bar" | "scatter">("line")
 
+  const taskDependancies = workflow?.workflowTasks.dataExploration
+  const workflowId = workflow?.workflowId
 
   // Function to fetch data based on selected columns and row limit
-  const fetchData = (payload : IDataExplorationRequest) => {
-    dispatch(fetchDataExploration(payload));
-  };
+  const fetchData = (payload: IDataExplorationRequest) => {
+    dispatch(fetchDataExploration(payload))
+  }
 
-  // Fetch initial data when the component mounts
   useEffect(() => {
-    const initialPayload = {
-      datasetId: `file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv`,
-      limit: rowLimit, // Default row limit
-      columns: [], // Fetch all columns by default
-      filters:[],
-      groupBy:[],
-      aggregation: {},
-      offset:0
-    };
-    fetchData(initialPayload); // Fetch initial data
-    if(workflow){
-    dispatch(fetchDataExplorationData({query: initialPayload, metadata: {workflowId: workflow?.workflowId, queryCase: 'lineChart'}}));
+    if (workflow && experimentId) {
+      dispatch(
+        fetchDataExplorationData({
+          query: {
+            datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+            limit: rowLimit, // Default row limit
+            columns: [], // Fetch all columns by default
+            filters: [],
+            groupBy: [],
+            aggregation: {},
+            offset: 0,
+          },
+          metadata: {
+            workflowId: workflowId || "",
+            queryCase: "lineChart",
+          },
+        }),
+      )
     }
-  }, [rowLimit]); // Dependency on rowLimit to re-fetch if it changes
+  }, [])
+
+  useEffect(() => {
+    if(taskDependancies?.lineChart.data) {
+      setColumns(taskDependancies?.lineChart.data.columns)
+      setOriginalColumns(taskDependancies?.lineChart.data.originalColumns) // Set original columns from the response
+      setUniqueColumnValues(taskDependancies?.lineChart.data.uniqueColumnValues)
+    }
+  }, [taskDependancies?.lineChart.data])
+
+  // // Fetch initial data when the component mounts
+  // useEffect(() => {
+  //   const initialPayload = {
+  //     datasetId: `file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv`,
+  //     limit: rowLimit, // Default row limit
+  //     columns: [], // Fetch all columns by default
+  //     filters: [],
+  //     groupBy: [],
+  //     aggregation: {},
+  //     offset: 0,
+  //   }
+  //   fetchData(initialPayload) // Fetch initial data
+  //   if (workflow) {
+  //     dispatch(
+  //       fetchDataExplorationData({
+  //         query: initialPayload,
+  //         metadata: {
+  //           workflowId: workflow?.workflowId,
+  //           queryCase: "lineChart",
+  //         },
+  //       }),
+  //     )
+  //   }
+  // }, [rowLimit]) // Dependency on rowLimit to re-fetch if it changes
 
   // Update data and columns when new data comes in
   useEffect(() => {
-    if (dataExploration?.data) {
-      const parsedData = JSON.parse(dataExploration.data);
-      setData(parsedData);
-      setColumns(dataExploration.columns);
-      setOriginalColumns(dataExploration.originalColumns); // Set original columns from the response
-      setUniqueColumnValues(dataExploration.uniqueColumnValues);
-      // Set default selected columns if none are selected
-      if (selectedColumns.length === 0 && dataExploration.originalColumns) {
-        const defaultColumns = dataExploration.originalColumns.map((col: { name: string; }) => col.name);
-        setSelectedColumns(defaultColumns);
+    if (taskDependancies?.lineChart.data) {
+      if (selectedColumns.length === 0) {
+        setSelectedColumns(taskDependancies.lineChart.data.originalColumns.map((col: any) => col.name))
       }
     }
-  }, [dataExploration, selectedColumns,filters,barGroupBy,barAggregation,columns,originalColumns,xAxis,yAxis]); // Listen for new dataExploration responses
+  }, [
+    selectedColumns
+  ]) // Listen for new dataExploration responses
 
   // Function to handle fetching data when the user clicks the button
   const handleFetchData = () => {
-    const payload = {
-      datasetId: 'file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv',
-      limit: rowLimit,
-      columns: selectedColumns, // Include selected columns in the payload
-      filters:filters
-      
-    };
-    fetchData(payload);
-  };
+    // const payload = {
+    //   datasetId: "file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv",
+    //   limit: rowLimit,
+    //   columns: selectedColumns, // Include selected columns in the payload
+    //   filters: filters,
+    // }
+    // fetchData(payload)
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+          limit: rowLimit, // Default row limit
+          columns: selectedColumns, // Include selected columns in the payload
+          filters: filters,
+        },
+        metadata: {
+          workflowId: workflowId || "",
+          queryCase: "lineChart",
+        },
+      }),
+    )
+  }
 
   if (loading) {
     return (
@@ -106,7 +163,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
         }}
       >
         <CircularProgress size={"5rem"} />
@@ -114,71 +171,79 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           Initializing page...
         </Typography>
       </Box>
-    );
+    )
   }
 
   if (error) {
-    return <Typography color="error">Error: {error}</Typography>;
+    return <Typography color="error">Error: {error}</Typography>
   }
+
   return (
     <>
-    {console.log(workflow)}
-  <Paper>
-    <Box sx={{ display: 'flex', height: '100vh' }}>
-      {/* Control Panel */}
-      <ControlPanel
-        originalColumns={originalColumns}
-        selectedColumns={selectedColumns}
-        setSelectedColumns={setSelectedColumns}
-        rowLimit={rowLimit}
-        setRowLimit={setRowLimit}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onFetchData={handleFetchData} // Pass the fetchData function to ControlPanel
-        filters={filters}
-        setFilters={setFilters}
-        uniqueValues={uniqueColumnValues}
-      />
-        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-
-        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-          <Tabs value={activeChartTab} onChange={(e, newValue) => setActiveChartTab(newValue)}>
-            <Tab label="Data Table" icon={<TableChartIcon/>} />
-            <Tab label="Charts" icon={<AddchartIcon/>} />
-          </Tabs>
-        </Box>
-        {activeChartTab === 0 && (
-            <Box sx={{ width: '100%', height: '100%', overflowX: 'auto' }}> {/* Enable horizontal scroll */}
-          <TableExpand data={data} columns={columns} datetimeColumn="" />
+      {console.log(uniqueColumnValues)}
+      <Paper>
+        <Box sx={{ display: "flex", height: "100vh" }}>
+          {/* Control Panel */}
+          <ControlPanel
+            originalColumns={originalColumns}
+            selectedColumns={selectedColumns}
+            setSelectedColumns={setSelectedColumns}
+            rowLimit={rowLimit}
+            setRowLimit={setRowLimit}
+            onFetchData={handleFetchData} // Pass the fetchData function to ControlPanel
+            filters={filters}
+            setFilters={setFilters}
+            uniqueValues={uniqueColumnValues}
+          />
+          <Box sx={{ flexGrow: 1, overflow: "auto" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "1rem",
+              }}
+            >
+              <Tabs
+                value={activeChartTab}
+                onChange={(e, newValue) => setActiveChartTab(newValue)}
+              >
+                <Tab label="Data Table" icon={<TableChartIcon />} />
+                <Tab label="Charts" icon={<AddchartIcon />} />
+              </Tabs>
+            </Box>
+            {activeChartTab === 0 && taskDependancies?.lineChart.data && (
+              <Box sx={{ width: "100%", height: "100%", overflowX: "auto" }}>
+                {" "}
+                {/* Enable horizontal scroll */}
+                <TableExpand data={taskDependancies?.lineChart.data?.data} columns={taskDependancies?.lineChart.data?.columns || null} datetimeColumn="" />
+              </Box>
+            )}
+            {activeChartTab === 1 && (
+              <GraphContainer
+                dataexp={workflow?.workflowTasks.dataExploration?.lineChart.data?.data}
+                columns={columns}
+                filters={filters}
+                chartType={chartType}
+                setChartType={setChartType}
+                xAxis={xAxis}
+                setXAxis={setXAxis}
+                yAxis={yAxis}
+                setYAxis={setYAxis}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                groupFunction={groupFunction}
+                setGroupFunction={setGroupFunction}
+                barGroupBy={barGroupBy}
+                setBarGroupBy={setBarGroupBy}
+                barAggregation={barAggregation}
+                setBarAggregation={setBarAggregation}
+              />
+            )}
           </Box>
-          )}
-        {activeChartTab === 1 && (
-          <GraphContainer dataexp={dataExploration ?? []}
-          filters={filters}
-          chartType={chartType}
-          setChartType={setChartType}
-          xAxis={xAxis}
-          setXAxis={setXAxis}
-          yAxis={yAxis}
-          setYAxis={setYAxis}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          groupFunction={groupFunction}
-          setGroupFunction={setGroupFunction}
-          barGroupBy={barGroupBy}
-          setBarGroupBy={setBarGroupBy}
-          barAggregation={barAggregation}
-          setBarAggregation={setBarAggregation}
-           />
-          )}
-      </Box>
-    </Box>
+        </Box>
+      </Paper>
+    </>
+  )
+}
 
-  </Paper>
-  </>
-  );
-};
-
-export default DataExplorationComponent;
-
-
+export default DataExplorationComponent
