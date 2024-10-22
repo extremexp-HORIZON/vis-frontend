@@ -5,13 +5,18 @@ import ChartButtonGroup from "../ChartControls/ChartButtonGroup"
 import LineChartControlPanel from "../Charts/LineChartControlPanel"
 import BarChartControlPanel from "../Charts/BarChartControlPanel"
 import { fetchDataExploration } from "../../../../store/slices/dataExplorationSlice"
-import { useAppDispatch } from "../../../../store/store"
 import { IFilter, VisualColumn } from "../../../../shared/models/dataexploration.model"
 import BarChart from "../Charts/BarChart"
+import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
+
 
 interface IGraphContainer {
-  dataexp: any
+  linedata: any
+  bardata:any
   filters: IFilter[]
+  experimentId: string
+  workflowId: string
   columns: VisualColumn[]
   chartType: "line" | "bar" | "scatter"
   setChartType: React.Dispatch<React.SetStateAction<"line" | "bar" | "scatter">>
@@ -32,8 +37,11 @@ interface IGraphContainer {
 const GraphContainer = (props: IGraphContainer) => {
 
   const {
-    dataexp,
+    linedata,
+    bardata,
     columns,
+    experimentId,
+    workflowId,
     filters,
     chartType,
     setChartType,
@@ -51,37 +59,35 @@ const GraphContainer = (props: IGraphContainer) => {
     setBarAggregation,
   } = props
   
-  const dispatch = useAppDispatch() // Initialize the dispatch
-  console.log('dataexp', dataexp)
+  
 
+  const dispatch = useAppDispatch()
+  
 
-  // const [barGroupBy, setBarGroupBy] = useState<string[]>([]); // State for bar chart grouping
-  // const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
-
-  // Fetch Bar Chart Data and ensure chartType doesn't reset
   const handleFetchBarChartData = () => {
-    console.log("Fetching Bar Chart Data...")
-    const payload = {
-      datasetId: "file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv",
-      limit: 1000,
-      offset: 0,
-      filters: filters,
-      groupBy: barGroupBy,
-      aggregation: barAggregation,
-    }
-
-    console.log("Fetch Bar Chart Data Payload:", payload)
-
-    // Ensure that the chartType is 'bar' BEFORE dispatch
-    // setChartType('bar');
-
-    // Fetch bar chart data without resetting the chart type
-    dispatch(fetchDataExploration(payload)).then(response => {
-      console.log("Bar Chart Data:", response)
-    })
-
-    // Ensure the chartType doesn't reset here
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+          limit: 1000, // Default row limit
+          columns: [], // Include selected columns in the payload
+          filters: filters,
+          groupBy: barGroupBy,
+          aggregation: barAggregation,
+        },
+        metadata: {
+          workflowId: workflowId || "",
+          queryCase: "barChart",
+        },
+      }),
+    )
   }
+
+
+  console.log('bardata',bardata)
+
+
+  
   return (
     <Paper>
       <Box sx={{ padding: "1rem", position: "relative" }}>
@@ -129,7 +135,7 @@ const GraphContainer = (props: IGraphContainer) => {
         )}
         {chartType === "bar" && (
           <BarChartControlPanel
-            originalColumns={dataexp.originalColumns}
+            originalColumns={columns}
             barGroupBy={barGroupBy}
             setBarGroupBy={setBarGroupBy}
             barAggregation={barAggregation}
@@ -144,14 +150,19 @@ const GraphContainer = (props: IGraphContainer) => {
           {chartType === "line" && (
             <LineChart
               viewMode={viewMode}
-              data={dataexp}
+              data={linedata}
               xAxis={xAxis}
               yAxis={yAxis}
               groupFunction={""}
             />
           )}
           {chartType === "bar" && (
-            <BarChart dataExploration={dataexp} />
+            // Conditionally render BarChart if bardata exists
+            bardata && bardata.length > 0 ? (
+              <BarChart dataExploration={bardata} />
+            ) : (
+              <p>No bar chart data available. Please fetch data first.</p> // Display a message if no bardata
+            )
           )}
           {chartType === "scatter" && <p>Scatter Plot</p>}
         </Box>

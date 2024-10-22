@@ -5,8 +5,10 @@ import { Vega } from 'react-vega';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const BarChart = ({ dataExploration }) => {
+  console.log("dataExplorationBArchaer",dataExploration)
   // Parse the data string from the dataExploration object
-  const parsedData = JSON.parse(dataExploration.data);
+  const parsedData = dataExploration.data;
+  console.log("parasedData",parsedData)
 
   // Extract the columns information
   const columns = dataExploration.columns;

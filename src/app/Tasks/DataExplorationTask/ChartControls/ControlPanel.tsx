@@ -13,6 +13,7 @@ import {
   ListItemText,
   Tooltip,
   Slider,
+  Chip,
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import InfoIcon from "@mui/icons-material/Info"
@@ -85,7 +86,6 @@ const ControlPanel = (props: IControlPanel) => {
   const [showColumnDropdown, setShowColumnDropdown] = useState(false)
   const [showRowLimitDropdown, setShowRowLimitDropdown] = useState(false)
   const [showFilterDropdown, setShowFilterDropdown] = useState(false)
-
   const [filterColumn, setFilterColumn] = useState("") // Selected column
   const [filterType, setFilterType] = useState("equals") // 'equals' or 'range'
   const [filterValue, setFilterValue] = useState("") // For equals, or range object {min, max}
@@ -326,29 +326,19 @@ const ControlPanel = (props: IControlPanel) => {
               </Button>
 
               {/* Render Filters */}
-              <Box sx={{ mt: 3 }}>
-                {filters.map((filter, index) => (
-                  <Box
-                    key={index}
-                    sx={{ display: "flex", alignItems: "center", mb: 2 }}
-                  >
-                    <Typography>
-                      {filter.column} {filter.type}{" "}
-                      {filter.type === "equals"
-                        ? filter.value
-                        : `${filter.value.min} - ${filter.value.max}`}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => handleDeleteFilter(index)}
-                      sx={{ ml: 2 }}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
-                ))}
-              </Box>
+              <Box sx={{ mt: 3, display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {filters.map((filter, index) => (
+                <Chip
+                  key={index}
+                  label={`${filter.column} ${filter.type} ${
+                    filter.type === "equals" ? filter.value : `${filter.value.min} - ${filter.value.max}`
+                  }`}
+                  onDelete={() => handleDeleteFilter(index)}
+                  color="primary"
+                  sx={{ margin: 0.5 }}
+                />
+              ))}
+            </Box>
             </Box>
           )}
           <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}

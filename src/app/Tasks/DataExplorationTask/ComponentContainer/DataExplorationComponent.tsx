@@ -29,12 +29,7 @@ interface IDataExplorationComponent {
 const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const { workflow } = props
   const dispatch = useAppDispatch()
-  const { dataExploration, loading, error } = useAppSelector(
-    state => state.dataExploration,
-  )
   const {} = useAppSelector(state => state.workflowTabs)
-
-  const [data, setData] = useState([])
   const [columns, setColumns] = useState<any[]>([])
   const [originalColumns, setOriginalColumns] = useState<any>([])
   const [selectedColumns, setSelectedColumns] = useState<any>([])
@@ -43,13 +38,11 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [filters, setFilters] = useState<IFilter[]>([])
   const [uniqueColumnValues, setUniqueColumnValues] = useState<string[]>([])
   const { experimentId } = useParams()
-
   const [xAxis, setXAxis] = useState<VisualColumn>({ name: "", type: "" })
   const [yAxis, setYAxis] = useState<VisualColumn[]>([])
   const [groupFunction, setGroupFunction] = useState<string>("sum")
   const [barGroupBy, setBarGroupBy] = useState<string[]>([]) // State for bar chart grouping
   const [barAggregation, setBarAggregation] = useState<any>({}) // State for bar chart aggregation
-
   const [viewMode, setViewMode] = useState<"overlay" | "stacked">("overlay")
   const [chartType, setChartType] = useState<"line" | "bar" | "scatter">("line")
 
@@ -62,8 +55,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
         fetchDataExplorationData({
           query: {
             datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
-            limit: rowLimit, // Default row limit
-            columns: [], // Fetch all columns by default
+            limit: rowLimit, 
+            columns: [], 
             filters: [],
             groupBy: [],
             aggregation: {},
@@ -81,24 +74,19 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   useEffect(() => {
     if(taskDependancies?.lineChart.data) {
       setColumns(taskDependancies?.lineChart.data.columns)
-      setOriginalColumns(taskDependancies?.lineChart.data.originalColumns) // Set original columns from the response
+      setOriginalColumns(taskDependancies?.lineChart.data.originalColumns) 
       setUniqueColumnValues(taskDependancies?.lineChart.data.uniqueColumnValues)
     }
   }, [taskDependancies?.lineChart.data,xAxis,yAxis])
 
-
-  // Update data and columns when new data comes in
   useEffect(() => {
     if (taskDependancies?.lineChart.data) {
       if (selectedColumns.length === 0) {
         setSelectedColumns(taskDependancies.lineChart.data.originalColumns.map((col: any) => col.name))
       }
     }
-  }, [
-    selectedColumns
-  ]) // Listen for new dataExploration responses
-
-  // Function to handle fetching data when the user clicks the button
+  }, [selectedColumns]) 
+  
   const handleFetchData = () => {
     dispatch(
       fetchDataExplorationData({
@@ -119,8 +107,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
  
   return (
     <>
-      {console.log(taskDependancies)}
-      {console.log(workflow)}
+      {console.log("workflow",workflow?.workflowTasks.dataExploration?.barChart.data)}
       <Paper>
         <Box sx={{ display: "flex", height: "100vh" }}>
           {/* Control Panel */}
@@ -160,7 +147,11 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             )}
             {activeChartTab === 1 && (
               <GraphContainer
-                dataexp={workflow?.workflowTasks.dataExploration?.lineChart.data?.data}
+                linedata={workflow?.workflowTasks.dataExploration?.lineChart.data?.data}
+                bardata={workflow?.workflowTasks.dataExploration?.barChart.data}
+
+                experimentId={experimentId}
+                workflowId={workflow.workflowId}
                 columns={columns}
                 filters={filters}
                 chartType={chartType}

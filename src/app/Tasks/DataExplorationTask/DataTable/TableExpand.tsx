@@ -174,13 +174,13 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
                   { field: "std", headerName: "Std", width: 80 }
                 ]}
                 // autoHeight
-                // hideFooter
-                // hideFooterSelectedRowCount
-                // hideFooterPagination
-                // disableColumnMenu
-                // disableColumnFilter
-                // disableColumnSorting
-                // disableColumnSelector
+                hideFooter
+                hideFooterSelectedRowCount
+                hideFooterPagination
+                disableColumnMenu
+                disableColumnFilter
+                disableColumnSorting
+                disableColumnSelector
               />
             </>
           ) : (
