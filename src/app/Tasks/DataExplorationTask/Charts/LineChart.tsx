@@ -2,6 +2,7 @@ import { Paper, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { VegaLite } from 'react-vega';
 import { VisualColumn } from '../../../../shared/models/dataexploration.model';
+import { cloneDeep } from 'lodash'; // Import lodash for deep cloning
 
 interface LineChartProps {
   viewMode: 'overlay' | 'stacked';
@@ -11,23 +12,41 @@ interface LineChartProps {
   groupFunction: string;
 }
 
+
 const getColumnType = (columnType: string) => {
   switch (columnType) {
     case 'DOUBLE':
     case 'FLOAT':
+    case 'INTEGER':
       return 'quantitative'; // Numbers -> quantitative
+    case 'LOCAL_DATE_TIME':
+      return 'temporal';
     case 'STRING':
     default:
       return 'nominal'; // Text -> nominal or ordinal
+    
   }
 };
 
 const LineChart = ({ viewMode, data, xAxis, yAxis, groupFunction }: LineChartProps) => {
+  console.log("props", viewMode, data, xAxis, yAxis, groupFunction)
+
   const [chartSpecs, setChartSpecs] = useState<any[]>([]);
+  const [dataCopy, setDataCopy] = useState<any[]>([]); // Define dataCopy here
+
 
   useEffect(() => {
     if (xAxis && yAxis.length > 0) {
       const yAxisFields = yAxis.map(axis => axis.name); // Get the names of the Y-axis fields
+      const dataCopy = cloneDeep(data); // Deep clone the data
+      // setDataCopy(dataCopy); // Update the dataCopy state
+      console.log("Original Data", data); // Log the original data
+    console.log("Cloned Data", dataCopy); // Log the cloned data for modifications
+    console.log("Y-Axis Fields:", yAxisFields);
+    setDataCopy(dataCopy);
+
+
+
 
       // Build the Vega-Lite specifications
       if (viewMode === 'overlay') {
@@ -42,7 +61,7 @@ const LineChart = ({ viewMode, data, xAxis, yAxis, groupFunction }: LineChartPro
               type: "interval",
               encodings: ["x"] // Enable interval selection for zooming on the x-axis
             },
-            bind: "scales" // Bind to the scales
+            bind: "scales"
           }],
           encoding: {
             x: { 
@@ -110,7 +129,7 @@ const LineChart = ({ viewMode, data, xAxis, yAxis, groupFunction }: LineChartPro
         setChartSpecs(specs); // Set specs for all Y-axes in stacked mode
       }
     }
-  }, [xAxis, yAxis, viewMode, groupFunction]); // Watch for changes in these dependencies
+  }, [xAxis, yAxis, viewMode, groupFunction, data]); // Watch for changes in these dependencies
 
   return chartSpecs.length > 0 ? (
     <Paper
@@ -129,7 +148,7 @@ const LineChart = ({ viewMode, data, xAxis, yAxis, groupFunction }: LineChartPro
         scrollBehavior: 'smooth', // Enable smooth scrolling (optional)
       }}>
       {chartSpecs.map((spec, index) => (
-        <VegaLite key={index} spec={spec} data={{ table: data }} />
+        <VegaLite key={index} spec={spec} data={{ table: dataCopy }} />
       ))}
     </Paper>
   ) : (

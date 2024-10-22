@@ -186,7 +186,7 @@ const ControlPanel = (props: IControlPanel) => {
             </FormControl>
           )}
           <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-          {/* <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: `1px solid ${grey[400]}` }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: `1px solid ${grey[400]}` }}>
                     <TableRowsIcon />
                     <Typography 
                     variant="h6" 
@@ -210,11 +210,11 @@ const ControlPanel = (props: IControlPanel) => {
                             <MenuItem value={10}>10</MenuItem>
                             <MenuItem value={100}>100</MenuItem>
                             <MenuItem value={1000}>1000</MenuItem>
-                            <MenuItem value={1234}>1234</MenuItem>
+                            <MenuItem value={10000}>10000</MenuItem>
 
                         </Select>
                     </FormControl>   
-                )} */}
+                )}
           <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
           <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
           <Box

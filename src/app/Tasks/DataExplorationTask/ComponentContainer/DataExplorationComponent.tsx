@@ -5,13 +5,11 @@ import TableExpand from "../DataTable/TableExpand"
 import ControlPanel from "../ChartControls/ControlPanel" // Import the new ControlPanel component
 import {
   Box,
-  CircularProgress,
   Paper,
   Tab,
   Tabs,
   Typography,
 } from "@mui/material"
-import { grey } from "@mui/material/colors"
 import {
   IDataExplorationRequest,
   IFilter,
@@ -58,11 +56,6 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const taskDependancies = workflow?.workflowTasks.dataExploration
   const workflowId = workflow?.workflowId
 
-  // Function to fetch data based on selected columns and row limit
-  const fetchData = (payload: IDataExplorationRequest) => {
-    dispatch(fetchDataExploration(payload))
-  }
-
   useEffect(() => {
     if (workflow && experimentId) {
       dispatch(
@@ -91,32 +84,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       setOriginalColumns(taskDependancies?.lineChart.data.originalColumns) // Set original columns from the response
       setUniqueColumnValues(taskDependancies?.lineChart.data.uniqueColumnValues)
     }
-  }, [taskDependancies?.lineChart.data])
+  }, [taskDependancies?.lineChart.data,xAxis,yAxis])
 
-  // // Fetch initial data when the component mounts
-  // useEffect(() => {
-  //   const initialPayload = {
-  //     datasetId: `file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv`,
-  //     limit: rowLimit, // Default row limit
-  //     columns: [], // Fetch all columns by default
-  //     filters: [],
-  //     groupBy: [],
-  //     aggregation: {},
-  //     offset: 0,
-  //   }
-  //   fetchData(initialPayload) // Fetch initial data
-  //   if (workflow) {
-  //     dispatch(
-  //       fetchDataExplorationData({
-  //         query: initialPayload,
-  //         metadata: {
-  //           workflowId: workflow?.workflowId,
-  //           queryCase: "lineChart",
-  //         },
-  //       }),
-  //     )
-  //   }
-  // }, [rowLimit]) // Dependency on rowLimit to re-fetch if it changes
 
   // Update data and columns when new data comes in
   useEffect(() => {
@@ -131,13 +100,6 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
 
   // Function to handle fetching data when the user clicks the button
   const handleFetchData = () => {
-    // const payload = {
-    //   datasetId: "file://I2Cat_phising/dataset/I2Cat_phising_dataset.csv",
-    //   limit: rowLimit,
-    //   columns: selectedColumns, // Include selected columns in the payload
-    //   filters: filters,
-    // }
-    // fetchData(payload)
     dispatch(
       fetchDataExplorationData({
         query: {
@@ -154,33 +116,11 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
     )
   }
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress size={"5rem"} />
-        <Typography fontSize={"1.5rem"} color={grey[500]}>
-          Initializing page...
-        </Typography>
-      </Box>
-    )
-  }
-
-  if (error) {
-    return <Typography color="error">Error: {error}</Typography>
-  }
-
+ 
   return (
     <>
-      {console.log(uniqueColumnValues)}
+      {console.log(taskDependancies)}
+      {console.log(workflow)}
       <Paper>
         <Box sx={{ display: "flex", height: "100vh" }}>
           {/* Control Panel */}

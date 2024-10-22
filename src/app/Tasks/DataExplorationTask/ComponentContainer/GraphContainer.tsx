@@ -52,6 +52,8 @@ const GraphContainer = (props: IGraphContainer) => {
   } = props
   
   const dispatch = useAppDispatch() // Initialize the dispatch
+  console.log('dataexp', dataexp)
+
 
   // const [barGroupBy, setBarGroupBy] = useState<string[]>([]); // State for bar chart grouping
   // const [barAggregation, setBarAggregation] = useState<any>({}); // State for bar chart aggregation
@@ -80,7 +82,6 @@ const GraphContainer = (props: IGraphContainer) => {
 
     // Ensure the chartType doesn't reset here
   }
-
   return (
     <Paper>
       <Box sx={{ padding: "1rem", position: "relative" }}>
