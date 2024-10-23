@@ -83,6 +83,8 @@ const GraphContainer = (props: IGraphContainer) => {
     )
   }
 
+  
+
 
   console.log('bardata',bardata)
 
@@ -157,12 +159,13 @@ const GraphContainer = (props: IGraphContainer) => {
             />
           )}
           {chartType === "bar" && (
-            // Conditionally render BarChart if bardata exists
-            bardata && bardata.length > 0 ? (
-              <BarChart dataExploration={bardata} />
-            ) : (
-              <p>No bar chart data available. Please fetch data first.</p> // Display a message if no bardata
-            )
+                          <BarChart dataExploration={bardata} />
+
+            // bardata && bardata.length > 0 ? (
+            //   <BarChart dataExploration={bardata} />
+            // ) : (
+            //   <p>No bar chart data available. Please fetch data first.</p> // Display a message if no bardata
+            // )
           )}
           {chartType === "scatter" && <p>Scatter Plot</p>}
         </Box>

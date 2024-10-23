@@ -79,26 +79,32 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
   });
   return (
     <ThemeProvider theme={theme}>
-
     <Box sx={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <Box sx={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <TextField
           select
           label="Category"
           value={barGroupBy}
-          onChange={(e) => handleGroupByChange(e.target.value as string[])}
           variant="outlined"
-          MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+          onChange={(e) => handleGroupByChange(Array.isArray(e.target.value) ? e.target.value : [])}
 
           SelectProps={{
             multiple: true,
-            renderValue: (selected) => (
+            renderValue: (selected:any) => (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {(selected as string[]).map((value) => (
                   <Chip key={value} label={value} onDelete={() => handleGroupByChange(selected.filter((s: string) => s !== value))} />
                 ))}
               </Box>
             ),
+            MenuProps: {
+              PaperProps: {
+                style: {
+                  maxHeight: 224,
+                  width: 250,
+                },
+              },
+            },
           }}
           sx={{ width: '300px' }} // Set a fixed width for the Group By dropdown
         >
@@ -117,8 +123,9 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
             value={selectedColumn}
             onChange={(e) => setSelectedColumn(e.target.value)}
             variant="outlined"
-            MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
-
+            SelectProps={{
+              MenuProps: { PaperProps: { style: { maxHeight: 224, width: 250 } } }
+            }}
             sx={{ width: '300px' }} // Set a fixed width for the Value dropdown
           >
             {originalColumns.map((col) => (

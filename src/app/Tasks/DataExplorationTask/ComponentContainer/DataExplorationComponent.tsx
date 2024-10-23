@@ -67,8 +67,27 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             queryCase: "lineChart",
           },
         }),
-      )
+      );
+      dispatch(
+        fetchDataExplorationData({
+          query: {
+            datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+            limit: rowLimit, 
+            columns: [], 
+            filters: [],
+            groupBy: [],
+            aggregation: {},
+            offset: 0,
+          },
+          metadata: {
+            workflowId: workflowId || "",
+            queryCase: "barChart",
+          },
+        }),
+      );
+
     }
+    
   }, [])
 
   useEffect(() => {
