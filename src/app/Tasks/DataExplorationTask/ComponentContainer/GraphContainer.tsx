@@ -9,6 +9,8 @@ import { IFilter, VisualColumn } from "../../../../shared/models/dataexploration
 import BarChart from "../Charts/BarChart"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
+import ScatterChart from "../Charts/ScatterChart"
 
 
 interface IGraphContainer {
@@ -21,9 +23,15 @@ interface IGraphContainer {
   chartType: "line" | "bar" | "scatter"
   setChartType: React.Dispatch<React.SetStateAction<"line" | "bar" | "scatter">>
   xAxis: VisualColumn
+  xAxisScatter:VisualColumn
+  colorBy: string;
+  setColorBy: (colorBy: string) => void;
   setXAxis: React.Dispatch<React.SetStateAction<VisualColumn>>
+  setXAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn>>
   yAxis: VisualColumn[]
+  yAxisScatter: VisualColumn[]
   setYAxis: React.Dispatch<React.SetStateAction<VisualColumn[]>>
+  setYAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn[]>>
   viewMode: "overlay" | "stacked"
   setViewMode: React.Dispatch<React.SetStateAction<"overlay" | "stacked">>
   groupFunction: string
@@ -43,12 +51,18 @@ const GraphContainer = (props: IGraphContainer) => {
     experimentId,
     workflowId,
     filters,
+    colorBy,
+    setColorBy,
     chartType,
     setChartType,
     xAxis,
+    xAxisScatter,
     setXAxis,
+    setXAxisScatter,
     yAxis,
+    yAxisScatter,
     setYAxis,
+    setYAxisScatter,
     viewMode,
     setViewMode,
     groupFunction,
@@ -145,7 +159,16 @@ const GraphContainer = (props: IGraphContainer) => {
             onFetchBarChartData={handleFetchBarChartData}
           />
         )}
-        {chartType === "scatter" && <p>Scatter Plot Controls</p>}
+        {chartType === "scatter" && 
+        <ScatterChartControlPanel 
+        columns={columns} 
+        xAxis={xAxisScatter} 
+        setXAxis={setXAxisScatter} 
+        yAxis={yAxisScatter} 
+        setYAxis={setYAxisScatter} 
+        colorBy={colorBy}
+        setColorBy={setColorBy}
+        />}
 
         {/* Conditionally Render Chart Based on Selected Type */}
         <Box sx={{ marginTop: "2rem" }}>
@@ -159,15 +182,19 @@ const GraphContainer = (props: IGraphContainer) => {
             />
           )}
           {chartType === "bar" && (
-                          <BarChart dataExploration={bardata} />
-
-            // bardata && bardata.length > 0 ? (
-            //   <BarChart dataExploration={bardata} />
-            // ) : (
-            //   <p>No bar chart data available. Please fetch data first.</p> // Display a message if no bardata
-            // )
+            <BarChart dataExploration={bardata} />
           )}
-          {chartType === "scatter" && <p>Scatter Plot</p>}
+          {chartType === "scatter" && 
+           <ScatterChart
+           viewMode={viewMode}
+           data={linedata}
+           xAxis={xAxisScatter}
+           yAxis={yAxisScatter}
+           colorBy={colorBy}
+           setColorBy={setColorBy}
+           columns={columns}
+         />
+          }
         </Box>
       </Box>
     </Paper>

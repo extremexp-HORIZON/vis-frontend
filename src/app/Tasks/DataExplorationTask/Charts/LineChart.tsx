@@ -54,7 +54,7 @@ const LineChart = ({ viewMode, data, xAxis, yAxis, groupFunction }: LineChartPro
           mark: 'line',
           autosize: { type: "fit", contains: "padding", resize: true },
           width: "container",
-          height: 500,
+          height: 600,
           params: [{
             name: "grid",
             select: {
@@ -106,7 +106,7 @@ const LineChart = ({ viewMode, data, xAxis, yAxis, groupFunction }: LineChartPro
             },
             bind: "scales" // Bind to the scales
           }],
-          height: 250, // Height for individual stacked charts
+          height: 600/yAxis.length, // Height for individual stacked charts
           encoding: {
             x: { 
               field: xAxis.name, 

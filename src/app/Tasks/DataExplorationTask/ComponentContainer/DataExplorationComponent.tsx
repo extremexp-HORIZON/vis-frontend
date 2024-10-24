@@ -39,12 +39,17 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [uniqueColumnValues, setUniqueColumnValues] = useState<string[]>([])
   const { experimentId } = useParams()
   const [xAxis, setXAxis] = useState<VisualColumn>({ name: "", type: "" })
+  const [xAxisScatter, setXAxisScatter] = useState<VisualColumn>({ name: "", type: "" })
   const [yAxis, setYAxis] = useState<VisualColumn[]>([])
+  const [yAxisScatter, setYAxisScatter] = useState<VisualColumn[]>([])
   const [groupFunction, setGroupFunction] = useState<string>("sum")
   const [barGroupBy, setBarGroupBy] = useState<string[]>([]) // State for bar chart grouping
   const [barAggregation, setBarAggregation] = useState<any>({}) // State for bar chart aggregation
   const [viewMode, setViewMode] = useState<"overlay" | "stacked">("overlay")
   const [chartType, setChartType] = useState<"line" | "bar" | "scatter">("line")
+  const [colorBy, setColorBy] = useState('None');
+
+
 
   const taskDependancies = workflow?.workflowTasks.dataExploration
   const workflowId = workflow?.workflowId
@@ -96,7 +101,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       setOriginalColumns(taskDependancies?.lineChart.data.originalColumns) 
       setUniqueColumnValues(taskDependancies?.lineChart.data.uniqueColumnValues)
     }
-  }, [taskDependancies?.lineChart.data,xAxis,yAxis])
+  }, [taskDependancies?.lineChart.data,xAxis,yAxis,xAxisScatter,yAxisScatter,colorBy])
 
   useEffect(() => {
     if (taskDependancies?.lineChart.data) {
@@ -126,7 +131,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
  
   return (
     <>
-      {console.log("workflow",workflow?.workflowTasks.dataExploration?.barChart.data)}
+      {console.log("workflow",workflow)}
       <Paper>
         <Box sx={{ display: "flex", height: "100vh" }}>
           {/* Control Panel */}
@@ -168,7 +173,6 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
               <GraphContainer
                 linedata={workflow?.workflowTasks.dataExploration?.lineChart.data?.data}
                 bardata={workflow?.workflowTasks.dataExploration?.barChart.data}
-
                 experimentId={experimentId}
                 workflowId={workflow.workflowId}
                 columns={columns}
@@ -177,8 +181,15 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                 setChartType={setChartType}
                 xAxis={xAxis}
                 setXAxis={setXAxis}
+                colorBy={colorBy}
+                setColorBy={setColorBy}
+
+                xAxisScatter={xAxisScatter}
+                setXAxisScatter={setXAxisScatter}
                 yAxis={yAxis}
                 setYAxis={setYAxis}
+                yAxisScatter={yAxisScatter}
+                setYAxisScatter={setYAxisScatter}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
                 groupFunction={groupFunction}

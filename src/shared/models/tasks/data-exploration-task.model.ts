@@ -32,6 +32,12 @@ export interface IDataExploration {
     //   groupFunction: string[]
     // }[]
   }
+  scatterChart:{
+    data: IDataExplorationResponse | null
+    loading: boolean
+    error: string | null
+
+  }
 }
 
 // Define the initial state of the slice
@@ -52,6 +58,12 @@ export const dataExplorationDefault: IDataExploration = {
     error: null,
     // aggregations: [],
   },
+  scatterChart:{
+    data: null,
+    loading: false,
+    error:  null
+
+  }
 }
 
 // export const additionalReducers = {
@@ -97,7 +109,7 @@ export const explainabilityExtraReducers = (
       tab => tab.workflowId === action.meta.arg.metadata.workflowId,
     )?.workflowTasks.dataExploration
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
-        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart")) {
+        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart" || queryCase === "scatterChart")) {
           dataExplorationTask[queryCase].data = prepareDataExplorationResponse(action.payload)
           dataExplorationTask[queryCase].loading = false
           dataExplorationTask[queryCase].error = null
@@ -108,7 +120,7 @@ export const explainabilityExtraReducers = (
       tab => tab.workflowId === action.meta.arg.metadata.workflowId,
     )?.workflowTasks.dataExploration
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
-        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart")) {
+        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart" || queryCase === "scatterChart")) {
           dataExplorationTask[queryCase].loading = true
         }
   })
@@ -117,7 +129,7 @@ export const explainabilityExtraReducers = (
       tab => tab.workflowId === action.meta.arg.metadata.workflowId,
     )?.workflowTasks.dataExploration
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
-        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart")) {
+        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart" || queryCase === "scatterChart")) {
           dataExplorationTask[queryCase].loading = false
           dataExplorationTask[queryCase].error = "Failed to fetch data"
         }
