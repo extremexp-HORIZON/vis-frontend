@@ -16,18 +16,25 @@ import ProgressPageGauges from "./progress-page-gauges"
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 import { useParams } from "react-router-dom"
-import { fetchExperimentWorkflows } from "../../store/slices/progressPageSlice"
+import { fetchExperiment, fetchExperimentWorkflows } from "../../store/slices/progressPageSlice"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>("progress")
+  const { experiment, workflows, progressGauges } = useAppSelector((state: RootState) => state.progressPage)
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if(experimentId){
-      dispatch(fetchExperimentWorkflows(experimentId));
+      dispatch(fetchExperiment(experimentId));
     }
   }, [])
+
+  useEffect(() => {
+    if(!experiment.loading && experiment.data){
+      dispatch(fetchExperimentWorkflows(experiment.data.workflow_ids));
+    }
+  }, [experiment])
 
   const handleChange =
     (newValue: number | string) => (event: React.SyntheticEvent) => {
@@ -38,6 +45,7 @@ const ProgressPage = () => {
 
   return (
     <>
+    {console.log(progressGauges)}
       <Grid
         sx={{
           maxWidth: "100vw",
@@ -56,7 +64,7 @@ const ProgressPage = () => {
               }}
             >
               <Typography fontSize={"2rem"} sx={{ fontWeight: 600 }}>
-                {experimentId && experimentId.charAt(0).toUpperCase() + experimentId.slice(1)}
+                {experiment.data?.name || "Experiment Name"}
               </Typography>
             </Box>
             <Box>
@@ -95,10 +103,10 @@ const ProgressPage = () => {
             <>
               <ProgressPageBar />
               <ProgressPageGauges />
-              <ParallelCoordinatePlot />
-              <WorkflowTable handleChange={handleChange} />
+              {/* <ParallelCoordinatePlot /> */}
+              {/* <WorkflowTable handleChange={handleChange} /> */}
               {/* <Divider sx={{ margin: '20px' }} /> */}
-              <ScheduleTable />
+              {/* <ScheduleTable /> */}
             </>
           )}
           {value !== "progress" && value !== "compare-completed" && (
