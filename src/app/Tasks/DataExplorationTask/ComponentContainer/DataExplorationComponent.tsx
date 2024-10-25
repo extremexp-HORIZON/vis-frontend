@@ -5,10 +5,12 @@ import TableExpand from "../DataTable/TableExpand"
 import ControlPanel from "../ChartControls/ControlPanel" // Import the new ControlPanel component
 import {
   Box,
+  CircularProgress,
   Pagination,
   Paper,
   Tab,
   Tabs,
+  Tooltip,
   Typography,
 } from "@mui/material"
 import {
@@ -22,6 +24,9 @@ import GraphContainer from "./GraphContainer"
 import { useParams } from "react-router-dom"
 import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { grey } from "@mui/material/colors"
+import InfoIcon from "@mui/icons-material/Info"
+
 
 interface IDataExplorationComponent {
   workflow: IWorkflowTabModel | null
@@ -49,6 +54,10 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [viewMode, setViewMode] = useState<"overlay" | "stacked">("overlay")
   const [chartType, setChartType] = useState<"line" | "bar" | "scatter">("line")
   const [colorBy, setColorBy] = useState('None');
+
+  console.log('groupBy',barGroupBy)
+  console.log('aggregation',barAggregation)
+
 
   const [currentPage, setCurrentPage] = useState(1);
 const [pageSize, setPageSize] = useState(100);
@@ -121,6 +130,24 @@ const [totalSize, setTotalSize] = useState(0);
   }, [selectedColumns]) 
   
   const handleFetchData = () => {
+    if (barGroupBy && barAggregation) {
+      dispatch(
+        fetchDataExplorationData({
+          query: {
+            datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+            limit: rowLimit, // Default row limit
+            columns: selectedColumns, // Include selected columns in the payload
+            filters: filters,
+            groupBy: barGroupBy,
+            aggregation: barAggregation,
+          },
+          metadata: {
+            workflowId: workflowId || "",
+            queryCase: "barChart",
+          },
+          })
+        )}
+      
     dispatch(
       fetchDataExplorationData({
         query: {
@@ -143,8 +170,51 @@ const [totalSize, setTotalSize] = useState(0);
   return (
     <>
       {console.log("workflow",workflow)}
-      <Paper>
-        <Box sx={{ display: "flex", height: "100vh" }}>
+      <Paper
+      className="Category-Item"
+      elevation={2}
+      sx={{
+        borderRadius: 4,
+        width: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 0,
+        minWidth: "300px",
+        height: "100%",
+      }}
+    >      
+    <Box
+        sx={{
+          px: 1.5,
+          py: 0.5,
+          display: "flex",
+          alignItems: "center",
+          borderBottom: `1px solid ${grey[400]}`,
+        }}
+      >
+        <Typography fontSize={"1rem"} fontWeight={600}>
+          {"Data Exploration"}
+        </Typography>
+        <Box sx={{ flex: 1 }} />
+        <Box sx={{ position: "relative" }}>
+        <Tooltip title="Explore your data through an interactive combination of tables and charts. Use the control panel to filter, select columns, and adjust data display preferences. Toggle between data views to uncover trends, patterns, and insights.">
+        <InfoIcon sx={{ padding: 1, zIndex: 100, color: grey[600] }} />
+          </Tooltip>
+          {workflow?.workflowTasks.dataExploration?.lineChart.loading && (
+            <CircularProgress
+              size={28}
+              sx={{
+                // color: green[500],
+                position: "absolute",
+                top: 6,
+                left: 6,
+                zIndex: 0,
+              }}
+            />
+          )}
+        </Box>
+      </Box>  
+    <Box sx={{ display: "flex", height: "100vh" }}>
           {/* Control Panel */}
           <ControlPanel
             originalColumns={originalColumns}

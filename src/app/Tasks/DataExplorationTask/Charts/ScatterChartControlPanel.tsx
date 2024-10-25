@@ -111,6 +111,8 @@ const ScatterChartControlPanel = ({ columns, xAxis, setXAxis, yAxis, setYAxis, c
           MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
 
         >
+              <MenuItem value="">None</MenuItem> {/* Empty string can represent None */}
+
           {columns.map((col) => (
             <MenuItem key={col.name} value={col.name}>
               {col.name} {/* Only show the column name */}
