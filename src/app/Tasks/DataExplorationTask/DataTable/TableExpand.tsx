@@ -111,7 +111,6 @@ const TableExpand: React.FC<DataTableProps> = ({ data, columns, datetimeColumn }
       flexDirection: "column",
       rowGap: 0,
       minWidth: "300px",
-      height: "100%",
     }}>
       {isVisible && (
         <Box sx={{ ...tableStyle, overflowX: 'auto' }}> {/* Enable horizontal scrolling */}

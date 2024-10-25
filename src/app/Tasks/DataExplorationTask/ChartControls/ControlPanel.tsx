@@ -90,12 +90,13 @@ const ControlPanel = (props: IControlPanel) => {
   const [filterType, setFilterType] = useState("equals") // 'equals' or 'range'
   const [filterValue, setFilterValue] = useState("") // For equals, or range object {min, max}
   const [sliderRange, setSliderRange] = useState([0, 100]) // Min and Max values for the slider
+  console.log('uunique values',uniqueValues)
 
   useEffect(() => {
     // Update slider range (min, max) whenever a new column is selected for range filtering
     if (filterType === "range" && filterColumn) {
       const columnValues =
-        uniqueValues[uniqueValues]?.map(Number).filter(v => !isNaN(v)) || []
+        uniqueValues[filterColumn]?.map(Number).filter(v => !isNaN(v)) || []
       const min = Math.min(...columnValues)
       const max = Math.max(...columnValues)
       setSliderRange([min, max])
@@ -152,8 +153,9 @@ const ControlPanel = (props: IControlPanel) => {
                 ml: 1,
                 fontWeight: "bold",
               }}
+              color={"primary"}
             >
-              Columns <ExpandMoreIcon />
+              Columns <ExpandMoreIcon sx={{ color:"primary" }} />
               <Tooltip title="Select the columns for display." arrow>
                 <InfoIcon sx={{ marginLeft: 1, fontSize: 16, color: "gray" }} />
               </Tooltip>
@@ -185,36 +187,7 @@ const ControlPanel = (props: IControlPanel) => {
               </Select>
             </FormControl>
           )}
-          <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-          <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: `1px solid ${grey[400]}` }}>
-                    <TableRowsIcon />
-                    <Typography 
-                    variant="h6" 
-                    onClick={() => setShowRowLimitDropdown(!showRowLimitDropdown)} 
-                    sx={{ marginTop: 2, cursor: 'pointer', display: 'flex', alignItems: 'center' ,ml: 1, fontWeight: 'bold' }}
-                    >
-                        Row Limit <ExpandMoreIcon />
-                        <Tooltip title="Limits the number of rows that get displayed." arrow>
-                            <InfoIcon sx={{ marginLeft: 1, fontSize: 16, color: 'gray' }} />
-                        </Tooltip>
-                    </Typography>
-                </Box>
-                {showRowLimitDropdown && (
-                    <FormControl fullWidth>
-                        <Select
-                        value={rowLimit}
-                        onChange={(e) => setRowLimit(e.target.value)}
-                        MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
-
-                        >
-                            <MenuItem value={10}>10</MenuItem>
-                            <MenuItem value={100}>100</MenuItem>
-                            <MenuItem value={1000}>1000</MenuItem>
-                            <MenuItem value={10000}>10000</MenuItem>
-
-                        </Select>
-                    </FormControl>   
-                )}
+          
           <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
           <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
           <Box
@@ -234,9 +207,11 @@ const ControlPanel = (props: IControlPanel) => {
                 alignItems: "center",
                 ml: 1,
                 fontWeight: "bold",
+              
               }}
+              color={"primary"}
             >
-              Filters <ExpandMoreIcon />
+              Filters <ExpandMoreIcon sx={{ color:"primary" }} />
               <Tooltip title="Select filters for display." arrow>
                 <InfoIcon sx={{ marginLeft: 1, fontSize: 16, color: "gray" }} />
               </Tooltip>

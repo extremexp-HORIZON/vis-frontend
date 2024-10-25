@@ -20,6 +20,7 @@ interface IGraphContainer {
   experimentId: string
   workflowId: string
   columns: VisualColumn[]
+  originalColumns: VisualColumn[]
   chartType: "line" | "bar" | "scatter"
   setChartType: React.Dispatch<React.SetStateAction<"line" | "bar" | "scatter">>
   xAxis: VisualColumn
@@ -48,6 +49,7 @@ const GraphContainer = (props: IGraphContainer) => {
     linedata,
     bardata,
     columns,
+    originalColumns,
     experimentId,
     workflowId,
     filters,
@@ -151,7 +153,7 @@ const GraphContainer = (props: IGraphContainer) => {
         )}
         {chartType === "bar" && (
           <BarChartControlPanel
-            originalColumns={columns}
+            originalColumns={originalColumns}
             barGroupBy={barGroupBy}
             setBarGroupBy={setBarGroupBy}
             barAggregation={barAggregation}

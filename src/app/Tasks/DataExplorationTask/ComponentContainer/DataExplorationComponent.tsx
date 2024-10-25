@@ -5,6 +5,7 @@ import TableExpand from "../DataTable/TableExpand"
 import ControlPanel from "../ChartControls/ControlPanel" // Import the new ControlPanel component
 import {
   Box,
+  Pagination,
   Paper,
   Tab,
   Tabs,
@@ -49,6 +50,11 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [chartType, setChartType] = useState<"line" | "bar" | "scatter">("line")
   const [colorBy, setColorBy] = useState('None');
 
+  const [currentPage, setCurrentPage] = useState(1);
+const [pageSize, setPageSize] = useState(100);
+const [totalSize, setTotalSize] = useState(0);
+
+
 
 
   const taskDependancies = workflow?.workflowTasks.dataExploration
@@ -56,16 +62,18 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
 
   useEffect(() => {
     if (workflow && experimentId) {
+      const offset = (currentPage - 1) * pageSize;
+
       dispatch(
         fetchDataExplorationData({
           query: {
             datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
-            limit: rowLimit, 
-            columns: [], 
-            filters: [],
+            limit: pageSize, 
+            columns: selectedColumns, 
+            filters: filters,
             groupBy: [],
             aggregation: {},
-            offset: 0,
+            offset: offset,
           },
           metadata: {
             workflowId: workflowId || "",
@@ -93,13 +101,14 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
 
     }
     
-  }, [])
+  }, [currentPage,totalSize])
 
   useEffect(() => {
     if(taskDependancies?.lineChart.data) {
       setColumns(taskDependancies?.lineChart.data.columns)
       setOriginalColumns(taskDependancies?.lineChart.data.originalColumns) 
       setUniqueColumnValues(taskDependancies?.lineChart.data.uniqueColumnValues)
+      setTotalSize(taskDependancies?.lineChart.data.querySize)
     }
   }, [taskDependancies?.lineChart.data,xAxis,yAxis,xAxisScatter,yAxisScatter,colorBy])
 
@@ -127,6 +136,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       }),
     )
   }
+
+  const totalPages = Math.ceil(totalSize / pageSize);
 
  
   return (
@@ -163,11 +174,21 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
               </Tabs>
             </Box>
             {activeChartTab === 0 && taskDependancies?.lineChart.data && (
-              <Box sx={{ width: "100%", height: "100%", overflowX: "auto" }}>
-                {" "}
-                {/* Enable horizontal scroll */}
+              <Box sx={{ width: "100%", overflowX: "auto" }}>
                 <TableExpand data={taskDependancies?.lineChart.data?.data} columns={taskDependancies?.lineChart.data?.columns || null} datetimeColumn="" />
+                <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                  <Pagination
+                  count={totalPages} // The total number of pages calculated based on totalSize and pageSize
+                  page={currentPage} // Current page number
+                  onChange={(event, value) => setCurrentPage(value)} // Function to update current page
+                  // variant="outlined"
+                  // shape="rounded"
+                  color="primary"
+                  />
+                </Box>
+                  
               </Box>
+             
             )}
             {activeChartTab === 1 && (
               <GraphContainer
@@ -176,6 +197,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                 experimentId={experimentId}
                 workflowId={workflow.workflowId}
                 columns={columns}
+                originalColumns={originalColumns}
                 filters={filters}
                 chartType={chartType}
                 setChartType={setChartType}
