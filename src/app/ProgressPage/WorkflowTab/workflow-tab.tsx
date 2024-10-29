@@ -25,12 +25,14 @@ const WorkflowTab = (props: IWorkflowTab) => {
       case "LG600B6_100636_IDK":
         return <DataExploration />
       case "TrainModel":
-        return <ModelAnalysisTask workflow={tabs.find(tab => tab.workflowId === workflowId)} />
+        return <ModelAnalysisTask workflow={tabs.find(tab => tab.workflowId === workflowId) as IWorkflowTabModel} />
       case null:
         return null
     }
   }
   return (
+    <>
+    {console.log(workflowId)}
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}>
         <Box key="workflow-svg">
           <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
@@ -118,6 +120,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
           </>
         )}
       </Box>
+      </>
   )
 }
 

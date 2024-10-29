@@ -100,29 +100,84 @@ export default function ScheduleTable() {
   useEffect(() => {
     if (workflows.data.length > 0) {
       //find unique parameters of each workflow -> model traning task
-      const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
+      // const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
+      const uniqueParameters = new Set(
+        workflows.data.reduce(
+          (acc: any[], workflow) => {
+            const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
+            let paramNames = []
+            if (params) {
+              paramNames = params.map(param => param.name)
+              return [
+                ...acc,
+                ...paramNames,
+              ]
+            }else{
+              return [
+                ...acc
+              ]
+            }
+            },
+          [],
+        ),
+      )
+      // const rows = workflows.data
+      // .filter(element => element.workflowInfo.status === "scheduled")
+      // .map(workflow => ({
+      //   id: idCounter++,
+      //   workflowId: workflow.workflowId,
+      //   "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+      //   ...Array.from(uniqueParameters).reduce((acc, variant) => {
+      //     acc[variant] = workflow.variabilityPoints["Model Training"].Parameters[variant] || ""
+      //     return acc
+      //   }, {}),
+      //   // status: workflow.workflowInfo.status === "running" ? workflow.workflowInfo.completedTasks ?? "running" : workflow.workflowInfo.status,
+      //   // constrains: Object.values(workflow.constraints).every((value: any) => value === true),
+      //   action: ""
+      // })).sort((a, b) => a.id - b.id)
       const rows = workflows.data
-      .filter(element => element.workflowInfo.status === "scheduled")
-      .map(workflow => ({
+        .filter(workflow => workflow.status === "scheduled")
+        .map(workflow => {
+          const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
+          return{
+          id: idCounter++,
+          workflowId: workflow.name,
+          // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+          ...Array.from(uniqueParameters).reduce((acc, variant) => {
+            acc[variant] = params?.find(param => param.name === variant)?.value || ""
+            return acc
+          }, {}),
+          status: workflow.status,
+          // ...Object.keys(workflow.constraints)
+          //   .map(key => ({ [key]: workflow.constraints[key] }))
+          //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+          action: "",
+        }}).sort((a, b) => a.id - b.id)
+      const infoRow = workflows.data
+      .map(workflow => {
+        const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
+        return{
         id: idCounter++,
-        workflowId: workflow.workflowId,
-        "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+        workflowId: workflow.name,
+        // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
         ...Array.from(uniqueParameters).reduce((acc, variant) => {
-          acc[variant] = workflow.variabilityPoints["Model Training"].Parameters[variant] || ""
+          acc[variant] = params?.find(param => param.name === variant)?.value || ""
           return acc
         }, {}),
-        // status: workflow.workflowInfo.status === "running" ? workflow.workflowInfo.completedTasks ?? "running" : workflow.workflowInfo.status,
-        // constrains: Object.values(workflow.constraints).every((value: any) => value === true),
-        action: ""
-      })).sort((a, b) => a.id - b.id)
-      columns = Object.keys(rows[0]).filter(key => key !== "id").map(key => ({
+        status: workflow.status,
+        // ...Object.keys(workflow.constraints)
+        //   .map(key => ({ [key]: workflow.constraints[key] }))
+        //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+        action: "",
+      }})
+      columns = infoRow.length > 0 ? Object.keys(infoRow[0]).filter(key => key !== "id").map(key => ({
         id: key,
         label: key,
         minWidth: key === "action" ? 100 : 50,
-        numeric: typeof rows[0][key] === "number" ? true : false,
+        numeric: typeof infoRow[0][key] === "number" ? true : false,
         align: "center",
         sortable: key !== "action" ? true : false,
-      }))
+      })) : []
       paramLength.current = uniqueParameters.size
       dispatch(setProgressScheduledTable({ rows, visibleRows: rows }))
     }
@@ -347,7 +402,7 @@ export default function ScheduleTable() {
               >
                 <TableCell align="right" colSpan={1} />
                 <TableCell align="right" colSpan={1} />
-                <TableCell
+                {/* <TableCell
                   sx={{
                     borderBottom: theme =>
                       `2px solid ${theme.palette.primary.light}`,
@@ -356,7 +411,7 @@ export default function ScheduleTable() {
                   colSpan={1}
                 >
                   Task Variant
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   sx={{
                     borderBottom: theme =>
@@ -367,6 +422,7 @@ export default function ScheduleTable() {
                 >
                   Parameters
                 </TableCell>
+                <TableCell align="right" colSpan={1} />
                 <TableCell align="right" colSpan={1} />
               </TableRow>
               <TableRow

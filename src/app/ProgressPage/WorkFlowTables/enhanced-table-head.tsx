@@ -43,16 +43,16 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
       }}>
         <TableCell align="right" colSpan={1} sx={{zIndex: 100}} />
         <TableCell align="right" colSpan={1} sx={{zIndex: 100}}/>
-        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}`, zIndex: 100 }} align="center" colSpan={1}>
+        {/* <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}`, zIndex: 100 }} align="center" colSpan={1}>
           Task Variant
-        </TableCell>
+        </TableCell> */}
         <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.dark}`, zIndex: 100 }} align="center" colSpan={parametersLength}>
           Parameters
         </TableCell>
         <TableCell align="right" colSpan={1} />
-        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}`, zIndex: 100 }} align="center" colSpan={1}>
+        {/* <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}`, zIndex: 100 }} align="center" colSpan={1}>
           Constraints
-        </TableCell>
+        </TableCell> */}
         <FixedTableCell align="right" colSpan={1} sx={{zIndex: 100}} />
       </TableRow>
       <TableRow

@@ -1,11 +1,12 @@
 import { IDataExplorationQuery } from "./dataexploration.model";
 import { IExplainability } from "./tasks/explainability.model";
 import { IModelAnalysis } from "./tasks/model-analysis.model";
+import { Task } from "./workflow.model";
 
 export interface IWorkflowTabModel {
     workflowId: string | number;
     workflowConfiguration: {
-        data: {[key: string]: number | string} | null
+        data: Task[] | null
         loading: boolean;
     }
     workflowMetrics: {

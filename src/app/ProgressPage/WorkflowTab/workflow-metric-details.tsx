@@ -8,7 +8,6 @@ interface Metric {
   value: number;
   avgDiff: number;
   avgValue: number;
-
 }
 
 interface Task {

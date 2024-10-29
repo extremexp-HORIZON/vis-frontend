@@ -38,7 +38,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           query: {
             datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
             columns: [],
-            filters: [],
+            limit: -1,
           },
           metadata: {
             workflowId: workflow.workflowId,
@@ -51,7 +51,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           query: {
             datasetId: `file://${experimentId}/metadata.csv`,
             columns: [],
-            filters: [],
+            limit: -1,
           },
           metadata: {
             workflowId: workflow.workflowId,

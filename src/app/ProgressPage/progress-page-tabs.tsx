@@ -176,7 +176,8 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
             disableTouchRipple
             onClick={handleChange(tab.workflowId as number)}
           >
-            Workflow{tab.workflowId}
+            {/* Workflow{tab.workflowId} */}
+            {tab.workflowId}
           </Button>
           <IconButton
             sx={{ p: 0, height: "max-content" }}

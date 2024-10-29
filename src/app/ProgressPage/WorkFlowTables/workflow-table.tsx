@@ -129,39 +129,45 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       //find unique parameters of each workflow -> model traning task
       const uniqueParameters = new Set(
         workflows.data.reduce(
-          (acc: any[], workflow) => [
-            ...acc,
-            ...Object.keys(
-              workflow.variabilityPoints["Model Training"].Parameters,
-            ),
-          ],
+          (acc: any[], workflow) => {
+            const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
+            let paramNames = []
+            if (params) {
+              paramNames = params.map(param => param.name)
+              return [
+                ...acc,
+                ...paramNames,
+              ]
+            }else{
+              return [
+                ...acc
+              ]
+            }
+            },
           [],
         ),
       )
-
+      
+      // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
-        .filter(workflow => workflow.workflowInfo.status !== "scheduled")
-        .map(workflow => ({
+        .filter(workflow => workflow.status !== "scheduled")
+        .map(workflow => {
+          const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
+          return{
           id: idCounter++,
-          workflowId: workflow.workflowId,
-          "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+          workflowId: workflow.name,
+          // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
           ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] =
-              workflow.variabilityPoints["Model Training"].Parameters[
-                variant
-              ] || ""
+            acc[variant] = params?.find(param => param.name === variant)?.value || ""
             return acc
           }, {}),
-          status:
-            workflow.workflowInfo.status === "running"
-              ? workflow.workflowInfo.completedTasks ?? "running"
-              : workflow.workflowInfo.status,
-          ...Object.keys(workflow.constraints)
-            .map(key => ({ [key]: workflow.constraints[key] }))
-            .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+          status: workflow.status,
+          // ...Object.keys(workflow.constraints)
+          //   .map(key => ({ [key]: workflow.constraints[key] }))
+          //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
           action: "",
-        }))
-        const constrainsNames = Object.keys(workflows.data[0].constraints)
+        }})
+        // const constrainsNames = Object.keys(workflows.data[0].constraints)
       columns = Object.keys(rows[0])
         .filter(key => key !== "id")
         .map(key => ({
@@ -171,7 +177,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           numeric: typeof rows[0][key] === "number" ? true : false,
           align: "center",
           sortable: key !== "action" ? true : false,
-          constraint: constrainsNames.includes(key) ? true : false
+          // constraint: constrainsNames.includes(key) ? true : false
         }))
       paramlength = uniqueParameters.size
       dispatch(setProgressWokflowsTable({ rows, filteredRows: rows }))

@@ -7,24 +7,24 @@ import {
 } from "@mui/x-charts/Gauge"
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { setProgressGauges } from "../../store/slices/progressPageSlice"
-import { IWorkflowResponse } from "../../shared/models/workflow.model"
+import { IWorkflowResponse, MetricDetail } from "../../shared/models/workflow.model"
 
-const MetricGauge = ({ title, value, isTime = false }: any) => {
-  const displayValue = isTime
-    ? `${value.toFixed(3)}s`
-    : `${value.toFixed(3)}`
-  const maxValue = isTime ? 5 : 100 // Set max to 5 for time values and 100 for percentages
+const MetricGauge = (props: {gaugeInfo: {name: string, type: string, value: number}}) => {
+  const { gaugeInfo } = props
+  const displayValue = gaugeInfo.value.toFixed(2)
+  const maxValue = 0 // Set max to 5 for time values and 100 for percentages
+  const val = gaugeInfo.value > 1 ? gaugeInfo.value : gaugeInfo.value * 100
   const theme = useTheme()
   return (
     <Box sx={{ display: "flex", flexDirection: "column", textAlign: "center" }}>
-      <Typography variant="h6">Avg. {title} per Workflow</Typography>
+      <Typography variant="h6">Avg. {gaugeInfo.name} per Workflow</Typography>
       <GaugeContainer
         width={150}
         height={150}
         sx={{ alignSelf: "center" }}
         startAngle={-110}
         endAngle={110}
-        value={isTime ? value : value * 100}
+        value={val}
       >
         <GaugeReferenceArc min={0} max={maxValue} />
         <GaugeValueArc style={{ fill: theme.palette.primary.main }} />
@@ -44,11 +44,11 @@ const MetricGauge = ({ title, value, isTime = false }: any) => {
   )
 }
 
-const RuntimeDisplay = (props: { value: number }) => {
-  const { value } = props
-  const displayValue = value > 60 
-    ? `${(value / 60).toFixed(2)}min` 
-    : `${value.toFixed(2)}sec`;
+const RuntimeDisplay = (props: {gaugeInfo: {name: string, type: string, value: number}}) => {
+  const { gaugeInfo } = props
+  const displayValue = gaugeInfo.value > 60 
+    ? `${(gaugeInfo.value / 60).toFixed(2)}min` 
+    : `${gaugeInfo.value.toFixed(2)}sec`;
 
   return (
     <Box
@@ -109,13 +109,12 @@ const ProgressPageGauges = () => {
 
       const calculateCommonMetricsAverageValues = () => {
         const averageValues = commonMetrics.reduce((acc: any, metric: string) => {
-          const metricValues:  = completedWorkflows.map((workflow: IWorkflowResponse["workflow"]) => (
+          const metricValues = completedWorkflows.map((workflow: IWorkflowResponse["workflow"]) => (
           Object.values(workflow.metrics).map((m: any) => Object.values(m)[0]).find((m: any) => m.name === metric)
-          ))
-          const metricAverage = metricValues.reduce((acc: number, metric: any) => {}, 0) / metricValues.length
-          return { ...acc, [metric]: metricAverage }
-        }, {})
-        console.log(averageValues)
+          )) as MetricDetail[]
+          const metricAverage = (metricValues.reduce((acc: number, metric: any) => (acc = acc + parseFloat(metric.value) ), 0) / metricValues.length)
+          return [...acc, {name: metric, type: metricValues[0].type, value: metricAverage}] 
+        }, [])
         return averageValues
       }
 
@@ -135,10 +134,12 @@ const ProgressPageGauges = () => {
         flexWrap: "wrap",
       }}
     >
-      <MetricGauge title="Accuracy" value={progressGauges.accuracy} />
-      <MetricGauge title="Precision" value={progressGauges.precision} />
-      <MetricGauge title="Recall" value={progressGauges.recall} />
-      <RuntimeDisplay value={progressGauges.runtime} />
+      {progressGauges.map((gaugeInfo: {name: string, type: string, value: number}) => (
+        gaugeInfo.type === "time" ? 
+        <RuntimeDisplay key={`${gaugeInfo.name}-gauge`} gaugeInfo={gaugeInfo} />
+        : 
+        <MetricGauge key={`${gaugeInfo.name}-gauge`} gaugeInfo={gaugeInfo} />
+        ))}
     </Box>
   )
 }

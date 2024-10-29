@@ -45,7 +45,7 @@ const ProgressPage = () => {
 
   return (
     <>
-    {console.log(progressGauges)}
+    {console.log(workflows)}
       <Grid
         sx={{
           maxWidth: "100vw",
@@ -103,10 +103,10 @@ const ProgressPage = () => {
             <>
               <ProgressPageBar />
               <ProgressPageGauges />
-              {/* <ParallelCoordinatePlot /> */}
-              {/* <WorkflowTable handleChange={handleChange} /> */}
+              <ParallelCoordinatePlot />
+              <WorkflowTable handleChange={handleChange} />
               {/* <Divider sx={{ margin: '20px' }} /> */}
-              {/* <ScheduleTable /> */}
+              <ScheduleTable />
             </>
           )}
           {value !== "progress" && value !== "compare-completed" && (

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { defaultDataExplorationQuery } from "../../shared/models/dataexploration.model"
+import { defaultDataExplorationQuery, IDataExplorationQuery } from "../../shared/models/dataexploration.model"
 import axios from "axios"
 import { set } from "lodash"
 import { IExperimentResponse } from "../../shared/models/experiment.model"
@@ -24,11 +24,10 @@ interface IWorkflowTab {
     progress: number
   }
   progressGauges: {
-    accuracy: number
-    precision: number
-    recall: number
-    runtime: number
-  }
+    name: string
+    type: string
+    value: number
+  }[]
   progressParallel: {
     data: { [key: string]: any }[]
     options: string[]
@@ -64,7 +63,7 @@ const initialState: IWorkflowTab = {
   experiment: { data: null, loading: false, error: null },
   workflows: { data: [], loading: false, error: null },
   progressBar: { total: 0, completed: 0, running: 0, failed: 0, progress: 0 },
-  progressGauges: { accuracy: 0, precision: 0, recall: 0, runtime: 0 },
+  progressGauges: [],
   progressParallel: { data: [], options: [], selected: "" },
   progressWokflowsTable: {
     order: "asc",
@@ -158,15 +157,47 @@ const apiKey = "3980f9c699c3e311f8d72bd0318038d976e5958a"
 export const fetchExperiment = createAsyncThunk(
   "progressPage/fetch_experiment",
   async (experimentId: string) => {
-    const headers = {
-      "access-token": apiKey,
+    const request: IDataExplorationQuery = {...defaultDataExplorationQuery, 
+      datasetId: `file:///test/test.json`
     }
-    const requestUrl = apiPath + `/experiments/${experimentId}`
+    const requestUrl = `api/visualization/data`
     return axios
-      .get<IExperimentResponse>(requestUrl, { headers })
-      .then(response => response.data.experiment)
+      .post<any>(requestUrl,request)
+      .then(response => JSON.parse(response.data.data).experiment)
   },
 )
+
+export const fetchExperimentWorkflows = createAsyncThunk(
+  "progressPage/fetch_experiment_and_workflows",
+  async (workflowIds: string[]) => {
+    const allData = await Promise.all(
+      workflowIds.map(async workflowId => {
+        const workflowRequestUrl = `api/visualization/data`
+        const workflowsResponse = await axios
+          .post<any>(workflowRequestUrl, {
+            ...defaultDataExplorationQuery,
+            datasetId: `file:///test/${workflowId}.json`,
+          })
+          .then(response => ({...JSON.parse(response.data.data).workflow, workflowId}))
+        return workflowsResponse
+      }),
+    )
+    return allData
+  },
+)
+
+// export const fetchExperiment = createAsyncThunk(
+//   "progressPage/fetch_experiment",
+//   async (experimentId: string) => {
+//     const headers = {
+//       "access-token": apiKey,
+//     }
+//     const requestUrl = apiPath + `/experiments/${experimentId}`
+//     return axios
+//       .get<IExperimentResponse>(requestUrl, { headers })
+//       .then(response => response.data.experiment)
+//   },
+// )
 
 // export const fetchExperimentWorkflows = createAsyncThunk(
 //   "progressPage/fetch_experiment_workflows",
@@ -181,26 +212,26 @@ export const fetchExperiment = createAsyncThunk(
 //   },
 // )
 
-export const fetchExperimentWorkflows = createAsyncThunk(
-  "progressPage/fetch_experiment_and_workflows",
-  async (workflowIds: string[]) => {
-    const allData = await Promise.all(
-      workflowIds.map(async workflowId => {
-        const workflowRequestUrl = apiPath + `/workflows/${workflowId}`
-        const headers = {
-          "access-token": apiKey,
-        }
-        const workflowsResponse = await axios
-          .get<IWorkflowResponse>(workflowRequestUrl, {
-            headers,
-          })
-          .then(response => response.data.workflow)
-        return workflowsResponse
-      }),
-    )
-    return allData
-  },
-)
+// export const fetchExperimentWorkflows = createAsyncThunk(
+//   "progressPage/fetch_experiment_and_workflows",
+//   async (workflowIds: string[]) => {
+//     const allData = await Promise.all(
+//       workflowIds.map(async workflowId => {
+//         const workflowRequestUrl = apiPath + `/workflows/${workflowId}`
+//         const headers = {
+//           "access-token": apiKey,
+//         }
+//         const workflowsResponse = await axios
+//           .get<IWorkflowResponse>(workflowRequestUrl, {
+//             headers,
+//           })
+//           .then(response => response.data.workflow)
+//         return workflowsResponse
+//       }),
+//     )
+//     return allData
+//   },
+// )
 
 //Reducer exports
 export const {

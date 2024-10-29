@@ -6,15 +6,17 @@ export interface IWorkflowResponse {
         status: string;
         metric_ids: string[];
         metrics: Metric[];
+        workflowId: string;
     };
 }
 
-interface Task {
+export interface Task {
     id: string;
     name: string;
     source_code: string;
     input_datasets?: InputDataset[];
     parameters?: Parameter[];
+    variant?: string;
 }
 
 interface InputDataset {
@@ -22,17 +24,17 @@ interface InputDataset {
     uri: string;
 }
 
-interface Parameter {
+export interface Parameter {
     name: string;
     value: string;
     type: string;
 }
 
-interface Metric {
+export interface Metric {
     [key: string]: MetricDetail;
 }
 
-interface MetricDetail {
+export interface MetricDetail {
     name: string;
     type: string;
     parent_id: string;

@@ -21,46 +21,83 @@ const ParallelCoordinatePlot = () => {
 
   useEffect(() => {
     if (workflows.data.length > 0) {
+      //TODO: This is based on the old data structure
+      // const uniqueParameters = new Set(
+      //   workflows.data.reduce(
+      //     (acc: any[], workflow) => [
+      //       ...acc,
+      //       ...Object.keys(
+      //         workflow.variabilityPoints["Model Training"].Parameters,
+      //       ),
+      //     ],
+      //     [],
+      //   ),
+      // )
       const uniqueParameters = new Set(
-        workflows.data.reduce(
-          (acc: any[], workflow) => [
-            ...acc,
-            ...Object.keys(
-              workflow.variabilityPoints["Model Training"].Parameters,
-            ),
-          ],
-          [],
-        ),
+        workflows.data.reduce((acc: any[], workflow) => {
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          let paramNames = []
+          if (params) {
+            paramNames = params.map(param => param.name)
+            return [...acc, ...paramNames]
+          } else {
+            return [...acc]
+          }
+        }, []),
       )
       foldArray.current = Array.from(uniqueParameters)
       const data = workflows.data
-        .filter(workflow => workflow.workflowInfo.status === "completed")
-        .map(workflow => ({
-          ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] =
-              (workflow.variabilityPoints["Model Training"].Parameters[
-                variant
-              ] !== "-"
-                ? workflow.variabilityPoints["Model Training"].Parameters[
-                    variant
-                  ]
-                : null) || ""
-            return acc
-          }, {}),
-          ...workflow.metrics,
-          workflowId: workflow.workflowId,
-        }))
+        .filter(workflow => workflow.status === "completed")
+        .map(workflow => {
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          return {
+            // ...Array.from(uniqueParameters).reduce((acc, variant) => {
+            //   acc[variant] =
+            //     (workflow.variabilityPoints["Model Training"].Parameters[
+            //       variant
+            //     ] !== "-"
+            //       ? workflow.variabilityPoints["Model Training"].Parameters[
+            //           variant
+            //         ]
+            //       : null) || ""
+            //   return acc
+            // }, {}),
+            ...Array.from(uniqueParameters).reduce((acc, variant) => {
+              acc[variant] =
+                params?.find(param => param.name === variant)?.value || ""
+              return acc
+            }, {}),
+            ...workflow.metrics.reduce((acc, metric) => {
+              const metricValues = Object.values(metric).reduce(
+                (acc: any, m: any) => ({
+                  ...acc,
+                  [m.name]: m.value,
+                }),
+                {},
+              )
+              return {
+                ...acc,
+                ...metricValues,
+              }
+            }, {}),
+            workflowId: workflow.name,
+          }
+        })
       parallelData.current = _.cloneDeep(data)
-      const options = Object.keys(
-        workflows.data.find(
-          workflow => workflow.workflowInfo.status === "completed",
-        )?.metrics || [],
-      )
-      tooltipArray.current = Object.keys(
-        workflows.data.filter(
-          workflow => workflow.workflowInfo.status === "completed",
-        )[0].metrics,
-      ).map(key => ({ field: key }))
+      const options = Array.from(new Set(workflows.data.filter(workflow => workflow.status === "completed")
+      .reduce((acc: any[], workflow) => {
+        const metrics = workflow.metrics.map((metric: any) => Object.values(metric)).map((metric: any) => metric[0].name)
+        return [...acc, ...metrics]
+      }, [])))
+      // tooltipArray.current = Object.keys(
+      //   workflows.data.filter(workflow => workflow.status === "completed")[0]
+      //     .metrics,
+      // ).map(key => ({ field: key }))
+      tooltipArray.current = options.map(key => ({ field: key }))
       const selected = options[0]
       dispatch(
         setProgressParallel({

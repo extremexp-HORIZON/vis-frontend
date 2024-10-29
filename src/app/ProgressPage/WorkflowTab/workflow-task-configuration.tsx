@@ -7,23 +7,22 @@ import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
+import { Parameter, Task } from "../../../shared/models/workflow.model"
 
 interface ITaskConfiguration {
-  configuration: { [key: string]: any } | null
+  configuration: Task[] | null
 }
 
 const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
   const { configuration } = props
 
-  const convertParametersToString = (obj: { [key: string]: any }) => {
-    const parametersString = Object.entries(obj)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join(", ")
-    return parametersString
-  }
+  const convertParametersToString = (obj: Parameter[]) => obj
+    .map((param) => `${param.name}: ${param.value}`)
+    .join(", ")
 
   return (
     <>
+      {console.log(configuration)}
       <Box>
         {configuration && (
           <TableContainer component={Paper}>
@@ -36,20 +35,23 @@ const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Object.keys(configuration).map((taskName, index) => (
+                {configuration.map((task, index) => (
                   <TableRow key={index}>
-                    <TableCell>{taskName}</TableCell>
-                    {Object.keys(configuration[taskName]).map(
-                      (task: any, index: number) => (
-                        <TableCell key={`${task}-${index}`}>
-                          {typeof configuration[taskName][task] === "string"
-                            ? configuration[taskName][task]
-                            : convertParametersToString(
-                                configuration[taskName][task],
-                              )}
-                        </TableCell>
-                      ),
-                    )}
+                    <TableCell>{task.name}</TableCell>
+                    <TableCell>{task.variant || "-"}</TableCell>
+                    <TableCell>
+                      {task.parameters ?
+                        convertParametersToString(task.parameters) : "-"}
+                    </TableCell>
+                    {/* {configuration.map((task: any, index: number) => (
+                      <TableCell key={`${task}-${index}`}>
+                        {typeof configuration[taskName][task] === "string"
+                          ? configuration[taskName][task]
+                          : convertParametersToString(
+                              configuration[taskName][task],
+                            )}
+                      </TableCell>
+                    ))} */}
                   </TableRow>
                 ))}
               </TableBody>
