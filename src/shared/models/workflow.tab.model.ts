@@ -5,7 +5,7 @@ import { IModelAnalysis } from "./tasks/model-analysis.model";
 import { Task } from "./workflow.model";
 
 export interface IWorkflowTabModel {
-    workflowId: string | number;
+    workflowId: string;
     workflowConfiguration: {
         data: Task[] | null
         loading: boolean;
@@ -26,7 +26,7 @@ export interface IWorkflowTabModel {
 }
 
 export const defaultWorkflowTabModel: IWorkflowTabModel = {
-    workflowId: 0,
+    workflowId: "0",
     workflowConfiguration: {
         data: null,
         loading: true

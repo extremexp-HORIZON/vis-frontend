@@ -204,9 +204,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
           <Checkbox checked={checkbox} onChange={handleCheckboxChange} disabled={plotData?.loading || !plotData?.data}/>
         </Box>
         <Box sx={{ width: "99%", px: 1, display: "flex", justifyContent: 'center', pb: !plotData?.data ? 2 : 0 }}>
-          {!plotData?.data ?
-          <Skeleton variant="rounded" width={"90%"} height={450} /> :
-           (
             <VegaLite
               actions={false}
               style={{ width: "90%", height: 500 }}
@@ -258,7 +255,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
                 },
               }}
             />
-          )}
         </Box>
       </Paper>
     </>

@@ -6,6 +6,7 @@ import ControlPanel from "../ChartControls/ControlPanel" // Import the new Contr
 import {
   Box,
   CircularProgress,
+  Grid,
   Pagination,
   Paper,
   Tab,
@@ -170,29 +171,31 @@ const [totalSize, setTotalSize] = useState(0);
   return (
     <>
       {console.log("workflow",workflow)}
-      <Paper
+      <Grid
       className="Category-Item"
-      elevation={2}
+      // elevation={2}
       sx={{
         borderRadius: 4,
-        width: "inherit",
+        // width: "inherit",
         display: "flex",
         flexDirection: "column",
         rowGap: 0,
         minWidth: "300px",
-        height: "100%",
+        // height: "100%",
+        overflow: "hidden",
+        border: `1px solid ${grey[400]}`,
       }}
     >      
     <Box
         sx={{
-          px: 1.5,
-          py: 0.5,
+          px: 2,
+          height: "3.5rem",
           display: "flex",
           alignItems: "center",
-          borderBottom: `1px solid ${grey[400]}`,
+          backgroundColor: grey[300],
         }}
       >
-        <Typography fontSize={"1rem"} fontWeight={600}>
+        <Typography fontSize={"1.2rem"}>
           {"Data Exploration"}
         </Typography>
         <Box sx={{ flex: 1 }} />
@@ -264,8 +267,8 @@ const [totalSize, setTotalSize] = useState(0);
               <GraphContainer
                 linedata={workflow?.workflowTasks.dataExploration?.lineChart.data?.data}
                 bardata={workflow?.workflowTasks.dataExploration?.barChart.data}
-                experimentId={experimentId}
-                workflowId={workflow.workflowId}
+                experimentId={experimentId || ""}
+                workflowId={workflow?.workflowId || ""}
                 columns={columns}
                 originalColumns={originalColumns}
                 filters={filters}
@@ -294,7 +297,7 @@ const [totalSize, setTotalSize] = useState(0);
             )}
           </Box>
         </Box>
-      </Paper>
+      </Grid>
     </>
   )
 }
