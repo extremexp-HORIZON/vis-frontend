@@ -7,11 +7,9 @@ import {
   explainabilityDefault,
   explainabilityReducers,
 } from "../../shared/models/tasks/explainability.model"
-import {
-  modelAnalysisDefault,
-  modelAnalysisReducers,
-} from "../../shared/models/tasks/model-analysis.model"
 import { IWorkflowResponse, Metric } from "../../shared/models/workflow.model"
+import { modelAnalysisDefault, modelAnalysisReducers } from "../../shared/models/tasks/model-analysis.model"
+import { dataExplorationDefault, explainabilityExtraReducers } from "../../shared/models/tasks/data-exploration-task.model"
 
 export interface IWorkflowTab {
   tabs: IWorkflowTabModel[]
@@ -35,9 +33,12 @@ export const workflowTabsSlice = createSlice({
     deleteTab: (state, action) => {
       state.tabs = state.tabs.filter(tab => tab.workflowId !== action.payload)
     },
+    // ...additionalReducers
   },
   extraReducers: builder => {
-    explainabilityReducers(builder), modelAnalysisReducers(builder)
+    explainabilityReducers(builder),
+    modelAnalysisReducers(builder),
+    explainabilityExtraReducers(builder)
   },
 })
 
@@ -140,7 +141,8 @@ const initializeTab = ({
     },
     workflowTasks: {
       modelAnalysis: modelAnalysisDefault,
-    },
+      dataExploration: dataExplorationDefault
+    }
   }
   return tab
 }

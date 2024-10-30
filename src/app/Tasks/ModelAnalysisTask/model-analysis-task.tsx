@@ -64,7 +64,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         fetchModelAnalysisData({
           query: {
             ...defaultDataExplorationQuery,
-            datasetId: `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
+            datasetId: `file://${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
             filters: [
               { column: "id", type: "equals", value: workflow.workflowId },
             ],
@@ -79,10 +79,11 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         fetchModelAnalysisData({
           query: {
             ...defaultDataExplorationQuery,
-            datasetId: `file:///${experimentId}/metrics/${experimentId}_instances.csv`,
+            datasetId: `file://${experimentId}/metrics/${experimentId}_instances.csv`,
             filters: [
               { column: "id", type: "equals", value: workflow.workflowId },
             ],
+            limit: 1000
           },
           metadata: {
             workflowId: workflow.workflowId,
@@ -117,7 +118,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       fetchModelAnalysisData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: `file:///${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
+          datasetId: `file://${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
           filters: [
             {
               column: "id",
@@ -136,6 +137,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
 
   return (
     <>
+    {console.log(tabs)}
       <Grid
         sx={{
           flexDirection: "column",

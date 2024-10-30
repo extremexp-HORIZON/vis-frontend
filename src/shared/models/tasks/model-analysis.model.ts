@@ -4,15 +4,15 @@ import { IWorkflowTab } from "../../../store/slices/workflowTabsSlice"
 import axios from "axios"
 import {
   IDataExplorationRequest,
-  IDataExplorationResponse,
+  IDataExplorationResponse
 } from "../dataexploration.model"
 
-const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
+export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
   data: JSON.parse(payload.data),
 })
 
-const handleMultiTimeSeriesData = (payload : any) => {
+export const handleMultiTimeSeriesData = (payload : any) => {
   const fileData = JSON.parse(payload.data);
   const seriesData = payload.fileNames;
   const flatFileData =  fileData.flatMap((file: any, id:number)=> {

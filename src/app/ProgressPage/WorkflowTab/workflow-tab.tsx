@@ -4,7 +4,7 @@ import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task
 import WorkflowSvg from "./workflow-svg"
 import { useState } from "react"
 import Typography from "@mui/material/Typography"
-import DataExploration from "../../Tasks/DataExplorationTask/data-exploration"
+import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 import { RootState, useAppSelector } from "../../../store/store"
 import WorkflowMetricDetails from "./workflow-metric-details"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
@@ -23,7 +23,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const taskProvider = (taskId: string | null) => {
     switch (taskId) {
       case "LG600B6_100636_IDK":
-        return <DataExploration />
+        return <DataExplorationComponent workflow={tabs.find(tab => tab.workflowId === workflowId) || null} />
       case "TrainModel":
         return <ModelAnalysisTask workflow={tabs.find(tab => tab.workflowId === workflowId) as IWorkflowTabModel} />
       case null:
