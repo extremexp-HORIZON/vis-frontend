@@ -20,6 +20,7 @@ import { fetchExperiment, fetchExperimentWorkflows } from "../../store/slices/pr
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>("progress")
   const { experiment, workflows, progressGauges } = useAppSelector((state: RootState) => state.progressPage)
+  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
 

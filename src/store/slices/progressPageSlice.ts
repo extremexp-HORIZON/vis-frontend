@@ -5,6 +5,21 @@ import { set } from "lodash"
 import { IExperimentResponse } from "../../shared/models/experiment.model"
 import { IWorkflowResponse } from "../../shared/models/workflow.model"
 
+const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
+  return {
+    ...workflow,
+    workflowId,
+    metrics: workflow.metrics.map((item: any) => {
+      const metricId = Object.keys(item)[0]
+      const metricData = item[metricId]
+      return {
+        ...metricData,
+        metricId,
+      }
+    })
+  }
+}
+
 interface IWorkflowTab {
   experiment: {
     data: IExperimentResponse["experiment"] | null
@@ -12,7 +27,7 @@ interface IWorkflowTab {
     error: string | null
   }
   workflows: {
-    data: IWorkflowResponse["workflow"][]
+    data: IWorkflowResponse[]
     loading: boolean
     error: string | null
   }
@@ -178,7 +193,7 @@ export const fetchExperimentWorkflows = createAsyncThunk(
             ...defaultDataExplorationQuery,
             datasetId: `file:///test/${workflowId}.json`,
           })
-          .then(response => ({...JSON.parse(response.data.data).workflow, workflowId}))
+          .then(response => (workflowMetricsPreparation(JSON.parse(response.data.data).workflow, workflowId)))
         return workflowsResponse
       }),
     )

@@ -1,13 +1,11 @@
 export interface IWorkflowResponse {
-    workflow: {
         name: string;
         tasks: Task[];
         experimentId: string;
         status: string;
         metric_ids: string[];
-        metrics: Metric[];
+        metrics: MetricDetail[];
         workflowId: string;
-    };
 }
 
 export interface Task {
@@ -42,6 +40,7 @@ export interface MetricDetail {
     experimentId: string;
     value: string;
     aggregation: Aggregation;
+    metricId: string;
 }
 
 interface Aggregation {}

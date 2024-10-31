@@ -7,7 +7,7 @@ import {
   explainabilityDefault,
   explainabilityReducers,
 } from "../../shared/models/tasks/explainability.model"
-import { IWorkflowResponse, Metric } from "../../shared/models/workflow.model"
+import { IWorkflowResponse, Metric, MetricDetail } from "../../shared/models/workflow.model"
 import { modelAnalysisDefault, modelAnalysisReducers } from "../../shared/models/tasks/model-analysis.model"
 import { dataExplorationDefault, explainabilityExtraReducers } from "../../shared/models/tasks/data-exploration-task.model"
 
@@ -48,9 +48,9 @@ const workflowMetricsInitializer = ({
   metrics,
   workflows,
 }: {
-  metrics: Metric[] | null
+  metrics: MetricDetail[] | null
   workflows: {
-    data: IWorkflowResponse["workflow"][]
+    data: IWorkflowResponse[]
     loading: boolean
     error: string | null
   }
@@ -60,28 +60,10 @@ const workflowMetricsInitializer = ({
 
   const finishedWorkflowsMetrics = workflows.data
     .filter(workflow => workflow.status === "completed")
-    .reduce<Metric[]>((acc, workflow) => [...acc, ...workflow.metrics], [])
+    .reduce<MetricDetail[]>((acc, workflow) => [...acc, ...workflow.metrics], [])
 
-  const transformedMetricsAll = finishedWorkflowsMetrics.map(item => {
-    const metricId = Object.keys(item)[0]
-    const metricData = item[metricId]
-    return {
-      ...metricData,
-      metricId,
-    }
-  })
-
-  const transformedMetrics = metrics.map(item => {
-    const metricId = Object.keys(item)[0]
-    const metricData = item[metricId]
-    return {
-      ...metricData,
-      metricId,
-    }
-  })
-
-  return transformedMetrics.map(metric => {
-    const filteredMetricsAll = transformedMetricsAll.filter(metricAll => metricAll.name === metric.name)
+  return metrics.map(metric => {
+    const filteredMetricsAll = finishedWorkflowsMetrics.filter(metricAll => metricAll.name === metric.name)
     const metricsSum = filteredMetricsAll.reduce((acc, metric) => acc + parseFloat(metric.value), 0)
     return {
       name: metric.name,
@@ -119,7 +101,7 @@ const initializeTab = ({
 }: {
   workflowId: string
   workflows: {
-    data: IWorkflowResponse["workflow"][]
+    data: IWorkflowResponse[]
     loading: boolean
     error: string | null
   }
@@ -154,6 +136,10 @@ const initializeCompareCompleteTab = () => {
     workflowTasks: {
       explainabilityTask: explainabilityDefault,
     },
+    workflowMetrics: {
+      data: null,
+      loading: false,
+    }
   }
   return tab
 }

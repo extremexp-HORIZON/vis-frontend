@@ -72,16 +72,9 @@ const ParallelCoordinatePlot = () => {
               return acc
             }, {}),
             ...workflow.metrics.reduce((acc, metric) => {
-              const metricValues = Object.values(metric).reduce(
-                (acc: any, m: any) => ({
-                  ...acc,
-                  [m.name]: m.value,
-                }),
-                {},
-              )
               return {
                 ...acc,
-                ...metricValues,
+                [metric.name]: metric.value,
               }
             }, {}),
             workflowId: workflow.name,
@@ -90,7 +83,7 @@ const ParallelCoordinatePlot = () => {
       parallelData.current = _.cloneDeep(data)
       const options = Array.from(new Set(workflows.data.filter(workflow => workflow.status === "completed")
       .reduce((acc: any[], workflow) => {
-        const metrics = workflow.metrics.map((metric: any) => Object.values(metric)).map((metric: any) => metric[0].name)
+        const metrics = workflow.metrics.map((metric: any) => metric.name)
         return [...acc, ...metrics]
       }, [])))
       // tooltipArray.current = Object.keys(
@@ -126,6 +119,7 @@ const ParallelCoordinatePlot = () => {
 
   return (
     <>
+    {console.log("progressParallel", progressParallel)}
       {progressParallel.data.length > 0 && (
         <Paper elevation={2}>
           <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>

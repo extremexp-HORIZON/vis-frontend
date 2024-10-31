@@ -92,10 +92,10 @@ const ProgressPageGauges = () => {
         workflow => workflow.status === "completed",
       )
 
-      const getCommonMetricsOfAllCompletedWorkflows = (completedWorkflows: any) => {
+      const getCommonMetricsOfAllCompletedWorkflows = (completedWorkflows: IWorkflowResponse[]) => {
         // Array of arrays that each array contains all the metric names of a workflow
-        const allMetrics = completedWorkflows.reduce((acc: any, workflow: IWorkflowResponse["workflow"]) => {
-          const workflowMetrics = workflow.metrics.map((metric: any) => Object.values(metric)).map((metric: any) => metric[0].name)
+        const allMetrics = completedWorkflows.reduce((acc: any, workflow: IWorkflowResponse) => {
+          const workflowMetrics = workflow.metrics.map((metric: any) => metric.name)
           return [...acc, workflowMetrics]
         }, [])
         // Get the common metrics of all workflows
@@ -109,8 +109,8 @@ const ProgressPageGauges = () => {
 
       const calculateCommonMetricsAverageValues = () => {
         const averageValues = commonMetrics.reduce((acc: any, metric: string) => {
-          const metricValues = completedWorkflows.map((workflow: IWorkflowResponse["workflow"]) => (
-          Object.values(workflow.metrics).map((m: any) => Object.values(m)[0]).find((m: any) => m.name === metric)
+          const metricValues = completedWorkflows.map((workflow: IWorkflowResponse) => (
+          workflow.metrics.find((m: any) => m.name === metric)
           )) as MetricDetail[]
           const metricAverage = (metricValues.reduce((acc: number, metric: any) => (acc = acc + parseFloat(metric.value) ), 0) / metricValues.length)
           return [...acc, {name: metric, type: metricValues[0].type, value: metricAverage}] 

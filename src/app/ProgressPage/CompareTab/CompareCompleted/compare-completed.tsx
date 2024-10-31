@@ -79,14 +79,14 @@ const CompareCompleted = () => {
                   mb: 1,
                 }}
               >
-                <Grid container spacing={2}>
+                {/* <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
                     <VariabilityPointCharts />
                   </Grid>
                   <Grid item xs={12} md={6}>
                     <VariabilityPointHeatmap />
                   </Grid>
-                </Grid>
+                </Grid> */}
               </Box>
             </Box>
           </>
