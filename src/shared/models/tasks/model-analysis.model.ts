@@ -244,7 +244,8 @@ export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
 export const fetchModelAnalysisData = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "api/visualization/data"
+    //TODO: this request should be only /data when /olddata is removed
+    const requestUrl = payload.query.temporalParams ? "api/visualization/olddata" : "api/visualization/data"
     return axios
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)

@@ -33,32 +33,43 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
 
   useEffect(() => {
     if (experimentId === "ideko") {
-      dispatch(
-        fetchModelAnalysisData({
-          query: {
-            datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
-            columns: [],
-            limit: -1,
-          },
-          metadata: {
-            workflowId: workflow.workflowId,
-            queryCase: "multipleTimeSeries",
-          },
-        }),
-      )
-      dispatch(
-        fetchModelAnalysisData({
-          query: {
-            datasetId: `file://${experimentId}/metadata.csv`,
-            columns: [],
-            limit: -1,
-          },
-          metadata: {
-            workflowId: workflow.workflowId,
-            queryCase: "multipleTimeSeriesMetadata",
-          },
-        }),
-      )
+      if (
+        workflow.workflowTasks.modelAnalysis?.multipleTimeSeries.data === null
+      ) {
+        dispatch(
+          fetchModelAnalysisData({
+            query: {
+              datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
+              temporalParams: { groupColumn: "", granularity: "HOURS" },
+              visualizationType: "temporal",
+              limit: -1,
+              columns: [],
+            },
+            metadata: {
+              workflowId: workflow.workflowId,
+              queryCase: "multipleTimeSeries",
+            },
+          }),
+        )
+      }
+      if (
+        workflow.workflowTasks.modelAnalysis?.multipleTimeSeriesMetadata
+          .data === null
+      ) {
+        dispatch(
+          fetchModelAnalysisData({
+            query: {
+              datasetId: `file://${experimentId}/metadata.csv`,
+              columns: [],
+              limit: -1,
+            },
+            metadata: {
+              workflowId: workflow.workflowId,
+              queryCase: "multipleTimeSeriesMetadata",
+            },
+          }),
+        )
+      }
     } else if (experimentId !== "ideko") {
       dispatch(
         fetchModelAnalysisData({
@@ -83,7 +94,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             filters: [
               { column: "id", type: "equals", value: workflow.workflowId },
             ],
-            limit: 1000
+            limit: 1000,
           },
           metadata: {
             workflowId: workflow.workflowId,
@@ -114,30 +125,33 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         }),
       )
     }
-    dispatch(
-      fetchModelAnalysisData({
-        query: {
-          ...defaultDataExplorationQuery,
-          datasetId: `file://${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
-          filters: [
-            {
-              column: "id",
-              type: "equals",
-              value: workflow.workflowId,
-            },
-          ],
-        },
-        metadata: {
-          workflowId: workflow.workflowId,
-          queryCase: "modelConfusionMatrix",
-        },
-      }),
-    )
+    if (
+      workflow.workflowTasks.modelAnalysis?.modelConfusionMatrix.data === null
+    ) {
+      dispatch(
+        fetchModelAnalysisData({
+          query: {
+            ...defaultDataExplorationQuery,
+            datasetId: `file://${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
+            filters: [
+              {
+                column: "id",
+                type: "equals",
+                value: workflow.workflowId,
+              },
+            ],
+          },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "modelConfusionMatrix",
+          },
+        }),
+      )
+    }
   }, [])
 
   return (
     <>
-    {console.log(tabs)}
       <Grid
         sx={{
           flexDirection: "column",

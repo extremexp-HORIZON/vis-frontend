@@ -8,11 +8,16 @@ import {
   VisualColumn,
 } from "../dataexploration.model"
 import {
+  handleMultiTimeSeriesData,
   prepareDataExplorationResponse,
 } from "./model-analysis.model"
 
 export interface IDataExploration {
-  multipleTimeSeries: any[]
+  multipleTimeSeries: {
+    data: IDataExplorationResponse | null, 
+    loading: boolean, 
+    error: string | null
+  }
   // filters: IFilter[]
   // columns: VisualColumn[]
   lineChart: {
@@ -42,7 +47,11 @@ export interface IDataExploration {
 
 // Define the initial state of the slice
 export const dataExplorationDefault: IDataExploration = {
-  multipleTimeSeries: [],
+  multipleTimeSeries: {
+    data: null,
+    loading: false,
+    error: null
+  },
   // filters: [],
   // columns: [],
   lineChart: {
@@ -109,8 +118,8 @@ export const explainabilityExtraReducers = (
       tab => tab.workflowId === action.meta.arg.metadata.workflowId,
     )?.workflowTasks.dataExploration
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
-        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart" || queryCase === "scatterChart")) {
-          dataExplorationTask[queryCase].data = prepareDataExplorationResponse(action.payload)
+        if (dataExplorationTask) {
+          dataExplorationTask[queryCase].data = queryCase === "multipleTimeSeries" ? handleMultiTimeSeriesData(action.payload) : prepareDataExplorationResponse(action.payload)
           dataExplorationTask[queryCase].loading = false
           dataExplorationTask[queryCase].error = null
         }
@@ -120,7 +129,7 @@ export const explainabilityExtraReducers = (
       tab => tab.workflowId === action.meta.arg.metadata.workflowId,
     )?.workflowTasks.dataExploration
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
-        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart" || queryCase === "scatterChart")) {
+        if (dataExplorationTask) {
           dataExplorationTask[queryCase].loading = true
         }
   })
@@ -129,7 +138,7 @@ export const explainabilityExtraReducers = (
       tab => tab.workflowId === action.meta.arg.metadata.workflowId,
     )?.workflowTasks.dataExploration
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
-        if (dataExplorationTask && (queryCase === "lineChart" || queryCase === "barChart" || queryCase === "scatterChart")) {
+        if (dataExplorationTask) {
           dataExplorationTask[queryCase].loading = false
           dataExplorationTask[queryCase].error = "Failed to fetch data"
         }
@@ -139,7 +148,8 @@ export const explainabilityExtraReducers = (
 export const fetchDataExplorationData = createAsyncThunk(
   "workflowTasks/data_exploration/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "api/visualization/data"
+    //TODO: this request should be only /data when /olddata is removed
+    const requestUrl = payload.query.temporalParams ? "api/visualization/olddata" : "api/visualization/data"
     return axios
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)

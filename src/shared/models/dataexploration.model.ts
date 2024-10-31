@@ -1,19 +1,20 @@
 import { IModelAnalysis } from "./tasks/model-analysis.model"
 
 export interface IDataExplorationQuery {
-    datasetId: string;
-    columns?: string[];
-    filters?: IFilter[];
-    limit: number;
-    offset?:number;
-    groupBy?: string[]; // Optional, added
-
-    aggregation?: {      // Optional, a map of columns to an array of aggregation functions
-        [column: string]: string[]; // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
-    };
+  datasetId: string
+  columns?: string[]
+  filters?: IFilter[]
+  limit: number
+  offset?: number
+  groupBy?: string[] // Optional, added
+  //TODO: temporalParams/visualizationType should be removed if /olddata is removed
+  temporalParams?: { groupColumn: string; granularity: string }
+  visualizationType?: string
+  aggregation?: {
+    // Optional, a map of columns to an array of aggregation functions
+    [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
+  }
 }
-
-
 
 export interface IDataExplorationRequest {
   query: IDataExplorationQuery
@@ -24,25 +25,22 @@ export interface IDataExplorationRequest {
 }
 
 export interface VisualColumn {
-  name: string;
-  type: string;
+  name: string
+  type: string
   // Add any other properties specific to the column metadata
 }
 
 // Model for TabularResults
 export interface IDataExplorationResponse {
-  data: string;
-  fileNames: string[];
-  columns: VisualColumn[]; 
-  originalColumns: VisualColumn[];
-  timestampColumn?: string;
-  totalItems: number;
-  querySize: number;
-  uniqueColumnValues: any;
+  data: any
+  fileNames: string[]
+  columns: VisualColumn[]
+  originalColumns: VisualColumn[]
+  timestampColumn?: string
+  totalItems: number
+  querySize: number
+  uniqueColumnValues: any
 }
-
-
-
 
 export interface IFilter {
   column: string

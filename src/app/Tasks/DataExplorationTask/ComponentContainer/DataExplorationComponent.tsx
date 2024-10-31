@@ -27,6 +27,7 @@ import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { grey } from "@mui/material/colors"
 import InfoIcon from "@mui/icons-material/Info"
+import MultiTimeSeriesVisualization from "../multi-ts-visualization/MultiTimeSeriesVisualization"
 
 
 interface IDataExplorationComponent {
@@ -73,45 +74,68 @@ const [totalSize, setTotalSize] = useState(0);
   useEffect(() => {
     if (workflow && experimentId) {
       const offset = (currentPage - 1) * pageSize;
-
-      dispatch(
-        fetchDataExplorationData({
-          query: {
-            datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
-            limit: pageSize, 
-            columns: selectedColumns, 
-            filters: filters,
-            groupBy: [],
-            aggregation: {},
-            offset: offset,
-          },
-          metadata: {
-            workflowId: workflowId || "",
-            queryCase: "lineChart",
-          },
-        }),
-      );
-      dispatch(
-        fetchDataExplorationData({
-          query: {
-            datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
-            limit: rowLimit, 
-            columns: [], 
-            filters: [],
-            groupBy: [],
-            aggregation: {},
-            offset: 0,
-          },
-          metadata: {
-            workflowId: workflowId || "",
-            queryCase: "barChart",
-          },
-        }),
-      );
-
+      if(experimentId === "ideko"){
+        if(workflow.workflowTasks.dataExploration?.multipleTimeSeries.data === null){
+          dispatch(
+            fetchDataExplorationData({
+              query: {
+                datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
+                temporalParams: {groupColumn: "", granularity: "HOURS"},
+                visualizationType: "temporal",
+                limit: pageSize,
+                columns: [],
+              },
+              metadata: {
+                workflowId: workflowId || "",
+                queryCase: "multipleTimeSeries",
+              },
+            }),
+          );
+        }
+        
+      }else{
+        if(workflow.workflowTasks.dataExploration?.lineChart.data === null){
+          dispatch(
+            fetchDataExplorationData({
+              query: {
+                datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+                limit: pageSize, 
+                columns: selectedColumns, 
+                filters: filters,
+                groupBy: [],
+                aggregation: {},
+                offset: offset,
+              },
+              metadata: {
+                workflowId: workflowId || "",
+                queryCase: "lineChart",
+              },
+            }),
+          );
+        }
+        if(workflow.workflowTasks.dataExploration?.barChart.data === null){
+          dispatch(
+            fetchDataExplorationData({
+              query: {
+                datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+                limit: rowLimit, 
+                columns: [], 
+                filters: [],
+                groupBy: [],
+                aggregation: {},
+                offset: 0,
+              },
+              metadata: {
+                workflowId: workflowId || "",
+                queryCase: "barChart",
+              },
+            }),
+          );
+        }    
+      }
     }
     
-  }, [currentPage,totalSize])
+  }, [])
 
   useEffect(() => {
     if(taskDependancies?.lineChart.data) {
@@ -170,7 +194,6 @@ const [totalSize, setTotalSize] = useState(0);
  
   return (
     <>
-      {console.log("workflow",workflow)}
       <Grid
       className="Category-Item"
       // elevation={2}
@@ -203,7 +226,7 @@ const [totalSize, setTotalSize] = useState(0);
         <Tooltip title="Explore your data through an interactive combination of tables and charts. Use the control panel to filter, select columns, and adjust data display preferences. Toggle between data views to uncover trends, patterns, and insights.">
         <InfoIcon sx={{ padding: 1, zIndex: 100, color: grey[600] }} />
           </Tooltip>
-          {workflow?.workflowTasks.dataExploration?.lineChart.loading && (
+          {(workflow?.workflowTasks.dataExploration?.multipleTimeSeries.loading || workflow?.workflowTasks.dataExploration?.lineChart.loading) && (
             <CircularProgress
               size={28}
               sx={{
@@ -217,7 +240,9 @@ const [totalSize, setTotalSize] = useState(0);
           )}
         </Box>
       </Box>  
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    {experimentId === "ideko" ? 
+    <MultiTimeSeriesVisualization multipleTimeSeries={workflow?.workflowTasks.dataExploration?.multipleTimeSeries || null} />
+    : <Box sx={{ display: "flex", height: "100vh" }}>
           {/* Control Panel */}
           <ControlPanel
             originalColumns={originalColumns}
@@ -296,7 +321,7 @@ const [totalSize, setTotalSize] = useState(0);
               />
             )}
           </Box>
-        </Box>
+        </Box>}
       </Grid>
     </>
   )
