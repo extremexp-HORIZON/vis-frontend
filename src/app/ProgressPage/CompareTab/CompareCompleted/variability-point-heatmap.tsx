@@ -32,22 +32,22 @@ const VariabilityPointHeatmap: React.FC = () => {
   const metrics = useMemo(() => {
     if (!workflows.data || workflows.data.length === 0) return []
     const allMetrics = workflows.data.flatMap(workflow =>
-      workflow.metrics ? Object.keys(workflow.metrics) : [],
+      workflow.metrics ? workflow.metrics.flatMap(metric => metric.name) : [],
     )
     return Array.from(new Set(allMetrics))
   }, [workflows.data])
 
-  const variabilityPoints = useMemo(() => {
-    if (!workflows.data || workflows.data.length === 0) return []
-    const allPoints = workflows.data.flatMap(workflow =>
-      workflow.variabilityPoints?.["Model Training"]?.["Parameters"]
-        ? Object.keys(
-            workflow.variabilityPoints["Model Training"]["Parameters"],
-          )
-        : [],
-    )
-    return Array.from(new Set(allPoints))
-  }, [workflows.data])
+  const variabilityPoints = workflows.data
+    ? Array.from(
+        new Set(
+          workflows.data.flatMap(workflow =>
+            workflow.tasks.findIndex(task => task.id === "TrainModel") !== -1
+              ? workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.map(param => param.name) || []
+              : [],
+          ),
+        ),
+      )
+    : []
 
   const processData = (
     selectedMetric: string,
@@ -57,19 +57,13 @@ const VariabilityPointHeatmap: React.FC = () => {
     return workflows.data
       .filter(
         workflow =>
-          workflow.workflowInfo.status === "completed" && workflow.metrics,
+          workflow.status === "completed" && workflow.metrics,
       )
       .map(workflow => ({
-        x:
-          workflow.variabilityPoints["Model Training"]["Parameters"][
-            xVarPoint
-          ] || 0,
-        y:
-          workflow.variabilityPoints["Model Training"]["Parameters"][
-            yVarPoint
-          ] || 0,
-        value: workflow.metrics[selectedMetric] || 0,
+        x: parseFloat(workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === xVarPoint)?.value || "0")|| 0,
+        y: parseFloat(workflow.metrics.find(m => m.name === yVarPoint)?.value || "0") || 0,
         id: workflow.workflowId,
+        value: parseFloat(workflow.metrics.find(m => m.name === selectedMetric)?.value || "0") || 0,
       }))
   }
 

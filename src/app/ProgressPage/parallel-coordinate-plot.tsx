@@ -119,7 +119,6 @@ const ParallelCoordinatePlot = () => {
 
   return (
     <>
-    {console.log("progressParallel", progressParallel)}
       {progressParallel.data.length > 0 && (
         <Paper elevation={2}>
           <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
