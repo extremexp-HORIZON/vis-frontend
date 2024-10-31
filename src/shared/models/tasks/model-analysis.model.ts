@@ -61,6 +61,7 @@ export interface IModelAnalysis {
 }
 
 export const modelAnalysisDefault: IModelAnalysis = {
+  //TODO: These features names should be populated from the response
   featureNames: [
     "dns_interlog_time_q1",
     "dns_interlog_time_q2",
@@ -244,8 +245,7 @@ export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
 export const fetchModelAnalysisData = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    //TODO: this request should be only /data when /olddata is removed
-    const requestUrl = payload.query.temporalParams ? "api/visualization/olddata" : "api/visualization/data"
+    const requestUrl = "api/visualization/data"
     return axios
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)

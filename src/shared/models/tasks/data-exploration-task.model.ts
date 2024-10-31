@@ -148,8 +148,7 @@ export const explainabilityExtraReducers = (
 export const fetchDataExplorationData = createAsyncThunk(
   "workflowTasks/data_exploration/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    //TODO: this request should be only /data when /olddata is removed
-    const requestUrl = payload.query.temporalParams ? "api/visualization/olddata" : "api/visualization/data"
+    const requestUrl = "api/visualization/data"
     return axios
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)

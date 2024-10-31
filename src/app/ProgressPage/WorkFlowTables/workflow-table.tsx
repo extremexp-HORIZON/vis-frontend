@@ -468,7 +468,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                       currentStatus !== "completed"
                                         ? () => {}
                                         : handleLaunchNewTab(row.workflowId)
-                                    } // TODO: Change to row.id or row.workflowId when tabs are fully implemented
+                                    }
                                     sx={{
                                       cursor:
                                         currentStatus !== "completed"

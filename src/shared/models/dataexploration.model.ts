@@ -7,9 +7,6 @@ export interface IDataExplorationQuery {
   limit: number
   offset?: number
   groupBy?: string[] // Optional, added
-  //TODO: temporalParams/visualizationType should be removed if /olddata is removed
-  temporalParams?: { groupColumn: string; granularity: string }
-  visualizationType?: string
   aggregation?: {
     // Optional, a map of columns to an array of aggregation functions
     [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }

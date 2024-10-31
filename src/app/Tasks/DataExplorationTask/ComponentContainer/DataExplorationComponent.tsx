@@ -80,8 +80,6 @@ const [totalSize, setTotalSize] = useState(0);
             fetchDataExplorationData({
               query: {
                 datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
-                temporalParams: {groupColumn: "", granularity: "HOURS"},
-                visualizationType: "temporal",
                 limit: pageSize,
                 columns: [],
               },

@@ -40,8 +40,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           fetchModelAnalysisData({
             query: {
               datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
-              temporalParams: { groupColumn: "", granularity: "HOURS" },
-              visualizationType: "temporal",
               limit: -1,
               columns: [],
             },
