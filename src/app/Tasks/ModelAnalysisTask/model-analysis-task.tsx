@@ -31,8 +31,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
 
-  //TODO: remove all .replace(/workflow /gi, "") and provide the correct modelId for these calls
-
   useEffect(() => {
     if (experimentId === "ideko") {
       if (
@@ -95,7 +93,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           feature1:
             workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
           feature2: "",
-          modelId: workflow.workflowId.replace(/workflow /gi, ""),
+          modelId: workflow.workflowId,
         }),
       )
       dispatch(
@@ -106,7 +104,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           feature1:
             workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
           feature2: "",
-          modelId: workflow.workflowId.replace(/workflow /gi, ""),
+          modelId: workflow.workflowId,
         }),
       )
     }
@@ -122,7 +120,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               {
                 column: "id",
                 type: "equals",
-                value: workflow.workflowId.replace(/workflow /gi, ""),
+                value: workflow.workflowId,
               },
             ],
           },
@@ -285,7 +283,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       workflow.workflowTasks.modelAnalysis?.featureNames || null
                     }
                     fetchFunction={fetchModelAnalysisExplainabilityPlot}
-                    workflowId={workflow.workflowId.replace(/workflow /gi, "")}
+                    workflowId={workflow.workflowId}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -298,7 +296,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       workflow.workflowTasks.modelAnalysis?.featureNames || null
                     }
                     fetchFunction={fetchModelAnalysisExplainabilityPlot}
-                    workflowId={workflow.workflowId.replace(/workflow /gi, "")}
+                    workflowId={workflow.workflowId}
                   />
                 </Grid>
               </Grid>

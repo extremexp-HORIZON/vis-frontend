@@ -106,10 +106,12 @@ const initializeTab = ({
     error: string | null
   }
 }) => {
-  const workflow = workflows.data.find(workflow => workflow.name === workflowId)
+  const workflow = workflows.data.find(workflow => workflow.workflowId === workflowId)
+  console.log("edw eimaii",workflow)
   const tab: IWorkflowTabModel = {
     ...defaultWorkflowTabModel,
-    workflowId: workflowId,
+    workflowName: workflow?.name || "",
+    workflowId: workflow?.workflowId || "",
     workflowConfiguration: {
       data: workflow?.tasks || null,
       loading: false,

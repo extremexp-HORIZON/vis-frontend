@@ -45,6 +45,7 @@ const ProgressPage = () => {
 
   return (
     <>
+    {console.log(tabs, value)}
       <Grid
         sx={{
           maxWidth: "100vw",

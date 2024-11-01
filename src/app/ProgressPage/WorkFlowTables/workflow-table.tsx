@@ -155,7 +155,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
           return{
           id: idCounter++,
-          workflowId: workflow.name,
+          workflowId: workflow.workflowId,
           // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
           ...Array.from(uniqueParameters).reduce((acc, variant) => {
             acc[variant] = params?.find(param => param.name === variant)?.value || ""
