@@ -173,7 +173,7 @@ export const fetchExperiment = createAsyncThunk(
   "progressPage/fetch_experiment",
   async (experimentId: string) => {
     const request: IDataExplorationQuery = {...defaultDataExplorationQuery, 
-      datasetId: `file:///test/test.json`
+      datasetId: `file://${experimentId}/metadata/experiment.json`
     }
     const requestUrl = `api/visualization/data`
     return axios
@@ -184,14 +184,15 @@ export const fetchExperiment = createAsyncThunk(
 
 export const fetchExperimentWorkflows = createAsyncThunk(
   "progressPage/fetch_experiment_and_workflows",
-  async (workflowIds: string[]) => {
+  async (payload: {experimentId: string, workflowIds: string[]}) => {
+    const {experimentId, workflowIds} = payload
     const allData = await Promise.all(
       workflowIds.map(async workflowId => {
         const workflowRequestUrl = `api/visualization/data`
         const workflowsResponse = await axios
           .post<any>(workflowRequestUrl, {
             ...defaultDataExplorationQuery,
-            datasetId: `file:///test/${workflowId}.json`,
+            datasetId: `file://${experimentId}/metadata/${workflowId}.json`,
           })
           .then(response => (workflowMetricsPreparation(JSON.parse(response.data.data).workflow, workflowId)))
         return workflowsResponse
