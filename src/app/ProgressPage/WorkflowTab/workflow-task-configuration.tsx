@@ -22,7 +22,6 @@ const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
 
   return (
     <>
-      {console.log(configuration)}
       <Box>
         {configuration && (
           <TableContainer component={Paper}>

@@ -21,18 +21,6 @@ const ParallelCoordinatePlot = () => {
 
   useEffect(() => {
     if (workflows.data.length > 0) {
-      //TODO: This is based on the old data structure
-      // const uniqueParameters = new Set(
-      //   workflows.data.reduce(
-      //     (acc: any[], workflow) => [
-      //       ...acc,
-      //       ...Object.keys(
-      //         workflow.variabilityPoints["Model Training"].Parameters,
-      //       ),
-      //     ],
-      //     [],
-      //   ),
-      // )
       const uniqueParameters = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
           const params = workflow.tasks.find(
@@ -55,17 +43,6 @@ const ParallelCoordinatePlot = () => {
             task => task.id === "TrainModel",
           )?.parameters
           return {
-            // ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            //   acc[variant] =
-            //     (workflow.variabilityPoints["Model Training"].Parameters[
-            //       variant
-            //     ] !== "-"
-            //       ? workflow.variabilityPoints["Model Training"].Parameters[
-            //           variant
-            //         ]
-            //       : null) || ""
-            //   return acc
-            // }, {}),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 params?.find(param => param.name === variant)?.value || ""

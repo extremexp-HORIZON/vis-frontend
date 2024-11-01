@@ -31,6 +31,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const [point, setPoint] = useState(null)
   const dispatch = useAppDispatch()
 
+  //TODO: remove all .replace(/workflow /gi, "") and provide the correct modelId for these calls
+
   useEffect(() => {
     if (experimentId === "ideko") {
       if (
@@ -73,21 +75,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         fetchModelAnalysisData({
           query: {
             ...defaultDataExplorationQuery,
-            datasetId: `file://${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
-            filters: [
-              { column: "id", type: "equals", value: workflow.workflowId },
-            ],
-          },
-          metadata: {
-            workflowId: workflow.workflowId,
-            queryCase: "modelConfusionMatrix",
-          },
-        }),
-      )
-      dispatch(
-        fetchModelAnalysisData({
-          query: {
-            ...defaultDataExplorationQuery,
             datasetId: `file://${experimentId}/metrics/${experimentId}_instances.csv`,
             filters: [
               { column: "id", type: "equals", value: workflow.workflowId },
@@ -108,7 +95,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           feature1:
             workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
           feature2: "",
-          modelId: workflow.workflowId,
+          modelId: workflow.workflowId.replace(/workflow /gi, ""),
         }),
       )
       dispatch(
@@ -119,7 +106,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           feature1:
             workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
           feature2: "",
-          modelId: workflow.workflowId,
+          modelId: workflow.workflowId.replace(/workflow /gi, ""),
         }),
       )
     }
@@ -135,7 +122,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               {
                 column: "id",
                 type: "equals",
-                value: workflow.workflowId,
+                value: workflow.workflowId.replace(/workflow /gi, ""),
               },
             ],
           },
@@ -298,7 +285,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       workflow.workflowTasks.modelAnalysis?.featureNames || null
                     }
                     fetchFunction={fetchModelAnalysisExplainabilityPlot}
-                    workflowId={workflow.workflowId}
+                    workflowId={workflow.workflowId.replace(/workflow /gi, "")}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -311,7 +298,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       workflow.workflowTasks.modelAnalysis?.featureNames || null
                     }
                     fetchFunction={fetchModelAnalysisExplainabilityPlot}
-                    workflowId={workflow.workflowId}
+                    workflowId={workflow.workflowId.replace(/workflow /gi, "")}
                   />
                 </Grid>
               </Grid>

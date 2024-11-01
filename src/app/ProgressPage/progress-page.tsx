@@ -45,7 +45,6 @@ const ProgressPage = () => {
 
   return (
     <>
-    {console.log(workflows)}
       <Grid
         sx={{
           maxWidth: "100vw",

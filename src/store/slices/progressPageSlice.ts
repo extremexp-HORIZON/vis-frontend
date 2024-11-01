@@ -169,6 +169,8 @@ export const progressPageSlice = createSlice({
 const apiPath = "https://api.expvis.smartarch.cz/api"
 const apiKey = "3980f9c699c3e311f8d72bd0318038d976e5958a"
 
+//TODO: These should be replaced with the actual API calls commented out below
+
 export const fetchExperiment = createAsyncThunk(
   "progressPage/fetch_experiment",
   async (experimentId: string) => {

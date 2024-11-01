@@ -28,7 +28,6 @@ const MetricsDistribution = () => {
           metricsSet.add(item.name)
         })
       })
-    console.log(metricsSet)
     return Array.from(metricsSet)
   }, [workflows.data])
 
@@ -74,7 +73,6 @@ const MetricsDistribution = () => {
   }
   return (
     <>
-      {console.log(availableMetrics)}
       <WorkflowCard
         title="Distribution of Metrics Across Workflows"
         description="Description not available"
