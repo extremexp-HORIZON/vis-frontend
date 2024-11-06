@@ -41,6 +41,8 @@ export interface MetricDetail {
     value: string;
     aggregation: Aggregation;
     metricId: string;
+    producedByTask: string;
+    semantic_type: string;
 }
 
 interface Aggregation {}

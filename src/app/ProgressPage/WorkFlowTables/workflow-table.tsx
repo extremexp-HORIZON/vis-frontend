@@ -158,7 +158,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           workflowId: workflow.workflowId,
           // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
           ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] = params?.find(param => param.name === variant)?.value || ""
+            acc[variant] = params?.find(param => param.name === variant)?.value.toString() || ""
             return acc
           }, {}),
           status: workflow.status,

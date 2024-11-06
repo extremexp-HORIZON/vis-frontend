@@ -21,6 +21,7 @@ const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
 }
 
 interface IWorkflowTab {
+  initialization: boolean
   experiment: {
     data: IExperimentResponse["experiment"] | null
     loading: boolean
@@ -75,6 +76,7 @@ interface IWorkflowTab {
 }
 
 const initialState: IWorkflowTab = {
+  initialization: false,
   experiment: { data: null, loading: false, error: null },
   workflows: { data: [], loading: false, error: null },
   progressBar: { total: 0, completed: 0, running: 0, failed: 0, progress: 0 },
@@ -114,6 +116,9 @@ export const progressPageSlice = createSlice({
     setProgressBarData: (state, action) => {
       state.progressBar = action.payload
     },
+    setIntialization: (state, action) => {
+      state.initialization = action.payload
+    },
     setProgressGauges: (state, action) => {
       state.progressGauges = action.payload
     },
@@ -149,7 +154,7 @@ export const progressPageSlice = createSlice({
         state.workflows.loading = true
       })
       .addCase(fetchExperiment.pending, state => {
-        state.workflows.loading = true
+        state.experiment.loading = true
       })
       .addCase(fetchExperimentWorkflows.rejected, (state, action) => {
         state.workflows.loading = false
@@ -157,8 +162,8 @@ export const progressPageSlice = createSlice({
           action.error.message || "Error while fetching data"
       })
       .addCase(fetchExperiment.rejected, (state, action) => {
-        state.workflows.loading = false
-        state.workflows.error =
+        state.experiment.loading = false
+        state.experiment.error =
           action.error.message || "Error while fetching data"
       })
   },
@@ -258,6 +263,7 @@ export const {
   setProgressParallel,
   setProgressWokflowsTable,
   setProgressScheduledTable,
+  setIntialization
 } = progressPageSlice.actions
 
 export default progressPageSlice.reducer

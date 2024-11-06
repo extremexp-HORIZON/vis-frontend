@@ -174,7 +174,7 @@ const ProgressPageTabs = (props: IProgressPageTabs) => {
             disableRipple
             disableFocusRipple
             disableTouchRipple
-            onClick={handleChange(tab.workflowId as number)}
+            onClick={handleChange(tab.workflowId)}
           >
             {tab.workflowName}
           </Button>
