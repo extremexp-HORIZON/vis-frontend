@@ -4,6 +4,8 @@ export interface IExperimentResponse {
         name: string;
         model: string;
         status: string;
+        start: string;
+        end: string;
         workflow_ids: string[];
         modelJSON: ModelJSON;
     };

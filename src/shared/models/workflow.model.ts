@@ -6,6 +6,9 @@ export interface IWorkflowResponse {
         metric_ids: string[];
         metrics: MetricDetail[];
         workflowId: string;
+        id?: string;
+        start: string;
+        end: string;
 }
 
 export interface Task {
@@ -15,6 +18,8 @@ export interface Task {
     input_datasets?: InputDataset[];
     parameters?: Parameter[];
     variant?: string;
+    start: string;
+    end: string;
 }
 
 interface InputDataset {

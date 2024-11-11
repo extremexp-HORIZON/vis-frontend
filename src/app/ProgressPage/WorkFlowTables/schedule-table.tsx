@@ -144,7 +144,7 @@ export default function ScheduleTable() {
           workflowId: workflow.name,
           // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
           ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] = params?.find(param => param.name === variant)?.value || ""
+            acc[variant] = `${params?.find(param => param.name === variant)?.value}` || ""
             return acc
           }, {}),
           status: workflow.status,
@@ -161,7 +161,7 @@ export default function ScheduleTable() {
         workflowId: workflow.name,
         // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
         ...Array.from(uniqueParameters).reduce((acc, variant) => {
-          acc[variant] = params?.find(param => param.name === variant)?.value || ""
+          acc[variant] = `${params?.find(param => param.name === variant)?.value}` || ""
           return acc
         }, {}),
         status: workflow.status,
@@ -179,7 +179,7 @@ export default function ScheduleTable() {
         sortable: key !== "action" ? true : false,
       })) : []
       paramLength.current = uniqueParameters.size
-      dispatch(setProgressScheduledTable({ rows, visibleRows: rows }))
+      dispatch(setProgressScheduledTable({ rows, visibleRows: rows, rowsPerPage: 10 }))
     }
   }, [workflows])
 

@@ -20,13 +20,13 @@ import {
   fetchExperimentWorkflows,
 } from "../../store/slices/progressPageSlice"
 import ProgressPageLoading from "./progress-page-loading"
+import ProgressPageTab from "./progressPageTabs/progress-page-tab"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>("progress")
-  const { experiment, initialization } = useAppSelector(
+  const { experiment, workflows, initialization } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
-  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const { experimentId } = useParams()
   const dispatch = useAppDispatch()
 
@@ -38,6 +38,10 @@ const ProgressPage = () => {
 
   useEffect(() => {
     if (!experiment.loading && experiment.data) {
+      //TODO: use this when connected to IVIS API
+      // dispatch(
+      //   fetchExperimentWorkflows(experimentId || ""),
+      // )
       dispatch(
         fetchExperimentWorkflows({
           experimentId: experimentId || "",
@@ -117,7 +121,8 @@ const ProgressPage = () => {
             </Box>
           </Box>
           <Box key="progress-tabs">
-            <ProgressPageTabs value={value} handleChange={handleChange} />
+            {/* <ProgressPageTabs value={value} handleChange={handleChange} /> */}
+            <ProgressPageTab value={value} handleChange={handleChange} />
           </Box>
           <Box
             sx={{

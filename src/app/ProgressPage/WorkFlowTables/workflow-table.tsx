@@ -158,7 +158,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           workflowId: workflow.workflowId,
           // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
           ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] = params?.find(param => param.name === variant)?.value.toString() || ""
+            acc[variant] = `${params?.find(param => param.name === variant)?.value}` || ""
             return acc
           }, {}),
           status: workflow.status,
@@ -180,7 +180,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           // constraint: constrainsNames.includes(key) ? true : false
         }))
       paramlength = uniqueParameters.size
-      dispatch(setProgressWokflowsTable({ rows, filteredRows: rows }))
+      dispatch(setProgressWokflowsTable({ rows, filteredRows: rows, visibleRows: rows.slice(0, progressWokflowsTable.rowsPerPage) }))
     }
   }, [workflows])
 
@@ -333,6 +333,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     progressWokflowsTable.selectedWorkflows.indexOf(id) !== -1
 
   useEffect(() => {
+    if(progressWokflowsTable.filteredRows.length === 0) return
     const visibleRows = stableSort(
       progressWokflowsTable.filteredRows,
       getComparator(progressWokflowsTable.order, progressWokflowsTable.orderBy),

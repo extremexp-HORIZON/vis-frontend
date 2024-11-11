@@ -30,6 +30,9 @@ export const workflowTabsSlice = createSlice({
     addCompareCompletedTab: (state, action) => {
       state.tabs = [...state.tabs, initializeCompareCompleteTab()]
     },
+    setTabsOrder: (state, action) => {
+      state.tabs = action.payload
+    },
     deleteTab: (state, action) => {
       state.tabs = state.tabs.filter(tab => tab.workflowId !== action.payload)
     },
@@ -107,7 +110,6 @@ const initializeTab = ({
   }
 }) => {
   const workflow = workflows.data.find(workflow => workflow.workflowId === workflowId)
-  console.log("edw eimaii",workflow)
   const tab: IWorkflowTabModel = {
     ...defaultWorkflowTabModel,
     workflowName: workflow?.name || "",
@@ -147,7 +149,7 @@ const initializeCompareCompleteTab = () => {
 }
 
 //Reducer exports
-export const { addTab, deleteTab, addCompareCompletedTab } =
+export const { addTab, deleteTab, addCompareCompletedTab, setTabsOrder } =
   workflowTabsSlice.actions
 
 export default workflowTabsSlice.reducer

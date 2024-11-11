@@ -231,7 +231,7 @@ export const fetchExperimentWorkflows = createAsyncThunk(
 //     const requestUrl = apiPath + `/workflows-query`
 //     return axios
 //       .post<IWorkflowResponse[]>(requestUrl, { experimentId }, { headers })
-//       .then(response => response.data)
+//       .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || "")))
 //   },
 // )
 
