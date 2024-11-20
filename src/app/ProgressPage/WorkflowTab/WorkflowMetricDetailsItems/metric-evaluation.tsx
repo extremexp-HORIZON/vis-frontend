@@ -85,6 +85,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
             spec={{
               width: 500,
               height: 500,
+              padding: 30,
               autosize: { type: "none", contains: "padding" },
               signals: [{ name: "radius", update: "width / 2" }],
               data: [
