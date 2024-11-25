@@ -2,26 +2,41 @@ import { IModelAnalysis } from "./tasks/model-analysis.model"
 
 export interface IDataExplorationQuery {
   datasetId: string
-  columns: string[]
-  filters: IFilter[]
-  aggFunction?: string
-  limit?: number
-  scaler?: string
+  columns?: string[]
+  filters?: IFilter[]
+  limit: number
+  offset?: number
+  groupBy?: string[] // Optional, added
+  aggregation?: {
+    // Optional, a map of columns to an array of aggregation functions
+    [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
+  }
 }
 
 export interface IDataExplorationRequest {
   query: IDataExplorationQuery
   metadata: {
     workflowId: string | number
-    queryCase: keyof IModelAnalysis
+    queryCase: any
   }
 }
 
+export interface VisualColumn {
+  name: string
+  type: string
+  // Add any other properties specific to the column metadata
+}
+
+// Model for TabularResults
 export interface IDataExplorationResponse {
   data: any
-  columns: { name: string; type: string }[]
   fileNames: string[]
-  timestampColumn: string | null
+  columns: VisualColumn[]
+  originalColumns: VisualColumn[]
+  timestampColumn?: string
+  totalItems: number
+  querySize: number
+  uniqueColumnValues: any
 }
 
 export interface IFilter {
@@ -39,9 +54,6 @@ export interface IFilter {
 
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
   datasetId: "",
+  limit: -1,
   columns: [],
-  aggFunction: "",
-  filters: [],
-  limit: 1000,
-  scaler: "",
 }

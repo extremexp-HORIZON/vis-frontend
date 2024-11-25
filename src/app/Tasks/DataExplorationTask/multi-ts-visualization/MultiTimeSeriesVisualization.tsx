@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import { getSpecConcat } from './vegaLiteSpecData';
+import { IDataExplorationResponse } from '../../../../shared/models/dataexploration.model';
 
 interface Data {
   series: string;
@@ -22,11 +23,16 @@ interface FileRegion {
 }
 
 interface MultiTimeSeriesVisualizationProps {
-  data: Data[];
+  multipleTimeSeries: {
+    data: IDataExplorationResponse | null;
+    loading: boolean;
+    error: string | null;
+  } | null;
 }
 
-const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> = ({ data }) => {
-  const [condensedChartData, setCondensedChartData] = useState<Data[]>(data); // line chart data in navigator
+const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> = (props) => {
+  const { multipleTimeSeries } = props;
+  const [condensedChartData, setCondensedChartData] = useState<Data[]>(); // line chart data in navigator
   const [chartData, setChartData] = useState<Data[]>(); // main chart data 
   const [fileRegions, setFileRegions] = useState<FileRegion[]>([]); // file regions on navigator
   const [fileCategoryMap, setFileCategoryMap] = useState<any>(null);
@@ -59,15 +65,20 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
   // Handles fileRegions update
   // Occurs on single click selection / brush / category selection from legend
   useEffect(() => {
-    if (viewRef.current) {
+    if (viewRef.current && multipleTimeSeries && multipleTimeSeries.data?.data) {
+      const data = structuredClone(multipleTimeSeries.data?.data);
       const selectedSeries = fileRegions.filter(region => region.selected).map(region => region.series);
-      const filteredData = data.filter(d => selectedSeries.includes(d.series));
+      const filteredData = data.filter((d: any) => selectedSeries.includes(d.series));
       updateData(filteredData);
     }
   }, [fileRegions]);
 
   // Updates the view when data or metadata changes
   useEffect(() => {
+    if(multipleTimeSeries && multipleTimeSeries.data)
+    {
+      console.log("mpika edw")
+    const data = structuredClone(multipleTimeSeries.data.data); 
     const regions: FileRegion[] = [];
     const newFileCategoryMap: { [key: string]: string } = {};
 
@@ -76,7 +87,7 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
       console.warn('Metadata is non-extensible:', data);
     }
     const fileDataMap: { [key: string]: { start: number; end: number } } = {};
-    data.forEach(d => {
+    data.forEach((d: any) => {
       const series = d.series;
       const timestamp = new Date(d.timestamp).getTime();
 
@@ -97,10 +108,11 @@ const MultiTimeSeriesVisualization: React.FC<MultiTimeSeriesVisualizationProps> 
       });
     }
     setFileRegions(regions);
-    setChartData(data);
+    // setChartData(data);
     setCondensedChartData(data);
     setFileCategoryMap(newFileCategoryMap);
-  }, [data]);
+  }
+  }, [multipleTimeSeries]);
 
   useEffect(() => {
     // setVlSpec(getVegaLiteSpec(alignment) as VisualizationSpec);

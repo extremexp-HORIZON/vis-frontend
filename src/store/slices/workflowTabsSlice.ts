@@ -1,16 +1,15 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  isFulfilled,
-  isPending,
-  isRejected,
-} from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit"
 import {
   IWorkflowTabModel,
   defaultWorkflowTabModel,
 } from "../../shared/models/workflow.tab.model"
-import { explainabilityDefault, explainabilityReducers } from "../../shared/models/tasks/explainability.model"
+import {
+  explainabilityDefault,
+  explainabilityReducers,
+} from "../../shared/models/tasks/explainability.model"
+import { IWorkflowResponse, Metric, MetricDetail } from "../../shared/models/workflow.model"
 import { modelAnalysisDefault, modelAnalysisReducers } from "../../shared/models/tasks/model-analysis.model"
+import { dataExplorationDefault, explainabilityExtraReducers } from "../../shared/models/tasks/data-exploration-task.model"
 
 export interface IWorkflowTab {
   tabs: IWorkflowTabModel[]
@@ -31,13 +30,18 @@ export const workflowTabsSlice = createSlice({
     addCompareCompletedTab: (state, action) => {
       state.tabs = [...state.tabs, initializeCompareCompleteTab()]
     },
+    setTabsOrder: (state, action) => {
+      state.tabs = action.payload
+    },
     deleteTab: (state, action) => {
       state.tabs = state.tabs.filter(tab => tab.workflowId !== action.payload)
     },
+    // ...additionalReducers
   },
   extraReducers: builder => {
     explainabilityReducers(builder),
-    modelAnalysisReducers(builder)
+    modelAnalysisReducers(builder),
+    explainabilityExtraReducers(builder)
   },
 })
 
@@ -47,38 +51,51 @@ const workflowMetricsInitializer = ({
   metrics,
   workflows,
 }: {
-  metrics: { [key: string]: number } | null
+  metrics: MetricDetail[] | null
   workflows: {
-    data: { [key: string]: any }[]
+    data: IWorkflowResponse[]
     loading: boolean
     error: string | null
   }
 }) => {
+
   if (!metrics) return null
-  const finishedWorkflows = workflows.data.filter(
-    workflow => workflow.workflowInfo.status === "completed",
-  )
-  const metricNames = ["accuracy", "precision", "recall", "loss"]
-  return Object.keys(metrics)
-    .filter(metricName => metricNames.includes(metricName))
-    .map(metric => {
-      const metricsSum = finishedWorkflows.reduce((acc, workflow) => {
-        return (
-          acc +
-          (workflow.metrics
-            ? workflow.metrics[metric as keyof typeof workflow.metrics]
-            : 0)
-        )
-      }, 0)
-      return {
-        name: metric,
-        value: metrics[metric],
-        avgValue: metricsSum / finishedWorkflows.length,
-        avgDiff:
-          (metrics[metric] * 100) / (metricsSum / finishedWorkflows.length) -
-          100,
-      }
-    })
+
+  const finishedWorkflowsMetrics = workflows.data
+    .filter(workflow => workflow.status === "completed")
+    .reduce<MetricDetail[]>((acc, workflow) => [...acc, ...workflow.metrics], [])
+
+  return metrics.map(metric => {
+    const filteredMetricsAll = finishedWorkflowsMetrics.filter(metricAll => metricAll.name === metric.name)
+    const metricsSum = filteredMetricsAll.reduce((acc, metric) => acc + parseFloat(metric.value), 0)
+    return {
+      name: metric.name,
+      value: parseFloat(metric.value),
+      avgValue: metricsSum / filteredMetricsAll.length,
+      avgDiff: (parseFloat(metric.value) * 100) / (metricsSum / filteredMetricsAll.length) - 100
+    }
+})
+
+  // return Object.keys(metrics)
+  //   .filter(metricName => metricNames.includes(metricName))
+  //   .map(metric => {
+  //     const metricsSum = finishedWorkflows.reduce((acc, workflow) => {
+  //       return (
+  //         acc +
+  //         (workflow.metrics
+  //           ? workflow.metrics[metric as keyof typeof workflow.metrics]
+  //           : 0)
+  //       )
+  //     }, 0)
+  //     return {
+  //       name: metric,
+  //       value: metrics[metric],
+  //       avgValue: metricsSum / finishedWorkflows.length,
+  //       avgDiff:
+  //         (metrics[metric] * 100) / (metricsSum / finishedWorkflows.length) -
+  //         100,
+  //     }
+  //   })
 }
 
 const initializeTab = ({
@@ -87,19 +104,18 @@ const initializeTab = ({
 }: {
   workflowId: string
   workflows: {
-    data: { [key: string]: any }[]
+    data: IWorkflowResponse[]
     loading: boolean
     error: string | null
   }
 }) => {
-  const workflow = workflows.data.find(
-    workflow => workflow.workflowId === workflowId,
-  )
+  const workflow = workflows.data.find(workflow => workflow.workflowId === workflowId)
   const tab: IWorkflowTabModel = {
     ...defaultWorkflowTabModel,
-    workflowId: workflowId,
+    workflowName: workflow?.name || "",
+    workflowId: workflow?.workflowId || "",
     workflowConfiguration: {
-      data: workflow?.variabilityPoints || null,
+      data: workflow?.tasks || null,
       loading: false,
     },
     workflowMetrics: {
@@ -111,6 +127,7 @@ const initializeTab = ({
     },
     workflowTasks: {
       modelAnalysis: modelAnalysisDefault,
+      dataExploration: dataExplorationDefault
     }
   }
   return tab
@@ -123,12 +140,16 @@ const initializeCompareCompleteTab = () => {
     workflowTasks: {
       explainabilityTask: explainabilityDefault,
     },
+    workflowMetrics: {
+      data: null,
+      loading: false,
+    }
   }
   return tab
 }
 
 //Reducer exports
-export const { addTab, deleteTab, addCompareCompletedTab } =
+export const { addTab, deleteTab, addCompareCompletedTab, setTabsOrder } =
   workflowTabsSlice.actions
 
 export default workflowTabsSlice.reducer

@@ -39,7 +39,7 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
             </IconButton>
           </Tooltip>
         </Box> */}
-        <Grid sx={{ p: 2 }} container spacing={3}>
+        <Grid sx={{ p: 2, justifyContent: "center" }} container spacing={3}>
           {metrics
             ? metrics.map(metric => (
                 <Grid

@@ -12,87 +12,103 @@ import { RootState, useAppSelector } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
+import { Metric, MetricDetail } from "../../../../shared/models/workflow.model"
 
 const MetricsDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+
   const availableMetrics = useMemo(() => {
     if (!workflows.data || workflows.data.length === 0) return []
     const metricsSet = new Set<string>()
-    workflows.data.forEach(workflow => {
-      if (workflow.metrics) {
-        Object.keys(workflow.metrics).forEach(metric => {
-          metricsSet.add(metric)
+
+    workflows.data
+      .filter(workflow => workflow.status === "completed")
+      .forEach(workflow => {
+        workflow.metrics.forEach((item: any) => {
+          metricsSet.add(item.name)
         })
-      }
-    })
+      })
     return Array.from(metricsSet)
   }, [workflows.data])
+
+  const metricAvailability = (metrics: MetricDetail[], metricName: string) => {
+    return metrics.some(metric => metric.name.toLowerCase() === metricName)
+  }
+
   const getData = (metric: string) => {
     const lowercaseMetric = metric.toLowerCase()
     const completedWorkflows = workflows.data.filter(
       workflow =>
         workflow.metrics &&
-        workflow.metrics[lowercaseMetric] !== undefined &&
-        workflow.workflowInfo.status === "completed",
+        metricAvailability(workflow.metrics, lowercaseMetric) &&
+        workflow.status === "completed",
     )
+
     completedWorkflows.sort(
       (a, b) =>
-        (b.metrics[lowercaseMetric] || 0) - (a.metrics[lowercaseMetric] || 0),
+        (parseFloat(
+          b.metrics.find(m => m.name === lowercaseMetric)?.value || "0",
+        ) || 0) -
+        (parseFloat(
+          a.metrics.find(m => m.name === lowercaseMetric)?.value || "0",
+        ) || 0),
     )
+
     return completedWorkflows.map(workflow => ({
       metricName: metric,
-      value: workflow.metrics[lowercaseMetric],
+      value: workflow.metrics.find(metric => metric.name === lowercaseMetric)
+        ?.value,
     }))
   }
 
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([
+  const [selectedMetrics, setSelectedMetrics] = useState<string>(
     availableMetrics[0],
-  ])
+  )
 
   const handleMetricChange = (event: any) => {
     const {
       target: { value },
     } = event
-    setSelectedMetrics(typeof value === "string" ? value.split(",") : value)
+    setSelectedMetrics(value)
   }
   return (
-    <WorkflowCard
-      title="Distribution of Metrics Across Workflows"
-      description="Description not available"
-    >
-      <ChartParameters>
-        <Typography fontSize={"0.8rem"}>Metrics:</Typography>
-        <FormControl sx={{ m: 1, minWidth: 120, maxHeight: 120 }} size="small">
-          <Select
-            labelId="metric-select-label"
-            multiple
-            value={selectedMetrics}
-            onChange={handleMetricChange}
-            renderValue={selected => (selected as string[]).join(", ")}
-          >
-            {availableMetrics.map(metric => (
-              <MenuItem key={metric} value={metric}>
-                <Checkbox checked={selectedMetrics.indexOf(metric) > -1} />
-                <ListItemText
-                  primary={metric.charAt(0).toUpperCase() + metric.slice(1)}
-                />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </ChartParameters>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-evenly",
-          p: 1,
-          className: "chart-container",
-          alignItems: "center",
-        }}
+    <>
+      <WorkflowCard
+        title="Distribution of Metrics Across Workflows"
+        description="Description not available"
       >
-        {selectedMetrics.map(metric => (
-          <Box width="40%" key={`metric-${metric}-distribution`}>
+        <ChartParameters>
+          <Typography fontSize={"0.8rem"}>Metrics:</Typography>
+          <FormControl
+            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
+            size="small"
+          >
+            <Select
+              value={selectedMetrics}
+              onChange={handleMetricChange}
+              sx={{ fontSize: "0.8rem" }}
+            >
+              {availableMetrics.map(metric => (
+                <MenuItem key={metric} value={metric}>
+                  <ListItemText
+                    primary={metric.charAt(0).toUpperCase() + metric.slice(1)}
+                  />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </ChartParameters>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-evenly",
+            p: 1,
+            className: "chart-container",
+            alignItems: "center",
+          }}
+        >
+          <Box width="40%" key={`metric-${selectedMetrics}-distribution`}>
             <ResponsiveVegaLite
               minHeight={100}
               actions={false}
@@ -112,7 +128,7 @@ const MetricsDistribution = () => {
                 data: [
                   {
                     name: "dummyData",
-                    values: getData(metric),
+                    values: getData(selectedMetrics),
                   },
                   {
                     name: "density",
@@ -190,7 +206,11 @@ const MetricsDistribution = () => {
                     },
                     encode: {
                       enter: {
-                        xc: { scale: "layout", field: "metricName", band: 0.5 },
+                        xc: {
+                          scale: "layout",
+                          field: "metricName",
+                          band: 0.5,
+                        },
                         width: { signal: "plotWidth" },
                         height: { signal: "height" },
                       },
@@ -274,9 +294,9 @@ const MetricsDistribution = () => {
               }}
             />
           </Box>
-        ))}
-      </Box>
-    </WorkflowCard>
+        </Box>
+      </WorkflowCard>
+    </>
   )
 }
 

@@ -14,16 +14,16 @@ const ProgressPageBar = () => {
     if (workflows.data.length > 0) {
       const total = workflows.data.length
       const completed = workflows.data.filter(
-        workflow => workflow.workflowInfo.status === "completed",
+        workflow => workflow.status === "completed",
       ).length
       const running =
         workflows.data.filter(
-          workflow => workflow.workflowInfo.status === "scheduled",
+          workflow => workflow.status === "scheduled",
         ).length +
-        workflows.data.filter(workflow => workflow.workflowInfo.status === "running")
+        workflows.data.filter(workflow => workflow.status === "running")
           .length
       const failed = workflows.data.filter(
-        workflow => workflow.workflowInfo.status === "failed",
+        workflow => workflow.status === "failed",
       ).length
       const progress = Math.round(((completed + failed) / total) * 100)
       dispatch(setProgressBarData({ total, completed, running, failed, progress }))

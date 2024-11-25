@@ -13,6 +13,7 @@ import grey from "@mui/material/colors/grey"
 import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { AsyncThunk } from "@reduxjs/toolkit"
+import red from "@mui/material/colors/red"
 
 interface ILineplot {
   plotModel: {
@@ -93,11 +94,11 @@ const LinePlot = (props: ILineplot) => {
         <Box sx={{ flex: 1 }} />
         <Box sx={{ position: "relative" }}>
           <Tooltip
-            title={plotModel?.data?.plotDescr || "Description not available"}
+            title={plotModel?.data?.plotDescr || (plotModel && !plotModel.error ? "Description not available" : plotModel?.error)}
           >
-            <InfoIcon sx={{ padding: 1, zIndex: 100, color: grey[600] }} />
+            <InfoIcon sx={{ padding: 1, zIndex: 100, color: plotModel && !plotModel.error ? grey[600] : red[800] }} />
           </Tooltip>
-          {plotModel && (plotModel.loading || !plotModel.data) && (
+          {plotModel && ((plotModel.loading || !plotModel.data) && !plotModel.error) && (
             <CircularProgress
               size={28}
               sx={{

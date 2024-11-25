@@ -155,7 +155,7 @@ const MultiTimeSeriesVisualizationWithCategories: React.FC<MultiTimeSeriesVisual
     }
     setVlSpec(getVlSpec('view', false) as VisualizationSpec);
     setFileRegions(regions);
-    setChartData(data);
+    // setChartData(data);
     setCondensedChartData(data);
     setFileCategoryMap(newFileCategoryMap);}
   }, [multipleTimeSeries, multipleTimeSeriesMetadata]);

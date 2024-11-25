@@ -12,6 +12,7 @@ import { useAppSelector, RootState } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
+import { MetricDetail } from "../../../../shared/models/workflow.model"
 
 const TopWorkflowMetric = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -20,26 +21,38 @@ const TopWorkflowMetric = () => {
   const metrics = useMemo(() => {
     if (!workflows.data || workflows.data.length === 0) return []
     const allMetrics = workflows.data.flatMap(workflow =>
-      workflow.metrics ? Object.keys(workflow.metrics) : [],
+      workflow.metrics ? workflow.metrics.flatMap(metric => metric.name) : [],
     )
     return Array.from(new Set(allMetrics))
   }, [workflows.data])
 
   const [metric, setMetric] = useState(metrics[0] || "loss")
 
+  const metricAvailability = (metrics: MetricDetail[], metricName: string) => {
+    return metrics.some(metric => metric.name.toLowerCase() === metricName)
+  }
+
   const getTopTenWorkflowsByMetric = (metric: string) => {
     if (!workflows.data) return []
 
     const completedWorkflows = workflows.data.filter(
-      workflow => workflow.metrics && workflow.metrics[metric] !== undefined,
+      workflow =>
+        workflow.metrics &&
+        metricAvailability(workflow.metrics, metric) &&
+        workflow.status === "completed",
     )
+
     completedWorkflows.sort(
-      (a, b) => (b.metrics[metric] || 0) - (a.metrics[metric] || 0),
+      (a, b) =>
+        (parseFloat(b.metrics.find(m => m.name === metric)?.value || "0") ||0) 
+        -
+        (parseFloat(a.metrics.find(m => m.name === metric)?.value || "0") || 0),
     )
+
     const topTenWorkflows = completedWorkflows.slice(0, 10)
     const chartData = topTenWorkflows.map(workflow => ({
       workflowId: workflow.workflowId,
-      metricValue: workflow.metrics[metric],
+      metricValue: workflow.metrics.find(m => m.name === metric)?.value || 0,
     }))
     return chartData
   }
