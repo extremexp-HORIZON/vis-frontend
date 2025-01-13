@@ -9,9 +9,9 @@ import ContourPlot from "../../../../Tasks/SharedItems/Plots/contour-plot"
 import LinePlot from "../../../../Tasks/SharedItems/Plots/line-plot"
 import { useEffect } from "react"
 import Typography from "@mui/material/Typography"
-import CircularProgress from "@mui/material/CircularProgress"
 import {
   fetchExplainabilityPlot,
+  fetchExplainabilityPlotPayloadDefault,
 } from "../../../../../shared/models/tasks/explainability.model"
 import { useParams } from "react-router-dom"
 import { IWorkflowTabModel } from "../../../../../shared/models/workflow.tab.model"
@@ -32,6 +32,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
       if(!taskVariables?.["2dpdp"].data){
     dispatch(
       fetchExplainabilityPlot({
+        ...fetchExplainabilityPlotPayloadDefault,
         explanationType: "hyperparameterExplanation",
         explanationMethod: "2dpdp",
         model: "Ideko_model",
@@ -43,6 +44,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
   }
     dispatch(
       fetchExplainabilityPlot({
+        ...fetchExplainabilityPlotPayloadDefault,
         explanationType: "hyperparameterExplanation",
         explanationMethod: "pdp",
         model: "Ideko_model",
@@ -53,6 +55,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
     )
     dispatch(
       fetchExplainabilityPlot({
+        ...fetchExplainabilityPlotPayloadDefault,
         explanationType: "hyperparameterExplanation",
         explanationMethod: "ale",
         model: "Ideko_model",
@@ -65,8 +68,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
   }, [])
 
   return (
-    <>
-      {console.log(tabs)}
+    <> 
       <Box sx={{ mb: "2rem" }}>
           <Box
             sx={{

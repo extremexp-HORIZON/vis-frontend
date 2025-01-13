@@ -11,6 +11,7 @@ export interface IDataExplorationQuery {
     // Optional, a map of columns to an array of aggregation functions
     [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
   }
+  type?: "csv" | "zenoh"
 }
 
 export interface IDataExplorationRequest {
@@ -54,6 +55,11 @@ export interface IFilter {
 
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
   datasetId: "",
-  limit: -1,
+  limit: 0,
   columns: [],
+  filters: [],
+  offset: 0,
+  groupBy: [],
+  aggregation: {},
+  type: "csv",
 }

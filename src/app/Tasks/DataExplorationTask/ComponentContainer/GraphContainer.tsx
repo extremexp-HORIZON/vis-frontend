@@ -84,7 +84,7 @@ const GraphContainer = (props: IGraphContainer) => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+          datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
           limit: 1000, // Default row limit
           columns: [], // Include selected columns in the payload
           filters: filters,

@@ -19,6 +19,7 @@ import {
   fetchModelAnalysisExplainabilityPlot,
 } from "../../../shared/models/tasks/model-analysis.model"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
+import { fetchExplainabilityPlotPayloadDefault } from "../../../shared/models/tasks/explainability.model"
 
 interface IFeatureExplainability {
   workflow: IWorkflowTabModel
@@ -57,7 +58,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         dispatch(
           fetchModelAnalysisData({
             query: {
-              datasetId: `file://${experimentId}/metadata.csv`,
+              datasetId: `${experimentId}/metadata.csv`,
               columns: [],
               limit: -1,
             },
@@ -73,7 +74,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         fetchModelAnalysisData({
           query: {
             ...defaultDataExplorationQuery,
-            datasetId: `file://${experimentId}/metrics/${experimentId}_instances.csv`,
+            datasetId: `${experimentId}/metrics/${experimentId}_instances.csv`,
             filters: [
               { column: "id", type: "equals", value: workflow.workflowId },
             ],
@@ -87,24 +88,26 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       )
       dispatch(
         fetchModelAnalysisExplainabilityPlot({
+          ...fetchExplainabilityPlotPayloadDefault,
           explanationType: "featureExplanation",
           explanationMethod: "pdp",
           model: "I2Cat_Phising_model",
           feature1:
             workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
           feature2: "",
-          modelId: workflow.workflowId,
+          modelId: parseInt(workflow.workflowId, 10),
         }),
       )
       dispatch(
         fetchModelAnalysisExplainabilityPlot({
+          ...fetchExplainabilityPlotPayloadDefault,
           explanationType: "featureExplanation",
           explanationMethod: "ale",
           model: "I2Cat_Phising_model",
           feature1:
             workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
           feature2: "",
-          modelId: workflow.workflowId,
+          modelId: parseInt(workflow.workflowId, 10),
         }),
       )
     }
@@ -115,7 +118,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         fetchModelAnalysisData({
           query: {
             ...defaultDataExplorationQuery,
-            datasetId: `file://${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
+            datasetId: `${experimentId}/metrics/${experimentId}_confusion_matrix.csv`,
             filters: [
               {
                 column: "id",

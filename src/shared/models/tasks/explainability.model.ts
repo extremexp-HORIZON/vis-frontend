@@ -93,6 +93,25 @@ export type FetchExplainabilityPlotPayload = {
   feature1: string
   feature2: string
   modelId: number
+  query: string
+  target: string
+  gcfSize: number
+  cfGenerator: string
+  clusterActionChoiceAlgo: string
+}
+
+export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPayload = {
+  explanationType: "",
+  explanationMethod: "",
+  model: "",
+  feature1: "",
+  feature2: "",
+  modelId: 0,
+  query: "",
+  target: "",
+  gcfSize: 0,
+  cfGenerator: "",
+  clusterActionChoiceAlgo: "",
 }
 
 export const fetchExplainabilityPlot = createAsyncThunk(

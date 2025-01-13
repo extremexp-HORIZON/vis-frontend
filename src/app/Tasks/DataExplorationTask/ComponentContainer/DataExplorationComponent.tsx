@@ -96,7 +96,7 @@ const [totalSize, setTotalSize] = useState(0);
           dispatch(
             fetchDataExplorationData({
               query: {
-                datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+                datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
                 limit: pageSize, 
                 columns: selectedColumns, 
                 filters: filters,
@@ -115,7 +115,7 @@ const [totalSize, setTotalSize] = useState(0);
           dispatch(
             fetchDataExplorationData({
               query: {
-                datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+                datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
                 limit: rowLimit, 
                 columns: [], 
                 filters: [],
@@ -157,7 +157,7 @@ const [totalSize, setTotalSize] = useState(0);
       dispatch(
         fetchDataExplorationData({
           query: {
-            datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
             limit: rowLimit, // Default row limit
             columns: selectedColumns, // Include selected columns in the payload
             filters: filters,
@@ -174,7 +174,7 @@ const [totalSize, setTotalSize] = useState(0);
     dispatch(
       fetchDataExplorationData({
         query: {
-          datasetId: `file://${experimentId}/dataset/${experimentId}_dataset.csv`,
+          datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
           limit: rowLimit, // Default row limit
           columns: selectedColumns, // Include selected columns in the payload
           filters: filters,

@@ -6,6 +6,7 @@ import {
   IDataExplorationRequest,
   IDataExplorationResponse
 } from "../dataexploration.model"
+import { FetchExplainabilityPlotPayload } from "./explainability.model"
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
@@ -163,7 +164,7 @@ export const modelAnalysisReducers = (
       fetchModelAnalysisExplainabilityPlot.fulfilled,
       (state, action) => {
         const compareCompletedTask = state.tabs.find(
-          tab => tab.workflowId === action.meta.arg.modelId,
+          tab => tab.workflowId === `${action.meta.arg.modelId}`,
         )?.workflowTasks.modelAnalysis
         const plotType = action.meta.arg.explanationMethod as keyof IModelAnalysis;
         console.log(compareCompletedTask, plotType)
@@ -187,7 +188,7 @@ export const modelAnalysisReducers = (
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.pending, (state, action) => {
       const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.modelId,
+        tab => tab.workflowId === `${action.meta.arg.modelId}`,
       )?.workflowTasks.modelAnalysis
       const plotType = action.meta.arg.explanationMethod as keyof IModelAnalysis;
         if (compareCompletedTask && plotType !== 'featureNames') {
@@ -205,7 +206,7 @@ export const modelAnalysisReducers = (
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.rejected, (state, action) => {
       const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.modelId,
+        tab => tab.workflowId === `${action.meta.arg.modelId}`,
       )?.workflowTasks.modelAnalysis
       const plotType = action.meta.arg.explanationMethod as keyof IModelAnalysis;
         if (compareCompletedTask && plotType !== 'featureNames') {
@@ -225,15 +226,6 @@ export const modelAnalysisReducers = (
     })
 }
 
-export type FetchExplainabilityPlotPayload = {
-  explanationType: string
-  explanationMethod: string
-  model: string
-  feature1: string
-  feature2: string
-  modelId: any
-}
-
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_explainability_plot",
   async (payload: FetchExplainabilityPlotPayload) => {
@@ -245,7 +237,7 @@ export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
 export const fetchModelAnalysisData = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "api/visualization/data"
+    const requestUrl = "api/visualization/tabular"
     return axios
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)

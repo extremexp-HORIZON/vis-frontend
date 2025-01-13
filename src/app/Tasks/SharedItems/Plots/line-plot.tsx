@@ -14,6 +14,7 @@ import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { AsyncThunk } from "@reduxjs/toolkit"
 import red from "@mui/material/colors/red"
+import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
 
 interface ILineplot {
   plotModel: {
@@ -54,6 +55,7 @@ const LinePlot = (props: ILineplot) => {
     (plmodel: IPlotModel | null) => (e: { target: { value: string } }) => {
       dispatch(
         fetchFunction({
+            ...fetchExplainabilityPlotPayloadDefault,
             explanationType: plmodel?.explainabilityType || "",
             explanationMethod: plmodel?.explanationMethod || "",
             model: plmodel?.explainabilityModel || "",

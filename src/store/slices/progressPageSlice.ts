@@ -6,7 +6,7 @@ import { IExperimentResponse } from "../../shared/models/experiment.model"
 import { IWorkflowResponse } from "../../shared/models/workflow.model"
 
 const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
-  return {
+  const ok = {
     ...workflow,
     workflowId,
     metrics: workflow.metrics.map((item: any) => {
@@ -18,6 +18,8 @@ const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
       }
     })
   }
+  console.log(ok)
+  return ok
 }
 
 interface IWorkflowTab {
@@ -180,9 +182,9 @@ export const fetchExperiment = createAsyncThunk(
   "progressPage/fetch_experiment",
   async (experimentId: string) => {
     const request: IDataExplorationQuery = {...defaultDataExplorationQuery, 
-      datasetId: `file://${experimentId}/metadata/experiment.json`
+      datasetId: `${experimentId}/metadata/experiment.json`
     }
-    const requestUrl = `api/visualization/data`
+    const requestUrl = `api/visualization/tabular`
     return axios
       .post<any>(requestUrl,request)
       .then(response => JSON.parse(response.data.data).experiment)
@@ -195,11 +197,11 @@ export const fetchExperimentWorkflows = createAsyncThunk(
     const {experimentId, workflowIds} = payload
     const allData = await Promise.all(
       workflowIds.map(async workflowId => {
-        const workflowRequestUrl = `api/visualization/data`
+        const workflowRequestUrl = `api/visualization/tabular`
         const workflowsResponse = await axios
           .post<any>(workflowRequestUrl, {
             ...defaultDataExplorationQuery,
-            datasetId: `file://${experimentId}/metadata/${workflowId}.json`,
+            datasetId: `${experimentId}/metadata/${workflowId}.json`,
           })
           .then(response => (workflowMetricsPreparation(JSON.parse(response.data.data).workflow, workflowId)))
         return workflowsResponse
@@ -231,6 +233,19 @@ export const fetchExperimentWorkflows = createAsyncThunk(
 //     const requestUrl = apiPath + `/workflows-query`
 //     return axios
 //       .post<IWorkflowResponse[]>(requestUrl, { experimentId }, { headers })
+//       .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || "")))
+//   },
+// )
+
+// export const scheduleWorkflowsReordering = createAsyncThunk(
+//   "progressPage/schedule_workflows_reordering",
+//   async (payload: { experimentId: string; workflowIds: string[] }) => {
+//     const headers = {
+//       "access-token": apiKey,
+//     }
+//     const requestUrl = apiPath + `/workflows-query`
+//     return axios
+//       .post<IWorkflowResponse[]>(requestUrl, { experimentId: payload.experimentId }, { headers })
 //       .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || "")))
 //   },
 // )
