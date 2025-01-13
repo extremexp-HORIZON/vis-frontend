@@ -18,7 +18,6 @@ const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
       }
     })
   }
-  console.log(ok)
   return ok
 }
 

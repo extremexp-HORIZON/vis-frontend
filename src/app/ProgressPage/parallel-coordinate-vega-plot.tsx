@@ -14,10 +14,15 @@ const ParallelCoordinateVega = ({
   progressParallel,
   foldArray,
 }: ParallelCoordinateVegaProps) => {
-  const processedData = parallelData.current.map(item => ({
-    ...item,
-    units: item.units.join(","), // Convert array to a comma-separated string
-  }))
+  const processedData = parallelData.current.map(item => {
+    const newItem = { ...item }
+    for (const key in newItem) {
+      if (Array.isArray(newItem[key])) {
+        newItem[key] = newItem[key].join(",") // Convert array to a comma-separated string
+      }
+    }
+    return newItem
+  })
 
   const handleNewView: ViewListener = (view: any) => {
     if (!view) return
