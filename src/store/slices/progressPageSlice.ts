@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import { defaultDataExplorationQuery, IDataExplorationQuery } from "../../shared/models/dataexploration.model"
 import axios from "axios"
-import { set } from "lodash"
 import { IExperimentResponse } from "../../shared/models/experiment.model"
 import { IWorkflowResponse } from "../../shared/models/workflow.model"
 
@@ -167,6 +166,34 @@ export const progressPageSlice = createSlice({
         state.experiment.error =
           action.error.message || "Error while fetching data"
       })
+      // TODO: Remove this when no longer needed: Hard Coded Cases for testing
+      .addCase(fetchExperimentTesting.fulfilled, (state, action) => {
+        state.experiment.data = action.payload
+        state.experiment.loading = false
+        state.experiment.error = null
+      })
+      .addCase(fetchExperimentWorkflowsTesting.fulfilled, (state, action) => {
+        state.workflows.data = action.payload
+        state.workflows.loading = false
+        state.workflows.error = null
+      })
+      .addCase(fetchExperimentWorkflowsTesting.pending, state => {
+        state.workflows.loading = true
+      })
+      .addCase(fetchExperimentTesting.pending, state => {
+        state.experiment.loading = true
+      })
+      .addCase(fetchExperimentWorkflowsTesting.rejected, (state, action) => {
+        state.workflows.loading = false
+        state.workflows.error =
+          action.error.message || "Error while fetching data"
+      })
+      .addCase(fetchExperimentTesting.rejected, (state, action) => {
+        state.experiment.loading = false
+        state.experiment.error =
+          action.error.message || "Error while fetching data"
+      })
+
   },
 })
 
@@ -175,10 +202,9 @@ export const progressPageSlice = createSlice({
 const apiPath = "https://api.expvis.smartarch.cz/api"
 const apiKey = "3980f9c699c3e311f8d72bd0318038d976e5958a"
 
-//TODO: These should be replaced with the actual API calls commented out below
-
-export const fetchExperiment = createAsyncThunk(
-  "progressPage/fetch_experiment",
+//TODO: Remove this when no longer needed
+export const fetchExperimentTesting = createAsyncThunk(
+  "progressPage/fetch_experiment_testing",
   async (experimentId: string) => {
     const request: IDataExplorationQuery = {...defaultDataExplorationQuery, 
       datasetId: `${experimentId}/metadata/experiment.json`
@@ -190,8 +216,9 @@ export const fetchExperiment = createAsyncThunk(
   },
 )
 
-export const fetchExperimentWorkflows = createAsyncThunk(
-  "progressPage/fetch_experiment_and_workflows",
+//TODO: Remove this when no longer needed
+export const fetchExperimentWorkflowsTesting = createAsyncThunk(
+  "progressPage/fetch_experiment_workflows_testing",
   async (payload: {experimentId: string, workflowIds: string[]}) => {
     const {experimentId, workflowIds} = payload
     const allData = await Promise.all(
@@ -210,31 +237,31 @@ export const fetchExperimentWorkflows = createAsyncThunk(
   },
 )
 
-// export const fetchExperiment = createAsyncThunk(
-//   "progressPage/fetch_experiment",
-//   async (experimentId: string) => {
-//     const headers = {
-//       "access-token": apiKey,
-//     }
-//     const requestUrl = apiPath + `/experiments/${experimentId}`
-//     return axios
-//       .get<IExperimentResponse>(requestUrl, { headers })
-//       .then(response => response.data.experiment)
-//   },
-// )
+export const fetchExperiment = createAsyncThunk(
+  "progressPage/fetch_experiment",
+  async (experimentId: string) => {
+    const headers = {
+      "access-token": apiKey,
+    }
+    const requestUrl = apiPath + `/experiments/${experimentId}`
+    return axios
+      .get<IExperimentResponse>(requestUrl, { headers })
+      .then(response => response.data.experiment)
+  },
+)
 
-// export const fetchExperimentWorkflows = createAsyncThunk(
-//   "progressPage/fetch_experiment_workflows",
-//   async (experimentId: string) => {
-//     const headers = {
-//       "access-token": apiKey,
-//     }
-//     const requestUrl = apiPath + `/workflows-query`
-//     return axios
-//       .post<IWorkflowResponse[]>(requestUrl, { experimentId }, { headers })
-//       .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || "")))
-//   },
-// )
+export const fetchExperimentWorkflows = createAsyncThunk(
+  "progressPage/fetch_experiment_workflows",
+  async (experimentId: string) => {
+    const headers = {
+      "access-token": apiKey,
+    }
+    const requestUrl = apiPath + `/workflows-query`
+    return axios
+      .post<IWorkflowResponse[]>(requestUrl, { experimentId }, { headers })
+      .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || "")))
+  },
+)
 
 // export const scheduleWorkflowsReordering = createAsyncThunk(
 //   "progressPage/schedule_workflows_reordering",

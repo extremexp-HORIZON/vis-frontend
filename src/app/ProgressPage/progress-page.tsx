@@ -17,7 +17,9 @@ import StopIcon from "@mui/icons-material/Stop"
 import { useParams } from "react-router-dom"
 import {
   fetchExperiment,
+  fetchExperimentTesting,
   fetchExperimentWorkflows,
+  fetchExperimentWorkflowsTesting,
 } from "../../store/slices/progressPageSlice"
 import ProgressPageLoading from "./progress-page-loading"
 import ProgressPageTab from "./progressPageTabs/progress-page-tab"
@@ -32,22 +34,28 @@ const ProgressPage = () => {
 
   useEffect(() => {
     if (experimentId) {
-      dispatch(fetchExperiment(experimentId))
+      // TODO: Remove this when no longer needed
+      if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
+        dispatch(fetchExperimentTesting(experimentId))
+      } else {
+        dispatch(fetchExperiment(experimentId))
+      }
     }
   }, [])
 
   useEffect(() => {
     if (!experiment.loading && experiment.data) {
-      //TODO: use this when connected to IVIS API
-      // dispatch(
-      //   fetchExperimentWorkflows(experimentId || ""),
-      // )
-      dispatch(
-        fetchExperimentWorkflows({
-          experimentId: experimentId || "",
-          workflowIds: experiment.data.workflow_ids,
-        }),
-      )
+      // TODO: Remove this when no longer needed
+      if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
+        dispatch(
+          fetchExperimentWorkflowsTesting({
+            experimentId: experimentId || "",
+            workflowIds: experiment.data.workflow_ids,
+          }),
+        )
+      } else {
+        dispatch(fetchExperimentWorkflows(experimentId || ""))
+      }
     }
   }, [experiment])
 
@@ -137,9 +145,11 @@ const ProgressPage = () => {
               <>
                 <ProgressPageBar />
                 <ProgressPageGauges />
-                <ParallelCoordinatePlot />
-                <WorkflowTable handleChange={handleChange} />
-                <ScheduleTable />
+                <Box sx={{ display: "flex", flexDirection: "column", rowGap: 6, px: [0, 3, 8, 15] }} >
+                  <ParallelCoordinatePlot />
+                  <WorkflowTable handleChange={handleChange} />
+                  <ScheduleTable />
+                </Box>
               </>
             )}
             {value !== "progress" && value !== "compare-completed" && (
