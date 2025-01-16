@@ -15,11 +15,12 @@ import grey from "@mui/material/colors/grey"
 import { styled } from "@mui/material/styles"
 import Modal from "@mui/material/Modal"
 import { useEffect } from "react"
-import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
+import { useAppDispatch } from "../../../../store/store"
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import CircularProgress from "@mui/material/CircularProgress"
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
 import { IPlotModel } from "../../../../shared/models/plotmodel.model"
+import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -40,6 +41,7 @@ interface ITableComponent {
     loading: boolean;
     error: string | null;
   } | null
+  experimentId: string | undefined;
 }
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -60,14 +62,15 @@ const FixedTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 const CounterfactualsTable = (props: ITableComponent) => {
-  const { point, handleClose, counterfactuals } = props
+  const { point, handleClose, counterfactuals, experimentId } = props
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     dispatch(fetchModelAnalysisExplainabilityPlot({
+    ...fetchExplainabilityPlotPayloadDefault,
     explanationType:"hyperparameterExplanation",
     explanationMethod:"counterfactuals",
-    model:"Ideko_model",
+    model:`${experimentId}_model`,
     modelId: 1,
     feature1: "",
     feature2: ""

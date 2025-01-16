@@ -12,7 +12,6 @@ import FormControl from "@mui/material/FormControl"
 import grey from "@mui/material/colors/grey"
 import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
-import { fetchExplanation } from "../../../../store/slices/explainabilitySlice"
 import { AsyncThunk } from "@reduxjs/toolkit"
 import CircularProgress from "@mui/material/CircularProgress"
 
@@ -51,11 +50,11 @@ const ContourPlot = (props: IContourplot) => {
   }
 
   useEffect(() => {
-    if (options && options.length > 0) {
-      setSelectedFeature1(options[0])
-      setSelectedFeature2(options[1])
+    if (plotModel?.data?.features && plotModel?.data?.features.feature1) {
+      setSelectedFeature1(plotModel?.data?.features.feature1)
+      setSelectedFeature2(plotModel?.data?.features.feature2)
     }
-  }, [])
+  }, [plotModel?.data?.features])
 
   const getAxisType = (axisType: string) => {
     if (axisType === "categorical") {

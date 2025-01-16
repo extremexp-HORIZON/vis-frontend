@@ -24,12 +24,7 @@ export interface IExplainability {
 
 export const explainabilityDefault: IExplainability = {
   //TODO: these hyperparameters names should be populated from the response
-  hyperparametersNames: [
-    "model__units",
-    "model__activation_function",
-    "batch_size",
-    "epochs",
-  ],
+  hyperparametersNames: [],
   "2dpdp": {
     data: null,
     loading: false,

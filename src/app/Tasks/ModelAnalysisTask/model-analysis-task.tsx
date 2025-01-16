@@ -91,9 +91,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           ...fetchExplainabilityPlotPayloadDefault,
           explanationType: "featureExplanation",
           explanationMethod: "pdp",
-          model: "I2Cat_Phising_model",
-          feature1:
-            workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
+          model: `${experimentId}_model`,
+          feature1: "",
           feature2: "",
           modelId: parseInt(workflow.workflowId, 10),
         }),
@@ -103,9 +102,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           ...fetchExplainabilityPlotPayloadDefault,
           explanationType: "featureExplanation",
           explanationMethod: "ale",
-          model: "I2Cat_Phising_model",
-          feature1:
-            workflow.workflowTasks.modelAnalysis?.featureNames[0] || "feature1",
+          model: `${experimentId}_model`,
+          feature1: "",
           feature2: "",
           modelId: parseInt(workflow.workflowId, 10),
         }),
@@ -251,6 +249,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                 counterfactuals={
                   workflow.workflowTasks.modelAnalysis?.counterfactuals || null
                 }
+                experimentId={experimentId}
               />
             )}
           </Box>
@@ -283,7 +282,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       workflow.workflowTasks.modelAnalysis?.pdp || null
                     }
                     options={
-                      workflow.workflowTasks.modelAnalysis?.featureNames || null
+                      workflow.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
                     }
                     fetchFunction={fetchModelAnalysisExplainabilityPlot}
                     workflowId={workflow.workflowId}
@@ -296,7 +295,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                       workflow.workflowTasks.modelAnalysis?.ale || null
                     }
                     options={
-                      workflow.workflowTasks.modelAnalysis?.featureNames || null
+                      workflow.workflowTasks.modelAnalysis?.ale.data?.featureList || null
                     }
                     fetchFunction={fetchModelAnalysisExplainabilityPlot}
                     workflowId={workflow.workflowId}

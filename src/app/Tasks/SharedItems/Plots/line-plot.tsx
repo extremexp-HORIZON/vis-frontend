@@ -46,10 +46,10 @@ const LinePlot = (props: ILineplot) => {
   }
 
   useEffect(() => {
-    if (options && options.length > 0) {
-      setSelectedFeature(options[0])
+    if (plotModel?.data?.features && plotModel?.data?.features.feature1) {
+      setSelectedFeature(plotModel?.data?.features.feature1)
     }
-  }, [])
+  }, [plotModel?.data?.features])
 
   const handleFeatureSelection =
     (plmodel: IPlotModel | null) => (e: { target: { value: string } }) => {

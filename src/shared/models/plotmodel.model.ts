@@ -8,7 +8,7 @@ export interface IPlotModel {
     plotDescr: string;
     plotType: string;
     features: Features;
-    featureListL: string[];
+    featureList: string[];
     hyperparameterList: string[];
     xAxis: Axis;
     yAxis: Axis;

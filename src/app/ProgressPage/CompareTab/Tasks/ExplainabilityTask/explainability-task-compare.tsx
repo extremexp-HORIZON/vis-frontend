@@ -36,8 +36,8 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
         explanationType: "hyperparameterExplanation",
         explanationMethod: "2dpdp",
         model: `${experimentId}_model`,
-        feature1: taskVariables?.hyperparametersNames[0] || "feature1",
-        feature2: taskVariables?.hyperparametersNames[1] || "feature2",
+        feature1: taskVariables?.hyperparametersNames[0] || "",
+        feature2: taskVariables?.hyperparametersNames[1] || "",
         modelId: 0,
       }),
     )
@@ -48,8 +48,8 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
         explanationType: "hyperparameterExplanation",
         explanationMethod: "pdp",
         model: `${experimentId}_model`,
-        feature1: taskVariables?.hyperparametersNames[0] || "feature1",
-        feature2: taskVariables?.hyperparametersNames[1] || "feature2",
+        feature1: taskVariables?.hyperparametersNames[0] || "",
+        feature2: taskVariables?.hyperparametersNames[1] || "",
         modelId: 0,
       }),
     )
@@ -59,8 +59,8 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
         explanationType: "hyperparameterExplanation",
         explanationMethod: "ale",
         model: `${experimentId}_model`,
-        feature1: taskVariables?.hyperparametersNames[0] || "feature1",
-        feature2: taskVariables?.hyperparametersNames[1] || "feature2",
+        feature1: taskVariables?.hyperparametersNames[0] || "",
+        feature2: taskVariables?.hyperparametersNames[1] || "",
         modelId: 0,
       }),
     )
@@ -103,7 +103,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                     <LinePlot
                       key={`pdp-plot`}
                       plotModel={workflow?.workflowTasks.explainabilityTask?.pdp || null}
-                      options={workflow?.workflowTasks.explainabilityTask?.hyperparametersNames || null}
+                      options={workflow?.workflowTasks.explainabilityTask?.pdp.data?.hyperparameterList || null}
                       fetchFunction={fetchExplainabilityPlot}
                       workflowId={0}
                     />
@@ -112,7 +112,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                     <LinePlot
                       key={`ale-plot`}
                       plotModel={workflow?.workflowTasks.explainabilityTask?.ale || null} 
-                      options={workflow?.workflowTasks.explainabilityTask?.hyperparametersNames || null}
+                      options={workflow?.workflowTasks.explainabilityTask?.ale.data?.hyperparameterList || null}
                       fetchFunction={fetchExplainabilityPlot}
                       workflowId={0}
                     />
@@ -122,7 +122,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                   <ContourPlot
                     key={`2dpdp-plot`}
                     plotModel={workflow?.workflowTasks.explainabilityTask?.["2dpdp"] || null}
-                    options={workflow?.workflowTasks.explainabilityTask?.hyperparametersNames || null}
+                    options={workflow?.workflowTasks.explainabilityTask?.["2dpdp"].data?.hyperparameterList || null}
                     fetchFunction={fetchExplainabilityPlot}
                     workflowId={0}
                   />
