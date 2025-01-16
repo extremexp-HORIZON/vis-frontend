@@ -14,6 +14,7 @@ import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { AsyncThunk } from "@reduxjs/toolkit"
 import CircularProgress from "@mui/material/CircularProgress"
+import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
 
 interface IContourplot {
   plotModel: {
@@ -69,6 +70,7 @@ const ContourPlot = (props: IContourplot) => {
     (e: { target: { value: string } }) => {
       dispatch(
         fetchFunction({
+          ...fetchExplainabilityPlotPayloadDefault,
           explanationType: plmodel?.explainabilityType || "",
           explanationMethod: plmodel?.explanationMethod || "",
           model: plmodel?.explainabilityModel || "",
