@@ -27,7 +27,7 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
+  width: "70%",
   boxShadow: 24,
   p: 1,
 };
@@ -42,6 +42,7 @@ interface ITableComponent {
     error: string | null;
   } | null
   experimentId: string | undefined;
+  workflowId: string
 }
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -62,18 +63,22 @@ const FixedTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 const CounterfactualsTable = (props: ITableComponent) => {
-  const { point, handleClose, counterfactuals, experimentId } = props
+  const { point, handleClose, counterfactuals, experimentId, workflowId } = props
   const dispatch = useAppDispatch()
 
   useEffect(() => {
+    const query = point
+    delete query["_vgsid_"]
+    delete query["Symbol(vega_id)"]
     dispatch(fetchModelAnalysisExplainabilityPlot({
     ...fetchExplainabilityPlotPayloadDefault,
     explanationType:"hyperparameterExplanation",
     explanationMethod:"counterfactuals",
     model:`${experimentId}_model`,
-    modelId: 1,
+    modelId: Number(workflowId),
     feature1: "",
-    feature2: ""
+    feature2: "",
+    query: JSON.stringify(query)
     }))
   }, [])
 
@@ -90,7 +95,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
         elevation={2}
         sx={{
           borderRadius: 4,
-          width: "90%",
           display: "flex",
           flexDirection: "column",
           rowGap: 0,
@@ -133,8 +137,8 @@ const CounterfactualsTable = (props: ITableComponent) => {
             <CircularProgress sx={{fontSize: "2rem"}} />
           </Box> : 
           <TableContainer
-            component={Paper}
-            sx={{ width: "99%", overflowX: "auto" }}
+            component={Box}
+            sx={{ width: "99%", overflowX: "auto", border: theme => `1px solid ${theme.palette.customGrey.main}` }}
           >
             <Table
               stickyHeader

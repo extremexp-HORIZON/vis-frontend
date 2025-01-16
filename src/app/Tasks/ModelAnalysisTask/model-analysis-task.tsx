@@ -78,7 +78,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             filters: [
               { column: "id", type: "equals", value: workflow.workflowId },
             ],
-            limit: 1000,
+            limit: 3000,
           },
           metadata: {
             workflowId: workflow.workflowId,
@@ -159,9 +159,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         >
           <Typography fontSize={"1.2rem"}>Model Training Task</Typography>
           <Box sx={{ flex: 1 }} />
-          <IconButton>
-            <CloseIcon />
-          </IconButton>
         </Box>
         <Box
           sx={{
@@ -250,6 +247,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   workflow.workflowTasks.modelAnalysis?.counterfactuals || null
                 }
                 experimentId={experimentId}
+                workflowId={workflow.workflowId}
               />
             )}
           </Box>

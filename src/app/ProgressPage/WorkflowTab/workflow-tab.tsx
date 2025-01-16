@@ -32,7 +32,6 @@ const WorkflowTab = (props: IWorkflowTab) => {
   }
   return (
     <>
-    {console.log(workflows.data[0].workflowId === workflowId)}
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}>
         <Box key="workflow-svg">
           <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
