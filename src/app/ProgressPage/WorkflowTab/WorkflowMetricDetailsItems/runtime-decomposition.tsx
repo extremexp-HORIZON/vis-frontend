@@ -9,17 +9,12 @@ import {
 import { Vega } from "react-vega"
 import InfoIcon from "@mui/icons-material/Info"
 import grey from "@mui/material/colors/grey"
+import { Task } from "../../../../shared/models/workflow.model"
 
 interface Metric {
   name: string
   value: number
   avgDiff: number
-}
-
-interface Task {
-  taskName: string;
-  startTime: string;
-  endTime: string;
 }
 
 interface IRuntimeDecomposition {
@@ -35,9 +30,9 @@ const RuntimeDecomposition = (props: IRuntimeDecomposition) => {
   useEffect(() => {
     if (tasks) {
       const data = tasks.map(task => ({
-        task: task.taskName.replace(' ', '_'),
-        start: new Date(task.startTime).getTime(),
-        end: new Date(task.endTime).getTime(),
+        task: task.name.replace(' ', '_'),
+        start: new Date(task.start).getTime(),
+        end: new Date(task.end).getTime(),
       }));
       setSpecData(data)
     }
