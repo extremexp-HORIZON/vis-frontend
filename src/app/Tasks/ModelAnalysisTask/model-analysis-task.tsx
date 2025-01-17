@@ -76,7 +76,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             ...defaultDataExplorationQuery,
             datasetId: `${experimentId}/metrics/${experimentId}_instances.csv`,
             filters: [
-              { column: "id", type: "equals", value: workflow.workflowId },
+              { column: "id", type: "equals", value: Number(workflow.workflowId) },
             ],
             limit: 3000,
           },
@@ -121,7 +121,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
               {
                 column: "id",
                 type: "equals",
-                value: workflow.workflowId,
+                value: Number(workflow.workflowId),
               },
             ],
           },

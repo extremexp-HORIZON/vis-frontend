@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
-import Papa from "papaparse"
-import "leaflet.heat"
 import {
   Button,
   Slider,
@@ -51,8 +49,8 @@ interface DataItem {
 }
 
 const App = () => {
-  const mapRef = useRef(null)
-  const markerRef = useRef(null)
+  const mapRef = useRef<L.Map | null>(null)
+  const markerRef = useRef<L.CircleMarker | null>(null)
   const mapContainerRef = useRef(null)
   const [data, setData] = useState<DataItem[]>([])
   const [index, setIndex] = useState(0)
@@ -64,7 +62,7 @@ const App = () => {
     osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     satellite: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
   }
-  const [mapLayer, setMapLayer] = useState("osm")
+  const [mapLayer, setMapLayer] = useState<keyof typeof layers>("osm")
 
   const theme = createTheme({
     palette: {
@@ -149,7 +147,7 @@ const App = () => {
       // Remove the previous tile layer
       mapRef.current.eachLayer(layer => {
         if (layer instanceof L.TileLayer) {
-          mapRef.current.removeLayer(layer)
+          mapRef.current?.removeLayer(layer)
         }
       })
 
@@ -246,7 +244,7 @@ const App = () => {
                     radius: size,
                     fillOpacity: 1,
                   },
-                ).addTo(mapRef.current)
+                ).addTo(mapRef.current!)
               } else {
                 markerRef.current
                   .setLatLng([row.latitude, row.longitude])
@@ -311,7 +309,7 @@ const App = () => {
             <InputLabel>Map Layer</InputLabel>
             <Select
               value={mapLayer}
-              onChange={e => setMapLayer(e.target.value)}
+              onChange={e => setMapLayer(e.target.value as keyof typeof layers)}
               label="Map Layer"
             >
               <MenuItem value="osm">Street Map</MenuItem>
@@ -478,7 +476,7 @@ const App = () => {
         <ThemeProvider theme={theme}>
           <Slider
             value={index}
-            onChange={(e, newValue) => setIndex(newValue)}
+            onChange={(e, newValue) => setIndex(newValue as number)}
             min={0}
             max={data.length - 1}
             valueLabelDisplay="auto"
