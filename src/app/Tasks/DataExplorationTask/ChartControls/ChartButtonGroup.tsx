@@ -3,10 +3,11 @@ import { ButtonGroup, Button } from '@mui/material';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
+import MapIcon from '@mui/icons-material/Map';
 
 interface ChartButtonGroupProps {
-  chartType: 'line' | 'bar' | 'scatter';
-  setChartType: (chartType: 'line' | 'bar' | 'scatter') => void;
+  chartType: 'line' | 'bar' | 'scatter' | 'map';
+  setChartType: (chartType: 'line' | 'bar' | 'scatter' | 'map') => void;
 }
 
 const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChartType }) => {
@@ -26,9 +27,16 @@ const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChart
       </Button>
       <Button
         variant={chartType === 'scatter' ? 'contained' : 'outlined'}
+        disabled
         onClick={() => setChartType('scatter')}
       >
         <ScatterPlotIcon />
+      </Button>
+      <Button
+        variant={chartType === 'map' ? 'contained' : 'outlined'}
+        onClick={() => setChartType('map')}
+      >
+        <MapIcon />
       </Button>
     </ButtonGroup>
   );

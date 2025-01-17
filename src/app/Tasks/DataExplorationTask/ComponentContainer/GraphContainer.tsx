@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, ButtonGroup, Button, Paper } from "@mui/material"
+import { Box, ButtonGroup, Button, Paper, Typography } from "@mui/material"
 import LineChart from "../Charts/LineChart"
 import ChartButtonGroup from "../ChartControls/ChartButtonGroup"
 import LineChartControlPanel from "../Charts/LineChartControlPanel"
@@ -11,6 +11,7 @@ import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-e
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 import ScatterChart from "../Charts/ScatterChart"
+import MapChart from "../Charts/MapChart"
 
 
 interface IGraphContainer {
@@ -21,8 +22,8 @@ interface IGraphContainer {
   workflowId: string
   columns: VisualColumn[]
   originalColumns: VisualColumn[]
-  chartType: "line" | "bar" | "scatter"
-  setChartType: React.Dispatch<React.SetStateAction<"line" | "bar" | "scatter">>
+  chartType: "line" | "bar" | "scatter" | "map"
+  setChartType: React.Dispatch<React.SetStateAction<"line" | "bar" | "scatter" | "map">>
   xAxis: VisualColumn
   xAxisScatter:VisualColumn
   colorBy: string;
@@ -125,7 +126,7 @@ const GraphContainer = (props: IGraphContainer) => {
           <Box sx={{ width: "1rem" }} />
 
           {/* View Mode Toggle (Overlay/Stacked) */}
-          <ButtonGroup variant="contained" aria-label="view mode">
+          <ButtonGroup variant="contained" aria-label="view mode" disabled={chartType === "map"}>
             <Button
               onClick={() => setViewMode("overlay")}
               disabled={viewMode === "overlay"}
@@ -171,6 +172,7 @@ const GraphContainer = (props: IGraphContainer) => {
         colorBy={colorBy}
         setColorBy={setColorBy}
         />}
+         
 
         {/* Conditionally Render Chart Based on Selected Type */}
         <Box sx={{ marginTop: "2rem" }}>
@@ -196,6 +198,10 @@ const GraphContainer = (props: IGraphContainer) => {
            setColorBy={setColorBy}
            columns={columns}
          />
+          }
+          {
+            chartType==="map" && 
+            <MapChart/>
           }
         </Box>
       </Box>

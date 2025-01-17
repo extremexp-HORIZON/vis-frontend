@@ -148,7 +148,7 @@ export const explainabilityExtraReducers = (
 export const fetchDataExplorationData = createAsyncThunk(
   "workflowTasks/data_exploration/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "api/visualization/data"
+    const requestUrl = "api/visualization/tabular"
     return axios
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)

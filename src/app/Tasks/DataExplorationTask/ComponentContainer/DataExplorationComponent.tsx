@@ -54,7 +54,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [barGroupBy, setBarGroupBy] = useState<string[]>([]) // State for bar chart grouping
   const [barAggregation, setBarAggregation] = useState<any>({}) // State for bar chart aggregation
   const [viewMode, setViewMode] = useState<"overlay" | "stacked">("overlay")
-  const [chartType, setChartType] = useState<"line" | "bar" | "scatter">("line")
+  const [chartType, setChartType] = useState<"line" | "bar" | "scatter" | "map">("line")
   const [colorBy, setColorBy] = useState('None');
 
   console.log('groupBy',barGroupBy)
