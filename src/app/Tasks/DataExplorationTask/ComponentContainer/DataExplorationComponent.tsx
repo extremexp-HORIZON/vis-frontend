@@ -15,6 +15,7 @@ import {
   Typography,
 } from "@mui/material"
 import {
+  defaultDataExplorationQuery,
   IDataExplorationRequest,
   IFilter,
   VisualColumn,
@@ -79,9 +80,8 @@ const [totalSize, setTotalSize] = useState(0);
           dispatch(
             fetchDataExplorationData({
               query: {
-                datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
-                limit: pageSize,
-                columns: [],
+                ...defaultDataExplorationQuery,
+                datasetId: `${experimentId}/datasets/LG600B6-100636-IDK`,
               },
               metadata: {
                 workflowId: workflowId || "",

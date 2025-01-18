@@ -40,9 +40,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         dispatch(
           fetchModelAnalysisData({
             query: {
-              datasetId: `folder://${experimentId}/datasets/LG600B6-100636-IDK`,
-              limit: -1,
-              columns: [],
+              ...defaultDataExplorationQuery,
+              datasetId: `${experimentId}/datasets/LG600B6-100636-IDK`,
             },
             metadata: {
               workflowId: workflow.workflowId,
@@ -58,9 +57,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         dispatch(
           fetchModelAnalysisData({
             query: {
+              ...defaultDataExplorationQuery,
               datasetId: `${experimentId}/metadata.csv`,
-              columns: [],
-              limit: -1,
             },
             metadata: {
               workflowId: workflow.workflowId,
