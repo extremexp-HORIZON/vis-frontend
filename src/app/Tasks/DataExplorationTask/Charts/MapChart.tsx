@@ -1,3 +1,6 @@
+
+
+
 import React, { useState, useEffect, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
@@ -338,6 +341,8 @@ const App = () => {
           >
             {backtraceMode ? "Switch to Live Mode" : "Enable Backtrace"}
           </Button>
+          {!backtraceMode && (
+
           <Button
             variant={showDetails ? "outlined" : "contained"}
             onClick={() => setShowDetails(!showDetails)}
@@ -345,6 +350,7 @@ const App = () => {
           >
             {showDetails ? "Hide Details" : "Show Details"}
           </Button>
+          )}
         </Grid>
       </Grid>
 
@@ -485,6 +491,8 @@ const App = () => {
       </Box>
       <Grid item xs={12} padding={5}>
         {/* <Typography gutterBottom>Timeline Control</Typography> */}
+         {!backtraceMode && (
+
         <ThemeProvider theme={theme}>
           <Slider
             value={index}
@@ -500,9 +508,11 @@ const App = () => {
             sx={{ width: "80%" }}
           />
         </ThemeProvider>
+        )}
       </Grid>
     </Box>
   )
 }
 
 export default App
+
