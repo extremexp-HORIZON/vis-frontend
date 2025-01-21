@@ -24,3 +24,47 @@ export interface IPlotModel {
     values: string[];
     index: number;
   }
+
+  export interface IAction {
+    [key: string]: ITableContents;
+  }
+
+  export interface IAffectedClusters {
+    [key: string]: IClusterData;
+  }
+  
+  export interface IClusterData {
+    clusterName: string;
+    data: Record<string, number | string>;
+  }
+  
+  export interface IEffCostActions {
+    [key: string]: {
+      cost: number;
+      effectiveness: number;
+      actions: Record<string, unknown>;
+    };
+  }
+
+
+  export interface IGlovesPlotModel {
+    explainabilityModel: string;
+  explainabilityType: string;
+  explanationMethod: string;
+  featureList: string[];
+  features: string[] | null;
+  hyperparameterList: string[] | null;
+  plotDescr: string;
+  plotName: string;
+  plotType: string;
+  tableContents: ITableContents | null;
+  totalCost: number;
+  totalEffectiveness: number;
+  xAxis: string[] | null;
+  yAxis: string[] | null;
+  zAxis: string[] | null;
+  actions: IAction;
+  affectedClusters: IAffectedClusters;
+  effCostActions: IEffCostActions;
+    
+  }

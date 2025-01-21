@@ -117,7 +117,7 @@ const App = () => {
           },
           metadata: {
             workflowId: "",
-            queryCase: "lineChart",
+            queryCase: "mapChart",
           },
         }),
       )

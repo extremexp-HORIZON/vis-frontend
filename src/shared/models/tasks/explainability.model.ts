@@ -19,6 +19,12 @@ export interface IExplainability {
     loading: boolean
     error: string | null
   }
+  global_counterfactuals: {
+    data: IPlotModel | null
+    loading: boolean
+    error: string | null
+  }
+
   hyperparametersNames: string[]
 }
 
@@ -36,6 +42,11 @@ export const explainabilityDefault: IExplainability = {
     error: null,
   },
   ale: {
+    data: null,
+    loading: false,
+    error: null,
+  },
+  global_counterfactuals: {
     data: null,
     loading: false,
     error: null,

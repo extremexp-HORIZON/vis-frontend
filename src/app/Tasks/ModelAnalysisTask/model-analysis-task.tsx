@@ -15,11 +15,14 @@ import InstanceClassification from "../SharedItems/Plots/instance-classification
 import ConfusionMatrix from "../SharedItems/Plots/confusion-matrix"
 import _ from "lodash"
 import {
+  fetchAffected,
   fetchModelAnalysisData,
   fetchModelAnalysisExplainabilityPlot,
 } from "../../../shared/models/tasks/model-analysis.model"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
 import { fetchExplainabilityPlotPayloadDefault } from "../../../shared/models/tasks/explainability.model"
+import { Tab, Tabs } from "@mui/material"
+import CGlanceExecution from "../SharedItems/Plots/gloves-plot"
 
 interface IFeatureExplainability {
   workflow: IWorkflowTabModel
@@ -30,7 +33,48 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
   const { experimentId } = useParams()
   const { workflow } = props
   const [point, setPoint] = useState(null)
+  const [activeTab, setActiveTab] = useState(0)
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    if (experimentId === "ideko" && newValue === 1) return
+
+    setActiveTab(newValue)
+  }
+
   const dispatch = useAppDispatch()
+
+  const dispatchActionsSequentially = async () => {
+    try {
+      // Dispatch the first action and wait for its completion
+      await dispatch(
+        fetchModelAnalysisExplainabilityPlot({
+          ...fetchExplainabilityPlotPayloadDefault,
+          explanationType: "featureExplanation",
+          explanationMethod: "global_counterfactuals",
+          model: "I2Cat_phising_model",
+          feature1: "",
+          feature2: "",
+          modelId: parseInt(workflow.workflowId, 10),
+          gcfSize: 3,
+          cfGenerator: "Dice",
+          clusterActionChoiceAlgo: "max-eff",
+        })
+      );
+  
+      // Dispatch the second action after the first is done
+      await dispatch(
+        fetchAffected({
+          workflowId: parseInt(workflow.workflowId, 10),
+          queryCase: "affected",
+        })
+      );
+  
+      console.log("Both actions completed successfully!");
+    } catch (error) {
+      console.error("An error occurred while dispatching actions:", error);
+    }
+  };
+  
 
   useEffect(() => {
     if (experimentId === "ideko") {
@@ -76,7 +120,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             filters: [
               { column: "id", type: "equals", value: Number(workflow.workflowId) },
             ],
-            limit: 3000,
+            limit: 30,
           },
           metadata: {
             workflowId: workflow.workflowId,
@@ -106,6 +150,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           modelId: parseInt(workflow.workflowId, 10),
         }),
       )
+ 
+    dispatchActionsSequentially();
     }
     if (
       workflow.workflowTasks.modelAnalysis?.modelConfusionMatrix.data === null
@@ -131,6 +177,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       )
     }
   }, [])
+  console.log("workflow", workflow)
 
   return (
     <>
@@ -158,149 +205,208 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           <Typography fontSize={"1.2rem"}>Model Training Task</Typography>
           <Box sx={{ flex: 1 }} />
         </Box>
-        <Box
-          sx={{
-            px: 5,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            rowGap: 4,
-            my: "3rem",
-          }}
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          aria-label="Model Analysis Tabs"
+          textColor="primary"
+          indicatorColor="primary"
         >
+          <Tab label="Classification Report" />
+          <Tab
+            label="Global Counterfactuals"
+            disabled={experimentId === "ideko"}
+          />
+        </Tabs>
+
+        {activeTab === 0 && (
           <Box
             sx={{
-              width: "100%",
+              px: 5,
               display: "flex",
               flexDirection: "column",
-              alignItems: "start",
-              columnGap: 1,
+              justifyContent: "center",
+              rowGap: 4,
+              my: "3rem",
             }}
           >
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "start",
+                columnGap: 1,
+              }}
             >
-              Classification Report
-            </Typography>
-            <Typography variant="body1">
-              Test set classified instances and Confusion Matrix
-            </Typography>
-          </Box>
-          {experimentId === "ideko" ? (
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={8}>
-                <MultiTimeSeriesVisualizationWithCategories
-                  setPoint={setPoint}
-                  multipleTimeSeries={
-                    workflow?.workflowTasks.modelAnalysis?.multipleTimeSeries ||
-                    null
-                  }
-                  multipleTimeSeriesMetadata={
-                    workflow?.workflowTasks.modelAnalysis
-                      ?.multipleTimeSeriesMetadata || null
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <ConfusionMatrix
-                  key={`confusion-matrix`}
-                  confusionMatrix={
-                    workflow.workflowTasks.modelAnalysis
-                      ?.modelConfusionMatrix || null
-                  }
-                />
-              </Grid>
-            </Grid>
-          ) : (
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <InstanceClassification
-                  key={`instance-classification`}
-                  point={point}
-                  setPoint={setPoint}
-                  plotData={
-                    workflow.workflowTasks.modelAnalysis?.modelInstances || null
-                  }
-                />
-              </Grid>
-              <Grid item md={6} xs={12}>
-                <ConfusionMatrix
-                  key={`confusion-matrix`}
-                  confusionMatrix={
-                    workflow.workflowTasks.modelAnalysis
-                      ?.modelConfusionMatrix || null
-                  }
-                />
-              </Grid>
-            </Grid>
-          )}
-          <Box>
-            {point && (
-              <CounterfactualsTable
-                key={`counterfactuals-table`}
-                point={point}
-                handleClose={() => setPoint(null)}
-                counterfactuals={
-                  workflow.workflowTasks.modelAnalysis?.counterfactuals || null
-                }
-                experimentId={experimentId}
-                workflowId={workflow.workflowId}
-              />
-            )}
-          </Box>
-          {experimentId !== "ideko" && (
-            <>
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "start",
-                  columnGap: 1,
-                }}
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: 600, fontSize: "1.5rem" }}
               >
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: 600, fontSize: "1.5rem" }}
-                >
-                  Expainability:
-                </Typography>
-                <Typography variant="body1">
-                  Feature based explanations for this variant
-                </Typography>
-              </Box>
+                Classification Report
+              </Typography>
+              <Typography variant="body1">
+                Test set classified instances and Confusion Matrix
+              </Typography>
+            </Box>
+            {experimentId === "ideko" ? (
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={8}>
+                  <MultiTimeSeriesVisualizationWithCategories
+                    setPoint={setPoint}
+                    multipleTimeSeries={
+                      workflow?.workflowTasks.modelAnalysis
+                        ?.multipleTimeSeries || null
+                    }
+                    multipleTimeSeriesMetadata={
+                      workflow?.workflowTasks.modelAnalysis
+                        ?.multipleTimeSeriesMetadata || null
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <ConfusionMatrix
+                    key={`confusion-matrix`}
+                    confusionMatrix={
+                      workflow.workflowTasks.modelAnalysis
+                        ?.modelConfusionMatrix || null
+                    }
+                  />
+                </Grid>
+              </Grid>
+            ) : (
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  <LinePlot
-                    key={`pdp-plot`}
-                    plotModel={
-                      workflow.workflowTasks.modelAnalysis?.pdp || null
+                  <InstanceClassification
+                    key={`instance-classification`}
+                    point={point}
+                    setPoint={setPoint}
+                    plotData={
+                      workflow.workflowTasks.modelAnalysis?.modelInstances || null
                     }
-                    options={
-                      workflow.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
-                    }
-                    fetchFunction={fetchModelAnalysisExplainabilityPlot}
-                    workflowId={workflow.workflowId}
                   />
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <LinePlot
-                    key={`ale-plot`}
-                    plotModel={
-                      workflow.workflowTasks.modelAnalysis?.ale || null
+                <Grid item md={6} xs={12}>
+                  <ConfusionMatrix
+                    key={`confusion-matrix`}
+                    confusionMatrix={
+                      workflow.workflowTasks.modelAnalysis
+                        ?.modelConfusionMatrix || null
                     }
-                    options={
-                      workflow.workflowTasks.modelAnalysis?.ale.data?.featureList || null
-                    }
-                    fetchFunction={fetchModelAnalysisExplainabilityPlot}
-                    workflowId={workflow.workflowId}
                   />
                 </Grid>
               </Grid>
-            </>
-          )}
-        </Box>
+            )}
+            <Box>
+              {point && (
+                <CounterfactualsTable
+                  key={`counterfactuals-table`}
+                  point={point}
+                  handleClose={() => setPoint(null)}
+                  counterfactuals={
+                    workflow.workflowTasks.modelAnalysis?.counterfactuals || null
+                  }
+                  experimentId={experimentId}
+                  workflowId={workflow.workflowId}
+                />
+              )}
+            </Box>
+            {experimentId !== "ideko" && (
+              <>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    columnGap: 1,
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+                  >
+                    Expainability:
+                  </Typography>
+                  <Typography variant="body1">
+                    Feature based explanations for this variant
+                  </Typography>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <LinePlot
+                      key={`pdp-plot`}
+                      plotModel={
+                        workflow.workflowTasks.modelAnalysis?.pdp || null
+                      }
+                      options={
+                        workflow.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
+                      }
+                      fetchFunction={fetchModelAnalysisExplainabilityPlot}
+                      workflowId={workflow.workflowId}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <LinePlot
+                      key={`ale-plot`}
+                      plotModel={
+                        workflow.workflowTasks.modelAnalysis?.ale || null
+                      }
+                      options={
+                        workflow.workflowTasks.modelAnalysis?.ale.data?.featureList || null
+                      }
+                      fetchFunction={fetchModelAnalysisExplainabilityPlot}
+                      workflowId={workflow.workflowId}
+                    />
+                  </Grid>
+                </Grid>
+              </>
+            )}
+          </Box>
+        )}
+
+        {activeTab === 1 && experimentId !== "ideko" && (
+          
+          <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "start",
+                columnGap: 1,
+              }}
+            >
+              {" "}
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: 600, fontSize: "1.5rem" }}
+              >
+                Global Counterfactuals
+              </Typography>
+              <Typography variant="body1">
+                Content for Global Counterfactuals
+              </Typography>
+              <>
+                <CGlanceExecution
+                  workflow={workflow}
+                  availableCfMethods={[
+                    "Dice",
+                    "NearestNeighbors",
+                    "NearestNeighborsScaled",
+                    "RandomSampling",
+                  ]}
+                  availableActionStrategies={[
+                    "max-eff",
+                    "mean-act",
+                    "low-cost",
+                  ]}
+                  availableFeatures={[]}
+                  
+                />
+              </>
+            </Box>
+
+        )}
       </Grid>
     </>
   )

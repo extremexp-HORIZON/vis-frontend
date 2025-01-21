@@ -43,6 +43,11 @@ export interface IDataExploration {
     error: string | null
 
   }
+  mapChart:{
+    data: IDataExplorationResponse | null
+    loading: boolean
+    error: string | null
+  }
 }
 
 // Define the initial state of the slice
@@ -72,6 +77,11 @@ export const dataExplorationDefault: IDataExploration = {
     loading: false,
     error:  null
 
+  },
+  mapChart:{
+    data: null,
+    loading: false,
+    error:  null
   }
 }
 

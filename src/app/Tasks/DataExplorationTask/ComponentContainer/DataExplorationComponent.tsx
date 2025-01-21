@@ -58,8 +58,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [chartType, setChartType] = useState<"line" | "bar" | "scatter" | "map">("line")
   const [colorBy, setColorBy] = useState('None');
 
-  console.log('groupBy',barGroupBy)
-  console.log('aggregation',barAggregation)
+  console.log('workflow',workflow)
 
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -129,7 +128,27 @@ const [totalSize, setTotalSize] = useState(0);
               },
             }),
           );
-        }    
+        } 
+        if(workflow.workflowTasks.dataExploration?.mapChart.data === null){
+          dispatch(
+            fetchDataExplorationData({
+                     query: {
+                       datasetId: "/test/newresult.csv",
+                       limit: 0,
+                       columns: [],
+                       filters: [],
+                       groupBy: [],
+                       aggregation: {},
+                       offset: 0,
+                     },
+                     metadata: {
+                       workflowId: workflowId || "",
+                       queryCase: "mapChart",
+                     },
+                   }),
+         )
+          
+        }   
       }
     }
     
@@ -184,7 +203,7 @@ const [totalSize, setTotalSize] = useState(0);
           queryCase: "lineChart",
         },
       }),
-    )
+    )  
   }
 
   const totalPages = Math.ceil(totalSize / pageSize);

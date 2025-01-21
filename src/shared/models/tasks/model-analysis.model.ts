@@ -1,8 +1,9 @@
 import { ActionReducerMapBuilder, createAsyncThunk } from "@reduxjs/toolkit"
-import { IPlotModel } from "../plotmodel.model"
+import { IGlovesPlotModel, IPlotModel } from "../plotmodel.model"
 import { IWorkflowTab } from "../../../store/slices/workflowTabsSlice"
 import axios from "axios"
 import {
+  fetchAffectedRequest,
   IDataExplorationRequest,
   IDataExplorationResponse
 } from "../dataexploration.model"
@@ -38,6 +39,13 @@ export interface IModelAnalysis {
     loading: boolean
     error: string | null
   }
+  global_counterfactuals:{
+    data: IGlovesPlotModel | null
+    loading: boolean
+    error: string | null
+
+  }
+  
   influenceFunctions: {
     data: IPlotModel | null
     loading: boolean
@@ -59,6 +67,11 @@ export interface IModelAnalysis {
     loading: boolean
     error: string | null
   }
+  affected: {
+    data: any | null
+    loading: boolean
+    error: string | null
+  }
 }
 
 export const modelAnalysisDefault: IModelAnalysis = {
@@ -66,11 +79,13 @@ export const modelAnalysisDefault: IModelAnalysis = {
   pdp: { data: null, loading: false, error: null },
   ale: { data: null, loading: false, error: null },
   counterfactuals: { data: null, loading: false, error: null },
+  global_counterfactuals: { data: null, loading: false, error: null },
   influenceFunctions: { data: null, loading: false, error: null },
   modelInstances: { data: null, loading: false, error: null },
   modelConfusionMatrix: { data: null, loading: false, error: null },
   multipleTimeSeries: { data: null, loading: false, error: null },
   multipleTimeSeriesMetadata: { data: null, loading: false, error: null },
+  affected: { data: null, loading: false, error: null },
 }
 
 export const modelAnalysisReducers = (
@@ -141,6 +156,40 @@ export const modelAnalysisReducers = (
         compareCompletedTask[queryCase].error = "Failed to fetch data"
       }
     })
+    .addCase(
+      fetchAffected.fulfilled,
+      (state, action) => {
+        const compareCompletedTask = state.tabs.find(
+          tab => tab.workflowId === `${action.meta.arg.workflowId}`,
+        )?.workflowTasks.modelAnalysis
+        const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
+        console.log(compareCompletedTask, plotType)
+        if (compareCompletedTask && plotType !== 'featureNames' ) {
+              compareCompletedTask[plotType].data = action.payload
+              compareCompletedTask[plotType].loading = false
+              compareCompletedTask[plotType].error = null
+        }
+      },
+    )
+    .addCase(fetchAffected.pending, (state, action) => {
+      const compareCompletedTask = state.tabs.find(
+        tab => tab.workflowId === `${action.meta.arg.workflowId}`,
+      )?.workflowTasks.modelAnalysis
+      const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
+      if (compareCompletedTask && plotType !== 'featureNames') {
+            compareCompletedTask[plotType].loading = true
+      }
+    })
+    .addCase(fetchAffected.rejected, (state, action) => {
+      const compareCompletedTask = state.tabs.find(
+        tab => tab.workflowId === `${action.meta.arg.workflowId}`,
+      )?.workflowTasks.modelAnalysis
+      const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
+      if (compareCompletedTask && plotType !== 'featureNames') {
+            compareCompletedTask[plotType].loading = false
+            compareCompletedTask[plotType].error = "Failed to fetch data"
+      }
+    })
 }
 
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
@@ -148,6 +197,13 @@ export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   async (payload: FetchExplainabilityPlotPayload) => {
     const requestUrl = "/api/explainability"
     return axios.post<any>(requestUrl, payload).then(response => response.data)
+  },
+)
+export const fetchAffected= createAsyncThunk(
+  "workflowTasks/model_analysis/fetch_affected",
+  async (payload: fetchAffectedRequest) => {
+    const requestUrl = "/api/affected"
+    return axios.get<any>(requestUrl).then(response => response.data)
   },
 )
 
