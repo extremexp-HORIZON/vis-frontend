@@ -126,16 +126,15 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
 
   return (
     <>
-      <Paper
+      <Box
         className="Category-Item"
-        elevation={2}
         sx={{
           borderRadius: 4,
-          width: "inherit",
           display: "flex",
           flexDirection: "column",
           rowGap: 0,
           minWidth: "300px",
+          width: "100%",
           height: "100%",
         }}
       >
@@ -341,7 +340,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
             )
           )}
         </Box>
-      </Paper>
+      </Box>
     </>
   );
 };

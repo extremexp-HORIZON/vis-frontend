@@ -369,14 +369,14 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           
           <Box
               sx={{
-                width: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "start",
                 columnGap: 1,
+                my: "3rem",
+                px: 5,
               }}
             >
-              {" "}
               <Typography
                 variant="body1"
                 sx={{ fontWeight: 600, fontSize: "1.5rem" }}

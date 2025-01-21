@@ -29,7 +29,7 @@ const GlovesMetricSummary: React.FC<MetricSummaryProps> = ({
   }
 
   return (
-    <Paper>
+    <Box>
       <Box
         sx={{
           display: "flex", // Aligns items in a row
@@ -78,7 +78,7 @@ const GlovesMetricSummary: React.FC<MetricSummaryProps> = ({
           />
         </WorkflowCard>
       </Box>
-    </Paper>
+    </Box>
   )
 }
 
