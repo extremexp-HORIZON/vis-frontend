@@ -43,6 +43,7 @@ const ProgressPage = () => {
     }
   }, [])
 
+
   useEffect(() => {
     if (!experiment.loading && experiment.data) {
       // TODO: Remove this when no longer needed
@@ -58,6 +59,26 @@ const ProgressPage = () => {
       }
     }
   }, [experiment])
+
+  // TODO: Enable this for live data
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     if (!experiment.loading && experiment.data) {
+  //       if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
+  //         dispatch(
+  //           fetchExperimentWorkflowsTesting({
+  //             experimentId: experimentId || "",
+  //             workflowIds: experiment.data.workflow_ids,
+  //           }),
+  //         )
+  //       } else {
+  //         dispatch(fetchExperimentWorkflows(experimentId || ""))
+  //       }
+  //     }
+  //   }, 15000)
+
+  //   return () => clearInterval(intervalId)
+  // }, [experiment])
 
   const handleChange =
     (newValue: number | string) => (event: React.SyntheticEvent) => {
@@ -145,7 +166,14 @@ const ProgressPage = () => {
               <>
                 <ProgressPageBar />
                 <ProgressPageGauges />
-                <Box sx={{ display: "flex", flexDirection: "column", rowGap: 6, px: [0, 3, 8, 15] }} >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 6,
+                    px: [0, 3, 8, 15],
+                  }}
+                >
                   <ParallelCoordinatePlot />
                   <WorkflowTable handleChange={handleChange} />
                   <ScheduleTable />
