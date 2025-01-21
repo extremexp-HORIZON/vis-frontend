@@ -153,17 +153,19 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
           <Tooltip title="The number of actions to be generated in the end of the algorithm">
             <FormControl
               sx={{
-                width: "20%",
+                width: "10%",
                 flex: 1,
                 minWidth: "150px",
                 marginLeft: "10px",
+                marginRight: "10px",
+                
               }}
             >
               <InputLabel id="gcf-size-select-label">
                 Number of CounterFactual Actions
               </InputLabel>
               <Select
-                size="small"
+              size="small"
                 MenuProps={{
                   PaperProps: { style: { maxHeight: 224, width: 250 } },
                 }}
@@ -183,31 +185,41 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
             </FormControl>
           </Tooltip>
           <Button
-            variant="outlined"
-            size="large"
-            onClick={() => setAdvancedOptionsOpen(!advancedOptionsOpen)}
+            variant="contained"
+            onClick={fetchData}
+            color="primary"
+            sx={{ flex: 1, minWidth: "150px",marginRight: "10px" }}
+          >
+            Run
+          </Button>
+          <Button
+            variant="contained"   onClick={() => setAdvancedOptionsOpen(!advancedOptionsOpen)}
           >
             {advancedOptionsOpen
               ? "Hide Advanced Options"
               : "Show Advanced Options"}
           </Button>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={fetchData}
-            color="primary"
-          >
-            Generate Counterfactuals
-          </Button>
+         
+
+       
+          </Box>
 
           {/* Multi-Select for Features */}
-        </Box>
+       
 
         <Collapse in={advancedOptionsOpen}>
-          <Box display="flex" gap={1} marginTop={2} flexWrap="wrap">
-            {/* Counterfactual Method Selection Dropdown */}
+          <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          gap={2}
+          marginTop={3}
+        >
+          <Box display="flex" gap={1} flexWrap="wrap" justifyContent="center">
+            {/* Local Counterfactual Method Dropdown */}
             <Tooltip title="Methods that generate candidate counterfactual explanations">
-              <FormControl fullWidth sx={{ flex: 1, minWidth: "150px" }}>
+              <FormControl fullWidth sx={{ flex: 1, minWidth: "350px" }}>
                 <InputLabel id="cf-method-select-label">
                   Local Counterfactual Method
                 </InputLabel>
@@ -228,10 +240,11 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 </Select>
               </FormControl>
             </Tooltip>
+            
 
-            {/* Action Choice Strategy Selection Dropdown */}
+            {/* Action Choice Strategy Dropdown */}
             <Tooltip title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria">
-              <FormControl fullWidth sx={{ flex: 1, minWidth: "150px" }}>
+              <FormControl fullWidth sx={{ flex: 1, minWidth: "350px" }}>
                 <InputLabel id="action-choice-strategy-select-label">
                   Action Choice Strategy
                 </InputLabel>
@@ -255,7 +268,9 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
               </FormControl>
             </Tooltip>
           </Box>
+        </Box>
         </Collapse>
+       
         <Box>
           {workflow.workflowTasks.modelAnalysis?.global_counterfactuals.data &&
           workflow.workflowTasks.modelAnalysis?.affected.data &&
