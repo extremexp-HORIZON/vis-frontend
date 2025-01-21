@@ -40,7 +40,7 @@ export interface IModelAnalysis {
     error: string | null
   }
   global_counterfactuals:{
-    data: IGlovesPlotModel | null
+    data: IPlotModel | null
     loading: boolean
     error: string | null
 

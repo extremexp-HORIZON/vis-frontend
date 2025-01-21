@@ -163,9 +163,11 @@ const App = () => {
     if (backtraceMode) {
       data.forEach(row => {
         if (row.latitude && row.longitude) {
-          const speedColor =
-            colorBy === "speed"
-              ? row.speed > 20
+          const speedColor = colorBy === "none" 
+          ? "blue" // Default color
+
+          : colorBy === "speed"
+                        ? row.speed > 20
                 ? "red"
                 : row.speed > 5
                   ? "orange"
@@ -178,9 +180,11 @@ const App = () => {
                     : "red"
                 : "blue"
 
-          const size =
-            sizeBy === "batteryLevel"
-              ? Math.round(row.batteryLevel * 10)
+                const size = sizeBy === "none"
+                ? 8 // Default size
+
+                : sizeBy === "batteryLevel"
+                ? Math.round(row.batteryLevel * 10)
               : sizeBy === "odometer"
                 ? Math.min(Math.max(row.odometer / 100, 5), 20)
                 : 8
@@ -213,8 +217,10 @@ const App = () => {
               // Store the past trip points
 
               // Marker properties
-              const speedColor =
-                colorBy === "speed"
+              const speedColor = colorBy === "none" 
+              ? "blue" // Default color
+    
+              : colorBy === "speed"
                   ? row.speed > 20
                     ? "red"
                     : row.speed > 5
@@ -228,8 +234,10 @@ const App = () => {
                         : "red"
                     : "blue"
 
-              const size =
-                sizeBy === "batteryLevel"
+            const size = sizeBy === "none"
+                ? 8 // Default size
+
+                : sizeBy === "batteryLevel"
                   ? Math.round(row.batteryLevel * 10)
                   : sizeBy === "odometer"
                     ? Math.min(Math.max(row.odometer / 100, 5), 20)
@@ -283,10 +291,12 @@ const App = () => {
               value={colorBy}
               onChange={e => setColorBy(e.target.value)}
               label="Color By"
-            >
+            >            
+              <MenuItem value="none">None</MenuItem> {/* Add None option */}
               <MenuItem value="speed">Speed</MenuItem>
               <MenuItem value="batteryLevel">Battery Level</MenuItem>
               <MenuItem value="isMoving">Movement Status</MenuItem>
+
             </Select>
           </FormControl>
         </Grid>
@@ -298,9 +308,11 @@ const App = () => {
               onChange={e => setSizeBy(e.target.value)}
               label="Sized By"
             >
+              <MenuItem value="none">None</MenuItem> {/* Add None option */}
               <MenuItem value="batteryLevel">Battery Level</MenuItem>
               <MenuItem value="odometer">Odometer</MenuItem>
               <MenuItem value="altitude">Altitude</MenuItem>
+
             </Select>
           </FormControl>
         </Grid>

@@ -14,6 +14,11 @@ export interface IPlotModel {
     yAxis: Axis;
     zAxis: Axis;
     tableContents: ITableContents;
+    totalCost: number;
+    totalEffectiveness: number;
+    actions: IAction;
+    affectedClusters: IAffectedClusters;
+    effCostActions: IEffCostActions;
   }
 
   interface ITableContents {
@@ -47,24 +52,4 @@ export interface IPlotModel {
   }
 
 
-  export interface IGlovesPlotModel {
-    explainabilityModel: string;
-  explainabilityType: string;
-  explanationMethod: string;
-  featureList: string[];
-  features: string[] | null;
-  hyperparameterList: string[] | null;
-  plotDescr: string;
-  plotName: string;
-  plotType: string;
-  tableContents: ITableContents | null;
-  totalCost: number;
-  totalEffectiveness: number;
-  xAxis: string[] | null;
-  yAxis: string[] | null;
-  zAxis: string[] | null;
-  actions: IAction;
-  affectedClusters: IAffectedClusters;
-  effCostActions: IEffCostActions;
-    
-  }
+  

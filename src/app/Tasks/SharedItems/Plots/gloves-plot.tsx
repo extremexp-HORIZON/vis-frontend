@@ -141,7 +141,6 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
       >
         {/* Box container to arrange elements side by side */}
         <Box
-          // display="flex"
           alignItems="center"
           justifyContent="center"
           gap={2}
@@ -158,14 +157,13 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 minWidth: "150px",
                 marginLeft: "10px",
                 marginRight: "10px",
-                
               }}
             >
               <InputLabel id="gcf-size-select-label">
                 Number of CounterFactual Actions
               </InputLabel>
               <Select
-              size="small"
+                size="small"
                 MenuProps={{
                   PaperProps: { style: { maxHeight: 224, width: 250 } },
                 }}
@@ -176,7 +174,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 value={gcfSize}
                 onChange={handleGcfSizeChange}
               >
-                {Array.from({ length: 10 }, (_, i) => i + 1).map(value => (
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
                   <MenuItem key={value} value={value}>
                     {value}
                   </MenuItem>
@@ -188,138 +186,90 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
             variant="contained"
             onClick={fetchData}
             color="primary"
-            sx={{ flex: 1, minWidth: "150px",marginRight: "10px" }}
+            sx={{ flex: 1, minWidth: "150px", marginRight: "10px" }}
           >
             Run
           </Button>
           <Button
-            variant="contained"   onClick={() => setAdvancedOptionsOpen(!advancedOptionsOpen)}
+            variant="contained"
+            onClick={() => setAdvancedOptionsOpen(!advancedOptionsOpen)}
           >
             {advancedOptionsOpen
               ? "Hide Advanced Options"
               : "Show Advanced Options"}
           </Button>
-         
+        </Box>
 
-       
-          </Box>
-
-          {/* Multi-Select for Features */}
-       
-
+        {/* Advanced Options */}
         <Collapse in={advancedOptionsOpen}>
           <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          gap={2}
-          marginTop={3}
-        >
-          <Box display="flex" gap={1} flexWrap="wrap" justifyContent="center">
-            {/* Local Counterfactual Method Dropdown */}
-            <Tooltip title="Methods that generate candidate counterfactual explanations">
-              <FormControl fullWidth sx={{ flex: 1, minWidth: "350px" }}>
-                <InputLabel id="cf-method-select-label">
-                  Local Counterfactual Method
-                </InputLabel>
-                <Select
-                  labelId="cf-method-select-label"
-                  input={<OutlinedInput label="Local Counterfactual Method" />}
-                  value={cfMethod}
-                  onChange={e => setCfMethod(e.target.value as string)}
-                  MenuProps={{
-                    PaperProps: { style: { maxHeight: 224, width: 250 } },
-                  }}
-                >
-                  {availableCfMethods.map(method => (
-                    <MenuItem key={method} value={method}>
-                      {method}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Tooltip>
-            
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            gap={2}
+            marginTop={3}
+          >
+            <Box display="flex" gap={1} flexWrap="wrap" justifyContent="center">
+              {/* Local Counterfactual Method Dropdown */}
+              <Tooltip title="Methods that generate candidate counterfactual explanations">
+                <FormControl fullWidth sx={{ flex: 1, minWidth: "350px" }}>
+                  <InputLabel id="cf-method-select-label">
+                    Local Counterfactual Method
+                  </InputLabel>
+                  <Select
+                    labelId="cf-method-select-label"
+                    input={
+                      <OutlinedInput label="Local Counterfactual Method" />
+                    }
+                    value={cfMethod}
+                    onChange={(e) => setCfMethod(e.target.value as string)}
+                    MenuProps={{
+                      PaperProps: { style: { maxHeight: 224, width: 250 } },
+                    }}
+                  >
+                    {availableCfMethods.map((method) => (
+                      <MenuItem key={method} value={method}>
+                        {method}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Tooltip>
 
-            {/* Action Choice Strategy Dropdown */}
-            <Tooltip title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria">
-              <FormControl fullWidth sx={{ flex: 1, minWidth: "350px" }}>
-                <InputLabel id="action-choice-strategy-select-label">
-                  Action Choice Strategy
-                </InputLabel>
-                <Select
-                  MenuProps={{
-                    PaperProps: { style: { maxHeight: 224, width: 250 } },
-                  }}
-                  labelId="action-choice-strategy-select-label"
-                  input={<OutlinedInput label="Action Choice Strategy" />}
-                  value={actionChoiceStrategy}
-                  onChange={e =>
-                    setActionChoiceStrategy(e.target.value as string)
-                  }
-                >
-                  {availableActionStrategies.map(strategy => (
-                    <MenuItem key={strategy} value={strategy}>
-                      {strategy}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Tooltip>
+              {/* Action Choice Strategy Dropdown */}
+              <Tooltip title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria">
+                <FormControl fullWidth sx={{ flex: 1, minWidth: "350px" }}>
+                  <InputLabel id="action-choice-strategy-select-label">
+                    Action Choice Strategy
+                  </InputLabel>
+                  <Select
+                    MenuProps={{
+                      PaperProps: { style: { maxHeight: 224, width: 250 } },
+                    }}
+                    labelId="action-choice-strategy-select-label"
+                    input={
+                      <OutlinedInput label="Action Choice Strategy" />
+                    }
+                    value={actionChoiceStrategy}
+                    onChange={(e) =>
+                      setActionChoiceStrategy(e.target.value as string)
+                    }
+                  >
+                    {availableActionStrategies.map((strategy) => (
+                      <MenuItem key={strategy} value={strategy}>
+                        {strategy}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Tooltip>
+            </Box>
           </Box>
-        </Box>
         </Collapse>
-       
+
         <Box>
-          {workflow.workflowTasks.modelAnalysis?.global_counterfactuals.data &&
-          workflow.workflowTasks.modelAnalysis?.affected.data &&
-          !workflow.workflowTasks.modelAnalysis?.global_counterfactuals
-            .loading ? (
-            <>
-              <GlovesMetricSummary
-                cost={
-                  workflow.workflowTasks.modelAnalysis.global_counterfactuals
-                    .data.totalCost
-                }
-                eff={
-                  workflow.workflowTasks.modelAnalysis.global_counterfactuals
-                    .data.totalEffectiveness
-                }
-                actions={
-                  workflow.workflowTasks.modelAnalysis.global_counterfactuals
-                    .data.actions
-                }
-                instances={undefined}
-                eff_cost_actions={
-                  workflow.workflowTasks.modelAnalysis.global_counterfactuals
-                    .data.effCostActions
-                }
-              />
-              <Box marginTop={2}>
-                <WorkflowCard
-                  title={"Plotting"}
-                  description="Set of final global counterfactual actions generated"
-                >
-                  <GlovesScatter
-                    data1={
-                      workflow.workflowTasks.modelAnalysis
-                        .global_counterfactuals.data.affectedClusters
-                    }
-                    data2={workflow.workflowTasks.modelAnalysis.affected.data}
-                    actions={
-                      workflow.workflowTasks.modelAnalysis
-                        .global_counterfactuals.data.actions
-                    }
-                    eff_cost_actions={
-                      workflow.workflowTasks.modelAnalysis
-                        .global_counterfactuals.data.effCostActions
-                    }
-                  />
-                </WorkflowCard>
-              </Box>
-            </>
-          ) : (
+          {workflow.workflowTasks.modelAnalysis?.global_counterfactuals.loading ? (
             <Box
               display="flex"
               flexDirection="column"
@@ -331,11 +281,69 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 Loading
               </Typography>
             </Box>
+          ) : workflow.workflowTasks.modelAnalysis?.global_counterfactuals.error ? (
+            <Typography
+              variant="body2"
+              color="error"
+              align="center"
+              sx={{ mt: 2 }}
+            >
+              No counterfactuals found for this configuration of the workflow
+            </Typography>
+          ) : (
+            workflow.workflowTasks.modelAnalysis?.global_counterfactuals.data &&
+            workflow.workflowTasks.modelAnalysis?.affected.data && (
+              <>
+                <GlovesMetricSummary
+                  cost={
+                    workflow.workflowTasks.modelAnalysis.global_counterfactuals
+                      .data.totalCost
+                  }
+                  eff={
+                    workflow.workflowTasks.modelAnalysis.global_counterfactuals
+                      .data.totalEffectiveness
+                  }
+                  actions={
+                    workflow.workflowTasks.modelAnalysis.global_counterfactuals
+                      .data.actions
+                  }
+                  instances={undefined}
+                  eff_cost_actions={
+                    workflow.workflowTasks.modelAnalysis.global_counterfactuals
+                      .data.effCostActions
+                  }
+                />
+                <Box marginTop={2}>
+                  <WorkflowCard
+                    title={"Plotting"}
+                    description="Set of final global counterfactual actions generated"
+                  >
+                    <GlovesScatter
+                      data1={
+                        workflow.workflowTasks.modelAnalysis
+                          .global_counterfactuals.data.affectedClusters
+                      }
+                      data2={
+                        workflow.workflowTasks.modelAnalysis.affected.data
+                      }
+                      actions={
+                        workflow.workflowTasks.modelAnalysis
+                          .global_counterfactuals.data.actions
+                      }
+                      eff_cost_actions={
+                        workflow.workflowTasks.modelAnalysis
+                          .global_counterfactuals.data.effCostActions
+                      }
+                    />
+                  </WorkflowCard>
+                </Box>
+              </>
+            )
           )}
         </Box>
       </Paper>
     </>
-  )
-}
+  );
+};
 
-export default CGlanceExecution
+export default CGlanceExecution;
