@@ -102,49 +102,54 @@ export default function ScheduleTable() {
       //find unique parameters of each workflow -> model traning task
       // const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
       const uniqueParameters = new Set(
-        workflows.data.reduce(
-          (acc: any[], workflow) => {
-            const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
-            let paramNames = []
-            if (params) {
-              paramNames = params.map(param => param.name)
-              return [
-                ...acc,
-                ...paramNames,
-              ]
-            }else{
-              return [
-                ...acc
-              ]
-            }
-            },
-          [],
-        ),
+        workflows.data.reduce((acc: any[], workflow) => {
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          let paramNames = []
+          if (params) {
+            paramNames = params.map(param => param.name)
+            return [...acc, ...paramNames]
+          } else {
+            return [...acc]
+          }
+        }, []),
       )
-      // const rows = workflows.data
-      // .filter(element => element.workflowInfo.status === "scheduled")
-      // .map(workflow => ({
-      //   id: idCounter++,
-      //   workflowId: workflow.workflowId,
-      //   "Train Model": workflow.variabilityPoints["Model Training"].Variant,
-      //   ...Array.from(uniqueParameters).reduce((acc, variant) => {
-      //     acc[variant] = workflow.variabilityPoints["Model Training"].Parameters[variant] || ""
-      //     return acc
-      //   }, {}),
-      //   // status: workflow.workflowInfo.status === "running" ? workflow.workflowInfo.completedTasks ?? "running" : workflow.workflowInfo.status,
-      //   // constrains: Object.values(workflow.constraints).every((value: any) => value === true),
-      //   action: ""
-      // })).sort((a, b) => a.id - b.id)
+
       const rows = workflows.data
         .filter(workflow => workflow.status === "scheduled")
         .map(workflow => {
-          const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
-          return{
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          return {
+            id: idCounter++,
+            workflowId: workflow.name,
+            // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+            ...Array.from(uniqueParameters).reduce((acc, variant) => {
+              acc[variant] =
+                `${params?.find(param => param.name === variant)?.value}` || ""
+              return acc
+            }, {}),
+            status: workflow.status,
+            // ...Object.keys(workflow.constraints)
+            //   .map(key => ({ [key]: workflow.constraints[key] }))
+            //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+            action: "",
+          }
+        })
+        .sort((a, b) => a.id - b.id)
+      const infoRow = workflows.data.map(workflow => {
+        const params = workflow.tasks.find(
+          task => task.id === "TrainModel",
+        )?.parameters
+        return {
           id: idCounter++,
           workflowId: workflow.name,
           // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
           ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] = `${params?.find(param => param.name === variant)?.value}` || ""
+            acc[variant] =
+              `${params?.find(param => param.name === variant)?.value}` || ""
             return acc
           }, {}),
           status: workflow.status,
@@ -152,34 +157,25 @@ export default function ScheduleTable() {
           //   .map(key => ({ [key]: workflow.constraints[key] }))
           //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
           action: "",
-        }}).sort((a, b) => a.id - b.id)
-      const infoRow = workflows.data
-      .map(workflow => {
-        const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
-        return{
-        id: idCounter++,
-        workflowId: workflow.name,
-        // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
-        ...Array.from(uniqueParameters).reduce((acc, variant) => {
-          acc[variant] = `${params?.find(param => param.name === variant)?.value}` || ""
-          return acc
-        }, {}),
-        status: workflow.status,
-        // ...Object.keys(workflow.constraints)
-        //   .map(key => ({ [key]: workflow.constraints[key] }))
-        //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
-        action: "",
-      }})
-      columns = infoRow.length > 0 ? Object.keys(infoRow[0]).filter(key => key !== "id").map(key => ({
-        id: key,
-        label: key,
-        minWidth: key === "action" ? 100 : 50,
-        numeric: typeof infoRow[0][key] === "number" ? true : false,
-        align: "center",
-        sortable: key !== "action" ? true : false,
-      })) : []
+        }
+      })
+      columns =
+        infoRow.length > 0
+          ? Object.keys(infoRow[0])
+              .filter(key => key !== "id")
+              .map(key => ({
+                id: key,
+                label: key,
+                minWidth: key === "action" ? 100 : 50,
+                numeric: typeof infoRow[0][key] === "number" ? true : false,
+                align: "center",
+                sortable: key !== "action" ? true : false,
+              }))
+          : []
       paramLength.current = uniqueParameters.size
-      dispatch(setProgressScheduledTable({ rows, visibleRows: rows, rowsPerPage: 10 }))
+      dispatch(
+        setProgressScheduledTable({ rows, visibleRows: rows, rowsPerPage: 10 }),
+      )
     }
   }, [workflows])
 
@@ -188,18 +184,26 @@ export default function ScheduleTable() {
     !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
   }
 
-  const removeSelected = (list: Number[] | string) => (e: React.SyntheticEvent) => {
-    let filteredWorkflows;
-    if(typeof list !== "string"){
-      filteredWorkflows = progressScheduledTable.rows.filter(
-        row => !list.includes(row.id))
-    }else{
-   filteredWorkflows = progressScheduledTable.rows.filter(
-      row => !progressScheduledTable.selectedWorkflows.includes(row.id),
-    )
-  }
-    dispatch(setProgressScheduledTable({ rows: filteredWorkflows, visibleRows: filteredWorkflows, selectedWorkflows: [] }))
-  }
+  const removeSelected =
+    (list: Number[] | string) => (e: React.SyntheticEvent) => {
+      let filteredWorkflows
+      if (typeof list !== "string") {
+        filteredWorkflows = progressScheduledTable.rows.filter(
+          row => !list.includes(row.id),
+        )
+      } else {
+        filteredWorkflows = progressScheduledTable.rows.filter(
+          row => !progressScheduledTable.selectedWorkflows.includes(row.id),
+        )
+      }
+      dispatch(
+        setProgressScheduledTable({
+          rows: filteredWorkflows,
+          visibleRows: filteredWorkflows,
+          selectedWorkflows: [],
+        }),
+      )
+    }
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = progressScheduledTable.selectedWorkflows.indexOf(id)
@@ -254,48 +258,65 @@ export default function ScheduleTable() {
   }
 
   const handleAddFilter = () => {
-    dispatch(setProgressScheduledTable({ filters: [...progressScheduledTable.filters, { column: "", operator: "", value: "" }] }))
+    dispatch(
+      setProgressScheduledTable({
+        filters: [
+          ...progressScheduledTable.filters,
+          { column: "", operator: "", value: "" },
+        ],
+      }),
+    )
   }
 
   const handleRemoveFilter = (index: number) => {
-    const newFilters = progressScheduledTable.filters.filter((_, i) => i !== index)
+    const newFilters = progressScheduledTable.filters.filter(
+      (_, i) => i !== index,
+    )
     dispatch(setProgressScheduledTable({ filters: newFilters }))
   }
 
   useEffect(() => {
-    let counter = 0
-    for (let i = 0; i < progressScheduledTable.filters.length; i++) {
-      if (progressScheduledTable.filters[i].value !== "") {
-        counter++
-      }
-    }
-    // dispatch(setProgressScheduledTable({ filtersCounter: counter }))
-    const newRows = progressScheduledTable.rows.filter(row => {
-      return progressScheduledTable.filters.every(filter => {
-        if (filter.value === "") return true
-        const cellValue = row[filter.column as keyof Data]
-          ?.toString()
-          .toLowerCase()
-        const filterValue = filter.value.toLowerCase()
-        if (!cellValue) return false
-
-        switch (filter.operator) {
-          case "contains":
-            return cellValue.includes(filterValue)
-          case "equals":
-            return cellValue === filterValue
-          case "startsWith":
-            return cellValue.startsWith(filterValue)
-          case "endsWith":
-            return cellValue.endsWith(filterValue)
-          default:
-            return true
+      if(progressScheduledTable.rows.length === 0) return
+      let counter = 0
+      let newRows = progressScheduledTable.rows
+      if(progressScheduledTable.filters.length > 0) {
+      for (let i = 0; i < progressScheduledTable.filters.length; i++) {
+        if (progressScheduledTable.filters[i].value !== "") {
+          counter++
         }
+      }
+      // dispatch(setProgressScheduledTable({ filtersCounter: counter }))
+       newRows = progressScheduledTable.rows.filter(row => {
+        return progressScheduledTable.filters.every(filter => {
+          if (filter.value === "") return true
+          const cellValue = row[filter.column as keyof Data]
+            ?.toString()
+            .toLowerCase()
+          const filterValue = filter.value.toLowerCase()
+          if (!cellValue) return false
+
+          switch (filter.operator) {
+            case "contains":
+              return cellValue.includes(filterValue)
+            case "equals":
+              return cellValue === filterValue
+            case "startsWith":
+              return cellValue.startsWith(filterValue)
+            case "endsWith":
+              return cellValue.endsWith(filterValue)
+            default:
+              return true
+          }
+        })
       })
-    })
-    dispatch(
-      setProgressScheduledTable({ filtersCounter: counter, filteredRows: newRows }),
-    )
+    }
+      console.log("newRows", newRows)
+      dispatch(
+        setProgressScheduledTable({
+          filtersCounter: counter,
+          filteredRows: newRows,
+        }),
+      )
   }, [progressScheduledTable.filters])
 
   const isStartRow = (id: number): boolean => {
@@ -324,7 +345,9 @@ export default function ScheduleTable() {
         ...row,
         id: index + 1,
       }))
-      dispatch(setProgressScheduledTable({ rows: newRows, visibleRows: newRows }))
+      dispatch(
+        setProgressScheduledTable({ rows: newRows, visibleRows: newRows }),
+      )
     }
   }
 
@@ -340,24 +363,25 @@ export default function ScheduleTable() {
             progressScheduledTable.rows.length,
         )
       : 0
-  
-      useEffect(() => {
-        const visibleRows = stableSort(
-          progressScheduledTable.filteredRows,
-          getComparator(progressScheduledTable.order, progressScheduledTable.orderBy),
-        ).slice(
-          progressScheduledTable.page * progressScheduledTable.rowsPerPage,
-          progressScheduledTable.page * progressScheduledTable.rowsPerPage +
-          progressScheduledTable.rowsPerPage,
-        )
-        dispatch(setProgressScheduledTable({ visibleRows }))
-      }, [
-        progressScheduledTable.order,
-        progressScheduledTable.orderBy,
-        progressScheduledTable.page,
-        progressScheduledTable.rowsPerPage,
+
+  useEffect(() => {
+      if (progressScheduledTable.filteredRows.length === 0) return
+      const visibleRows = stableSort(
         progressScheduledTable.filteredRows,
-      ])
+        getComparator(progressScheduledTable.order, progressScheduledTable.orderBy),
+      ).slice(
+        progressScheduledTable.page * progressScheduledTable.rowsPerPage,
+        progressScheduledTable.page * progressScheduledTable.rowsPerPage +
+        progressScheduledTable.rowsPerPage,
+      )
+      dispatch(setProgressScheduledTable({ visibleRows }))
+    }, [
+      progressScheduledTable.order,
+      progressScheduledTable.orderBy,
+      progressScheduledTable.page,
+      progressScheduledTable.rowsPerPage,
+      progressScheduledTable.filteredRows,
+    ])
 
   return (
     <Box>

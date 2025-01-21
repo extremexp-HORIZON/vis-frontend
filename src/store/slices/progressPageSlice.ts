@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import { defaultDataExplorationQuery, IDataExplorationQuery } from "../../shared/models/dataexploration.model"
 import axios from "axios"
 import { IExperimentResponse } from "../../shared/models/experiment.model"
-import { IWorkflowResponse } from "../../shared/models/workflow.model"
+import { IWorkflowResponse, MetricDetail } from "../../shared/models/workflow.model"
 
 const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
   const ok = {
@@ -301,6 +301,7 @@ export const fetchExperimentWorkflows = createAsyncThunk(
 
 // Calls for Workflow Actions
 
+// TODO: Test this once the reordering changes are done
 export const workflowsReordering = createAsyncThunk(
   "progressPage/workflows_reordering",
   async (payload: { workflowId1: string; workflowId2: string, experimentId: string }) => {
@@ -320,6 +321,7 @@ export const workflowsReordering = createAsyncThunk(
   }
 )
 
+// TODO: Test this once the table changes are done
 export const stateController = createAsyncThunk(
   "progressPage/state_controller",
   async (payload: {state: string, id: string, action: string}) => {
@@ -330,6 +332,21 @@ export const stateController = createAsyncThunk(
       .then(response => response.data)
   },
 )
+
+// TODO: Test this once the table changes are done
+export const workflowRating = (payload: {metric: MetricDetail, newValue: string}) => {
+    const {metric, newValue} = payload
+    const headers = {
+      "access-token": apiKey,
+    }
+    const requestUrl = apiPath + `/metrics/metricId`
+    const requestPayload: Partial<MetricDetail> = {
+      ...metric,
+      value: newValue,
+    }
+    delete requestPayload.metricId
+    return axios.post<IWorkflowResponse[]>(requestUrl, requestPayload, { headers })
+  }
 
 //Reducer exports
 export const {

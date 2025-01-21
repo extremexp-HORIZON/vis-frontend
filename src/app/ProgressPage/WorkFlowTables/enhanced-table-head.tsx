@@ -50,6 +50,7 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
           Parameters
         </TableCell>
         <TableCell align="right" colSpan={1} />
+        <TableCell align="right" colSpan={1} />
         {/* <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}`, zIndex: 100 }} align="center" colSpan={1}>
           Constraints
         </TableCell> */}

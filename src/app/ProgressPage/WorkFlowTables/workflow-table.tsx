@@ -12,13 +12,12 @@ import CloseIcon from "@mui/icons-material/Close"
 import ProgressPercentage from "./progress-percentage"
 import Box from "@mui/material/Box"
 import Checkbox from "@mui/material/Checkbox"
-import PauseIcon from "@mui/icons-material/Pause"
-import StopIcon from "@mui/icons-material/Stop"
-// import FilterListIcon from '@mui/icons-material/FilterList';
-import LaunchIcon from "@mui/icons-material/Launch"
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
+import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import EnhancedTableHead from "./enhanced-table-head"
 import ToolbarWorkflow from "./toolbar-workflow-table"
-import { Popover, styled, useTheme } from "@mui/material"
+import { Popover, Rating, styled, useTheme } from "@mui/material"
 import type { RootState } from "../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import {
@@ -128,46 +127,45 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     if (workflows.data.length > 0) {
       //find unique parameters of each workflow -> model traning task
       const uniqueParameters = new Set(
-        workflows.data.reduce(
-          (acc: any[], workflow) => {
-            const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
-            let paramNames = []
-            if (params) {
-              paramNames = params.map(param => param.name)
-              return [
-                ...acc,
-                ...paramNames,
-              ]
-            }else{
-              return [
-                ...acc
-              ]
-            }
-            },
-          [],
-        ),
+        workflows.data.reduce((acc: any[], workflow) => {
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          let paramNames = []
+          if (params) {
+            paramNames = params.map(param => param.name)
+            return [...acc, ...paramNames]
+          } else {
+            return [...acc]
+          }
+        }, []),
       )
-      
+
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
         .filter(workflow => workflow.status !== "scheduled")
         .map(workflow => {
-          const params = workflow.tasks.find(task => task.id === "TrainModel")?.parameters
-          return{
-          id: idCounter++,
-          workflowId: workflow.workflowId,
-          // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
-          ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] = `${params?.find(param => param.name === variant)?.value}` || ""
-            return acc
-          }, {}),
-          status: workflow.status,
-          // ...Object.keys(workflow.constraints)
-          //   .map(key => ({ [key]: workflow.constraints[key] }))
-          //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
-          action: "",
-        }})
-        // const constrainsNames = Object.keys(workflows.data[0].constraints)
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          return {
+            id: idCounter++,
+            workflowId: workflow.workflowId,
+            // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+            ...Array.from(uniqueParameters).reduce((acc, variant) => {
+              acc[variant] =
+                `${params?.find(param => param.name === variant)?.value}` || ""
+              return acc
+            }, {}),
+            status: workflow.status,
+            // ...Object.keys(workflow.constraints)
+            //   .map(key => ({ [key]: workflow.constraints[key] }))
+            //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+            rating: 2,
+            action: "",
+          }
+        })
+      // const constrainsNames = Object.keys(workflows.data[0].constraints)
       columns = Object.keys(rows[0])
         .filter(key => key !== "id")
         .map(key => ({
@@ -180,7 +178,13 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           // constraint: constrainsNames.includes(key) ? true : false
         }))
       paramlength = uniqueParameters.size
-      dispatch(setProgressWokflowsTable({ rows, filteredRows: rows, visibleRows: rows.slice(0, progressWokflowsTable.rowsPerPage) }))
+      dispatch(
+        setProgressWokflowsTable({
+          rows,
+          filteredRows: rows,
+          visibleRows: rows.slice(0, progressWokflowsTable.rowsPerPage),
+        }),
+      )
     }
   }, [workflows])
 
@@ -333,7 +337,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     progressWokflowsTable.selectedWorkflows.indexOf(id) !== -1
 
   useEffect(() => {
-    if(progressWokflowsTable.filteredRows.length === 0) return
+    if (progressWokflowsTable.filteredRows.length === 0) return
     const visibleRows = stableSort(
       progressWokflowsTable.filteredRows,
       getComparator(progressWokflowsTable.order, progressWokflowsTable.orderBy),
@@ -464,7 +468,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                       theme.palette.customGrey.text,
                                   }}
                                 >
-                                  <LaunchIcon
+                                  <LaunchRoundedIcon
                                     onClick={
                                       currentStatus !== "completed"
                                         ? () => {}
@@ -486,7 +490,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                   {currentStatus !== "completed" &&
                                     currentStatus !== "failed" && (
                                       <span>
-                                        <PauseIcon
+                                        <PauseRoundedIcon
                                           sx={{ cursor: "pointer" }}
                                           onClick={() => console.log("clicked")}
                                           style={{
@@ -494,7 +498,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                           }}
                                         />
 
-                                        <StopIcon
+                                        <CancelRoundedIcon
                                           sx={{ cursor: "pointer" }}
                                           onClick={() => console.log("clicked")}
                                           style={{
@@ -506,7 +510,26 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                     )}
                                 </FixedTableCell>
                               )
-
+                            case "rating":
+                              return (
+                                <TableCell
+                                  key={column.id}
+                                  align={column.align}
+                                  sx={{
+                                    color: theme =>
+                                      theme.palette.customGrey.text,
+                                  }}
+                                >
+                                  <Rating
+                                    name="rating-column"
+                                    size="small"
+                                    onChange={(event, newValue) => {
+                                      console.log(newValue)
+                                    }}
+                                    defaultValue={row[column.id]}
+                                  />
+                                </TableCell>
+                              )
                             default:
                               value = String(row[column.id])
 

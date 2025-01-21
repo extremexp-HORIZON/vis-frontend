@@ -9,6 +9,7 @@ import { RootState, useAppSelector } from "../../../store/store"
 import WorkflowMetricDetails from "./workflow-metric-details"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
+import Rating from "@mui/material/Rating"
 
 interface IWorkflowTab {
   workflowId: number | string
@@ -23,9 +24,21 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const taskProvider = (taskId: string | null) => {
     switch (taskId) {
       case "LG600B6_100636_IDK":
-        return <DataExplorationComponent workflow={tabs.find(tab => tab.workflowId === workflowId) || null} />
+        return (
+          <DataExplorationComponent
+            workflow={tabs.find(tab => tab.workflowId === workflowId) || null}
+          />
+        )
       case "TrainModel":
-        return <ModelAnalysisTask workflow={tabs.find(tab => tab.workflowId === workflowId) as IWorkflowTabModel} />
+        return (
+          <ModelAnalysisTask
+            workflow={
+              tabs.find(
+                tab => tab.workflowId === workflowId,
+              ) as IWorkflowTabModel
+            }
+          />
+        )
       case null:
         return null
     }
@@ -33,6 +46,28 @@ const WorkflowTab = (props: IWorkflowTab) => {
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}>
+        <Box key="workflow-title" sx={{ display: "flex", flexDirection: "row", columnGap: 2, justifyContent: "left", alignItems: "center" }}>
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: 600, fontSize: "2rem" }}
+          >
+           {`Workflow ${workflowId}`}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: 600, fontSize: "2rem" }}
+          >
+            -
+          </Typography>
+          <Rating
+            name="simple-uncontrolled"
+            size="large"
+            onChange={(event, newValue) => {
+              console.log(newValue)
+            }}
+            defaultValue={2}
+          />
+        </Box>
         <Box key="workflow-svg">
           <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
         </Box>
@@ -60,7 +95,8 @@ const WorkflowTab = (props: IWorkflowTab) => {
                       tabs.find(
                         tab => tab.workflowId === workflowId,
                       ) as IWorkflowTabModel
-                    )?.workflowConfiguration.data || null}
+                    )?.workflowConfiguration.data || null
+                  }
                 />
               </Box>
             </Box>
@@ -110,16 +146,20 @@ const WorkflowTab = (props: IWorkflowTab) => {
                     )?.workflowMetrics.data || null
                   }
                   workflowId={workflowId}
-                  info={(
-                    workflows.data.find(workflow=>workflow.workflowId === workflowId) as any
-                  )?.tasks || null}
+                  info={
+                    (
+                      workflows.data.find(
+                        workflow => workflow.workflowId === workflowId,
+                      ) as any
+                    )?.tasks || null
+                  }
                 />
               </Box>
             </Box>
           </>
         )}
       </Box>
-      </>
+    </>
   )
 }
 
