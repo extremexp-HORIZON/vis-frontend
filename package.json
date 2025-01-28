@@ -28,6 +28,7 @@
     "@mui/x-data-grid": "^7.5.1",
     "@reduxjs/toolkit": "^2.0.1",
     "@types/lodash": "^4.17.5",
+    "@xyflow/react": "^12.4.2",
     "axios": "^1.6.8",
     "leaflet": "^1.9.4",
     "loadash": "^1.0.0",

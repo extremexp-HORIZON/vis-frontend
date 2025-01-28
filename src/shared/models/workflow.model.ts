@@ -18,8 +18,15 @@ export interface Task {
     input_datasets?: InputDataset[];
     parameters?: Parameter[];
     variant?: string;
+    metadata?: Metadata;
     start: string;
     end: string;
+}
+
+interface Metadata {
+    prototypical_name: string;
+    URL?: string;
+    type?: string;
 }
 
 interface InputDataset {

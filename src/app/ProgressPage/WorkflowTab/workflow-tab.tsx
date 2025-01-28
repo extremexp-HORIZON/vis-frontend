@@ -10,6 +10,8 @@ import WorkflowMetricDetails from "./workflow-metric-details"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
 import Rating from "@mui/material/Rating"
+import UserInteractiveTask from "../../Tasks/UserInteractiveTask/user-interactive-task"
+import StaticDirectedGraph from "./worfklow-flow-chart"
 
 interface IWorkflowTab {
   workflowId: number | string
@@ -21,15 +23,15 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const [chosenTask, setChosenTask] = useState<string | null>(null)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
 
-  const taskProvider = (taskId: string | null) => {
-    switch (taskId) {
-      case "LG600B6_100636_IDK":
+  const taskProvider = (taskType: string | null) => {
+    switch (taskType) {
+      case "read_data":
         return (
           <DataExplorationComponent
             workflow={tabs.find(tab => tab.workflowId === workflowId) || null}
           />
         )
-      case "TrainModel":
+      case "evaluation":
         return (
           <ModelAnalysisTask
             workflow={
@@ -37,6 +39,12 @@ const WorkflowTab = (props: IWorkflowTab) => {
                 tab => tab.workflowId === workflowId,
               ) as IWorkflowTabModel
             }
+          />
+        )
+      case "interactive":
+        return (
+          <UserInteractiveTask
+            url={"http://163.172.30.91:5000"}
           />
         )
       case null:
@@ -68,10 +76,9 @@ const WorkflowTab = (props: IWorkflowTab) => {
             defaultValue={2}
           />
         </Box>
-        <Box key="workflow-svg">
-          <WorkflowSvg setChosenTask={setChosenTask} chosenTask={chosenTask} />
+        <Box key="workflow-flow-chart">
+          <StaticDirectedGraph setChosenTask={setChosenTask} chosenTask={chosenTask} tasks={tabs.find(tab => tab.workflowId === workflowId)?.workflowSvg.data || null}/>
         </Box>
-
         {chosenTask ? (
           <Box key="workflow-task">{taskProvider(chosenTask)}</Box>
         ) : (

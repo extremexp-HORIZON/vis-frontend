@@ -1,5 +1,5 @@
 import { ActionReducerMapBuilder, createAsyncThunk } from "@reduxjs/toolkit"
-import { IGlovesPlotModel, IPlotModel } from "../plotmodel.model"
+import { IPlotModel } from "../plotmodel.model"
 import { IWorkflowTab } from "../../../store/slices/workflowTabsSlice"
 import axios from "axios"
 import {

@@ -10,6 +10,8 @@ import {
 import { IWorkflowResponse, Metric, MetricDetail } from "../../shared/models/workflow.model"
 import { modelAnalysisDefault, modelAnalysisReducers } from "../../shared/models/tasks/model-analysis.model"
 import { dataExplorationDefault, explainabilityExtraReducers } from "../../shared/models/tasks/data-exploration-task.model"
+import UserInteractiveTask from "../../app/Tasks/UserInteractiveTask/user-interactive-task"
+import { userInteractionDefault } from "../../shared/models/tasks/user-interaction.model"
 
 export interface IWorkflowTab {
   tabs: IWorkflowTabModel[]
@@ -114,6 +116,10 @@ const initializeTab = ({
     ...defaultWorkflowTabModel,
     workflowName: workflow?.name || "",
     workflowId: workflow?.workflowId || "",
+    workflowSvg: {
+      data: workflow?.tasks || null,
+      loading: false,
+    },
     workflowConfiguration: {
       data: workflow?.tasks || null,
       loading: false,
@@ -127,7 +133,8 @@ const initializeTab = ({
     },
     workflowTasks: {
       modelAnalysis: modelAnalysisDefault,
-      dataExploration: dataExplorationDefault
+      dataExploration: dataExplorationDefault,
+      userInteraction: userInteractionDefault
     }
   }
   return tab

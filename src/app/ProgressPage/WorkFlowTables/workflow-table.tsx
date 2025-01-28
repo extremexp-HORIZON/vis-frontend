@@ -12,12 +12,12 @@ import CloseIcon from "@mui/icons-material/Close"
 import ProgressPercentage from "./progress-percentage"
 import Box from "@mui/material/Box"
 import Checkbox from "@mui/material/Checkbox"
-import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
-import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
-import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
+import PauseRoundedIcon from "@mui/icons-material/PauseRounded"
+import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
+import LaunchRoundedIcon from "@mui/icons-material/LaunchRounded"
 import EnhancedTableHead from "./enhanced-table-head"
 import ToolbarWorkflow from "./toolbar-workflow-table"
-import { Popover, Rating, styled, useTheme } from "@mui/material"
+import { Badge, Popover, Rating, styled, useTheme } from "@mui/material"
 import type { RootState } from "../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import {
@@ -466,27 +466,36 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                   sx={{
                                     color: theme =>
                                       theme.palette.customGrey.text,
+                                    display: "flex",
+                                    justifyContent: "center",
                                   }}
                                 >
-                                  <LaunchRoundedIcon
-                                    onClick={
-                                      currentStatus !== "completed"
-                                        ? () => {}
-                                        : handleLaunchNewTab(row.workflowId)
-                                    }
-                                    sx={{
-                                      cursor:
-                                        currentStatus !== "completed"
-                                          ? "default"
-                                          : "pointer",
-                                    }}
-                                    style={{
-                                      color:
-                                        currentStatus !== "completed"
-                                          ? theme.palette.action.disabled
-                                          : theme.palette.primary.main,
-                                    }}
-                                  />
+                                  <Badge
+                                    color="secondary"
+                                    variant="dot"
+                                    invisible={currentStatus !== "pending"}
+                                  >
+                                    <LaunchRoundedIcon
+                                      onClick={
+                                        currentStatus !== "completed" &&
+                                        currentStatus !== "pending"
+                                          ? () => {}
+                                          : handleLaunchNewTab(row.workflowId)
+                                      }
+                                      sx={{
+                                        cursor:
+                                          currentStatus !== "completed"
+                                            ? "default"
+                                            : "pointer",
+                                      }}
+                                      style={{
+                                        color:
+                                          (currentStatus !== "completed" && currentStatus !== "pending")
+                                            ? theme.palette.action.disabled
+                                            : theme.palette.primary.main,
+                                      }}
+                                    />
+                                  </Badge>
                                   {currentStatus !== "completed" &&
                                     currentStatus !== "failed" && (
                                       <span>

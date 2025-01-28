@@ -17,7 +17,7 @@ const WorkflowSvg = (props: IWorkflowSvg) => {
   const listeners = useRef<
     { gElement: SVGGElement; listener: EventListener }[]
   >([])
-  const workingTasks = ["LG600B6_100636_IDK", "TrainModel"]
+  const workingTasks = ["LG600B6_100636_IDK", "TrainModel", "AddPadding"]
 
   ////I let this for next time when I have time dynamic svg Panos///
   // const experimentId=useParams().experimentId

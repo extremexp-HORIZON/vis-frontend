@@ -59,7 +59,10 @@ const ParallelCoordinatePlot = () => {
           }
         })
       parallelData.current = _.cloneDeep(data)
-      const options = Array.from(
+      let selected = progressParallel.selected
+      let options = progressParallel.options
+      if(progressParallel.options.length === 0) {
+      options = Array.from(
         new Set(
           workflows.data
             .filter(workflow => workflow.status === "completed")
@@ -70,8 +73,8 @@ const ParallelCoordinatePlot = () => {
         ),
       )
 
-      const selected = options[0]
-
+      selected = options[0]
+      }
       tooltipArray.current = (
         parallelData.current.at(0)
           ? Object.keys(parallelData.current.at(0))
@@ -86,7 +89,7 @@ const ParallelCoordinatePlot = () => {
         }),
       )
     }
-  }, [dispatch, workflows])
+  }, [workflows])
 
   const handleMetricSelection = (event: SelectChangeEvent) => {
     dispatch(setProgressParallel({ selected: event.target.value as string }))
