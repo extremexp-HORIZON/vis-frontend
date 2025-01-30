@@ -21,7 +21,7 @@ interface ISortableTab {
 const TabSortable = (props: ISortableTab) => {
   const { id, tabName, value, handleChange } = props
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
-  const { attributes, listeners, setNodeRef, transform, transition } =
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id })
   const dispatch = useAppDispatch()
   const theme = useTheme()
@@ -33,10 +33,11 @@ const TabSortable = (props: ISortableTab) => {
   }
 
   const itemStyle = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
     userSelect: "none",
     cursor: "grab",
+    zIndex: isDragging ? 1000 : "auto"
   };
 
   return (
