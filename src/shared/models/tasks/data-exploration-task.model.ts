@@ -11,6 +11,7 @@ import {
   handleMultiTimeSeriesData,
   prepareDataExplorationResponse,
 } from "./model-analysis.model"
+import { P } from "vitest/dist/reporters-yx5ZTtEV.js"
 
 export interface IDataExploration {
   multipleTimeSeries: {
@@ -48,6 +49,12 @@ export interface IDataExploration {
     loading: boolean
     error: string | null
   }
+  metaData:{
+    data: IDataExplorationResponse | null
+    loading: boolean
+    error: string | null
+
+  }
 }
 
 // Define the initial state of the slice
@@ -82,6 +89,13 @@ export const dataExplorationDefault: IDataExploration = {
     data: null,
     loading: false,
     error:  null
+  },
+  metaData:{
+
+    data: null,
+    loading: false,
+    error:  null
+
   }
 }
 
@@ -128,6 +142,8 @@ export const explainabilityExtraReducers = (
       tab => tab.workflowId === action.meta.arg.metadata.workflowId,
     )?.workflowTasks.dataExploration
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
+    console.log("Data exploration task:", dataExplorationTask); // Debugging log
+
         if (dataExplorationTask) {
           dataExplorationTask[queryCase].data = queryCase === "multipleTimeSeries" ? handleMultiTimeSeriesData(action.payload) : prepareDataExplorationResponse(action.payload)
           dataExplorationTask[queryCase].loading = false
@@ -153,6 +169,34 @@ export const explainabilityExtraReducers = (
           dataExplorationTask[queryCase].error = "Failed to fetch data"
         }
   })
+
+  .addCase(fetchMetaData.fulfilled, (state, action) => {
+      const dataExplorationTask = state.tabs.find(
+        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
+      )?.workflowTasks.dataExploration;
+      if (dataExplorationTask) {
+        dataExplorationTask.metaData.data = action.payload;
+        dataExplorationTask.metaData.loading = false;
+        dataExplorationTask.metaData.error = null;
+      }
+    })
+    .addCase(fetchMetaData.pending, (state, action) => {
+      const dataExplorationTask = state.tabs.find(
+        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
+      )?.workflowTasks.dataExploration;
+      if (dataExplorationTask) {
+        dataExplorationTask.metaData.loading = true;
+      }
+    })
+    .addCase(fetchMetaData.rejected, (state, action) => {
+      const dataExplorationTask = state.tabs.find(
+        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
+      )?.workflowTasks.dataExploration;
+      if (dataExplorationTask) {
+        dataExplorationTask.metaData.loading = false;
+        dataExplorationTask.metaData.error = "Failed to fetch metadata";
+      }
+    });
 }
 
 export const fetchDataExplorationData = createAsyncThunk(
@@ -163,4 +207,16 @@ export const fetchDataExplorationData = createAsyncThunk(
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)
   },
+)
+
+export const fetchMetaData=createAsyncThunk(
+  "workflowTasks/data_exploration/fetch_metadata",
+  async(payload:IDataExplorationRequest)=>{
+    const requestUrl="api/visualization/metadata"
+    return axios
+    .post<IDataExplorationResponse>(requestUrl, payload.query)
+      .then(response => response.data)
+  }
+
+
 )

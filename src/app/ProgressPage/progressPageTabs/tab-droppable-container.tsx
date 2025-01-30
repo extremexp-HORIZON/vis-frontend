@@ -15,7 +15,6 @@ interface IDroppableContainer {
 
 const TabDroppableContainer = (props: IDroppableContainer) => {
   const { value, handleChange } = props
-  const { setNodeRef } = useDroppable({ id: "droppable-tabs-container" })
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
 
   const droppableStyle = {
@@ -32,7 +31,7 @@ const TabDroppableContainer = (props: IDroppableContainer) => {
       items={tabs.map(tab => tab.workflowId)}
       strategy={horizontalListSortingStrategy}
     >
-      <div ref={setNodeRef} style={droppableStyle}>
+      <div  style={droppableStyle}>
           {tabs.map(tab => (
             <SortableTab
               key={`sortable-tab-${tab.workflowId}`}

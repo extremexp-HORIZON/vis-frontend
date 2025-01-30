@@ -126,7 +126,7 @@ const GraphContainer = (props: IGraphContainer) => {
           <Box sx={{ width: "1rem" }} />
 
           {/* View Mode Toggle (Overlay/Stacked) */}
-          <ButtonGroup variant="contained" aria-label="view mode" disabled={chartType === "map"}>
+          <ButtonGroup variant="contained" aria-label="view mode" disabled={chartType === "map" || chartType === "bar"}>
             <Button
               onClick={() => setViewMode("overlay")}
               disabled={viewMode === "overlay"}
