@@ -1,5 +1,9 @@
 import type { GridColDef } from "@mui/x-data-grid"
-import { DataGrid, GridToolbarContainer } from "@mui/x-data-grid"
+import {
+  DataGrid,
+  GridToolbarColumnsButton,
+  GridToolbarContainer,
+} from "@mui/x-data-grid"
 import ToolbarWorkflow from "./toolbar-workflow-table"
 import ProgressPercentage from "./progress-percentage"
 import Paper from "@mui/material/Paper"
@@ -7,7 +11,6 @@ import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import LaunchIcon from "@mui/icons-material/Launch"
-import theme from "../../../mui-theme"
 import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import type { RootState } from "../../../store/store"
@@ -18,6 +21,8 @@ import {
 import { id } from "vega"
 import { useEffect } from "react"
 import TableContainer from "@mui/material/TableContainer"
+import theme from "../../../mui-theme"
+import { styled } from "@mui/material"
 
 const fractionStrToDecimal = (str: string): string => {
   const [numerator, denominator] = str.split("/").map(Number)
@@ -48,24 +53,89 @@ const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
   // !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
 }
 
-interface Column extends GridColDef<{ [key: string]: any }> {
-  id: keyof Data
-  label: string
+type CustomGridColDef = GridColDef & {
+  field: string
   minWidth?: number
-  align?: "right" | "left" | "center" | "inherit" | "justify" | undefined
-  numeric?: boolean
-  sortable?: boolean
-  constraint?: boolean
+  flex?: number
+  align?: "left" | "right" | "center"
+  headerAlign?: "left" | "right" | "center"
 }
 
-let columns: Column[] = []
+let columns: CustomGridColDef[] = []
 
 export interface Data {
   [key: string]: any
 }
 
 let idCounter = 1
-let paramlength = 0
+
+const WorkflowActions = (props: {
+  currentStatus: string
+  workflowId: string
+  handleLaunchNewTab: (workflowId: string) => (e: React.SyntheticEvent) => void
+}) => {
+  const { currentStatus, workflowId, handleLaunchNewTab } = props
+
+  return (
+    <span onClick={event => event.stopPropagation()}>
+      <LaunchIcon
+        onClick={
+          currentStatus !== "completed"
+            ? () => {}
+            : handleLaunchNewTab(workflowId)
+        }
+        style={{
+          cursor: currentStatus !== "completed" ? "default" : "pointer",
+          color:
+            currentStatus !== "completed"
+              ? theme.palette.action.disabled
+              : theme.palette.primary.main,
+        }}
+      />
+      {currentStatus !== "completed" && currentStatus !== "failed" && (
+        <>
+          <PauseIcon
+            onClick={() => console.log("Pause clicked")}
+            style={{ cursor: "pointer", color: theme.palette.primary.main }}
+          />
+          <StopIcon
+            onClick={() => console.log("Stop clicked")}
+            style={{ cursor: "pointer", color: theme.palette.primary.main }}
+          />
+        </>
+      )}
+    </span>
+  )
+}
+
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  "& .MuiDataGrid-scrollbarFiller": {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  "& .MuiDataGrid-columnHeaderTitle": {
+    whiteSpace: "nowrap",
+    overflow: "visible",
+  },
+  "& .datagrid-header-fixed": {
+    // Action column
+    position: "sticky",
+    right: 0,
+    zIndex: 100,
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-cell[data-field="action"]': {
+    position: "sticky",
+    right: 0,
+    backgroundColor: theme.palette.customGrey.light,
+    zIndex: 90,
+  },
+}))
 
 export default function WorkflowDataGrid() {
   const { workflows, progressWokflowsTable } = useAppSelector(
@@ -101,90 +171,50 @@ export default function WorkflowDataGrid() {
           return {
             id: idCounter++,
             workflowId: workflow.workflowId,
-            // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 `${params?.find(param => param.name === variant)?.value}` || ""
               return acc
             }, {}),
             status: workflow.status,
-            // ...Object.keys(workflow.constraints)
-            //   .map(key => ({ [key]: workflow.constraints[key] }))
-            //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
             action: "",
           }
         })
-      // const constrainsNames = Object.keys(workflows.data[0].constraints)
+
       columns = Object.keys(rows[0])
         .filter(key => key !== "id")
         .map(key => ({
-          field: key, // Add this property
-          type: "string", // Add this property (or use a different type if needed)
-          id: key,
-          label: key,
-          minWidth: key === "action" ? 100 : 50,
-          numeric: typeof rows[0][key] === "number" ? true : false,
+          field: key,
+          headerName: key.replace("_", " "),
+          headerClassName:
+            key === "action" ? "datagrid-header-fixed" : "datagrid-header",
+          minWidth: key === "action" ? 100 : key.length * 10 - 30,
+          flex: 1,
           align: "center",
-          sortable: key !== "action" ? true : false,
-          flex: 1
-          // constraint: constrainsNames.includes(key) ? true : false
+          headerAlign: "center",
+          sortable: key !== "action",
+          type: typeof rows[0][key] === "number" ? "number" : "string",
+          ...(key === "status" && {
+            renderCell: params => (
+              <ProgressPercentage
+                progressNumber={fractionStrToDecimal(params.value)}
+              />
+            ),
+          }),
+          ...(key === "action" && {
+            renderCell: params => {
+              const currentStatus = params.row.status
+              return (
+                <WorkflowActions
+                  currentStatus={currentStatus}
+                  workflowId={params.row.workflowId}
+                  handleLaunchNewTab={handleLaunchNewTab}
+                />
+              )
+            },
+          }),
         }))
 
-      columns.forEach(col => {
-        if (col.field === "status") {
-          col.renderCell = params => (
-            <ProgressPercentage
-              progressNumber={fractionStrToDecimal(params.value)}
-            />
-          )
-        }
-
-        if (col.field === "action") {
-          col.renderCell = params => {
-            const currentStatus = params.row.status
-            return (
-              <span>
-                <LaunchIcon
-                  onClick={
-                    currentStatus !== "completed"
-                      ? () => {}
-                      : handleLaunchNewTab(params.row.workflowId)
-                  }
-                  style={{
-                    cursor:
-                      currentStatus !== "completed" ? "default" : "pointer",
-                    color:
-                      currentStatus !== "completed"
-                        ? theme.palette.action.disabled
-                        : theme.palette.primary.main,
-                  }}
-                />
-                {currentStatus !== "completed" &&
-                  currentStatus !== "failed" && (
-                    <>
-                      <PauseIcon
-                        onClick={() => console.log("Pause clicked")}
-                        style={{
-                          cursor: "pointer",
-                          color: theme.palette.primary.main,
-                        }}
-                      />
-                      <StopIcon
-                        onClick={() => console.log("Stop clicked")}
-                        style={{
-                          cursor: "pointer",
-                          color: theme.palette.primary.main,
-                        }}
-                      />
-                    </>
-                  )}
-              </span>
-            )
-          }
-        }
-      })
-
-      paramlength = uniqueParameters.size
       dispatch(
         setProgressWokflowsTable({
           rows,
@@ -198,7 +228,6 @@ export default function WorkflowDataGrid() {
   return (
     <Box>
       <Paper elevation={2}>
-        {/* Toolbar for Workflow Actions */}
         <ToolbarWorkflow
           actionButtonName="Compare selected workflows"
           secondActionButtonName="Compare completed workflows"
@@ -210,8 +239,8 @@ export default function WorkflowDataGrid() {
         />
 
         <div style={{ height: 450, width: "100%" }}>
-          <DataGrid
-            rows={progressWokflowsTable.rows} 
+          <StyledDataGrid
+            rows={progressWokflowsTable.rows}
             columns={columns}
             checkboxSelection
             pageSizeOptions={[10, 25, 100]}
@@ -219,13 +248,6 @@ export default function WorkflowDataGrid() {
               pagination: {
                 paginationModel: { pageSize: 10 },
               },
-            }}
-            components={{
-              Toolbar: () => (
-                <GridToolbarContainer>
-                  {/* Add additional toolbar elements here if needed */}
-                </GridToolbarContainer>
-              ),
             }}
           />
         </div>
