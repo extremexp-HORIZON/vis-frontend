@@ -473,12 +473,12 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                   <Badge
                                     color="secondary"
                                     variant="dot"
-                                    invisible={currentStatus !== "pending"}
+                                    invisible={currentStatus !== "pending_input"}
                                   >
                                     <LaunchRoundedIcon
                                       onClick={
                                         currentStatus !== "completed" &&
-                                        currentStatus !== "pending"
+                                        currentStatus !== "pending_input"
                                           ? () => {}
                                           : handleLaunchNewTab(row.workflowId)
                                       }
@@ -490,7 +490,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                                       }}
                                       style={{
                                         color:
-                                          (currentStatus !== "completed" && currentStatus !== "pending")
+                                          (currentStatus !== "completed" && currentStatus !== "pending_input")
                                             ? theme.palette.action.disabled
                                             : theme.palette.primary.main,
                                       }}
