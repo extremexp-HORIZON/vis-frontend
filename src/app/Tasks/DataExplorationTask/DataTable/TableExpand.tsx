@@ -22,8 +22,7 @@ const TableExpand: React.FC<DataTableProps> = ({
   columns,
   datetimeColumn,
 }) => {
-  const [isVisible, setIsVisible] = useState(true)
-  const [isMaximized, setIsMaximized] = useState(false)
+
   const [showAllColumns, setShowAllColumns] = useState(true)
   const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] })
 
@@ -37,7 +36,7 @@ const TableExpand: React.FC<DataTableProps> = ({
   const [columnType, setColumnType] = useState<string | null>(null)
 
   const tableStyle = {
-    height: isMaximized ? "90vh" : isVisible ? 400 : "50px",
+    height: 800,
     width: "98%",
   }
 
@@ -108,7 +107,6 @@ const TableExpand: React.FC<DataTableProps> = ({
 
   return (
     <>
-      {isVisible && (
         <Box sx={{ ...tableStyle, marginLeft: 2, marginRight: 2 }}>
           {" "}
           {/* Enable horizontal scrolling */}
@@ -138,7 +136,7 @@ const TableExpand: React.FC<DataTableProps> = ({
             }}
           />
         </Box>
-      )}
+    
       <Popper
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}

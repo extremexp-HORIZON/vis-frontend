@@ -236,8 +236,6 @@
 
 // export default App
 
-
-
 import React, { useState, useEffect, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
@@ -251,9 +249,14 @@ import {
   ListItemText,
   Typography,
   OutlinedInput,
+  Paper,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
 } from "@mui/material"
 import { useAppDispatch } from "../../../../store/store"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { ExpandMore } from "@mui/icons-material"
 
 const App = () => {
   const mapRef = useRef<L.Map | null>(null)
@@ -261,11 +264,15 @@ const App = () => {
   const [data, setData] = useState<any[]>([])
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [columns, setColumns] = useState<string[]>([])
+  const [intColumns, setIntColumns] = useState<string[]>([])
   const [colorMap, setColorMap] = useState<Record<string, string>>({})
   const [mapLayer, setMapLayer] = useState<keyof typeof layers>("osm")
   const [timestampField, setTimestampField] = useState<string>("timestamp")
   const [tripsMode, setTripsMode] = useState<boolean>(false)
   const [colorBy, setColorBy] = useState<string | null>("None") // Set initial color to 'default'
+
+  const [latitudeField, setLatitudeField] = useState<string>("")
+  const [longitudeField, setLongitudeField] = useState<string>("")
 
   const layers = {
     osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -304,7 +311,27 @@ const App = () => {
             typeof JSON.parse(data.data)[0][key] === "string" &&
             key !== "timestamp",
         )
+
+        const potentialLatColumns = ["lat", "latitude"]
+        const potentialLonColumns = ["lon", "longitude"]
+        const integerColumns = Object.keys(
+          JSON.parse(data.data)[0] || {},
+        ).filter(key => typeof JSON.parse(data.data)[0][key] === "number")
+
+        const detectedLatitude =
+          integerColumns.find(col =>
+            potentialLatColumns.includes(col.toLowerCase()),
+          ) || ""
+        const detectedLongitude =
+          integerColumns.find(col =>
+            potentialLonColumns.includes(col.toLowerCase()),
+          ) || ""
+        console.log("detectedLatitude", detectedLatitude)
+
+        setLatitudeField(detectedLatitude)
+        setLongitudeField(detectedLongitude)
         setColumns(stringColumns)
+        setIntColumns(integerColumns)
       }
     }
     fetchData()
@@ -392,8 +419,11 @@ const App = () => {
         ])
         L.polyline(tripCoords, { color: generateRandomColor(), weight: 4 })
           .addTo(layerGroup)
-          .bindTooltip(`Trip: ${tripKey}`)
-          .on("mouseover", function (e) {
+          .bindTooltip(
+            `<strong>Trip:</strong> ${tripKey} <br/>
+             <strong>Segmented By:</strong> ${selectedColumns.join(", ")}`
+          )
+                    .on("mouseover", function (e) {
             this.openTooltip()
             this.bringToFront()
           })
@@ -402,8 +432,17 @@ const App = () => {
           })
           .on("click", function (e) {
             layerGroup.eachLayer(layer => layer.setStyle({ opacity: 0.4 }))
-            e.target.setStyle({ opacity: 1, weight: 6 })
+            e.target.setStyle({ opacity: 1, weight: 8 })
+            const tripBounds = e.target.getBounds()
+  mapRef.current?.fitBounds(tripBounds, { padding: [20, 20] })
+  
+
+
           })
+
+          
+          
+          
       })
     } else {
       data.forEach(row => {
@@ -414,16 +453,16 @@ const App = () => {
             : "blue"
 
         L.circleMarker([row.latitude, row.longitude], {
-          radius: 6,
+          radius: 3,
           color: color,
-          fillOpacity: 0.7,
+          fillOpacity: 0.5,
         })
           .addTo(layerGroup)
           .bindPopup(
             `
             <strong>Latitude:</strong> ${row.latitude} <br/>
             <strong>Longitude:</strong> ${row.longitude} <br/>
-            <strong>Timestamp:</strong> ${row.timestamp}
+            <strong>Timestamp:</strong> ${row.timestamp} <br/>
           `,
           )
           .bindTooltip(`Latitude: ${row.latitude}, Longitude: ${row.longitude}`)
@@ -459,71 +498,123 @@ const App = () => {
 
   return (
     <>
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-      
-        <FormControl sx={{ flex: 1 }}>
-        <InputLabel>Timestamp Field</InputLabel>
-        <Select
-          value={timestampField}
-          onChange={e => setTimestampField(e.target.value)}
-          disabled={!columns.some(col => col === "timestamp")}
-          renderValue={selected => selected}
-          input={<OutlinedInput label="Timestamp Field" />}
-          
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMore />}>
+              <Typography>Field Selection</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                <FormControl sx={{ flex: 1 }}>
+                  <InputLabel>Timestamp Field</InputLabel>
+                  <Select
+                    value={timestampField}
+                    onChange={e => setTimestampField(e.target.value)}
+                    disabled={!columns.some(col => col === "timestamp")}
+                    renderValue={selected => selected}
+                    input={<OutlinedInput label="Timestamp Field" />}
+                  >
+                    {columns.map(col => (
+                      <MenuItem key={col} value={col}>
+                        {col}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl sx={{ flex: 1 }}>
+                  <InputLabel>Latitude Field</InputLabel>
+                  <Select
+                    value={latitudeField}
+                    onChange={e => setLatitudeField(e.target.value)}
+                    input={<OutlinedInput label="Latitude Field" />}
+                    disabled={!intColumns.some(col => col === "otinani")}
+                  >
+                    {intColumns.map(col => (
+                      <MenuItem key={col} value={col}>
+                        {col}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ flex: 1 }}>
+                  <InputLabel>Longitude Field</InputLabel>
+                  <Select
+                    value={longitudeField}
+                    onChange={e => setLongitudeField(e.target.value)}
+                    input={<OutlinedInput label="Longitude Field" />}
+                    disabled={!intColumns.some(col => col === "otinani")}
+                  >
+                    {intColumns.map(col => (
+                      <MenuItem key={col} value={col}>
+                        {col}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+
+          <FormControl sx={{ flex: 1 }}>
+            <InputLabel>Color By</InputLabel>
+            <Select
+              value={colorBy}
+              onChange={e => setColorBy(e.target.value)}
+              disabled={tripsMode} // Disable when showing paths
+              input={<OutlinedInput label="Color By" />}
+            >
+              <MenuItem value="None">None</MenuItem>
+              {columns.map(col => (
+                <MenuItem key={col} value={col}>
+                  {col}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl disabled={!timestampField} sx={{ flex: 1 }}>
+            <InputLabel>Segment By</InputLabel>
+            <Select
+              multiple
+              value={selectedColumns}
+              onChange={handleSegmentByChange}
+              renderValue={selected => selected.join(", ")}
+              input={<OutlinedInput label="Segment By" />}
+            >
+              {columns.map(col => (
+                <MenuItem key={col} value={col}>
+                  <Checkbox checked={selectedColumns.includes(col)} />
+                  <ListItemText primary={col} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Paper
+          className="Category-Item"
+          elevation={2}
+          sx={{
+            borderRadius: 4,
+            width: "inherit",
+            display: "flex",
+            flexDirection: "column",
+            rowGap: 0,
+            minWidth: "300px",
+            height: "100%",
+            overflow: "auto", // Allow scrolling if content is larger than container
+            overscrollBehavior: "contain", // Prevent the bounce effect at the edges
+            scrollBehavior: "smooth", // Enable smooth scrolling (optional)
+          }}
         >
-          {columns.map(col => (
-            <MenuItem key={col} value={col}>
-              {col}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-        <FormControl sx={{ flex: 1 }}>
-        <InputLabel>Color By</InputLabel>
-        <Select
-          value={colorBy}
-          onChange={e => setColorBy(e.target.value)}
-          disabled={tripsMode} // Disable when showing paths
-          input={<OutlinedInput label="Color By" />}
-
-        >
-          <MenuItem value="None">None</MenuItem>
-          {columns.map(col => (
-            <MenuItem key={col} value={col}>
-              {col}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <FormControl disabled={!timestampField} sx={{ flex: 1 }}>
-        <InputLabel>Segment By</InputLabel>
-        <Select
-          multiple
-          value={selectedColumns}
-          onChange={handleSegmentByChange}
-          renderValue={selected => selected.join(", ")}
-          input={<OutlinedInput label="Segment By" />}
-
-        >
-          {columns.map(col => (
-            <MenuItem key={col} value={col}>
-              <Checkbox checked={selectedColumns.includes(col)} />
-              <ListItemText primary={col} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Box>
-      <Box
-        ref={mapContainerRef}
-        sx={{ height: "700px", width: "100%", border: "1px solid gray" }}
-      />
-    </Box>
+          <Box
+            ref={mapContainerRef}
+            sx={{ height: "700px", width: "100%", border: "1px solid gray" }}
+          />
+        </Paper>
+      </Box>
     </>
-
   )
 }
 

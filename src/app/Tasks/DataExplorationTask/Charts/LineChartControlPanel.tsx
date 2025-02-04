@@ -58,7 +58,7 @@ const LineChartControlPanel = ({
     }
   }, [columns, xAxis, yAxis, setXAxis, setYAxis])
   return (
-    <Box sx={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+    <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem", }}>
       {/* X-Axis Selector */}
       <FormControl fullWidth>
         <InputLabel id="x-axis-select-label">X-Axis</InputLabel>

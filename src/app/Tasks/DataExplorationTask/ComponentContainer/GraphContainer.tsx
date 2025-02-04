@@ -88,7 +88,6 @@ const GraphContainer = (props: IGraphContainer) => {
           sx={{
             display: "flex",
             justifyContent: "flex-end",
-            marginBottom: "1rem",
             alignItems: "flex-end",
             flexDirection: "column", // Stack elements verticall
           }}
@@ -152,7 +151,7 @@ const GraphContainer = (props: IGraphContainer) => {
         )}
 
         {/* Conditionally Render Chart Based on Selected Type */}
-        <Box sx={{ marginTop: "2rem" }}>
+        <Box sx={{ marginTop: "1rem" }}>
           {chartType === "line" && (
             <LineChart
               viewMode={viewMode}
