@@ -1,44 +1,28 @@
-import { useEffect, useMemo, useState } from "react"
-import Paper from "@mui/material/Paper"
-import Table from "@mui/material/Table"
-import TableBody from "@mui/material/TableBody"
-import TableCell, { tableCellClasses } from "@mui/material/TableCell"
-import TableContainer from "@mui/material/TableContainer"
-import TablePagination from "@mui/material/TablePagination"
-import TableRow from "@mui/material/TableRow"
-import workflows from "../../../shared/data/workflows.json"
-import CheckIcon from "@mui/icons-material/Check"
-import CloseIcon from "@mui/icons-material/Close"
-import ProgressPercentage from "./progress-percentage"
-import Box from "@mui/material/Box"
-import Checkbox from "@mui/material/Checkbox"
-import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
-import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
-import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
-import EnhancedTableHead from "./enhanced-table-head"
+import type {
+  GridColDef,
+  GridColumnNode,
+  GridRowSelectionModel,
+} from "@mui/x-data-grid"
+import { DataGrid } from "@mui/x-data-grid"
 import ToolbarWorkflow from "./toolbar-workflow-table"
-import { Popover, Rating, styled, useTheme } from "@mui/material"
-import type { RootState } from "../../../store/store"
+import ProgressPercentage from "./progress-percentage"
+import Paper from "@mui/material/Paper"
+import Box from "@mui/material/Box"
+import PauseIcon from "@mui/icons-material/Pause"
+import StopIcon from "@mui/icons-material/Stop"
+import LaunchIcon from "@mui/icons-material/Launch"
+import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
+import type { RootState } from "../../../store/store"
 import {
   addCompareCompletedTab,
   addTab,
 } from "../../../store/slices/workflowTabsSlice"
+import { useEffect, useState } from "react"
+import { Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
-import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
-import { grey } from "@mui/material/colors"
 
-const FixedTableCell = styled(TableCell)(({ theme }) => ({
-  position: "sticky",
-  right: 0,
-  backgroundColor: theme.palette.customGrey.light,
-  zIndex: 10,
-  overflow: "hidden",
-  borderLeft: `1px solid ${grey[300]}`,
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.customGrey.light,
-  },
-}))
+import theme from "../../../mui-theme"
 
 const fractionStrToDecimal = (str: string): string => {
   const [numerator, denominator] = str.split("/").map(Number)
@@ -47,64 +31,92 @@ const fractionStrToDecimal = (str: string): string => {
   }
   return (numerator / denominator).toString()
 }
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1
-  }
-  return 0
-}
 
-export type Order = "asc" | "desc"
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string | boolean },
-  b: { [key in Key]: number | string | boolean },
-) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy)
-}
-
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number,
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number])
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0])
-    if (order !== 0) {
-      return order
-    }
-    return a[1] - b[1]
-  })
-  return stabilizedThis.map(el => el[0])
-}
-
-export interface Column {
-  id: keyof Data
-  label: string
+type CustomGridColDef = GridColDef & {
+  field: string
   minWidth?: number
-  align?: "right" | "left" | "center" | "inherit" | "justify" | undefined
-  numeric?: boolean
-  sortable?: boolean
-  constraint?: boolean
-  // format?: (value: number) => string;
+  flex?: number
+  align?: "left" | "right" | "center"
+  headerAlign?: "left" | "right" | "center"
 }
 
-let columns: Column[] = []
+let columns: CustomGridColDef[] = []
 
 export interface Data {
   [key: string]: any
 }
 
 let idCounter = 1
-let paramlength = 0
+
+// WorkflowActions
+
+const WorkflowActions = (props: {
+  currentStatus: string
+  workflowId: string
+  handleLaunchNewTab: (workflowId: string) => (e: React.SyntheticEvent) => void
+}) => {
+  const { currentStatus, workflowId, handleLaunchNewTab } = props
+
+  return (
+    <span onClick={event => event.stopPropagation()}>
+      <LaunchIcon
+        onClick={
+          currentStatus !== "completed"
+            ? () => {}
+            : handleLaunchNewTab(workflowId)
+        }
+        style={{
+          cursor: currentStatus !== "completed" ? "default" : "pointer",
+          color:
+            currentStatus !== "completed"
+              ? theme.palette.action.disabled
+              : theme.palette.primary.main,
+        }}
+      />
+      {currentStatus !== "completed" && currentStatus !== "failed" && (
+        <>
+          <PauseIcon
+            onClick={() => console.log("Pause clicked")}
+            style={{ cursor: "pointer", color: theme.palette.primary.main }}
+          />
+          <StopIcon
+            onClick={() => console.log("Stop clicked")}
+            style={{ cursor: "pointer", color: theme.palette.primary.main }}
+          />
+        </>
+      )}
+    </span>
+  )
+}
+
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  "& .MuiDataGrid-scrollbarFiller": {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  "& .MuiDataGrid-columnHeaderTitle": {
+    whiteSpace: "nowrap",
+    overflow: "visible",
+  },
+  "& .datagrid-header-fixed": {
+    // Action column
+    position: "sticky",
+    right: 0,
+    zIndex: 100,
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-cell[data-field="action"]': {
+    position: "sticky",
+    right: 0,
+    backgroundColor: theme.palette.customGrey.light,
+    zIndex: 90,
+  },
+}))
 
 interface WorkFlowTableProps {
   handleChange: (
@@ -113,84 +125,21 @@ interface WorkFlowTableProps {
 }
 
 export default function WorkflowTable(props: WorkFlowTableProps) {
-  const theme = useTheme()
-  const { handleChange } = props
-  const dispatch = useAppDispatch()
   const { workflows, progressWokflowsTable } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const { handleChange } = props
   const [isFilterOpen, setFilterOpen] = useState(false)
+  const [uniqueParameters, setUniqueParameters] = useState<Set<string> | null>(
+    null,
+  )
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
-  useEffect(() => {
-    if (workflows.data.length > 0) {
-      //find unique parameters of each workflow -> model traning task
-      const uniqueParameters = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
-          let paramNames = []
-          if (params) {
-            paramNames = params.map(param => param.name)
-            return [...acc, ...paramNames]
-          } else {
-            return [...acc]
-          }
-        }, []),
-      )
+  const dispatch = useAppDispatch()
 
-      // Create rows for the table based on the unique parameters we found
-      const rows = workflows.data
-        .filter(workflow => workflow.status !== "scheduled")
-        .map(workflow => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
-          return {
-            id: idCounter++,
-            workflowId: workflow.workflowId,
-            // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
-            ...Array.from(uniqueParameters).reduce((acc, variant) => {
-              acc[variant] =
-                `${params?.find(param => param.name === variant)?.value}` || ""
-              return acc
-            }, {}),
-            status: workflow.status,
-            // ...Object.keys(workflow.constraints)
-            //   .map(key => ({ [key]: workflow.constraints[key] }))
-            //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
-            rating: 2,
-            action: "",
-          }
-        })
-      // const constrainsNames = Object.keys(workflows.data[0].constraints)
-      columns = Object.keys(rows[0])
-        .filter(key => key !== "id")
-        .map(key => ({
-          id: key,
-          label: key,
-          minWidth: key === "action" ? 100 : 50,
-          numeric: typeof rows[0][key] === "number" ? true : false,
-          align: "center",
-          sortable: key !== "action" ? true : false,
-          // constraint: constrainsNames.includes(key) ? true : false
-        }))
-      paramlength = uniqueParameters.size
-      dispatch(
-        setProgressWokflowsTable({
-          rows,
-          filteredRows: rows,
-          visibleRows: rows.slice(0, progressWokflowsTable.rowsPerPage),
-        }),
-      )
-    }
-  }, [workflows])
-
-  const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setFilterOpen(!isFilterOpen)
-    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
+  const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
+    dispatch(setProgressWokflowsTable({ selectedWorkflows: newSelection }))
   }
 
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
@@ -206,69 +155,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       handleChange(workflowId)(e)
     }
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data,
-  ) => {
-    const isAsc =
-      progressWokflowsTable.orderBy === property &&
-      progressWokflowsTable.order === "asc"
-    dispatch(
-      setProgressWokflowsTable({
-        order: isAsc ? "desc" : "asc",
-        orderBy: property,
-      }),
-    )
-  }
-
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = progressWokflowsTable.rows.map(n => n.id)
-      dispatch(setProgressWokflowsTable({ selectedWorkflows: newSelected }))
-      return
-    }
-    dispatch(setProgressWokflowsTable({ selectedWorkflows: [] }))
-  }
-
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-    const selectedIndex = progressWokflowsTable.selectedWorkflows.indexOf(id)
-    let newSelected: readonly number[] = []
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(
-        progressWokflowsTable.selectedWorkflows,
-        id,
-      )
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(
-        progressWokflowsTable.selectedWorkflows.slice(1),
-      )
-    } else if (
-      selectedIndex ===
-      progressWokflowsTable.selectedWorkflows.length - 1
-    ) {
-      newSelected = newSelected.concat(
-        progressWokflowsTable.selectedWorkflows.slice(0, -1),
-      )
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        progressWokflowsTable.selectedWorkflows.slice(0, selectedIndex),
-        progressWokflowsTable.selectedWorkflows.slice(selectedIndex + 1),
-      )
-    }
-    dispatch(setProgressWokflowsTable({ selectedWorkflows: newSelected }))
-  }
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    dispatch(setProgressWokflowsTable({ page: newPage }))
-  }
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    dispatch(
-      setProgressWokflowsTable({ rowsPerPage: +event.target.value, page: 0 }),
-    )
+  const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setFilterOpen(!isFilterOpen)
+    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
   }
 
   const handleFilterChange = (
@@ -299,7 +188,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   useEffect(() => {
     let counter = 0
-    // if(progressWokflowsTable.filters.length > 0) {
     for (let i = 0; i < progressWokflowsTable.filters.length; i++) {
       if (progressWokflowsTable.filters[i].value !== "") {
         counter++
@@ -330,30 +218,89 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       })
     })
     dispatch(setProgressWokflowsTable({ filteredRows }))
-    // }
-  }, [progressWokflowsTable.filters])
-
-  const isSelected = (id: number) =>
-    progressWokflowsTable.selectedWorkflows.indexOf(id) !== -1
+  }, [dispatch, progressWokflowsTable.filters, progressWokflowsTable.rows])
 
   useEffect(() => {
-    if (progressWokflowsTable.filteredRows.length === 0) return
-    const visibleRows = stableSort(
-      progressWokflowsTable.filteredRows,
-      getComparator(progressWokflowsTable.order, progressWokflowsTable.orderBy),
-    ).slice(
-      progressWokflowsTable.page * progressWokflowsTable.rowsPerPage,
-      progressWokflowsTable.page * progressWokflowsTable.rowsPerPage +
-        progressWokflowsTable.rowsPerPage,
-    )
-    dispatch(setProgressWokflowsTable({ visibleRows }))
-  }, [
-    progressWokflowsTable.order,
-    progressWokflowsTable.orderBy,
-    progressWokflowsTable.page,
-    progressWokflowsTable.rowsPerPage,
-    progressWokflowsTable.filteredRows,
-  ])
+    if (workflows.data.length > 0) {
+      //find unique parameters of each workflow -> model traning task
+      const uniqueParameters = new Set(
+        workflows.data.reduce((acc: any[], workflow) => {
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          let paramNames = []
+          if (params) {
+            paramNames = params.map(param => param.name)
+            return [...acc, ...paramNames]
+          } else {
+            return [...acc]
+          }
+        }, []),
+      )
+      setUniqueParameters(uniqueParameters)
+      // Create rows for the table based on the unique parameters we found
+      const rows = workflows.data
+        .filter(workflow => workflow.status !== "scheduled")
+        .map(workflow => {
+          const params = workflow.tasks.find(
+            task => task.id === "TrainModel",
+          )?.parameters
+          return {
+            id: idCounter++,
+            workflowId: workflow.workflowId,
+            ...Array.from(uniqueParameters).reduce((acc, variant) => {
+              acc[variant] =
+                `${params?.find(param => param.name === variant)?.value}` || ""
+              return acc
+            }, {}),
+            status: workflow.status,
+            action: "",
+          }
+        })
+
+      columns = Object.keys(rows[0])
+        .filter(key => key !== "id")
+        .map(key => ({
+          field: key,
+          headerName: key.replace("_", " "),
+          headerClassName:
+            key === "action" ? "datagrid-header-fixed" : "datagrid-header",
+          minWidth: key === "action" ? 100 : key.length * 10 - 30,
+          flex: 1,
+          align: "center",
+          headerAlign: "center",
+          sortable: key !== "action",
+          type: typeof rows[0][key] === "number" ? "number" : "string",
+          ...(key === "status" && {
+            renderCell: params => (
+              <ProgressPercentage
+                progressNumber={fractionStrToDecimal(params.value)}
+              />
+            ),
+          }),
+          ...(key === "action" && {
+            renderCell: params => {
+              const currentStatus = params.row.status
+              return (
+                <WorkflowActions
+                  currentStatus={currentStatus}
+                  workflowId={params.row.workflowId}
+                  handleLaunchNewTab={handleLaunchNewTab}
+                />
+              )
+            },
+          }),
+        }))
+
+      dispatch(
+        setProgressWokflowsTable({
+          rows,
+          filteredRows: rows,
+          visibleRows: rows.slice(0, progressWokflowsTable.rowsPerPage),
+        }),
+      )
+    }
+  }, [workflows])
 
   return (
     <Box>
@@ -388,184 +335,55 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           </Box>
         </Popover>
 
-        {columns.length > 0 && (
-          <TableContainer sx={{ maxHeight: 440 }}>
-            <Table stickyHeader aria-label="sticky table">
-              <EnhancedTableHead
-                columns={columns}
-                parametersLength={paramlength}
-                numSelected={progressWokflowsTable.selectedWorkflows.length}
-                order={progressWokflowsTable.order}
-                orderBy={progressWokflowsTable.orderBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={progressWokflowsTable.rows.length}
-              />
-              <TableBody>
-                {progressWokflowsTable.visibleRows.map((row: any, index) => {
-                  const isItemSelected = isSelected(row.id)
-                  const labelId = `enhanced-table-checkbox-${index}`
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          onClick={event => handleClick(event, row.id)}
-                          sx={{
-                            cursor: "pointer",
-                            color: theme => theme.palette.primary.main,
-                          }}
-                          checked={isItemSelected}
-                          inputProps={{
-                            "aria-labelledby": labelId,
-                          }}
-                        />
-                      </TableCell>
-                      {columns.map(column => {
-                        let value: string
-                        const currentStatus = row.status
-                        if (column.constraint) {
-                          return (
-                            <TableCell key={column.id} align={column.align}>
-                              {Boolean(row[column.id]) ? (
-                                <CheckIcon style={{ color: "green" }} />
-                              ) : (
-                                <CloseIcon style={{ color: "red" }} />
-                              )}
-                            </TableCell>
-                          )
-                        } else {
-                          switch (column.id) {
-                            case "status":
-                              value = row[column.id]
-                              return (
-                                <TableCell
-                                  key={column.id}
-                                  align={column.align}
-                                  sx={{
-                                    color: theme =>
-                                      theme.palette.customGrey.text,
-                                  }}
-                                >
-                                  <ProgressPercentage
-                                    progressNumber={fractionStrToDecimal(value)}
-                                  />
-                                </TableCell>
-                              )
-                            case "action":
-                              return (
-                                <FixedTableCell
-                                  key={column.id}
-                                  align={column.align}
-                                  sx={{
-                                    color: theme =>
-                                      theme.palette.customGrey.text,
-                                  }}
-                                >
-                                  <LaunchRoundedIcon
-                                    onClick={
-                                      currentStatus !== "completed"
-                                        ? () => {}
-                                        : handleLaunchNewTab(row.workflowId)
-                                    }
-                                    sx={{
-                                      cursor:
-                                        currentStatus !== "completed"
-                                          ? "default"
-                                          : "pointer",
-                                    }}
-                                    style={{
-                                      color:
-                                        currentStatus !== "completed"
-                                          ? theme.palette.action.disabled
-                                          : theme.palette.primary.main,
-                                    }}
-                                  />
-                                  {currentStatus !== "completed" &&
-                                    currentStatus !== "failed" && (
-                                      <span>
-                                        <PauseRoundedIcon
-                                          sx={{ cursor: "pointer" }}
-                                          onClick={() => console.log("clicked")}
-                                          style={{
-                                            color: theme.palette.primary.main,
-                                          }}
-                                        />
-
-                                        <CancelRoundedIcon
-                                          sx={{ cursor: "pointer" }}
-                                          onClick={() => console.log("clicked")}
-                                          style={{
-                                            color: theme.palette.primary.main,
-                                          }}
-                                        />
-                                        {/* </Button> */}
-                                      </span>
-                                    )}
-                                </FixedTableCell>
-                              )
-                            case "rating":
-                              return (
-                                <TableCell
-                                  key={column.id}
-                                  align={column.align}
-                                  sx={{
-                                    color: theme =>
-                                      theme.palette.customGrey.text,
-                                  }}
-                                >
-                                  <Rating
-                                    name="rating-column"
-                                    size="small"
-                                    onChange={(event, newValue) => {
-                                      console.log(newValue)
-                                    }}
-                                    defaultValue={row[column.id]}
-                                  />
-                                </TableCell>
-                              )
-                            default:
-                              value = String(row[column.id])
-
-                              return (
-                                <TableCell
-                                  key={column.id}
-                                  align={column.align}
-                                  sx={{
-                                    color: theme =>
-                                      theme.palette.customGrey.text,
-                                  }}
-                                >
-                                  {value}
-                                </TableCell>
-                              )
-                          }
-                        }
-                      })}
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-        {progressWokflowsTable.filteredRows.length > 5 && (
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={progressWokflowsTable.filteredRows.length}
-            rowsPerPage={progressWokflowsTable.rowsPerPage}
-            page={progressWokflowsTable.page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+        <div style={{ height: 450, width: "100%" }}>
+          <StyledDataGrid
+            rows={progressWokflowsTable.filteredRows}
+            columns={columns}
+            checkboxSelection
+            onRowSelectionModelChange={handleSelectionChange}
+            sx={{
+              "& .MuiDataGrid-selectedRowCount": {
+                visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header
+              },
+              "& .theme-parameters-group": {
+                textAlign: "center",
+                justifyContent: "center",
+                position: "relative",
+                display: "flex",
+                width: "100%",
+                "&::after": {
+                  content: '""',
+                  display: "block",
+                  width: "100%",
+                  height: "2px",
+                  backgroundColor: theme.palette.primary.main,
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                },
+              },
+            }}
+            pageSizeOptions={[10, 25, 100]}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10 },
+              },
+            }}
+            columnGroupingModel={[
+              {
+                groupId: "Parameters",
+                headerClassName: "theme-parameters-group",
+                children: uniqueParameters
+                  ? (Array.from(uniqueParameters).map(
+                      (param): GridColumnNode => ({
+                        field: param,
+                      }),
+                    ) as GridColumnNode[])
+                  : [],
+              },
+            ]}
           />
-        )}
+        </div>
       </Paper>
     </Box>
   )
