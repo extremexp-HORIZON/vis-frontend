@@ -1,66 +1,89 @@
-import * as React from 'react';
-import { Select, MenuItem, TextField, Box, FormControl, InputLabel, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import AddIcon from '@mui/icons-material/Add';
+import {
+  Select,
+  MenuItem,
+  TextField,
+  Box,
+  FormControl,
+  InputLabel,
+  IconButton,
+} from "@mui/material"
+import CloseIcon from "@mui/icons-material/Close"
+import AddIcon from "@mui/icons-material/Add"
+import type { GridColDef } from "@mui/x-data-grid"
 
-interface Column {
-  id: number | string
-  label: string
+type CustomGridColDef = GridColDef & {
+  field: string
   minWidth?: number
-  align?: "right" | "left" | "center" | "inherit" | "justify" | undefined
-  numeric?: boolean
-  sortable?: boolean
-  // format?: (value: number) => string;
+  flex?: number
+  align?: "left" | "right" | "center"
+  headerAlign?: "left" | "right" | "center"
 }
-
-// const columns = [
-//   { id: 'workflowId', label: 'Workflow ID' },
-//   { id: 'train_model', label: 'Train Model' },
-//   { id: 'split_proportion', label: 'split_proportion' },
-//   { id: 'max_depth', label: 'max_depth' },
-//   { id: 'batch_size', label: 'batch_size' },
-// ];
 
 const operators = [
-  { id: 'contains', label: 'contains' },
-  { id: 'equals', label: 'equals' },
-  { id: 'startsWith', label: 'starts with' },
-  { id: 'endsWith', label: 'ends with' },
-];
+  { id: "contains", label: "contains" },
+  { id: "equals", label: "equals" },
+  { id: "startsWith", label: "starts with" },
+  { id: "endsWith", label: "ends with" },
+]
 
 interface FilterBarProps {
-  columns: Column[];
-  filters: { column: string, operator: string, value: string }[];
-  onFilterChange: (index: number, column: string, operator: string, value: string) => void;
-  onAddFilter: () => void;
-  onRemoveFilter: (index: number) => void;
+  columns: CustomGridColDef[]
+  filters: { column: string; operator: string; value: string }[]
+  onFilterChange: (
+    index: number,
+    column: string,
+    operator: string,
+    value: string,
+  ) => void
+  onAddFilter: () => void
+  onRemoveFilter: (index: number) => void
 }
 
-export default function FilterBar({ columns, filters, onFilterChange, onAddFilter, onRemoveFilter }: FilterBarProps) {
+export default function FilterBar({
+  columns,
+  filters,
+  onFilterChange,
+  onAddFilter,
+  onRemoveFilter,
+}: FilterBarProps) {
   return (
     <Box>
       {filters.map((filter, index) => (
         <Box key={index} display="flex" gap={2} alignItems="center">
-          <FormControl sx={{ width: '200px' }}>
+          <FormControl sx={{ width: "200px" }}>
             <InputLabel>Columns</InputLabel>
             <Select
               value={filter.column}
-              onChange={(event) => onFilterChange(index, event.target.value, filter.operator, filter.value)}
+              onChange={event =>
+                onFilterChange(
+                  index,
+                  event.target.value,
+                  filter.operator,
+                  filter.value,
+                )
+              }
             >
-              {columns.map((column) => (
-                <MenuItem key={column.id} value={column.id}>
-                  {column.label}
+              {columns.map((column: CustomGridColDef) => (
+                <MenuItem key={column.field} value={column.field}>
+                  {column.headerName}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <FormControl sx={{ width: '200px' }}>
+          <FormControl sx={{ width: "200px" }}>
             <InputLabel>Operator</InputLabel>
             <Select
               value={filter.operator}
-              onChange={(event) => onFilterChange(index, filter.column, event.target.value, filter.value)}
+              onChange={event =>
+                onFilterChange(
+                  index,
+                  filter.column,
+                  event.target.value,
+                  filter.value,
+                )
+              }
             >
-              {operators.map((operator) => (
+              {operators.map(operator => (
                 <MenuItem key={operator.id} value={operator.id}>
                   {operator.label}
                 </MenuItem>
@@ -70,16 +93,26 @@ export default function FilterBar({ columns, filters, onFilterChange, onAddFilte
           <TextField
             label="Value"
             value={filter.value}
-            onChange={(event) => onFilterChange(index, filter.column, filter.operator, event.target.value)}
+            onChange={event =>
+              onFilterChange(
+                index,
+                filter.column,
+                filter.operator,
+                event.target.value,
+              )
+            }
             variant="outlined"
           />
-          <IconButton onClick={() => onRemoveFilter(index)}><CloseIcon /></IconButton>
+          <IconButton onClick={() => onRemoveFilter(index)}>
+            <CloseIcon />
+          </IconButton>
         </Box>
       ))}
       <Box display="flex" justifyContent="center" gap={2} mt={2}>
-        <IconButton onClick={onAddFilter}><AddIcon /></IconButton>
+        <IconButton onClick={onAddFilter}>
+          <AddIcon />
+        </IconButton>
       </Box>
     </Box>
-  );
-
+  )
 }

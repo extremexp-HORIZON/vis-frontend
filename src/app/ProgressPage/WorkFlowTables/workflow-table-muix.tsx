@@ -1,9 +1,9 @@
-import type { GridColDef } from "@mui/x-data-grid"
-import {
-  DataGrid,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
+import type {
+  GridColDef,
+  GridColumnNode,
+  GridRowSelectionModel,
 } from "@mui/x-data-grid"
+import { DataGrid } from "@mui/x-data-grid"
 import ToolbarWorkflow from "./toolbar-workflow-table"
 import ProgressPercentage from "./progress-percentage"
 import Paper from "@mui/material/Paper"
@@ -18,11 +18,11 @@ import {
   addCompareCompletedTab,
   addTab,
 } from "../../../store/slices/workflowTabsSlice"
-import { id } from "vega"
-import { useEffect } from "react"
-import TableContainer from "@mui/material/TableContainer"
+import { useEffect, useState } from "react"
+import { Popover, Rating, styled, useTheme } from "@mui/material"
+import FilterBar from "./filter-bar"
+
 import theme from "../../../mui-theme"
-import { styled } from "@mui/material"
 
 const fractionStrToDecimal = (str: string): string => {
   const [numerator, denominator] = str.split("/").map(Number)
@@ -30,27 +30,6 @@ const fractionStrToDecimal = (str: string): string => {
     return str
   }
   return (numerator / denominator).toString()
-}
-
-const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
-  console.log("handleLaunchNewTab")
-  // if (tabs.find(tab => tab.workflowId === workflowId)) return
-  // dispatch(addTab({ workflowId, workflows }))
-  // handleChange(workflowId)(e)
-}
-
-const handleLaunchCompletedTab =
-  (workflowId: any) => (e: React.SyntheticEvent) => {
-    console.log("handleLaunchCompletedTab")
-    // if (tabs.find(tab => tab.workflowId === workflowId)) return
-    // dispatch(addCompareCompletedTab(workflows))
-    // handleChange(workflowId)(e)
-  }
-
-const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
-  console.log("Filter is clicked")
-  // setFilterOpen(!isFilterOpen)
-  // !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
 }
 
 type CustomGridColDef = GridColDef & {
@@ -68,6 +47,8 @@ export interface Data {
 }
 
 let idCounter = 1
+
+// WorkflowActions
 
 const WorkflowActions = (props: {
   currentStatus: string
@@ -137,11 +118,107 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }))
 
-export default function WorkflowDataGrid() {
+interface WorkFlowTableProps {
+  handleChange: (
+    newValue: number | string,
+  ) => (event: React.SyntheticEvent) => void
+}
+
+export default function WorkflowDataGrid(props: WorkFlowTableProps) {
   const { workflows, progressWokflowsTable } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
+  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
+  const { handleChange } = props
+  const [isFilterOpen, setFilterOpen] = useState(false)
+  const [uniqueParameters, setUniqueParameters] = useState<Set<string> | null>(
+    null,
+  )
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+
   const dispatch = useAppDispatch()
+
+  const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
+    dispatch(setProgressWokflowsTable({ selectedWorkflows: newSelection }))
+  }
+
+  const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
+    if (tabs.find(tab => tab.workflowId === workflowId)) return
+    dispatch(addTab({ workflowId, workflows }))
+    handleChange(workflowId)(e)
+  }
+
+  const handleLaunchCompletedTab =
+    (workflowId: any) => (e: React.SyntheticEvent) => {
+      if (tabs.find(tab => tab.workflowId === workflowId)) return
+      dispatch(addCompareCompletedTab(workflows))
+      handleChange(workflowId)(e)
+    }
+
+  const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setFilterOpen(!isFilterOpen)
+    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
+  }
+
+  const handleFilterChange = (
+    index: number,
+    column: string,
+    operator: string,
+    value: string,
+  ) => {
+    const newFilters = [...progressWokflowsTable.filters]
+    newFilters[index] = { column, operator, value }
+    dispatch(setProgressWokflowsTable({ filters: newFilters }))
+  }
+
+  const handleAddFilter = () => {
+    const newFilters = [
+      ...progressWokflowsTable.filters,
+      { column: "", operator: "", value: "" },
+    ]
+    dispatch(setProgressWokflowsTable({ filters: newFilters }))
+  }
+
+  const handleRemoveFilter = (index: number) => {
+    const newFilters = progressWokflowsTable.filters.filter(
+      (_, i) => i !== index,
+    )
+    dispatch(setProgressWokflowsTable({ filters: newFilters }))
+  }
+
+  useEffect(() => {
+    let counter = 0
+    for (let i = 0; i < progressWokflowsTable.filters.length; i++) {
+      if (progressWokflowsTable.filters[i].value !== "") {
+        counter++
+      }
+    }
+    dispatch(setProgressWokflowsTable({ filtersCounter: counter }))
+    const filteredRows = progressWokflowsTable.rows.filter(row => {
+      return progressWokflowsTable.filters.every(filter => {
+        if (filter.value === "") return true
+        const cellValue = row[filter.column as keyof Data]
+          ?.toString()
+          .toLowerCase()
+        const filterValue = filter.value.toLowerCase()
+        if (!cellValue) return false
+
+        switch (filter.operator) {
+          case "contains":
+            return cellValue.includes(filterValue)
+          case "equals":
+            return cellValue === filterValue
+          case "startsWith":
+            return cellValue.startsWith(filterValue)
+          case "endsWith":
+            return cellValue.endsWith(filterValue)
+          default:
+            return true
+        }
+      })
+    })
+    dispatch(setProgressWokflowsTable({ filteredRows }))
+  }, [dispatch, progressWokflowsTable.filters, progressWokflowsTable.rows])
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -160,7 +237,7 @@ export default function WorkflowDataGrid() {
           }
         }, []),
       )
-
+      setUniqueParameters(uniqueParameters)
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
         .filter(workflow => workflow.status !== "scheduled")
@@ -237,18 +314,74 @@ export default function WorkflowDataGrid() {
           filterClickedFunction={filterClicked}
           handleClickedFunction={handleLaunchCompletedTab}
         />
+        <Popover
+          id={"Filters"}
+          open={isFilterOpen}
+          anchorEl={anchorEl}
+          onClose={() => setFilterOpen(false)}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <FilterBar
+              columns={columns}
+              filters={progressWokflowsTable.filters}
+              onFilterChange={handleFilterChange}
+              onAddFilter={handleAddFilter}
+              onRemoveFilter={handleRemoveFilter}
+            />
+          </Box>
+        </Popover>
 
         <div style={{ height: 450, width: "100%" }}>
           <StyledDataGrid
-            rows={progressWokflowsTable.rows}
+            rows={progressWokflowsTable.filteredRows}
             columns={columns}
             checkboxSelection
+            onRowSelectionModelChange={handleSelectionChange}
+            sx={{
+              "& .MuiDataGrid-selectedRowCount": {
+                visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header
+              },
+              "& .theme-parameters-group": {
+                textAlign: "center",
+                justifyContent: "center",
+                position: "relative",
+                display: "flex",
+                width: "100%",
+                "&::after": {
+                  content: '""',
+                  display: "block",
+                  width: "100%",
+                  height: "2px",
+                  backgroundColor: theme.palette.primary.main,
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                },
+              },
+            }}
             pageSizeOptions={[10, 25, 100]}
             initialState={{
               pagination: {
                 paginationModel: { pageSize: 10 },
               },
             }}
+            columnGroupingModel={[
+              {
+                groupId: "Parameters",
+                headerClassName: "theme-parameters-group",
+                children: uniqueParameters
+                  ? (Array.from(uniqueParameters).map(
+                      (param): GridColumnNode => ({
+                        field: param,
+                      }),
+                    ) as GridColumnNode[])
+                  : [],
+              },
+            ]}
           />
         </div>
       </Paper>
