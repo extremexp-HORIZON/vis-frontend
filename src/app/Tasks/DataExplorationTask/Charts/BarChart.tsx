@@ -1,27 +1,28 @@
-
-import Paper from '@mui/material/Paper';
-import React from 'react';
-import { Vega } from 'react-vega';
+import Paper from "@mui/material/Paper"
+import { Vega } from "react-vega"
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const BarChart = ({ dataExploration }) => {
-  console.log("dataExplorationBArchaer",dataExploration)
+  console.log("dataExplorationBArchaer", dataExploration)
   // Parse the data string from the dataExploration object
-  const parsedData = dataExploration.data;
-  console.log("parasedData",parsedData)
+  const parsedData = dataExploration.data
+  console.log("parasedData", parsedData)
 
   // Extract the columns information
-  const columns = dataExploration.columns;
+  const columns = dataExploration.columns
 
   // Identify the column for the x-axis (which should be a string)
-  const xAxisColumn = columns.find(col => col.type === 'STRING').name;
+  const xAxisColumn = columns.find(col => col.type === "STRING").name
 
   // Identify all other categorical columns
-  const categoricalColumns = columns
-    .filter(col => col.type === 'STRING' && col.name !== xAxisColumn);
+  const categoricalColumns = columns.filter(
+    col => col.type === "STRING" && col.name !== xAxisColumn,
+  )
 
   // Identify the columns for the y-axis (which should be numeric, DOUBLE)
-  const yAxisColumns = columns.filter(col => col.type === 'DOUBLE').map(col => col.name);
+  const yAxisColumns = columns
+    .filter(col => col.type === "DOUBLE")
+    .map(col => col.name)
 
   // Transform the data into a suitable format for grouped bar chart
   const transformedData = parsedData.flatMap(item =>
@@ -29,54 +30,68 @@ const BarChart = ({ dataExploration }) => {
       [xAxisColumn]: item[xAxisColumn],
       type: col, // Each numeric column becomes a type/category
       value: item[col], // The value for each column
-      ...Object.fromEntries(categoricalColumns.map(catCol => [catCol.name, item[catCol.name]])), // Include all categorical values
-    }))
-  );
+      ...Object.fromEntries(
+        categoricalColumns.map(catCol => [catCol.name, item[catCol.name]]),
+      ), // Include all categorical values
+    })),
+  )
 
   // Create a dynamic Vega specification
   const specification = {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "description": "A grouped bar chart showing different numeric values by category.",
-    "autosize": { "type": "fit", "contains": "padding", "resize": true },
-    "width": "container",
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    description:
+      "A grouped bar chart showing different numeric values by category.",
+    autosize: { type: "fit", contains: "padding", resize: true },
+    width: "container",
     // "height": "auto",
-    "data": {
-      "values": transformedData,
+    data: {
+      values: transformedData,
     },
-    "mark": "bar",
-    "encoding": {
-      "y": {
-        "field": xAxisColumn,
-        "type": "nominal",
-        "axis": { "labelAngle": 0 },
-        "sort": null,  // Sort by the x-axis values
+    mark: "bar",
+    params: [
+      {
+        name: "industry",
+        select: { type: "point", fields: ["type"] }, // Selection on "type" field
+        bind: "legend", // Bind this selection to the legend
       },
-      "x": {
-        "field": "value",
-        "type": "quantitative",
-        "title": "Value",
+    ],
+    encoding: {
+      y: {
+        field: xAxisColumn,
+        type: "nominal",
+        axis: { labelAngle: 0 },
+        sort: null, // Sort by the x-axis values
       },
-      "color": {
-        "field": "type",
-        "type": "nominal",
-        "title": "Metric",
+      x: {
+        field: "value",
+        type: "quantitative",
+        title: "Value",
       },
-      "xOffset": {
-        "field": "type",
-        "type": "nominal",
+      color: {
+        field: "type",
+        type: "nominal",
+        title: "Metric",
       },
-      "tooltip": [
-        { "field": xAxisColumn, "type": "nominal", "title": xAxisColumn},
+      xOffset: {
+        field: "type",
+        type: "nominal",
+      },
+      tooltip: [
+        { field: xAxisColumn, type: "nominal", title: xAxisColumn },
         ...categoricalColumns.map(col => ({
-          "field": col.name,
-          "type": "nominal",
-          "title": col.name // Use the column name as the tooltip title
+          field: col.name,
+          type: "nominal",
+          title: col.name, // Use the column name as the tooltip title
         })),
-        { "field": "value", "type": "quantitative", "title": "Value" },
-        { "field": "type", "type": "nominal", "title": "Metric" },
+        { field: "value", type: "quantitative", title: "Value" },
+        { field: "type", type: "nominal", title: "Metric" },
       ],
-    }
-  };
+      opacity: {
+        condition: { param: "industry", value: 1 },
+        value: 0.01,
+      },
+    },
+  }
 
   return (
     <Paper
@@ -90,16 +105,14 @@ const BarChart = ({ dataExploration }) => {
         rowGap: 0,
         minWidth: "300px",
         height: "100%",
-        overflow: 'auto', // Allow scrolling if content is larger than container
-        overscrollBehavior: 'contain', // Prevent the bounce effect at the edges
-        scrollBehavior: 'smooth', // Enable smooth scrolling (optional)
+        overflow: "auto", // Allow scrolling if content is larger than container
+        overscrollBehavior: "contain", // Prevent the bounce effect at the edges
+        scrollBehavior: "smooth", // Enable smooth scrolling (optional)
       }}
     >
-      <Vega
-        spec={specification}
-      />
+      <Vega spec={specification} actions={false} />
     </Paper>
-  );
-};
+  )
+}
 
-export default BarChart;
+export default BarChart
