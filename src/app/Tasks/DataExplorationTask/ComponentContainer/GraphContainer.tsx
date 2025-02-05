@@ -23,9 +23,9 @@ interface IGraphContainer {
   workflowId: string
   columns: VisualColumn[]
   originalColumns: VisualColumn[]
-  chartType: "line" | "bar" | "scatter" | "map"
+  chartType: 'datatable' |"line" | "bar" | "scatter" | "map"
   setChartType: React.Dispatch<
-    React.SetStateAction<"line" | "bar" | "scatter" | "map">
+    React.SetStateAction<'datatable' |"line" | "bar" | "scatter" | "map">
   >
   xAxis: VisualColumn
   xAxisScatter: VisualColumn
@@ -102,7 +102,7 @@ const GraphContainer = (props: IGraphContainer) => {
           <ButtonGroup
             variant="contained"
             aria-label="view mode"
-            disabled={chartType === "map" || chartType === "bar"}
+            disabled={chartType === "map" || chartType === "bar"|| chartType === "datatable"}
           >
             <Button
               onClick={() => setViewMode("overlay")}

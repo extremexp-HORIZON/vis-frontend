@@ -55,8 +55,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [barAggregation, setBarAggregation] = useState<any>({}) // State for bar chart aggregation
   const [viewMode, setViewMode] = useState<"overlay" | "stacked">("overlay")
   const [chartType, setChartType] = useState<
-    "line" | "bar" | "scatter" | "map"
-  >("line")
+    'datatable' |"line" | "bar" | "scatter" | "map"
+  >("datatable")
   const [colorBy, setColorBy] = useState("None")
 
   console.log("workflow", workflow)
