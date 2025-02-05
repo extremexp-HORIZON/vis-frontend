@@ -124,7 +124,7 @@ interface WorkFlowTableProps {
   ) => (event: React.SyntheticEvent) => void
 }
 
-export default function WorkflowTable(props: WorkFlowTableProps) {
+export default function WorkflowDataGrid(props: WorkFlowTableProps) {
   const { workflows, progressWokflowsTable } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
