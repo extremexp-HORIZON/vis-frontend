@@ -431,7 +431,7 @@ const App = () => {
             this.closeTooltip()
           })
           .on("click", function (e) {
-            layerGroup.eachLayer(layer => layer.setStyle({ opacity: 0.4 }))
+            layerGroup.eachLayer(layer => layer.setStyle({ opacity: 0.5 }))
             e.target.setStyle({ opacity: 1, weight: 8 })
             const tripBounds = e.target.getBounds()
   mapRef.current?.fitBounds(tripBounds, { padding: [20, 20] })
