@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Typography from "@mui/material/Typography"
 import FormControl from "@mui/material/FormControl"
 import Select, { SelectChangeEvent } from "@mui/material/Select"
@@ -9,14 +9,16 @@ import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { setProgressParallel } from "../../store/slices/progressPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 
 const ParallelCoordinatePlot = () => {
-  const { workflows, progressParallel } = useAppSelector(
+  const { workflows, progressParallel, progressGauges } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
   const parallelData = useRef<any[]>([])
   const foldArray = useRef<string[]>([])
   const tooltipArray = useRef<{ [key: string]: string }[]>([])
+  const [metricExist, setMetricExist] = useState<boolean>(false)
 
   const dispatch = useAppDispatch()
 
@@ -78,6 +80,9 @@ const ParallelCoordinatePlot = () => {
           : []
       ).map(key => ({ field: key }))
 
+      const gaugeValue = progressGauges.find(gauge => gauge.name === selected)?.value
+      setMetricExist(Number.isNaN(gaugeValue) ? false : true)
+
       dispatch(
         setProgressParallel({
           data,
@@ -86,10 +91,12 @@ const ParallelCoordinatePlot = () => {
         }),
       )
     }
-  }, [dispatch, workflows])
+  }, [dispatch, workflows, progressGauges])
 
   const handleMetricSelection = (event: SelectChangeEvent) => {
     dispatch(setProgressParallel({ selected: event.target.value as string }))
+    const gaugeValue = progressGauges.find(gauge => gauge.name === event.target.value as string)?.value
+    setMetricExist(!Number.isNaN(gaugeValue))
   }
 
   return (
@@ -124,11 +131,29 @@ const ParallelCoordinatePlot = () => {
             </FormControl>
           </Box>
           <Box sx={{ width: "99%", px: 1 }}>
-            <ParallelCoordinateVega
-              parallelData={parallelData}
-              progressParallel={progressParallel}
-              foldArray={foldArray}
-            ></ParallelCoordinateVega>
+            {
+              metricExist ? (
+                <ParallelCoordinateVega
+                parallelData={parallelData}
+                progressParallel={progressParallel}
+                foldArray={foldArray}
+              ></ParallelCoordinateVega>
+              ) : (
+                <Box
+                  sx= {{
+                    width: '100%',
+                    height: 300,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <ReportProblemIcon fontSize="large"/>
+                  <Typography>No Metric Data Available</Typography>
+                </Box>
+              )
+            }
           </Box>
         </Paper>
       )}

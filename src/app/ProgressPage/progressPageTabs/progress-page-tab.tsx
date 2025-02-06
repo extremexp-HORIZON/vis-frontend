@@ -14,6 +14,7 @@ import {
   restrictToFirstScrollableAncestor,
   restrictToHorizontalAxis,
   restrictToWindowEdges,
+  restrictToParentElement 
 } from "@dnd-kit/modifiers"
 import TabDroppableContainer from "./tab-droppable-container"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
@@ -81,7 +82,7 @@ const ProgressPageTab = (props: IProgressPageTabs) => {
     <DndContext
       sensors={sensors}
       onDragEnd={handleDragEnd}
-      modifiers={[restrictToHorizontalAxis, restrictToFirstScrollableAncestor]}
+      modifiers={[restrictToHorizontalAxis,restrictToParentElement]}
     >
       <Grid
         ref={progressPageTabsRef}

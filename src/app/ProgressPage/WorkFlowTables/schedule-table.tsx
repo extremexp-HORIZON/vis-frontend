@@ -1,23 +1,19 @@
 import Paper from "@mui/material/Paper"
-import Table from "@mui/material/Table"
-import TableBody from "@mui/material/TableBody"
-import TableCell from "@mui/material/TableCell"
-import TableContainer from "@mui/material/TableContainer"
-import TableHead from "@mui/material/TableHead"
-import TablePagination from "@mui/material/TablePagination"
-import TableRow from "@mui/material/TableRow"
 import Box from "@mui/material/Box"
-import Checkbox from "@mui/material/Checkbox"
 import ArrowUp from "@mui/icons-material/KeyboardArrowUp"
 import ArrowDown from "@mui/icons-material/KeyboardArrowDown"
-// import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import { Close } from "@mui/icons-material"
+import { Close, Visibility } from "@mui/icons-material"
 import ToolBarWorkflow from "./toolbar-workflow-table"
 import FilterBar from "./filter-bar"
-import { Popover } from "@mui/material"
+import { Popover, styled } from "@mui/material"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { setProgressScheduledTable } from "../../../store/slices/progressPageSlice"
+import type { GridColDef, GridRowSelectionModel, GridColumnNode } from "@mui/x-data-grid"
+import { DataGrid } from "@mui/x-data-grid"
+import NoRowsOverlayWrapper from "./no-rows-overlay"
+import theme from "../../../mui-theme"
+
 
 const fractionStrToDecimal = (str: string): string => {
   const [numerator, denominator] = str.split("/").map(Number)
@@ -75,7 +71,14 @@ export interface Column {
   // format?: (value: number) => string;
 }
 
-let columns: Column[] = []
+type CustomGridColDef = GridColDef & {
+  field: string
+  minWidth?: number
+  flex?: number
+  align?: "left" | "right" | "center"
+  headerAlign?: "left" | "right" | "center"
+}
+let columns: CustomGridColDef[] = []
 
 export interface Data {
   [key: string]: string | number | boolean
@@ -87,20 +90,139 @@ let idCounter = 1
 //   handleChange: (newValue: number) => (event: React.SyntheticEvent) => void;
 // }
 
+const WorkflowActions = (props: {
+  id: number,
+}) => {
+  const { id } = props
+  const dispatch = useAppDispatch();
+  const { progressScheduledTable } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  )
+
+  const handleIndexChange = (indexChange: number, id: number) => {
+    const rowIndex = progressScheduledTable.rows.findIndex(row => row.id === id)
+    const newIndex = rowIndex + indexChange
+    if (newIndex < 0 || newIndex >= progressScheduledTable.rows.length) {
+      return
+    } else {
+      const updatedRows = [...progressScheduledTable.rows]
+      const [movedRow] = updatedRows.splice(rowIndex, 1)
+      updatedRows.splice(newIndex, 0, movedRow)
+
+      const newRows = updatedRows.map((row, index) => ({
+        ...row,
+        id: index + 1,
+      }))
+      dispatch(
+        setProgressScheduledTable({ rows: newRows, visibleRows: newRows }),
+      )
+    }
+  }
+
+  const removeRow =
+  (list: Number) => {
+    let filteredWorkflows = progressScheduledTable.rows.filter(
+        row => !(row.id === id),
+      )
+    dispatch(
+      setProgressScheduledTable({
+        rows: filteredWorkflows,
+        visibleRows: filteredWorkflows,
+        selectedWorkflows: [],
+      }),
+    )
+  }
+
+  const isStartRow = (id: number): boolean => {
+    if (id === 1) {
+      return true
+    }
+    return false
+  }
+  const isEndRow = (id: number): boolean => {
+    if (id === progressScheduledTable.rows.length) {
+      return true
+    }
+    return false
+  }
+
+  return (
+    <span onClick={event => event.stopPropagation()}>
+      <ArrowUp
+        onClick={() => handleIndexChange(-1, id)}
+        sx={{
+          cursor: "pointer",
+          color: theme =>
+            isStartRow(id)
+              ? theme.palette.text.disabled
+              : theme.palette.primary.main,
+        }}
+      />
+      <ArrowDown
+        onClick={() => handleIndexChange(1, id)}
+        sx={{
+          cursor: "pointer",
+          color: theme =>
+            isEndRow(id)
+              ? theme.palette.text.disabled
+              : theme.palette.primary.main,
+        }}
+      />
+      <Close
+        onClick={() => removeRow(id)} // TODO: Create function deleting the workflow (delete from scheduled? Or from whole database?)
+        sx={{
+          cursor: "pointer",
+          color: theme => theme.palette.primary.main,
+        }}
+      />
+    </span>
+  )
+}
+
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  "& .MuiDataGrid-scrollbarFiller": {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  "& .MuiDataGrid-columnHeaderTitle": {
+    whiteSpace: "nowrap",
+    overflow: "visible",
+  },
+  "& .datagrid-header-fixed": {
+    // Action column
+    position: "sticky",
+    right: 0,
+    zIndex: 100,
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-cell[data-field="action"]': {
+    position: "sticky",
+    right: 0,
+    backgroundColor: theme.palette.customGrey.light,
+    zIndex: 90,
+  },
+}))
+
 export default function ScheduleTable() {
   // const { handleChange } = props;
   const { workflows, progressScheduledTable } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
   const dispatch = useAppDispatch()
+  const [uniqueParameters, setUniqueParameters] = useState<Set<string> | null>(
+    null,
+  )
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [isFilterOpen, setFilterOpen] = useState(false)
   const paramLength = useRef(0)
 
   useEffect(() => {
     if (workflows.data.length > 0) {
-      //find unique parameters of each workflow -> model traning task
-      // const uniqueParameters = new Set(workflows.data.reduce((acc: any[], workflow) => ([...acc, ...Object.keys(workflow.variabilityPoints["Model Training"].Parameters)]), []))
       const uniqueParameters = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
           const params = workflow.tasks.find(
@@ -115,7 +237,7 @@ export default function ScheduleTable() {
           }
         }, []),
       )
-
+      setUniqueParameters(uniqueParameters)
       const rows = workflows.data
         .filter(workflow => workflow.status === "scheduled")
         .map(workflow => {
@@ -164,12 +286,25 @@ export default function ScheduleTable() {
           ? Object.keys(infoRow[0])
               .filter(key => key !== "id")
               .map(key => ({
-                id: key,
-                label: key,
+                field: key,
+                headerName: key.replace("_", " "),
+                headerClassName:
+                key === "action" ? "datagrid-header-fixed" : "datagrid-header",
                 minWidth: key === "action" ? 100 : 50,
-                numeric: typeof infoRow[0][key] === "number" ? true : false,
+                flex: 1,
                 align: "center",
-                sortable: key !== "action" ? true : false,
+                headerAlign: "center",
+                sortable: false,    
+                type: typeof rows[0][key] === "number" ? "number" : "string",
+                ...(key === "action" && {
+                  renderCell: (params) => {
+                    return (
+                      <WorkflowActions
+                        id={params.row.id}
+                      />
+                    )
+                  }
+                })
               }))
           : []
       paramLength.current = uniqueParameters.size
@@ -205,46 +340,9 @@ export default function ScheduleTable() {
       )
     }
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-    const selectedIndex = progressScheduledTable.selectedWorkflows.indexOf(id)
-    let newSelected: readonly number[] = []
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(
-        progressScheduledTable.selectedWorkflows,
-        id,
-      )
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(
-        progressScheduledTable.selectedWorkflows.slice(1),
-      )
-    } else if (
-      selectedIndex ===
-      progressScheduledTable.selectedWorkflows.length - 1
-    ) {
-      newSelected = newSelected.concat(
-        progressScheduledTable.selectedWorkflows.slice(0, -1),
-      )
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        progressScheduledTable.selectedWorkflows.slice(0, selectedIndex),
-        progressScheduledTable.selectedWorkflows.slice(selectedIndex + 1),
-      )
+    const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
+      dispatch(setProgressScheduledTable({ selectedWorkflows: newSelection }))
     }
-    dispatch(setProgressScheduledTable({ selectedWorkflows: newSelected }))
-  }
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    dispatch(setProgressScheduledTable({ page: newPage }))
-  }
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    dispatch(
-      setProgressScheduledTable({ rowsPerPage: +event.target.value, page: 0 }),
-    )
-  }
 
   const handleFilterChange = (
     index: number,
@@ -310,78 +408,13 @@ export default function ScheduleTable() {
         })
       })
     }
-      console.log("newRows", newRows)
-      dispatch(
+    dispatch(
         setProgressScheduledTable({
           filtersCounter: counter,
           filteredRows: newRows,
         }),
       )
   }, [progressScheduledTable.filters])
-
-  const isStartRow = (id: number): boolean => {
-    if (id === 1) {
-      return true
-    }
-    return false
-  }
-  const isEndRow = (id: number): boolean => {
-    if (id === progressScheduledTable.rows.length) {
-      return true
-    }
-    return false
-  }
-  function handleIndexChange(indexChange: number, id: number) {
-    const rowIndex = progressScheduledTable.rows.findIndex(row => row.id === id)
-    const newIndex = rowIndex + indexChange
-    if (newIndex < 0 || newIndex >= progressScheduledTable.rows.length) {
-      return null
-    } else {
-      const updatedRows = [...progressScheduledTable.rows]
-      const [movedRow] = updatedRows.splice(rowIndex, 1)
-      updatedRows.splice(newIndex, 0, movedRow)
-
-      const newRows = updatedRows.map((row, index) => ({
-        ...row,
-        id: index + 1,
-      }))
-      dispatch(
-        setProgressScheduledTable({ rows: newRows, visibleRows: newRows }),
-      )
-    }
-  }
-
-  const isSelected = (id: number) =>
-    progressScheduledTable.selectedWorkflows.indexOf(id) !== -1
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    progressScheduledTable.page > 0
-      ? Math.max(
-          0,
-          (1 + progressScheduledTable.page) *
-            progressScheduledTable.rowsPerPage -
-            progressScheduledTable.rows.length,
-        )
-      : 0
-
-  useEffect(() => {
-      if (progressScheduledTable.filteredRows.length === 0) return
-      const visibleRows = stableSort(
-        progressScheduledTable.filteredRows,
-        getComparator(progressScheduledTable.order, progressScheduledTable.orderBy),
-      ).slice(
-        progressScheduledTable.page * progressScheduledTable.rowsPerPage,
-        progressScheduledTable.page * progressScheduledTable.rowsPerPage +
-        progressScheduledTable.rowsPerPage,
-      )
-      dispatch(setProgressScheduledTable({ visibleRows }))
-    }, [
-      progressScheduledTable.order,
-      progressScheduledTable.orderBy,
-      progressScheduledTable.page,
-      progressScheduledTable.rowsPerPage,
-      progressScheduledTable.filteredRows,
-    ])
 
   return (
     <Box>
@@ -414,187 +447,74 @@ export default function ScheduleTable() {
             />
           </Box>
         </Popover>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow
-                sx={{
-                  "& th": {
-                    backgroundColor: theme => theme.palette.customGrey.main,
-                  },
-                }}
-              >
-                <TableCell align="right" colSpan={1} />
-                <TableCell align="right" colSpan={1} />
-                {/* <TableCell
-                  sx={{
-                    borderBottom: theme =>
-                      `2px solid ${theme.palette.primary.light}`,
-                  }}
-                  align="center"
-                  colSpan={1}
-                >
-                  Task Variant
-                </TableCell> */}
-                <TableCell
-                  sx={{
-                    borderBottom: theme =>
-                      `2px solid ${theme.palette.primary.dark}`,
-                  }}
-                  align="center"
-                  colSpan={paramLength.current}
-                >
-                  Parameters
-                </TableCell>
-                <TableCell align="right" colSpan={1} />
-                <TableCell align="right" colSpan={1} />
-              </TableRow>
-              <TableRow
-                sx={{
-                  "& th": {
-                    backgroundColor: theme => theme.palette.customGrey.main,
-                  },
-                }}
-              >
-                <TableCell
-                  padding="checkbox"
-                  key={"checkbox-cell"}
-                  // align={"center"}
-                  style={{ top: 57, minWidth: "50" }}
-                ></TableCell>
-                {columns.map(headCell => (
-                  <TableCell
-                    key={headCell.id}
-                    align={headCell.align}
-                    sx={{ top: 57, minWidth: headCell.minWidth }}
-                  >
-                    {headCell.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {progressScheduledTable.visibleRows
-                .slice(
-                  progressScheduledTable.page *
-                    progressScheduledTable.rowsPerPage,
-                  progressScheduledTable.page *
-                    progressScheduledTable.rowsPerPage +
-                    progressScheduledTable.rowsPerPage,
-                )
-                .map((row, index) => {
-                  const isItemSelected = isSelected(row.id)
-                  const labelId = `enhanced-table-checkbox-${index}`
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          onClick={event => handleClick(event, row.id)}
-                          sx={{
-                            cursor: "pointer",
-                            color: theme => theme.palette.primary.main,
-                          }}
-                          checked={isItemSelected}
-                          inputProps={{
-                            "aria-labelledby": labelId,
-                          }}
-                        />
-                      </TableCell>
-                      {columns.map(column => {
-                        let value: string
-
-                        let currentScheduledPosition = row.id
-
-                        switch (column.id) {
-                          case "action":
-                            currentScheduledPosition = row.id
-
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                <span>
-                                  <ArrowUp
-                                    onClick={() =>
-                                      handleIndexChange(-1, row.id)
-                                    }
-                                    sx={{
-                                      cursor: "pointer",
-                                      color: theme =>
-                                        isStartRow(currentScheduledPosition)
-                                          ? theme.palette.text.disabled
-                                          : theme.palette.primary.main,
-                                    }}
-                                  />
-
-                                  <ArrowDown
-                                    onClick={() => handleIndexChange(1, row.id)}
-                                    sx={{
-                                      cursor: "pointer",
-                                      color: theme =>
-                                        isEndRow(currentScheduledPosition)
-                                          ? theme.palette.text.disabled
-                                          : theme.palette.primary.main,
-                                    }}
-                                  />
-                                </span>
-                                <Close
-                                  onClick={removeSelected([row.id])} // TODO: Create function deleting the workflow (delete from scheduled? Or from whole database?)
-                                  sx={{
-                                    cursor: "pointer",
-                                    color: theme => theme.palette.primary.main,
-                                  }}
-                                />
-                              </TableCell>
-                            )
-
-                          default:
-                            value = String(row[column.id])
-
-                            return (
-                              <TableCell
-                                key={column.id}
-                                align={column.align}
-                                sx={{
-                                  color: theme => theme.palette.customGrey.text,
-                                }}
-                              >
-                                {value}
-                              </TableCell>
-                            )
-                        }
-                      })}
-                    </TableRow>
-                  )
-                })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 53 * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {progressScheduledTable.rows.length > 5 && (
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={progressScheduledTable.rows.length}
-            rowsPerPage={progressScheduledTable.rowsPerPage}
-            page={progressScheduledTable.page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+        <div style={{ height: 450, width: "100%" }}>
+          <StyledDataGrid 
+            rows={progressScheduledTable.visibleRows}
+            columns={columns}
+            slots={{noRowsOverlay: NoRowsOverlayWrapper}}
+            slotProps={{noRowsOverlay: {title: "No scheduled workflows"}}}
+            checkboxSelection
+            onRowSelectionModelChange={handleSelectionChange}
+            sx={{
+              "& .MuiDataGrid-selectedRowCount": {
+                visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header
+              },
+              "& .theme-parameters-group": {
+                textAlign: "center",
+                justifyContent: "center",
+                position: "relative",
+                display: "grid",
+                width: "100%",
+                "&::after": {
+                  content: '""',
+                  display: "block",
+                  width: "100%",
+                  height: "2px",
+                  backgroundColor: theme.palette.primary.main,
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                },
+              },
+              "& .theme-parameters-group-2": {
+                textAlign: "center",
+                justifyContent: "center",
+                position: "relative",
+                display: "grid",
+                width: "100%",
+                "&::after": {
+                  content: '""',
+                  display: "block",
+                  width: "100%",
+                  height: "2px",
+                  backgroundColor: theme.palette.secondary.dark,
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                },
+              }
+            }}
+            pageSizeOptions={[10, 25, 100]}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10 },
+              },
+            }}
+            columnGroupingModel={[
+              {
+                groupId: "Parameters",
+                headerClassName: "theme-parameters-group",
+                children: uniqueParameters
+                  ? (Array.from(uniqueParameters).map(
+                      (param): GridColumnNode => ({
+                        field: param,
+                      }),
+                    ) as GridColumnNode[])
+                  : [],
+              }
+            ]}
           />
-        )}
+        </div>
       </Paper>
     </Box>
   )

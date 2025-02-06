@@ -8,6 +8,7 @@ import { grey } from "@mui/material/colors";
 interface EnhancedTableProps {
   columns: Column[];
   parametersLength: number;
+  metricsLength: number;
   numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -28,7 +29,7 @@ const FixedTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 export default function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, columns, order, orderBy, numSelected, rowCount, onRequestSort, parametersLength } =
+  const { onSelectAllClick, columns, order, orderBy, numSelected, rowCount, onRequestSort, parametersLength, metricsLength } =
     props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
@@ -48,6 +49,9 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
         </TableCell> */}
         <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.dark}`, zIndex: 100 }} align="center" colSpan={parametersLength}>
           Parameters
+        </TableCell>
+        <TableCell sx={{ borderBottom: theme => `2px solid ${theme.palette.primary.light}`, zIndex: 100 }} align="center" colSpan={metricsLength}>
+          Metrics
         </TableCell>
         <TableCell align="right" colSpan={1} />
         <TableCell align="right" colSpan={1} />

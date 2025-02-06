@@ -3,6 +3,7 @@ import { Box, Typography, IconButton, Paper, Tooltip, Checkbox, FormControlLabel
 import { VegaLite } from "react-vega";
 import InfoIcon from "@mui/icons-material/Info";
 import grey from "@mui/material/colors/grey";
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
  
 interface Metric {
   name: string;
@@ -14,10 +15,11 @@ interface Metric {
 interface IMetricEvaluation {
   availableMetrics: Metric[] | null;
   workflowId: number | string;
+  hasMetrics: boolean | undefined
 }
  
 const MetricEvaluation = (props: IMetricEvaluation) => {
-  const { availableMetrics, workflowId } = props;
+  const { availableMetrics, workflowId, hasMetrics } = props;
   const [selectedMetrics, setSelectedMetrics] = useState<Metric[]>(availableMetrics || []);
  
   const handleMetricChange = (event: any, newValue: Metric[]) => {
@@ -37,6 +39,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
     value: metric.avgValue.toFixed(3),
     category: "Experiments Average",
   }));
+  console.log(radarData)
  
   return (
     <Paper
@@ -64,21 +67,23 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
         </Tooltip>
       </Box>
  
-     
-      <Box sx={{ px: 1, py: 2, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+     {
+      hasMetrics ? (
+        <Box sx={{ px: 1, py: 2, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', justifyContent: 'center', flex: 1 }}>
  
           {availableMetrics && (
-            
-          <Autocomplete
-            multiple
-            options={availableMetrics}
-            getOptionLabel={(option) => option.name}
-            value={selectedMetrics}
-            onChange={handleMetricChange}
-            size='small'
-            renderInput={(params) => <TextField {...params} label="Select Metrics" />}
-          />
-        )}
+
+            <Autocomplete
+              multiple
+              options={availableMetrics}
+              getOptionLabel={(option) => option.name}
+              value={selectedMetrics}
+              onChange={handleMetricChange}
+              size='small'
+              renderInput={(params) => <TextField {...params} label="Select Metrics" />}
+            />
+          )}
+          { radarData.some(data => data.value !== 'NaN') ? (
           <VegaLite
             actions={false}
             style={{ width: "max-content" }}
@@ -182,7 +187,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
                         },
                       },
                     },
- 
+
                     {
                       type: "text",
                       name: "value-text",
@@ -282,7 +287,20 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
               ],
             }}
           />
+          ) : (
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
+              <ReportProblemIcon fontSize={"large"} />
+              <Typography>{"No Metric Data Available"}</Typography>
+            </Box>
+          )}
         </Box>
+      ) : (
+        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
+          <ReportProblemIcon fontSize={"large"} />
+          <Typography>{"No Metrics Available"}</Typography>
+        </Box>
+      )
+     }  
     </Paper>
   );
 };
