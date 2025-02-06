@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, ButtonGroup, Button, Paper, Typography } from "@mui/material"
+import { Box, ButtonGroup, Button, Paper, Typography, Pagination } from "@mui/material"
 import LineChart from "../Charts/LineChart"
 import ChartButtonGroup from "../ChartControls/ChartButtonGroup"
 import LineChartControlPanel from "../Charts/LineChartControlPanel"
@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 import ScatterChart from "../Charts/ScatterChart"
 import MapChart from "../Charts/MapChart"
+import TableExpand from "../DataTable/TableExpand"
 
 interface IGraphContainer {
   linedata: any
@@ -46,6 +47,11 @@ interface IGraphContainer {
   barAggregation: any
   onFetchData: () => void
   setBarAggregation: React.Dispatch<React.SetStateAction<any>>
+  tabledata: any
+  tablecolumns: any
+  count: number
+  page: number
+  onChange: (event: React.ChangeEvent<unknown>, value: number) => void
 }
 
 const GraphContainer = (props: IGraphContainer) => {
@@ -78,6 +84,11 @@ const GraphContainer = (props: IGraphContainer) => {
     barAggregation,
     setBarAggregation,
     onFetchData,
+    tabledata,
+    tablecolumns,
+    count,
+    page,
+    onChange,
   } = props
 
   return (
@@ -174,6 +185,31 @@ const GraphContainer = (props: IGraphContainer) => {
             />
           )}
           {chartType === "map" && <MapChart />}
+          {chartType === "datatable" && (
+            <Box sx={{ width: "100%", overflowX: "auto" }}>
+                              <TableExpand
+                                data={tabledata}
+                                columns={tablecolumns}
+                                datetimeColumn=""
+                              />
+            
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  justifyContent: "right",
+                                  marginTop: "1rem",
+                                  padding: "1rem",
+                                }}
+                              >
+                                <Pagination
+                                  count={count}
+                                  page={page}
+                                  onChange={onChange}
+                                  variant="outlined"
+                                />
+                              </Box>
+                            </Box>
+          )}
         </Box>
       </Box>
     </Paper>
