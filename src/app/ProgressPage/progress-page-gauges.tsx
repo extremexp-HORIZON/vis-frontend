@@ -27,7 +27,7 @@ const MetricGauge = (props: {gaugeInfo: {name: string, type: string, value: numb
         value={isNaN(displayValue) ? 100 : val}
       >
         <GaugeReferenceArc min={0} max={maxValue} />
-        <GaugeValueArc style={{ fill: isNaN(displayValue) ? theme.palette.error.light : theme.palette.primary.main }} />
+        <GaugeValueArc style={{ fill: isNaN(displayValue) ? "#E0E0E0" : theme.palette.primary.main }} />
         <text
           x="50%"
           y="50%"
@@ -37,7 +37,7 @@ const MetricGauge = (props: {gaugeInfo: {name: string, type: string, value: numb
           fill={theme.palette.text.primary}
           fontWeight={600}
         >
-          {isNaN(displayValue) ? 'No Data' : displayValue}
+          {isNaN(displayValue) ? 'N/A' : displayValue}
         </text>
       </GaugeContainer>
     </Box>
@@ -102,6 +102,7 @@ const ProgressPageGauges = () => {
         const commonMetrics = allMetrics.reduce((acc: any, metrics: string[]) => {
           return acc.filter((metric: string) => metrics.includes(metric))
         })
+        console.log(commonMetrics)
         return commonMetrics
       }
 
@@ -111,7 +112,9 @@ const ProgressPageGauges = () => {
         const averageValues = commonMetrics.reduce((acc: any, metric: string) => {
           const metricValues = completedWorkflows.map((workflow: IWorkflowResponse) => (
           workflow.metrics.find((m: any) => m.name === metric)
-          )) as MetricDetail[]
+          )).filter(m => m?.semantic_type && m.semantic_type.includes("ML")) as MetricDetail[]
+          console.log(metricValues)
+          if(metricValues.length === 0) return acc
           const metricAverage = (metricValues.reduce((acc: number, metric: any) => (acc = acc + parseFloat(metric.value) ), 0) / metricValues.length)
           return [...acc, {name: metric, type: metricValues[0].type, value: metricAverage}] 
         }, [])
