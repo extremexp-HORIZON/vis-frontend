@@ -22,7 +22,7 @@ const TabDroppableContainer = (props: IDroppableContainer) => {
     height: "3.5rem",
     columnGap: 8,
     alignItems: "center",
-    overflow: "auto"
+    overflow: "hidden"
   }
 
   return (

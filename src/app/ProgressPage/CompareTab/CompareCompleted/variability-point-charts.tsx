@@ -64,7 +64,7 @@ const VariabilityPointCharts = () => {
         )
         .map(workflow => ({
           x: parseFloat(workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === variabilityPoint)?.value || "0")|| 0,
-          y: parseFloat(workflow.metrics.find(m => m.name === selectedMetric)?.value || "0") || 0,
+          y: workflow.metrics.find(m => m.name === selectedMetric)?.value ? parseFloat(workflow.metrics.find(m => m.name === selectedMetric)?.value || "0") : null,
           id: workflow.workflowId,
           point: variabilityPoint,
         }),
@@ -86,6 +86,7 @@ const VariabilityPointCharts = () => {
   )
 
   const chartData = processData(selectedMetric, selectedVariabilityPoint)
+  console.log(chartData)
   const yAxisDomain = getYAxisDomain(chartData)
 
   const handleMetricChange = (event: SelectChangeEvent<string>) => {

@@ -6,13 +6,24 @@ import green from "@mui/material/colors/green"
 import red from "@mui/material/colors/red"
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
+import { useEffect } from "react"
 
 interface IWorkflowMetrics {
   metrics: { [key: string]: number | string }[] | null
+  hasMetrics: boolean | undefined
+  setHasMetrics: React.Dispatch<React.SetStateAction<boolean | undefined>>
 }
 
 const WorkflowMetrics = (props: IWorkflowMetrics) => {
-  const { metrics } = props
+  const { metrics, hasMetrics, setHasMetrics } = props
+  
+  useEffect(() => {
+    const hasDisplayMetrics = metrics?.some(metric => {
+      const value = typeof metric.value === 'string' ? Number(parseFloat(metric.value).toFixed(3)) : Number(metric.value.toFixed(3))
+      return !isNaN(value)
+    })  
+    setHasMetrics(hasDisplayMetrics)
+  }, [])
 
   return (
     <>
@@ -41,51 +52,66 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
         </Box> */}
         <Grid sx={{ p: 2, justifyContent: "center" }} container spacing={3}>
           {metrics
-            ? metrics.map(metric => (
-                <Grid
-                  key={`statistics-${metric.name}`}
-                  xs={12}
-                  sm={12}
-                  md={6}
-                  lg={3}
-                  item
-                >
-                  <Paper sx={{ p: 2 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "centers",
-                        columnGap: 1,
-                      }}
+            ? metrics.map(metric => {
+                const value = typeof metric.value === 'string' ? Number(parseFloat(metric.value).toFixed(3)) : Number(metric.value.toFixed(3))
+                if(!isNaN(value))
+                  return (
+                    <Grid
+                      key={`statistics-${metric.name}`}
+                      xs={12}
+                      sm={12}
+                      md={6}
+                      lg={3}
+                      item
                     >
-                      <Typography fontWeight={600}>{metric.name}:</Typography>
-                      <Typography>
-                      {typeof metric.value === 'string' ? parseFloat(metric.value).toFixed(3) : metric.value.toFixed(3)}
-                      {metric.name === "runtime" && "s"}
-                      </Typography>
-                    </Box>
-                     <Box
-                      sx={{
-                        textAlign: "center",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {metric.avgDiff as number > 0 ? (
-                        <ArrowDropUpIcon sx={{ color: green[400] }} />
-                      ) : (
-                        <ArrowDropDownIcon sx={{ color: red[400] }} />
-                      )}
-                      <Typography sx={{ mr: 0.5 }}>
-                        {parseInt(metric.avgDiff.toString())}%
-                      </Typography>
-                      <Typography>vs. experiment average</Typography>
-                    </Box> 
-                  </Paper>
-                </Grid>
-              ))
+                      <Paper sx={{ p: 2 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "centers",
+                            columnGap: 1,
+                          }}
+                        >
+                          <Typography fontWeight={600}>{metric.name}:</Typography>
+                          <Typography>
+                          {value}
+                          {metric.name === "runtime" && "s"}
+                          </Typography>
+                        </Box>
+                         <Box
+                          sx={{
+                            textAlign: "center",
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {metric.avgDiff as number > 0 ? (
+                            <ArrowDropUpIcon sx={{ color: green[400] }} />
+                          ) : (
+                            <ArrowDropDownIcon sx={{ color: red[400] }} />
+                          )}
+                          <Typography sx={{ mr: 0.5 }}>
+                            {parseInt(metric.avgDiff.toString())}%
+                          </Typography>
+                          <Typography>vs. experiment average</Typography>
+                        </Box> 
+                      </Paper>
+                    </Grid>
+                  )
+              })
             : null}
+            {!hasMetrics && (
+              <Grid
+                xs={12}
+                sm={12}
+                md={6}
+                lg={3}
+                item
+              >
+                <Typography>{"No Metrics Available"}</Typography>
+              </Grid>
+            )}
         </Grid>
       </Box>
     </>

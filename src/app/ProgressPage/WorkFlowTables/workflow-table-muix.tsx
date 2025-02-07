@@ -21,7 +21,6 @@ import {
 import { useEffect, useState } from "react"
 import { Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
-import NoRowsOverlayWrapper from "./no-rows-overlay"
 
 import theme from "../../../mui-theme"
 
@@ -125,7 +124,7 @@ interface WorkFlowTableProps {
   ) => (event: React.SyntheticEvent) => void
 }
 
-export default function WorkflowTable(props: WorkFlowTableProps) {
+export default function WorkflowDataGrid(props: WorkFlowTableProps) {
   const { workflows, progressWokflowsTable } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
@@ -136,7 +135,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     null,
   )
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-  const [uniqueMetrics, setUniqueMetrics] = useState<Set<string> | null>(null)
 
   const dispatch = useAppDispatch()
 
@@ -239,20 +237,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           }
         }, []),
       )
-      const uniqueMetrics = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
-          const metrics = workflow?.metrics
-          let metricNames = []
-          if(metrics) {
-            metricNames = metrics.map(metric => metric.name)
-            return [...acc, ...metricNames]
-          } else {
-            return [...acc]
-          }
-        }, [])
-      )
       setUniqueParameters(uniqueParameters)
-      setUniqueMetrics(uniqueMetrics)
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
         .filter(workflow => workflow.status !== "scheduled")
@@ -260,18 +245,12 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           const params = workflow.tasks.find(
             task => task.id === "TrainModel",
           )?.parameters
-          const metrics = workflow?.metrics
           return {
             id: idCounter++,
             workflowId: workflow.workflowId,
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 `${params?.find(param => param.name === variant)?.value}` || ""
-              return acc
-            }, {}),
-            ...Array.from(uniqueMetrics).reduce((acc, variant) => {
-              const value = metrics?.find(metric => metric.name === variant)?.value
-              acc[variant] = value != null ? value : ""
               return acc
             }, {}),
             status: workflow.status,
@@ -360,8 +339,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           <StyledDataGrid
             rows={progressWokflowsTable.filteredRows}
             columns={columns}
-            slots={{noRowsOverlay: NoRowsOverlayWrapper}}
-            slotProps={{noRowsOverlay: {title: "No workflows available"}}}
             checkboxSelection
             onRowSelectionModelChange={handleSelectionChange}
             sx={{
@@ -372,7 +349,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                 textAlign: "center",
                 justifyContent: "center",
                 position: "relative",
-                display: "grid",
+                display: "flex",
                 width: "100%",
                 "&::after": {
                   content: '""',
@@ -385,23 +362,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                   left: 0,
                 },
               },
-              "& .theme-parameters-group-2": {
-                textAlign: "center",
-                justifyContent: "center",
-                position: "relative",
-                display: "grid",
-                width: "100%",
-                "&::after": {
-                  content: '""',
-                  display: "block",
-                  width: "100%",
-                  height: "2px",
-                  backgroundColor: theme.palette.secondary.dark,
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                },
-              }
             }}
             pageSizeOptions={[10, 25, 100]}
             initialState={{
@@ -421,17 +381,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                     ) as GridColumnNode[])
                   : [],
               },
-              {
-                groupId: "Metrics",
-                headerClassName: "theme-parameters-group-2",
-                children: uniqueMetrics ? (
-                  Array.from(uniqueMetrics).map(
-                    (metric): GridColumnNode => ({
-                      field: metric,
-                    }),
-                  ) as GridColumnNode[]
-                ) : []
-              }
             ]}
           />
         </div>

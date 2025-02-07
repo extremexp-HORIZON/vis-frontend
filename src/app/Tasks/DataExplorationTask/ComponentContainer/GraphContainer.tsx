@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { Box, ButtonGroup, Button, Paper, Typography } from "@mui/material"
 import LineChart from "../Charts/LineChart"
 import ChartButtonGroup from "../ChartControls/ChartButtonGroup"
 import LineChartControlPanel from "../Charts/LineChartControlPanel"
 import BarChartControlPanel from "../Charts/BarChartControlPanel"
-import { fetchDataExploration } from "../../../../store/slices/dataExplorationSlice"
-import { IFilter, VisualColumn } from "../../../../shared/models/dataexploration.model"
+import {
+  IFilter,
+  VisualColumn,
+} from "../../../../shared/models/dataexploration.model"
 import BarChart from "../Charts/BarChart"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
@@ -13,21 +15,22 @@ import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 import ScatterChart from "../Charts/ScatterChart"
 import MapChart from "../Charts/MapChart"
 
-
 interface IGraphContainer {
   linedata: any
-  bardata:any
+  bardata: any
   filters: IFilter[]
   experimentId: string
   workflowId: string
   columns: VisualColumn[]
   originalColumns: VisualColumn[]
   chartType: "line" | "bar" | "scatter" | "map"
-  setChartType: React.Dispatch<React.SetStateAction<"line" | "bar" | "scatter" | "map">>
+  setChartType: React.Dispatch<
+    React.SetStateAction<"line" | "bar" | "scatter" | "map">
+  >
   xAxis: VisualColumn
-  xAxisScatter:VisualColumn
-  colorBy: string;
-  setColorBy: (colorBy: string) => void;
+  xAxisScatter: VisualColumn
+  colorBy: string
+  setColorBy: (colorBy: string) => void
   setXAxis: React.Dispatch<React.SetStateAction<VisualColumn>>
   setXAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn>>
   yAxis: VisualColumn[]
@@ -41,11 +44,11 @@ interface IGraphContainer {
   barGroupBy: string[]
   setBarGroupBy: React.Dispatch<React.SetStateAction<string[]>>
   barAggregation: any
+  onFetchData: () => void
   setBarAggregation: React.Dispatch<React.SetStateAction<any>>
 }
 
 const GraphContainer = (props: IGraphContainer) => {
-
   const {
     linedata,
     bardata,
@@ -74,59 +77,33 @@ const GraphContainer = (props: IGraphContainer) => {
     setBarGroupBy,
     barAggregation,
     setBarAggregation,
+    onFetchData,
   } = props
-  
-  
 
-  const dispatch = useAppDispatch()
-  
-
-  const handleFetchBarChartData = () => {
-    dispatch(
-      fetchDataExplorationData({
-        query: {
-          datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
-          limit: 1000, // Default row limit
-          columns: [], // Include selected columns in the payload
-          filters: filters,
-          groupBy: barGroupBy,
-          aggregation: barAggregation,
-        },
-        metadata: {
-          workflowId: workflowId || "",
-          queryCase: "barChart",
-        },
-      }),
-    )
-  }
-
-  
-
-
-  console.log('bardata',bardata)
-
-
-  
   return (
     <Paper>
-      <Box sx={{ padding: "1rem", position: "relative" }}>
+      <Box sx={{ padding: "1rem" }}>
         {/* Container for Chart Buttons and View Mode Buttons */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "flex-end",
-            alignItems: "center",
-            marginBottom: "1rem",
+            alignItems: "flex-end",
+            flexDirection: "column", // Stack elements verticall
           }}
         >
           {/* Chart Selection Buttons */}
           <ChartButtonGroup chartType={chartType} setChartType={setChartType} />
 
           {/* Spacing between the buttons */}
-          <Box sx={{ width: "1rem" }} />
+          <Box sx={{ width: "1rem", padding: "1rem" }} />
 
           {/* View Mode Toggle (Overlay/Stacked) */}
-          <ButtonGroup variant="contained" aria-label="view mode" disabled={chartType === "map" || chartType === "bar"}>
+          <ButtonGroup
+            variant="contained"
+            aria-label="view mode"
+            disabled={chartType === "map" || chartType === "bar"}
+          >
             <Button
               onClick={() => setViewMode("overlay")}
               disabled={viewMode === "overlay"}
@@ -159,23 +136,22 @@ const GraphContainer = (props: IGraphContainer) => {
             setBarGroupBy={setBarGroupBy}
             barAggregation={barAggregation}
             setBarAggregation={setBarAggregation}
-            onFetchBarChartData={handleFetchBarChartData}
           />
         )}
-        {chartType === "scatter" && 
-        <ScatterChartControlPanel 
-        columns={columns} 
-        xAxis={xAxisScatter} 
-        setXAxis={setXAxisScatter} 
-        yAxis={yAxisScatter} 
-        setYAxis={setYAxisScatter} 
-        colorBy={colorBy}
-        setColorBy={setColorBy}
-        />}
-         
+        {chartType === "scatter" && (
+          <ScatterChartControlPanel
+            columns={columns}
+            xAxis={xAxisScatter}
+            setXAxis={setXAxisScatter}
+            yAxis={yAxisScatter}
+            setYAxis={setYAxisScatter}
+            colorBy={colorBy}
+            setColorBy={setColorBy}
+          />
+        )}
 
         {/* Conditionally Render Chart Based on Selected Type */}
-        <Box sx={{ marginTop: "2rem" }}>
+        <Box sx={{ marginTop: "1rem" }}>
           {chartType === "line" && (
             <LineChart
               viewMode={viewMode}
@@ -185,24 +161,19 @@ const GraphContainer = (props: IGraphContainer) => {
               groupFunction={""}
             />
           )}
-          {chartType === "bar" && (
-            <BarChart dataExploration={bardata} />
+          {chartType === "bar" && <BarChart dataExploration={bardata} />}
+          {chartType === "scatter" && (
+            <ScatterChart
+              viewMode={viewMode}
+              data={linedata}
+              xAxis={xAxisScatter}
+              yAxis={yAxisScatter}
+              colorBy={colorBy}
+              setColorBy={setColorBy}
+              columns={columns}
+            />
           )}
-          {chartType === "scatter" && 
-           <ScatterChart
-           viewMode={viewMode}
-           data={linedata}
-           xAxis={xAxisScatter}
-           yAxis={yAxisScatter}
-           colorBy={colorBy}
-           setColorBy={setColorBy}
-           columns={columns}
-         />
-          }
-          {
-            chartType==="map" && 
-            <MapChart/>
-          }
+          {chartType === "map" && <MapChart />}
         </Box>
       </Box>
     </Paper>

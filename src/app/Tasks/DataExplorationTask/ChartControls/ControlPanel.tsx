@@ -83,15 +83,18 @@ const ControlPanel = (props: IControlPanel) => {
       },
     },
   })
-  const [showColumnDropdown, setShowColumnDropdown] = useState(false)
+  const [showColumnDropdown, setShowColumnDropdown] = useState(true)
   const [showRowLimitDropdown, setShowRowLimitDropdown] = useState(false)
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+  const [showFilterDropdown, setShowFilterDropdown] = useState(true)
   const [filterColumn, setFilterColumn] = useState("") // Selected column
   const [filterType, setFilterType] = useState("equals") // 'equals' or 'range'
   const [filterValue, setFilterValue] = useState("") // For equals, or range object {min, max}
   const [sliderRange, setSliderRange] = useState([0, 100]) // Min and Max values for the slider
   console.log('uunique values',uniqueValues)
 
+useEffect(() => {
+  onFetchData()
+}, [filters]) // Runs every time filters change
   useEffect(() => {
     // Update slider range (min, max) whenever a new column is selected for range filtering
     if (filterType === "range" && filterColumn) {
@@ -119,6 +122,7 @@ const ControlPanel = (props: IControlPanel) => {
   const handleDeleteFilter = index => {
     const updatedFilters = filters.filter((_, i) => i !== index)
     setFilters(updatedFilters)
+    onFetchData()
   }
   const handleSliderChange = (event, newValue) => {
     setFilterValue({ min: newValue[0], max: newValue[1] })
@@ -133,7 +137,7 @@ const ControlPanel = (props: IControlPanel) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: "250px", padding: 2, borderRight: "1px solid #ccc" }}>
+      <Box sx={{ width: "25%", padding: 2, borderRight: "1px solid #ccc" }}>
         <Box sx={{ marginTop: 2 }}>
           <Box
             sx={{
@@ -172,6 +176,7 @@ const ControlPanel = (props: IControlPanel) => {
                 value={selectedColumns}
                 onChange={handleChange}
                 renderValue={getDisplayValue} // Use the new display function
+                onClose={onFetchData}
                 MenuProps={{
                   PaperProps: { style: { maxHeight: 224, width: 250 } },
                 }}
@@ -315,16 +320,7 @@ const ControlPanel = (props: IControlPanel) => {
               ))}
             </Box>
             </Box>
-          )}
-          <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={onFetchData}
-            sx={{ marginTop: 2 }}
-          >
-            Fetch Data
-          </Button>
+          )}  
         </Box>
       </Box>
     </ThemeProvider>

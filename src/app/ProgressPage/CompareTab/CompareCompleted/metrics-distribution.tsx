@@ -13,6 +13,7 @@ import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 import { Metric, MetricDetail } from "../../../../shared/models/workflow.model"
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 
 const MetricsDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -32,7 +33,7 @@ const MetricsDistribution = () => {
   }, [workflows.data])
 
   const metricAvailability = (metrics: MetricDetail[], metricName: string) => {
-    return metrics.some(metric => metric.name.toLowerCase() === metricName)
+    return metrics.some(metric => metric.name.toLowerCase() === metricName.toLowerCase())
   }
 
   const getData = (metric: string) => {
@@ -56,7 +57,7 @@ const MetricsDistribution = () => {
 
     return completedWorkflows.map(workflow => ({
       metricName: metric,
-      value: workflow.metrics.find(metric => metric.name === lowercaseMetric)
+      value: workflow.metrics.find(metric => metric.name.toLowerCase() === lowercaseMetric)
         ?.value,
     }))
   }
@@ -65,6 +66,9 @@ const MetricsDistribution = () => {
     availableMetrics[0],
   )
 
+  const data = getData(selectedMetrics)
+  console.log(data)
+  
   const handleMetricChange = (event: any) => {
     const {
       target: { value },
@@ -98,203 +102,217 @@ const MetricsDistribution = () => {
             </Select>
           </FormControl>
         </ChartParameters>
-        <Box
+        {data.some(d => d.value) ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-evenly",
+              p: 1,
+              className: "chart-container",
+              alignItems: "center",
+            }}
+          >
+            <Box width="40%" key={`metric-${selectedMetrics}-distribution`}>
+              <ResponsiveVegaLite
+                minHeight={100}
+                actions={false}
+                spec={{
+                  config: {
+                    axisBand: {
+                      bandPosition: 1,
+                      tickExtra: false,
+                      tickOffset: 0,
+                    },
+                  },
+                  signals: [
+                    { name: "plotWidth", update: "(width - 50)/3" },
+                    { name: "trim", value: false }, // Default value set to false
+                    { name: "bandwidth", value: 0.1 }, // Default value set to 0
+                  ],
+                  data: [
+                    {
+                      name: "dummyData",
+                      values: data,
+                    },
+                    {
+                      name: "density",
+                      source: "dummyData",
+                      transform: [
+                        {
+                          type: "kde",
+                          field: "value",
+                          groupby: ["metricName"],
+                          bandwidth: { signal: "bandwidth" },
+                          extent: { signal: "trim ? null : [0, 2]" },
+                        },
+                      ],
+                    },
+                    {
+                      name: "stats",
+                      source: "dummyData",
+                      transform: [
+                        {
+                          type: "aggregate",
+                          groupby: ["metricName"],
+                          fields: ["value", "value", "value"],
+                          ops: ["q1", "median", "q3"],
+                          as: ["q1", "median", "q3"],
+                        },
+                      ],
+                    },
+                  ],
+                  scales: [
+                    {
+                      name: "layout",
+                      type: "band",
+                      range: "width",
+                      domain: { data: "dummyData", field: "metricName" },
+                    },
+                    {
+                      name: "yscale",
+                      type: "linear",
+                      range: "height",
+                      round: true,
+                      domain: { data: "dummyData", field: "value" },
+                      domainMin: 0,
+                      domainMax: 1.5,
+  
+                      zero: false,
+                      nice: true,
+                      reverse: false,
+                    },
+                    {
+                      name: "hscale",
+                      type: "linear",
+                      range: [0, { signal: "plotWidth" }],
+                      domain: { data: "density", field: "density" },
+                    },
+                    {
+                      name: "color",
+                      type: "ordinal",
+                      domain: { data: "dummyData", field: "metricName" },
+                      range: "category",
+                    },
+                  ],
+                  axes: [
+                    { orient: "bottom", scale: "layout", zindex: 1 },
+                    { orient: "left", scale: "yscale", zindex: 1 },
+                  ],
+                  marks: [
+                    {
+                      type: "group",
+                      from: {
+                        facet: {
+                          data: "density",
+                          name: "violin",
+                          groupby: "metricName",
+                        },
+                      },
+                      encode: {
+                        enter: {
+                          xc: {
+                            scale: "layout",
+                            field: "metricName",
+                            band: 0.5,
+                          },
+                          width: { signal: "plotWidth" },
+                          height: { signal: "height" },
+                        },
+                      },
+                      data: [
+                        {
+                          name: "summary",
+                          source: "stats",
+                          transform: [
+                            {
+                              type: "filter",
+                              expr: "datum.metricName === parent.metricName",
+                            },
+                          ],
+                        },
+                      ],
+                      marks: [
+                        {
+                          type: "area",
+                          from: { data: "violin" },
+                          encode: {
+                            enter: {
+                              fill: {
+                                scale: "color",
+                                field: { parent: "metricName" },
+                              },
+                              orient: { value: "horizontal" },
+                              tooltip: {
+                                signal:
+                                  "{'Metric': parent.metricName, 'WorkflowId': parent.workflowId,'Value': datum.value, 'Density': datum.density}",
+                              },
+                            },
+                            update: {
+                              y: { scale: "yscale", field: "value" },
+                              xc: { signal: "plotWidth / 2" },
+                              width: { scale: "hscale", field: "density" },
+                            },
+                          },
+                        },
+                        {
+                          type: "rect",
+                          from: { data: "summary" },
+                          encode: {
+                            enter: {
+                              fill: { value: "black" },
+                              width: { value: 2 },
+                              tooltip: {
+                                signal:
+                                  "{'Metric': parent.metricName,'WorkflowId': parent.workflowId, 'Q1': datum.q1, 'Q3': datum.q3}",
+                              },
+                            },
+                            update: {
+                              y: { scale: "yscale", field: "q1" },
+                              y2: { scale: "yscale", field: "q3" },
+                              xc: { signal: "plotWidth / 2" },
+                            },
+                          },
+                        },
+                        {
+                          type: "rect",
+                          from: { data: "summary" },
+                          encode: {
+                            enter: {
+                              fill: { value: "black" },
+                              height: { value: 10 },
+                              width: { value: 10 },
+                              tooltip: {
+                                signal:
+                                  "{'Metric': parent.metricName,'WorkflowId': parent.workflowId, 'Median': datum.median}",
+                              },
+                            },
+                            update: {
+                              y: { scale: "yscale", field: "median" },
+                              xc: { signal: "plotWidth / 2" },
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                }}
+              />
+            </Box>
+          </Box>        
+        ) : (
+          <Box
           sx={{
             display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-evenly",
-            p: 1,
-            className: "chart-container",
+            justifyContent: "center",
             alignItems: "center",
+            flexDirection: "column"
           }}
-        >
-          <Box width="40%" key={`metric-${selectedMetrics}-distribution`}>
-            <ResponsiveVegaLite
-              minHeight={100}
-              actions={false}
-              spec={{
-                config: {
-                  axisBand: {
-                    bandPosition: 1,
-                    tickExtra: false,
-                    tickOffset: 0,
-                  },
-                },
-                signals: [
-                  { name: "plotWidth", update: "(width - 50)/3" },
-                  { name: "trim", value: false }, // Default value set to false
-                  { name: "bandwidth", value: 0.1 }, // Default value set to 0
-                ],
-                data: [
-                  {
-                    name: "dummyData",
-                    values: getData(selectedMetrics),
-                  },
-                  {
-                    name: "density",
-                    source: "dummyData",
-                    transform: [
-                      {
-                        type: "kde",
-                        field: "value",
-                        groupby: ["metricName"],
-                        bandwidth: { signal: "bandwidth" },
-                        extent: { signal: "trim ? null : [0, 2]" },
-                      },
-                    ],
-                  },
-                  {
-                    name: "stats",
-                    source: "dummyData",
-                    transform: [
-                      {
-                        type: "aggregate",
-                        groupby: ["metricName"],
-                        fields: ["value", "value", "value"],
-                        ops: ["q1", "median", "q3"],
-                        as: ["q1", "median", "q3"],
-                      },
-                    ],
-                  },
-                ],
-                scales: [
-                  {
-                    name: "layout",
-                    type: "band",
-                    range: "width",
-                    domain: { data: "dummyData", field: "metricName" },
-                  },
-                  {
-                    name: "yscale",
-                    type: "linear",
-                    range: "height",
-                    round: true,
-                    domain: { data: "dummyData", field: "value" },
-                    domainMin: 0,
-                    domainMax: 1.5,
-
-                    zero: false,
-                    nice: true,
-                    reverse: false,
-                  },
-                  {
-                    name: "hscale",
-                    type: "linear",
-                    range: [0, { signal: "plotWidth" }],
-                    domain: { data: "density", field: "density" },
-                  },
-                  {
-                    name: "color",
-                    type: "ordinal",
-                    domain: { data: "dummyData", field: "metricName" },
-                    range: "category",
-                  },
-                ],
-                axes: [
-                  { orient: "bottom", scale: "layout", zindex: 1 },
-                  { orient: "left", scale: "yscale", zindex: 1 },
-                ],
-                marks: [
-                  {
-                    type: "group",
-                    from: {
-                      facet: {
-                        data: "density",
-                        name: "violin",
-                        groupby: "metricName",
-                      },
-                    },
-                    encode: {
-                      enter: {
-                        xc: {
-                          scale: "layout",
-                          field: "metricName",
-                          band: 0.5,
-                        },
-                        width: { signal: "plotWidth" },
-                        height: { signal: "height" },
-                      },
-                    },
-                    data: [
-                      {
-                        name: "summary",
-                        source: "stats",
-                        transform: [
-                          {
-                            type: "filter",
-                            expr: "datum.metricName === parent.metricName",
-                          },
-                        ],
-                      },
-                    ],
-                    marks: [
-                      {
-                        type: "area",
-                        from: { data: "violin" },
-                        encode: {
-                          enter: {
-                            fill: {
-                              scale: "color",
-                              field: { parent: "metricName" },
-                            },
-                            orient: { value: "horizontal" },
-                            tooltip: {
-                              signal:
-                                "{'Metric': parent.metricName, 'WorkflowId': parent.workflowId,'Value': datum.value, 'Density': datum.density}",
-                            },
-                          },
-                          update: {
-                            y: { scale: "yscale", field: "value" },
-                            xc: { signal: "plotWidth / 2" },
-                            width: { scale: "hscale", field: "density" },
-                          },
-                        },
-                      },
-                      {
-                        type: "rect",
-                        from: { data: "summary" },
-                        encode: {
-                          enter: {
-                            fill: { value: "black" },
-                            width: { value: 2 },
-                            tooltip: {
-                              signal:
-                                "{'Metric': parent.metricName,'WorkflowId': parent.workflowId, 'Q1': datum.q1, 'Q3': datum.q3}",
-                            },
-                          },
-                          update: {
-                            y: { scale: "yscale", field: "q1" },
-                            y2: { scale: "yscale", field: "q3" },
-                            xc: { signal: "plotWidth / 2" },
-                          },
-                        },
-                      },
-                      {
-                        type: "rect",
-                        from: { data: "summary" },
-                        encode: {
-                          enter: {
-                            fill: { value: "black" },
-                            height: { value: 10 },
-                            width: { value: 10 },
-                            tooltip: {
-                              signal:
-                                "{'Metric': parent.metricName,'WorkflowId': parent.workflowId, 'Median': datum.median}",
-                            },
-                          },
-                          update: {
-                            y: { scale: "yscale", field: "median" },
-                            xc: { signal: "plotWidth / 2" },
-                          },
-                        },
-                      },
-                    ],
-                  },
-                ],
-              }}
-            />
+          >
+            <ReportProblemIcon fontSize="large" />
+            <Typography>{"No Metric Data"}</Typography>
           </Box>
-        </Box>
+        )}
       </WorkflowCard>
     </>
   )

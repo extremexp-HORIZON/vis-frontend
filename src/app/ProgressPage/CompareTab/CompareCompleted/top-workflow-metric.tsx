@@ -13,6 +13,7 @@ import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 import { MetricDetail } from "../../../../shared/models/workflow.model"
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 
 const TopWorkflowMetric = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -29,7 +30,7 @@ const TopWorkflowMetric = () => {
   const [metric, setMetric] = useState(metrics[0] || "loss")
 
   const metricAvailability = (metrics: MetricDetail[], metricName: string) => {
-    return metrics.some(metric => metric.name.toLowerCase() === metricName)
+    return metrics.some(metric => metric.name.toLowerCase() === metricName.toLowerCase())
   }
 
   const getTopTenWorkflowsByMetric = (metric: string) => {
@@ -110,14 +111,28 @@ const TopWorkflowMetric = () => {
           </Select>
         </FormControl>
       </ChartParameters>
-      <Box sx={{ textAlign: "center", m: 2 }}>
-        <ResponsiveVegaLite
-          minWidth={100}
-          aspectRatio={2 / 1}
-          actions={false}
-          spec={spec as VisualizationSpec}
-        />
-      </Box>
+      { topTenWorkflows.some(workflow => workflow.metricValue) ? (
+        <Box sx={{ textAlign: "center", m: 2 }}>
+          <ResponsiveVegaLite
+            minWidth={100}
+            aspectRatio={2 / 1}
+            actions={false}
+            spec={spec as VisualizationSpec}
+          />
+        </Box>      
+      ) : (
+        <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column"
+        }}
+        >
+          <ReportProblemIcon fontSize="large" />
+          <Typography>{"No Metric Data"}</Typography>
+        </Box>
+      )}
     </WorkflowCard>
   )
 }

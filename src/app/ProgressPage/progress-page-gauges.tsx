@@ -11,7 +11,7 @@ import { IWorkflowResponse, MetricDetail } from "../../shared/models/workflow.mo
 
 const MetricGauge = (props: {gaugeInfo: {name: string, type: string, value: number}}) => {
   const { gaugeInfo } = props
-  const displayValue = gaugeInfo.value.toFixed(2)
+  const displayValue = Number(gaugeInfo.value.toFixed(2))
   const maxValue = 0 // Set max to 5 for time values and 100 for percentages
   const val = gaugeInfo.value > 1 ? gaugeInfo.value : gaugeInfo.value * 100
   const theme = useTheme()
@@ -24,10 +24,10 @@ const MetricGauge = (props: {gaugeInfo: {name: string, type: string, value: numb
         sx={{ alignSelf: "center" }}
         startAngle={-110}
         endAngle={110}
-        value={val}
+        value={isNaN(displayValue) ? 100 : val}
       >
         <GaugeReferenceArc min={0} max={maxValue} />
-        <GaugeValueArc style={{ fill: theme.palette.primary.main }} />
+        <GaugeValueArc style={{ fill: isNaN(displayValue) ? theme.palette.error.light : theme.palette.primary.main }} />
         <text
           x="50%"
           y="50%"
@@ -37,7 +37,7 @@ const MetricGauge = (props: {gaugeInfo: {name: string, type: string, value: numb
           fill={theme.palette.text.primary}
           fontWeight={600}
         >
-          {displayValue}
+          {isNaN(displayValue) ? 'No Data' : displayValue}
         </text>
       </GaugeContainer>
     </Box>
