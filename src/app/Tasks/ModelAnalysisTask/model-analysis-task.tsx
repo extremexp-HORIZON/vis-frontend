@@ -377,15 +377,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                 px: 5,
               }}
             >
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 600, fontSize: "1.5rem" }}
-              >
-                Global Counterfactuals
-              </Typography>
-              <Typography variant="body1">
-                Content for Global Counterfactuals
-              </Typography>
               <>
                 <CGlanceExecution
                   workflow={workflow}

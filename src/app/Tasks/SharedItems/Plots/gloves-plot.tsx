@@ -162,7 +162,6 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 Number of CounterFactual Actions
               </InputLabel>
               <Select
-                size="small"
                 MenuProps={{
                   PaperProps: { style: { maxHeight: 224, width: 250 } },
                 }}
@@ -314,7 +313,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 />
                 <Box marginTop={2}>
                   <WorkflowCard
-                    title={"Plotting"}
+                    title={""}
                     description="Set of final global counterfactual actions generated"
                   >
                     <GlovesScatter
