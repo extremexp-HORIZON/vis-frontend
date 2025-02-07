@@ -270,9 +270,33 @@ const App = () => {
   const [timestampField, setTimestampField] = useState<string>("timestamp")
   const [tripsMode, setTripsMode] = useState<boolean>(false)
   const [colorBy, setColorBy] = useState<string | null>("None") // Set initial color to 'default'
-
+  
   const [latitudeField, setLatitudeField] = useState<string>("")
   const [longitudeField, setLongitudeField] = useState<string>("")
+
+  const COLOR_PALETTE = [
+    "#E6194B",
+    "#3CB44B",
+    "#FFE119",
+    "#0082C8",
+    "#F58231",
+    "#911EB4",
+    "#46F0F0",
+    "#F032E6",
+    "#D2F53C",
+    "#FABEBE",
+    "#008080",
+    "#E6BEFF",
+    "#AA6E28",
+    "#800000",
+    "#808000",
+    "#000080",
+    "#808080",
+    "#FFFFFF",
+    "#000000",
+    "#A9A9A9",
+  ]
+
 
   const layers = {
     osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -326,7 +350,6 @@ const App = () => {
           integerColumns.find(col =>
             potentialLonColumns.includes(col.toLowerCase()),
           ) || ""
-        console.log("detectedLatitude", detectedLatitude)
 
         setLatitudeField(detectedLatitude)
         setLongitudeField(detectedLongitude)
@@ -342,12 +365,14 @@ const App = () => {
   }, [timestampField, selectedColumns])
 
   const generateColorMap = (data: any[], colorBy: string) => {
-    const colors: Record<string, string> = {}
-    const categories = [...new Set(data.map(row => row[colorBy]))] // Get unique categories
-    categories.forEach(category => {
-      colors[category] = generateRandomColor() // Assign a random color to each category
+    const uniqueCategories = [...new Set(data.map(row => row[colorBy]))]
+    const colorMapping: Record<string, string> = {}
+
+    uniqueCategories.forEach((category, index) => {
+      colorMapping[category] = COLOR_PALETTE[index % COLOR_PALETTE.length] // Ensure cycling through colors
     })
-    return colors
+
+    return colorMapping
   }
 
   useEffect(() => {
@@ -398,7 +423,9 @@ const App = () => {
     const layerGroup = L.layerGroup().addTo(mapRef.current)
 
     if (tripsMode) {
-      const trips: Record<string, any[]> = {}
+      const trips = {}
+      const tripColorMap = generateTripColorMap(data, selectedColumns) // Use consistent colors
+
       data.forEach(row => {
         if (!row.latitude || !row.longitude) return
         const tripKey = selectedColumns.map(col => row[col]).join("-")
@@ -412,39 +439,62 @@ const App = () => {
             new Date(a[timestampField]).getTime() -
             new Date(b[timestampField]).getTime(),
         )
-        console.log("trips", trips)
+
         const tripCoords = trips[tripKey].map(row => [
           row.latitude,
           row.longitude,
         ])
-        L.polyline(tripCoords, { color: generateRandomColor(), weight: 4 })
+        const tripColor = tripColorMap[tripKey]
+
+        // Draw the trip polyline
+        L.polyline(tripCoords, { color: tripColor, weight: 4 })
           .addTo(layerGroup)
           .bindTooltip(
             `<strong>Trip:</strong> ${tripKey} <br/>
-             <strong>Segmented By:</strong> ${selectedColumns.join(", ")}`
+                   <strong>Segmented By:</strong> ${selectedColumns.join(", ")}`,
           )
-                    .on("mouseover", function (e) {
+          .on("mouseover", function () {
             this.openTooltip()
             this.bringToFront()
           })
-          .on("mouseout", function (e) {
+          .on("mouseout", function () {
             this.closeTooltip()
           })
           .on("click", function (e) {
-            layerGroup.eachLayer(layer => layer.setStyle({ opacity: 0.5 }))
-            e.target.setStyle({ opacity: 1, weight: 8 })
+            layerGroup.eachLayer(layer => layer.setStyle({ opacity: 0.3}))
+            e.target.setStyle({ opacity: 1, weight: 4 })
             const tripBounds = e.target.getBounds()
-  mapRef.current?.fitBounds(tripBounds, { padding: [20, 20] })
-  
-
-
+            mapRef.current?.fitBounds(tripBounds, { padding: [20, 20] })
           })
 
-          
-          
-          
+        // Add circle markers for each trip point
+        trips[tripKey].forEach(row => {
+          L.circleMarker([row.latitude, row.longitude], {
+            radius: 3,
+            color: tripColor,
+            fillOpacity: 0.5,
+            opacity:1,
+            weight: 5
+          })
+            .addTo(layerGroup)
+            .bindPopup(
+              `<strong>Latitude:</strong> ${row.latitude} <br/>
+                   <strong>Longitude:</strong> ${row.longitude} <br/>
+                   <strong>Timestamp:</strong> ${new Date(row[timestampField]).toLocaleDateString()} <br/>`,
+            )
+            // .bindTooltip(
+            //   `Latitude: ${row.latitude}, Longitude: ${row.longitude}`,
+            // )
+            .on("mouseover", function () {
+              this.openTooltip()
+            })
+            .on("mouseout", function () {
+              this.closeTooltip()
+            })
+        })
       })
-    } else {
+    } 
+    else {
       data.forEach(row => {
         if (!row.latitude || !row.longitude) return
         const color =
@@ -462,10 +512,11 @@ const App = () => {
             `
             <strong>Latitude:</strong> ${row.latitude} <br/>
             <strong>Longitude:</strong> ${row.longitude} <br/>
-            <strong>Timestamp:</strong> ${row.timestamp} <br/>
+            <strong>Timestamp:</strong> ${new Date(row.timestamp).toLocaleDateString()} <br/>
+            
           `,
           )
-          .bindTooltip(`Latitude: ${row.latitude}, Longitude: ${row.longitude}`)
+          // .bindTooltip(`Latitude: ${row.latitude}, Longitude: ${row.longitude}`)
           .on("mouseover", function () {
             this.openTooltip()
           })
@@ -473,6 +524,37 @@ const App = () => {
             this.closeTooltip()
           })
       })
+
+      if (data.length > 1) {
+        const trajectoryCoords = data
+          .filter(row => row.latitude && row.longitude && row.timestamp) 
+          .map(row => [row.latitude, row.longitude, row.timestamp])
+
+        const marker = L.marker(trajectoryCoords[0], {
+          icon: L.icon({
+            iconUrl:
+              "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+          }),
+        }).addTo(layerGroup)
+
+        // Animate the marker along the trajectory
+        let index = 0
+        const interval = setInterval(() => {
+          if (index >= trajectoryCoords.length) {
+            clearInterval(interval) // Stop the animation at the end
+            return
+          }
+          marker
+            .setLatLng(trajectoryCoords[index])
+            .bindPopup(
+              `Timestamp: ${new Date(trajectoryCoords[index][2]).toLocaleString()}`,
+            )
+          // .openPopup();
+          index++
+        }, 1000)
+      }
 
       const pointBounds = data.map(row =>
         row.latitude && row.longitude ? [row.latitude, row.longitude] : [],
@@ -484,16 +566,34 @@ const App = () => {
     }
   }, [data, selectedColumns, tripsMode, timestampField, colorBy, colorMap])
 
-  const generateRandomColor = () =>
-    `#${Math.floor(Math.random() * 16777215)
-      .toString(16)
-      .padStart(6, "0")}`
+  useEffect(() => {
+    if (colorBy && colorBy !== "None") {
+      setColorMap(generateColorMap(data, colorBy))
+    } else {
+      setColorMap({})
+    }
+  }, [data, colorBy])
 
   const handleSegmentByChange = (
     event: React.ChangeEvent<{ value: unknown }>,
   ) => {
     setSelectedColumns(event.target.value as string[])
     setColorBy("None") // Reset Color By to default
+  }
+  const generateTripColorMap = (data: any[], selectedColumns: string[]) => {
+    const uniqueTripKeys = [
+      ...new Set(
+        data.map(row => selectedColumns.map(col => row[col]).join("-")),
+      ),
+    ]
+
+    const colorMapping: Record<string, string> = {}
+
+    uniqueTripKeys.forEach((tripKey, index) => {
+      colorMapping[tripKey] = COLOR_PALETTE[index % COLOR_PALETTE.length] // Cycle through fixed colors
+    })
+
+    return colorMapping
   }
 
   return (
@@ -610,7 +710,7 @@ const App = () => {
         >
           <Box
             ref={mapContainerRef}
-            sx={{ height: "700px", width: "100%", border: "1px solid gray" }}
+            sx={{ height: "700px", width: "99%", border: "1px solid gray" }}
           />
         </Paper>
       </Box>

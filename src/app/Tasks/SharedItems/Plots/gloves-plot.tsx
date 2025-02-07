@@ -56,7 +56,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
   const [gcfSizes, setGcfSizes] = useState<Map<string, number>>(new Map())
   const [gcfSize, setGcfSize] = useState<number>(3) // Default size
   const [selectedFeature, setSelectedFeature] = useState<string[]>([]) // Start with empty array
-  const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(false) // To control the collapse state
+  const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(true) // To control the collapse state
 
   const dispatch = useAppDispatch()
 
