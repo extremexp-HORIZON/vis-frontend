@@ -81,7 +81,8 @@ const App = () => {
     handleResize()
     return () => window.removeEventListener("resize", handleResize)
   }, [])
-
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
