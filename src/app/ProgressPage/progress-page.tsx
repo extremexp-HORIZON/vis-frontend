@@ -23,11 +23,15 @@ import {
 } from "../../store/slices/progressPageSlice"
 import ProgressPageLoading from "./progress-page-loading"
 import ProgressPageTab from "./progressPageTabs/progress-page-tab"
+import { updateTabs } from "../../store/slices/workflowTabsSlice"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>("progress")
   const { experiment, workflows, initialization } = useAppSelector(
     (state: RootState) => state.progressPage,
+  )
+  const { tabs } = useAppSelector(
+    (state: RootState) => state.workflowTabs,
   )
   const { experimentId } = useParams()
   const dispatch = useAppDispatch()
@@ -93,6 +97,7 @@ const ProgressPage = () => {
   // TODO: Enable this for live data
   useEffect(() => {
     if (workflows.data && workflows.data.length > 0) {
+      dispatch(updateTabs({workflows, tabs}))
       workflows.data.every(workflow => workflow.status === "completed") &&
         intervalId.current &&
         clearInterval(intervalId.current)

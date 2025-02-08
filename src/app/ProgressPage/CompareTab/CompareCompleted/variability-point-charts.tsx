@@ -86,7 +86,6 @@ const VariabilityPointCharts = () => {
   )
 
   const chartData = processData(selectedMetric, selectedVariabilityPoint)
-  console.log(chartData)
   const yAxisDomain = getYAxisDomain(chartData)
 
   const handleMetricChange = (event: SelectChangeEvent<string>) => {

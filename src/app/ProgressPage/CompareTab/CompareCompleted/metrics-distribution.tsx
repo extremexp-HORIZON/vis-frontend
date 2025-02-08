@@ -67,7 +67,6 @@ const MetricsDistribution = () => {
   )
 
   const data = getData(selectedMetrics)
-  console.log(data)
   
   const handleMetricChange = (event: any) => {
     const {

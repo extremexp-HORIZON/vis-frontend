@@ -88,13 +88,19 @@ const ProgressPageGauges = () => {
 
   useEffect(() => {
     if (workflows.data.length > 0) {
-      const completedWorkflows = workflows.data.filter(
-        workflow => workflow.status === "completed",
-      )
 
-      const getCommonMetricsOfAllCompletedWorkflows = (completedWorkflows: IWorkflowResponse[]) => {
+      let filteredWorkflows;
+
+      workflows.data.filter(
+        workflow => workflow.status === "completed",
+      ).length > 0 ? 
+      filteredWorkflows = workflows.data.filter(
+        workflow => workflow.status === "completed",
+      ) : filteredWorkflows = workflows.data
+
+      const getCommonMetricsOfAllCompletedWorkflows = (filteredWorkflows: IWorkflowResponse[]) => {
         // Array of arrays that each array contains all the metric names of a workflow
-        const allMetrics = completedWorkflows.reduce((acc: any, workflow: IWorkflowResponse) => {
+        const allMetrics = filteredWorkflows.reduce((acc: any, workflow: IWorkflowResponse) => {
           const workflowMetrics = workflow.metrics.map((metric: any) => metric.name)
           return [...acc, workflowMetrics]
         }, [])
@@ -102,18 +108,16 @@ const ProgressPageGauges = () => {
         const commonMetrics = allMetrics.reduce((acc: any, metrics: string[]) => {
           return acc.filter((metric: string) => metrics.includes(metric))
         })
-        console.log(commonMetrics)
         return commonMetrics
       }
 
-      const commonMetrics = getCommonMetricsOfAllCompletedWorkflows(completedWorkflows)
+      const commonMetrics = getCommonMetricsOfAllCompletedWorkflows(filteredWorkflows)
 
       const calculateCommonMetricsAverageValues = () => {
         const averageValues = commonMetrics.reduce((acc: any, metric: string) => {
-          const metricValues = completedWorkflows.map((workflow: IWorkflowResponse) => (
+          const metricValues = filteredWorkflows.map((workflow: IWorkflowResponse) => (
           workflow.metrics.find((m: any) => m.name === metric)
           )).filter(m => m?.semantic_type && m.semantic_type.includes("ML")) as MetricDetail[]
-          console.log(metricValues)
           if(metricValues.length === 0) return acc
           const metricAverage = (metricValues.reduce((acc: number, metric: any) => (acc = acc + parseFloat(metric.value) ), 0) / metricValues.length)
           return [...acc, {name: metric, type: metricValues[0].type, value: metricAverage}] 

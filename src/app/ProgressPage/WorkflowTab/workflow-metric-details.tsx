@@ -16,19 +16,18 @@ interface IWorkflowMetricDetails {
   metrics: Metric[] | null;
   workflowId: number | string;
   info: Task[] | null;
-  hasMetrics: boolean | undefined
 }
 
 const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {
   // const metrics = ["Accuracy", "Precision", "Recall", "Runtime"]
-  const  { metrics, workflowId, info, hasMetrics } = props
+  const  { metrics, workflowId, info } = props
 
   return (
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: "100%" }}>
-            <MetricEvaluation availableMetrics={metrics} workflowId={workflowId} hasMetrics={hasMetrics} />
+            <MetricEvaluation availableMetrics={metrics} workflowId={workflowId} />
           </Box>
         </Grid>
         <Grid item xs={12} md={6}>

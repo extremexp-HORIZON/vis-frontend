@@ -19,7 +19,7 @@ import {
   addTab,
 } from "../../../store/slices/workflowTabsSlice"
 import { useEffect, useState } from "react"
-import { Popover, Rating, styled, useTheme } from "@mui/material"
+import { Badge, Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 
@@ -59,21 +59,23 @@ const WorkflowActions = (props: {
   const { currentStatus, workflowId, handleLaunchNewTab } = props
 
   return (
-    <span onClick={event => event.stopPropagation()}>
+    <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+      <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== "pending_input"}>
       <LaunchIcon
         onClick={
-          currentStatus !== "completed"
-            ? () => {}
-            : handleLaunchNewTab(workflowId)
+          (currentStatus === "completed" || currentStatus === "pending_input")
+            ? handleLaunchNewTab(workflowId)
+            : () => {}
         }
         style={{
-          cursor: currentStatus !== "completed" ? "default" : "pointer",
+          cursor: (currentStatus === "completed" || currentStatus === "pending_input") ? "pointer" : "default",
           color:
-            currentStatus !== "completed"
-              ? theme.palette.action.disabled
-              : theme.palette.primary.main,
+          (currentStatus === "completed" || currentStatus === "pending_input")
+              ? theme.palette.primary.main
+              : theme.palette.action.disabled,
         }}
       />
+        </Badge>
       {currentStatus !== "completed" && currentStatus !== "failed" && (
         <>
           <PauseIcon
@@ -108,14 +110,14 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     // Action column
     position: "sticky",
     right: 0,
-    zIndex: 100,
+    zIndex: 9999,
     backgroundColor: theme.palette.customGrey.main,
   },
   '& .MuiDataGrid-cell[data-field="action"]': {
     position: "sticky",
     right: 0,
     backgroundColor: theme.palette.customGrey.light,
-    zIndex: 90,
+    zIndex: 9999,
   },
 }))
 
@@ -241,7 +243,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       )
       const uniqueMetrics = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const metrics = workflow?.metrics
+          const metrics = workflow?.metrics.filter(metric => metric.semantic_type && metric.semantic_type.includes("ML"))
           let metricNames = []
           if(metrics) {
             metricNames = metrics.map(metric => metric.name)
@@ -271,7 +273,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             }, {}),
             ...Array.from(uniqueMetrics).reduce((acc, variant) => {
               const value = metrics?.find(metric => metric.name === variant)?.value
-              acc[variant] = value != null ? value : ""
+              acc[variant] = value != null ? value : "n/a"
               return acc
             }, {}),
             status: workflow.status,
@@ -286,12 +288,12 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           headerName: key.replace("_", " "),
           headerClassName:
             key === "action" ? "datagrid-header-fixed" : "datagrid-header",
-          minWidth: key === "action" ? 100 : key.length * 10 - 30,
+          minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
           flex: 1,
           align: "center",
           headerAlign: "center",
           sortable: key !== "action",
-          type: typeof rows[0][key] === "number" ? "number" : "string",
+          type: rows.length > 0 && typeof rows[0][key] === "number" ? "number" : "string",
           ...(key === "status" && {
             renderCell: params => (
               <ProgressPercentage

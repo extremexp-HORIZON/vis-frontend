@@ -67,7 +67,7 @@ const ParallelCoordinatePlot = () => {
         options = Array.from(
           new Set(
             workflows.data
-              .filter(workflow => workflow.status === "completed")
+              // .filter(workflow => workflow.status === "completed")
               .reduce((acc: any[], workflow) => {
                 const metrics = workflow.metrics
                   .filter(
@@ -78,7 +78,6 @@ const ParallelCoordinatePlot = () => {
               }, []),
           ),
         )
-
         selected = options[0]
       }
       tooltipArray.current = (
@@ -100,7 +99,7 @@ const ParallelCoordinatePlot = () => {
         }),
       )
     }
-  }, [dispatch, workflows, progressGauges])
+  }, [workflows])
 
   const handleMetricSelection = (event: SelectChangeEvent) => {
     dispatch(setProgressParallel({ selected: event.target.value as string }))
@@ -112,7 +111,6 @@ const ParallelCoordinatePlot = () => {
 
   return (
     <>
-      {progressParallel.data.length > 0 && (
         <Paper elevation={2}>
           <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
             <Typography fontSize={"0.8rem"}>Color by:</Typography>
@@ -165,7 +163,7 @@ const ParallelCoordinatePlot = () => {
             )}
           </Box>
         </Paper>
-      )}
+      {/* )} */}
     </>
   )
 }

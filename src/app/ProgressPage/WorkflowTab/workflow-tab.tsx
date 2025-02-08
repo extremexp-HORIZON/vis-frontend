@@ -22,7 +22,6 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const [chosenTask, setChosenTask] = useState<string | null>(null)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
-  const [hasMetrics, setHasMetrics] = useState<boolean | undefined>(false)
 
   const taskProvider = (taskType: string | null) => {
     switch (taskType) {
@@ -78,7 +77,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
           />
         </Box>
         <Box key="workflow-flow-chart">
-          <StaticDirectedGraph setChosenTask={setChosenTask} chosenTask={chosenTask} tasks={tabs.find(tab => tab.workflowId === workflowId)?.workflowSvg.data || null}/>
+          <StaticDirectedGraph setChosenTask={setChosenTask} chosenTask={chosenTask} workflowSvg={tabs.find(tab => tab.workflowId === workflowId)?.workflowSvg.data || null} />
         </Box>
         {chosenTask ? (
           <Box key="workflow-task">{taskProvider(chosenTask)}</Box>
@@ -129,8 +128,6 @@ const WorkflowTab = (props: IWorkflowTab) => {
                       ) as IWorkflowTabModel
                     )?.workflowMetrics.data || null
                   }
-                  hasMetrics={hasMetrics}
-                  setHasMetrics={setHasMetrics}
                 />
               </Box>
             </Box>
@@ -163,7 +160,6 @@ const WorkflowTab = (props: IWorkflowTab) => {
                       ) as any
                     )?.tasks || null
                   }
-                  hasMetrics={hasMetrics}
                 />
               </Box>
             </Box>

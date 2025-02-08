@@ -47,7 +47,6 @@ const ProgressPageTab = (props: IProgressPageTabs) => {
     }
 
     if (active.id !== over.id) {
-      console.log(active.id, over.id)
       const newArr = [...tabs]
       const [item] = newArr.splice(tabs.findIndex(tab => tab.workflowId === active.id.toString()), 1)
       newArr.splice(tabs.findIndex(tab => tab.workflowId === over.id.toString()), 0, item)

@@ -17,7 +17,7 @@ export interface IWorkflowTabModel {
         loading: boolean;
     }
     workflowSvg: {
-        data: Task[] | null
+        data: {tasks: Task[], start: string, end: string} | null
         loading: boolean;
     }
     workflowTasks: {
