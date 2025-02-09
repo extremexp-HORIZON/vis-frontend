@@ -1,241 +1,3 @@
-// import React, { useState, useEffect, useRef } from "react"
-// import L from "leaflet"
-// import "leaflet/dist/leaflet.css"
-// import {
-//   Box,
-//   MenuItem,
-//   Select,
-//   FormControl,
-//   InputLabel,
-//   Checkbox,
-//   ListItemText,
-//   Typography,
-//   OutlinedInput,
-// } from "@mui/material"
-// import { useAppDispatch } from "../../../../store/store"
-// import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
-
-// const App = () => {
-//   const mapRef = useRef<L.Map | null>(null)
-//   const mapContainerRef = useRef(null)
-//   const [data, setData] = useState<any[]>([])
-//   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
-//   const [columns, setColumns] = useState<string[]>([])
-//   const [colorMap, setColorMap] = useState<Record<string, string>>({})
-//   const [mapLayer, setMapLayer] = useState<keyof typeof layers>("osm")
-//   const layers = {
-//     osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-//     satellite: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
-//   }
-//   const dispatch = useAppDispatch()
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       const resultAction = await dispatch(
-//         fetchDataExplorationData({
-//           query: {
-//             datasetId: "/test/newresult.csv",
-//             limit: 0,
-//             columns: [],
-//             filters: [],
-//             groupBy: [],
-//             aggregation: {},
-//             offset: 0,
-//           },
-//           metadata: {
-//             workflowId: "",
-//             queryCase: "mapChart",
-//           },
-//         }),
-//       )
-//       if (fetchDataExplorationData.fulfilled.match(resultAction)) {
-//         const data = resultAction.payload
-//         setData(JSON.parse(data.data))
-
-//         // Extract column names that are strings (for dropdown options)
-//         const stringColumns = Object.keys(
-//           JSON.parse(data.data)[0] || {},
-//         ).filter(key => typeof JSON.parse(data.data)[0][key] === "string" && key !== "timestamp" )
-//         setColumns(stringColumns)
-//       }
-//     }
-//     fetchData()
-//   }, [dispatch])
-
-//   const generateColorMap = (data: any[], groupKeys: string[]) => {
-//     const colors: Record<string, string> = {}
-//     data.forEach(row => {
-//       const compositeKey = groupKeys.map(key => row[key]).join("-")
-//       if (!colors[compositeKey]) {
-//         colors[compositeKey] = generateRandomColor()
-//       }
-//     })
-//     return colors
-//   }
-
-//   const handleColumnSelectionChange = (
-//     event: React.ChangeEvent<{ value: unknown }>,
-//   ) => {
-//     setSelectedColumns(event.target.value as string[])
-//   }
-
-//   useEffect(() => {
-//     if (data.length > 0 && selectedColumns.length > 0) {
-//       const colors = generateColorMap(data, selectedColumns)
-//       setColorMap(colors)
-//     }
-//   }, [data, selectedColumns])
-
-//   useEffect(() => {
-//     if (!mapRef.current && mapContainerRef.current && data.length > 0) {
-//       mapRef.current = L.map(mapContainerRef.current).setView(
-//         [data[0].latitude, data[0].longitude],
-//         15,
-//       )
-//       L.tileLayer(layers[mapLayer]).addTo(mapRef.current)
-//     }
-//   }, [data])
-
-//   useEffect(() => {
-//     if (mapRef.current) {
-//       mapRef.current.eachLayer(layer => {
-//         if (layer instanceof L.TileLayer) {
-//           mapRef.current?.removeLayer(layer)
-//         }
-//       })
-//       L.tileLayer(layers[mapLayer]).addTo(mapRef.current)
-//     }
-//   }, [mapLayer])
-
-//   useEffect(() => {
-//     if (!mapRef.current) return
-
-//     mapRef.current.eachLayer(layer => {
-//       if (layer instanceof L.LayerGroup) {
-//         mapRef.current?.removeLayer(layer)
-//       }
-//     })
-
-//     const layerGroup = L.layerGroup().addTo(mapRef.current)
-
-//     data.forEach(row => {
-//       if (row.latitude && row.longitude) {
-//         const compositeKey = selectedColumns.map(key => row[key]).join("-")
-//         const color = colorMap[compositeKey] || "#3388FF"
-//         L.circleMarker([row.latitude, row.longitude], {
-//           radius: 10,
-//           color,
-//           weight: 2,
-//           opacity: 1,
-//           fillOpacity: 1,
-//         })
-//           .addTo(layerGroup)
-//           .bindPopup(
-//             `<div>
-//                ${selectedColumns.map(col => `<p><strong>${col}:</strong> ${row[col]}</p>`).join("")}
-//                <p><strong>Latitude:</strong> ${row.latitude}</p>
-//                <p><strong>Longitude:</strong> ${row.longitude}</p>
-//              </div>`,
-//           )
-//       }
-//     })
-//   }, [data, selectedColumns, colorMap])
-
-//   const generateRandomColor = () =>
-//     `#${Math.floor(Math.random() * 16777215)
-//       .toString(16)
-//       .padStart(6, "0")}`
-
-//   return (
-//     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-//       <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-//         <FormControl sx={{ flex: 1 }}>
-//           <InputLabel id="select-columns-label">Segment By</InputLabel>
-//           <Select
-//             labelId="select-columns-label"
-//             multiple
-//             value={selectedColumns}
-//             onChange={handleColumnSelectionChange}
-//             renderValue={selected => selected.join(", ")}
-//             input={<OutlinedInput label="Segment By" />}
-//             sx={{ width: "20%" }}
-//           >
-//             {columns.map(column => (
-//               <MenuItem key={column} value={column}>
-//                 <Checkbox checked={selectedColumns.includes(column)} />
-//                 <ListItemText primary={column} />
-//               </MenuItem>
-//             ))}
-//           </Select>
-//         </FormControl>
-//       </Box>
-
-//       <Box sx={{ position: "relative", height: "700px", width: "100%" }}>
-//         <Box
-//           ref={mapContainerRef}
-//           sx={{
-//             height: "100%",
-//             width: "100%",
-//             borderRadius: 2,
-//             boxShadow: 3,
-//           }}
-//         />
-//         <Box
-//           sx={{
-//             position: "absolute",
-//             top: "10px",
-//             right: "10px",
-//             display: "flex",
-//             flexDirection: "column",
-//             gap: 1,
-//             p: 2,
-//             border: "1px solid #ccc",
-//             borderRadius: 2,
-//             backgroundColor: "#fff",
-//             boxShadow: 1,
-//             zIndex: 1000, // Ensures it appears above the map
-//           }}
-//         >
-//           <Typography
-//             variant="h6"
-//             sx={{ mb: 1, textAlign: "center", width: "100%" }}
-//           >
-//             Legend
-//           </Typography>
-//           {Object.entries(colorMap).map(([key, color]) => {
-//             const keyParts = key.split("-") // Split composite keys
-//             return (
-//               <Box
-//                 key={key}
-//                 sx={{ display: "flex", alignItems: "center", gap: 1 }}
-//               >
-//                 <Box
-//                   sx={{
-//                     width: 16,
-//                     height: 16,
-//                     borderRadius: "50%",
-//                     backgroundColor: color,
-//                   }}
-//                 />
-//                 <Typography variant="body2">
-//                   {selectedColumns.map((col, index) => (
-//                     <span key={col}>
-//                       <strong>{col}:</strong> {keyParts[index]}
-//                       {index < selectedColumns.length - 1 ? ", " : ""}
-//                     </span>
-//                   ))}
-//                 </Typography>
-//               </Box>
-//             )
-//           })}
-//         </Box>
-//       </Box>
-//     </Box>
-//   )
-// }
-
-// export default App
-
 import React, { useState, useEffect, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
@@ -253,11 +15,45 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  CircularProgress,
+  Chip,
+  Slider,
+  ThemeProvider,
+  createTheme,
+  Divider,
 } from "@mui/material"
 import { useAppDispatch } from "../../../../store/store"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { ExpandMore } from "@mui/icons-material"
+import { set } from "lodash"
 
+const COLOR_PALETTE = [
+  "#E6194B",
+  "#3CB44B",
+  "#FFE119",
+  "#0082C8",
+  "#F58231",
+  "#911EB4",
+  "#46F0F0",
+  "#F032E6",
+  "#D2F53C",
+  "#FABEBE",
+  "#008080",
+  "#E6BEFF",
+  "#AA6E28",
+  "#800000",
+  "#808000",
+  "#000080",
+  "#808080",
+  "#FFFFFF",
+  "#000000",
+  "#A9A9A9",
+]
+
+const layers = {
+  osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  satellite: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
+}
 const App = () => {
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef(null)
@@ -270,91 +66,83 @@ const App = () => {
   const [timestampField, setTimestampField] = useState<string>("timestamp")
   const [tripsMode, setTripsMode] = useState<boolean>(false)
   const [colorBy, setColorBy] = useState<string | null>("None") // Set initial color to 'default'
-  
+
   const [latitudeField, setLatitudeField] = useState<string>("")
   const [longitudeField, setLongitudeField] = useState<string>("")
 
-  const COLOR_PALETTE = [
-    "#E6194B",
-    "#3CB44B",
-    "#FFE119",
-    "#0082C8",
-    "#F58231",
-    "#911EB4",
-    "#46F0F0",
-    "#F032E6",
-    "#D2F53C",
-    "#FABEBE",
-    "#008080",
-    "#E6BEFF",
-    "#AA6E28",
-    "#800000",
-    "#808000",
-    "#000080",
-    "#808080",
-    "#FFFFFF",
-    "#000000",
-    "#A9A9A9",
-  ]
-
-
-  const layers = {
-    osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    satellite: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
-  }
   const dispatch = useAppDispatch()
-
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapContainerRef.current) {
+        mapContainerRef.current.style.height = `${window.innerHeight * 0.7}px`
+      }
+    }
+    window.addEventListener("resize", handleResize)
+    handleResize()
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   useEffect(() => {
     const fetchData = async () => {
-      const resultAction = await dispatch(
-        fetchDataExplorationData({
-          query: {
-            datasetId: "/test/newresult.csv",
-            limit: 0,
-            columns: [],
-            filters: [],
-            groupBy: [],
-            aggregation: {},
-            offset: 0,
-          },
-          metadata: {
-            workflowId: "",
-            queryCase: "mapChart",
-          },
-        }),
-      )
-      if (fetchDataExplorationData.fulfilled.match(resultAction)) {
-        const data = resultAction.payload
-        setData(JSON.parse(data.data))
-
-        // Extract column names that are strings (for dropdown options)
-        const stringColumns = Object.keys(
-          JSON.parse(data.data)[0] || {},
-        ).filter(
-          key =>
-            typeof JSON.parse(data.data)[0][key] === "string" &&
-            key !== "timestamp",
+      setLoading(true)
+      try {
+        const resultAction = await dispatch(
+          fetchDataExplorationData({
+            query: {
+              datasetId: "/test/newresult.csv",
+              limit: 0,
+              columns: [],
+              filters: [],
+              groupBy: [],
+              aggregation: {},
+              offset: 0,
+            },
+            metadata: {
+              workflowId: "",
+              queryCase: "mapChart",
+            },
+          }),
         )
+        if (fetchDataExplorationData.fulfilled.match(resultAction)) {
+          const data = resultAction.payload
+          setData(JSON.parse(data.data))
 
-        const potentialLatColumns = ["lat", "latitude"]
-        const potentialLonColumns = ["lon", "longitude"]
-        const integerColumns = Object.keys(
-          JSON.parse(data.data)[0] || {},
-        ).filter(key => typeof JSON.parse(data.data)[0][key] === "number")
+          // Extract column names that are strings (for dropdown options)
+          const stringColumns = Object.keys(
+            JSON.parse(data.data)[0] || {},
+          ).filter(
+            key =>
+              typeof JSON.parse(data.data)[0][key] === "string" &&
+              key !== "timestamp",
+          )
 
-        const detectedLatitude =
-          integerColumns.find(col =>
-            potentialLatColumns.includes(col.toLowerCase()),
-          ) || ""
-        const detectedLongitude =
-          integerColumns.find(col =>
-            potentialLonColumns.includes(col.toLowerCase()),
-          ) || ""
+          const potentialLatColumns = ["lat", "latitude"]
+          const potentialLonColumns = ["lon", "longitude"]
+          const integerColumns = Object.keys(
+            JSON.parse(data.data)[0] || {},
+          ).filter(key => typeof JSON.parse(data.data)[0][key] === "number")
 
-        setLatitudeField(detectedLatitude)
-        setLongitudeField(detectedLongitude)
-        setColumns(stringColumns)
-        setIntColumns(integerColumns)
+          const detectedLatitude =
+            integerColumns.find(col =>
+              potentialLatColumns.includes(col.toLowerCase()),
+            ) || ""
+          const detectedLongitude =
+            integerColumns.find(col =>
+              potentialLonColumns.includes(col.toLowerCase()),
+            ) || ""
+
+          setLatitudeField(detectedLatitude)
+          setLongitudeField(detectedLongitude)
+          setColumns(stringColumns)
+          setIntColumns(integerColumns)
+        } else {
+          setError("Failed to load data.")
+        }
+      } catch (err) {
+        setError("An error occurred.")
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
@@ -390,6 +178,7 @@ const App = () => {
       setColorMap(colors)
     }
   }, [data, selectedColumns])
+  const [sliderValue, setSliderValue] = useState(0)
 
   useEffect(() => {
     if (!mapRef.current && mapContainerRef.current && data.length > 0) {
@@ -461,7 +250,7 @@ const App = () => {
             this.closeTooltip()
           })
           .on("click", function (e) {
-            layerGroup.eachLayer(layer => layer.setStyle({ opacity: 0.3}))
+            layerGroup.eachLayer(layer => layer.setStyle({ opacity: 0.3 }))
             e.target.setStyle({ opacity: 1, weight: 4 })
             const tripBounds = e.target.getBounds()
             mapRef.current?.fitBounds(tripBounds, { padding: [20, 20] })
@@ -470,11 +259,12 @@ const App = () => {
         // Add circle markers for each trip point
         trips[tripKey].forEach(row => {
           L.circleMarker([row.latitude, row.longitude], {
-            radius: 3,
+            radius: 5,
+            fillColor: tripColor,
             color: tripColor,
-            fillOpacity: 0.5,
-            opacity:1,
-            weight: 5
+            fillOpacity: 0.9,
+            opacity: 1,
+            weight: 5,
           })
             .addTo(layerGroup)
             .bindPopup(
@@ -493,8 +283,7 @@ const App = () => {
             })
         })
       })
-    } 
-    else {
+    } else {
       data.forEach(row => {
         if (!row.latitude || !row.longitude) return
         const color =
@@ -503,9 +292,10 @@ const App = () => {
             : "blue"
 
         L.circleMarker([row.latitude, row.longitude], {
-          radius: 3,
+          radius: 5,
+          fillColor: color,
           color: color,
-          fillOpacity: 0.5,
+          fillOpacity: 0.9,
         })
           .addTo(layerGroup)
           .bindPopup(
@@ -523,11 +313,15 @@ const App = () => {
           .on("mouseout", function () {
             this.closeTooltip()
           })
+          .on("click", function () {
+            this.setStyle({ radius: 8, fillOpacity: 1 })
+          })
       })
 
       if (data.length > 1) {
         const trajectoryCoords = data
-          .filter(row => row.latitude && row.longitude && row.timestamp) 
+
+          .filter(row => row.latitude && row.longitude && row.timestamp)
           .map(row => [row.latitude, row.longitude, row.timestamp])
 
         const marker = L.marker(trajectoryCoords[0], {
@@ -540,20 +334,15 @@ const App = () => {
         }).addTo(layerGroup)
 
         // Animate the marker along the trajectory
-        let index = 0
-        const interval = setInterval(() => {
-          if (index >= trajectoryCoords.length) {
-            clearInterval(interval) // Stop the animation at the end
-            return
-          }
+        let index = sliderValue
+        if (index < trajectoryCoords.length) {
           marker
             .setLatLng(trajectoryCoords[index])
             .bindPopup(
               `Timestamp: ${new Date(trajectoryCoords[index][2]).toLocaleString()}`,
             )
           // .openPopup();
-          index++
-        }, 1000)
+        }
       }
 
       const pointBounds = data.map(row =>
@@ -564,7 +353,15 @@ const App = () => {
         mapRef.current.fitBounds(bounds)
       }
     }
-  }, [data, selectedColumns, tripsMode, timestampField, colorBy, colorMap])
+  }, [
+    data,
+    selectedColumns,
+    tripsMode,
+    timestampField,
+    colorBy,
+    colorMap,
+    sliderValue,
+  ])
 
   useEffect(() => {
     if (colorBy && colorBy !== "None") {
@@ -573,13 +370,21 @@ const App = () => {
       setColorMap({})
     }
   }, [data, colorBy])
-
   const handleSegmentByChange = (
     event: React.ChangeEvent<{ value: unknown }>,
   ) => {
-    setSelectedColumns(event.target.value as string[])
-    setColorBy("None") // Reset Color By to default
+    const selected = event.target.value as string[]
+    setSelectedColumns(selected)
+
+    // Reset Color By if segments are selected
+    if (selected.length > 0) {
+      setColorBy("None")
+    }
+    if (selected.length === 0) {
+      setColorMap({})
+    }
   }
+
   const generateTripColorMap = (data: any[], selectedColumns: string[]) => {
     const uniqueTripKeys = [
       ...new Set(
@@ -596,16 +401,35 @@ const App = () => {
     return colorMapping
   }
 
+  const theme = createTheme({
+    palette: {
+      primary: { main: "#1976d2" },
+      secondary: { main: "#dc004e" },
+    },
+    typography: {
+      fontFamily: "Arial",
+      h6: { fontWeight: 600 },
+    },
+  })
+
   return (
     <>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "text.secondary", marginBottom: 1 }}
+        >
+          Select the fields for timestamp, latitude, and longitude, as well as
+          the fields for additional data visualization.
+        </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMore />}>
-              <Typography>Field Selection</Typography>
+              <Typography variant="h6">Configure Fields</Typography>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails sx={{ padding: 2 }}>
               <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                {/* Timestamp Field */}
                 <FormControl sx={{ flex: 1 }}>
                   <InputLabel>Timestamp Field</InputLabel>
                   <Select
@@ -622,6 +446,8 @@ const App = () => {
                     ))}
                   </Select>
                 </FormControl>
+
+                {/* Latitude Field */}
                 <FormControl sx={{ flex: 1 }}>
                   <InputLabel>Latitude Field</InputLabel>
                   <Select
@@ -638,6 +464,7 @@ const App = () => {
                   </Select>
                 </FormControl>
 
+                {/* Longitude Field */}
                 <FormControl sx={{ flex: 1 }}>
                   <InputLabel>Longitude Field</InputLabel>
                   <Select
@@ -656,7 +483,6 @@ const App = () => {
               </Box>
             </AccordionDetails>
           </Accordion>
-
           <FormControl sx={{ flex: 1 }}>
             <InputLabel>Color By</InputLabel>
             <Select
@@ -692,27 +518,86 @@ const App = () => {
             </Select>
           </FormControl>
         </Box>
+        <Divider sx={{ my: 2 }} />
+
         <Paper
           className="Category-Item"
           elevation={2}
           sx={{
             borderRadius: 4,
-            width: "inherit",
+            width: "100%",
             display: "flex",
             flexDirection: "column",
             rowGap: 0,
-            minWidth: "300px",
             height: "100%",
-            overflow: "auto", // Allow scrolling if content is larger than container
-            overscrollBehavior: "contain", // Prevent the bounce effect at the edges
-            scrollBehavior: "smooth", // Enable smooth scrolling (optional)
+            overflow: "hidden",
           }}
         >
           <Box
             ref={mapContainerRef}
-            sx={{ height: "700px", width: "99%", border: "1px solid gray" }}
+            sx={{
+              height: "70vh",
+              width: "100%",
+              borderRadius: 4,
+              border: "1px solid rgba(0, 0, 0, 0.2)",
+              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+              overflowX: "hidden", // Prevent horizontal scrolling
+              overflowY: "hidden", // Prevent vertical scrolling
+            }}
           />
         </Paper>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 3,
+            marginTop: 2,
+            padding: 2,
+          }}
+        >
+          {/* Color Categories */}
+          {!tripsMode && (
+            <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+              <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                Color categories based on the selected field:
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {Object.entries(colorMap).map(([key, color]) => (
+                  <Chip
+                    label={key}
+                    sx={{
+                      backgroundColor: color,
+                      color: "white",
+                      marginRight: 1,
+                    }}
+                    key={key}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
+
+          {/* Slider */}
+          {data.length > 0 && (
+            <Box sx={{ width: "33%", padding: 2 }}>
+              <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                Use the slider to animate through the data points over time.
+              </Typography>
+              <ThemeProvider theme={theme}>
+                <Slider
+                  value={sliderValue}
+                  onChange={(e, newValue) => setSliderValue(newValue as number)}
+                  valueLabelDisplay="auto"
+                  valueLabelFormat={value =>
+                    new Date(data[value].timestamp).toLocaleString()
+                  }
+                  min={0}
+                  max={data.length - 1}
+                />
+              </ThemeProvider>
+            </Box>
+          )}
+        </Box>
       </Box>
     </>
   )
