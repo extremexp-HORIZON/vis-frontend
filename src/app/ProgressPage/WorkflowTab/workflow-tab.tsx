@@ -44,7 +44,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
       case "interactive":
         return (
           <UserInteractiveTask
-            url={"http://163.172.30.91:5000"}
+            url={"/iframe/"}
           />
         )
       case null:
