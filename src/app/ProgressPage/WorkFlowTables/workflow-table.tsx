@@ -51,6 +51,11 @@ let idCounter = 1
 
 // WorkflowActions
 
+const WorkflowRating = (props: { rating: number }) => {
+  const { rating } = props
+  return <Rating sx={{verticalAlign: "middle"}} value={rating} size="small" />
+}
+
 const WorkflowActions = (props: {
   currentStatus: string
   workflowId: string
@@ -277,6 +282,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               return acc
             }, {}),
             status: workflow.status,
+            rating: 2,
             action: "",
           }
         })
@@ -310,6 +316,15 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                   workflowId={params.row.workflowId}
                   handleLaunchNewTab={handleLaunchNewTab}
                 />
+              )
+            },
+          }),
+          ...(key === "rating" && {
+            renderCell: params => {
+              const currentRating = params.row.rating
+              return (
+                <WorkflowRating
+                  rating={currentRating} />
               )
             },
           }),
