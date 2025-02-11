@@ -40,7 +40,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
       value: metric.avgValue.toFixed(3),
       category: "Experiments Average",
     })));
-  }, [selectedMetrics]);
+  }, [availableMetrics, selectedMetrics]);
  
   return (
     <Paper
