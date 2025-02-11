@@ -248,7 +248,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       )
       const uniqueMetrics = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const metrics = workflow?.metrics.filter(metric => metric.semantic_type && metric.semantic_type.includes("ML"))
+          const metrics = workflow.metrics?.filter(metric => metric.semantic_type && metric.semantic_type.includes("ML"))
           let metricNames = []
           if(metrics) {
             metricNames = metrics.map(metric => metric.name)

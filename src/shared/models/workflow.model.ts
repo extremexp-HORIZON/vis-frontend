@@ -4,7 +4,7 @@ export interface IWorkflowResponse {
         experimentId: string;
         status: string;
         metric_ids: string[];
-        metrics: MetricDetail[];
+        metrics?: MetricDetail[];
         workflowId: string;
         id?: string;
         start: string;
