@@ -22,7 +22,9 @@ const TopWorkflowMetric = () => {
   const metrics = useMemo(() => {
     if (!workflows.data || workflows.data.length === 0) return []
     const allMetrics = workflows.data.flatMap(workflow =>
-      workflow.metrics ? workflow.metrics.flatMap(metric => metric.name) : [],
+      workflow.metrics ? workflow.metrics.filter(
+        m => m?.semantic_type && m.semantic_type.includes("ML"),
+      ).flatMap(metric => metric.name) : [],
     )
     return Array.from(new Set(allMetrics))
   }, [workflows.data])
@@ -45,15 +47,15 @@ const TopWorkflowMetric = () => {
 
     completedWorkflows.sort(
       (a, b) =>
-        (parseFloat(b.metrics.find(m => m.name === metric)?.value || "0") ||0) 
+        (parseFloat(b.metrics?.find(m => m.name === metric)?.value || "0") ||0) 
         -
-        (parseFloat(a.metrics.find(m => m.name === metric)?.value || "0") || 0),
+        (parseFloat(a.metrics?.find(m => m.name === metric)?.value || "0") || 0),
     )
 
     const topTenWorkflows = completedWorkflows.slice(0, 10)
     const chartData = topTenWorkflows.map(workflow => ({
       workflowId: workflow.workflowId,
-      metricValue: workflow.metrics.find(m => m.name === metric)?.value || 0,
+      metricValue: workflow.metrics?.find(m => m.name === metric)?.value || 0,
     }))
     return chartData
   }
