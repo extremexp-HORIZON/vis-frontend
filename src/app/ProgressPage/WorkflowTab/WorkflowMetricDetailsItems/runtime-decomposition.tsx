@@ -10,7 +10,7 @@ import { Vega } from "react-vega"
 import InfoIcon from "@mui/icons-material/Info"
 import grey from "@mui/material/colors/grey"
 import { Task } from "../../../../shared/models/workflow.model"
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 interface Metric {
   name: string
@@ -111,7 +111,7 @@ const RuntimeDecomposition = (props: IRuntimeDecomposition) => {
         </>
       ) : (
         <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
-              <ReportProblemIcon fontSize={"large"} sx={{color: theme => theme.palette.customGrey.dark}} />
+              <ReportProblemRoundedIcon fontSize={"large"} sx={{color: theme => theme.palette.customGrey.dark}} />
               <Typography sx={{color: theme => theme.palette.customGrey.dark}} variant={"h6"}>{"No Runtime Data Available"}</Typography>
             </Box>
       )}

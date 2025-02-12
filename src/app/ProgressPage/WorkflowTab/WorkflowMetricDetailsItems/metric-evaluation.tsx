@@ -287,7 +287,7 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
           />
           ) : (
             <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
-              <ReportProblemIcon fontSize={"large"} sx={{color: theme => theme.palette.customGrey.dark}} />
+              <ReportProblemRoundedIcon fontSize={"large"} sx={{color: theme => theme.palette.customGrey.dark}} />
               <Typography sx={{color: theme => theme.palette.customGrey.dark}} variant={"h6"}>{"No Metric Data Available"}</Typography>
             </Box>
           )}

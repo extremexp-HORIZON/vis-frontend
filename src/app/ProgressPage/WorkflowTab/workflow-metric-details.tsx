@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material"
 import MetricEvaluation from "./WorkflowMetricDetailsItems/metric-evaluation"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition";
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { Task } from "../../../shared/models/workflow.model";
 
 

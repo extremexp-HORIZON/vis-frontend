@@ -49,16 +49,16 @@ const MetricsDistribution = () => {
     completedWorkflows.sort(
       (a, b) =>
         (parseFloat(
-          b.metrics?.find(m => m.name === lowercaseMetric)?.value || "0",
+          b.metrics?.find(m => m.name === metric)?.value || "0",
         ) || 0) -
         (parseFloat(
-          a.metrics?.find(m => m.name === lowercaseMetric)?.value || "0",
+          a.metrics?.find(m => m.name === metric)?.value || "0",
         ) || 0),
     )
 
     return completedWorkflows.map(workflow => ({
       metricName: metric,
-      value: workflow.metrics?.find(metric => metric.name.toLowerCase() === lowercaseMetric)
+      value: workflow.metrics?.find(m => m.name === metric)
         ?.value,
     }))
   }
