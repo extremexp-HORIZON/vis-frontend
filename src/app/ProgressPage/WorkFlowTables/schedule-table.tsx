@@ -147,7 +147,7 @@ const WorkflowActions = (props: {
   }
 
   return (
-    <span onClick={event => event.stopPropagation()}>
+    <td onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
       <ArrowUp
         onClick={() => handleIndexChange(-1, id)}
         sx={{
@@ -175,7 +175,7 @@ const WorkflowActions = (props: {
           color: theme => theme.palette.primary.main,
         }}
       />
-    </span>
+    </td>
   )
 }
 
@@ -261,41 +261,61 @@ export default function ScheduleTable() {
           }
         })
         .sort((a, b) => a.id - b.id)
-      const infoRow = workflows.data.map(workflow => {
-        const params = workflow.tasks.find(
-          task => task.id === "TrainModel",
-        )?.parameters
-        return {
-          id: idCounter++,
-          workflowId: workflow.name,
-          // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
-          ...Array.from(uniqueParameters).reduce((acc, variant) => {
-            acc[variant] =
-              `${params?.find(param => param.name === variant)?.value}` || ""
-            return acc
-          }, {}),
-          status: workflow.status,
-          // ...Object.keys(workflow.constraints)
-          //   .map(key => ({ [key]: workflow.constraints[key] }))
-          //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
-          action: "",
-        }
-      })
+      const workflow = workflows.data[0]
+      const params = workflow.tasks.find(
+        task => task.id === "TrainModel",
+      )?.parameters
+      const infoRow = {
+        id: idCounter++,
+        workflowId: workflow.name,
+        // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+        ...Array.from(uniqueParameters).reduce((acc, variant) => {
+          acc[variant] =
+            `${params?.find(param => param.name === variant)?.value}` || ""
+          return acc
+        }, {}),
+        status: workflow.status,
+        // ...Object.keys(workflow.constraints)
+        //   .map(key => ({ [key]: workflow.constraints[key] }))
+        //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+        action: "",
+      }
+      // .filter(workflow => workflow.status === "scheduled")
+      // .map(workflow => {
+      //   const params = workflow.tasks.find(
+      //     task => task.id === "TrainModel",
+      //   )?.parameters
+      //   return {
+      //     id: idCounter++,
+      //     workflowId: workflow.name,
+      //     // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
+      //     ...Array.from(uniqueParameters).reduce((acc, variant) => {
+      //       acc[variant] =
+      //         `${params?.find(param => param.name === variant)?.value}` || ""
+      //       return acc
+      //     }, {}),
+      //     status: workflow.status,
+      //     // ...Object.keys(workflow.constraints)
+      //     //   .map(key => ({ [key]: workflow.constraints[key] }))
+      //     //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
+      //     action: "",
+      //   }
+      // })
       columns =
-        infoRow.length > 0
-          ? Object.keys(infoRow[0])
+        infoRow
+          ? Object.keys(infoRow)
               .filter(key => key !== "id")
               .map(key => ({
                 field: key,
                 headerName: key.replace("_", " "),
                 headerClassName:
                 key === "action" ? "datagrid-header-fixed" : "datagrid-header",
-                minWidth: key === "action" ? 100 : 50,
+                minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
                 flex: 1,
                 align: "center",
                 headerAlign: "center",
                 sortable: false,    
-                type: typeof infoRow[0][key] === "number" ? "number" : "string",
+                type: (rows.length > 0 && typeof rows[0][key] === "number") ? "number" : "string",
                 ...(key === "action" && {
                   renderCell: (params) => {
                     return (

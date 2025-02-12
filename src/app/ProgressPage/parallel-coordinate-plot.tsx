@@ -9,7 +9,7 @@ import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { setProgressParallel } from "../../store/slices/progressPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
-import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 
 const ParallelCoordinatePlot = () => {
   const { workflows, progressParallel, progressGauges } = useAppSelector(
@@ -51,38 +51,50 @@ const ParallelCoordinatePlot = () => {
                 params?.find(param => param.name === variant)?.value || ""
               return acc
             }, {}),
-            ...workflow.metrics.reduce((acc, metric) => {
-              return {
-                ...acc,
-                [metric.name]: metric.value,
-              }
-            }, {}),
+            ...(workflow.metrics
+              ? workflow.metrics?.reduce((acc, metric) => {
+                  return {
+                    ...acc,
+                    [metric.name]: metric.value,
+                  }
+                }, {})
+              : {}),
             workflowId: workflow.name,
           }
         })
       parallelData.current = _.cloneDeep(data)
-      const options = Array.from(
-        new Set(
-          workflows.data
-            .filter(workflow => workflow.status === "completed")
-            .reduce((acc: any[], workflow) => {
-              const metrics = workflow.metrics.map((metric: any) => metric.name)
-              return [...acc, ...metrics]
-            }, []),
-        ),
-      )
-
-      const selected = options[0]
-
+      let selected = progressParallel.selected
+      let options = progressParallel.options
+      if (progressParallel.options.length === 0) {
+        options = Array.from(
+          new Set(
+            workflows.data
+              // .filter(workflow => workflow.status === "completed")
+              .reduce((acc: any[], workflow) => {
+                const metrics = workflow.metrics
+                  ? workflow.metrics
+                      ?.filter(
+                        m => m?.semantic_type && m.semantic_type.includes("ML"),
+                      )
+                      .map((metric: any) => metric.name)
+                  : []
+                return [...acc, ...metrics]
+              }, []),
+          ),
+        )
+        selected = options[0]
+      }
       tooltipArray.current = (
         parallelData.current.at(0)
           ? Object.keys(parallelData.current.at(0))
           : []
       ).map(key => ({ field: key }))
 
-      const gaugeValue = progressGauges.find(gauge => gauge.name === selected)?.value
+      const gaugeValue = progressGauges.find(
+        gauge => gauge.name === selected,
+      )?.value
       setMetricExist(Number.isNaN(gaugeValue) ? false : true)
-
+      console.log("data", options)
       dispatch(
         setProgressParallel({
           data,
@@ -91,72 +103,80 @@ const ParallelCoordinatePlot = () => {
         }),
       )
     }
-  }, [dispatch, workflows, progressGauges])
+  }, [workflows])
 
   const handleMetricSelection = (event: SelectChangeEvent) => {
     dispatch(setProgressParallel({ selected: event.target.value as string }))
-    const gaugeValue = progressGauges.find(gauge => gauge.name === event.target.value as string)?.value
+    const gaugeValue = progressGauges.find(
+      gauge => gauge.name === (event.target.value as string),
+    )?.value
     setMetricExist(!Number.isNaN(gaugeValue))
   }
 
   return (
     <>
-      {progressParallel.data.length > 0 && (
-        <Paper elevation={2}>
-          <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
-            <Typography fontSize={"0.8rem"}>Color by:</Typography>
-            <FormControl
-              sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
-              size="small"
-            >
-              <Select
-                value={progressParallel.selected}
-                sx={{ fontSize: "0.8rem" }}
-                onChange={handleMetricSelection}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 250,
-                      maxWidth: 300,
-                    },
+      <Paper elevation={2}>
+        <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+          <Typography fontSize={"0.8rem"}>Color by:</Typography>
+          <FormControl
+            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
+            size="small"
+          >
+            <Select
+              value={progressParallel.selected}
+              sx={{ fontSize: "0.8rem" }}
+              onChange={handleMetricSelection}
+              disabled={progressParallel.options.length === 0}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 250,
+                    maxWidth: 300,
                   },
-                }}
+                },
+              }}
+            >
+              {progressParallel.options.map(feature => (
+                <MenuItem key={`${feature}`} value={feature}>
+                  {feature}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box sx={{ width: "99%", px: 1 }}>
+          {progressParallel.options.length > 0 ? (
+            <ParallelCoordinateVega
+              parallelData={parallelData}
+              progressParallel={progressParallel}
+              foldArray={foldArray}
+            ></ParallelCoordinateVega>
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                height: 300,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                columnGap: 1,
+              }}
+            >
+              <ReportProblemIcon
+                sx={{ color: theme => theme.palette.customGrey.dark }}
+              />
+              <Typography
+                variant={"h6"}
+                sx={{ color: theme => theme.palette.customGrey.dark }}
               >
-                {progressParallel.options.map(feature => (
-                  <MenuItem key={`${feature}`} value={feature}>
-                    {feature}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box sx={{ width: "99%", px: 1 }}>
-            {
-              metricExist ? (
-                <ParallelCoordinateVega
-                parallelData={parallelData}
-                progressParallel={progressParallel}
-                foldArray={foldArray}
-              ></ParallelCoordinateVega>
-              ) : (
-                <Box
-                  sx= {{
-                    width: '100%',
-                    height: 300,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <ReportProblemRoundedIcon fontSize="large"/>
-                  <Typography>No Metric Data Available</Typography>
-                </Box>
-              )
-            }
-          </Box>
-        </Paper>
-      )}
+                No Metric Data Available
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Paper>
+      {/* )} */}
     </>
   )
 }

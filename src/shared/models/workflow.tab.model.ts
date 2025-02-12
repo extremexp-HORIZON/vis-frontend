@@ -2,6 +2,7 @@ import { IDataExplorationQuery } from "./dataexploration.model";
 import { IDataExploration } from "./tasks/data-exploration-task.model";
 import { IExplainability } from "./tasks/explainability.model";
 import { IModelAnalysis } from "./tasks/model-analysis.model";
+import { IUserInteraction } from "./tasks/user-interaction.model";
 import { Task } from "./workflow.model";
 
 export interface IWorkflowTabModel {
@@ -16,13 +17,14 @@ export interface IWorkflowTabModel {
         loading: boolean;
     }
     workflowSvg: {
-        data: string | null
+        data: {tasks: Task[], start: string, end: string} | null
         loading: boolean;
     }
     workflowTasks: {
         modelAnalysis?: IModelAnalysis;
         dataExploration?: IDataExploration;
         explainabilityTask?: IExplainability;
+        userInteraction?: IUserInteraction;
     }
 }
 

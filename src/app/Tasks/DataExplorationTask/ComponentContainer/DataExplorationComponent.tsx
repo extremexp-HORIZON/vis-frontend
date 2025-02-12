@@ -1,24 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import TableExpand from "../DataTable/TableExpand"
 import ControlPanel from "../ChartControls/ControlPanel" // Import the new ControlPanel component
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  Pagination,
-  Tab,
-  Tabs,
-  Tooltip,
-  Typography,
-} from "@mui/material"
+import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material"
 import {
   defaultDataExplorationQuery,
   IFilter,
   VisualColumn,
 } from "../../../../shared/models/dataexploration.model" // Ensure correct path
-import TableChartIcon from "@mui/icons-material/TableChartSharp"
-import AddchartIcon from "@mui/icons-material/Addchart"
+
 import GraphContainer from "./GraphContainer"
 import { useParams } from "react-router-dom"
 import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
@@ -30,7 +19,6 @@ import MultiTimeSeriesVisualization from "../multi-ts-visualization/MultiTimeSer
 interface IDataExplorationComponent {
   workflow: IWorkflowTabModel | null
 }
-
 const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const { workflow } = props
   const dispatch = useAppDispatch()
@@ -39,24 +27,18 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [originalColumns, setOriginalColumns] = useState<any>([])
   const [selectedColumns, setSelectedColumns] = useState<any>([])
   const [rowLimit, setRowLimit] = useState(1000)
-  const [activeChartTab, setActiveChartTab] = useState(0)
   const [filters, setFilters] = useState<IFilter[]>([])
   const [uniqueColumnValues, setUniqueColumnValues] = useState<string[]>([])
   const { experimentId } = useParams()
   const [xAxis, setXAxis] = useState<VisualColumn>({ name: "", type: "" })
-  const [xAxisScatter, setXAxisScatter] = useState<VisualColumn>({
-    name: "",
-    type: "",
-  })
+  const [xAxisScatter, setXAxisScatter] = useState<VisualColumn>({name: "",type: ""})
   const [yAxis, setYAxis] = useState<VisualColumn[]>([])
   const [yAxisScatter, setYAxisScatter] = useState<VisualColumn[]>([])
   const [groupFunction, setGroupFunction] = useState<string>("sum")
-  const [barGroupBy, setBarGroupBy] = useState<string[]>([]) // State for bar chart grouping
-  const [barAggregation, setBarAggregation] = useState<any>({}) // State for bar chart aggregation
+  const [barGroupBy, setBarGroupBy] = useState<string[]>([]) 
+  const [barAggregation, setBarAggregation] = useState<any>({})
   const [viewMode, setViewMode] = useState<"overlay" | "stacked">("overlay")
-  const [chartType, setChartType] = useState<
-    "line" | "bar" | "scatter" | "map"
-  >("line")
+  const [chartType, setChartType] = useState<"datatable" | "line" | "bar" | "scatter" | "map">("datatable")
   const [colorBy, setColorBy] = useState("None")
 
   console.log("workflow", workflow)
@@ -318,49 +300,16 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             />
 
             <Box sx={{ flex: 1, overflow: "auto" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "left",
-                  marginBottom: "1rem",
-                  padding: "1rem",
-                }}
-              >
-                <Tabs
-                  value={activeChartTab}
-                  onChange={(e, newValue) => setActiveChartTab(newValue)}
-                >
-                  <Tab label="Data Table" icon={<TableChartIcon />} />
-                  <Tab label="Charts" icon={<AddchartIcon />} />
-                </Tabs>
-              </Box>
-              {activeChartTab === 0 && taskDependancies?.lineChart.data && (
-                <Box sx={{ width: "100%", overflowX: "auto" }}>
-                  <TableExpand
-                    data={taskDependancies?.lineChart.data?.data}
-                    columns={taskDependancies?.lineChart.data?.columns || null}
-                    datetimeColumn=""
-                  />
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "right",
-                      marginTop: "1rem",
-                      padding: "1rem",
-                    }}
-                  >
-                    <Pagination
-                      count={totalPages}
-                      page={currentPage}
-                      onChange={handlePageChange}
-                      variant="outlined"
-                    />
-                  </Box>
-                </Box>
-              )}
-              {activeChartTab === 1 && (
+              { workflow?.workflowTasks.dataExploration?.lineChart.data
+                       && (
                 <GraphContainer
+                  tabledata={ workflow?.workflowTasks.dataExploration?.lineChart.data
+                    ?.data}
+                  tablecolumns={ workflow?.workflowTasks.dataExploration?.lineChart.data
+                    ?.columns}
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={handlePageChange}
                   linedata={
                     workflow?.workflowTasks.dataExploration?.lineChart.data
                       ?.data

@@ -56,7 +56,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
   const [gcfSizes, setGcfSizes] = useState<Map<string, number>>(new Map())
   const [gcfSize, setGcfSize] = useState<number>(3) // Default size
   const [selectedFeature, setSelectedFeature] = useState<string[]>([]) // Start with empty array
-  const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(false) // To control the collapse state
+  const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(true) // To control the collapse state
 
   const dispatch = useAppDispatch()
 
@@ -162,7 +162,6 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 Number of CounterFactual Actions
               </InputLabel>
               <Select
-                size="small"
                 MenuProps={{
                   PaperProps: { style: { maxHeight: 224, width: 250 } },
                 }}
@@ -314,7 +313,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 />
                 <Box marginTop={2}>
                   <WorkflowCard
-                    title={"Plotting"}
+                    title={""}
                     description="Set of final global counterfactual actions generated"
                   >
                     <GlovesScatter

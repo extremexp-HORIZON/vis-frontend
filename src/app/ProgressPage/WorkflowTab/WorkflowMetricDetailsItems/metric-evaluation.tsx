@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, IconButton, Paper, Tooltip, Checkbox, FormControlLabel, Autocomplete, TextField } from "@mui/material";
 import { VegaLite } from "react-vega";
 import InfoIcon from "@mui/icons-material/Info";
@@ -15,12 +15,13 @@ interface Metric {
 interface IMetricEvaluation {
   availableMetrics: Metric[] | null;
   workflowId: number | string;
-  hasMetrics: boolean | undefined
 }
  
 const MetricEvaluation = (props: IMetricEvaluation) => {
-  const { availableMetrics, workflowId, hasMetrics } = props;
+  const { availableMetrics, workflowId } = props;
   const [selectedMetrics, setSelectedMetrics] = useState<Metric[]>(availableMetrics || []);
+  const [radarData, setRadarData] = useState<any[]>(availableMetrics || []);
+  const [experimentAverage, setExperimentAverage] = useState<any[]>(availableMetrics || []);
  
   const handleMetricChange = (event: any, newValue: Metric[]) => {
     setSelectedMetrics(newValue);
@@ -28,18 +29,18 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
   
   window.dispatchEvent(new Event('resize'))
  
-  const radarData = selectedMetrics.map(metric => ({
-    key: metric.name,
-    value: metric.value.toFixed(3),
-    category: `Workflow ${workflowId}`,
-  }));
- 
-  const experimentAverage = selectedMetrics.map(metric => ({
-    key: metric.name,
-    value: metric.avgValue.toFixed(3),
-    category: "Experiments Average",
-  }));
-  console.log(radarData)
+  useEffect(() => {
+    setRadarData(selectedMetrics.map(metric => ({
+      key: metric.name,
+      value: metric.value.toFixed(3),
+      category: `Workflow ${workflowId}`,
+    })));
+    setExperimentAverage(selectedMetrics.map(metric => ({
+      key: metric.name,
+      value: metric.avgValue.toFixed(3),
+      category: "Experiments Average",
+    })));
+  }, [availableMetrics, selectedMetrics]);
  
   return (
     <Paper
@@ -66,9 +67,6 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
           </IconButton>
         </Tooltip>
       </Box>
- 
-     {
-      hasMetrics ? (
         <Box sx={{ px: 1, py: 2, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', justifyContent: 'center', flex: 1 }}>
  
           {availableMetrics && (
@@ -289,18 +287,11 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
           />
           ) : (
             <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
-              <ReportProblemRoundedIcon fontSize={"large"} />
-              <Typography>{"No Metric Data Available"}</Typography>
+              <ReportProblemIcon fontSize={"large"} sx={{color: theme => theme.palette.customGrey.dark}} />
+              <Typography sx={{color: theme => theme.palette.customGrey.dark}} variant={"h6"}>{"No Metric Data Available"}</Typography>
             </Box>
           )}
-        </Box>
-      ) : (
-        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
-          <ReportProblemRoundedIcon fontSize={"large"} />
-          <Typography>{"No Metrics Available"}</Typography>
-        </Box>
-      )
-     }  
+        </Box>  
     </Paper>
   );
 };

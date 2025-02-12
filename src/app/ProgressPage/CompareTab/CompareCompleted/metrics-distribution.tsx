@@ -25,7 +25,9 @@ const MetricsDistribution = () => {
     workflows.data
       .filter(workflow => workflow.status === "completed")
       .forEach(workflow => {
-        workflow.metrics.forEach((item: any) => {
+        workflow.metrics?.filter(
+          m => m?.semantic_type && m.semantic_type.includes("ML"),
+        ).forEach((item: any) => {
           metricsSet.add(item.name)
         })
       })
@@ -47,16 +49,16 @@ const MetricsDistribution = () => {
     completedWorkflows.sort(
       (a, b) =>
         (parseFloat(
-          b.metrics.find(m => m.name === metric)?.value || "0",
+          b.metrics?.find(m => m.name === lowercaseMetric)?.value || "0",
         ) || 0) -
         (parseFloat(
-          a.metrics.find(m => m.name === metric)?.value || "0",
+          a.metrics?.find(m => m.name === lowercaseMetric)?.value || "0",
         ) || 0),
     )
 
     return completedWorkflows.map(workflow => ({
       metricName: metric,
-      value: workflow.metrics.find(m => m.name === metric)
+      value: workflow.metrics?.find(metric => metric.name.toLowerCase() === lowercaseMetric)
         ?.value,
     }))
   }
@@ -66,7 +68,6 @@ const MetricsDistribution = () => {
   )
 
   const data = getData(selectedMetrics)
-  console.log(data)
   
   const handleMetricChange = (event: any) => {
     const {

@@ -7,9 +7,21 @@ import {
   explainabilityDefault,
   explainabilityReducers,
 } from "../../shared/models/tasks/explainability.model"
-import { IWorkflowResponse, Metric, MetricDetail } from "../../shared/models/workflow.model"
-import { modelAnalysisDefault, modelAnalysisReducers } from "../../shared/models/tasks/model-analysis.model"
-import { dataExplorationDefault, explainabilityExtraReducers } from "../../shared/models/tasks/data-exploration-task.model"
+import {
+  IWorkflowResponse,
+  Metric,
+  MetricDetail,
+} from "../../shared/models/workflow.model"
+import {
+  modelAnalysisDefault,
+  modelAnalysisReducers,
+} from "../../shared/models/tasks/model-analysis.model"
+import {
+  dataExplorationDefault,
+  explainabilityExtraReducers,
+} from "../../shared/models/tasks/data-exploration-task.model"
+import UserInteractiveTask from "../../app/Tasks/UserInteractiveTask/user-interactive-task"
+import { userInteractionDefault } from "../../shared/models/tasks/user-interaction.model"
 
 export interface IWorkflowTab {
   tabs: IWorkflowTabModel[]
@@ -27,6 +39,9 @@ export const workflowTabsSlice = createSlice({
     addTab: (state, action) => {
       state.tabs = [...state.tabs, initializeTab(action.payload)]
     },
+    updateTabs: (state, action) => {
+      state.tabs = updateActiveTabs(action.payload)
+    },
     addCompareCompletedTab: (state, action) => {
       state.tabs = [...state.tabs, initializeCompareCompleteTab()]
     },
@@ -40,8 +55,8 @@ export const workflowTabsSlice = createSlice({
   },
   extraReducers: builder => {
     explainabilityReducers(builder),
-    modelAnalysisReducers(builder),
-    explainabilityExtraReducers(builder)
+      modelAnalysisReducers(builder),
+      explainabilityExtraReducers(builder)
   },
 })
 
@@ -58,23 +73,32 @@ const workflowMetricsInitializer = ({
     error: string | null
   }
 }) => {
-
   if (!metrics) return null
 
   const finishedWorkflowsMetrics = workflows.data
     .filter(workflow => workflow.status === "completed")
-    .reduce<MetricDetail[]>((acc, workflow) => [...acc, ...workflow.metrics], [])
+    .reduce<
+      MetricDetail[]
+    >((acc, workflow) => [...acc, ...workflow.metrics], [])
 
   return metrics.map(metric => {
-    const filteredMetricsAll = finishedWorkflowsMetrics.filter(metricAll => metricAll.name === metric.name)
-    const metricsSum = filteredMetricsAll.reduce((acc, metric) => acc + parseFloat(metric.value), 0)
+    const filteredMetricsAll = finishedWorkflowsMetrics.filter(
+      metricAll => metricAll.name === metric.name,
+    )
+    const metricsSum = filteredMetricsAll.reduce(
+      (acc, metric) => acc + parseFloat(metric.value),
+      0,
+    )
     return {
       name: metric.name,
       value: parseFloat(metric.value),
       avgValue: metricsSum / filteredMetricsAll.length,
-      avgDiff: (parseFloat(metric.value) * 100) / (metricsSum / filteredMetricsAll.length) - 100
+      avgDiff:
+        (parseFloat(metric.value) * 100) /
+          (metricsSum / filteredMetricsAll.length) -
+        100,
     }
-})
+  })
 
   // return Object.keys(metrics)
   //   .filter(metricName => metricNames.includes(metricName))
@@ -98,6 +122,45 @@ const workflowMetricsInitializer = ({
   //   })
 }
 
+const updateActiveTabs = ({
+  workflows,
+  tabs,
+}: {
+  workflows: {
+    data: IWorkflowResponse[]
+    loading: boolean
+    error: string | null
+  }
+  tabs: IWorkflowTabModel[]
+}) => {
+  return tabs.map(tab => {
+    const workflow = workflows.data.find(
+      workflow => workflow.workflowId === tab.workflowId,
+    )
+    if (!workflow) return tab
+    return {
+      ...tab,
+      workflowSvg: {
+        data: workflow
+          ? { tasks: workflow.tasks, start: workflow.start, end: workflow.end }
+          : null,
+        loading: false,
+      },
+      workflowConfiguration: {
+        data: workflow?.tasks || null,
+        loading: false,
+      },
+      workflowMetrics: {
+        ...tab.workflowMetrics,
+        data: workflowMetricsInitializer({
+          metrics: workflow.metrics,
+          workflows,
+        }),
+      },
+    }
+  })
+}
+
 const initializeTab = ({
   workflowId,
   workflows,
@@ -109,11 +172,19 @@ const initializeTab = ({
     error: string | null
   }
 }) => {
-  const workflow = workflows.data.find(workflow => workflow.workflowId === workflowId)
+  const workflow = workflows.data.find(
+    workflow => workflow.workflowId === workflowId,
+  )
   const tab: IWorkflowTabModel = {
     ...defaultWorkflowTabModel,
     workflowName: workflow?.name || "",
     workflowId: workflow?.workflowId || "",
+    workflowSvg: {
+      data: workflow
+        ? { tasks: workflow.tasks, start: workflow.start, end: workflow.end }
+        : null,
+      loading: false,
+    },
     workflowConfiguration: {
       data: workflow?.tasks || null,
       loading: false,
@@ -127,8 +198,9 @@ const initializeTab = ({
     },
     workflowTasks: {
       modelAnalysis: modelAnalysisDefault,
-      dataExploration: dataExplorationDefault
-    }
+      dataExploration: dataExplorationDefault,
+      userInteraction: userInteractionDefault,
+    },
   }
   return tab
 }
@@ -143,13 +215,13 @@ const initializeCompareCompleteTab = () => {
     workflowMetrics: {
       data: null,
       loading: false,
-    }
+    },
   }
   return tab
 }
 
 //Reducer exports
-export const { addTab, deleteTab, addCompareCompletedTab, setTabsOrder } =
+export const { addTab, deleteTab, addCompareCompletedTab, setTabsOrder, updateTabs } =
   workflowTabsSlice.actions
 
 export default workflowTabsSlice.reducer

@@ -4,7 +4,7 @@ export interface IWorkflowResponse {
         experimentId: string;
         status: string;
         metric_ids: string[];
-        metrics: MetricDetail[];
+        metrics?: MetricDetail[];
         workflowId: string;
         id?: string;
         start: string;
@@ -18,8 +18,15 @@ export interface Task {
     input_datasets?: InputDataset[];
     parameters?: Parameter[];
     variant?: string;
+    metadata?: Metadata;
     start: string;
     end: string;
+}
+
+interface Metadata {
+    prototypical_name: string;
+    URL?: string;
+    type?: string;
 }
 
 interface InputDataset {

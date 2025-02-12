@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
 import grey from "@mui/material/colors/grey"
 import ParallelCoordinatePlot from "./parallel-coordinate-plot"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import WorkflowTab from "./WorkflowTab/workflow-tab"
 import ProgressPageTabs from "./progress-page-tabs"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
@@ -23,18 +23,23 @@ import {
 } from "../../store/slices/progressPageSlice"
 import ProgressPageLoading from "./progress-page-loading"
 import ProgressPageTab from "./progressPageTabs/progress-page-tab"
+import { updateTabs } from "../../store/slices/workflowTabsSlice"
 
 const ProgressPage = () => {
   const [value, setValue] = useState<number | string>("progress")
   const { experiment, workflows, initialization } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
+  const { tabs } = useAppSelector(
+    (state: RootState) => state.workflowTabs,
+  )
   const { experimentId } = useParams()
   const dispatch = useAppDispatch()
+  const intervalId = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (experimentId) {
-      // TODO: Remove this when no longer needed
+      // TODO: Remove this if statement when no longer needed
       if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
         dispatch(fetchExperimentTesting(experimentId))
       } else {
@@ -43,42 +48,61 @@ const ProgressPage = () => {
     }
   }, [])
 
+  // useEffect(() => {
+  //   if (!experiment.loading && experiment.data) {
+  //     // TODO: Remove this if statement when no longer needed
+  //     if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
+  //       dispatch(
+  //         fetchExperimentWorkflowsTesting({
+  //           experimentId: experimentId || "",
+  //           workflowIds: experiment.data.workflow_ids,
+  //         }),
+  //       )
+  //     } else {
+  //       dispatch(fetchExperimentWorkflows(experimentId || ""))
+  //     }
+  //   }
+  // }, [experiment])
 
+  // TODO: Enable this for live data
   useEffect(() => {
-    if (!experiment.loading && experiment.data) {
-      // TODO: Remove this when no longer needed
-      if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
-        dispatch(
-          fetchExperimentWorkflowsTesting({
-            experimentId: experimentId || "",
-            workflowIds: experiment.data.workflow_ids,
-          }),
-        )
-      } else {
-        dispatch(fetchExperimentWorkflows(experimentId || ""))
+    const fetchWorkflows = () => {
+      if (!experiment.loading && experiment.data) {
+        // TODO: Remove this if statement when no longer needed
+        if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
+          dispatch(
+            fetchExperimentWorkflowsTesting({
+              experimentId: experimentId || "",
+              workflowIds: experiment.data.workflow_ids,
+            }),
+          )
+        } else {
+          dispatch(fetchExperimentWorkflows(experimentId || ""))
+        }
+      }
+    }
+    fetchWorkflows()
+    // TODO: Remove this if statement when no longer needed
+    if (experimentId !== "ideko" && experimentId !== "I2Cat_phising") {
+    intervalId.current = setInterval(fetchWorkflows, 5000)
+    }
+
+    return () => {
+      if (intervalId.current) {
+        clearInterval(intervalId.current)
       }
     }
   }, [experiment])
 
   // TODO: Enable this for live data
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     if (!experiment.loading && experiment.data) {
-  //       if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
-  //         dispatch(
-  //           fetchExperimentWorkflowsTesting({
-  //             experimentId: experimentId || "",
-  //             workflowIds: experiment.data.workflow_ids,
-  //           }),
-  //         )
-  //       } else {
-  //         dispatch(fetchExperimentWorkflows(experimentId || ""))
-  //       }
-  //     }
-  //   }, 15000)
-
-  //   return () => clearInterval(intervalId)
-  // }, [experiment])
+  useEffect(() => {
+    if (workflows.data && workflows.data.length > 0) {
+      dispatch(updateTabs({workflows, tabs}))
+      workflows.data.every(workflow => workflow.status === "completed") &&
+        intervalId.current &&
+        clearInterval(intervalId.current)
+    }
+  }, [workflows])
 
   const handleChange =
     (newValue: number | string) => (event: React.SyntheticEvent) => {

@@ -5,6 +5,9 @@ import { IExperimentResponse } from "../../shared/models/experiment.model"
 import { IWorkflowResponse, MetricDetail } from "../../shared/models/workflow.model"
 
 const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
+  if (!workflow.metrics) {
+    return { ...workflow, workflowId };
+  }
   const ok = {
     ...workflow,
     workflowId,

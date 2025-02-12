@@ -6,30 +6,19 @@ import green from "@mui/material/colors/green"
 import red from "@mui/material/colors/red"
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
-import { useEffect } from "react"
+import WarningIcon from "@mui/icons-material/Warning"
 
 interface IWorkflowMetrics {
   metrics: { [key: string]: number | string }[] | null
-  hasMetrics: boolean | undefined
-  setHasMetrics: React.Dispatch<React.SetStateAction<boolean | undefined>>
 }
 
 const WorkflowMetrics = (props: IWorkflowMetrics) => {
-  const { metrics, hasMetrics, setHasMetrics } = props
-  
-  useEffect(() => {
-    const hasDisplayMetrics = metrics?.some(metric => {
-      const value = typeof metric.value === 'string' ? Number(parseFloat(metric.value).toFixed(3)) : Number(metric.value.toFixed(3))
-      return !isNaN(value)
-    })  
-    setHasMetrics(hasDisplayMetrics)
-  }, [])
+  const { metrics } = props
 
   return (
     <>
       <Box
         className="Category-Item"
-        // elevation={2}
         sx={{
           borderRadius: 4,
           display: "flex",
@@ -51,67 +40,83 @@ const WorkflowMetrics = (props: IWorkflowMetrics) => {
           </Tooltip>
         </Box> */}
         <Grid sx={{ p: 2, justifyContent: "center" }} container spacing={3}>
-          {metrics
-            ? metrics.map(metric => {
-                const value = typeof metric.value === 'string' ? Number(parseFloat(metric.value).toFixed(3)) : Number(metric.value.toFixed(3))
-                if(!isNaN(value))
-                  return (
-                    <Grid
-                      key={`statistics-${metric.name}`}
-                      xs={12}
-                      sm={12}
-                      md={6}
-                      lg={3}
-                      item
+          {metrics ? (
+            metrics.map(metric => {
+              const value =
+                typeof metric.value === "string"
+                  ? Number(parseFloat(metric.value).toFixed(3))
+                  : Number(metric.value.toFixed(3))
+              return (
+                <Grid
+                  key={`statistics-${metric.name}`}
+                  xs={12}
+                  sm={12}
+                  md={6}
+                  lg={3}
+                  item
+                >
+                  <Paper sx={{ p: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "centers",
+                        columnGap: 1,
+                      }}
                     >
-                      <Paper sx={{ p: 2 }}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "centers",
-                            columnGap: 1,
-                          }}
-                        >
-                          <Typography fontWeight={600}>{metric.name}:</Typography>
-                          <Typography>
-                          {value}
-                          {metric.name === "runtime" && "s"}
-                          </Typography>
-                        </Box>
-                         <Box
-                          sx={{
-                            textAlign: "center",
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {metric.avgDiff as number > 0 ? (
-                            <ArrowDropUpIcon sx={{ color: green[400] }} />
-                          ) : (
-                            <ArrowDropDownIcon sx={{ color: red[400] }} />
-                          )}
-                          <Typography sx={{ mr: 0.5 }}>
-                            {parseInt(metric.avgDiff.toString())}%
-                          </Typography>
-                          <Typography>vs. experiment average</Typography>
-                        </Box> 
-                      </Paper>
-                    </Grid>
-                  )
-              })
-            : null}
-            {!hasMetrics && (
-              <Grid
-                xs={12}
-                sm={12}
-                md={6}
-                lg={3}
-                item
+                      <Typography fontWeight={600}>{metric.name}:</Typography>
+                      <Typography>
+                        {!isNaN(value) ? value : "N/A"}
+                        {metric.name === "runtime" && "s"}
+                      </Typography>
+                    </Box>
+                    {!isNaN(value) ? (
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {(metric.avgDiff as number) > 0 ? (
+                          <ArrowDropUpIcon sx={{ color: green[400] }} />
+                        ) : (metric.avgDiff as number) === 0 ? null : (
+                          <ArrowDropDownIcon sx={{ color: red[400] }} />
+                        )}
+                        <Typography sx={{ mr: 0.5 }}>
+                          {parseInt(metric.avgDiff.toString())}%
+                        </Typography>
+                        <Typography>vs. experiment average</Typography>
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography sx={{ mr: 0.5 }}>0%</Typography>
+                        <Typography>vs. experiment average</Typography>
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
+              )
+            })
+          ) : (
+            <Box sx={{ display: "flex", columnGap: 1, alignItems: "center", py: 4 }}>
+              <WarningIcon
+                sx={{ color: theme => theme.palette.customGrey.dark }}
+              />
+              <Typography
+                sx={{ color: theme => theme.palette.customGrey.dark }}
+                variant="h6"
               >
-                <Typography>{"No Metrics Available"}</Typography>
-              </Grid>
-            )}
+                No metrics found
+              </Typography>
+            </Box>
+          )}
         </Grid>
       </Box>
     </>
