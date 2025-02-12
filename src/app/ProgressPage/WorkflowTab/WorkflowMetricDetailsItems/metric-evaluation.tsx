@@ -3,7 +3,7 @@ import { Box, Typography, IconButton, Paper, Tooltip, Checkbox, FormControlLabel
 import { VegaLite } from "react-vega";
 import InfoIcon from "@mui/icons-material/Info";
 import grey from "@mui/material/colors/grey";
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
  
 interface Metric {
   name: string;
@@ -289,14 +289,14 @@ const MetricEvaluation = (props: IMetricEvaluation) => {
           />
           ) : (
             <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
-              <ReportProblemIcon fontSize={"large"} />
+              <ReportProblemRoundedIcon fontSize={"large"} />
               <Typography>{"No Metric Data Available"}</Typography>
             </Box>
           )}
         </Box>
       ) : (
         <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 500}}>
-          <ReportProblemIcon fontSize={"large"} />
+          <ReportProblemRoundedIcon fontSize={"large"} />
           <Typography>{"No Metrics Available"}</Typography>
         </Box>
       )

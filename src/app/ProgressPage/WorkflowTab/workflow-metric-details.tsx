@@ -2,7 +2,6 @@ import { Box, Grid, Typography } from "@mui/material"
 import MetricEvaluation from "./WorkflowMetricDetailsItems/metric-evaluation"
 import MetricEvolution from "./WorkflowMetricDetailsItems/metric-evolution"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition";
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 
 
 interface Metric {

@@ -295,7 +295,7 @@ export default function ScheduleTable() {
                 align: "center",
                 headerAlign: "center",
                 sortable: false,    
-                type: typeof rows[0][key] === "number" ? "number" : "string",
+                type: typeof infoRow[0][key] === "number" ? "number" : "string",
                 ...(key === "action" && {
                   renderCell: (params) => {
                     return (

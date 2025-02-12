@@ -9,7 +9,7 @@ import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { setProgressParallel } from "../../store/slices/progressPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 const ParallelCoordinatePlot = () => {
   const { workflows, progressParallel, progressGauges } = useAppSelector(
@@ -149,7 +149,7 @@ const ParallelCoordinatePlot = () => {
                     justifyContent: 'center'
                   }}
                 >
-                  <ReportProblemIcon fontSize="large"/>
+                  <ReportProblemRoundedIcon fontSize="large"/>
                   <Typography>No Metric Data Available</Typography>
                 </Box>
               )

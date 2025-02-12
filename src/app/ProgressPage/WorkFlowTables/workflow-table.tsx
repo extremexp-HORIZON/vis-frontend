@@ -22,6 +22,7 @@ import { useEffect, useState } from "react"
 import { Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
+import ProgressBar from "./prgress-bar"
 
 import theme from "../../../mui-theme"
 
@@ -286,7 +287,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           headerName: key.replace("_", " "),
           headerClassName:
             key === "action" ? "datagrid-header-fixed" : "datagrid-header",
-          minWidth: key === "action" ? 100 : key.length * 10 - 30,
+          minWidth: key === "action" ? 100 : Math.max(key.length * 10 - 30, 50),
           flex: 1,
           align: "center",
           headerAlign: "center",
@@ -294,8 +295,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           type: typeof rows[0][key] === "number" ? "number" : "string",
           ...(key === "status" && {
             renderCell: params => (
-              <ProgressPercentage
-                progressNumber={fractionStrToDecimal(params.value)}
+              <ProgressBar
+                workflowStatus={params.value}
+                workflowId={params.row.workflowId}
               />
             ),
           }),

@@ -13,7 +13,7 @@ import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 import { Metric, MetricDetail } from "../../../../shared/models/workflow.model"
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 const MetricsDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -33,31 +33,30 @@ const MetricsDistribution = () => {
   }, [workflows.data])
 
   const metricAvailability = (metrics: MetricDetail[], metricName: string) => {
-    return metrics.some(metric => metric.name.toLowerCase() === metricName.toLowerCase())
+    return metrics.some(metric => metric.name === metricName)
   }
 
   const getData = (metric: string) => {
-    const lowercaseMetric = metric.toLowerCase()
     const completedWorkflows = workflows.data.filter(
       workflow =>
         workflow.metrics &&
-        metricAvailability(workflow.metrics, lowercaseMetric) &&
+        metricAvailability(workflow.metrics, metric) &&
         workflow.status === "completed",
     )
 
     completedWorkflows.sort(
       (a, b) =>
         (parseFloat(
-          b.metrics.find(m => m.name === lowercaseMetric)?.value || "0",
+          b.metrics.find(m => m.name === metric)?.value || "0",
         ) || 0) -
         (parseFloat(
-          a.metrics.find(m => m.name === lowercaseMetric)?.value || "0",
+          a.metrics.find(m => m.name === metric)?.value || "0",
         ) || 0),
     )
 
     return completedWorkflows.map(workflow => ({
       metricName: metric,
-      value: workflow.metrics.find(metric => metric.name.toLowerCase() === lowercaseMetric)
+      value: workflow.metrics.find(m => m.name === metric)
         ?.value,
     }))
   }
@@ -309,7 +308,7 @@ const MetricsDistribution = () => {
             flexDirection: "column"
           }}
           >
-            <ReportProblemIcon fontSize="large" />
+            <ReportProblemRoundedIcon fontSize="large" />
             <Typography>{"No Metric Data"}</Typography>
           </Box>
         )}
