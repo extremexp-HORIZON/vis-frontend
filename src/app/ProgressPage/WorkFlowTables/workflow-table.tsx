@@ -22,6 +22,7 @@ import { useEffect, useState } from "react"
 import { Badge, Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
+import ProgressBar from "./prgress-bar"
 
 import theme from "../../../mui-theme"
 
@@ -302,8 +303,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           type: rows.length > 0 && typeof rows[0][key] === "number" ? "number" : "string",
           ...(key === "status" && {
             renderCell: params => (
-              <ProgressPercentage
-                progressNumber={fractionStrToDecimal(params.value)}
+              <ProgressBar
+                workflowStatus={params.value}
+                workflowId={params.row.workflowId}
               />
             ),
           }),
