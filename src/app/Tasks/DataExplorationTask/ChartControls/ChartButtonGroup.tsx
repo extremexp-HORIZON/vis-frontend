@@ -42,7 +42,7 @@ const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChart
       <Tooltip title="Scatter">
       <Button
         variant={chartType === 'scatter' ? 'contained' : 'outlined'}
-        disabled
+       
         onClick={() => setChartType('scatter')}
       >
         <ScatterPlotIcon />

@@ -43,7 +43,6 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   >("datatable")
   const [colorBy, setColorBy] = useState("None")
   const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true) // Control when to stop fetching
   const pageSize = 100
   const totalPages = Math.ceil(
     (workflow?.workflowTasks?.dataExploration?.lineChart?.data?.querySize ??
@@ -77,7 +76,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
         }),
       )
     }
-    if (chartType === "line" || chartType === "datatable") {
+    if (chartType === "line" || chartType === "datatable" || chartType === "scatter") {
       dispatch(
         fetchDataExplorationData({
           query: {
@@ -90,6 +89,21 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           metadata: {
             workflowId: workflowId || "",
             queryCase: "lineChart",
+          },
+        }),
+      )
+      dispatch(
+        fetchDataExplorationData({
+          query: {
+            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+            limit: 2000, // Default row limit
+            columns: selectedColumns, // Include selected columns in the payload
+            filters: filters,
+            offset: 0,
+          },
+          metadata: {
+            workflowId: workflowId || "",
+            queryCase: "scatterChart",
           },
         }),
       )
@@ -162,6 +176,25 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             }),
           )
         }
+        if (workflow.workflowTasks.dataExploration?.scatterChart.data === null) {
+          dispatch(
+            fetchDataExplorationData({
+              query: {
+                datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+                limit: 2000,
+                columns: [],
+                filters: [],
+                groupBy: [],
+                aggregation: {},
+                offset: 0,
+              },
+              metadata: {
+                workflowId: workflowId || "",
+                queryCase: "scatterChart",
+              },
+            }),
+          )
+        }
       }
     }
   }, [])
@@ -213,9 +246,25 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           },
         }),
       )
+      dispatch(
+        fetchDataExplorationData({
+          query: {
+            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+            limit: 2000, // Default row limit
+            columns: selectedColumns, // Include selected columns in the payload
+            filters: filters,
+            offset: 0,
+          },
+          metadata: {
+            workflowId: workflowId || "",
+            queryCase: "scatterChart",
+          },
+        }),
+      )
     }
   }, [currentPage, pageSize, filters,offset])
 
+  console.log("taskDependancies", taskDependancies)
   return (
     <Grid
       className="Category-Item"
@@ -272,30 +321,32 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
         <Box sx={{ display: "flex", height: "100vh" }}>
           {/* Control Panel */}
           <ControlPanel
-            originalColumns={
-              workflow?.workflowTasks.dataExploration?.metaData.data
-                ?.originalColumns || []
-            }
-            selectedColumns={selectedColumns}
-            setSelectedColumns={setSelectedColumns}
-            onFetchData={handleFetchData}
-            filters={filters}
-            setFilters={setFilters}
-            uniqueValues={
-              workflow?.workflowTasks.dataExploration?.metaData.data
-                ?.uniqueColumnValues || []
-            }
-            chartType={chartType}
-            columns={columns}
-            xAxis={xAxis}
-            setXAxis={setXAxis}
-            yAxis={yAxis}
-            setYAxis={setYAxis}
-            barGroupBy={barGroupBy}
-            setBarGroupBy={setBarGroupBy}
-            barAggregation={barAggregation}
-            setBarAggregation={setBarAggregation}
-          />
+              originalColumns={workflow?.workflowTasks.dataExploration?.metaData.data
+                ?.originalColumns || []}
+              selectedColumns={selectedColumns}
+              setSelectedColumns={setSelectedColumns}
+              onFetchData={handleFetchData}
+              filters={filters}
+              setFilters={setFilters}
+              uniqueValues={workflow?.workflowTasks.dataExploration?.metaData.data
+                ?.uniqueColumnValues || []}
+              chartType={chartType}
+              columns={columns}
+              xAxis={xAxis}
+              setXAxis={setXAxis}
+              yAxis={yAxis}
+              setYAxis={setYAxis}
+              barGroupBy={barGroupBy}
+              setBarGroupBy={setBarGroupBy}
+              barAggregation={barAggregation}
+              setBarAggregation={setBarAggregation} 
+              yAxisScatter={yAxisScatter} 
+              setYAxisScatter={setYAxisScatter}
+               xAxisScatter={xAxisScatter} 
+               setXAxisScatter={setXAxisScatter} 
+               colorBy={colorBy} 
+               setColorBy={setColorBy} 
+                       />
 
           {/* Graph Container */}
           <Box sx={{ flex: 1, overflow: "auto" }}>
@@ -311,10 +362,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                 colorBy={colorBy}
                 setColorBy={setColorBy}
                 xAxisScatter={xAxisScatter}
-                setXAxisScatter={setXAxisScatter}
                 yAxis={yAxis}
                 yAxisScatter={yAxisScatter}
-                setYAxisScatter={setYAxisScatter}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
               />

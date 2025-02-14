@@ -26,7 +26,7 @@ import {
 import LineChartControlPanel from "../Charts/LineChartControlPanel"
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 import BarChartControlPanel from "../Charts/BarChartControlPanel"
-import { set } from "lodash"
+import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 
 interface IControlPanel {
   originalColumns: VisualColumn[]
@@ -46,6 +46,13 @@ interface IControlPanel {
   setBarGroupBy: (value: string[]) => void
   barAggregation: { [key: string]: string[] }
   setBarAggregation: (value: { [key: string]: string[] }) => void
+  yAxisScatter: VisualColumn[]
+  setYAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn[]>>
+  xAxisScatter: VisualColumn
+  setXAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn>>
+
+  colorBy: string
+  setColorBy: (colorBy: string) => void
 }
 
 const ControlPanel = (props: IControlPanel) => {
@@ -67,6 +74,12 @@ const ControlPanel = (props: IControlPanel) => {
     setBarGroupBy,
     barAggregation,
     setBarAggregation,
+    yAxisScatter,
+    setYAxisScatter,
+    xAxisScatter,
+    setXAxisScatter,
+    colorBy,
+    setColorBy
   } = props
   const handleChange = event => {
     const {
@@ -126,31 +139,37 @@ const ControlPanel = (props: IControlPanel) => {
       const max = Math.max(...columnValues)
       setSliderRange([min, max])
       setFilterValue({ min, max }) // Set default slider values to min and max
-    } if (
+    }
+    if (
       filterType === "range" &&
-      originalColumns.find(col => col.name === filterColumn)?.type ==="STRING")
-    {
+      originalColumns.find(col => col.name === filterColumn)?.type === "STRING"
+    ) {
       setFilterType("equals") // Switch to 'equals' filtering when a string column is selected(
     }
 
-    if (filterType === "range" && originalColumns.find(col => col.name === filterColumn)?.type === "LOCAL_DATE_TIME") {
+    if (
+      filterType === "range" &&
+      originalColumns.find(col => col.name === filterColumn)?.type ===
+        "LOCAL_DATE_TIME"
+    ) {
       const columnValues = (uniqueValues[filterColumn] || [])
         .map(dateStr => new Date(dateStr).getTime())
-        .filter(timestamp => !isNaN(timestamp));
-    
+        .filter(timestamp => !isNaN(timestamp))
+
       if (columnValues.length > 0) {
-        const min = Math.min(...columnValues);
-        const max = Math.max(...columnValues);
-    
-        
-        setSliderRange([new Date(min).toISOString().slice(0, 16), new Date(max).toISOString().slice(0, 16)]);
+        const min = Math.min(...columnValues)
+        const max = Math.max(...columnValues)
+
+        setSliderRange([
+          new Date(min).toISOString().slice(0, 16),
+          new Date(max).toISOString().slice(0, 16),
+        ])
         setFilterValue({
           min: new Date(min).toISOString().slice(0, 16),
           max: new Date(max).toISOString().slice(0, 16),
-        });
+        })
       }
     }
-
   }, [filterColumn, filterType, uniqueValues])
 
   const handleAddFilter = () => {
@@ -175,18 +194,21 @@ const ControlPanel = (props: IControlPanel) => {
   }
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
-      if (originalColumns.find(col => col.name === filterColumn)?.type === "LOCAL_DATE_TIME") {
+      if (
+        originalColumns.find(col => col.name === filterColumn)?.type ===
+        "LOCAL_DATE_TIME"
+      ) {
         // If the filter column is of type LOCAL_DATE_TIME (date), convert the slider values to ISO strings
         setFilterValue({
           min: new Date(newValue[0]).toISOString().slice(0, 16),
           max: new Date(newValue[1]).toISOString().slice(0, 16),
-        });
+        })
       } else {
         // Otherwise, for numeric values, just set the min and max directly
-        setFilterValue({ min: newValue[0], max: newValue[1] });
+        setFilterValue({ min: newValue[0], max: newValue[1] })
       }
     }
-  };
+  }
 
   // Determine the display value for the Select component
   const getDisplayValue = () => {
@@ -315,8 +337,16 @@ const ControlPanel = (props: IControlPanel) => {
                   }}
                 >
                   <MenuItem value="equals">Equals</MenuItem>
-                  <MenuItem value="range" disabled={originalColumns.find(col => col.name === filterColumn)?.type === "STRING"}>Range</MenuItem>                
-                  </Select>
+                  <MenuItem
+                    value="range"
+                    disabled={
+                      originalColumns.find(col => col.name === filterColumn)
+                        ?.type === "STRING"
+                    }
+                  >
+                    Range
+                  </MenuItem>
+                </Select>
               </FormControl>
 
               {filterType === "equals" ? (
@@ -341,42 +371,43 @@ const ControlPanel = (props: IControlPanel) => {
                 </FormControl>
               ) : (
                 <Box sx={{ mt: 2 }}>
-                <Typography gutterBottom>Range</Typography>
-                
-                {/* Conditionally render the slider based on the type */}
-                {filterType === "range" && originalColumns.find(col => col.name === filterColumn)?.type === "LOCAL_DATE_TIME" ? (
-                  // For date-time range slider
-                  <>
-                    <Slider
-                      value={[
-                        new Date(filterValue.min).getTime(),
-                        new Date(filterValue.max).getTime(),
-                      ]}
-                      onChange={handleSliderChange}
-                      valueLabelDisplay="auto"
-                      min={new Date(sliderRange[0]).getTime()}
-                      max={new Date(sliderRange[1]).getTime()}
-                      // valueLabelFormat={(value) => new Date(value).toISOString().slice(0, 16)} // Format label as ISO string
-                    />
-                    {/* <Typography>Min: {new Date(filterValue.min).toISOString().slice(0, 16)}</Typography>
+                  <Typography gutterBottom>Range</Typography>
+
+                  {/* Conditionally render the slider based on the type */}
+                  {filterType === "range" &&
+                  originalColumns.find(col => col.name === filterColumn)
+                    ?.type === "LOCAL_DATE_TIME" ? (
+                    // For date-time range slider
+                    <>
+                      <Slider
+                        value={[
+                          new Date(filterValue.min).getTime(),
+                          new Date(filterValue.max).getTime(),
+                        ]}
+                        onChange={handleSliderChange}
+                        valueLabelDisplay="auto"
+                        min={new Date(sliderRange[0]).getTime()}
+                        max={new Date(sliderRange[1]).getTime()}
+                        // valueLabelFormat={(value) => new Date(value).toISOString().slice(0, 16)} // Format label as ISO string
+                      />
+                      {/* <Typography>Min: {new Date(filterValue.min).toISOString().slice(0, 16)}</Typography>
                     <Typography>Max: {new Date(filterValue.max).toISOString().slice(0, 16)}</Typography> */}
-                  </>
-                ) : (
-                  // For numeric range slider
-                  <>
-                    <Slider
-                      value={[filterValue.min, filterValue.max]}
-                      onChange={handleSliderChange}
-                      valueLabelDisplay="auto"
-                      min={sliderRange[0]}
-                      max={sliderRange[1]}
-                    />
-                    <Typography>Min: {filterValue.min}</Typography>
-                    <Typography>Max: {filterValue.max}</Typography>
-                  </>
-                )}
-              </Box>
-              
+                    </>
+                  ) : (
+                    // For numeric range slider
+                    <>
+                      <Slider
+                        value={[filterValue.min, filterValue.max]}
+                        onChange={handleSliderChange}
+                        valueLabelDisplay="auto"
+                        min={sliderRange[0]}
+                        max={sliderRange[1]}
+                      />
+                      <Typography>Min: {filterValue.min}</Typography>
+                      <Typography>Max: {filterValue.max}</Typography>
+                    </>
+                  )}
+                </Box>
               )}
 
               <Button
@@ -386,10 +417,11 @@ const ControlPanel = (props: IControlPanel) => {
                 sx={{
                   mt: 2,
                   "&:hover": {
-                      backgroundColor: theme => theme.palette.primary.dark,
-                      transform: "scale(1.05)",
+                    backgroundColor: theme => theme.palette.primary.dark,
+                    transform: "scale(1.05)",
                   },
-              }}              >
+                }}
+              >
                 Add Filter
               </Button>
 
@@ -407,19 +439,19 @@ const ControlPanel = (props: IControlPanel) => {
                     color="primary"
                     sx={{
                       margin: 0.5,
-                      minWidth: '200px',  // Set a minimum width to prevent shrinking
-                      maxWidth: '200px',  // Set a max width so it won't grow indefinitely
-                      whiteSpace: 'nowrap',  // Prevent text from wrapping
-                      overflow: 'hidden',  // Hide the overflowed text
-                      textOverflow: 'ellipsis',  // Show ellipsis when text overflows
-                      transition: 'max-width 0.3s ease',  // Smooth transition when expanding
-                      '&:hover': {
-                        maxWidth: '500px',   // Allow it to expand on hover (set to desired max width)
-                        whiteSpace: 'normal',  // Allow the text to wrap normally on hover
+                      minWidth: "200px", // Set a minimum width to prevent shrinking
+                      maxWidth: "200px", // Set a max width so it won't grow indefinitely
+                      whiteSpace: "nowrap", // Prevent text from wrapping
+                      overflow: "hidden", // Hide the overflowed text
+                      textOverflow: "ellipsis", // Show ellipsis when text overflows
+                      transition: "max-width 0.3s ease", // Smooth transition when expanding
+                      "&:hover": {
+                        maxWidth: "500px", // Allow it to expand on hover (set to desired max width)
+                        whiteSpace: "normal", // Allow the text to wrap normally on hover
                         // backgroundColor: theme => theme.palette.action.hover,  // Highlight on hover
                       },
                     }}
-                                      />
+                  />
                 ))}
               </Box>
             </Box>
@@ -476,6 +508,18 @@ const ControlPanel = (props: IControlPanel) => {
               setBarGroupBy={setBarGroupBy}
               barAggregation={barAggregation}
               setBarAggregation={setBarAggregation}
+            />
+          )}
+
+          {chartType === "scatter" && (
+            <ScatterChartControlPanel
+              columns={columns}
+              xAxis={xAxisScatter}
+              setXAxis={setXAxisScatter}
+              yAxis={yAxisScatter}
+              setYAxis={setYAxisScatter}
+              colorBy={colorBy}
+              setColorBy={setColorBy}
             />
           )}
         </Box>

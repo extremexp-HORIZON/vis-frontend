@@ -20,10 +20,9 @@ interface IGraphContainer {
   xAxisScatter: VisualColumn
   colorBy: string
   setColorBy: (colorBy: string) => void
-  setXAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn>>
   yAxis: VisualColumn[]
   yAxisScatter: VisualColumn[]
-  setYAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn[]>>
+  
   viewMode: "overlay" | "stacked"
   setViewMode: React.Dispatch<React.SetStateAction<"overlay" | "stacked">>
   
@@ -42,10 +41,10 @@ const GraphContainer = (props: IGraphContainer) => {
     setChartType,
     xAxis,
     xAxisScatter,
-    setXAxisScatter,
+    
     yAxis,
     yAxisScatter,
-    setYAxisScatter,
+    
     viewMode,
     setViewMode,
     
@@ -101,17 +100,7 @@ const GraphContainer = (props: IGraphContainer) => {
             </Button>
           </ButtonGroup>
         </Box>
-        {/* {chartType === "scatter" && (
-          <ScatterChartControlPanel
-            columns={columns}
-            xAxis={xAxisScatter}
-            setXAxis={setXAxisScatter}
-            yAxis={yAxisScatter}
-            setYAxis={setYAxisScatter}
-            colorBy={colorBy}
-            setColorBy={setColorBy}
-          />
-        )} */}
+        
 
         {/* Conditionally Render Chart Based on Selected Type */}
         <Box sx={{ marginTop: "1rem" }}>
@@ -128,8 +117,8 @@ const GraphContainer = (props: IGraphContainer) => {
           {chartType === "scatter" && (
             <ScatterChart
               viewMode={viewMode}
-              data={workflow.workflowTasks.dataExploration?.lineChart.data?.data}
-              xAxis={xAxisScatter}
+              data={workflow.workflowTasks.dataExploration?.scatterChart.data?.data}
+              xAxis={xAxisScatter} 
               yAxis={yAxisScatter}
               colorBy={colorBy}
               setColorBy={setColorBy}
