@@ -195,6 +195,25 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             }),
           )
         }
+        if (workflow.workflowTasks.dataExploration?.mapChart.data === null) {
+          dispatch(
+                    fetchDataExplorationData({
+                      query: {
+                        datasetId: "/test/newresult.csv",
+                        limit: 0,
+                        columns: [],
+                        filters: [],
+                        groupBy: [],
+                        aggregation: {},
+                        offset: 0,
+                      },
+                      metadata: {
+                        workflowId: workflowId || "",
+                        queryCase: "mapChart",
+                      },
+                    }),
+                  )
+        }
       }
     }
   }, [])
@@ -350,7 +369,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
 
           {/* Graph Container */}
           <Box sx={{ flex: 1, overflow: "auto" }}>
-            {workflow?.workflowTasks.dataExploration?.lineChart.data && (
+            {workflow?.workflowTasks.dataExploration?.lineChart.data && workflow?.workflowTasks.dataExploration?.metaData.data &&
+            workflow?.workflowTasks.dataExploration?.scatterChart.data && workflow?.workflowTasks.dataExploration?.mapChart.data && (
               <GraphContainer
                 workflow={workflow}
                 count={totalPages}

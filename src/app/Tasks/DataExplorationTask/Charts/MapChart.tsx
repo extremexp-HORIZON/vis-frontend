@@ -15,17 +15,13 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  CircularProgress,
   Chip,
   Slider,
   ThemeProvider,
   createTheme,
   Divider,
 } from "@mui/material"
-import { useAppDispatch } from "../../../../store/store"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { ExpandMore } from "@mui/icons-material"
-import { set } from "lodash"
 
 const COLOR_PALETTE = [
   "#E6194B",
@@ -54,7 +50,7 @@ const layers = {
   osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   satellite: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
 }
-const App = () => {
+const MapChart = (rawData: any) => {
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef(null)
   const [data, setData] = useState<any[]>([])
@@ -70,83 +66,50 @@ const App = () => {
   const [latitudeField, setLatitudeField] = useState<string>("")
   const [longitudeField, setLongitudeField] = useState<string>("")
 
-  const dispatch = useAppDispatch()
   useEffect(() => {
     const handleResize = () => {
       if (mapContainerRef.current) {
-        mapContainerRef.current.style.height = `${window.innerHeight * 0.7}px`
+        mapContainerRef.current.style.height = `${window.innerHeight * 0.6}px`
       }
     }
     window.addEventListener("resize", handleResize)
     handleResize()
     return () => window.removeEventListener("resize", handleResize)
   }, [])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
+    if (rawData) {
       try {
-        const resultAction = await dispatch(
-          fetchDataExplorationData({
-            query: {
-              datasetId: "/test/newresult.csv",
-              limit: 0,
-              columns: [],
-              filters: [],
-              groupBy: [],
-              aggregation: {},
-              offset: 0,
-            },
-            metadata: {
-              workflowId: "",
-              queryCase: "mapChart",
-            },
-          }),
-        )
-        if (fetchDataExplorationData.fulfilled.match(resultAction)) {
-          const data = resultAction.payload
-          setData(JSON.parse(data.data))
+        const parsedData = rawData.rawData;
+        setData(parsedData);
 
-          // Extract column names that are strings (for dropdown options)
-          const stringColumns = Object.keys(
-            JSON.parse(data.data)[0] || {},
-          ).filter(
-            key =>
-              typeof JSON.parse(data.data)[0][key] === "string" &&
-              key !== "timestamp",
-          )
+        const stringColumns = Object.keys(parsedData[0] || {}).filter(
+          (key) => typeof parsedData[0][key] === "string" && key !== "timestamp"
+        );
 
-          const potentialLatColumns = ["lat", "latitude"]
-          const potentialLonColumns = ["lon", "longitude"]
-          const integerColumns = Object.keys(
-            JSON.parse(data.data)[0] || {},
-          ).filter(key => typeof JSON.parse(data.data)[0][key] === "number")
+        const potentialLatColumns = ["lat", "latitude"];
+        const potentialLonColumns = ["lon", "longitude"];
+        const integerColumns = Object.keys(parsedData[0] || {}).filter(
+          (key) => typeof parsedData[0][key] === "number"
+        );
 
-          const detectedLatitude =
-            integerColumns.find(col =>
-              potentialLatColumns.includes(col.toLowerCase()),
-            ) || ""
-          const detectedLongitude =
-            integerColumns.find(col =>
-              potentialLonColumns.includes(col.toLowerCase()),
-            ) || ""
+        const detectedLatitude =
+          integerColumns.find((col) =>
+            potentialLatColumns.includes(col.toLowerCase())
+          ) || "";
+        const detectedLongitude =
+          integerColumns.find((col) =>
+            potentialLonColumns.includes(col.toLowerCase())
+          ) || "";
 
-          setLatitudeField(detectedLatitude)
-          setLongitudeField(detectedLongitude)
-          setColumns(stringColumns)
-          setIntColumns(integerColumns)
-        } else {
-          setError("Failed to load data.")
-        }
+        setLatitudeField(detectedLatitude);
+        setLongitudeField(detectedLongitude);
+        setColumns(stringColumns);
+        setIntColumns(integerColumns);
       } catch (err) {
-        setError("An error occurred.")
-      } finally {
-        setLoading(false)
+        console.error("Error parsing data:", err);
       }
     }
-    fetchData()
-  }, [dispatch])
+  }, [rawData]);
 
   useEffect(() => {
     setTripsMode(!!timestampField && selectedColumns.length > 0)
@@ -483,6 +446,7 @@ const App = () => {
               </Box>
             </AccordionDetails>
           </Accordion>
+          
           <FormControl sx={{ flex: 1 }}>
             <InputLabel>Color By</InputLabel>
             <Select
@@ -536,7 +500,7 @@ const App = () => {
           <Box
             ref={mapContainerRef}
             sx={{
-              height: "70vh",
+              height: "30vh",
               width: "100%",
               borderRadius: 4,
               border: "1px solid rgba(0, 0, 0, 0.2)",
@@ -603,4 +567,4 @@ const App = () => {
   )
 }
 
-export default App
+export default MapChart

@@ -104,6 +104,7 @@ const GraphContainer = (props: IGraphContainer) => {
 
         {/* Conditionally Render Chart Based on Selected Type */}
         <Box sx={{ marginTop: "1rem" }}>
+
           {chartType === "line" && (
             <LineChart
               viewMode={viewMode}
@@ -113,7 +114,13 @@ const GraphContainer = (props: IGraphContainer) => {
               groupFunction={""}
             />
           )}
-          {chartType === "bar" && <BarChart dataExploration={workflow.workflowTasks.dataExploration?.barChart.data} />}
+
+          {chartType === "bar" && (  
+            <BarChart 
+            dataExploration={workflow.workflowTasks.dataExploration?.barChart.data} 
+            />
+          )}
+
           {chartType === "scatter" && (
             <ScatterChart
               viewMode={viewMode}
@@ -125,7 +132,10 @@ const GraphContainer = (props: IGraphContainer) => {
               columns={workflow.workflowTasks.dataExploration?.lineChart.data?.columns||[]}
             />
           )}
-          {chartType === "map" && <MapChart />}
+          {chartType === "map" && 
+          <MapChart rawData={workflow.workflowTasks.dataExploration?.mapChart.data?.data || []}
+           />}
+          
           {chartType === "datatable" && (
             <Box sx={{ width: "100%", overflowX: "hidden" }}>
               <TableExpand
