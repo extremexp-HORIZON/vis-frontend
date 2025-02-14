@@ -14,7 +14,6 @@ const ControlPanel = ({ onPathSubmit }: { onPathSubmit: (path: string) => void }
 
   const handleSubmit = () => {
     const fullPath = `/${useCase}/${folder}/${subfolder}/${filename}`;
-    console.log("Submitting path:", fullPath);
     onPathSubmit(fullPath);
   };
 

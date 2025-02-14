@@ -143,7 +143,7 @@ const TableExpand: React.FC<DataTableProps> = ({
         placement="bottom-start"
         style={{ zIndex: 1000, padding: "10px" }}
       >
-        <Paper style={{ width: 300, padding: 10 }}>
+        {/* <Paper style={{ width: 300, padding: 10 }}>
           <IconButton
             onClick={handleClose}
             style={{ position: "absolute", right: 10, top: 10 }}
@@ -182,7 +182,7 @@ const TableExpand: React.FC<DataTableProps> = ({
           ) : (
             <Typography variant="subtitle1">Type: {columnType}</Typography>
           )}
-        </Paper>
+        </Paper> */}
       </Popper>
     </>
   )

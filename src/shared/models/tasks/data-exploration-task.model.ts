@@ -19,8 +19,11 @@ export interface IDataExploration {
     loading: boolean, 
     error: string | null
   }
-  // filters: IFilter[]
-  // columns: VisualColumn[]
+  dataTable:{
+    data: IDataExplorationResponse | null
+    loading: boolean
+    error: string | null
+  }
   lineChart: {
     data: IDataExplorationResponse | null
     loading: boolean
@@ -64,8 +67,12 @@ export const dataExplorationDefault: IDataExploration = {
     loading: false,
     error: null
   },
-  // filters: [],
-  // columns: [],
+  
+  dataTable: {
+    data: null,
+    loading: false,
+    error: null
+  },
   lineChart: {
     data: null,
     loading: false,

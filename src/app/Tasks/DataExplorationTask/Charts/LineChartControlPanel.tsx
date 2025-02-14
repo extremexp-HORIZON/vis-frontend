@@ -16,8 +16,7 @@ interface LineChartControlPanelProps {
   setXAxis: React.Dispatch<React.SetStateAction<VisualColumn>>
   yAxis: VisualColumn[]
   setYAxis: React.Dispatch<React.SetStateAction<VisualColumn[]>>
-  groupFunction: string
-  setGroupFunction: (groupFunction: string) => void
+
 }
 
 const LineChartControlPanel = ({
@@ -26,11 +25,8 @@ const LineChartControlPanel = ({
   setXAxis,
   yAxis,
   setYAxis,
-  groupFunction,
-  setGroupFunction,
 }: LineChartControlPanelProps) => {
-  console.log(columns)
-  console.log(xAxis)
+ 
   useEffect(() => {
     if (columns && columns.length > 0) {
       const localDateTimeColumn = columns.find(
@@ -58,7 +54,7 @@ const LineChartControlPanel = ({
     }
   }, [columns, xAxis, yAxis, setXAxis, setYAxis])
   return (
-    <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem", }}>
+    <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem",flexDirection: "column" }}>
       {/* X-Axis Selector */}
       <FormControl fullWidth>
         <InputLabel id="x-axis-select-label">X-Axis</InputLabel>
