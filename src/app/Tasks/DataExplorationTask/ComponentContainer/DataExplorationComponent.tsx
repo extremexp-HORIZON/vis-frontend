@@ -50,7 +50,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   )
   const taskDependancies = workflow?.workflowTasks.dataExploration
   const workflowId = workflow?.workflowId
-  const [offset, setOffset] = useState((currentPage - 1) * pageSize)
+  // const [offset, setOffset] = useState((currentPage - 1) * pageSize)
 
 
   const handleFetchData = () => {
@@ -84,7 +84,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             limit: pageSize, // Default row limit
             columns: selectedColumns, // Include selected columns in the payload
             filters: filters,
-            offset: offset,
+            offset: 0,
+            groupBy: ["handlefetchdata gia line,"],
           },
           metadata: {
             workflowId: workflowId || "",
@@ -100,6 +101,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             columns: selectedColumns, // Include selected columns in the payload
             filters: filters,
             offset: 0,
+            groupBy: ["handlefetchdata gia ,scatter"],
           },
           metadata: {
             workflowId: workflowId || "",
@@ -145,7 +147,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                 limit: 10,
                 columns: [],
                 filters: [],
-                groupBy: [],
+                groupBy: ["arxiko gia bar"],
                 aggregation: {},
                 offset: 0,
               },
@@ -184,7 +186,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                 limit: 2000,
                 columns: [],
                 filters: [],
-                groupBy: [],
+                groupBy: ["arxikogiascatter"],
                 aggregation: {},
                 offset: 0,
               },
@@ -203,7 +205,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                         limit: 0,
                         columns: [],
                         filters: [],
-                        groupBy: [],
+                        groupBy: ["arxiko gia map"],
                         aggregation: {},
                         offset: 0,
                       },
@@ -247,7 +249,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       if (filters.length > 0) {
         setCurrentPage(1)
       }
-      setOffset((currentPage - 1) * pageSize)
+      const offset = (currentPage - 1) * pageSize
       dispatch(
         fetchDataExplorationData({
           query: {
@@ -255,7 +257,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             limit: pageSize,
             columns: selectedColumns,
             filters: filters,
-            groupBy: ["pipa"],
+            groupBy: ["linechart meta apo filter kai pagination"],
             aggregation: {},
             offset: offset,
           },
@@ -265,23 +267,28 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           },
         }),
       )
-      dispatch(
-        fetchDataExplorationData({
-          query: {
-            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
-            limit: 2000, // Default row limit
-            columns: selectedColumns, // Include selected columns in the payload
-            filters: filters,
-            offset: 0,
-          },
-          metadata: {
-            workflowId: workflowId || "",
-            queryCase: "scatterChart",
-          },
-        }),
-      )
+     
     }
-  }, [currentPage, pageSize, filters,offset])
+  }, [currentPage, pageSize, filters])
+  useEffect(() => {
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+          limit: 2000, // Default row limit
+          columns: selectedColumns, // Include selected columns in the payload
+          filters: filters,
+          offset: 0,
+          groupBy: ["scatterchart meta apo filter"],
+        },
+        metadata: {
+          workflowId: workflowId || "",
+          queryCase: "scatterChart",
+        },
+      }),
+    )
+  }, [filters])
+  console.log("ti skata allazei kai kalei to useeff gia pagination",currentPage,pageSize,filters)
 
   console.log("taskDependancies", taskDependancies)
   return (
@@ -315,7 +322,10 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           </Tooltip>
           {(workflow?.workflowTasks.dataExploration?.multipleTimeSeries
             .loading ||
-            workflow?.workflowTasks.dataExploration?.lineChart.loading) && (
+            workflow?.workflowTasks.dataExploration?.lineChart.loading 
+            || workflow?.workflowTasks.dataExploration?.scatterChart.loading 
+            || workflow?.workflowTasks.dataExploration?.barChart.loading
+          || workflow?.workflowTasks.dataExploration?.mapChart.loading) && (
             <CircularProgress
               size={28}
               sx={{

@@ -22,10 +22,10 @@ interface IGraphContainer {
   setColorBy: (colorBy: string) => void
   yAxis: VisualColumn[]
   yAxisScatter: VisualColumn[]
-  
+
   viewMode: "overlay" | "stacked"
   setViewMode: React.Dispatch<React.SetStateAction<"overlay" | "stacked">>
-  
+
   count: number
   page: number
   onChange: (event: React.ChangeEvent<unknown>, value: number) => void
@@ -34,26 +34,21 @@ interface IGraphContainer {
 
 const GraphContainer = (props: IGraphContainer) => {
   const {
-   
+    workflow,
     colorBy,
     setColorBy,
     chartType,
     setChartType,
-    xAxis,
-    xAxisScatter,
-    
-    yAxis,
-    yAxisScatter,
-    
     viewMode,
     setViewMode,
-    
+    xAxis,
+    xAxisScatter,
+    yAxis,
+    yAxisScatter,
     count,
     page,
     onChange,
-    workflow
   } = props
-
 
   return (
     <Paper>
@@ -100,48 +95,64 @@ const GraphContainer = (props: IGraphContainer) => {
             </Button>
           </ButtonGroup>
         </Box>
-        
 
         {/* Conditionally Render Chart Based on Selected Type */}
         <Box sx={{ marginTop: "1rem" }}>
-
           {chartType === "line" && (
             <LineChart
               viewMode={viewMode}
-              data={workflow.workflowTasks.dataExploration?.lineChart.data?.data}
+              data={
+                workflow.workflowTasks.dataExploration?.lineChart.data?.data
+              }
               xAxis={xAxis}
               yAxis={yAxis}
               groupFunction={""}
             />
           )}
 
-          {chartType === "bar" && (  
-            <BarChart 
-            dataExploration={workflow.workflowTasks.dataExploration?.barChart.data} 
+          {chartType === "bar" && (
+            <BarChart
+              dataExploration={
+                workflow.workflowTasks.dataExploration?.barChart.data
+              }
             />
           )}
 
           {chartType === "scatter" && (
             <ScatterChart
               viewMode={viewMode}
-              data={workflow.workflowTasks.dataExploration?.scatterChart.data?.data}
-              xAxis={xAxisScatter} 
+              data={
+                workflow.workflowTasks.dataExploration?.scatterChart.data?.data
+              }
+              xAxis={xAxisScatter}
               yAxis={yAxisScatter}
               colorBy={colorBy}
               setColorBy={setColorBy}
-              columns={workflow.workflowTasks.dataExploration?.lineChart.data?.columns||[]}
+              columns={
+                workflow.workflowTasks.dataExploration?.lineChart.data
+                  ?.columns || []
+              }
             />
           )}
-          {chartType === "map" && 
-          <MapChart rawData={workflow.workflowTasks.dataExploration?.mapChart.data?.data || []}
-           />}
-          
+          {chartType === "map" && (
+            <MapChart
+              rawData={
+                workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
+                []
+              }
+            />
+          )}
+
           {chartType === "datatable" && (
             <Box sx={{ width: "100%", overflowX: "hidden" }}>
               <TableExpand
-                data={workflow.workflowTasks.dataExploration?.lineChart.data?.data}
-                columns={workflow.workflowTasks.dataExploration?.lineChart.data
-                  ?.columns || []}
+                data={
+                  workflow.workflowTasks.dataExploration?.lineChart.data?.data
+                }
+                columns={
+                  workflow.workflowTasks.dataExploration?.lineChart.data
+                    ?.columns || []
+                }
                 datetimeColumn=""
               />
 
