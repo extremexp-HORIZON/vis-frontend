@@ -2,27 +2,27 @@ import React, { useState, useEffect, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import {
-  Box,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Checkbox,
-  ListItemText,
-  Typography,
-  OutlinedInput,
-  Paper,
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
+  Checkbox,
   Chip,
+  Divider,
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Paper,
+  Select,
   Slider,
   ThemeProvider,
+  Typography,
   createTheme,
-  Divider,
 } from "@mui/material"
-import { ExpandMore } from "@mui/icons-material"
 import MapControlPanel from "./MapChartControlPanel"
+import { ExpandMore } from "@mui/icons-material"
 
 const COLOR_PALETTE = [
   "#E6194B",
@@ -377,29 +377,186 @@ const MapChart = (rawData: any) => {
     },
   })
 
+  console.log("colormap", colorMap)
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-      {/* Render the Control Panel */}
-      <MapControlPanel
-        timestampField={timestampField}
-        onTimestampChange={setTimestampField}
-        latitudeField={latitudeField}
-        onLatitudeChange={setLatitudeField}
-        longitudeField={longitudeField}
-        onLongitudeChange={setLongitudeField}
-        colorBy={colorBy}
-        onColorByChange={setColorBy}
-        selectedColumns={selectedColumns}
-        onSegmentByChange={setSelectedColumns}
-        columns={columns}
-        intColumns={intColumns}
-        sliderValue={sliderValue}
-        onSliderChange={setSliderValue}
-        tripsMode={tripsMode}
-        data={data}
-      />
+    // <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+    //   {/* Render the Control Panel */}
+    //   {/* <MapControlPanel
+    //     timestampField={timestampField}
+    //     onTimestampChange={setTimestampField}
+    //     latitudeField={latitudeField}
+    //     onLatitudeChange={setLatitudeField}
+    //     longitudeField={longitudeField}
+    //     onLongitudeChange={setLongitudeField}
+    //     colorBy={colorBy}
+    //     onColorByChange={setColorBy}
+    //     selectedColumns={selectedColumns}
+    //     onSegmentByChange={setSelectedColumns}
+    //     columns={columns}
+    //     intColumns={intColumns}
+    //     sliderValue={sliderValue}
+    //     onSliderChange={setSliderValue}
+    //     tripsMode={tripsMode}
+    //     data={data}
+    //   /> */}
 
-      {/* Render the Map */}
+    //   {/* Render the Map */}
+    //   <Paper
+    //     className="Category-Item"
+    //     elevation={2}
+    //     sx={{
+    //       borderRadius: 4,
+    //       width: "100%",
+    //       display: "flex",
+    //       flexDirection: "column",
+    //       rowGap: 0,
+    //       height: "100%",
+    //       overflow: "hidden",
+    //     }}
+    //   >
+    //     <Box
+    //       ref={mapContainerRef}
+    //       sx={{
+    //         height: "30vh",
+    //         width: "100%",
+    //         borderRadius: 4,
+    //         border: "1px solid rgba(0, 0, 0, 0.2)",
+    //         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+    //         overflowX: "hidden",
+    //         overflowY: "hidden",
+    //       }}
+    //     />
+    //   </Paper>
+    // </Box>
+
+    <>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+      <Typography
+        variant="body2"
+        sx={{ color: "text.secondary", marginBottom: 1 }}
+      >
+        Select the fields for timestamp, latitude, and longitude, as well as
+        the fields for additional data visualization.
+      </Typography>
+      <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMore />}>
+            <Typography variant="h6">Configure Fields</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ padding: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+              {/* Timestamp Field */}
+              <FormControl sx={{ flex: 1 }}>
+                <InputLabel>Timestamp Field</InputLabel>
+                <Select
+                  value={timestampField}
+                  onChange={e => setTimestampField(e.target.value)}
+                  disabled={!columns.some(col => col === "timestamp")}
+                  renderValue={selected => selected}
+                  input={<OutlinedInput label="Timestamp Field" />}
+                >
+                  {columns.map(col => (
+                    <MenuItem key={col} value={col}>
+                      {col}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Latitude Field */}
+              <FormControl sx={{ flex: 1 }}>
+                <InputLabel>Latitude Field</InputLabel>
+                <Select
+                  value={latitudeField}
+                  onChange={e => setLatitudeField(e.target.value)}
+                  input={<OutlinedInput label="Latitude Field" />}
+                  disabled={!intColumns.some(col => col === "otinani")}
+                >
+                  {intColumns.map(col => (
+                    <MenuItem key={col} value={col}>
+                      {col}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Longitude Field */}
+              <FormControl sx={{ flex: 1 }}>
+                <InputLabel>Longitude Field</InputLabel>
+                <Select
+                  value={longitudeField}
+                  onChange={e => setLongitudeField(e.target.value)}
+                  input={<OutlinedInput label="Longitude Field" />}
+                  disabled={!intColumns.some(col => col === "otinani")}
+                >
+                  {intColumns.map(col => (
+                    <MenuItem key={col} value={col}>
+                      {col}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+        
+        <FormControl sx={{ flex: 1 }}>
+          <InputLabel>Color By</InputLabel>
+          <Select
+            value={colorBy}
+            onChange={e => setColorBy(e.target.value)}
+            disabled={tripsMode} // Disable when showing paths
+            input={<OutlinedInput label="Color By" />}
+          >
+            <MenuItem value="None">None</MenuItem>
+            {columns.map(col => (
+              <MenuItem key={col} value={col}>
+                {col}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl disabled={!timestampField} sx={{ flex: 1 }}>
+          <InputLabel>Segment By</InputLabel>
+          <Select
+            multiple
+            value={selectedColumns}
+            onChange={handleSegmentByChange}
+            renderValue={selected => selected.join(", ")}
+            input={<OutlinedInput label="Segment By" />}
+          >
+            {columns.map(col => (
+              <MenuItem key={col} value={col}>
+                <Checkbox checked={selectedColumns.includes(col)} />
+                <ListItemText primary={col} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {data.length > 0 && (
+            <Box sx={{ width: "33%", padding: 2 }}>
+              <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                Use the slider to animate through the data points over time.
+              </Typography>
+              <ThemeProvider theme={theme}>
+                <Slider
+                  value={sliderValue}
+                  onChange={(e, newValue) => setSliderValue(newValue as number)}
+                  valueLabelDisplay="auto"
+                  valueLabelFormat={value =>
+                    new Date(data[value].timestamp).toLocaleString()
+                  }
+                  min={0}
+                  max={data.length - 1}
+                />
+              </ThemeProvider>
+            </Box>
+          )}
+      </Box>
+      <Divider sx={{ my: 2 }} />
+
       <Paper
         className="Category-Item"
         elevation={2}
@@ -416,17 +573,56 @@ const MapChart = (rawData: any) => {
         <Box
           ref={mapContainerRef}
           sx={{
-            height: "30vh",
-            width: "100%",
-            borderRadius: 4,
-            border: "1px solid rgba(0, 0, 0, 0.2)",
-            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-            overflowX: "hidden",
-            overflowY: "hidden",
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 3,
+            marginTop: 2,
+            padding: 2,
+
           }}
         />
       </Paper>
+      
+          {/* Color Categories */}
+          {!tripsMode && (
+  <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+    <Typography variant="body1" sx={{ marginBottom: 1 }}>
+      Color categories based on the selected field:
+    </Typography>
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 1,
+        maxHeight: 200, // Set max height for scroll control
+        overflowY: "auto", // Enable vertical scrolling
+        padding: 1,
+        border: "1px solid #ccc", // Optional: Adds a border for clarity
+        borderRadius: 2,
+      }}
+    >
+      {Object.entries(colorMap).map(([key, color]) => (
+        <Chip
+          label={key}
+          sx={{
+            backgroundColor: color,
+            color: "white",
+            marginRight: 1,
+          }}
+          key={key}
+        />
+      ))}
     </Box>
+  </Box>
+)}
+
+
+          {/* Slider */}
+         
+        </Box>
+    </>
+  
+
   );
 };
 
