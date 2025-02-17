@@ -118,12 +118,14 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     right: 0,
     zIndex: 9999,
     backgroundColor: theme.palette.customGrey.main,
+    borderLeft: "1px solid #ddd",
   },
   '& .MuiDataGrid-cell[data-field="action"]': {
     position: "sticky",
     right: 0,
     backgroundColor: theme.palette.customGrey.light,
     zIndex: 9999,
+    borderLeft: "1px solid #ddd",
   },
 }))
 
@@ -228,7 +230,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       })
     })
     dispatch(setProgressWokflowsTable({ filteredRows }))
-  }, [dispatch, progressWokflowsTable.filters, progressWokflowsTable.rows])
+  }, [progressWokflowsTable.filters, progressWokflowsTable.rows])
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -296,6 +298,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           headerClassName:
             key === "action" ? "datagrid-header-fixed" : "datagrid-header",
           minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
+          maxWidth: 200,
           flex: 1,
           align: "center",
           headerAlign: "center",
@@ -377,6 +380,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
         <div style={{ height: 450, width: "100%" }}>
           <StyledDataGrid
+            disableVirtualization
             rows={progressWokflowsTable.filteredRows}
             columns={columns}
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}
@@ -422,7 +426,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                 },
               }
             }}
-            pageSizeOptions={[10, 25, 100]}
+            pageSizeOptions={[10, 25, 50]}
             initialState={{
               pagination: {
                 paginationModel: { pageSize: 10 },

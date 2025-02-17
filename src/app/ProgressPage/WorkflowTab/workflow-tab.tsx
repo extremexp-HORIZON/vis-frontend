@@ -145,6 +145,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
               </Box>
               <Box key="workflow-metric-details-items">
                 <WorkflowMetricDetails
+                  key={workflowId}
                   metrics={
                     (
                       tabs.find(
