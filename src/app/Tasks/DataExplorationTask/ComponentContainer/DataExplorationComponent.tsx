@@ -288,9 +288,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       }),
     )
   }, [filters])
-  console.log("ti skata allazei kai kalei to useeff gia pagination",currentPage,pageSize,filters)
 
-  console.log("taskDependancies", taskDependancies)
   return (
     <Grid
       className="Category-Item"
@@ -323,8 +321,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           {(workflow?.workflowTasks.dataExploration?.multipleTimeSeries
             .loading ||
             workflow?.workflowTasks.dataExploration?.lineChart.loading 
-            || workflow?.workflowTasks.dataExploration?.scatterChart.loading 
-            || workflow?.workflowTasks.dataExploration?.barChart.loading
+            // || workflow?.workflowTasks.dataExploration?.scatterChart.loading 
+            // || workflow?.workflowTasks.dataExploration?.barChart.loading
           || workflow?.workflowTasks.dataExploration?.mapChart.loading) && (
             <CircularProgress
               size={28}
@@ -371,11 +369,11 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
               setBarAggregation={setBarAggregation} 
               yAxisScatter={yAxisScatter} 
               setYAxisScatter={setYAxisScatter}
-               xAxisScatter={xAxisScatter} 
-               setXAxisScatter={setXAxisScatter} 
-               colorBy={colorBy} 
-               setColorBy={setColorBy} 
-                       />
+              xAxisScatter={xAxisScatter} 
+              setXAxisScatter={setXAxisScatter} 
+              colorBy={colorBy} 
+              setColorBy={setColorBy}             
+              />
 
           {/* Graph Container */}
           <Box sx={{ flex: 1, overflow: "auto" }}>

@@ -9,6 +9,7 @@ import ScatterChart from "../Charts/ScatterChart"
 import MapChart from "../Charts/MapChart"
 import TableExpand from "../DataTable/TableExpand"
 import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
+import { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
 
 interface IGraphContainer {
   
@@ -136,10 +137,12 @@ const GraphContainer = (props: IGraphContainer) => {
           )}
           {chartType === "map" && (
             <MapChart
-              rawData={
+              data={
                 workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
                 []
               }
+              workflow={workflow.workflowTasks?.dataExploration || {} as IDataExploration}
+              columns={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col=>col.type==="STRING").map(col=>col.name)}
             />
           )}
 
