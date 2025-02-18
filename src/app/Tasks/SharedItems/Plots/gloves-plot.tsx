@@ -20,7 +20,10 @@ import {
   fetchModelAnalysisExplainabilityPlot,
 } from "../../../../shared/models/tasks/model-analysis.model"
 import WorkflowCard from "../../../../shared/components/workflow-card"
-import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
+import {
+  explainabilityQueryDefault,
+  fetchExplainabilityPlotPayloadDefault,
+} from "../../../../shared/models/tasks/explainability.model"
 import GlovesScatter from "./gloves-scatter"
 import GlovesMetricSummary from "./gloves-metric-summary"
 import { useAppDispatch } from "../../../../store/store"
@@ -52,7 +55,9 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
   availableFeatures,
 }) => {
   const [cfMethod, setCfMethod] = useState<string>(availableCfMethods[0] || "")
-  const [actionChoiceStrategy, setActionChoiceStrategy] = useState<string>(availableActionStrategies[0] || "")
+  const [actionChoiceStrategy, setActionChoiceStrategy] = useState<string>(
+    availableActionStrategies[0] || "",
+  )
   const [gcfSizes, setGcfSizes] = useState<Map<string, number>>(new Map())
   const [gcfSize, setGcfSize] = useState<number>(3) // Default size
   const [selectedFeature, setSelectedFeature] = useState<string[]>([]) // Start with empty array
@@ -80,16 +85,20 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
       // Dispatch global_counterfactuals
       await dispatch(
         fetchModelAnalysisExplainabilityPlot({
-          ...fetchExplainabilityPlotPayloadDefault,
-          explanationType: "featureExplanation",
-          explanationMethod: "global_counterfactuals",
-          model: "I2Cat_phising_model",
-          feature1: selectedFeature[0] || "",
-          feature2: selectedFeature[1] || "",
-          modelId: parseInt(workflow.workflowId, 10),
-          gcfSize,
-          cfGenerator: cfMethod,
-          clusterActionChoiceAlgo: actionChoiceStrategy,
+          query: {
+            ...explainabilityQueryDefault,
+            explanation_type: "featureExplanation",
+            explanation_method: "global_counterfactuals",
+            feature1: selectedFeature[0] || "",
+            feature2: selectedFeature[1] || "",
+            gcfSize,
+            cfGenerator: cfMethod,
+            clusterActionChoiceAlgo: actionChoiceStrategy,
+          },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "global_counterfactuals",
+          },
         }),
       )
 
@@ -110,7 +119,6 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
   }
 
   const handleGcfSizeChange = (event: SelectChangeEvent<number>) => {
-
     const newSize = event.target.value as number
 
     // Update the size in the `Map`
@@ -172,7 +180,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 value={gcfSize}
                 onChange={handleGcfSizeChange}
               >
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
+                {Array.from({ length: 10 }, (_, i) => i + 1).map(value => (
                   <MenuItem key={value} value={value}>
                     {value}
                   </MenuItem>
@@ -221,12 +229,12 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                       <OutlinedInput label="Local Counterfactual Method" />
                     }
                     value={cfMethod}
-                    onChange={(e) => setCfMethod(e.target.value as string)}
+                    onChange={e => setCfMethod(e.target.value as string)}
                     MenuProps={{
                       PaperProps: { style: { maxHeight: 224, width: 250 } },
                     }}
                   >
-                    {availableCfMethods.map((method) => (
+                    {availableCfMethods.map(method => (
                       <MenuItem key={method} value={method}>
                         {method}
                       </MenuItem>
@@ -246,15 +254,13 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                       PaperProps: { style: { maxHeight: 224, width: 250 } },
                     }}
                     labelId="action-choice-strategy-select-label"
-                    input={
-                      <OutlinedInput label="Action Choice Strategy" />
-                    }
+                    input={<OutlinedInput label="Action Choice Strategy" />}
                     value={actionChoiceStrategy}
-                    onChange={(e) =>
+                    onChange={e =>
                       setActionChoiceStrategy(e.target.value as string)
                     }
                   >
-                    {availableActionStrategies.map((strategy) => (
+                    {availableActionStrategies.map(strategy => (
                       <MenuItem key={strategy} value={strategy}>
                         {strategy}
                       </MenuItem>
@@ -267,7 +273,8 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
         </Collapse>
 
         <Box>
-          {workflow.workflowTasks.modelAnalysis?.global_counterfactuals.loading ? (
+          {workflow.workflowTasks.modelAnalysis?.global_counterfactuals
+            .loading ? (
             <Box
               display="flex"
               flexDirection="column"
@@ -279,7 +286,8 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                 Loading
               </Typography>
             </Box>
-          ) : workflow.workflowTasks.modelAnalysis?.global_counterfactuals.error ? (
+          ) : workflow.workflowTasks.modelAnalysis?.global_counterfactuals
+              .error ? (
             <Typography
               variant="body2"
               color="error"
@@ -321,9 +329,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
                         workflow.workflowTasks.modelAnalysis
                           .global_counterfactuals.data.affectedClusters
                       }
-                      data2={
-                        workflow.workflowTasks.modelAnalysis.affected.data
-                      }
+                      data2={workflow.workflowTasks.modelAnalysis.affected.data}
                       actions={
                         workflow.workflowTasks.modelAnalysis
                           .global_counterfactuals.data.actions
@@ -341,7 +347,7 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
         </Box>
       </Box>
     </>
-  );
-};
+  )
+}
 
-export default CGlanceExecution;
+export default CGlanceExecution

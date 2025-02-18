@@ -147,7 +147,7 @@ const WorkflowActions = (props: {
   }
 
   return (
-    <td onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+    <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
       <ArrowUp
         onClick={() => handleIndexChange(-1, id)}
         sx={{
@@ -175,7 +175,7 @@ const WorkflowActions = (props: {
           color: theme => theme.palette.primary.main,
         }}
       />
-    </td>
+    </span>
   )
 }
 

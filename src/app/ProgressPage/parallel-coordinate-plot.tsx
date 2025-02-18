@@ -94,7 +94,6 @@ const ParallelCoordinatePlot = () => {
         gauge => gauge.name === selected,
       )?.value
       setMetricExist(Number.isNaN(gaugeValue) ? false : true)
-      console.log("data", options)
       dispatch(
         setProgressParallel({
           data,

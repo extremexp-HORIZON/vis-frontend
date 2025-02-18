@@ -43,9 +43,7 @@ export interface IModelAnalysis {
     data: IPlotModel | null
     loading: boolean
     error: string | null
-
   }
-  
   influenceFunctions: {
     data: IPlotModel | null
     loading: boolean
@@ -96,9 +94,9 @@ export const modelAnalysisReducers = (
       fetchModelAnalysisExplainabilityPlot.fulfilled,
       (state, action) => {
         const compareCompletedTask = state.tabs.find(
-          tab => tab.workflowId === `${action.meta.arg.modelId}`,
+          tab => tab.workflowId === `${action.meta.arg.metadata.workflowId}`,
         )?.workflowTasks.modelAnalysis
-        const plotType = action.meta.arg.explanationMethod as keyof IModelAnalysis;
+        const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
         console.log(compareCompletedTask, plotType)
         if (compareCompletedTask && plotType !== 'featureNames') {
               compareCompletedTask[plotType].data = action.payload
@@ -120,9 +118,9 @@ export const modelAnalysisReducers = (
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.pending, (state, action) => {
       const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === `${action.meta.arg.modelId}`,
+        tab => tab.workflowId === `${action.meta.arg.metadata.workflowId}`,
       )?.workflowTasks.modelAnalysis
-      const plotType = action.meta.arg.explanationMethod as keyof IModelAnalysis;
+      const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
         if (compareCompletedTask && plotType !== 'featureNames') {
               compareCompletedTask[plotType].loading = true
         }
@@ -138,9 +136,9 @@ export const modelAnalysisReducers = (
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.rejected, (state, action) => {
       const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === `${action.meta.arg.modelId}`,
+        tab => tab.workflowId === `${action.meta.arg.metadata.workflowId}`,
       )?.workflowTasks.modelAnalysis
-      const plotType = action.meta.arg.explanationMethod as keyof IModelAnalysis;
+      const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
         if (compareCompletedTask && plotType !== 'featureNames') {
               compareCompletedTask[plotType].loading = false
               compareCompletedTask[plotType].error = "Failed to fetch data"
@@ -196,10 +194,10 @@ export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_explainability_plot",
   async (payload: FetchExplainabilityPlotPayload) => {
     const requestUrl = "/api/explainability"
-    return axios.post<any>(requestUrl, payload).then(response => response.data)
+    return axios.post<any>(requestUrl, payload.query).then(response => response.data)
   },
 )
-export const fetchAffected= createAsyncThunk(
+export const fetchAffected = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_affected",
   async (payload: fetchAffectedRequest) => {
     const requestUrl = "/api/affected"

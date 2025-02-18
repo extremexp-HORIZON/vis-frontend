@@ -4,11 +4,9 @@ import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import CounterfactualsTable from "../SharedItems/Tables/counterfactuals-table"
 import LinePlot from "../SharedItems/Plots/line-plot"
-import CloseIcon from "@mui/icons-material/Close"
 import grey from "@mui/material/colors/grey"
 import { defaultDataExplorationQuery } from "../../../shared/models/dataexploration.model"
 import Typography from "@mui/material/Typography"
-import IconButton from "@mui/material/IconButton"
 import MultiTimeSeriesVisualizationWithCategories from "./multi-ts-visualization/MultiTimeSeriesVisualizationWithCategories"
 import { useParams } from "react-router-dom"
 import InstanceClassification from "../SharedItems/Plots/instance-classification"
@@ -20,7 +18,10 @@ import {
   fetchModelAnalysisExplainabilityPlot,
 } from "../../../shared/models/tasks/model-analysis.model"
 import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
-import { fetchExplainabilityPlotPayloadDefault } from "../../../shared/models/tasks/explainability.model"
+import {
+  explainabilityQueryDefault,
+  fetchExplainabilityPlotPayloadDefault,
+} from "../../../shared/models/tasks/explainability.model"
 import { Tab, Tabs } from "@mui/material"
 import CGlanceExecution from "../SharedItems/Plots/gloves-plot"
 
@@ -29,11 +30,18 @@ interface IFeatureExplainability {
 }
 
 const ModelAnalysisTask = (props: IFeatureExplainability) => {
-  const { tabs } = useAppSelector(state => state.workflowTabs)
+  const { workflows } = useAppSelector(state => state.progressPage)
   const { experimentId } = useParams()
   const { workflow } = props
   const [point, setPoint] = useState(null)
   const [activeTab, setActiveTab] = useState(0)
+  const [plotRequestMetadata, setPlotRequestMetadata] = useState<{
+    model: string[]
+    data: string
+    train_index: any[]
+    test_index: any[]
+    target_column: string
+  }>({ model: [], data: "", train_index: [], test_index: [], target_column: "" })
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     if (experimentId === "ideko" && newValue === 1) return
@@ -48,35 +56,70 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       // Dispatch the first action and wait for its completion
       await dispatch(
         fetchModelAnalysisExplainabilityPlot({
-          ...fetchExplainabilityPlotPayloadDefault,
-          explanationType: "featureExplanation",
-          explanationMethod: "global_counterfactuals",
-          model: "I2Cat_phising_model",
+          query: {
+          ...explainabilityQueryDefault,
+          explanation_type: "featureExplanation",
+          explanation_method: "global_counterfactuals",
           feature1: "",
           feature2: "",
-          modelId: parseInt(workflow.workflowId, 10),
           gcfSize: 3,
           cfGenerator: "Dice",
           clusterActionChoiceAlgo: "max-eff",
-        })
-      );
-  
+          ...plotRequestMetadata
+          },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "globalCounterfactuals",
+          }
+        }),
+      )
+
       // Dispatch the second action after the first is done
       await dispatch(
         fetchAffected({
           workflowId: parseInt(workflow.workflowId, 10),
           queryCase: "affected",
-        })
-      );
-  
-      console.log("Both actions completed successfully!");
+        }),
+      )
+
+      console.log("Both actions completed successfully!")
     } catch (error) {
-      console.error("An error occurred while dispatching actions:", error);
+      console.error("An error occurred while dispatching actions:", error)
     }
-  };
-  
+  }
 
   useEffect(() => {
+    const workflowContent = workflows.data.find(
+      w => w.workflowId === workflow.workflowId,
+    )
+    const workflowDataset =
+      workflowContent?.tasks
+        ?.find(t => t.metadata?.type === "read_data")
+        ?.input_datasets?.find(data => data.name === "ExternalDataFile")?.uri ??
+      ""
+    const workflowModels =
+      workflowContent?.tasks
+        ?.find(t => t.metadata?.type === "explainability")
+        ?.output_datasets?.find(data => data.name === "saved_model")?.uri ?? ""
+    const workflowMetrics =
+      workflowContent?.metrics?.filter(
+        m => m.producedByTask === "Explainability",
+      ) ?? []
+    const trainIndexMetric = JSON.parse(
+      workflowMetrics.find(m => m.name === "train_index")?.value || "",
+    )
+    const testIndexMetric = JSON.parse(
+      workflowMetrics.find(m => m.name === "test_index")?.value || "",
+    )
+    const targetColumnMetric = workflowMetrics.find(m => m.name === "target_column")?.value || ""
+
+    setPlotRequestMetadata({
+      model: [workflowModels],
+      data: workflowDataset,
+      train_index: trainIndexMetric,
+      test_index: testIndexMetric,
+      target_column: targetColumnMetric,
+    })
     if (experimentId === "ideko") {
       if (
         workflow.workflowTasks.modelAnalysis?.multipleTimeSeries.data === null
@@ -118,7 +161,11 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
             ...defaultDataExplorationQuery,
             datasetId: `${experimentId}/metrics/${experimentId}_instances.csv`,
             filters: [
-              { column: "id", type: "equals", value: Number(workflow.workflowId) },
+              {
+                column: "id",
+                type: "equals",
+                value: Number(workflow.workflowId),
+              },
             ],
             limit: 30,
           },
@@ -130,28 +177,41 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       )
       dispatch(
         fetchModelAnalysisExplainabilityPlot({
-          ...fetchExplainabilityPlotPayloadDefault,
-          explanationType: "featureExplanation",
-          explanationMethod: "pdp",
-          model: `${experimentId}_model`,
-          feature1: "",
-          feature2: "",
-          modelId: parseInt(workflow.workflowId, 10),
+          query: {
+            ...explainabilityQueryDefault,
+            explanation_type: "featureExplanation",
+            explanation_method: "pdp",
+            model: [workflowModels],
+            data: workflowDataset,
+            train_index: trainIndexMetric,
+            test_index: testIndexMetric,
+            target_column: targetColumnMetric,
+          },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "pdp",
+          },
         }),
       )
       dispatch(
         fetchModelAnalysisExplainabilityPlot({
-          ...fetchExplainabilityPlotPayloadDefault,
-          explanationType: "featureExplanation",
-          explanationMethod: "ale",
-          model: `${experimentId}_model`,
-          feature1: "",
-          feature2: "",
-          modelId: parseInt(workflow.workflowId, 10),
+          query: {
+            ...explainabilityQueryDefault,
+            explanation_type: "featureExplanation",
+            explanation_method: "ale",
+            model: [workflowModels],
+            data: workflowDataset,
+            train_index: trainIndexMetric,
+            test_index: testIndexMetric,
+            target_column: targetColumnMetric,
+          },
+          metadata: {
+            workflowId: workflow.workflowId,
+            queryCase: "ale",
+          },
         }),
       )
- 
-    dispatchActionsSequentially();
+      dispatchActionsSequentially()
     }
     if (
       workflow.workflowTasks.modelAnalysis?.modelConfusionMatrix.data === null
@@ -177,7 +237,6 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
       )
     }
   }, [])
-  console.log("workflow", workflow)
 
   return (
     <>
@@ -282,7 +341,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                     point={point}
                     setPoint={setPoint}
                     plotData={
-                      workflow.workflowTasks.modelAnalysis?.modelInstances || null
+                      workflow.workflowTasks.modelAnalysis?.modelInstances ||
+                      null
                     }
                   />
                 </Grid>
@@ -304,7 +364,8 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                   point={point}
                   handleClose={() => setPoint(null)}
                   counterfactuals={
-                    workflow.workflowTasks.modelAnalysis?.counterfactuals || null
+                    workflow.workflowTasks.modelAnalysis?.counterfactuals ||
+                    null
                   }
                   experimentId={experimentId}
                   workflowId={workflow.workflowId}
@@ -340,8 +401,10 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                         workflow.workflowTasks.modelAnalysis?.pdp || null
                       }
                       options={
-                        workflow.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
+                        workflow.workflowTasks.modelAnalysis?.pdp.data
+                          ?.featureList || null
                       }
+                      plotRequestMetadata={plotRequestMetadata}
                       fetchFunction={fetchModelAnalysisExplainabilityPlot}
                       workflowId={workflow.workflowId}
                     />
@@ -353,8 +416,10 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
                         workflow.workflowTasks.modelAnalysis?.ale || null
                       }
                       options={
-                        workflow.workflowTasks.modelAnalysis?.ale.data?.featureList || null
+                        workflow.workflowTasks.modelAnalysis?.ale.data
+                          ?.featureList || null
                       }
+                      plotRequestMetadata={plotRequestMetadata}
                       fetchFunction={fetchModelAnalysisExplainabilityPlot}
                       workflowId={workflow.workflowId}
                     />
@@ -366,37 +431,30 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
         )}
 
         {activeTab === 1 && experimentId !== "ideko" && (
-          
           <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "start",
-                columnGap: 1,
-                my: "3rem",
-                px: 5,
-              }}
-            >
-              <>
-                <CGlanceExecution
-                  workflow={workflow}
-                  availableCfMethods={[
-                    "Dice",
-                    "NearestNeighbors",
-                    "NearestNeighborsScaled",
-                    "RandomSampling",
-                  ]}
-                  availableActionStrategies={[
-                    "max-eff",
-                    "mean-act",
-                    "low-cost",
-                  ]}
-                  availableFeatures={[]}
-                  
-                />
-              </>
-            </Box>
-
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "start",
+              columnGap: 1,
+              my: "3rem",
+              px: 5,
+            }}
+          >
+            <>
+              <CGlanceExecution
+                workflow={workflow}
+                availableCfMethods={[
+                  "Dice",
+                  "NearestNeighbors",
+                  "NearestNeighborsScaled",
+                  "RandomSampling",
+                ]}
+                availableActionStrategies={["max-eff", "mean-act", "low-cost"]}
+                availableFeatures={[]}
+              />
+            </>
+          </Box>
         )}
       </Grid>
     </>
