@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Checkbox,
@@ -13,8 +13,25 @@ import {
   Typography,
   createTheme,
 } from "@mui/material";
+interface MapControlsProps {
+  columns: string[];
+  colorBy: string;
+  setColorBy: React.Dispatch<React.SetStateAction<string>>;
+  selectedColumns: string[];
+  setSelectedColumns: React.Dispatch<React.SetStateAction<string[]>>;
+  timestampField: string | null;
+  data: { timestamp: string }[]; // Assuming data is an array of objects with a `timestamp` field
+  sliderValue: number;
+  setSliderValue: React.Dispatch<React.SetStateAction<number>>;
+  tripsMode: boolean;
+  setTripsMode: React.Dispatch<React.SetStateAction<boolean>>;
+  
 
-const MapControls = ({
+
+}
+
+
+const MapControls: React.FC<MapControlsProps> = ({
   columns,
   colorBy,
   setColorBy,
@@ -22,9 +39,9 @@ const MapControls = ({
   setSelectedColumns,
   timestampField,
   data,
-  sliderValue,
-  setSliderValue,
   tripsMode,
+  setTripsMode,
+  
 }) => {
   const theme = createTheme({
     palette: {
@@ -37,6 +54,11 @@ const MapControls = ({
     },
   });
 
+  useEffect(() => {
+    setTripsMode(!!timestampField && selectedColumns.length > 0)
+  }, [timestampField, selectedColumns])
+
+
   const handleSegmentByChange = (event) => {
     const selected = event.target.value;
     setSelectedColumns(selected);
@@ -46,13 +68,9 @@ const MapControls = ({
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-      <Typography variant="body2" sx={{ color: "text.secondary", marginBottom: 1 }}>
-        Select the fields for timestamp, latitude, and longitude, as well as the
-        fields for additional data visualization.
-      </Typography>
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-        <FormControl sx={{ flex: 1 }}>
+      
+    <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem",flexDirection: "column" }}>
+        <FormControl fullWidth >
           <InputLabel>Color By</InputLabel>
           <Select
             value={colorBy}
@@ -69,7 +87,7 @@ const MapControls = ({
           </Select>
         </FormControl>
 
-        <FormControl disabled={!timestampField} sx={{ flex: 1 }}>
+        <FormControl fullWidth disabled={!timestampField} >
           <InputLabel>Segment By</InputLabel>
           <Select
             multiple
@@ -88,24 +106,7 @@ const MapControls = ({
         </FormControl>
       </Box>
 
-      <Box sx={{ width: "33%", padding: 2 }}>
-        <Typography variant="body1" sx={{ marginBottom: 1 }}>
-          Use the slider to animate through the data points over time.
-        </Typography>
-        <ThemeProvider theme={theme}>
-          <Slider
-            value={sliderValue}
-            onChange={(e, newValue) => setSliderValue(newValue)}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(value) =>
-              new Date(data[value].timestamp).toLocaleString()
-            }
-            min={0}
-            max={data.length - 1}
-          />
-        </ThemeProvider>
-      </Box>
-    </Box>
+     
   );
 };
 

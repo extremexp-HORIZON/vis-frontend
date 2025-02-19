@@ -27,6 +27,7 @@ import LineChartControlPanel from "../Charts/LineChartControlPanel"
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 import BarChartControlPanel from "../Charts/BarChartControlPanel"
 import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
+import MapControls from "../Charts/MapChartControlPanel"
 
 interface IControlPanel {
   originalColumns: VisualColumn[]
@@ -53,6 +54,14 @@ interface IControlPanel {
 
   colorBy: string
   setColorBy: (colorBy: string) => void
+  datamap: any
+  colorByMap: string
+  setColorByMap: Dispatch<SetStateAction<string>>
+  columnsMap:any
+  tripsMode:boolean
+  setTripsMode: Dispatch<SetStateAction<boolean>>
+  selectedColumnsMap:any
+  setSelectedColumnsMap:(selectedColumnMap:any)=>void
 }
 
 const ControlPanel = (props: IControlPanel) => {
@@ -79,7 +88,15 @@ const ControlPanel = (props: IControlPanel) => {
     xAxisScatter,
     setXAxisScatter,
     colorBy,
-    setColorBy
+    setColorBy,
+    datamap,
+    colorByMap,
+    setColorByMap,
+    columnsMap,
+    tripsMode,
+    setTripsMode,
+    selectedColumnsMap,
+    setSelectedColumnsMap,
   } = props
   const handleChange = event => {
     const {
@@ -520,6 +537,20 @@ const ControlPanel = (props: IControlPanel) => {
               setYAxis={setYAxisScatter}
               colorBy={colorBy}
               setColorBy={setColorBy}
+            />
+          )}
+          {chartType === "map" && (
+            <MapControls
+              columns={columnsMap}
+              colorBy={colorByMap}
+              setColorBy={setColorByMap}
+              selectedColumns={selectedColumnsMap}
+              setSelectedColumns={setSelectedColumnsMap}
+              timestampField={"timestamp"}
+              data={[datamap]}
+              tripsMode={tripsMode}
+              setTripsMode={setTripsMode}
+             
             />
           )}
         </Box>

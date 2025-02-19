@@ -3,16 +3,7 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import {
   Box,
-  Checkbox,
   Chip,
-  Divider,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Paper,
-  Select,
   Slider,
   ThemeProvider,
   Typography,
@@ -20,7 +11,6 @@ import {
 } from "@mui/material"
 
 import { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
-import MapControls from "./MapChartControlPanel"
 
 const COLOR_PALETTE = [
   "#E6194B",
@@ -53,19 +43,25 @@ interface IMapChartProps {
   data: any
   workflow: IDataExploration
   columns: any
+  colorBy: any
+  tripsMode: boolean
+  selectedColumns: any
 }
 
-const MapChart = ({ data, workflow, columns }: IMapChartProps) => {
+const MapChart = ({
+  data,
+  workflow,
+  columns,
+  colorBy,
+  tripsMode,
+  selectedColumns,
+}: IMapChartProps) => {
   console.log("workflow", workflow)
-  console.log(columns)
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef(null)
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [colorMap, setColorMap] = useState<Record<string, string>>({})
   const [mapLayer, setMapLayer] = useState<keyof typeof layers>("osm")
   const [timestampField, setTimestampField] = useState<string>("timestamp")
-  const [tripsMode, setTripsMode] = useState<boolean>(false)
-  const [colorBy, setColorBy] = useState<string | null>("None") // Set initial color to 'default'
   const [sliderValue, setSliderValue] = useState(0)
 
   useEffect(() => {
@@ -78,10 +74,6 @@ const MapChart = ({ data, workflow, columns }: IMapChartProps) => {
     handleResize()
     return () => window.removeEventListener("resize", handleResize)
   }, [])
-
-  useEffect(() => {
-    setTripsMode(!!timestampField && selectedColumns.length > 0)
-  }, [timestampField, selectedColumns])
 
   useEffect(() => {
     if (colorBy && colorBy !== "None") {
@@ -275,6 +267,17 @@ const MapChart = ({ data, workflow, columns }: IMapChartProps) => {
     sliderValue,
   ])
 
+  const theme = createTheme({
+    palette: {
+      primary: { main: "#1976d2" },
+      secondary: { main: "#dc004e" },
+    },
+    typography: {
+      fontFamily: "Arial",
+      h6: { fontWeight: 600 },
+    },
+  })
+
   useEffect(() => {
     if (colorBy && colorBy !== "None") {
       setColorMap(generateColorMap(data, colorBy))
@@ -312,57 +315,28 @@ const MapChart = ({ data, workflow, columns }: IMapChartProps) => {
 
   return (
     <>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <MapControls
-          columns={columns}
-          colorBy={colorBy}
-          setColorBy={setColorBy}
-          selectedColumns={selectedColumns}
-          setSelectedColumns={setSelectedColumns}
-          timestampField={timestampField}
-          data={data}
-          sliderValue={sliderValue}
-          setSliderValue={setSliderValue}
-          tripsMode={tripsMode}
-        />
+      <Box ref={mapContainerRef} />
 
-        <Paper
-          className="Category-Item"
-          elevation={2}
-          sx={{
-            borderRadius: 4,
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            rowGap: 0,
-            height: "100%",
-            overflow: "hidden",
-          }}
-        >
+      {!tripsMode && (
+        <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+          <Typography variant="body1" sx={{ marginBottom: 1 }}>
+            Color categories based on the selected field:
+          </Typography>
           <Box
-            ref={mapContainerRef}
             sx={{
               display: "flex",
-              justifyContent: "space-between",
-              gap: 3,
-              marginTop: 2,
-              padding: 2,
+              gap: "1rem",
+              marginTop: "1rem",
+              flexDirection: "row",
             }}
-          />
-        </Paper>
-
-        {/* Color Categories */}
-        {!tripsMode && (
-          <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-            <Typography variant="body1" sx={{ marginBottom: 1 }}>
-              Color categories based on the selected field:
-            </Typography>
+          >
             <Box
               sx={{
                 display: "flex",
                 flexWrap: "wrap",
                 gap: 1,
-                maxHeight: 200, // Set max height for scroll control
+                maxHeight: 100, // Set max height for scroll control
+                maxWidth: 600,
                 overflowY: "auto", // Enable vertical scrolling
                 padding: 1,
                 border: "1px solid #ccc", // Optional: Adds a border for clarity
@@ -381,9 +355,26 @@ const MapChart = ({ data, workflow, columns }: IMapChartProps) => {
                 />
               ))}
             </Box>
+            <Box >
+              <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                Use the slider to animate through the data points over time.
+              </Typography>
+              <ThemeProvider theme={theme}>
+                <Slider
+                  value={sliderValue}
+                  onChange={(e, newValue) => setSliderValue(newValue)}
+                  valueLabelDisplay="auto"
+                  valueLabelFormat={value =>
+                    new Date(data[value].timestamp).toLocaleString()
+                  }
+                  min={0}
+                  max={data.length - 1}
+                />
+              </ThemeProvider>
+            </Box>
           </Box>
-        )}
-      </Box>
+        </Box>
+      )}
     </>
   )
 }

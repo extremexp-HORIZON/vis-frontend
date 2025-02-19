@@ -31,6 +31,9 @@ interface IGraphContainer {
   page: number
   onChange: (event: React.ChangeEvent<unknown>, value: number) => void
   workflow: IWorkflowTabModel
+  colorByMap:any
+  tripsMode:boolean
+  selectedColumnsMap:any
 }
 
 const GraphContainer = (props: IGraphContainer) => {
@@ -49,6 +52,9 @@ const GraphContainer = (props: IGraphContainer) => {
     count,
     page,
     onChange,
+    colorByMap,
+    tripsMode,
+    selectedColumnsMap,
   } = props
 
   return (
@@ -137,13 +143,14 @@ const GraphContainer = (props: IGraphContainer) => {
           )}
           {chartType === "map" && (
             <MapChart
-              data={
-                workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
-                []
-              }
+              data={workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
+                []}
               workflow={workflow.workflowTasks?.dataExploration || {} as IDataExploration}
-              columns={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col=>col.type==="STRING").map(col=>col.name)}
-            />
+              columns={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col => col.type === "STRING").map(col => col.name)}
+              colorBy={colorByMap}
+              tripsMode={tripsMode}
+              selectedColumns={selectedColumnsMap} 
+                        />
           )}
 
           {chartType === "datatable" && (

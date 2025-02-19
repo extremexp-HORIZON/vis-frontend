@@ -14,7 +14,6 @@ import { fetchDataExplorationData, fetchMetaData } from "../../../../shared/mode
 import { grey } from "@mui/material/colors"
 import InfoIcon from "@mui/icons-material/Info"
 import MultiTimeSeriesVisualization from "../multi-ts-visualization/MultiTimeSeriesVisualization"
-import { set } from "lodash"
 
 interface IDataExplorationComponent {
   workflow: IWorkflowTabModel | null
@@ -51,6 +50,14 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const taskDependancies = workflow?.workflowTasks.dataExploration
   const workflowId = workflow?.workflowId
   // const [offset, setOffset] = useState((currentPage - 1) * pageSize)
+
+  //mapcontrols
+    const [colorByMap, setColorByMap] = useState<string | null>("None") // Set initial color to 'default'
+      const [tripsMode, setTripsMode] = useState<boolean>(false)
+        const [selectedColumnsMap, setSelectedColumnsMap] = useState<string[]>([])
+      
+    
+  
 
 
   const handleFetchData = () => {
@@ -372,7 +379,17 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
               xAxisScatter={xAxisScatter} 
               setXAxisScatter={setXAxisScatter} 
               colorBy={colorBy} 
-              setColorBy={setColorBy}             
+              setColorBy={setColorBy}   
+              datamap={workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
+                []}   
+                
+              colorByMap={colorByMap}
+              setColorByMap={setColorByMap}
+              columnsMap={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col=>col.type==="STRING").map(col=>col.name)}
+              tripsMode={tripsMode}
+              setTripsMode={setTripsMode}
+              selectedColumnsMap={selectedColumnsMap} 
+              setSelectedColumnsMap={setSelectedColumnsMap}
               />
 
           {/* Graph Container */}
@@ -380,21 +397,24 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             {workflow?.workflowTasks.dataExploration?.lineChart.data && workflow?.workflowTasks.dataExploration?.metaData.data &&
             workflow?.workflowTasks.dataExploration?.scatterChart.data && workflow?.workflowTasks.dataExploration?.mapChart.data && (
               <GraphContainer
-                workflow={workflow}
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-                chartType={chartType}
-                setChartType={setChartType}
-                xAxis={xAxis}
-                colorBy={colorBy}
-                setColorBy={setColorBy}
-                xAxisScatter={xAxisScatter}
-                yAxis={yAxis}
-                yAxisScatter={yAxisScatter}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
+                  workflow={workflow}
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={handlePageChange}
+                  chartType={chartType}
+                  setChartType={setChartType}
+                  xAxis={xAxis}
+                  colorBy={colorBy}
+                  setColorBy={setColorBy}
+                  xAxisScatter={xAxisScatter}
+                  yAxis={yAxis}
+                  yAxisScatter={yAxisScatter}
+                  viewMode={viewMode}
+                  setViewMode={setViewMode}
+                  colorByMap={colorByMap}
+                  tripsMode={tripsMode}
+                  selectedColumnsMap={selectedColumnsMap}
+                             />
             )}
           </Box>
         </Box>
