@@ -319,7 +319,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           backgroundColor: grey[300],
         }}
       >
-        <Typography fontSize={"1.2rem"}>Data Exploration</Typography>
+        <Typography fontSize={"1.2rem"}>Data Exploration of {experimentId}</Typography>
         <Box sx={{ flex: 1 }} />
         <Box sx={{ position: "relative" }}>
           <Tooltip title="Explore your data through interactive charts and tables. Use the control panel to filter and select columns.">

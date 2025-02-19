@@ -57,11 +57,11 @@ interface IControlPanel {
   datamap: any
   colorByMap: string
   setColorByMap: Dispatch<SetStateAction<string>>
-  columnsMap:any
-  tripsMode:boolean
+  columnsMap: any
+  tripsMode: boolean
   setTripsMode: Dispatch<SetStateAction<boolean>>
-  selectedColumnsMap:any
-  setSelectedColumnsMap:(selectedColumnMap:any)=>void
+  selectedColumnsMap: any
+  setSelectedColumnsMap: (selectedColumnMap: any) => void
 }
 
 const ControlPanel = (props: IControlPanel) => {
@@ -256,12 +256,18 @@ const ControlPanel = (props: IControlPanel) => {
                 ml: 1,
                 fontWeight: "bold",
               }}
-              color={"primary"}
+              color="primary"
             >
-              Columns <ExpandMoreIcon sx={{ color: "primary" }} />
-              <Tooltip title="Select the columns for display." arrow>
-                <InfoIcon sx={{ marginLeft: 1, fontSize: 16, color: "gray" }} />
-              </Tooltip>
+              Columns
+              <ExpandMoreIcon
+                sx={{
+                  color: "primary",
+                  transform: showColumnDropdown
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)",
+                  transition: "transform 0.3s ease-in-out",
+                }}
+              />
             </Typography>
           </Box>
           <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
@@ -311,12 +317,18 @@ const ControlPanel = (props: IControlPanel) => {
                 ml: 1,
                 fontWeight: "bold",
               }}
-              color={"primary"}
+              color="primary"
             >
-              Filters <ExpandMoreIcon sx={{ color: "primary" }} />
-              <Tooltip title="Select filters for display." arrow>
-                <InfoIcon sx={{ marginLeft: 1, fontSize: 16, color: "gray" }} />
-              </Tooltip>
+              Filters
+              <ExpandMoreIcon
+                sx={{
+                  color: "primary",
+                  transform: showFilterDropdown
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)",
+                  transition: "transform 0.3s ease-in-out",
+                }}
+              />
             </Typography>
           </Box>
           {showFilterDropdown && (
@@ -476,82 +488,96 @@ const ControlPanel = (props: IControlPanel) => {
         </Box>
 
         <Box sx={{ marginTop: 2 }}>
-          {showChartTypeDropdown && (
-            <Box
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              borderBottom: `1px solid ${grey[400]}`,
+            }}
+          >
+            <SettingsSuggestIcon />
+            <Typography
+              variant="h6"
+              onClick={() => setShowChartTypeDropdown(!showChartTypeDropdown)}
               sx={{
+                cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                borderBottom: `1px solid ${grey[400]}`,
+                ml: 1,
+                fontWeight: "bold",
               }}
+              color="primary"
             >
-              <SettingsSuggestIcon />
-              <Typography
-                variant="h6"
-                onClick={() => setShowChartTypeDropdown(!showChartTypeDropdown)}
+              Options{" "}
+              <ExpandMoreIcon
                 sx={{
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  ml: 1,
-                  fontWeight: "bold",
+                  color: "primary",
+                  transform: showChartTypeDropdown
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)",
+                  transition: "transform 0.3s ease-in-out",
                 }}
-                color="primary"
-              >
-                Options <ExpandMoreIcon sx={{ color: "primary" }} />
-                <Tooltip title="Select the columns for display." arrow>
+              />
+              {/* <Tooltip title="Select the columns for display." arrow>
                   <InfoIcon
                     sx={{ marginLeft: 1, fontSize: 16, color: "gray" }}
                   />
-                </Tooltip>
-              </Typography>
+                </Tooltip> */}
+            </Typography>
+          </Box>
+          {showChartTypeDropdown && (
+            <Box>
+              {chartType === "line" && (
+                <LineChartControlPanel
+                  columns={columns}
+                  xAxis={xAxis}
+                  setXAxis={setXAxis}
+                  yAxis={yAxis}
+                  setYAxis={setYAxis}
+                />
+              )}
+
+              {chartType === "bar" && (
+                <BarChartControlPanel
+                  originalColumns={originalColumns}
+                  barGroupBy={barGroupBy}
+                  setBarGroupBy={setBarGroupBy}
+                  barAggregation={barAggregation}
+                  setBarAggregation={setBarAggregation}
+                />
+              )}
+
+              {chartType === "scatter" && (
+                <ScatterChartControlPanel
+                  columns={columns}
+                  xAxis={xAxisScatter}
+                  setXAxis={setXAxisScatter}
+                  yAxis={yAxisScatter}
+                  setYAxis={setYAxisScatter}
+                  colorBy={colorBy}
+                  setColorBy={setColorBy}
+                />
+              )}
+              {chartType === "map" && (
+                <MapControls
+                  columns={columnsMap}
+                  colorBy={colorByMap}
+                  setColorBy={setColorByMap}
+                  selectedColumns={selectedColumnsMap}
+                  setSelectedColumns={setSelectedColumnsMap}
+                  timestampField={"timestamp"}
+                  data={[datamap]}
+                  tripsMode={tripsMode}
+                  setTripsMode={setTripsMode}
+                  sliderValue={0}
+                  setSliderValue={function (
+                    value: React.SetStateAction<number>,
+                  ): void {
+                    throw new Error("Function not implemented.")
+                  }}
+                />
+              )}
             </Box>
-          )}
-
-          {/* Render control panels based on chartType */}
-          {chartType === "line" && (
-            <LineChartControlPanel
-              columns={columns}
-              xAxis={xAxis}
-              setXAxis={setXAxis}
-              yAxis={yAxis}
-              setYAxis={setYAxis}
-            />
-          )}
-
-          {chartType === "bar" && (
-            <BarChartControlPanel
-              originalColumns={originalColumns}
-              barGroupBy={barGroupBy}
-              setBarGroupBy={setBarGroupBy}
-              barAggregation={barAggregation}
-              setBarAggregation={setBarAggregation}
-            />
-          )}
-
-          {chartType === "scatter" && (
-            <ScatterChartControlPanel
-              columns={columns}
-              xAxis={xAxisScatter}
-              setXAxis={setXAxisScatter}
-              yAxis={yAxisScatter}
-              setYAxis={setYAxisScatter}
-              colorBy={colorBy}
-              setColorBy={setColorBy}
-            />
-          )}
-          {chartType === "map" && (
-            <MapControls
-              columns={columnsMap}
-              colorBy={colorByMap}
-              setColorBy={setColorByMap}
-              selectedColumns={selectedColumnsMap}
-              setSelectedColumns={setSelectedColumnsMap}
-              timestampField={"timestamp"}
-              data={[datamap]}
-              tripsMode={tripsMode}
-              setTripsMode={setTripsMode}
-             
-            />
           )}
         </Box>
       </Box>

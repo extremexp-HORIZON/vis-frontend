@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css"
 import {
   Box,
   Chip,
+  Paper,
   Slider,
   ThemeProvider,
   Typography,
@@ -312,81 +313,73 @@ const MapChart = ({
 
     return colorMapping
   }
+  useEffect(() => {
+    if (!mapRef.current || colorBy === "None") return
+
+    const legend = L.control({ position: "topright" })
+
+    legend.onAdd = () => {
+      const div = L.DomUtil.create("div", "info legend")
+      div.style.background = "white"
+      div.style.padding = "10px"
+      div.style.borderRadius = "5px"
+      div.style.boxShadow = "0 0 5px rgba(0,0,0,0.2)"
+
+      div.innerHTML = `<strong>${colorBy}</strong><br/>`
+      Object.entries(colorMap).forEach(([key, color]) => {
+        div.innerHTML += `
+          <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <div style="width: 15px; height: 15px; background: ${color}; margin-right: 5px; border-radius: 3px;"></div>
+            ${key}
+          </div>
+        `
+      })
+
+      return div
+    }
+
+    legend.addTo(mapRef.current)
+
+    return () => {
+      mapRef.current?.removeControl(legend)
+    }
+  }, [colorMap, colorBy])
 
   return (
     <>
-  
-     <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            padding: "0.5rem",
-            flexWrap: "wrap",
-          }}
-        >
-              <Typography variant="body1" sx={{ marginBottom: 1,marginRight:2 }}>
-              Slide to animate through the points over time
-          </Typography>
-          
-          
-          <ThemeProvider theme={theme}>
-            <Slider
-              value={sliderValue}
-              onChange={(e, newValue) => setSliderValue(newValue)}
-              valueLabelDisplay="auto"
-              valueLabelFormat={(value) =>
-                new Date(data[value].timestamp).toLocaleString()
-              }
-              min={0}
-              max={data.length - 1}
-              sx={{ width: "250px", maxWidth: "100%" }}
-            />
-          </ThemeProvider>
-        </Box>
-    <Box ref={mapContainerRef} sx={{ height: "500vh", width: "100%" }} />
+      {/* <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          padding: "0.5rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <Typography variant="body1" sx={{ marginBottom: 1, marginRight: 2 }}>
+          Slide to animate through the points over time
+        </Typography>
 
-    {!tripsMode && colorBy !== "None" && (
-      <Box sx={{ display: "flex", flexDirection: "column", flex: 1, padding: "1rem" }}>
-        {/* Slider on the Top-Right Corner */}
-       
+        <ThemeProvider theme={theme}>
+          <Slider
+            value={sliderValue}
+            onChange={(e, newValue) => setSliderValue(newValue)}
+            valueLabelDisplay="auto"
+            valueLabelFormat={value =>
+              new Date(data[value].timestamp).toLocaleString()
+            }
+            min={0}
+            max={data.length - 1}
+            sx={{ width: "250px", maxWidth: "100%" }}
+          />
+        </ThemeProvider>
+      </Box> */}
 
-        {/* Color Categories Section */}
-        <Box sx={{ padding: "1rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Typography variant="body1" sx={{ marginBottom: 1, textAlign: "center" }}>
-            Color categories based on the selected field:
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 1,
-              maxHeight: 120,
-              overflowY: "auto",
-              padding: 1,
-              border: "1px solid #ccc",
-              borderRadius: 2,
-              justifyContent: "center",
-              width: "100%",
-              maxWidth: "600px",
-            }}
-          >
-            {Object.entries(colorMap).map(([key, color]) => (
-              <Chip
-                label={key}
-                sx={{
-                  backgroundColor: color,
-                  color: "white",
-                  marginRight: 1,
-                }}
-                key={key}
-              />
-            ))}
-          </Box>
-        </Box>
-      </Box>
-    )}
-  </>
+      <Paper
+        ref={mapContainerRef}
+        sx={{ height: "500vh", width: "100%", padding: 2, elevation: 3 }}
+      />
+    </>
   )
 }
 
