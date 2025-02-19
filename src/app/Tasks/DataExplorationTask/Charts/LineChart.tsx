@@ -50,7 +50,7 @@ const LineChart = ({
           mark: "line",
           autosize: { type: "fit", contains: "padding", resize: true },
           width: "container",
-          height: 800,
+          height: 850,
           params: [
             {
               name: "grid",
@@ -106,7 +106,7 @@ const LineChart = ({
               bind: "scales", // Bind to the scales
             },
           ],
-          height: 800 / yAxis.length, // Height for individual stacked charts
+          height: 850 / yAxis.length, // Height for individual stacked charts
           encoding: {
             x: {
               field: xAxis.name,

@@ -41,7 +41,7 @@ const BarChart = ({ dataExploration }) => {
       "A grouped bar chart showing different numeric values by category.",
     autosize: { type: "fit", contains: "padding", resize: true },
     width: "container",
-    height: 800,
+    height: 850,
     data: {
       values: transformedData,
     },

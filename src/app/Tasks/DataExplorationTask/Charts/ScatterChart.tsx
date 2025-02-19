@@ -44,7 +44,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
           mark: 'point',
           autosize: { type: "fit", contains: "padding", resize: true },
           width: "container",
-          height: 800,
+          height: 850,
           selection: {
             paintbrush: {
               type: 'multi',
@@ -109,7 +109,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
             //   nearest: true
             }
           },
-          height: 600/yAxis.length,
+          height: 850/yAxis.length,
           encoding: {
             x: {
               field: xAxis.name,
@@ -126,7 +126,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
                 selection: 'paintbrush',
                 field: colorBy && colorBy !== "None" ? colorBy : 'variable',
                 type: getColumnType(columns.find(column => column.name === colorBy)?.type || 'nominal'),
-                title: colorBy || 'Variable'
+                title: colorBy!=="None" ? colorBy: "variable"
               },
               value: 'grey'
             },
