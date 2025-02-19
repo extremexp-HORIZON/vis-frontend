@@ -67,7 +67,7 @@ const MapChart = ({
   useEffect(() => {
     const handleResize = () => {
       if (mapContainerRef.current) {
-        mapContainerRef.current.style.height = `${window.innerHeight * 0.6}px`
+        mapContainerRef.current.style.height = `${window.innerHeight * 0.7}px`
       }
     }
     window.addEventListener("resize", handleResize)
@@ -315,67 +315,78 @@ const MapChart = ({
 
   return (
     <>
-      <Box ref={mapContainerRef} />
+  
+     <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            padding: "0.5rem",
+            flexWrap: "wrap",
+          }}
+        >
+              <Typography variant="body1" sx={{ marginBottom: 1,marginRight:2 }}>
+              Slide to animate through the points over time
+          </Typography>
+          
+          
+          <ThemeProvider theme={theme}>
+            <Slider
+              value={sliderValue}
+              onChange={(e, newValue) => setSliderValue(newValue)}
+              valueLabelDisplay="auto"
+              valueLabelFormat={(value) =>
+                new Date(data[value].timestamp).toLocaleString()
+              }
+              min={0}
+              max={data.length - 1}
+              sx={{ width: "250px", maxWidth: "100%" }}
+            />
+          </ThemeProvider>
+        </Box>
+    <Box ref={mapContainerRef} sx={{ height: "500vh", width: "100%" }} />
 
-      {!tripsMode && (
-        <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-          <Typography variant="body1" sx={{ marginBottom: 1 }}>
+    {!tripsMode && colorBy !== "None" && (
+      <Box sx={{ display: "flex", flexDirection: "column", flex: 1, padding: "1rem" }}>
+        {/* Slider on the Top-Right Corner */}
+       
+
+        {/* Color Categories Section */}
+        <Box sx={{ padding: "1rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Typography variant="body1" sx={{ marginBottom: 1, textAlign: "center" }}>
             Color categories based on the selected field:
           </Typography>
           <Box
             sx={{
               display: "flex",
-              gap: "1rem",
-              marginTop: "1rem",
-              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 1,
+              maxHeight: 120,
+              overflowY: "auto",
+              padding: 1,
+              border: "1px solid #ccc",
+              borderRadius: 2,
+              justifyContent: "center",
+              width: "100%",
+              maxWidth: "600px",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 1,
-                maxHeight: 100, // Set max height for scroll control
-                maxWidth: 600,
-                overflowY: "auto", // Enable vertical scrolling
-                padding: 1,
-                border: "1px solid #ccc", // Optional: Adds a border for clarity
-                borderRadius: 2,
-              }}
-            >
-              {Object.entries(colorMap).map(([key, color]) => (
-                <Chip
-                  label={key}
-                  sx={{
-                    backgroundColor: color,
-                    color: "white",
-                    marginRight: 1,
-                  }}
-                  key={key}
-                />
-              ))}
-            </Box>
-            <Box >
-              <Typography variant="body1" sx={{ marginBottom: 1 }}>
-                Use the slider to animate through the data points over time.
-              </Typography>
-              <ThemeProvider theme={theme}>
-                <Slider
-                  value={sliderValue}
-                  onChange={(e, newValue) => setSliderValue(newValue)}
-                  valueLabelDisplay="auto"
-                  valueLabelFormat={value =>
-                    new Date(data[value].timestamp).toLocaleString()
-                  }
-                  min={0}
-                  max={data.length - 1}
-                />
-              </ThemeProvider>
-            </Box>
+            {Object.entries(colorMap).map(([key, color]) => (
+              <Chip
+                label={key}
+                sx={{
+                  backgroundColor: color,
+                  color: "white",
+                  marginRight: 1,
+                }}
+                key={key}
+              />
+            ))}
           </Box>
         </Box>
-      )}
-    </>
+      </Box>
+    )}
+  </>
   )
 }
 
