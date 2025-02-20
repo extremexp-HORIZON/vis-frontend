@@ -58,10 +58,17 @@ interface IControlPanel {
   colorByMap: string
   setColorByMap: Dispatch<SetStateAction<string>>
   columnsMap: any
+  columnsMapDouble: any
+
   tripsMode: boolean
   setTripsMode: Dispatch<SetStateAction<boolean>>
   selectedColumnsMap: any
   setSelectedColumnsMap: (selectedColumnMap: any) => void
+  lat: VisualColumn
+  setLat: React.Dispatch<React.SetStateAction<VisualColumn>>
+  lon: VisualColumn
+  setLon: React.Dispatch<React.SetStateAction<VisualColumn>>
+
 }
 
 const ControlPanel = (props: IControlPanel) => {
@@ -97,6 +104,11 @@ const ControlPanel = (props: IControlPanel) => {
     setTripsMode,
     selectedColumnsMap,
     setSelectedColumnsMap,
+    lat,
+    setLat,
+    lon,
+    setLon,
+    columnsMapDouble
   } = props
   const handleChange = event => {
     const {
@@ -130,6 +142,7 @@ const ControlPanel = (props: IControlPanel) => {
       },
     },
   })
+  console.log("lat",lat,lon)
   const [showColumnDropdown, setShowColumnDropdown] = useState(true)
   const [showChartTypeDropdown, setShowChartTypeDropdown] = useState(true)
   const [showFilterDropdown, setShowFilterDropdown] = useState(true)
@@ -575,6 +588,11 @@ const ControlPanel = (props: IControlPanel) => {
                   ): void {
                     throw new Error("Function not implemented.")
                   }}
+                  lat={lat}
+                  lon={lon}
+                  setLat={setLat}
+                  setLon={setLon}
+                  columnsMapDouble
                 />
               )}
             </Box>

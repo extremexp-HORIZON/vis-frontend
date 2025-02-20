@@ -36,6 +36,8 @@ interface IGraphContainer {
   selectedColumnsMap:any
   barGroupBy: string[]
   barAggregation: { [key: string]: string[] }
+  lat:any
+  lon:any
 }
 
 const GraphContainer = (props: IGraphContainer) => {
@@ -58,7 +60,10 @@ const GraphContainer = (props: IGraphContainer) => {
     tripsMode,
     selectedColumnsMap,
     barGroupBy,
-    barAggregation
+    barAggregation,
+    lat,
+    lon
+
   } = props
 
   return (
@@ -156,7 +161,9 @@ const GraphContainer = (props: IGraphContainer) => {
               columns={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col => col.type === "STRING").map(col => col.name)}
               colorBy={colorByMap}
               tripsMode={tripsMode}
-              selectedColumns={selectedColumnsMap} 
+              selectedColumns={selectedColumnsMap}
+              lat={lat}
+              lon={lon}
                         />
           )}
 

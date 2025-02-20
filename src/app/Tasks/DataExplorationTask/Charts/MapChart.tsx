@@ -47,6 +47,8 @@ interface IMapChartProps {
   colorBy: any
   tripsMode: boolean
   selectedColumns: any
+  lat:any
+  lon:any
 }
 
 const MapChart = ({
@@ -56,8 +58,10 @@ const MapChart = ({
   colorBy,
   tripsMode,
   selectedColumns,
+  lat,
+  lon
 }: IMapChartProps) => {
-  console.log("workflow", workflow)
+  console.log("lat,lon", lat,lon)
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef(null)
   const [colorMap, setColorMap] = useState<Record<string, string>>({})

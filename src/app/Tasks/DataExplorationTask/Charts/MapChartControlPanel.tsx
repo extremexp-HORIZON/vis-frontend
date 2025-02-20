@@ -13,6 +13,7 @@ import {
   Typography,
   createTheme,
 } from "@mui/material";
+import { VisualColumn } from "../../../../shared/models/dataexploration.model";
 interface MapControlsProps {
   columns: string[];
   colorBy: string;
@@ -25,6 +26,11 @@ interface MapControlsProps {
   setSliderValue: React.Dispatch<React.SetStateAction<number>>;
   tripsMode: boolean;
   setTripsMode: React.Dispatch<React.SetStateAction<boolean>>;
+  lat: VisualColumn
+  setLat: React.Dispatch<React.SetStateAction<VisualColumn>>
+  lon: VisualColumn
+  setLon: React.Dispatch<React.SetStateAction<VisualColumn>>
+  columnsMapDouble:any
   
 
 
@@ -41,8 +47,16 @@ const MapControls: React.FC<MapControlsProps> = ({
   data,
   tripsMode,
   setTripsMode,
+  sliderValue,
+  setSliderValue,
+  lat,
+  setLat,
+  lon,
+  setLon,
+  columnsMapDouble
   
 }) => {
+  console.log("columnsMapDoublemap", columnsMapDouble)
   const theme = createTheme({
     palette: {
       primary: { main: "#1976d2" },
@@ -54,6 +68,7 @@ const MapControls: React.FC<MapControlsProps> = ({
     },
   });
 
+  console.log("columns", columns);
   useEffect(() => {
     setTripsMode(!!timestampField && selectedColumns.length > 0)
   }, [timestampField, selectedColumns])
@@ -100,6 +115,38 @@ const MapControls: React.FC<MapControlsProps> = ({
               <MenuItem key={col} value={col}>
                 <Checkbox checked={selectedColumns.includes(col)} />
                 <ListItemText primary={col} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth >
+          <InputLabel>lat</InputLabel>
+          <Select
+            value={lat}
+            onChange={(e) => setLat(e.target.value)}
+            // disabled={tripsMode}
+            input={<OutlinedInput label="lat" />}
+          >
+            {columnsMapDouble.map((col) => (
+              <MenuItem key={col} value={col}>
+                {col}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth >
+          <InputLabel>lon</InputLabel>
+          <Select
+            value={lon}
+            onChange={(e) => setLon(e.target.value)}
+            // disabled={tripsMode}
+            input={<OutlinedInput label="lon" />}
+          >
+            {columnsMapDouble.map((col) => (
+              <MenuItem key={col} value={col}>
+                {col}
               </MenuItem>
             ))}
           </Select>

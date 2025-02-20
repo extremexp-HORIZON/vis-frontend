@@ -28,6 +28,10 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [filters, setFilters] = useState<IFilter[]>([])
   const { experimentId } = useParams()
   const [xAxis, setXAxis] = useState<VisualColumn>({ name: "", type: "" })
+  const [lat,setLat] = useState<string>("")
+  const [lon,setLon] = useState<string>("")
+
+
   const [xAxisScatter, setXAxisScatter] = useState<VisualColumn>({
     name: "",
     type: "",
@@ -386,10 +390,15 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
               colorByMap={colorByMap}
               setColorByMap={setColorByMap}
               columnsMap={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col=>col.type==="STRING").map(col=>col.name)}
+              columnsMapDouble={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col=>col.type==="DOUBLE").map(col=>col.name)}
               tripsMode={tripsMode}
               setTripsMode={setTripsMode}
               selectedColumnsMap={selectedColumnsMap} 
               setSelectedColumnsMap={setSelectedColumnsMap}
+              lat={lat}
+              setLat={setLat}
+              lon={lon}
+              setLon={setLon}
               />
 
           {/* Graph Container */}
@@ -416,6 +425,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                   selectedColumnsMap={selectedColumnsMap}
                   barGroupBy={barGroupBy}
                   barAggregation={barAggregation}
+                  lat={lat}
+                  lon={lon}
                              />
             )}
           </Box>
