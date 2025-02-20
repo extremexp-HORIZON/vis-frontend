@@ -34,6 +34,8 @@ interface IGraphContainer {
   colorByMap:any
   tripsMode:boolean
   selectedColumnsMap:any
+  barGroupBy: string[]
+  barAggregation: { [key: string]: string[] }
 }
 
 const GraphContainer = (props: IGraphContainer) => {
@@ -55,6 +57,8 @@ const GraphContainer = (props: IGraphContainer) => {
     colorByMap,
     tripsMode,
     selectedColumnsMap,
+    barGroupBy,
+    barAggregation
   } = props
 
   return (
@@ -77,17 +81,18 @@ const GraphContainer = (props: IGraphContainer) => {
 
           {/* View Mode Toggle (Overlay/Stacked) */}
           <ButtonGroup
-            variant="contained"
-            aria-label="view mode"
-            sx={{
-              display:
-                chartType === "map" ||
-                chartType === "bar" ||
-                chartType === "datatable"
-                  ? "none"
-                  : "flex",
-            }}
-          >
+  variant="contained"
+  aria-label="view mode"
+  sx={{
+    visibility:
+      chartType === "map" ||
+      chartType === "bar" ||
+      chartType === "datatable"
+        ? "hidden" // Keeps the space but hides the buttons
+        : "visible",
+    height: "36px", // Ensure consistent height for the button group
+  }}
+>
             <Button
               onClick={() => setViewMode("overlay")}
               disabled={viewMode === "overlay"}
@@ -122,6 +127,8 @@ const GraphContainer = (props: IGraphContainer) => {
               dataExploration={
                 workflow.workflowTasks.dataExploration?.barChart.data
               }
+              barGroupBy={barGroupBy}
+              barAggregation={barAggregation}
             />
           )}
 

@@ -174,7 +174,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
       ))}
     </Paper>
   ) : (
-    <Typography>Select x-Axis and y-Axis to display the chart.</Typography>
+    <Typography align="center" fontWeight="bold">Select x-Axis and y-Axis to display the chart.</Typography>
   );
 };
 

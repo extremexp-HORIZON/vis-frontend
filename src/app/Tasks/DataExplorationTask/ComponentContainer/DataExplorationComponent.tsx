@@ -414,6 +414,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
                   colorByMap={colorByMap}
                   tripsMode={tripsMode}
                   selectedColumnsMap={selectedColumnsMap}
+                  barGroupBy={barGroupBy}
+                  barAggregation={barAggregation}
                              />
             )}
           </Box>

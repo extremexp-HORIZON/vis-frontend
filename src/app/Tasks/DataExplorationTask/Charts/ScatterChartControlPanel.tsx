@@ -32,27 +32,20 @@ const ScatterChartControlPanel = ({
   setColorBy,
 }: ScatterChartControlPanelProps) => {
   useEffect(() => {
-    if (columns && columns.length > 0) {
-      // Check if current xAxis is still valid
-      if (!xAxis || !columns.find(col => col.name === xAxis.name)) {
-        setXAxis(columns[0]) // Use 'LOCAL DATE TIME' column if found, otherwise default to first column
+    // Ensure x-axis and y-axis remain valid if columns change
+    if (columns.length > 0) {
+      if (xAxis && !columns.find(col => col.name === xAxis.name)) {
+        setXAxis(null) // Clear x-axis if invalid
       }
 
-      // Filter the yAxis columns to keep only the ones that still exist in `columns`
       const validYAxis = yAxis.filter(yCol =>
-        columns.find(col => col.name === yCol.name),
+        columns.some(col => col.name === yCol.name),
       )
-
       if (validYAxis.length !== yAxis.length) {
-        setYAxis(validYAxis) // Reset the yAxis to only valid columns if any are invalid
-      }
-
-      // Ensure there is at least one column selected in yAxis
-      if (validYAxis.length === 0 && columns.length > 1) {
-        setYAxis([columns[1]]) // Set yAxis to the second column if no valid yAxis exists
+        setYAxis(validYAxis) // Remove invalid y-axis selections
       }
     }
-  }, [columns, xAxis, yAxis, setXAxis, setYAxis, colorBy, setColorBy])
+  }, [columns, xAxis, yAxis, setXAxis, setYAxis])
 
   const handleColorByChange = (event: SelectChangeEvent<string>) => {
     setColorBy(event.target.value as string)

@@ -1,8 +1,22 @@
+import { Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
 import { Vega } from "react-vega"
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
-const BarChart = ({ dataExploration }) => {
+const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
+  console.log("bar",barAggregation,barGroupBy)
+
+  if (
+    (Array.isArray(barGroupBy) && barGroupBy.length === 0) ||
+    (typeof barAggregation === "object" && Object.keys(barAggregation).length === 0)
+  ) {
+    return (
+      <Typography align="center" fontWeight="bold" sx={{ mt: 2 }}>
+        Please select both Group By and Aggregation to display the chart.
+      </Typography>
+    )
+  }
+  
   // Parse the data string from the dataExploration object
   const parsedData = dataExploration.data
 

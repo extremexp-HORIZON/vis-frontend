@@ -29,15 +29,6 @@ const LineChartControlPanel = ({
  
   useEffect(() => {
     if (columns && columns.length > 0) {
-      const localDateTimeColumn = columns.find(
-        col => col.type === "LOCAL_DATE_TIME",
-      )
-
-      // Check if current xAxis is still valid
-      if (!xAxis || !columns.find(col => col.name === xAxis.name)) {
-        setXAxis(localDateTimeColumn ? localDateTimeColumn : columns[0]) // Use 'LOCAL DATE TIME' column if found, otherwise default to first column
-      }
-
       // Filter the yAxis columns to keep only the ones that still exist in `columns`
       const validYAxis = yAxis.filter(yCol =>
         columns.find(col => col.name === yCol.name),
@@ -46,13 +37,9 @@ const LineChartControlPanel = ({
       if (validYAxis.length !== yAxis.length) {
         setYAxis(validYAxis) // Reset the yAxis to only valid columns if any are invalid
       }
-
-      // Ensure there is at least one column selected in yAxis
-      if (validYAxis.length === 0 && columns.length > 1) {
-        setYAxis([columns[0]]) // Set yAxis to the second column if no valid yAxis exists
-      }
     }
-  }, [columns, xAxis, yAxis, setXAxis, setYAxis])
+  }, [columns, yAxis, setYAxis])
+
   return (
     <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem",flexDirection: "column" }}>
       {/* X-Axis Selector */}
