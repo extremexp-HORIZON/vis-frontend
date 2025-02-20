@@ -592,7 +592,7 @@ const ControlPanel = (props: IControlPanel) => {
                   lon={lon}
                   setLat={setLat}
                   setLon={setLon}
-                  columnsMapDouble
+                  columnsMapDouble={columnsMapDouble}
                 />
               )}
             </Box>

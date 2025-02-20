@@ -85,6 +85,37 @@ const MapControls: React.FC<MapControlsProps> = ({
   return (
       
     <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem",flexDirection: "column" }}>
+      <FormControl fullWidth >
+          <InputLabel>Latitude Field</InputLabel>
+          <Select
+            value={lat}
+            onChange={(e) => setLat(e.target.value)}
+            // disabled={tripsMode}
+            input={<OutlinedInput label="Latitude Field" />}
+          >
+            {columnsMapDouble.map((col) => (
+              <MenuItem key={col} value={col}>
+                {col}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth >
+          <InputLabel>Longitude Field</InputLabel>
+          <Select
+            value={lon}
+            onChange={(e) => setLon(e.target.value)}
+            // disabled={tripsMode}
+            input={<OutlinedInput label="Longitude Field" />}
+          >
+            {columnsMapDouble.map((col) => (
+              <MenuItem key={col} value={col}>
+                {col}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <FormControl fullWidth >
           <InputLabel>Color By</InputLabel>
           <Select
@@ -120,37 +151,7 @@ const MapControls: React.FC<MapControlsProps> = ({
           </Select>
         </FormControl>
 
-        <FormControl fullWidth >
-          <InputLabel>lat</InputLabel>
-          <Select
-            value={lat}
-            onChange={(e) => setLat(e.target.value)}
-            // disabled={tripsMode}
-            input={<OutlinedInput label="lat" />}
-          >
-            {columnsMapDouble.map((col) => (
-              <MenuItem key={col} value={col}>
-                {col}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth >
-          <InputLabel>lon</InputLabel>
-          <Select
-            value={lon}
-            onChange={(e) => setLon(e.target.value)}
-            // disabled={tripsMode}
-            input={<OutlinedInput label="lon" />}
-          >
-            {columnsMapDouble.map((col) => (
-              <MenuItem key={col} value={col}>
-                {col}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        
       </Box>
 
      

@@ -93,21 +93,24 @@ const MapChart = ({
   }, [data, colorBy, selectedColumns])
 
   useEffect(() => {
+    if (!lat || !lon) return // Skip map creation if fields are empty
+  
     if (!mapRef.current && mapContainerRef.current && data.length > 0) {
       mapRef.current = L.map(mapContainerRef.current).setView(
-        [data[0].latitude, data[0].longitude],
+        [data[0][lat], data[0][lon]],
         15,
       )
       L.tileLayer(layers[mapLayer]).addTo(mapRef.current)
     }
-  }, [data])
+  }, [data, lat, lon, mapLayer])
+  
 
   const renderTrips = (layerGroup: L.LayerGroup) => {
     const trips = {}
     const tripColorMap = generateTripColorMap(data, selectedColumns) // Use consistent colors
 
     data.forEach(row => {
-      if (!row.latitude || !row.longitude) return
+      if (!row[lat] || !row[lon]) return
       const tripKey = selectedColumns.map(col => row[col]).join("-")
       if (!trips[tripKey]) trips[tripKey] = []
       trips[tripKey].push(row)
@@ -121,8 +124,8 @@ const MapChart = ({
       )
 
       const tripCoords = trips[tripKey].map(row => [
-        row.latitude,
-        row.longitude,
+        row[lat],
+        row[lon],
       ])
       const tripColor = tripColorMap[tripKey]
 
@@ -149,7 +152,7 @@ const MapChart = ({
 
       // Add circle markers for each trip point
       trips[tripKey].forEach(row => {
-        L.circleMarker([row.latitude, row.longitude], {
+        L.circleMarker([row[lat], row[lon]], {
           radius: 5,
           fillColor: tripColor,
           color: tripColor,
@@ -159,8 +162,8 @@ const MapChart = ({
         })
           .addTo(layerGroup)
           .bindPopup(
-            `<strong>Latitude:</strong> ${row.latitude} <br/>
-                   <strong>Longitude:</strong> ${row.longitude} <br/>
+            `<strong>Latitude:</strong> ${row[lat]} <br/>
+                   <strong>Longitude:</strong> ${row[lon]} <br/>
                    <strong>Timestamp:</strong> ${new Date(row[timestampField]).toLocaleDateString()} <br/>`,
           )
           // .bindTooltip(
@@ -178,13 +181,13 @@ const MapChart = ({
 
   const renderMarkers = (layerGroup: L.LayerGroup) => {
     data.forEach(row => {
-      if (!row.latitude || !row.longitude) return
+      if (!row[lat] || !row[lon]) return
       const color =
         colorBy && colorBy !== "None"
           ? colorMap[row[colorBy]] || "blue"
           : "blue"
 
-      L.circleMarker([row.latitude, row.longitude], {
+      L.circleMarker([row[lat], row[lon]], {
         radius: 5,
         fillColor: color,
         color: color,
@@ -193,8 +196,8 @@ const MapChart = ({
         .addTo(layerGroup)
         .bindPopup(
           `
-          <strong>Latitude:</strong> ${row.latitude} <br/>
-          <strong>Longitude:</strong> ${row.longitude} <br/>
+          <strong>Latitude:</strong> ${row[lat]} <br/>
+          <strong>Longitude:</strong> ${row[lon]} <br/>
           <strong>Timestamp:</strong> ${new Date(row.timestamp).toLocaleDateString()} <br/>
           
         `,
@@ -214,8 +217,8 @@ const MapChart = ({
     if (data.length > 1) {
       const trajectoryCoords = data
 
-        .filter(row => row.latitude && row.longitude && row.timestamp)
-        .map(row => [row.latitude, row.longitude, row.timestamp])
+        .filter(row => row[lat] && row[lon] && row.timestamp)
+        .map(row => [row[lat], row[lon], row.timestamp])
 
       const marker = L.marker(trajectoryCoords[0], {
         icon: L.icon({
@@ -239,7 +242,7 @@ const MapChart = ({
     }
 
     const pointBounds = data.map(row =>
-      row.latitude && row.longitude ? [row.latitude, row.longitude] : [],
+      row[lat] && row[lon] ? [row[lat], row[lon]] : [],
     )
     if (pointBounds.length > 0) {
       const bounds = L.latLngBounds(pointBounds)
@@ -270,6 +273,8 @@ const MapChart = ({
     colorBy,
     colorMap,
     sliderValue,
+    lat,
+    lon
   ])
 
   const theme = createTheme({
@@ -379,10 +384,16 @@ const MapChart = ({
         </ThemeProvider>
       </Box> */}
 
+{(!lat || !lon) ? (
+      <Typography variant="h6" sx={{ textAlign: "center", margin: 4 }}>
+        Please select valid latitude and longitude fields to display the map.
+      </Typography>
+    ) : (
       <Paper
         ref={mapContainerRef}
         sx={{ height: "500vh", width: "100%", padding: 2, elevation: 3 }}
       />
+    )}
     </>
   )
 }
