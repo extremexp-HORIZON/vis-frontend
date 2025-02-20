@@ -51,28 +51,30 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
   // Create a dynamic Vega specification
   const specification = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-    description:
-      "A grouped bar chart showing different numeric values by category.",
+    description: "A grouped bar chart showing different numeric values by category.",
     autosize: { type: "fit", contains: "padding", resize: true },
     width: "container",
-    height: 850,
-    data: {
-      values: transformedData,
-    },
+    height: 850, // Fixed height
+    data: { values: transformedData },
     mark: "bar",
     params: [
       {
         name: "industry",
-        select: { type: "point", fields: ["type"] }, // Selection on "type" field
-        bind: "legend", // Bind this selection to the legend
+        select: { type: "point", fields: ["type"] },
+        bind: "legend",
       },
     ],
     encoding: {
       y: {
         field: xAxisColumn,
         type: "nominal",
-        axis: { labelAngle: 0 },
-        sort: null, // Sort by the x-axis values
+        axis: {
+          labelAngle: 0,
+          labelLimit: 100,
+          labelOverlap: "parity",
+          tickCount: Math.floor(850 / 20), // Show only ticks that fit within height 800
+        },
+        sort: null,
       },
       x: {
         field: "value",
@@ -93,7 +95,7 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
         ...categoricalColumns.map(col => ({
           field: col.name,
           type: "nominal",
-          title: col.name, // Use the column name as the tooltip title
+          title: col.name,
         })),
         { field: "value", type: "quantitative", title: "Value" },
         { field: "type", type: "nominal", title: "Metric" },
@@ -104,6 +106,7 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
       },
     },
   }
+  
 
   return (
     <Paper
@@ -122,8 +125,8 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
         scrollBehavior: "smooth", // Enable smooth scrolling (optional)
       }}
     >
-      <Vega spec={specification} actions={false} />
-    </Paper>
+<Vega spec={specification} actions={false} style={{ overflowY: "auto", height: "850px" }} />
+</Paper>
   )
 }
 
