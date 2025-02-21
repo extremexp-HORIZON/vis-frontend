@@ -14,8 +14,8 @@ export interface IPlotModel {
     yAxis: Axis;
     zAxis: Axis;
     tableContents: ITableContents;
-    totalCost: number;
-    totalEffectiveness: number;
+    TotalCost: number;
+    TotalEffectiveness: number;
     actions: IAction;
     affectedClusters: IAffectedClusters;
     effCostActions: IEffCostActions;
