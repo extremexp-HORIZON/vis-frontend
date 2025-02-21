@@ -12,7 +12,7 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
   ) {
     return (
       <Typography align="center" fontWeight="bold" sx={{ mt: 2 }}>
-        Please select both Group By and Aggregation to display the chart.
+        Select both Group By and Aggregation to display the chart.
       </Typography>
     )
   }

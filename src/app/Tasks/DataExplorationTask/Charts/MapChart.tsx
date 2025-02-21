@@ -97,7 +97,7 @@ const MapChart = ({
   
     if (!mapRef.current && mapContainerRef.current && data.length > 0) {
       mapRef.current = L.map(mapContainerRef.current).setView(
-        [data[0][lat], data[0][lon]],
+        [data[1][lat], data[1][lon]],
         15,
       )
       L.tileLayer(layers[mapLayer]).addTo(mapRef.current)
@@ -385,8 +385,8 @@ const MapChart = ({
       </Box> */}
 
 {(!lat || !lon) ? (
-      <Typography variant="h6" sx={{ textAlign: "center", margin: 4 }}>
-        Please select valid latitude and longitude fields to display the map.
+      <Typography  align="center" fontWeight="bold">
+       Select latitude and longitude fields to display the map.
       </Typography>
     ) : (
       <Paper
