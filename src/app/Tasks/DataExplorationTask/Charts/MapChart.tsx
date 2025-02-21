@@ -214,32 +214,32 @@ const MapChart = ({
         })
     })
 
-    if (data.length > 1) {
-      const trajectoryCoords = data
+    // if (data.length > 1) {
+    //   const trajectoryCoords = data
 
-        .filter(row => row[lat] && row[lon] && row.timestamp)
-        .map(row => [row[lat], row[lon], row.timestamp])
+    //     .filter(row => row[lat] && row[lon] && row.timestamp)
+    //     .map(row => [row[lat], row[lon], row.timestamp])
 
-      const marker = L.marker(trajectoryCoords[0], {
-        icon: L.icon({
-          iconUrl:
-            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-        }),
-      }).addTo(layerGroup)
+    //   const marker = L.marker(trajectoryCoords[0], {
+    //     icon: L.icon({
+    //       iconUrl:
+    //         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    //       iconSize: [25, 41],
+    //       iconAnchor: [12, 41],
+    //     }),
+    //   }).addTo(layerGroup)
 
       // Animate the marker along the trajectory
-      let index = sliderValue
-      if (index < trajectoryCoords.length) {
-        marker
-          .setLatLng(trajectoryCoords[index])
-          .bindPopup(
-            `Timestamp: ${new Date(trajectoryCoords[index][2]).toLocaleString()}`,
-          )
-        // .openPopup();
-      }
-    }
+      // let index = sliderValue
+      // if (index < trajectoryCoords.length) {
+      //   marker
+      //     .setLatLng(trajectoryCoords[index])
+      //     .bindPopup(
+      //       `Timestamp: ${new Date(trajectoryCoords[index][2]).toLocaleString()}`,
+      //     )
+      //   // .openPopup();
+      // }
+    // }
 
     const pointBounds = data.map(row =>
       row[lat] && row[lon] ? [row[lat], row[lon]] : [],
@@ -391,9 +391,24 @@ const MapChart = ({
     ) : (
       <Paper
         ref={mapContainerRef}
-        sx={{ height: "500vh", width: "100%", padding: 2, elevation: 3 }}
+        
+      className="Category-Item"
+      elevation={2}
+      sx={{
+        borderRadius: 4,
+        width: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 0,
+        minWidth: "300px",
+        height: "100%",
+        overflow: "hidden", // Allow scrolling if content is larger than container
+        overscrollBehavior: "contain", // Prevent the bounce effect at the edges
+        scrollBehavior: "smooth", // Enable smooth scrolling (optional)
+      }}
       />
     )}
+    
     </>
   )
 }
