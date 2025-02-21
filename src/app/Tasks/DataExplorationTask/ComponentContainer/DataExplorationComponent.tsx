@@ -356,7 +356,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           }
         />
       ) : (
-        <Box sx={{ display: "flex", height: "100vh" }}>
+        <Box sx={{ display: "flex", height: "100vh",padding: 1 }}>
           {/* Control Panel */}
           <ControlPanel
               originalColumns={workflow?.workflowTasks.dataExploration?.metaData.data
