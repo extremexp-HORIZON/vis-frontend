@@ -2293,14 +2293,14 @@ const CGlanceExecution: React.FC<CGlanceExecutionProps> = ({
               </Typography>
             </Box>
           ) : workflow.workflowTasks.modelAnalysis?.global_counterfactuals
-              .error ? (
+              .error || workflow.workflowTasks.modelAnalysis?.global_counterfactuals.data?.plotName==="Error" ? (
             <Typography
               variant="body2"
               color="error"
               align="center"
               sx={{ mt: 2 }}
             >
-              No counterfactuals found for this configuration of the workflow
+            {workflow.workflowTasks.modelAnalysis?.global_counterfactuals.data?.plotDescr}
             </Typography>
           ) : (
             workflow.workflowTasks.modelAnalysis?.global_counterfactuals.data &&
