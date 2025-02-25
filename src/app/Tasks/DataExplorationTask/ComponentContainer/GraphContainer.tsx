@@ -1,94 +1,69 @@
 import React from "react"
-import { Box, ButtonGroup, Button, Paper, Typography, Pagination } from "@mui/material"
+import { Box, ButtonGroup, Button, Paper, Pagination } from "@mui/material"
 import LineChart from "../Charts/LineChart"
 import ChartButtonGroup from "../ChartControls/ChartButtonGroup"
-import LineChartControlPanel from "../Charts/LineChartControlPanel"
-import BarChartControlPanel from "../Charts/BarChartControlPanel"
-import {
-  IFilter,
-  VisualColumn,
-} from "../../../../shared/models/dataexploration.model"
+import { VisualColumn } from "../../../../shared/models/dataexploration.model"
 import BarChart from "../Charts/BarChart"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 import ScatterChart from "../Charts/ScatterChart"
 import MapChart from "../Charts/MapChart"
 import TableExpand from "../DataTable/TableExpand"
+import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
+import { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
 
 interface IGraphContainer {
-  linedata: any
-  bardata: any
-  filters: IFilter[]
-  experimentId: string
-  workflowId: string
-  columns: VisualColumn[]
-  originalColumns: VisualColumn[]
-  chartType: 'datatable' |"line" | "bar" | "scatter" | "map"
+  
+  chartType: "datatable" | "line" | "bar" | "scatter" | "map"
   setChartType: React.Dispatch<
-    React.SetStateAction<'datatable' |"line" | "bar" | "scatter" | "map">
+    React.SetStateAction<"datatable" | "line" | "bar" | "scatter" | "map">
   >
   xAxis: VisualColumn
   xAxisScatter: VisualColumn
   colorBy: string
   setColorBy: (colorBy: string) => void
-  setXAxis: React.Dispatch<React.SetStateAction<VisualColumn>>
-  setXAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn>>
   yAxis: VisualColumn[]
   yAxisScatter: VisualColumn[]
-  setYAxis: React.Dispatch<React.SetStateAction<VisualColumn[]>>
-  setYAxisScatter: React.Dispatch<React.SetStateAction<VisualColumn[]>>
+
   viewMode: "overlay" | "stacked"
   setViewMode: React.Dispatch<React.SetStateAction<"overlay" | "stacked">>
-  groupFunction: string
-  setGroupFunction: React.Dispatch<React.SetStateAction<string>>
-  barGroupBy: string[]
-  setBarGroupBy: React.Dispatch<React.SetStateAction<string[]>>
-  barAggregation: any
-  onFetchData: () => void
-  setBarAggregation: React.Dispatch<React.SetStateAction<any>>
-  tabledata: any
-  tablecolumns: any
+
   count: number
   page: number
   onChange: (event: React.ChangeEvent<unknown>, value: number) => void
+  workflow: IWorkflowTabModel
+  colorByMap:any
+  tripsMode:boolean
+  selectedColumnsMap:any
+  barGroupBy: string[]
+  barAggregation: { [key: string]: string[] }
+  lat:any
+  lon:any
 }
 
 const GraphContainer = (props: IGraphContainer) => {
   const {
-    linedata,
-    bardata,
-    columns,
-    originalColumns,
-    experimentId,
-    workflowId,
-    filters,
+    workflow,
     colorBy,
     setColorBy,
     chartType,
     setChartType,
-    xAxis,
-    xAxisScatter,
-    setXAxis,
-    setXAxisScatter,
-    yAxis,
-    yAxisScatter,
-    setYAxis,
-    setYAxisScatter,
     viewMode,
     setViewMode,
-    groupFunction,
-    setGroupFunction,
-    barGroupBy,
-    setBarGroupBy,
-    barAggregation,
-    setBarAggregation,
-    onFetchData,
-    tabledata,
-    tablecolumns,
+    xAxis,
+    xAxisScatter,
+    yAxis,
+    yAxisScatter,
     count,
     page,
     onChange,
+    colorByMap,
+    tripsMode,
+    selectedColumnsMap,
+    barGroupBy,
+    barAggregation,
+    lat,
+    lon
+
   } = props
 
   return (
@@ -111,10 +86,18 @@ const GraphContainer = (props: IGraphContainer) => {
 
           {/* View Mode Toggle (Overlay/Stacked) */}
           <ButtonGroup
-            variant="contained"
-            aria-label="view mode"
-            disabled={chartType === "map" || chartType === "bar"|| chartType === "datatable"}
-          >
+  variant="contained"
+  aria-label="view mode"
+  sx={{
+    visibility:
+      chartType === "map" ||
+      chartType === "bar" ||
+      chartType === "datatable"
+        ? "hidden" // Keeps the space but hides the buttons
+        : "visible",
+    height: "36px", // Ensure consistent height for the button group
+  }}
+>
             <Button
               onClick={() => setViewMode("overlay")}
               disabled={viewMode === "overlay"}
@@ -129,86 +112,90 @@ const GraphContainer = (props: IGraphContainer) => {
             </Button>
           </ButtonGroup>
         </Box>
-        {chartType === "line" && (
-          <LineChartControlPanel
-            columns={columns}
-            xAxis={xAxis}
-            setXAxis={setXAxis}
-            yAxis={yAxis}
-            setYAxis={setYAxis}
-            groupFunction={groupFunction}
-            setGroupFunction={setGroupFunction}
-          />
-        )}
-        {chartType === "bar" && (
-          <BarChartControlPanel
-            originalColumns={originalColumns}
-            barGroupBy={barGroupBy}
-            setBarGroupBy={setBarGroupBy}
-            barAggregation={barAggregation}
-            setBarAggregation={setBarAggregation}
-          />
-        )}
-        {chartType === "scatter" && (
-          <ScatterChartControlPanel
-            columns={columns}
-            xAxis={xAxisScatter}
-            setXAxis={setXAxisScatter}
-            yAxis={yAxisScatter}
-            setYAxis={setYAxisScatter}
-            colorBy={colorBy}
-            setColorBy={setColorBy}
-          />
-        )}
 
         {/* Conditionally Render Chart Based on Selected Type */}
         <Box sx={{ marginTop: "1rem" }}>
           {chartType === "line" && (
             <LineChart
               viewMode={viewMode}
-              data={linedata}
+              data={
+                workflow.workflowTasks.dataExploration?.lineChart.data?.data
+              }
               xAxis={xAxis}
               yAxis={yAxis}
               groupFunction={""}
             />
           )}
-          {chartType === "bar" && <BarChart dataExploration={bardata} />}
+
+          {chartType === "bar" && (
+            <BarChart
+              dataExploration={
+                workflow.workflowTasks.dataExploration?.barChart.data
+              }
+              barGroupBy={barGroupBy}
+              barAggregation={barAggregation}
+            />
+          )}
+
           {chartType === "scatter" && (
             <ScatterChart
               viewMode={viewMode}
-              data={linedata}
+              data={
+                workflow.workflowTasks.dataExploration?.scatterChart.data?.data
+              }
               xAxis={xAxisScatter}
               yAxis={yAxisScatter}
               colorBy={colorBy}
               setColorBy={setColorBy}
-              columns={columns}
+              columns={
+                workflow.workflowTasks.dataExploration?.lineChart.data
+                  ?.columns || []
+              }
             />
           )}
-          {chartType === "map" && <MapChart />}
+          {chartType === "map" && (
+            <MapChart
+              data={workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
+                []}
+              workflow={workflow.workflowTasks?.dataExploration || {} as IDataExploration}
+              columns={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col => col.type === "STRING").map(col => col.name)}
+              colorBy={colorByMap}
+              tripsMode={tripsMode}
+              selectedColumns={selectedColumnsMap}
+              lat={lat}
+              lon={lon}
+                        />
+          )}
+
           {chartType === "datatable" && (
-            <Box sx={{ width: "100%", overflowX: "auto" }}>
-                              <TableExpand
-                                data={tabledata}
-                                columns={tablecolumns}
-                                datetimeColumn=""
-                              />
-            
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "right",
-                                  marginTop: "1rem",
-                                  padding: "1rem",
-                                }}
-                              >
-                                <Pagination
-                                  count={count}
-                                  page={page}
-                                  onChange={onChange}
-                                  variant="outlined"
-                                />
-                              </Box>
-                            </Box>
+            <Box sx={{ width: "100%", overflowX: "hidden" }}>
+              <TableExpand
+                data={
+                  workflow.workflowTasks.dataExploration?.lineChart.data?.data
+                }
+                columns={
+                  workflow.workflowTasks.dataExploration?.lineChart.data
+                    ?.columns || []
+                }
+                datetimeColumn=""
+              />
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "right",
+                  marginTop: "1rem",
+                  padding: "1rem",
+                }}
+              >
+                <Pagination
+                  count={count}
+                  page={page}
+                  onChange={onChange}
+                  variant="outlined"
+                />
+              </Box>
+            </Box>
           )}
         </Box>
       </Box>

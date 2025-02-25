@@ -48,17 +48,13 @@ export interface IDataExplorationResponse {
 }
 
 export interface IFilter {
-  column: string
-  type: string
-  value:
-    | {
-        min?: number | string
-        max?: number | string
-        value?: number | string
-      }
-    | number
-    | string
+  column: string;
+  type: string;
+  value?: number | string; // For "equals" type
+  min?: number | string;   // For "range" type
+  max?: number | string;   // For "range" type
 }
+
 
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
   datasetId: "",

@@ -108,7 +108,6 @@ const TableExpand: React.FC<DataTableProps> = ({
   return (
     <>
         <Box sx={{ ...tableStyle, marginLeft: 2, marginRight: 2 }}>
-          {" "}
           {/* Enable horizontal scrolling */}
           <DataGrid
             rows={rows}
@@ -136,54 +135,6 @@ const TableExpand: React.FC<DataTableProps> = ({
             }}
           />
         </Box>
-    
-      <Popper
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        placement="bottom-start"
-        style={{ zIndex: 1000, padding: "10px" }}
-      >
-        <Paper style={{ width: 300, padding: 10 }}>
-          <IconButton
-            onClick={handleClose}
-            style={{ position: "absolute", right: 10, top: 10 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          {statistics ? (
-            <>
-              <Typography variant="subtitle1">Type: {columnType}</Typography>
-              <DataGrid
-                rows={[
-                  {
-                    id: 1,
-                    min: statistics.min,
-                    max: statistics.max,
-                    avg: statistics.avg,
-                    std: statistics.std,
-                  },
-                ]}
-                columns={[
-                  { field: "min", headerName: "Min", width: 80 },
-                  { field: "max", headerName: "Max", width: 80 },
-                  { field: "avg", headerName: "Avg", width: 80 },
-                  { field: "std", headerName: "Std", width: 80 },
-                ]}
-                // autoHeight
-                hideFooter
-                hideFooterSelectedRowCount
-                hideFooterPagination
-                disableColumnMenu
-                disableColumnFilter
-                disableColumnSorting
-                disableColumnSelector
-              />
-            </>
-          ) : (
-            <Typography variant="subtitle1">Type: {columnType}</Typography>
-          )}
-        </Paper>
-      </Popper>
     </>
   )
 }

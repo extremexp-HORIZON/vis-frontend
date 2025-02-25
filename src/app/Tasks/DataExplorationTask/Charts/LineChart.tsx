@@ -33,7 +33,6 @@ const LineChart = ({
   yAxis,
   groupFunction,
 }: LineChartProps) => {
-  console.log("props", viewMode, data, xAxis, yAxis, groupFunction)
 
   const [chartSpecs, setChartSpecs] = useState<any[]>([])
   const [dataCopy, setDataCopy] = useState<any[]>([]) // Define dataCopy here
@@ -42,10 +41,7 @@ const LineChart = ({
     if (xAxis && yAxis.length > 0) {
       const yAxisFields = yAxis.map(axis => axis.name) // Get the names of the Y-axis fields
       const dataCopy = cloneDeep(data) // Deep clone the data
-      // setDataCopy(dataCopy); // Update the dataCopy state
-      console.log("Original Data", data) // Log the original data
-      console.log("Cloned Data", dataCopy) // Log the cloned data for modifications
-      console.log("Y-Axis Fields:", yAxisFields)
+      
       setDataCopy(dataCopy)
 
       // Build the Vega-Lite specifications
@@ -54,7 +50,7 @@ const LineChart = ({
           mark: "line",
           autosize: { type: "fit", contains: "padding", resize: true },
           width: "container",
-          height: 700,
+          height: 850,
           params: [
             {
               name: "grid",
@@ -110,7 +106,7 @@ const LineChart = ({
               bind: "scales", // Bind to the scales
             },
           ],
-          height: 700 / yAxis.length, // Height for individual stacked charts
+          height: 850 / yAxis.length, // Height for individual stacked charts
           encoding: {
             x: {
               field: xAxis.name,
@@ -162,7 +158,7 @@ const LineChart = ({
       ))}
     </Paper>
   ) : (
-    <Typography>Select x-Axis and y-Axis to display the chart.</Typography>
+    <Typography align="center" fontWeight="bold">Select x-Axis and y-Axis to display the chart.</Typography>
   )
 }
 
