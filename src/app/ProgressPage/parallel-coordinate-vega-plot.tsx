@@ -50,11 +50,20 @@ const ParallelCoordinateVega = ({
         tooltipHandler.call(view, event, {} as Item, hover)
         isTooltipVisible = true
       } else if (isTooltipVisible) {
-        // To hide tooltip, simulate an empty/null value
-        tooltipHandler.call(view, new MouseEvent("mousemove"), {} as Item, null)
-        isTooltipVisible = false
+        hideTooltip()
       }
     })
+    window.addEventListener("scroll", () => {
+      if (isTooltipVisible) {
+        hideTooltip()
+      }
+    })
+
+    function hideTooltip() {
+      // To hide tooltip, simulate an empty/null value
+      tooltipHandler.call(view, new MouseEvent("mousemove"), {} as Item, null)
+      isTooltipVisible = false
+    }
   }
 
   const columnNames = [...foldArray.current, progressParallel.selected]
