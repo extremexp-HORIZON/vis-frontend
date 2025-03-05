@@ -22,6 +22,7 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const [chosenTask, setChosenTask] = useState<string | null>(null)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  const selectedTab = tabs.find(tab => tab.workflowId === workflowId)
 
   const taskProvider = (taskType: string | null) => {
     switch (taskType) {
@@ -144,7 +145,8 @@ const WorkflowTab = (props: IWorkflowTab) => {
                 </Typography>
               </Box>
               <Box key="workflow-metric-details-items">
-                <WorkflowMetricDetails
+                { selectedTab && 
+                (<WorkflowMetricDetails
                   key={workflowId}
                   metrics={
                     (
@@ -161,7 +163,8 @@ const WorkflowTab = (props: IWorkflowTab) => {
                       ) as any
                     )?.tasks || null
                   }
-                />
+                />)
+                }
               </Box>
             </Box>
           </>

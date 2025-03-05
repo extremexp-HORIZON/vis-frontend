@@ -155,15 +155,11 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   }
 
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
-    if (tabs.find(tab => tab.workflowId === workflowId)) return
-    dispatch(addTab({ workflowId, workflows }))
     handleChange(workflowId)(e)
   }
 
   const handleLaunchCompletedTab =
     (workflowId: any) => (e: React.SyntheticEvent) => {
-      if (tabs.find(tab => tab.workflowId === workflowId)) return
-      dispatch(addCompareCompletedTab(workflows))
       handleChange(workflowId)(e)
     }
 
