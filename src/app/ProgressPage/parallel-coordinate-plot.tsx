@@ -9,7 +9,8 @@ import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { setProgressParallel } from "../../store/slices/progressPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
-import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded'
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+import DraggableColumns from "./draggable-columns"
 
 const ParallelCoordinatePlot = () => {
   const { workflows, progressParallel, progressGauges } = useAppSelector(
@@ -145,6 +146,12 @@ const ParallelCoordinatePlot = () => {
           </FormControl>
         </Box>
         <Box sx={{ width: "99%", px: 1 }}>
+          <DraggableColumns
+            foldArray={foldArray}
+            onOrderChange={() => {
+              dispatch(setProgressParallel({ ...progressParallel }))
+            }}
+          />
           {progressParallel.options.length > 0 ? (
             <ParallelCoordinateVega
               parallelData={parallelData}
