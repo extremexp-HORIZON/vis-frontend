@@ -199,12 +199,14 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     right: 0,
     zIndex: 100,
     backgroundColor: theme.palette.customGrey.main,
+    borderLeft: "1px solid #ddd",
   },
   '& .MuiDataGrid-cell[data-field="action"]': {
     position: "sticky",
     right: 0,
     backgroundColor: theme.palette.customGrey.light,
     zIndex: 90,
+    borderLeft: "1px solid #ddd",
   },
 }))
 
@@ -311,6 +313,7 @@ export default function ScheduleTable() {
                 headerClassName:
                 key === "action" ? "datagrid-header-fixed" : "datagrid-header",
                 minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
+                maxWidth: 200,
                 flex: 1,
                 align: "center",
                 headerAlign: "center",
@@ -468,7 +471,8 @@ export default function ScheduleTable() {
           </Box>
         </Popover>
         <div style={{ height: 450, width: "100%" }}>
-          <StyledDataGrid 
+          <StyledDataGrid
+            disableVirtualization
             rows={progressScheduledTable.visibleRows}
             columns={columns}
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}
@@ -514,7 +518,7 @@ export default function ScheduleTable() {
                 },
               }
             }}
-            pageSizeOptions={[10, 25, 100]}
+            pageSizeOptions={[10, 25, 50]}
             initialState={{
               pagination: {
                 paginationModel: { pageSize: 10 },
