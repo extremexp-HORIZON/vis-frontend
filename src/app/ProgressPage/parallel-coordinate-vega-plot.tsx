@@ -147,13 +147,14 @@ const ParallelCoordinateVega = ({
       padding: 0.3,
     })
   }
-  // Generate axes
+
   const generatedAxes: Axis[] = []
   for (const columnName of columnNames) {
     generatedAxes.push({
       orient: "left",
       scale: columnName,
-      title: columnName,
+      // only show the last column, other columns are shown as draggable objects
+      title: columnName === progressParallel.selected ? columnName : "",
       offset: { scale: "ord", value: columnName, mult: -1 },
     })
   }
