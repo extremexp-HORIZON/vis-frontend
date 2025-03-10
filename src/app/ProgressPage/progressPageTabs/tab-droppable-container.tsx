@@ -10,7 +10,7 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers"
 
 interface IDroppableContainer {
   value: number | string
-  handleChange: (newValue: number | string) => (event: any) => void
+  handleChange: (newValue: number | string | null) => (event: any) => void
 }
 
 const TabDroppableContainer = (props: IDroppableContainer) => {

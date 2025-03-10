@@ -22,7 +22,7 @@ import { setTabsOrder } from "../../../store/slices/workflowTabsSlice"
 
 interface IProgressPageTabs {
   value: number | string
-  handleChange: (newValue: number | string) => (event: any) => void
+  handleChange: (newValue: number | string | null) => (event: any) => void
 }
 
 const ProgressPageTab = (props: IProgressPageTabs) => {
@@ -116,7 +116,7 @@ const ProgressPageTab = (props: IProgressPageTabs) => {
           }}
           size="small"
           disableRipple
-          onClick={handleChange("progress")}
+          onClick={handleChange(null)}
         >
           Experiment Overview
         </Button>

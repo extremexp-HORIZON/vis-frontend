@@ -14,7 +14,7 @@ import ProgressPageBar from "./progress-page-bar"
 import ProgressPageGauges from "./progress-page-gauges"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
-import { useParams } from "react-router-dom"
+import { useParams, useLocation, useSearchParams, useNavigate } from "react-router-dom"
 import {
   fetchExperiment,
   fetchExperimentTesting,
@@ -23,19 +23,24 @@ import {
 } from "../../store/slices/progressPageSlice"
 import ProgressPageLoading from "./progress-page-loading"
 import ProgressPageTab from "./progressPageTabs/progress-page-tab"
-import { updateTabs } from "../../store/slices/workflowTabsSlice"
+import { updateTabs, initTabs } from "../../store/slices/workflowTabsSlice"
 
 const ProgressPage = () => {
-  const [value, setValue] = useState<number | string>("progress")
   const { experiment, workflows, initialization } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
   const { tabs } = useAppSelector(
     (state: RootState) => state.workflowTabs,
   )
+  const tabsRef = useRef(tabs)
   const { experimentId } = useParams()
+  const [ searchParams ] = useSearchParams()
+  const workflowId = searchParams.get("workflowId")
+  const tabsQuery = searchParams.get("tabs")
   const dispatch = useAppDispatch()
   const intervalId = useRef<NodeJS.Timeout | null>(null)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     if (experimentId) {
@@ -104,12 +109,38 @@ const ProgressPage = () => {
     }
   }, [workflows])
 
-  const handleChange =
-    (newValue: number | string) => (event: React.SyntheticEvent) => {
-      if (value === newValue) return
-      setValue(newValue)
-      window.scrollTo(0, 0)
+  useEffect (() => {
+    const tabsArray = tabsQuery?.split(',')
+    if (workflowId && !tabsArray?.find(tabId => tabId === workflowId)) {
+      const queryParams = new URLSearchParams()
+      queryParams.append("workflowId", workflowId.toString())
+      queryParams.append("tabs", workflowId.toString())
+      navigate(`${location.pathname}?${queryParams.toString()}`, {replace: true})
     }
+
+    if (workflows.data && workflows.data.length > 0 ) dispatch(initTabs({tabs: tabsQuery, workflows}))
+  },[searchParams,workflows])
+
+  useEffect(() => {
+    tabsRef.current = tabs
+  }, [tabs]);
+  
+
+  const handleChange =
+  (newValue: number | string | null) => (event: React.SyntheticEvent) => {
+    if (workflowId === newValue) return
+    const currentTabs = newValue && !tabsRef.current.find(tab => tab.workflowId === newValue) ? 
+      [...tabsRef.current.map(tab => tab.workflowId), newValue.toString()] : tabsRef.current.map(tab => tab.workflowId)
+    
+    const newTabsQuery = currentTabs.join(",")
+    const queryParams = new URLSearchParams()
+
+    if (newValue !== null) queryParams.append("workflowId", newValue.toString())
+    if(currentTabs.length > 0) queryParams.append("tabs", newTabsQuery)
+
+    navigate(`${location.pathname}?${queryParams.toString()}`)
+    window.scrollTo(0, 0)
+  }
 
   return (
     <>
@@ -175,7 +206,7 @@ const ProgressPage = () => {
           </Box>
           <Box key="progress-tabs">
             {/* <ProgressPageTabs value={value} handleChange={handleChange} /> */}
-            <ProgressPageTab value={value} handleChange={handleChange} />
+            <ProgressPageTab value={workflowId ? workflowId : "progress"} handleChange={handleChange} />
           </Box>
           <Box
             sx={{
@@ -186,7 +217,7 @@ const ProgressPage = () => {
               rowGap: 6,
             }}
           >
-            {value === "progress" && (
+            {!workflowId && (
               <>
                 <ProgressPageBar />
                 <ProgressPageGauges />
@@ -204,10 +235,10 @@ const ProgressPage = () => {
                 </Box>
               </>
             )}
-            {value !== "progress" && value !== "compare-completed" && (
-              <WorkflowTab workflowId={value} />
+            {workflowId && workflowId !== "compare-completed" && (
+              <WorkflowTab workflowId={workflowId} />
             )}
-            {value === "compare-completed" && <CompareCompleted />}
+            {workflowId === "compare-completed" && <CompareCompleted />}
           </Box>
         </Grid>
       )}
