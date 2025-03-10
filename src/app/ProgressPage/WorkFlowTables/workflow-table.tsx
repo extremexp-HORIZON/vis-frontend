@@ -383,6 +383,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             slotProps={{noRowsOverlay: {title: "No workflows available"}}}
             checkboxSelection
             onRowSelectionModelChange={handleSelectionChange}
+            rowSelectionModel={progressWokflowsTable.selectedWorkflows}
             sx={{
               "& .MuiDataGrid-selectedRowCount": {
                 visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header
