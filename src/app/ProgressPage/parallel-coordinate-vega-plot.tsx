@@ -165,7 +165,7 @@ const ParallelCoordinateVega = ({
       onNewView={handleNewView}
       style={{ width: "100%" }}
       spec={{
-        height: 300,
+        height: window.innerHeight * 0.3,
         padding: 15,
         autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
         config: {

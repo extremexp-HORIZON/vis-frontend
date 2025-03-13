@@ -15,13 +15,6 @@ import NoRowsOverlayWrapper from "./no-rows-overlay"
 import theme from "../../../mui-theme"
 
 
-const fractionStrToDecimal = (str: string): string => {
-  const [numerator, denominator] = str.split("/").map(Number)
-  if (isNaN(numerator) || isNaN(denominator) || denominator === 0) {
-    return str
-  }
-  return (numerator / denominator).toString()
-}
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
     return -1
@@ -210,8 +203,16 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }))
 
-export default function ScheduleTable() {
-  // const { handleChange } = props;
+interface ScheduleTableProps {
+  visibleTable: string,
+  handleTableChange: (
+    newTable: string,
+  ) => (event: React.SyntheticEvent) => void
+}
+
+
+export default function ScheduleTable(props: ScheduleTableProps) {
+  const { visibleTable, handleTableChange } = props;
   const { workflows, progressScheduledTable } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
@@ -446,9 +447,11 @@ export default function ScheduleTable() {
           filterNumbers={progressScheduledTable.filtersCounter}
           filterClickedFunction={filterClicked}
           actionButtonName="Cancel selected workflows"
+          visibleTable={visibleTable}
           numSelected={progressScheduledTable.selectedWorkflows.length}
           tableName={"Scheduled Workflows"}
           handleClickedFunction={removeSelected}
+          handleTableChange={handleTableChange}
         />
         <Popover
           id={"Filters"}

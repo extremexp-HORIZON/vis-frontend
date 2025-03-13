@@ -5,22 +5,23 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
-import { Button, Stack } from '@mui/material';
+import { Button, Stack, Box } from '@mui/material';
 
 interface ToolBarWorkflowProps {
   filterNumbers: number;
   numSelected: number;
   tableName: string;
   actionButtonName: string;
-  secondActionButtonName?: string;
+  visibleTable: string;
   handleClickedFunction: (workflowId: number[] | string) => (e: React.SyntheticEvent) => void;
   filterClickedFunction: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  // handleLaunchNewTab: (workflowId: number) => React.SyntheticEvent;
-
+  handleTableChange: (
+    newTable: string,
+  ) => (event: React.SyntheticEvent) => void;
 }
 
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
-  const { filterNumbers, numSelected, tableName, actionButtonName, secondActionButtonName, handleClickedFunction, filterClickedFunction } = props;
+  const { filterNumbers, numSelected, tableName, actionButtonName, visibleTable, handleClickedFunction, filterClickedFunction, handleTableChange } = props;
 
   return (
     <Toolbar
@@ -47,18 +48,26 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography
-          sx={{ flex: '1 1 55%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          {tableName}
-          <IconButton onClick={(event) => filterClickedFunction(event)}>
-            <FilterListIcon />
-            <Typography gap={5}> {filterNumbers > 0 ? ` (${filterNumbers})` : ''}</Typography>
-          </IconButton>
-        </Typography>
+        <Tooltip title="">
+          <Stack spacing={1} direction="row">
+              <Button
+                size="small"
+                variant={ visibleTable === "workflows" ? "contained" : "outlined"}
+                sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold', borderRadius: 4 }}
+                onClick={handleTableChange("workflows")}
+              >
+                Workflows
+              </Button>
+              <Button
+                size="small"
+                variant={ visibleTable === "scheduled" ? "contained" : "outlined"}
+                sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold', borderRadius: 4 }}
+                onClick={handleTableChange("scheduled")}
+              >
+                Scheduled
+              </Button>
+          </Stack>
+        </Tooltip>
       )}
       {numSelected > 0 ? (
         <Tooltip title="">
@@ -75,20 +84,13 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           </Button>
         </Tooltip>
       ) : (
-        <Tooltip title="">
-          <Stack spacing={2} direction="row">
-            {secondActionButtonName ?
-              <Button
-                size="small"
-                variant="outlined"
-                color='secondary'
-                sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold' }}
-                onClick={handleClickedFunction("compare-completed")} // TODO: Get all the completed and get right value to open new tab
-              >
-                {secondActionButtonName}
-              </Button> : ''}
-          </Stack>
-        </Tooltip>
+        <Box sx={{marginLeft: "auto"}}>
+          <IconButton sx={{gap: 0.2 }} onClick={(event) => filterClickedFunction(event)}>
+            <FilterListIcon sx={{ color: theme => theme.palette.primary.main }} />
+            <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }} > {filterNumbers > 0 ? ` (${filterNumbers})` : ''}</Typography>
+            <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }} >FILTERS</Typography>
+          </IconButton>
+        </Box>
       )}
     </Toolbar>
   );

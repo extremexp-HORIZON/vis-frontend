@@ -5,7 +5,6 @@ import type {
 } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
 import ToolbarWorkflow from "./toolbar-workflow-table"
-import ProgressPercentage from "./progress-percentage"
 import Paper from "@mui/material/Paper"
 import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
@@ -14,10 +13,6 @@ import LaunchIcon from "@mui/icons-material/Launch"
 import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import type { RootState } from "../../../store/store"
-import {
-  addCompareCompletedTab,
-  addTab,
-} from "../../../store/slices/workflowTabsSlice"
 import { useEffect, useState } from "react"
 import { Badge, Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
@@ -25,14 +20,6 @@ import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
 
 import theme from "../../../mui-theme"
-
-const fractionStrToDecimal = (str: string): string => {
-  const [numerator, denominator] = str.split("/").map(Number)
-  if (isNaN(numerator) || isNaN(denominator) || denominator === 0) {
-    return str
-  }
-  return (numerator / denominator).toString()
-}
 
 type CustomGridColDef = GridColDef & {
   field: string
@@ -130,8 +117,12 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 }))
 
 interface WorkFlowTableProps {
+  visibleTable: string,
   handleChange: (
     newValue: number | string,
+  ) => (event: React.SyntheticEvent) => void
+  handleTableChange: (
+    newTable: string,
   ) => (event: React.SyntheticEvent) => void
 }
 
@@ -139,8 +130,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const { workflows, progressWokflowsTable } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
-  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
-  const { handleChange } = props
+  const { visibleTable, handleChange, handleTableChange } = props
   const [isFilterOpen, setFilterOpen] = useState(false)
   const [uniqueParameters, setUniqueParameters] = useState<Set<string> | null>(
     null,
@@ -346,12 +336,13 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       <Paper elevation={2}>
         <ToolbarWorkflow
           actionButtonName="Compare selected workflows"
-          secondActionButtonName="Compare completed workflows"
+          visibleTable={visibleTable}
           tableName="Workflow Execution"
           numSelected={progressWokflowsTable.selectedWorkflows.length}
           filterNumbers={progressWokflowsTable.filtersCounter}
           filterClickedFunction={filterClicked}
           handleClickedFunction={handleLaunchCompletedTab}
+          handleTableChange={handleTableChange}
         />
         <Popover
           id={"Filters"}

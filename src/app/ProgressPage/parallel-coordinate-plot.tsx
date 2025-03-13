@@ -117,33 +117,36 @@ const ParallelCoordinatePlot = () => {
   return (
     <>
       <Paper elevation={2}>
-        <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
-          <Typography fontSize={"0.8rem"}>Color by:</Typography>
-          <FormControl
-            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
-            size="small"
-          >
-            <Select
-              value={progressParallel.selected}
-              sx={{ fontSize: "0.8rem" }}
-              onChange={handleMetricSelection}
-              disabled={progressParallel.options.length === 0}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
-                  },
-                },
-              }}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Typography variant="h6">Parallel Coordinates</Typography>
+          <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+            <Typography fontSize={"0.8rem"}>Color by:</Typography>
+            <FormControl
+              sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
+              size="small"
             >
-              {progressParallel.options.map(feature => (
-                <MenuItem key={`${feature}`} value={feature}>
-                  {feature}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              <Select
+                value={progressParallel.selected}
+                sx={{ fontSize: "0.8rem" }}
+                onChange={handleMetricSelection}
+                disabled={progressParallel.options.length === 0}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 250,
+                      maxWidth: 300,
+                    },
+                  },
+                }}
+              >
+                {progressParallel.options.map(feature => (
+                  <MenuItem key={`${feature}`} value={feature}>
+                    {feature}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Box>
         <Box sx={{ width: "99%", px: 1 }}>
           <DraggableColumns
