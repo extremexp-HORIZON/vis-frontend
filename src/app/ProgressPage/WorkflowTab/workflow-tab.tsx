@@ -5,7 +5,8 @@ import { RootState, useAppSelector } from "../../../store/store"
 import Rating from "@mui/material/Rating"
 import { useNavigate } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import { Tabs, Tab } from "@mui/material"
+import { Tabs, Tab, Card } from "@mui/material"
+import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 
 interface IWorkflowTab {
   workflowId: number | string
@@ -22,6 +23,13 @@ const WorkflowTab = (props: IWorkflowTab) => {
   const navigate = useNavigate()
   const [selectedTabs, setSelectedTabs] = useState(0)
 
+  console.log("tabs",tabs)
+  console.log("workflow",workflows)
+  console.log("sugkekrimeno workflow", workflows.data.find(workflow => workflow.workflowId === workflowId))
+  const workflow = workflows.data.find(workflow => workflow.workflowId === workflowId);
+  const metrics = workflow ? workflow.metrics : [];
+
+  console.log("pinwmauro",workflows.data.find(workflow => workflow.workflowId === workflowId)?.metrics)
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}>
@@ -110,10 +118,37 @@ const WorkflowTab = (props: IWorkflowTab) => {
 
         {/* Tab Content */}
         <Box sx={{ p: 2 }}>
-          {selectedTabs === 0 && <Typography>Metrics 1 Content</Typography>}
-          {selectedTabs === 1 && <Typography>Metrics 2 Content</Typography>}
-          {selectedTabs === 2 && <Typography>Metrics 3 Content</Typography>}
-          {selectedTabs === 3 && <Typography>Metrics 4 Content</Typography>}
+        {selectedTabs === 0 && (
+  <Box sx={{ display: "flex", flexDirection: "row", gap: 2, justifyContent: "space-between", width: "100%" }}>
+    {workflows.data.find(workflow => workflow.workflowId === workflowId)?.metrics.map((metric) => (
+      <Card 
+        key={metric.metricId} 
+        sx={{ 
+          flex: 1, // Ensures cards take equal space
+          textAlign: "center", 
+          backgroundColor: "#f5f5f5", 
+          boxShadow: 2 
+        }}
+      >
+        <Typography variant="body1" sx={{ fontWeight: 200 }}>
+          {metric.name}
+        </Typography>
+        <Typography variant="h6" sx={{ color: "blue" }}>
+          {metric.value.toFixed(3)}
+        </Typography>
+      </Card>
+    ))}
+  </Box>
+)}
+
+          {selectedTabs === 1 && (
+            <DataExplorationComponent
+              workflow={tabs.find(tab => tab.workflowId === workflowId) || null}
+            />
+          )}
+          {selectedTabs === 2 && <Typography>Source Code Content</Typography>}
+          {selectedTabs === 3 && <Typography>Montiroring Content</Typography>}
+          {selectedTabs === 4 && <Typography>User Input Content</Typography>}
         </Box>
       </Box>
     </>
