@@ -117,7 +117,8 @@ const WorkflowTab = (props: IWorkflowTab) => {
         value={selectedTabs}
         onChange={(event, newValue) => setSelectedTabs(newValue)}
         aria-label="tab menu"
-      >
+        sx={{borderBottom:1, backgroundColor: "#f0f0f0"}}
+>
         <Tab
           sx={{
             fontWeight: 600,

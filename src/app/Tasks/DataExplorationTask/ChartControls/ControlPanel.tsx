@@ -28,6 +28,7 @@ import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 import BarChartControlPanel from "../Charts/BarChartControlPanel"
 import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 import MapControls from "../Charts/MapChartControlPanel"
+import ChartButtonGroup from "./ChartButtonGroup"
 
 interface IControlPanel {
   originalColumns: VisualColumn[]
@@ -68,6 +69,7 @@ interface IControlPanel {
   setLat: React.Dispatch<React.SetStateAction<VisualColumn>>
   lon: VisualColumn
   setLon: React.Dispatch<React.SetStateAction<VisualColumn>>
+  setChartType: React.Dispatch<React.SetStateAction<"datatable" | "line" | "bar" | "scatter" | "map">>
 
 }
 
@@ -108,7 +110,8 @@ const ControlPanel = (props: IControlPanel) => {
     setLat,
     lon,
     setLon,
-    columnsMapDouble
+    columnsMapDouble,
+    setChartType
   } = props
   const handleChange = event => {
     const {
@@ -531,15 +534,13 @@ const ControlPanel = (props: IControlPanel) => {
                   transition: "transform 0.3s ease-in-out",
                 }}
               />
-              {/* <Tooltip title="Select the columns for display." arrow>
-                  <InfoIcon
-                    sx={{ marginLeft: 1, fontSize: 16, color: "gray" }}
-                  />
-                </Tooltip> */}
             </Typography>
           </Box>
           {showChartTypeDropdown && (
-            <Box>
+            <>
+              <Box sx={{padding: 2}}>
+              <ChartButtonGroup chartType={chartType} setChartType={setChartType} />
+              </Box>
               {chartType === "line" && (
                 <LineChartControlPanel
                   columns={columns}
@@ -595,7 +596,7 @@ const ControlPanel = (props: IControlPanel) => {
                   columnsMapDouble={columnsMapDouble}
                 />
               )}
-            </Box>
+            </>
           )}
         </Box>
       </Box>

@@ -12,7 +12,7 @@ import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
 import { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
 
 interface IGraphContainer {
-  
+
   chartType: "datatable" | "line" | "bar" | "scatter" | "map"
   setChartType: React.Dispatch<
     React.SetStateAction<"datatable" | "line" | "bar" | "scatter" | "map">
@@ -31,13 +31,13 @@ interface IGraphContainer {
   page: number
   onChange: (event: React.ChangeEvent<unknown>, value: number) => void
   workflow: IWorkflowTabModel
-  colorByMap:any
-  tripsMode:boolean
-  selectedColumnsMap:any
+  colorByMap: any
+  tripsMode: boolean
+  selectedColumnsMap: any
   barGroupBy: string[]
   barAggregation: { [key: string]: string[] }
-  lat:any
-  lon:any
+  lat: any
+  lon: any
 }
 
 const GraphContainer = (props: IGraphContainer) => {
@@ -78,26 +78,20 @@ const GraphContainer = (props: IGraphContainer) => {
             flexDirection: "column", // Stack elements verticall
           }}
         >
-          {/* Chart Selection Buttons */}
-          <ChartButtonGroup chartType={chartType} setChartType={setChartType} />
 
-          {/* Spacing between the buttons */}
-          <Box sx={{ width: "1rem", padding: "1rem" }} />
-
-          {/* View Mode Toggle (Overlay/Stacked) */}
           <ButtonGroup
-  variant="contained"
-  aria-label="view mode"
-  sx={{
-    visibility:
-      chartType === "map" ||
-      chartType === "bar" ||
-      chartType === "datatable"
-        ? "hidden" // Keeps the space but hides the buttons
-        : "visible",
-    height: "36px", // Ensure consistent height for the button group
-  }}
->
+            variant="contained"
+            aria-label="view mode"
+            sx={{
+              visibility:
+                chartType === "map" ||
+                chartType === "bar" ||
+                chartType === "datatable"
+                  ? "hidden" // Keeps the space but hides the buttons
+                  : "visible",
+              height: "36px", // Ensure consistent height for the button group
+            }}
+          >
             <Button
               onClick={() => setViewMode("overlay")}
               disabled={viewMode === "overlay"}
@@ -155,16 +149,23 @@ const GraphContainer = (props: IGraphContainer) => {
           )}
           {chartType === "map" && (
             <MapChart
-              data={workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
-                []}
-              workflow={workflow.workflowTasks?.dataExploration || {} as IDataExploration}
-              columns={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col => col.type === "STRING").map(col => col.name)}
+              data={
+                workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
+                []
+              }
+              workflow={
+                workflow.workflowTasks?.dataExploration ||
+                ({} as IDataExploration)
+              }
+              columns={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns
+                .filter(col => col.type === "STRING")
+                .map(col => col.name)}
               colorBy={colorByMap}
               tripsMode={tripsMode}
               selectedColumns={selectedColumnsMap}
               lat={lat}
               lon={lon}
-                        />
+            />
           )}
 
           {chartType === "datatable" && (
