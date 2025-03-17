@@ -1,5 +1,5 @@
 // Import necessary modules
-import { grey } from "@mui/material/colors"
+import { grey, blue } from "@mui/material/colors"
 import { createTheme, responsiveFontSizes } from "@mui/material/styles"
 
 // Extend the existing palette interface to include custom properties
@@ -14,6 +14,9 @@ declare module "@mui/material/styles" {
       light: string
       text: string
     }
+    customBlue: {
+      selected: string
+    }
   }
   interface PaletteOptions {
     customGradient?: {
@@ -24,6 +27,9 @@ declare module "@mui/material/styles" {
       dark: string
       light: string
       text: string
+    }
+    customBlue?: {
+      selected: string
     }
   }
 }
@@ -45,6 +51,9 @@ let theme = createTheme({
       dark: grey[400],
       light: grey[50],
       text: grey[700]
+    },
+    customBlue: {
+      selected: blue[50]
     },
     background: {
       default: "#FFFFFF",

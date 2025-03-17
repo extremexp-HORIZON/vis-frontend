@@ -5,7 +5,6 @@ import CompareRoundedIcon from '@mui/icons-material/CompareRounded'
 import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded'
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { useTheme, Theme } from "@mui/material/styles"
-import { blue } from "@mui/material/colors";
 
 const LeftMenu = (props: { workflowId: string | null}) => {
     const { workflowId } = props
@@ -74,12 +73,12 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                         component="button"
                         sx={{
-                            bgcolor: !workflowId ? blue[50] : "transparent",
+                            bgcolor: !workflowId ? theme => theme.palette.customBlue.selected : "transparent",
                             border: "none",
                             cursor: "pointer",
                             borderBottom: "1px solid #ddd",
                             justifyContent: { xs: "center", md: "flex-start"},
-                            "&:hover": { bgcolor: "#f5f5f5" }
+                            "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                             }}
                             onClick={handleClick(null)}
                         >
@@ -90,12 +89,12 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                       component="button"
                       sx={{
-                        bgcolor: !workflowId ? blue[50] : "transparent",
+                        bgcolor: !workflowId ? theme => theme.palette.customBlue.selected : "transparent",
                         border: "none",
                           cursor: "pointer",
                           borderBottom: "1px solid #ddd",
                           justifyContent: { xs: "center", md: "flex-start"},
-                          "&:hover": { bgcolor: "#f5f5f5" }
+                          "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                           }}
                           onClick={handleClick(null)}
                     >
@@ -109,12 +108,12 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                         component="button"
                         sx={{
-                          bgcolor: workflowId === "compare-completed" ? blue[50] : "transparent",
+                          bgcolor: workflowId === "compare-completed" ? theme => theme.palette.customBlue.selected : "transparent",
                           border: "none",
                             cursor: "pointer",
                             borderBottom: "1px solid #ddd",
                             justifyContent: { xs: "center", md: "flex-start"},
-                            "&:hover": { bgcolor: "#f5f5f5" }
+                            "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                             }}
                             onClick={handleClick("compare-completed")}
                         >
@@ -125,12 +124,12 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                       component="button"
                       sx={{
-                        bgcolor: workflowId === "compare-completed" ? blue[50] : "transparent",
+                        bgcolor: workflowId === "compare-completed" ? theme => theme.palette.customBlue.selected : "transparent",
                         border: "none",
                           cursor: "pointer",
                           borderBottom: "1px solid #ddd",
                           justifyContent: { xs: "center", md: "flex-start"},
-                          "&:hover": { bgcolor: "#f5f5f5" }
+                          "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                           }}
                           onClick={handleClick("compare-completed")}
                     >
@@ -144,12 +143,12 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                         component="button"
                         sx={{
-                          bgcolor: workflowId === "explainability" ? blue[50] : "transparent",
+                          bgcolor: workflowId === "explainability" ? theme => theme.palette.customBlue.selected : "transparent",
                             border: "none",
                             cursor: "pointer",
                             borderBottom: "1px solid #ddd",
                             justifyContent: { xs: "center", md: "flex-start"},
-                            "&:hover": { bgcolor: "#f5f5f5" }
+                            "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                             }}
                         >
                         <PsychologyAltRoundedIcon />
@@ -159,12 +158,12 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                       component="button"
                       sx={{
-                        bgcolor: workflowId === "explainability" ? blue[50] : "transparent",
+                        bgcolor: workflowId === "explainability" ? theme => theme.palette.customBlue.selected : "transparent",
                         border: "none",
                           cursor: "pointer",
                           borderBottom: "1px solid #ddd",
                           justifyContent: { xs: "center", md: "flex-start"},
-                          "&:hover": { bgcolor: "#f5f5f5" }
+                          "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                           }}
                     >
                       <PsychologyAltRoundedIcon sx={{mr: 1.5}} />

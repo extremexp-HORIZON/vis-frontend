@@ -20,6 +20,8 @@ import {
 import ProgressPageLoading from "./progress-page-loading"
 import { updateTabs, initTabs } from "../../store/slices/workflowTabsSlice"
 import LeftMenu from "./left-menu"
+import { IconButton } from "@mui/material"
+import ExperimentControls from "./experiment-controls"
 
 const ProgressPage = () => {
   const { experiment, workflows, initialization } = useAppSelector(
@@ -160,40 +162,7 @@ const ProgressPage = () => {
             >
               {!workflowId && (
                 <>
-                  <Box
-                    key={"progress-page-experiment-controls"}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 1,
-                      height: "5%",
-                      px: 2
-                    }}
-                  >
-                    <Box className={"progress-page-bar"} sx={{flex: 4}}>
-                      <ProgressPageBar />
-                    </Box>
-
-                    <Box className={"progress-page-actions"} >
-                      <PauseIcon
-                        onClick={() => console.log("clicked")}
-                        sx={{
-                          cursor: "pointer",
-                          color: theme => theme.palette.primary.main,
-                        }}
-                        fontSize="large"
-                      />
-                      <StopIcon
-                        onClick={() => console.log("clicked")}
-                        sx={{
-                          cursor: "pointer",
-                          color: theme => theme.palette.primary.main,
-                        }}
-                        fontSize="large"
-                      />
-                    </Box>
-                  </Box>
+                  <ExperimentControls />
                   <Box
                     sx={{
                       display: "flex",
@@ -217,7 +186,12 @@ const ProgressPage = () => {
               {workflowId && workflowId !== "compare-completed" && (
                 <WorkflowTab workflowId={workflowId} />
               )}
-              {workflowId === "compare-completed" && <CompareCompleted />}
+              {workflowId === "compare-completed" && (
+                <>
+                  <ExperimentControls />
+                  <CompareCompleted />
+                </>
+              )}
             </Box>
           </Grid>
         </Grid>
