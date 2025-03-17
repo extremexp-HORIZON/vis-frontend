@@ -314,39 +314,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       }}
     >
       {/* Header */}
-      <Box
-        sx={{
-          px: 2,
-          height: "3.5rem",
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: grey[300],
-        }}
-      >
-        <Typography fontSize={"1.2rem"}>Data Exploration of {experimentId}</Typography>
-        <Box sx={{ flex: 1 }} />
-        <Box sx={{ position: "relative" }}>
-          <Tooltip title="Explore your data through interactive charts and tables. Use the control panel to filter and select columns.">
-            <InfoIcon sx={{ padding: 1, zIndex: 100, color: grey[600] }} />
-          </Tooltip>
-          {(workflow?.workflowTasks.dataExploration?.multipleTimeSeries
-            .loading ||
-            workflow?.workflowTasks.dataExploration?.lineChart.loading 
-            // || workflow?.workflowTasks.dataExploration?.scatterChart.loading 
-            // || workflow?.workflowTasks.dataExploration?.barChart.loading
-          || workflow?.workflowTasks.dataExploration?.mapChart.loading) && (
-            <CircularProgress
-              size={28}
-              sx={{
-                position: "absolute",
-                top: 6,
-                left: 6,
-                zIndex: 0,
-              }}
-            />
-          )}
-        </Box>
-      </Box>
+     
 
       {/* Main Content */}
       {experimentId === "ideko" ? (
