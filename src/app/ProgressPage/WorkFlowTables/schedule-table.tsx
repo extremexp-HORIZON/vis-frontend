@@ -441,18 +441,20 @@ export default function ScheduleTable(props: ScheduleTableProps) {
   }, [progressScheduledTable.filters])
 
   return (
-    <Box>
-      <Paper sx={{ width: "100%", mb: 2 }} elevation={2}>
-        <ToolBarWorkflow
-          filterNumbers={progressScheduledTable.filtersCounter}
-          filterClickedFunction={filterClicked}
-          actionButtonName="Cancel selected workflows"
-          visibleTable={visibleTable}
-          numSelected={progressScheduledTable.selectedWorkflows.length}
-          tableName={"Scheduled Workflows"}
-          handleClickedFunction={removeSelected}
-          handleTableChange={handleTableChange}
-        />
+    <Box sx={{height: "100%"}} >
+      <Paper sx={{ height: "100%", width: "100%", mb: 2 }} elevation={2}>
+        <Box sx={{height: "15%"}} >
+          <ToolBarWorkflow
+            filterNumbers={progressScheduledTable.filtersCounter}
+            filterClickedFunction={filterClicked}
+            actionButtonName="Cancel selected workflows"
+            visibleTable={visibleTable}
+            numSelected={progressScheduledTable.selectedWorkflows.length}
+            tableName={"Scheduled Workflows"}
+            handleClickedFunction={removeSelected}
+            handleTableChange={handleTableChange}
+          />
+        </Box>
         <Popover
           id={"Filters"}
           open={isFilterOpen}
@@ -473,7 +475,7 @@ export default function ScheduleTable(props: ScheduleTableProps) {
             />
           </Box>
         </Popover>
-        <div style={{ height: 450, width: "100%" }}>
+        <div style={{ height: "85%", width: "100%" }}>
           <StyledDataGrid
             disableVirtualization
             rows={progressScheduledTable.visibleRows}

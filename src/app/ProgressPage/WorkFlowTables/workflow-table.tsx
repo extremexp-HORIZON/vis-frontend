@@ -332,18 +332,20 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   }, [workflows])
 
   return (
-    <Box>
-      <Paper elevation={2}>
-        <ToolbarWorkflow
-          actionButtonName="Compare selected workflows"
-          visibleTable={visibleTable}
-          tableName="Workflow Execution"
-          numSelected={progressWokflowsTable.selectedWorkflows.length}
-          filterNumbers={progressWokflowsTable.filtersCounter}
-          filterClickedFunction={filterClicked}
-          handleClickedFunction={handleLaunchCompletedTab}
-          handleTableChange={handleTableChange}
-        />
+    <Box sx={{height: "100%"}}>
+      <Paper elevation={2} sx={{height: "100%", width: "100%", mb: 2}}>
+        <Box sx={{height: "15%"}} >
+          <ToolbarWorkflow
+            actionButtonName="Compare selected workflows"
+            visibleTable={visibleTable}
+            tableName="Workflow Execution"
+            numSelected={progressWokflowsTable.selectedWorkflows.length}
+            filterNumbers={progressWokflowsTable.filtersCounter}
+            filterClickedFunction={filterClicked}
+            handleClickedFunction={handleLaunchCompletedTab}
+            handleTableChange={handleTableChange}
+          />
+        </Box>
         <Popover
           id={"Filters"}
           open={isFilterOpen}
@@ -365,7 +367,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           </Box>
         </Popover>
 
-        <div style={{ height: 450, width: "100%" }}>
+        <div style={{ height: "85%", width: "100%" }}>
           <StyledDataGrid
             disableVirtualization
             rows={progressWokflowsTable.filteredRows}
