@@ -14,7 +14,7 @@ interface ChartButtonGroupProps {
 
 const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChartType }) => {
   return (
-    <ButtonGroup variant="contained" aria-label="Chart button group" >
+    <ButtonGroup variant="outlined" aria-label="Chart button group" fullWidth>
       <Tooltip title="Table">
       <Button
         variant={chartType === 'datatable' ? 'contained' : 'outlined'}

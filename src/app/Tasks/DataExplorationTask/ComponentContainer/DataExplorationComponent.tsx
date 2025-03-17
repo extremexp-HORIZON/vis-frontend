@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ControlPanel from "../ChartControls/ControlPanel" // Import the new ControlPanel component
-import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material"
+import { Box, CircularProgress, Grid } from "@mui/material"
 import {
   defaultDataExplorationQuery,
   IFilter,
@@ -10,9 +10,11 @@ import {
 import GraphContainer from "./GraphContainer"
 import { useParams } from "react-router-dom"
 import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
-import { fetchDataExplorationData, fetchMetaData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import {
+  fetchDataExplorationData,
+  fetchMetaData,
+} from "../../../../shared/models/tasks/data-exploration-task.model"
 import { grey } from "@mui/material/colors"
-import InfoIcon from "@mui/icons-material/Info"
 import MultiTimeSeriesVisualization from "../multi-ts-visualization/MultiTimeSeriesVisualization"
 
 interface IDataExplorationComponent {
@@ -24,13 +26,11 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const {} = useAppSelector(state => state.workflowTabs)
   const [columns, setColumns] = useState<any[]>([])
   const [selectedColumns, setSelectedColumns] = useState<any>([])
-  const [rowLimit, setRowLimit] = useState(1000)
   const [filters, setFilters] = useState<IFilter[]>([])
   const { experimentId } = useParams()
   const [xAxis, setXAxis] = useState<VisualColumn>({ name: "", type: "" })
-  const [lat,setLat] = useState<string>("")
-  const [lon,setLon] = useState<string>("")
-
+  const [lat, setLat] = useState<string>("")
+  const [lon, setLon] = useState<string>("")
 
   const [xAxisScatter, setXAxisScatter] = useState<VisualColumn>({
     name: "",
@@ -56,13 +56,9 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   // const [offset, setOffset] = useState((currentPage - 1) * pageSize)
 
   //mapcontrols
-    const [colorByMap, setColorByMap] = useState<string | null>("None") // Set initial color to 'default'
-      const [tripsMode, setTripsMode] = useState<boolean>(false)
-        const [selectedColumnsMap, setSelectedColumnsMap] = useState<string[]>([])
-      
-    
-  
-
+  const [colorByMap, setColorByMap] = useState<string | null>("None") // Set initial color to 'default'
+  const [tripsMode, setTripsMode] = useState<boolean>(false)
+  const [selectedColumnsMap, setSelectedColumnsMap] = useState<string[]>([])
 
   const handleFetchData = () => {
     if (
@@ -87,7 +83,11 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
         }),
       )
     }
-    if (chartType === "line" || chartType === "datatable" || chartType === "scatter") {
+    if (
+      chartType === "line" ||
+      chartType === "datatable" ||
+      chartType === "scatter"
+    ) {
       dispatch(
         fetchDataExplorationData({
           query: {
@@ -173,7 +173,6 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           dispatch(
             fetchMetaData({
               query: {
-                
                 datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
                 limit: 10,
                 columns: [],
@@ -189,7 +188,9 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             }),
           )
         }
-        if (workflow.workflowTasks.dataExploration?.scatterChart.data === null) {
+        if (
+          workflow.workflowTasks.dataExploration?.scatterChart.data === null
+        ) {
           dispatch(
             fetchDataExplorationData({
               query: {
@@ -210,22 +211,22 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
         }
         if (workflow.workflowTasks.dataExploration?.mapChart.data === null) {
           dispatch(
-                    fetchDataExplorationData({
-                      query: {
-                        datasetId: "/test/newresult.csv",
-                        limit: 0,
-                        columns: [],
-                        filters: [],
-                        groupBy: ["arxiko gia map"],
-                        aggregation: {},
-                        offset: 0,
-                      },
-                      metadata: {
-                        workflowId: workflowId || "",
-                        queryCase: "mapChart",
-                      },
-                    }),
-                  )
+            fetchDataExplorationData({
+              query: {
+                datasetId: "/test/newresult.csv",
+                limit: 0,
+                columns: [],
+                filters: [],
+                groupBy: ["arxiko gia map"],
+                aggregation: {},
+                offset: 0,
+              },
+              metadata: {
+                workflowId: workflowId || "",
+                queryCase: "mapChart",
+              },
+            }),
+          )
         }
       }
     }
@@ -278,7 +279,6 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           },
         }),
       )
-     
     }
   }, [currentPage, pageSize, filters])
   useEffect(() => {
@@ -314,7 +314,6 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       }}
     >
       {/* Header */}
-     
 
       {/* Main Content */}
       {experimentId === "ideko" ? (
@@ -324,78 +323,112 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           }
         />
       ) : (
-        <Box sx={{ display: "flex", height: "100vh",padding: 1 }}>
+        <Box sx={{ display: "flex", height: "100vh", padding: 1 }}>
           {/* Control Panel */}
           <ControlPanel
-              originalColumns={workflow?.workflowTasks.dataExploration?.metaData.data
-                ?.originalColumns || []}
-              selectedColumns={selectedColumns}
-              setSelectedColumns={setSelectedColumns}
-              onFetchData={handleFetchData}
-              filters={filters}
-              setFilters={setFilters}
-              uniqueValues={workflow?.workflowTasks.dataExploration?.metaData.data
-                ?.uniqueColumnValues || []}
-              chartType={chartType}
-              columns={columns}
-              xAxis={xAxis}
-              setXAxis={setXAxis}
-              yAxis={yAxis}
-              setYAxis={setYAxis}
-              barGroupBy={barGroupBy}
-              setBarGroupBy={setBarGroupBy}
-              barAggregation={barAggregation}
-              setBarAggregation={setBarAggregation} 
-              yAxisScatter={yAxisScatter} 
-              setYAxisScatter={setYAxisScatter}
-              xAxisScatter={xAxisScatter} 
-              setXAxisScatter={setXAxisScatter} 
-              colorBy={colorBy} 
-              setColorBy={setColorBy}   
-              datamap={workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
-                []}   
-                
-              colorByMap={colorByMap}
-              setColorByMap={setColorByMap}
-              columnsMap={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col=>col.type==="STRING").map(col=>col.name)}
-              columnsMapDouble={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns.filter(col=>col.type==="DOUBLE").map(col=>col.name)}
-              tripsMode={tripsMode}
-              setTripsMode={setTripsMode}
-              selectedColumnsMap={selectedColumnsMap} 
-              setSelectedColumnsMap={setSelectedColumnsMap}
-              lat={lat}
-              setLat={setLat}
-              lon={lon}
-              setLon={setLon}
-              />
+            originalColumns={
+              workflow?.workflowTasks.dataExploration?.metaData.data
+                ?.originalColumns || []
+            }
+            selectedColumns={selectedColumns}
+            setSelectedColumns={setSelectedColumns}
+            onFetchData={handleFetchData}
+            filters={filters}
+            setFilters={setFilters}
+            uniqueValues={
+              workflow?.workflowTasks.dataExploration?.metaData.data
+                ?.uniqueColumnValues || []
+            }
+            chartType={chartType}
+            columns={columns}
+            xAxis={xAxis}
+            setXAxis={setXAxis}
+            yAxis={yAxis}
+            setYAxis={setYAxis}
+            barGroupBy={barGroupBy}
+            setBarGroupBy={setBarGroupBy}
+            barAggregation={barAggregation}
+            setBarAggregation={setBarAggregation}
+            yAxisScatter={yAxisScatter}
+            setYAxisScatter={setYAxisScatter}
+            xAxisScatter={xAxisScatter}
+            setXAxisScatter={setXAxisScatter}
+            colorBy={colorBy}
+            setColorBy={setColorBy}
+            datamap={
+              workflow.workflowTasks.dataExploration?.mapChart.data?.data || []
+            }
+            colorByMap={colorByMap}
+            setColorByMap={setColorByMap}
+            columnsMap={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns
+              .filter(col => col.type === "STRING")
+              .map(col => col.name)}
+            columnsMapDouble={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns
+              .filter(col => col.type === "DOUBLE")
+              .map(col => col.name)}
+            tripsMode={tripsMode}
+            setTripsMode={setTripsMode}
+            selectedColumnsMap={selectedColumnsMap}
+            setSelectedColumnsMap={setSelectedColumnsMap}
+            lat={lat}
+            setLat={setLat}
+            lon={lon}
+            setLon={setLon}
+            setChartType={setChartType}
+          />
 
           {/* Graph Container */}
           <Box sx={{ flex: 1, overflow: "auto" }}>
-            {workflow?.workflowTasks.dataExploration?.lineChart.data && workflow?.workflowTasks.dataExploration?.metaData.data &&
-            workflow?.workflowTasks.dataExploration?.scatterChart.data && workflow?.workflowTasks.dataExploration?.mapChart.data && (
-              <GraphContainer
-                  workflow={workflow}
-                  count={totalPages}
-                  page={currentPage}
-                  onChange={handlePageChange}
-                  chartType={chartType}
-                  setChartType={setChartType}
-                  xAxis={xAxis}
-                  colorBy={colorBy}
-                  setColorBy={setColorBy}
-                  xAxisScatter={xAxisScatter}
-                  yAxis={yAxis}
-                  yAxisScatter={yAxisScatter}
-                  viewMode={viewMode}
-                  setViewMode={setViewMode}
-                  colorByMap={colorByMap}
-                  tripsMode={tripsMode}
-                  selectedColumnsMap={selectedColumnsMap}
-                  barGroupBy={barGroupBy}
-                  barAggregation={barAggregation}
-                  lat={lat}
-                  lon={lon}
-                             />
+            {workflow?.workflowTasks.dataExploration && (
+              <>
+                {/* Check if any chart is loading */}
+                {workflow.workflowTasks.dataExploration.lineChart?.loading ||
+                workflow.workflowTasks.dataExploration.metaData?.loading ||
+                workflow.workflowTasks.dataExploration.scatterChart?.loading ||
+                workflow.workflowTasks.dataExploration.mapChart?.loading ||
+                workflow.workflowTasks.dataExploration.barChart?.loading ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
+                    <CircularProgress /> {/* Material-UI loading spinner */}
+                  </Box>
+                ) : (
+                  // Render GraphContainer only when data is available and not loading
+                  workflow.workflowTasks.dataExploration.lineChart?.data &&
+                  workflow.workflowTasks.dataExploration.metaData?.data &&
+                  workflow.workflowTasks.dataExploration.scatterChart?.data &&
+                  workflow.workflowTasks.dataExploration.mapChart?.data && (
+                    <GraphContainer
+                      workflow={workflow}
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                      chartType={chartType}
+                      setChartType={setChartType}
+                      xAxis={xAxis}
+                      colorBy={colorBy}
+                      setColorBy={setColorBy}
+                      xAxisScatter={xAxisScatter}
+                      yAxis={yAxis}
+                      yAxisScatter={yAxisScatter}
+                      viewMode={viewMode}
+                      setViewMode={setViewMode}
+                      colorByMap={colorByMap}
+                      tripsMode={tripsMode}
+                      selectedColumnsMap={selectedColumnsMap}
+                      barGroupBy={barGroupBy}
+                      barAggregation={barAggregation}
+                      lat={lat}
+                      lon={lon}
+                    />
+                  )
+                )}
+              </>
             )}
           </Box>
         </Box>
