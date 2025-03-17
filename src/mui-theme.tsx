@@ -1,6 +1,6 @@
 // Import necessary modules
 import { grey } from "@mui/material/colors"
-import { createTheme } from "@mui/material/styles"
+import { createTheme, responsiveFontSizes } from "@mui/material/styles"
 
 // Extend the existing palette interface to include custom properties
 declare module "@mui/material/styles" {
@@ -29,7 +29,7 @@ declare module "@mui/material/styles" {
 }
 
 // Create the theme
-const theme = createTheme({
+let theme = createTheme({
   palette: {
     primary: {
       main: "#3766AF",
@@ -62,5 +62,8 @@ const theme = createTheme({
     },
   },
 })
+
+theme = responsiveFontSizes(theme, {factor: 2});
+
 
 export default theme

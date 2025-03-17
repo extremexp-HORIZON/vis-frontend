@@ -42,7 +42,7 @@ const ProgressPageBar = () => {
       >
         <Box sx={{ minWidth: 35 }}>
           <Typography
-            fontSize={"1.4rem"}
+            variant="h5"
             color="text.primary"
           >{`Progress: ${Math.round(progressBar.progress)}%`}</Typography>
         </Box>

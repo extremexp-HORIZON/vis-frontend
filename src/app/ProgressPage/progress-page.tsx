@@ -131,6 +131,11 @@ const ProgressPage = () => {
           <Grid
             item
             xs={2}
+            sx = {{
+              position: "fixed",
+              width: "16.6667%",
+              height: "100%",
+            }}
           >
             <LeftMenu workflowId={workflowId} />
           </Grid>
@@ -140,7 +145,8 @@ const ProgressPage = () => {
             sx={{
               flexDirection: "column",
               display: "flex",
-              p: 2,
+              height:"100%",
+              marginLeft: "16.6667%"
             }}
           >
             <Box
@@ -149,6 +155,7 @@ const ProgressPage = () => {
                 flexDirection: "column",
                 mt: 2,
                 rowGap: 2,
+                height:"98%",
               }}
             >
               {!workflowId && (
@@ -159,7 +166,9 @@ const ProgressPage = () => {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      gap: 3
+                      gap: 1,
+                      height: "5%",
+                      px: 2
                     }}
                   >
                     <Box className={"progress-page-bar"} sx={{flex: 4}}>
@@ -190,13 +199,18 @@ const ProgressPage = () => {
                       display: "flex",
                       flexDirection: "column",
                       rowGap: 1,
+                      height: "90%"
                     }}
                   >
-                    <ParallelCoordinatePlot />
-                    {visibleTable === "workflows" ? 
-                      <WorkflowTable visibleTable={visibleTable} handleChange={handleChange} handleTableChange={handleTableChange} /> :  
-                      <ScheduleTable visibleTable={visibleTable} handleTableChange={handleTableChange}/>
-                    }
+                    <Box sx={{height: "40%", px: 2}}>
+                      <ParallelCoordinatePlot />
+                    </Box>
+                    <Box sx={{height: "60%", minHeight: "350px", px: 2}}>
+                      {visibleTable === "workflows" ? 
+                        <WorkflowTable visibleTable={visibleTable} handleChange={handleChange} handleTableChange={handleTableChange} /> :  
+                        <ScheduleTable visibleTable={visibleTable} handleTableChange={handleTableChange}/>
+                      }
+                    </Box>
                   </Box>
                 </>
               )}

@@ -35,6 +35,16 @@ const ParallelCoordinateVega = ({
   selectedWorkflows,
 }: ParallelCoordinateVegaProps) => {
   const [processedData, setProcessedData] = useState<any>([])
+  const [chartHeight, setChartHeight] = useState(window.innerHeight * 0.25)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setChartHeight(window.innerHeight * 0.25)
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [])
 
   // Add new selected property to each item in the parallelData based on the selectedWorkflows array
   useEffect(() => {
@@ -165,7 +175,7 @@ const ParallelCoordinateVega = ({
       onNewView={handleNewView}
       style={{ width: "100%" }}
       spec={{
-        height: window.innerHeight * 0.3,
+        height: chartHeight,
         padding: 15,
         autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
         config: {

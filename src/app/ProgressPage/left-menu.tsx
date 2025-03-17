@@ -1,4 +1,4 @@
-import { Box, Typography, Tooltip, ListItem, List, ListItemText } from "@mui/material"
+import { Box, Typography, Tooltip, ListItem, List, ListItemText, Paper } from "@mui/material"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import ListRoundedIcon from "@mui/icons-material/ListRounded"
 import CompareRoundedIcon from '@mui/icons-material/CompareRounded'
@@ -22,17 +22,19 @@ const LeftMenu = (props: { workflowId: string | null}) => {
     }
     
     return (
-        <Box
-            sx={{
-                px: 2,
-                display: "flex",
-                flexDirection: "column",
-                mt: 2,
-                rowGap: 2,
-            }}
-        >
+      <Paper elevation={2} sx={{height: "100%"}}>
+          <Box
+              sx={{
+                  px: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  rowGap: 2,
+                  height: "98%",
+              }}
+          >
             <Box
                 sx={{
+                    mt: 2,
                     display: "flex",
                     flexDirection: "row",
                     alignItems: "center",
@@ -42,11 +44,10 @@ const LeftMenu = (props: { workflowId: string | null}) => {
             >
                 <Box
                   component="img"
-                  src="/images/extremexp-logo.png"
+                  src="/images\extremexp-logo-removebg-preview.png"
                   alt="ExtremeXP logo"
                   sx={{
                     width: {xs: "100%", sm: "50px"},
-                    height: "auto",
                     borderRadius: "8px",
                     objectFit: "cover",
                     userSelect: "none",
@@ -173,7 +174,8 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                 }
               </List>
             </Box>
-        </Box>
+          </Box>
+        </Paper>
     )
 
 }
