@@ -1,4 +1,4 @@
-import { Paper, Typography } from "@mui/material"
+import { Box, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { VegaLite } from "react-vega"
 import { VisualColumn } from "../../../../shared/models/dataexploration.model"
@@ -49,8 +49,8 @@ const LineChart = ({
         const spec = {
           mark: "line",
           autosize: { type: "fit", contains: "padding", resize: true },
-          width: "container",
-          height: 850,
+          width: 1000,
+          height: 800,
           params: [
             {
               name: "grid",
@@ -95,7 +95,7 @@ const LineChart = ({
         const specs = yAxis.map(axis => ({
           mark: "line",
           autosize: { type: "fit", contains: "padding", resize: true },
-          width: "container",
+          width: 1000,
           params: [
             {
               name: "grid",
@@ -106,7 +106,7 @@ const LineChart = ({
               bind: "scales", // Bind to the scales
             },
           ],
-          height: 850 / yAxis.length, // Height for individual stacked charts
+          height: 800 / yAxis.length, // Height for individual stacked charts
           encoding: {
             x: {
               field: xAxis.name,
@@ -132,22 +132,7 @@ const LineChart = ({
   }, [xAxis, yAxis, viewMode, groupFunction, data]) // Watch for changes in these dependencies
 
   return chartSpecs.length > 0 ? (
-    <Paper
-      className="Category-Item"
-      elevation={2}
-      sx={{
-        borderRadius: 4,
-        width: "inherit",
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 0,
-        minWidth: "300px",
-        height: "100%",
-        overflow: "auto", // Allow scrolling if content is larger than container
-        overscrollBehavior: "contain", // Prevent the bounce effect at the edges
-        scrollBehavior: "smooth", // Enable smooth scrolling (optional)
-      }}
-    >
+    <>
       {chartSpecs.map((spec, index) => (
         <VegaLite
           key={index}
@@ -156,9 +141,11 @@ const LineChart = ({
           actions={false}
         />
       ))}
-    </Paper>
+    </>
   ) : (
+    <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
     <Typography align="center" fontWeight="bold">Select x-Axis and y-Axis to display the chart.</Typography>
+    </Box>
   )
 }
 

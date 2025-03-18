@@ -310,7 +310,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
         minWidth: "300px",
         overflow: "hidden",
         border: `1px solid ${grey[400]}`,
-        height: 1100,
+        height: 900,
       }}
     >
       {/* Header */}
@@ -323,7 +323,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           }
         />
       ) : (
-        <Box sx={{ display: "flex", height: "100vh", padding: 1 }}>
+        <Box sx={{ display: "flex", height: 900, padding: 1 }}>
           {/* Control Panel */}
           <ControlPanel
             originalColumns={

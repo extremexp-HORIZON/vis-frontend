@@ -72,7 +72,7 @@ const MapChart = ({
   useEffect(() => {
     const handleResize = () => {
       if (mapContainerRef.current) {
-        mapContainerRef.current.style.height = `${window.innerHeight * 0.7}px`
+        mapContainerRef.current.style.height = `${window.innerHeight * 0.75}px`
       }
     }
     window.addEventListener("resize", handleResize)
@@ -384,10 +384,17 @@ const MapChart = ({
         </ThemeProvider>
       </Box> */}
 
+
 {(!lat || !lon) ? (
+  <>
+        <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
+
+  
       <Typography  align="center" fontWeight="bold">
        Select latitude and longitude fields to display the map.
       </Typography>
+      </Box>
+      </>
     ) : (
       <Paper
         ref={mapContainerRef}
