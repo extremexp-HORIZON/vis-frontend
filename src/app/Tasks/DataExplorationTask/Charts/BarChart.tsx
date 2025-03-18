@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
 import { Vega } from "react-vega"
 
@@ -11,9 +11,14 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
     (typeof barAggregation === "object" && Object.keys(barAggregation).length === 0)
   ) {
     return (
+      <>
+      
+      <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
       <Typography align="center" fontWeight="bold" sx={{ mt: 2 }}>
         Select both Group By and Aggregation to display the chart.
       </Typography>
+      </Box>
+      </>
     )
   }
   
@@ -53,8 +58,8 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "A grouped bar chart showing different numeric values by category.",
     autosize: { type: "fit", contains: "padding", resize: true },
-    width: "container",
-    height: 850, // Fixed height
+    width: 1000,
+    height: 800, // Fixed height
     data: { values: transformedData },
     mark: "bar",
     params: [
@@ -109,24 +114,9 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
   
 
   return (
-    <Paper
-      className="Category-Item"
-      elevation={2}
-      sx={{
-        borderRadius: 4,
-        width: "inherit",
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 0,
-        minWidth: "300px",
-        height: "100%",
-        overflow: "auto", // Allow scrolling if content is larger than container
-        overscrollBehavior: "contain", // Prevent the bounce effect at the edges
-        scrollBehavior: "smooth", // Enable smooth scrolling (optional)
-      }}
-    >
+    <>
 <Vega spec={specification} actions={false} style={{ overflowY: "auto", height: "850px" }} />
-</Paper>
+</>
   )
 }
 

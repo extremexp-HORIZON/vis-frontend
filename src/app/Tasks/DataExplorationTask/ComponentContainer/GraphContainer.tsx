@@ -67,8 +67,8 @@ const GraphContainer = (props: IGraphContainer) => {
   } = props
 
   return (
-    <Paper>
-      <Box sx={{ padding: "1rem" }}>
+    <>
+      <>
         {/* Container for Chart Buttons and View Mode Buttons */}
         <Box
           sx={{
@@ -199,8 +199,8 @@ const GraphContainer = (props: IGraphContainer) => {
             </Box>
           )}
         </Box>
-      </Box>
-    </Paper>
+      </>
+    </>
   )
 }
 

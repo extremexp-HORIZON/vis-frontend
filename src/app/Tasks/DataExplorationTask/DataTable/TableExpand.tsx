@@ -36,7 +36,7 @@ const TableExpand: React.FC<DataTableProps> = ({
   const [columnType, setColumnType] = useState<string | null>(null)
 
   const tableStyle = {
-    height: 800,
+    height: 700,
     width: "98%",
   }
 

@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { VegaLite } from 'react-vega';
 import { VisualColumn } from '../../../../shared/models/dataexploration.model';
@@ -43,8 +43,8 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
         const spec = {
           mark: 'point',
           autosize: { type: "fit", contains: "padding", resize: true },
-          width: "container",
-          height: 850,
+          width:1000,
+          height: 800,
           selection: {
             paintbrush: {
               type: 'multi',
@@ -101,7 +101,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
         const specs = yAxis.map(axis => ({
           mark: 'point',
           autosize: { type: "fit", contains: "padding", resize: true },
-          width: "container",
+          width: 1000,
           selection: {
             paintbrush: {
               type: 'multi',
@@ -109,7 +109,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
             //   nearest: true
             }
           },
-          height: 850/yAxis.length,
+          height: 800/yAxis.length,
           encoding: {
             x: {
               field: xAxis.name,
@@ -154,27 +154,15 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
   }, [xAxis, yAxis, viewMode, data, columns, colorBy]);
 
   return chartSpecs.length > 0 ? (
-    <Paper
-      className="Category-Item"
-      elevation={2}
-      sx={{
-        borderRadius: 4,
-        width: "inherit",
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 0,
-        minWidth: "300px",
-        height: "100%",
-        overflow: 'auto',
-        overscrollBehavior: 'contain',
-        scrollBehavior: 'smooth',
-      }}>
+    <>
       {chartSpecs.map((spec, index) => (
         <VegaLite key={index} spec={spec} data={{ table: dataCopy }} />
       ))}
-    </Paper>
+    </>
   ) : (
+    <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
     <Typography align="center" fontWeight="bold">Select x-Axis and y-Axis to display the chart.</Typography>
+    </Box>
   );
 };
 

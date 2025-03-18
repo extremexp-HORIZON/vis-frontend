@@ -253,7 +253,10 @@ const ControlPanel = (props: IControlPanel) => {
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ width: "25%", padding: 2, borderRight: "1px solid #ccc" }}>
-        <Box sx={{ marginTop: 2 }}>
+      <Box sx={{padding: 2}}>
+              <ChartButtonGroup chartType={chartType} setChartType={setChartType} />
+              </Box>
+        <Box sx={{ marginTop: 1 }}>
           <Box
             sx={{
               display: "flex",
@@ -503,7 +506,7 @@ const ControlPanel = (props: IControlPanel) => {
           )}
         </Box>
 
-        <Box sx={{ marginTop: 2 }}>
+        <Box sx={{ marginTop: 1 }}>
           <Box
             sx={{
               display: "flex",
@@ -538,9 +541,7 @@ const ControlPanel = (props: IControlPanel) => {
           </Box>
           {showChartTypeDropdown && (
             <>
-              <Box sx={{padding: 2}}>
-              <ChartButtonGroup chartType={chartType} setChartType={setChartType} />
-              </Box>
+              
               {chartType === "line" && (
                 <LineChartControlPanel
                   columns={columns}
