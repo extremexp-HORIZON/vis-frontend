@@ -62,7 +62,7 @@ const ParallelCoordinateVega = ({
     })
 
     setProcessedData(updatedData)
-  }, [selectedWorkflows, parallelData])
+  }, [selectedWorkflows, parallelData.current])
 
   const handleNewView: ViewListener = (view: View) => {
     if (!view) return

@@ -5,7 +5,20 @@ import StopIcon from "@mui/icons-material/Stop"
 
 
 const ExperimentControls = () => {
+
     return (
+      <Box
+        sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 9999,
+          width: "100%",
+          backgroundColor: "white",
+          borderColor: theme => theme.palette.customGrey.main,
+          borderBottomWidth: 2,
+          borderBottomStyle: "solid"
+        }}
+      >
         <Box
           key={"progress-page-experiment-controls"}
           sx={{
@@ -13,8 +26,6 @@ const ExperimentControls = () => {
             justifyContent: "space-between",
             alignItems: "center",
             gap: 1,
-            height: "5%",
-            px: 2
           }}
         >
           <Box className={"progress-page-bar"} sx={{flex: 4}}>
@@ -29,6 +40,7 @@ const ExperimentControls = () => {
             </IconButton>
           </Box>
         </Box>
+      </Box>
     )
 }
 

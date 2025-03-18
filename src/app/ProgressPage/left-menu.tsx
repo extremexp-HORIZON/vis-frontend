@@ -15,7 +15,6 @@ const LeftMenu = (props: { workflowId: string | null}) => {
     const location = useLocation()
 
     const handleClick = (newValue: string | null) => (event: React.SyntheticEvent) => {
-      console.log("here")
       if (newValue) navigate(`${location.pathname}?workflowId=${newValue}`)
       else navigate(`${location.pathname}`)
     }
