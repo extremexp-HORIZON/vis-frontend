@@ -26,25 +26,23 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
     <Box>
       {/* Sticky Header with Tabs */}
       <Box
-        sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          backgroundColor: "white",
-          boxShadow: 1,
-          padding: 0,
-          
-        }}
+               sx={{
+                position: "sticky",
+                top: 0,
+                zIndex: 9999,
+                width: "100%",
+                backgroundColor: "white",
+                borderColor: theme => theme.palette.customGrey.main,
+                borderBottomWidth: 2,
+                borderBottomStyle: "solid"
+              }}
       >
         <Box
-          key="workflow-title"
           sx={{
             display: "flex",
-            flexDirection: "row",
-            columnGap: 1,
             justifyContent: "space-between",
             alignItems: "center",
-            padding: 1,
+            gap: 1,
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -107,7 +105,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
       </Box>
 
       {/* Tab Content */}
-      <Box sx={{ p: 2 }}>
+      <Box>
         {selectedTabs === 0 && (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
             {workflows.data
