@@ -412,6 +412,8 @@ const MapChart = ({
         overflow: "hidden", // Allow scrolling if content is larger than container
         overscrollBehavior: "contain", // Prevent the bounce effect at the edges
         scrollBehavior: "smooth", // Enable smooth scrolling (optional)
+        marginLeft: "1rem",
+        marginRight: "1rem",
       }}
       />
     )}
