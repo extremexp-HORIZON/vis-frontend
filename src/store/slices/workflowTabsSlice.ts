@@ -224,27 +224,19 @@ const initializeCompareCompleteTab = () => {
 }
 
 const addInitialTabs = ({
-  tabs,
+  tab,
   workflows,
 }: {
-  tabs: string | null
+  tab: string | null
   workflows: {
     data: IWorkflowResponse[]
     loading: boolean
     error: string | null
   },
 }) => {
-  const tabsArray = tabs ? tabs.split(',') : []
-  const uniqueTabs = [...(tabsArray || [])].filter((tab, index, self) => self.indexOf(tab) === index).
-    filter(newTab => workflows.data.find(workflow => workflow.workflowId ===  newTab) || newTab === "compare-completed")
-  
-    const newTabs : IWorkflowTabModel[] = uniqueTabs.map(
-    tabName => {
-      if (tabName === "compare-completed") return initializeCompareCompleteTab()
-      return initializeTab({ workflowId: tabName, workflows})
-    }
-  )
-  return newTabs
+  if(tab === "compare-completed") return [initializeCompareCompleteTab()]
+  else if (tab !== null) return [initializeTab({ workflowId: tab, workflows})]
+  else return []
 }
 
 //Reducer exports

@@ -92,15 +92,7 @@ const ProgressPage = () => {
   }, [workflows])
 
   useEffect (() => {
-    const tabsArray = tabsQuery?.split(',')
-    if (workflowId && !tabsArray?.find(tabId => tabId === workflowId)) {
-      const queryParams = new URLSearchParams()
-      queryParams.append("workflowId", workflowId.toString())
-      queryParams.append("tabs", workflowId.toString())
-      navigate(`${location.pathname}?${queryParams.toString()}`, {replace: true})
-    }
-
-    if (workflows.data && workflows.data.length > 0 ) dispatch(initTabs({tabs: tabsQuery, workflows}))
+    if (workflows.data && workflows.data.length > 0 ) dispatch(initTabs({tab: workflowId, workflows}))
   },[searchParams,workflows])  
 
   const handleChange =
