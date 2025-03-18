@@ -23,7 +23,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
   const [selectedTabs, setSelectedTabs] = useState(0);
 
   return (
-    <Box>
+    <>
       {/* Sticky Header with Tabs */}
       <Box
                sx={{
@@ -45,7 +45,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
             gap: 1,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <ArrowBackIcon
               fontSize="large"
               sx={{ fontSize: 48, cursor: "pointer", color: "black" }}
@@ -58,7 +58,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
             <Rating name="simple-uncontrolled" size="large" defaultValue={2} />
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", }}>
             <Box sx={{ position: "relative", display: "inline-flex" }}>
               <CircularProgress
                 variant="determinate"
@@ -94,7 +94,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
         <Tabs
           value={selectedTabs}
           onChange={(event, newValue) => setSelectedTabs(newValue)}
-          aria-label="tab menu"
+          // aria-label="tab menu"
         >
           <Tab label="METRICS" />
           <Tab label="DATA EXPLORATION" />
@@ -138,7 +138,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
         {selectedTabs === 3 && <Typography>Monitoring Content</Typography>}
         {selectedTabs === 4 && <Typography>User Input Content</Typography>}
       </Box>
-    </Box>
+    </>
   );
 };
 
