@@ -46,11 +46,14 @@ const GlovesTable: React.FC<DataTableProps> = ({ title, data, eff_cost_actions }
 
   // Create columns dynamically
   const columns: GridColDef[] = [
-    { field: "id", headerName: "Action ID", flex: 0.5 }, // Add ID as the first column
+    { field: "id", headerName: "Action ID", flex: 0.5, minWidth: 100 }, // Add ID as the first column
+    { field: "eff", headerName: "Effectiveness (%)", flex: 1, minWidth: 150 },
+    { field: "cost", headerName: "Cost", flex: 1, minWidth: 100 },
     ...keys.map((key) => ({
       field: key,
       headerName: key.replace(/_/g, " "), // Format header names for better readability
       flex: 1,
+      minWidth:150,
       renderCell: (params) => {
         const value = params.value;
         const numValue = parseFloat(value);
@@ -68,8 +71,7 @@ const GlovesTable: React.FC<DataTableProps> = ({ title, data, eff_cost_actions }
         );
       },
     })),
-    { field: "eff", headerName: "Effectiveness (%)", flex: 1 },
-    { field: "cost", headerName: "Cost", flex: 1 },
+    
   ];
 
   return (

@@ -174,7 +174,6 @@ function FlowGraph(props: IFlowGraphProps) {
 
   useEffect(() => {
     if (workflowSvg && workflowSvg.tasks.length > 0) {
-      console.log("mpika")
       //Nodes and Edges initialization
       const taskNodes = workflowSvg.tasks.map((task, index) => ({
         id: task.id,

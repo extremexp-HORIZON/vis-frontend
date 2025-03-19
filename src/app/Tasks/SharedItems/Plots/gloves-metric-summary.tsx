@@ -68,7 +68,7 @@ const GlovesMetricSummary: React.FC<MetricSummaryProps> = ({
       </Box>
       <Box marginBottom={1}>
         <WorkflowCard
-          title={"Counterfactual Actions"}
+     title={"Counterfactual Actions"}
           description="Set of final global counterfactual actions generated"
         >
           <GlovesTable

@@ -23,10 +23,8 @@ export interface IDataExplorationRequest {
 }
 
 export interface fetchAffectedRequest{
- 
     workflowId: string | number
     queryCase: any
-  
 }
 
 export interface VisualColumn {

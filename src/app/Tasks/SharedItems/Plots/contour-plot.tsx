@@ -14,7 +14,7 @@ import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { AsyncThunk } from "@reduxjs/toolkit"
 import CircularProgress from "@mui/material/CircularProgress"
-import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
+import { explainabilityQueryDefault, fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
 
 interface IContourplot {
   plotModel: {
@@ -25,10 +25,12 @@ interface IContourplot {
   options: string[] | null
   fetchFunction: AsyncThunk<any, any, any>
   workflowId: string | number
+  plotRequestMetadata: any
 }
 
 const ContourPlot = (props: IContourplot) => {
-  const { plotModel, options, fetchFunction, workflowId } = props
+  const { plotModel, options, fetchFunction, workflowId, plotRequestMetadata } =
+    props
   const dispatch = useAppDispatch()
   const [selectedFeature1, setSelectedFeature1] = useState<string>("")
   const [selectedFeature2, setSelectedFeature2] = useState<string>("")
@@ -70,15 +72,20 @@ const ContourPlot = (props: IContourplot) => {
     (e: { target: { value: string } }) => {
       dispatch(
         fetchFunction({
-          ...fetchExplainabilityPlotPayloadDefault,
-          explanationType: plmodel?.explainabilityType || "",
-          explanationMethod: plmodel?.explanationMethod || "",
-          model: plmodel?.explainabilityModel || "",
-          feature1:
-            featureNumber === 1 ? e.target.value : selectedFeature1 || "",
-          feature2:
-            featureNumber === 2 ? e.target.value : selectedFeature2 || "",
-          modelId: workflowId,
+          query: {
+            ...explainabilityQueryDefault,
+            explanationType: plmodel?.explainabilityType || "",
+            explanationMethod: plmodel?.explanationMethod || "",
+            feature1:
+              featureNumber === 1 ? e.target.value : selectedFeature1 || "",
+            feature2:
+              featureNumber === 2 ? e.target.value : selectedFeature2 || "",
+            ...plotRequestMetadata,
+          },
+          metadata: {
+            workflowId: workflowId,
+            queryCase: plmodel?.explanationMethod,
+          },
         }),
       )
       featureNumber === 1
