@@ -2,34 +2,43 @@ import React from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
-import { deleteTab } from "../../../store/slices/workflowTabsSlice"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import IconButton from "@mui/material/IconButton"
 import CloseIcon from "@mui/icons-material/Close"
 import grey from "@mui/material/colors/grey"
 import { useTheme } from "@mui/material"
-import zIndex from "@mui/material/styles/zIndex"
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
 
 interface ISortableTab {
   id: string
   tabName: string
   value: number | string
-  handleChange: (newValue: number | string) => (event: any) => void
+  handleChange: (newValue: number | string | null) => (event: any) => void
 }
 
 const TabSortable = (props: ISortableTab) => {
   const { id, tabName, value, handleChange } = props
-  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id })
   const dispatch = useAppDispatch()
   const theme = useTheme()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [ searchParams ] = useSearchParams()
+  const tabsQuery = searchParams.get("tabs")
 
   const handleRemoveTab = (workflowId: number | string | null) => () => {
     if (workflowId === null) return
-    workflowId === value && handleChange("progress")(null)
-    dispatch(deleteTab(workflowId))
+
+    const tabsArray = tabsQuery ? tabsQuery.split(',').filter(tabId => tabId !== workflowId) : []
+    const newTabsQuery = tabsArray.join(",")
+    const queryParams = new URLSearchParams()
+
+    if (workflowId !== value && value !== "progress") queryParams.append("workflowId", value.toString())
+
+    if(tabsArray.length > 0) queryParams.append("tabs", newTabsQuery)
+    navigate(`${location.pathname}?${queryParams.toString()}`)
   }
 
   const itemStyle = {

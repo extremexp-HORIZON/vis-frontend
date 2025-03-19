@@ -3,18 +3,20 @@ import Paper from "@mui/material/Paper"
 import { useEffect, useRef, useState } from "react"
 import Typography from "@mui/material/Typography"
 import FormControl from "@mui/material/FormControl"
-import Select, { SelectChangeEvent } from "@mui/material/Select"
+import DraggableColumns from "./draggable-columns"
+import type { SelectChangeEvent } from "@mui/material/Select"
+import Select from "@mui/material/Select"
 import MenuItem from "@mui/material/MenuItem"
-import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
+import type { RootState } from "../../store/store"
+import { useAppDispatch, useAppSelector } from "../../store/store"
 import { setProgressParallel } from "../../store/slices/progressPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
-import ReportProblemIcon from "@mui/icons-material/ReportProblem"
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 
 const ParallelCoordinatePlot = () => {
-  const { workflows, progressParallel, progressGauges } = useAppSelector(
-    (state: RootState) => state.progressPage,
-  )
+  const { workflows, progressParallel, progressWokflowsTable, progressGauges } =
+    useAppSelector((state: RootState) => state.progressPage)
   const parallelData = useRef<any[]>([])
   const foldArray = useRef<string[]>([])
   const tooltipArray = useRef<{ [key: string]: string }[]>([])
@@ -144,11 +146,19 @@ const ParallelCoordinatePlot = () => {
           </FormControl>
         </Box>
         <Box sx={{ width: "99%", px: 1 }}>
+          <DraggableColumns
+            foldArray={foldArray}
+            onOrderChange={() => {
+              dispatch(setProgressParallel({ ...progressParallel }))
+            }}
+          />
           {progressParallel.options.length > 0 ? (
             <ParallelCoordinateVega
               parallelData={parallelData}
               progressParallel={progressParallel}
               foldArray={foldArray}
+              // map from progressWorkflowsTable.selectedWorkflows id (because it is rows ids) to actual workflowId
+              selectedWorkflows={progressWokflowsTable.selectedWorkflows}
             ></ParallelCoordinateVega>
           ) : (
             <Box
@@ -162,7 +172,7 @@ const ParallelCoordinatePlot = () => {
                 columnGap: 1,
               }}
             >
-              <ReportProblemIcon
+              <ReportProblemRoundedIcon
                 sx={{ color: theme => theme.palette.customGrey.dark }}
               />
               <Typography

@@ -1,32 +1,62 @@
-import { ViewListener, Vega } from "react-vega"
+import type { ViewListener } from "react-vega";
+import { Vega } from "react-vega"
 import { scheme } from "vega"
 import vegaTooltip from "vega-tooltip"
-import { Axis, Item, Scale } from "vega-typings/types"
+import type { Axis, Item, Scale } from "vega-typings/types"
+import type { View } from "vega"
+import { useEffect, useState } from "react"
 
 interface ParallelCoordinateVegaProps {
   parallelData: React.MutableRefObject<any[]>
   progressParallel: { selected: string }
   foldArray: React.MutableRefObject<string[]>
+  selectedWorkflows: number[]
+}
+
+function setValuesIfSelectedAndDefault(
+  filteredOutValue: number,
+  defaultValue: number,
+) {
+  return [
+    {
+      test: "anySelected && parent.selected === false",
+      value: filteredOutValue,
+    },
+    {
+      value: defaultValue,
+    },
+  ]
 }
 
 const ParallelCoordinateVega = ({
   parallelData,
   progressParallel,
   foldArray,
+  selectedWorkflows,
 }: ParallelCoordinateVegaProps) => {
-  const processedData = parallelData.current.map(item => {
-    const newItem = { ...item }
-    for (const key in newItem) {
-      if (Array.isArray(newItem[key])) {
-        newItem[key] = newItem[key].join(",") // Convert array to a comma-separated string
-      }
-    }
-    return newItem
-  })
+  const [processedData, setProcessedData] = useState<any>([])
 
-  const handleNewView: ViewListener = (view: any) => {
+  // Add new selected property to each item in the parallelData based on the selectedWorkflows array
+  useEffect(() => {
+    const updatedData = parallelData.current.map((item, index) => {
+      const newItem = { ...item }
+
+      for (const key in newItem) {
+        if (Array.isArray(newItem[key])) {
+          newItem[key] = newItem[key].join(",")
+        }
+      }
+
+      newItem.selected = selectedWorkflows.includes(index + 1) ? true : false
+      return newItem
+    })
+
+    setProcessedData(updatedData)
+  }, [selectedWorkflows, parallelData])
+
+  const handleNewView: ViewListener = (view: View) => {
     if (!view) return
-    // Create tooltip handler with more precise positioning options
+
     const tooltipHandler = vegaTooltip(view, {
       formatTooltip: datum => {
         const table = document.createElement("table")
@@ -50,11 +80,20 @@ const ParallelCoordinateVega = ({
         tooltipHandler.call(view, event, {} as Item, hover)
         isTooltipVisible = true
       } else if (isTooltipVisible) {
-        // To hide tooltip, simulate an empty/null value
-        tooltipHandler.call(view, new MouseEvent("mousemove"), {} as Item, null)
-        isTooltipVisible = false
+        hideTooltip()
       }
     })
+    window.addEventListener("scroll", () => {
+      if (isTooltipVisible) {
+        hideTooltip()
+      }
+    })
+
+    function hideTooltip() {
+      // To hide tooltip, simulate an empty/null value
+      tooltipHandler.call(view, new MouseEvent("mousemove"), {} as Item, null)
+      isTooltipVisible = false
+    }
   }
 
   const columnNames = [...foldArray.current, progressParallel.selected]
@@ -108,13 +147,14 @@ const ParallelCoordinateVega = ({
       padding: 0.3,
     })
   }
-  // Generate axes
+
   const generatedAxes: Axis[] = []
   for (const columnName of columnNames) {
     generatedAxes.push({
       orient: "left",
       scale: columnName,
-      title: columnName,
+      // only show the last column, other columns are shown as draggable objects
+      title: columnName === progressParallel.selected ? columnName : "",
       offset: { scale: "ord", value: columnName, mult: -1 },
     })
   }
@@ -160,12 +200,17 @@ const ParallelCoordinateVega = ({
         ],
         signals: [
           {
+            name: "anySelected",
+            value: selectedWorkflows.length > 0,
+          },
+          {
             name: "hover",
             value: null,
             on: [
               {
                 events: "@oneDataLine:mouseover",
-                update: "group().datum", // send data from the group object, not only line
+                update:
+                  "anySelected && group().datum.selected ? group().datum : null", // if any lines are filtered, then send data if that out is selected
               },
               { events: "@oneDataLine:mouseout", update: "null" },
             ],
@@ -206,14 +251,24 @@ const ParallelCoordinateVega = ({
                   },
                   update: {
                     strokeWidth: { value: 2 },
-                    zindex: { value: 1 },
-                    strokeOpacity: { value: 0.5 },
+                    zindex: setValuesIfSelectedAndDefault(2, 1),
+                    strokeOpacity: setValuesIfSelectedAndDefault(0.1, 0.9),
+                    stroke: [
+                      {
+                        test: "anySelected && parent.selected === false", // if any line is selected and this line is not selected then grey it out
+                        value: "grey",
+                      },
+                      {
+                        scale: "selectedLastColumnColorScale",
+                        field: { parent: progressParallel.selected },
+                      },
+                    ],
                   },
                   hover: {
-                    strokeWidth: { value: 5 },
+                    strokeWidth: setValuesIfSelectedAndDefault(2, 5),
                     cursor: { value: "pointer" },
-                    strokeOpacity: { value: 1 },
-                    zindex: { value: 2 },
+                    strokeOpacity: setValuesIfSelectedAndDefault(0.1, 1),
+                    zindex: setValuesIfSelectedAndDefault(1, 2),
                   },
                 },
               },

@@ -13,7 +13,7 @@ import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 import { MetricDetail } from "../../../../shared/models/workflow.model"
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 const TopWorkflowMetric = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -32,7 +32,7 @@ const TopWorkflowMetric = () => {
   const [metric, setMetric] = useState(metrics[0] || "loss")
 
   const metricAvailability = (metrics: MetricDetail[], metricName: string) => {
-    return metrics.some(metric => metric.name.toLowerCase() === metricName.toLowerCase())
+    return metrics.some(metric => metric.name === metricName)
   }
 
   const getTopTenWorkflowsByMetric = (metric: string) => {
@@ -131,7 +131,7 @@ const TopWorkflowMetric = () => {
           flexDirection: "column"
         }}
         >
-          <ReportProblemIcon fontSize="large" />
+          <ReportProblemRoundedIcon fontSize="large" />
           <Typography>{"No Metric Data"}</Typography>
         </Box>
       )}

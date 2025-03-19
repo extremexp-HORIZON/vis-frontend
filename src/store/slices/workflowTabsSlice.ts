@@ -51,6 +51,9 @@ export const workflowTabsSlice = createSlice({
     deleteTab: (state, action) => {
       state.tabs = state.tabs.filter(tab => tab.workflowId !== action.payload)
     },
+    initTabs: (state, action) => {
+      state.tabs = addInitialTabs(action.payload)
+    }
     // ...additionalReducers
   },
   extraReducers: builder => {
@@ -220,8 +223,32 @@ const initializeCompareCompleteTab = () => {
   return tab
 }
 
+const addInitialTabs = ({
+  tabs,
+  workflows,
+}: {
+  tabs: string | null
+  workflows: {
+    data: IWorkflowResponse[]
+    loading: boolean
+    error: string | null
+  },
+}) => {
+  const tabsArray = tabs ? tabs.split(',') : []
+  const uniqueTabs = [...(tabsArray || [])].filter((tab, index, self) => self.indexOf(tab) === index).
+    filter(newTab => workflows.data.find(workflow => workflow.workflowId ===  newTab) || newTab === "compare-completed")
+  
+    const newTabs : IWorkflowTabModel[] = uniqueTabs.map(
+    tabName => {
+      if (tabName === "compare-completed") return initializeCompareCompleteTab()
+      return initializeTab({ workflowId: tabName, workflows})
+    }
+  )
+  return newTabs
+}
+
 //Reducer exports
-export const { addTab, deleteTab, addCompareCompletedTab, setTabsOrder, updateTabs } =
+export const { addTab, deleteTab, addCompareCompletedTab, setTabsOrder, updateTabs, initTabs } =
   workflowTabsSlice.actions
 
 export default workflowTabsSlice.reducer

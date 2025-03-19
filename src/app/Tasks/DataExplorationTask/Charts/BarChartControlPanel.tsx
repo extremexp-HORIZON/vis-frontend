@@ -94,17 +94,10 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
   const open = Boolean(anchorEl)
   return (
     <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          padding: "1rem",
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-        }}
-      >
-        <Box sx={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+   
+    <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem",flexDirection: "column" }}>
           {/* Group By Selection */}
-          <FormControl sx={{ width: "300px" }}>
+      <FormControl fullWidth>
             <InputLabel>Category</InputLabel>
             <Select
               label="Category"
@@ -142,7 +135,7 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
           </FormControl>
 
           {/* Value Selection */}
-          <FormControl sx={{ width: "300px" }}>
+          <FormControl fullWidth>
             <InputLabel>Value</InputLabel>
             <Select
               label="Value"
@@ -164,7 +157,7 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
 
           {/* Aggregation Selection */}
           {selectedColumn && (
-            <FormControl sx={{ width: "300px" }}>
+            <FormControl fullWidth>
               <InputLabel>Aggregations</InputLabel>
               <Select
                 label="Aggregations"
@@ -202,7 +195,6 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
             </FormControl>
           )}
         </Box>
-      </Box>
     </ThemeProvider>
   )
 }
