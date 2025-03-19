@@ -16,6 +16,7 @@ export interface Task {
     name: string;
     source_code: string;
     input_datasets?: InputDataset[];
+    output_datasets?: InputDataset[];
     parameters?: Parameter[];
     variant?: string;
     metadata?: Metadata;

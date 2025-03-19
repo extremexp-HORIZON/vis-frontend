@@ -34,6 +34,7 @@ const RuntimeDecomposition = (props: IRuntimeDecomposition) => {
         task: task.name.replace(' ', '_'),
         start: new Date(task.start).getTime(),
         end: new Date(task.end).getTime(),
+        duration: (new Date(task.end).getTime() - new Date(task.start).getTime()) / 1000, // duration in seconds
       }));
       setSpecData(data)
     }
@@ -91,19 +92,27 @@ const RuntimeDecomposition = (props: IRuntimeDecomposition) => {
                     field: "task",
                     type: "nominal",
                     axis: {
-                      title: "task",
+                      title: "Task",
                       titleFontWeight: "bold",
                     },
                   },
                   x: {
-                    field: "start",
-                    type: "temporal",
-                    scale: { nice: false },
+                    field: "duration",
+                    type: "quantitative",
+                    axis: {
+                      title: "Duration (seconds)",
+                      titleFontWeight: "bold",
+                    },
                   },
-                  x2: { field: "end",type:"temporal" },
                   color: {
                     value: "#4682b4",
                   },
+                  tooltip: [
+                    { field: "task", type: "nominal", title: "Task:" },
+                    { field: "start", type: "temporal", title: "Start Time:" },
+                    { field: "end", type: "temporal", title: "End Time:" },
+                    { field: "duration", type: "quantitative", title: "Duration:" },
+                  ],
                 },
               }}
             />

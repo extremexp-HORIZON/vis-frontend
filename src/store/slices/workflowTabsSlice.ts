@@ -82,7 +82,7 @@ const workflowMetricsInitializer = ({
     .filter(workflow => workflow.status === "completed")
     .reduce<
       MetricDetail[]
-    >((acc, workflow) => [...acc, ...workflow.metrics], [])
+    >((acc, workflow) => workflow.metrics ? [...acc, ...workflow.metrics] : [...acc], [])
 
   return metrics.map(metric => {
     const filteredMetricsAll = finishedWorkflowsMetrics.filter(
@@ -156,7 +156,7 @@ const updateActiveTabs = ({
       workflowMetrics: {
         ...tab.workflowMetrics,
         data: workflowMetricsInitializer({
-          metrics: workflow.metrics,
+          metrics: workflow.metrics || null,
           workflows,
         }),
       },

@@ -14,7 +14,10 @@ import { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { useAppDispatch } from "../../../../store/store"
 import { AsyncThunk } from "@reduxjs/toolkit"
 import red from "@mui/material/colors/red"
-import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
+import {
+  explainabilityQueryDefault,
+  fetchExplainabilityPlotPayloadDefault,
+} from "../../../../shared/models/tasks/explainability.model"
 
 interface ILineplot {
   plotModel: {
@@ -25,10 +28,17 @@ interface ILineplot {
   options: string[] | null
   fetchFunction: AsyncThunk<any, any, any>
   workflowId: string | number
+  plotRequestMetadata: {
+    model: string[]
+    data: string
+    train_index: string[]
+    test_index: string[]
+    target_column: string
+  } | any
 }
 
 const LinePlot = (props: ILineplot) => {
-  const { plotModel, options, fetchFunction, workflowId } = props
+  const { plotModel, options, fetchFunction, workflowId, plotRequestMetadata } = props
   const dispatch = useAppDispatch()
   const theme = useTheme()
   const [selectedFeature, setSelectedFeature] = useState<string>("")
@@ -53,15 +63,21 @@ const LinePlot = (props: ILineplot) => {
 
   const handleFeatureSelection =
     (plmodel: IPlotModel | null) => (e: { target: { value: string } }) => {
+      console.log(plmodel)
       dispatch(
         fetchFunction({
-            ...fetchExplainabilityPlotPayloadDefault,
-            explanationType: plmodel?.explainabilityType || "",
-            explanationMethod: plmodel?.explanationMethod || "",
-            model: plmodel?.explainabilityModel || "",
+          query: {
+            ...explainabilityQueryDefault,
+            explanation_type: plmodel?.explainabilityType || "",
+            explanation_method: plmodel?.explanationMethod || "",
             feature1: e.target.value || "",
             feature2: plmodel?.features.feature2 || "",
-            modelId: workflowId,
+            ...plotRequestMetadata
+          },
+          metadata: {
+            workflowId: workflowId,
+            queryCase: plmodel?.explanationMethod,
+          },
         }),
       )
       setSelectedFeature(e.target.value)
@@ -96,22 +112,35 @@ const LinePlot = (props: ILineplot) => {
         <Box sx={{ flex: 1 }} />
         <Box sx={{ position: "relative" }}>
           <Tooltip
-            title={plotModel?.data?.plotDescr || (plotModel && !plotModel.error ? "Description not available" : plotModel?.error)}
+            title={
+              plotModel?.data?.plotDescr ||
+              (plotModel && !plotModel.error
+                ? "Description not available"
+                : plotModel?.error)
+            }
           >
-            <InfoIcon sx={{ padding: 1, zIndex: 100, color: plotModel && !plotModel.error ? grey[600] : red[800] }} />
-          </Tooltip>
-          {plotModel && ((plotModel.loading || !plotModel.data) && !plotModel.error) && (
-            <CircularProgress
-              size={28}
+            <InfoIcon
               sx={{
-                // color: green[500],
-                position: "absolute",
-                top: 6,
-                left: 6,
-                zIndex: 0,
+                padding: 1,
+                zIndex: 100,
+                color: plotModel && !plotModel.error ? grey[600] : red[800],
               }}
             />
-          )}
+          </Tooltip>
+          {plotModel &&
+            (plotModel.loading || !plotModel.data) &&
+            !plotModel.error && (
+              <CircularProgress
+                size={28}
+                sx={{
+                  // color: green[500],
+                  position: "absolute",
+                  top: 6,
+                  left: 6,
+                  zIndex: 0,
+                }}
+              />
+            )}
         </Box>
       </Box>
       <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
