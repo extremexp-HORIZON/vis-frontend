@@ -2,18 +2,14 @@ import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store";
-import Rating from "@mui/material/Rating";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Tabs, Tab, Card, CircularProgress, IconButton } from "@mui/material";
+import { Tabs, Tab, Card } from "@mui/material";
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent";
-import PauseIcon from "@mui/icons-material/Pause";
-import StopIcon from "@mui/icons-material/Stop";
 import { initTabs } from "../../../store/slices/workflowTabsSlice";
 
 const WorkflowTab = () => {
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs);
-  const { workflows, progressBar } = useAppSelector(
+  const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage
   );
   const navigate = useNavigate();
@@ -33,66 +29,13 @@ const WorkflowTab = () => {
       {/* Sticky Header with Tabs */}
       <Box
         sx={{
-         width: "100%",
-         borderColor: theme => theme.palette.customGrey.main,
-         borderBottomWidth: 2,
-         borderBottomStyle: "solid",
+          borderColor: theme => theme.palette.customGrey.main,
+          borderBottomWidth: 2,
+          borderBottomStyle: "solid",
+          width: "100%",
+          px: 2
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <ArrowBackIcon
-              fontSize="large"
-              sx={{ fontSize: 48, cursor: "pointer", color: "black" }}
-              onClick={() => navigate(-1)}
-            />
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {`Workflow ${workflowId}`}
-            </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
-            <Rating name="simple-uncontrolled" size="large" defaultValue={2} />
-          </Box>
-
-          <Box sx={{ display: "flex", alignItems: "center", }}>
-            <Box sx={{ position: "relative", display: "inline-flex" }}>
-              <CircularProgress
-                variant="determinate"
-                value={progressBar.progress}
-                size={50}
-                thickness={5}
-                sx={{ color: (theme) => theme.palette.primary.main }}
-              />
-              <Box
-                sx={{
-                  position: "absolute",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: "bold",
-                  fontSize: "1rem",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                {`${Math.round(progressBar.progress)}%`}
-              </Box>
-            </Box>
-            <IconButton onClick={() => console.log("Paused")} color="primary">
-              <PauseIcon fontSize="large" />
-            </IconButton>
-            <IconButton onClick={() => console.log("Stopped")} color="primary">
-              <StopIcon fontSize="large" />
-            </IconButton>
-          </Box>
-        </Box>
-
         <Tabs
           value={selectedTabs}
           onChange={(event, newValue) => setSelectedTabs(newValue)}
@@ -107,7 +50,7 @@ const WorkflowTab = () => {
       </Box>
 
       {/* Tab Content */}
-      <Box sx={{overflow: "auto"}}>
+      <Box sx={{overflow: "auto", px: 2}}>
         {selectedTabs === 0 && (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
             {workflows.data

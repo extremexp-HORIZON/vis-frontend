@@ -23,10 +23,9 @@ const CompareCompleted = () => {
   
   return (
     <>
-      <ExperimentControls />
       <Box
         key="compare-completed"
-        sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3, height: "90%", overflow: "auto" }}
+        sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3, height: "100%", overflow: "auto", px: 2 }}
       >
         <Box key="compare-completed-svg">
           <CompareCompletedSvg

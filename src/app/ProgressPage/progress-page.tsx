@@ -12,6 +12,8 @@ import {
 import ProgressPageLoading from "./progress-page-loading"
 import { updateTabs } from "../../store/slices/workflowTabsSlice"
 import LeftMenu from "./left-menu"
+import ExperimentControls from "./experiment-controls"
+import { useState } from "react"
 
 interface ProgressPageProps {
   children?: ReactNode;
@@ -32,6 +34,7 @@ const ProgressPage = (props: ProgressPageProps) => {
   const { children } = props
   const location = useLocation()
   const navigate = useNavigate()
+  const [collapsed, setCollapsed] = useState<boolean>(false)
 
   useEffect(() => {
     const pathParts = location.pathname.split("/").filter(Boolean);
@@ -99,48 +102,45 @@ const ProgressPage = (props: ProgressPageProps) => {
       {!initialization ? (
         <ProgressPageLoading />
       ) : (
-        <Grid
-          container
-          spacing={0.5}
+        <Box
+          sx={{height: "100vh", width:"100vw"}}
+        >
+        <Box sx={{ height: {xs:"15%", xl:"10%"}, width: "100vw"}}>
+          <ExperimentControls />
+        </Box>
+        <Box
           sx={{
-            height: "100vh",
+            height: {xs:"85%", xl:"90%"},
+            width: "100vw",
           }}
         >
-          <Grid
-            item
-            xs={2}
-            sx = {{
-              position: "fixed",
-              width: "16.6667%",
-              height: "100%",
-            }}
-          >
-            <LeftMenu />
-          </Grid>
-          <Grid
-            item
-            xs={10}
-            sx={{
-              flexDirection: "column",
-              display: "flex",
-              height:"100%",
-              marginLeft: "16.6667%"
-            }}
-          >
+            <Box
+              sx={{
+                position: "fixed",
+                left: 0,
+                width: !collapsed ? "15%" : "8%",
+                height: "100%",
+                transition: "width 0.3s ease",
+              }}
+            >
+              <LeftMenu collapsed={collapsed} setCollapsed={setCollapsed} />
+            </Box>
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                mt: 2,
                 rowGap: 2,
-                height:"98%",
-                overflow: "hidden"
+                height:"100%",
+                overflow: "hidden",
+                width:  !collapsed ? "75%%" : "92%",
+                marginLeft: !collapsed ? "15%" : "8%",
+                transition: "margin-left 0.3s ease, width 0.3s ease",  
               }}
             >
               {children}
             </Box>
-          </Grid>
-        </Grid>
+        </Box>
+        </Box>
       )}  
     </>
   ) 

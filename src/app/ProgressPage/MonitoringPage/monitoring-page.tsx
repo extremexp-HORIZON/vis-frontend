@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
-import ExperimentControls from "../experiment-controls"
 
 const MonitoringPage = () => {
     const [visibleTable, setVisibleTable] = useState<string>("workflows")
@@ -27,13 +26,12 @@ const MonitoringPage = () => {
     
     return (
         <>
-            <ExperimentControls />
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
                 rowGap: 1,
-                height: "90%",
+                height: "100%",
                 overflow: "auto"
               }}
             >
