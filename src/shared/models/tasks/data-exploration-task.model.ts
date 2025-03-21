@@ -206,11 +206,17 @@ export const explainabilityExtraReducers = (
     });
 }
 
+const api = axios.create({
+  baseURL: '/api', // Let Nginx handle the proxy
+  withCredentials: true, // If authentication is needed
+});
+
+
 export const fetchDataExplorationData = createAsyncThunk(
   "workflowTasks/data_exploration/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "api/visualization/tabular"
-    return axios
+    const requestUrl = "visualization/tabular"
+    return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)
   },
@@ -219,8 +225,8 @@ export const fetchDataExplorationData = createAsyncThunk(
 export const fetchMetaData=createAsyncThunk(
   "workflowTasks/data_exploration/fetch_metadata",
   async(payload:IDataExplorationRequest)=>{
-    const requestUrl="api/visualization/metadata"
-    return axios
+    const requestUrl="visualization/metadata"
+    return api
     .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)
   }

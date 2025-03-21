@@ -1,7 +1,7 @@
 import LinearProgress from '@mui/material/LinearProgress';
-import { useAppSelector } from "../../../store/store"
+import { useAppSelector } from "../../../../store/store"
 import { Box, Typography } from '@mui/material';
-import type { RootState } from "../../../store/store"
+import type { RootState } from "../../../../store/store"
 
 export default function ProgressBar({workflowStatus, workflowId} : {workflowStatus : string, workflowId : string}) {
     const { workflows } = useAppSelector(

@@ -241,6 +241,12 @@ export const progressPageSlice = createSlice({
 const apiPath = "https://api.expvis.smartarch.cz/api"
 const apiKey = "3980f9c699c3e311f8d72bd0318038d976e5958a"
 
+const api = axios.create({
+  baseURL: '/api', // Let Nginx handle the proxy
+  withCredentials: true, // If authentication is needed
+});
+
+
 //TODO: Remove this when no longer needed
 export const fetchExperimentTesting = createAsyncThunk(
   "progressPage/fetch_experiment_testing",
@@ -248,8 +254,8 @@ export const fetchExperimentTesting = createAsyncThunk(
     const request: IDataExplorationQuery = {...defaultDataExplorationQuery, 
       datasetId: `${experimentId}/metadata/experiment.json`
     }
-    const requestUrl = `api/visualization/tabular`
-    return axios
+    const requestUrl = `visualization/tabular`
+    return api
       .post<any>(requestUrl,request)
       .then(response => JSON.parse(response.data.data).experiment)
   },
@@ -262,8 +268,8 @@ export const fetchExperimentWorkflowsTesting = createAsyncThunk(
     const {experimentId, workflowIds} = payload
     const allData = await Promise.all(
       workflowIds.map(async workflowId => {
-        const workflowRequestUrl = `api/visualization/tabular`
-        const workflowsResponse = await axios
+        const workflowRequestUrl = `visualization/tabular`
+        const workflowsResponse = api
           .post<any>(workflowRequestUrl, {
             ...defaultDataExplorationQuery,
             datasetId: `${experimentId}/metadata/${workflowId}.json`,

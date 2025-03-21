@@ -6,13 +6,13 @@ import { Close, Visibility } from "@mui/icons-material"
 import ToolBarWorkflow from "./toolbar-workflow-table"
 import FilterBar from "./filter-bar"
 import { Popover, styled } from "@mui/material"
-import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useRef, useState } from "react"
-import { setProgressScheduledTable } from "../../../store/slices/progressPageSlice"
+import { setProgressScheduledTable } from "../../../../store/slices/progressPageSlice"
 import type { GridColDef, GridRowSelectionModel, GridColumnNode } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
-import theme from "../../../mui-theme"
+import theme from "../../../../mui-theme"
 
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -478,6 +478,7 @@ export default function ScheduleTable(props: ScheduleTableProps) {
         <div style={{ height: "85%", width: "100%" }}>
           <StyledDataGrid
             disableVirtualization
+            density="compact"
             rows={progressScheduledTable.visibleRows}
             columns={columns}
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}

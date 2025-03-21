@@ -9,14 +9,12 @@ const ExperimentControls = () => {
     return (
       <Box
         sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 9999,
           width: "100%",
-          backgroundColor: "white",
           borderColor: theme => theme.palette.customGrey.main,
           borderBottomWidth: 2,
-          borderBottomStyle: "solid"
+          borderBottomStyle: "solid",
+          paddingBottom: 2,
+          height: "7%",
         }}
       >
         <Box

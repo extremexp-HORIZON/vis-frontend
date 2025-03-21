@@ -31,6 +31,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
   useEffect(() => {
     if (workflow) {
       const taskVariables = workflow.workflowTasks.explainabilityTask || null
+      console.log("here")
 
       // Create nessesary queries for the explainability plots
       const query = {hyper_configs: workflows.data.reduce((acc: {}, workflow: IWorkflowResponse) => {

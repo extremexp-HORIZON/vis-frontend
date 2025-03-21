@@ -10,16 +10,16 @@ import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import LaunchIcon from "@mui/icons-material/Launch"
-import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
-import { useAppDispatch, useAppSelector } from "../../../store/store"
-import type { RootState } from "../../../store/store"
+import { setProgressWokflowsTable } from "../../../../store/slices/progressPageSlice"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import type { RootState } from "../../../../store/store"
 import { useEffect, useState } from "react"
 import { Badge, Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
 
-import theme from "../../../mui-theme"
+import theme from "../../../../mui-theme"
 
 type CustomGridColDef = GridColDef & {
   field: string
@@ -370,6 +370,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         <div style={{ height: "85%", width: "100%" }}>
           <StyledDataGrid
             disableVirtualization
+            density="compact"
             rows={progressWokflowsTable.filteredRows}
             columns={columns}
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}

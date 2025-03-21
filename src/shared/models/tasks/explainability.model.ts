@@ -151,11 +151,17 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
     },
   }
 
+  const api = axios.create({
+    baseURL: '/api', // Let Nginx handle the proxy
+    withCredentials: true, // If authentication is needed
+  });
+  
+
 export const fetchExplainabilityPlot = createAsyncThunk(
   "workflowTabs/explainability/fetch_explainability_plot",
   async (payload: FetchExplainabilityPlotPayload) => {
-    const requestUrl = "/api/explainability"
-    return axios
+    const requestUrl = "explainability"
+    return api
       .post<any>(requestUrl, payload.query)
       .then(response => response.data)
   },

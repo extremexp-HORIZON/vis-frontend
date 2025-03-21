@@ -1,16 +1,8 @@
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
-import ParallelCoordinatePlot from "./parallel-coordinate-plot"
-import { useEffect, useState, useRef } from "react"
-import WorkflowTab from "./WorkflowTab/workflow-tab"
-import WorkflowTable from "./WorkFlowTables/workflow-table"
-import ScheduleTable from "./WorkFlowTables/schedule-table"
+import { useEffect, useRef, ReactNode } from "react"
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
-import CompareCompleted from "./CompareTab/CompareCompleted/compare-completed"
-import ProgressPageBar from "./progress-page-bar"
-import PauseIcon from "@mui/icons-material/Pause"
-import StopIcon from "@mui/icons-material/Stop"
-import { useParams, useLocation, useSearchParams, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import {
   fetchExperiment,
   fetchExperimentTesting,
@@ -18,12 +10,15 @@ import {
   fetchExperimentWorkflowsTesting,
 } from "../../store/slices/progressPageSlice"
 import ProgressPageLoading from "./progress-page-loading"
-import { updateTabs, initTabs } from "../../store/slices/workflowTabsSlice"
+import { updateTabs } from "../../store/slices/workflowTabsSlice"
 import LeftMenu from "./left-menu"
-import { IconButton } from "@mui/material"
-import ExperimentControls from "./experiment-controls"
 
-const ProgressPage = () => {
+interface ProgressPageProps {
+  children?: ReactNode;
+}
+
+
+const ProgressPage = (props: ProgressPageProps) => {
   const { experiment, workflows, initialization } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
@@ -32,16 +27,24 @@ const ProgressPage = () => {
   )
   const { experimentId } = useParams()
   const [ searchParams ] = useSearchParams()
-  const workflowId = searchParams.get("workflowId")
-  const tabsQuery = searchParams.get("tabs")
   const dispatch = useAppDispatch()
   const intervalId = useRef<NodeJS.Timeout | null>(null)
-  const navigate = useNavigate()
+  const { children } = props
   const location = useLocation()
-  const [visibleTable, setVisibleTable] = useState<string>("workflows")
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (experimentId) {
+    const pathParts = location.pathname.split("/").filter(Boolean);
+
+    if (pathParts.length === 1) {
+      navigate(`/${experimentId}/monitoring`, {replace: true});
+    }
+    if(location.pathname.includes("workflow") && !searchParams.has("workflowId")) 
+      navigate(`/${experimentId}/monitoring`, {replace: true});
+  }, [location, history]);
+
+  useEffect(() => {
+    if (experimentId && experimentId !== experiment.data?.id) {
       // TODO: Remove this if statement when no longer needed
       if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
         dispatch(fetchExperimentTesting(experimentId))
@@ -91,25 +94,6 @@ const ProgressPage = () => {
     }
   }, [workflows])
 
-  useEffect (() => {
-    if (workflows.data && workflows.data.length > 0 ) dispatch(initTabs({tab: workflowId, workflows}))
-  },[searchParams,workflows])  
-
-  const handleChange =
-  (newValue: number | string | null) => (event: React.SyntheticEvent) => {
-    if (workflowId === newValue) return
-    const queryParams = new URLSearchParams()
-
-    if (newValue !== null) queryParams.append("workflowId", newValue.toString())
-
-    navigate(`${location.pathname}?${queryParams.toString()}`)
-    window.scrollTo(0, 0)
-  }
-
-  const handleTableChange = (newTable: string) => (event: React.SyntheticEvent) => {
-    setVisibleTable(newTable)
-  }
-
   return (
     <>
       {!initialization ? (
@@ -131,7 +115,7 @@ const ProgressPage = () => {
               height: "100%",
             }}
           >
-            <LeftMenu workflowId={workflowId} />
+            <LeftMenu />
           </Grid>
           <Grid
             item
@@ -150,40 +134,10 @@ const ProgressPage = () => {
                 mt: 2,
                 rowGap: 2,
                 height:"98%",
+                overflow: "hidden"
               }}
             >
-              {!workflowId && (
-                <>
-                  <ExperimentControls />
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: 1,
-                      height: "90%"
-                    }}
-                  >
-                    <Box sx={{height: "40%", px: 2}}>
-                      <ParallelCoordinatePlot />
-                    </Box>
-                    <Box sx={{height: "60%", minHeight: "350px", px: 2}}>
-                      {visibleTable === "workflows" ? 
-                        <WorkflowTable visibleTable={visibleTable} handleChange={handleChange} handleTableChange={handleTableChange} /> :  
-                        <ScheduleTable visibleTable={visibleTable} handleTableChange={handleTableChange}/>
-                      }
-                    </Box>
-                  </Box>
-                </>
-              )}
-              {workflowId && workflowId !== "compare-completed" && (
-                <WorkflowTab workflowId={workflowId} />
-              )}
-              {workflowId === "compare-completed" && (
-                <>
-                  <ExperimentControls />
-                  <CompareCompleted />
-                </>
-              )}
+              {children}
             </Box>
           </Grid>
         </Grid>

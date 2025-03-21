@@ -70,13 +70,19 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
     [data2, columnNamesFiltered2],
   )
 
+  const api = axios.create({
+    baseURL: '/api', // Let Nginx handle the proxy
+    withCredentials: true, // If authentication is needed
+  });
+  
+
   // Combined fetch function
   const fetchUmapData = async () => {
     try {
       setLoading(true)
       const [response1, response2] = await Promise.all([
-        axios.post<number[][]>("/api/umap", formattedPayload1),
-        axios.post<number[][]>("/api/umap", formattedPayload2),
+        api.post<number[][]>("umap", formattedPayload1),
+        api.post<number[][]>("umap", formattedPayload2),
       ])
       setUmapResults({ umap1: response1.data, umap2: response2.data })
     } catch (err) {

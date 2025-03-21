@@ -24,6 +24,12 @@ const initialState: IExploration = {
 // Define the API path
 const apiPath = 'api/';
 
+const api = axios.create({
+  baseURL: '/api', // Let Nginx handle the proxy
+  withCredentials: true, // If authentication is needed
+});
+
+
 const handleMultiTimeSeriesData = (payload : any) => {
     const fileData = JSON.parse(payload.data);
     const seriesData = payload.fileNames;
@@ -44,15 +50,15 @@ const handleMultiTimeSeriesData = (payload : any) => {
 export const fetchDataExploration = createAsyncThunk(
     'dataExploration/fetchData',
     async (payload: IDataExplorationRequest) => {
-        const requestUrl = `${apiPath}visualization/data`;
-        return axios.post<any>(requestUrl, payload).then((response) => response.data);
+        const requestUrl = `visualization/data`;
+        return api.post<any>(requestUrl, payload).then((response) => response.data);
     }
 );
 
 export const fetchMultipleTimeseries = createAsyncThunk('dataExploration/fetch_multiple_timeseries',
     async (payload: {dataQuery: IDataExplorationRequest} ) => {
-      const requestUrl = apiPath + "visualization/data";
-      return axios.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
+      const requestUrl = "visualization/data";
+      return api.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
   });
   
 

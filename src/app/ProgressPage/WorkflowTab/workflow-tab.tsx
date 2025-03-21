@@ -1,41 +1,43 @@
 import Box from "@mui/material/Box";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
-import { RootState, useAppSelector } from "../../../store/store";
+import { RootState, useAppDispatch, useAppSelector } from "../../../store/store";
 import Rating from "@mui/material/Rating";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Tabs, Tab, Card, CircularProgress, IconButton } from "@mui/material";
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent";
 import PauseIcon from "@mui/icons-material/Pause";
 import StopIcon from "@mui/icons-material/Stop";
+import { initTabs } from "../../../store/slices/workflowTabsSlice";
 
-interface IWorkflowTab {
-  workflowId: number | string;
-}
-
-const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
+const WorkflowTab = () => {
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs);
   const { workflows, progressBar } = useAppSelector(
     (state: RootState) => state.progressPage
   );
   const navigate = useNavigate();
   const [selectedTabs, setSelectedTabs] = useState(0);
+  const [ searchParams ] = useSearchParams()
+  const workflowId = searchParams.get("workflowId")
+  const dispatch = useAppDispatch()
+  const { experimentId } = useParams()
+ 
+  useEffect (() => {
+    if (!workflows.data.find(workflow => workflow.workflowId === workflowId)) navigate(`/${experimentId}/monitoring`)
+    else dispatch(initTabs({tab: workflowId, workflows}))
+  },[searchParams,workflows])
 
   return (
     <>
       {/* Sticky Header with Tabs */}
       <Box
-               sx={{
-                position: "sticky",
-                top: 0,
-                zIndex: 9999,
-                width: "100%",
-                backgroundColor: "white",
-                borderColor: theme => theme.palette.customGrey.main,
-                borderBottomWidth: 2,
-                borderBottomStyle: "solid"
-              }}
+        sx={{
+         width: "100%",
+         borderColor: theme => theme.palette.customGrey.main,
+         borderBottomWidth: 2,
+         borderBottomStyle: "solid",
+        }}
       >
         <Box
           sx={{
@@ -51,7 +53,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
               sx={{ fontSize: 48, cursor: "pointer", color: "black" }}
               onClick={() => navigate(-1)}
             />
-            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               {`Workflow ${workflowId}`}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
@@ -105,7 +107,7 @@ const WorkflowTab = ({ workflowId }: IWorkflowTab) => {
       </Box>
 
       {/* Tab Content */}
-      <Box>
+      <Box sx={{overflow: "auto"}}>
         {selectedTabs === 0 && (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
             {workflows.data

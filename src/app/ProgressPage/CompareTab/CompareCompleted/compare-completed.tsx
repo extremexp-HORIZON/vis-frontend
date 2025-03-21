@@ -5,19 +5,28 @@ import { Grid, Typography } from "@mui/material"
 import VariabilityPointCharts from "./variability-point-charts"
 import VariabilityPointHeatmap from "./variability-point-heatmap"
 import CompareCompletedSvg from "./compare-completed-svg"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ExplainabilityTaskCompare from "../Tasks/ExplainabilityTask/explainability-task-compare"
-import { RootState, useAppSelector } from "../../../../store/store"
-import { explainabilityDefault } from "../../../../shared/models/tasks/explainability.model"
+import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
+import ExperimentControls from "../../experiment-controls"
+import { initTabs } from "../../../../store/slices/workflowTabsSlice"
 
 const CompareCompleted = () => {
   const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const [chosenTask, setChosenTask] = useState<string | null>(null)
+  const dispatch = useAppDispatch()
+
+    useEffect (() => {
+      dispatch(initTabs({tab: "compare-completed", workflows}))
+    },[workflows])
+  
   return (
     <>
+      <ExperimentControls />
       <Box
         key="compare-completed"
-        sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3 }}
+        sx={{ display: "flex", flexDirection: "column", rowGap: 2, mb: 3, height: "90%", overflow: "auto" }}
       >
         <Box key="compare-completed-svg">
           <CompareCompletedSvg

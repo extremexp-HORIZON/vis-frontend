@@ -7,9 +7,9 @@ import DraggableColumns from "./draggable-columns"
 import type { SelectChangeEvent } from "@mui/material/Select"
 import Select from "@mui/material/Select"
 import MenuItem from "@mui/material/MenuItem"
-import type { RootState } from "../../store/store"
-import { useAppDispatch, useAppSelector } from "../../store/store"
-import { setProgressParallel } from "../../store/slices/progressPageSlice"
+import type { RootState } from "../../../../store/store"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import { setProgressParallel } from "../../../../store/slices/progressPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
@@ -148,7 +148,7 @@ const ParallelCoordinatePlot = () => {
             </FormControl>
           </Box>
         </Box>
-        <Box sx={{ width: "99%", px: 1 }}>
+        <Box sx={{ width: "99%", px: 1, position: "relative" }}>
           <DraggableColumns
             foldArray={foldArray}
             onOrderChange={() => {

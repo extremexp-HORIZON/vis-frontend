@@ -190,26 +190,31 @@ export const modelAnalysisReducers = (
     })
 }
 
+const api = axios.create({
+  baseURL: '/api', // Let Nginx handle the proxy
+  withCredentials: true, // If authentication is needed
+});
+
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_explainability_plot",
   async (payload: FetchExplainabilityPlotPayload) => {
-    const requestUrl = "/api/explainability"
-    return axios.post<any>(requestUrl, payload.query).then(response => response.data)
+    const requestUrl = "explainability"
+    return api.post<any>(requestUrl, payload.query).then(response => response.data)
   },
 )
 export const fetchAffected = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_affected",
   async (payload: fetchAffectedRequest) => {
-    const requestUrl = "/api/affected"
-    return axios.get<any>(requestUrl).then(response => response.data)
+    const requestUrl = "affected"
+    return api.get<any>(requestUrl).then(response => response.data)
   },
 )
 
 export const fetchModelAnalysisData = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "api/visualization/tabular"
-    return axios
+    const requestUrl = "visualization/tabular"
+    return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)
   }

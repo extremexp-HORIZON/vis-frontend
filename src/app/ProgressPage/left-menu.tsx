@@ -6,18 +6,12 @@ import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded'
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { useTheme, Theme } from "@mui/material/styles"
 
-const LeftMenu = (props: { workflowId: string | null}) => {
-    const { workflowId } = props
+const LeftMenu = () => {
     const { experimentId } = useParams()
     const theme: Theme = useTheme()
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"))
     const navigate = useNavigate()
     const location = useLocation()
-
-    const handleClick = (newValue: string | null) => (event: React.SyntheticEvent) => {
-      if (newValue) navigate(`${location.pathname}?workflowId=${newValue}`)
-      else navigate(`${location.pathname}`)
-    }
     
     return (
       <Paper elevation={2} sx={{height: "100%"}}>
@@ -28,6 +22,7 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                   flexDirection: "column",
                   rowGap: 2,
                   height: "98%",
+                  overflow: "hidden",
               }}
           >
             <Box
@@ -37,7 +32,11 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 2,
-                    overflow: "hidden"
+                    borderColor: theme => theme.palette.customGrey.main,
+                    borderBottomWidth: 2,
+                    borderBottomStyle: "solid",
+                    paddingBottom: 2,
+                    height: "7%"          
                 }}
             >
                 <Box
@@ -55,8 +54,7 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                   <Box
                     sx={{
                       whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      overflowX: "auto"
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: "bold" }} noWrap>
@@ -72,14 +70,14 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                         component="button"
                         sx={{
-                            bgcolor: !workflowId ? theme => theme.palette.customBlue.selected : "transparent",
+                            bgcolor: location.pathname.includes("monitoring") || location.pathname.includes("workflow") ? theme => theme.palette.customBlue.selected : "transparent",
                             border: "none",
                             cursor: "pointer",
                             borderBottom: "1px solid #ddd",
                             justifyContent: { xs: "center", md: "flex-start"},
                             "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                             }}
-                            onClick={handleClick(null)}
+                            onClick={() => navigate(`/${experimentId}/monitoring`)}
                         >
                         <ListRoundedIcon />
                       </ListItem>
@@ -88,14 +86,14 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                       component="button"
                       sx={{
-                        bgcolor: !workflowId ? theme => theme.palette.customBlue.selected : "transparent",
+                        bgcolor: location.pathname.includes("monitoring") || location.pathname.includes("workflow") ? theme => theme.palette.customBlue.selected : "transparent",
                         border: "none",
                           cursor: "pointer",
                           borderBottom: "1px solid #ddd",
                           justifyContent: { xs: "center", md: "flex-start"},
                           "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                           }}
-                          onClick={handleClick(null)}
+                          onClick={() => navigate(`/${experimentId}/monitoring`)}
                     >
                       <ListRoundedIcon sx={{mr: 1.5}} />
                       <ListItemText primary="Monitoring" />
@@ -107,14 +105,14 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                         component="button"
                         sx={{
-                          bgcolor: workflowId === "compare-completed" ? theme => theme.palette.customBlue.selected : "transparent",
+                          bgcolor: location.pathname.includes("comparative-analysis") ? theme => theme.palette.customBlue.selected : "transparent",
                           border: "none",
                             cursor: "pointer",
                             borderBottom: "1px solid #ddd",
                             justifyContent: { xs: "center", md: "flex-start"},
                             "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                             }}
-                            onClick={handleClick("compare-completed")}
+                            onClick={() => navigate(`/${experimentId}/comparative-analysis`)}
                         >
                         <CompareRoundedIcon />
                       </ListItem>
@@ -123,14 +121,14 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                       component="button"
                       sx={{
-                        bgcolor: workflowId === "compare-completed" ? theme => theme.palette.customBlue.selected : "transparent",
+                        bgcolor: location.pathname.includes("comparative-analysis") ? theme => theme.palette.customBlue.selected : "transparent",
                         border: "none",
                           cursor: "pointer",
                           borderBottom: "1px solid #ddd",
                           justifyContent: { xs: "center", md: "flex-start"},
                           "&:hover": { bgcolor: theme => theme.palette.customGrey.main }
                           }}
-                          onClick={handleClick("compare-completed")}
+                          onClick={() => navigate(`/${experimentId}/comparative-analysis`)}
                     >
                       <CompareRoundedIcon sx={{mr: 1.5}} />
                       <ListItemText primary="Comparative Analysis" />
@@ -142,7 +140,7 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                         component="button"
                         sx={{
-                          bgcolor: workflowId === "explainability" ? theme => theme.palette.customBlue.selected : "transparent",
+                          bgcolor: location.pathname.includes("explainability") ? theme => theme.palette.customBlue.selected : "transparent",
                             border: "none",
                             cursor: "pointer",
                             borderBottom: "1px solid #ddd",
@@ -157,7 +155,7 @@ const LeftMenu = (props: { workflowId: string | null}) => {
                     <ListItem
                       component="button"
                       sx={{
-                        bgcolor: workflowId === "explainability" ? theme => theme.palette.customBlue.selected : "transparent",
+                        bgcolor: location.pathname.includes("explainability") ? theme => theme.palette.customBlue.selected : "transparent",
                         border: "none",
                           cursor: "pointer",
                           borderBottom: "1px solid #ddd",
