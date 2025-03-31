@@ -32,9 +32,7 @@ const VariabilityPointHeatmap: React.FC = () => {
   const metrics = useMemo(() => {
     if (!workflows.data || workflows.data.length === 0) return []
     const allMetrics = workflows.data.flatMap(workflow =>
-      workflow.metrics ? workflow.metrics.filter(
-        m => m?.semantic_type && m.semantic_type.includes("ML"),
-      ).flatMap(metric => metric.name) : [],
+      workflow.metrics ? workflow.metrics.flatMap(metric => metric.name) : [],
     )
     return Array.from(new Set(allMetrics))
   }, [workflows.data])
@@ -43,9 +41,7 @@ const VariabilityPointHeatmap: React.FC = () => {
     ? Array.from(
         new Set(
           workflows.data.flatMap(workflow =>
-            workflow.tasks.findIndex(task => task.id === "TrainModel") !== -1
-              ? workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.map(param => param.name) || []
-              : [],
+              workflow.params?.map(param => param.name) || []
           ),
         ),
       )
@@ -59,13 +55,13 @@ const VariabilityPointHeatmap: React.FC = () => {
     return workflows.data
       .filter(
         workflow =>
-          workflow.status === "completed" && workflow.metrics,
+          workflow.status === "COMPLETED" && workflow.metrics,
       )
       .map(workflow => ({
-        x: parseFloat(workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === xVarPoint)?.value || "0")|| 0,
-        y: parseFloat(workflow.metrics?.find(m => m.name === yVarPoint)?.value || "0") || 0,
-        id: workflow.workflowId,
-        value: parseFloat(workflow.metrics?.find(m => m.name === selectedMetric)?.value || "0") || 0,
+        x: parseFloat(workflow.params?.find(param => param.name === xVarPoint)?.value || "0")|| 0,
+        y: workflow.metrics?.find(m => m.name === yVarPoint)?.value || 0,
+        id: workflow.id,
+        value: workflow.metrics?.find(m => m.name === selectedMetric)?.value || 0,
       }))
   }
 

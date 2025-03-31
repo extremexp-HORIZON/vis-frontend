@@ -12,8 +12,8 @@ import { RootState, useAppSelector } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
-import { Metric, MetricDetail } from "../../../../shared/models/workflow.model"
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import { IMetric } from "../../../../shared/models/experiment/metric.model"
 
 const MetricsDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -23,18 +23,16 @@ const MetricsDistribution = () => {
     const metricsSet = new Set<string>()
 
     workflows.data
-      .filter(workflow => workflow.status === "completed")
+      .filter(workflow => workflow.status === "COMPLETED")
       .forEach(workflow => {
-        workflow.metrics?.filter(
-          m => m?.semantic_type && m.semantic_type.includes("ML"),
-        ).forEach((item: any) => {
+        workflow.metrics.forEach((item: any) => {
           metricsSet.add(item.name)
         })
       })
     return Array.from(metricsSet)
   }, [workflows.data])
 
-  const metricAvailability = (metrics: MetricDetail[], metricName: string) => {
+  const metricAvailability = (metrics: IMetric[], metricName: string) => {
     return metrics.some(metric => metric.name === metricName)
   }
 
@@ -43,17 +41,17 @@ const MetricsDistribution = () => {
       workflow =>
         workflow.metrics &&
         metricAvailability(workflow.metrics, metric) &&
-        workflow.status === "completed",
+        workflow.status === "COMPLETED",
     )
 
     completedWorkflows.sort(
       (a, b) =>
-        (parseFloat(
-          b.metrics?.find(m => m.name === metric)?.value || "0",
-        ) || 0) -
-        (parseFloat(
-          a.metrics?.find(m => m.name === metric)?.value || "0",
-        ) || 0),
+        (
+          b.metrics?.find(m => m.name === metric)?.value
+        || 0) -
+        (
+          a.metrics?.find(m => m.name === metric)?.value
+        || 0),
     )
 
     return completedWorkflows.map(workflow => ({

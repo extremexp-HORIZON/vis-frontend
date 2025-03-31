@@ -5,7 +5,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { useAppSelector, useAppDispatch, RootState } from '../../../../store/store';
  
 interface Props {
-    workflowIds?: number[];
+    workflowIds?: string[];
 }
  
 const CompletedMetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
@@ -13,9 +13,9 @@ const CompletedMetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
         (state: RootState) => state.progressPage,
       )
     const dispatch = useAppDispatch();
-    let filteredWorkflows = workflows.data.filter(wf => wf.workflowInfo.status === "completed");
+    let filteredWorkflows = workflows.data.filter(wf => wf.status === "COMPLETED");
     if (workflowIds && workflowIds.length > 0) {
-        filteredWorkflows = filteredWorkflows.filter(wf => workflowIds.includes(wf.workflowId));
+        filteredWorkflows = filteredWorkflows.filter(wf => workflowIds.includes(wf.id));
     }
     
     const availableMetrics = ['accuracy', 'precision', 'recall', 'f1_score', 'f1_macro', 'false_negatives', 'false_positives', 'true_negatives', 'true_positives', 'runtime'];

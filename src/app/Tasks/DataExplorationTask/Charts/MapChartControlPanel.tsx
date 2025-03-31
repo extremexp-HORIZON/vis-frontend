@@ -93,7 +93,7 @@ const MapControls: React.FC<MapControlsProps> = ({
             // disabled={tripsMode}
             input={<OutlinedInput label="Latitude Field" />}
           >
-            {columnsMapDouble.map((col) => (
+            {columnsMapDouble?.map((col) => (
               <MenuItem key={col} value={col}>
                 {col}
               </MenuItem>
@@ -109,7 +109,7 @@ const MapControls: React.FC<MapControlsProps> = ({
             // disabled={tripsMode}
             input={<OutlinedInput label="Longitude Field" />}
           >
-            {columnsMapDouble.map((col) => (
+            {columnsMapDouble?.map((col) => (
               <MenuItem key={col} value={col}>
                 {col}
               </MenuItem>
@@ -125,7 +125,7 @@ const MapControls: React.FC<MapControlsProps> = ({
             input={<OutlinedInput label="Color By" />}
           >
             <MenuItem value="None">None</MenuItem>
-            {columns.map((col) => (
+            {columns?.map((col) => (
               <MenuItem key={col} value={col}>
                 {col}
               </MenuItem>
@@ -142,7 +142,7 @@ const MapControls: React.FC<MapControlsProps> = ({
             renderValue={(selected) => selected.join(", ")}
             input={<OutlinedInput label="Segment By" />}
           >
-            {columns.map((col) => (
+            {columns?.map((col) => (
               <MenuItem key={col} value={col}>
                 <Checkbox checked={selectedColumns.includes(col)} />
                 <ListItemText primary={col} />

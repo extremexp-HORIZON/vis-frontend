@@ -1,12 +1,14 @@
 import { Box } from "@mui/material"
-import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
+import { RootState, useAppSelector } from "../../../store/store"
 
 const MonitoringPage = () => {
-    const [visibleTable, setVisibleTable] = useState<string>("workflows")
+    const { visibleTable } = useAppSelector(
+      (state: RootState) => state.monitorPage
+    )
     const navigate = useNavigate()
     const { experimentId } = useParams()
 
@@ -18,10 +20,6 @@ const MonitoringPage = () => {
     
         navigate(`/${experimentId}/workflow?${queryParams.toString()}`)
         window.scrollTo(0, 0)
-      }
-    
-      const handleTableChange = (newTable: string) => (event: React.SyntheticEvent) => {
-        setVisibleTable(newTable)
       }
     
     return (
@@ -40,8 +38,8 @@ const MonitoringPage = () => {
                 </Box>
                 <Box sx={{height: "60%", minHeight: "350px", px: 2}}>
                   {visibleTable === "workflows" ? 
-                    <WorkflowTable visibleTable={visibleTable} handleChange={handleChange} handleTableChange={handleTableChange} /> :  
-                    <ScheduleTable visibleTable={visibleTable} handleTableChange={handleTableChange}/>
+                    <WorkflowTable handleChange={handleChange} /> :  
+                    <ScheduleTable />
                   }
                 </Box>
             </Box>

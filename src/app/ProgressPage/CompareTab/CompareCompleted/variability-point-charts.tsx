@@ -34,9 +34,7 @@ const VariabilityPointCharts = () => {
     ? Array.from(
         new Set(
           workflows.data.flatMap(workflow =>
-            workflow.metrics ? workflow.metrics.filter(
-              m => m?.semantic_type && m.semantic_type.includes("ML"),
-            ).flatMap(m => m.name) : [],
+            workflow.metrics ? workflow.metrics.flatMap(m => m.name) : [],
           ),
         ),
       )
@@ -46,9 +44,7 @@ const VariabilityPointCharts = () => {
     ? Array.from(
         new Set(
           workflows.data.flatMap(workflow =>
-            workflow.tasks.findIndex(task => task.id === "TrainModel") !== -1
-              ? workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.map(param => param.name) || []
-              : [],
+              workflow.params?.map(param => param.name) || []
           ),
         ),
       )
@@ -60,14 +56,14 @@ const VariabilityPointCharts = () => {
       return  workflows.data
         .filter(
           workflow =>
-            workflow.status === "completed" &&
+            workflow.status === "COMPLETED" &&
             workflow.metrics &&
-            workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === variabilityPoint),
+            workflow.params?.find(param => param.name === variabilityPoint),
         )
         .map(workflow => ({
-          x: parseFloat(workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === variabilityPoint)?.value || "0")|| 0,
-          y: workflow.metrics?.find(m => m.name === selectedMetric)?.value ? parseFloat(workflow.metrics?.find(m => m.name === selectedMetric)?.value || "0") : null,
-          id: workflow.workflowId,
+          x: parseFloat(workflow.params?.find(param => param.name === variabilityPoint)?.value || "0")|| 0,
+          y: workflow.metrics?.find(m => m.name === selectedMetric)?.value  || 0,
+          id: workflow.id,
           point: variabilityPoint,
         }),
     )
@@ -122,7 +118,7 @@ const VariabilityPointCharts = () => {
     return () => {
       window.removeEventListener("resize", handleResize)
     }
-  }, [selectedVariabilityPoint.length])
+  }, [selectedVariabilityPoint])
 
   return (
     <WorkflowCard

@@ -9,16 +9,16 @@ import { useEffect, useState } from "react"
 import ExplainabilityTaskCompare from "../Tasks/ExplainabilityTask/explainability-task-compare"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
 import ExperimentControls from "../../experiment-controls"
-import { initTabs } from "../../../../store/slices/workflowTabsSlice"
+import { initTab } from "../../../../store/slices/workflowPageSlice"
 
 const CompareCompleted = () => {
-  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs)
+  const { tab } = useAppSelector((state: RootState) => state.workflowPage)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const [chosenTask, setChosenTask] = useState<string | null>(null)
   const dispatch = useAppDispatch()
 
     useEffect (() => {
-      dispatch(initTabs({tab: "compare-completed", workflows}))
+      dispatch(initTab({tab: "compare-completed", workflows}))
     },[workflows])
   
   return (
@@ -100,10 +100,7 @@ const CompareCompleted = () => {
           </>
         ) : (
           <ExplainabilityTaskCompare
-            workflow={
-              tabs.find(tab => tab.workflowId === "compare-completed") ||
-              null
-            }
+            workflow={tab}
           />
         )}
       </Box>

@@ -1,13 +1,13 @@
 import { ActionReducerMapBuilder, createAsyncThunk } from "@reduxjs/toolkit"
 import { IPlotModel } from "../plotmodel.model"
-import { IWorkflowTab } from "../../../store/slices/workflowTabsSlice"
-import axios from "axios"
+import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
 import {
   fetchAffectedRequest,
   IDataExplorationRequest,
   IDataExplorationResponse
 } from "../dataexploration.model"
 import { FetchExplainabilityPlotPayload } from "./explainability.model"
+import { api } from "../../../app/api/api"
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
@@ -87,15 +87,13 @@ export const modelAnalysisDefault: IModelAnalysis = {
 }
 
 export const modelAnalysisReducers = (
-  builder: ActionReducerMapBuilder<IWorkflowTab>,
+  builder: ActionReducerMapBuilder<IWorkflowPage>,
 ) => {
   builder
     .addCase(
       fetchModelAnalysisExplainabilityPlot.fulfilled,
       (state, action) => {
-        const compareCompletedTask = state.tabs.find(
-          tab => tab.workflowId === `${action.meta.arg.metadata.workflowId}`,
-        )?.workflowTasks.modelAnalysis
+        const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.metadata.workflowId}` ? state.tab.workflowTasks.modelAnalysis : null
         const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
         console.log(compareCompletedTask, plotType)
         if (compareCompletedTask && plotType !== 'featureNames') {
@@ -106,9 +104,7 @@ export const modelAnalysisReducers = (
       },
     )
     .addCase(fetchModelAnalysisData.fulfilled, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-      )?.workflowTasks.modelAnalysis
+      const compareCompletedTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ? state.tab.workflowTasks.modelAnalysis : null
       const queryCase = action.meta.arg.metadata.queryCase as keyof IModelAnalysis
       if (compareCompletedTask && queryCase !== 'featureNames') {
         compareCompletedTask[queryCase].data = queryCase === "multipleTimeSeries" ? handleMultiTimeSeriesData(action.payload) : prepareDataExplorationResponse(action.payload)
@@ -117,27 +113,21 @@ export const modelAnalysisReducers = (
       }
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.pending, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === `${action.meta.arg.metadata.workflowId}`,
-      )?.workflowTasks.modelAnalysis
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.metadata.workflowId}` ? state.tab.workflowTasks.modelAnalysis : null
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
         if (compareCompletedTask && plotType !== 'featureNames') {
               compareCompletedTask[plotType].loading = true
         }
     })
     .addCase(fetchModelAnalysisData.pending, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-      )?.workflowTasks.modelAnalysis
+      const compareCompletedTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ? state.tab.workflowTasks.modelAnalysis : null
       const queryCase = action.meta.arg.metadata.queryCase as keyof IModelAnalysis
       if (compareCompletedTask && queryCase !== 'featureNames') {
         compareCompletedTask[queryCase].loading = true
       }
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.rejected, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === `${action.meta.arg.metadata.workflowId}`,
-      )?.workflowTasks.modelAnalysis
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.metadata.workflowId}` ? state.tab.workflowTasks.modelAnalysis : null
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
         if (compareCompletedTask && plotType !== 'featureNames') {
               compareCompletedTask[plotType].loading = false
@@ -145,9 +135,7 @@ export const modelAnalysisReducers = (
         }
     })
     .addCase(fetchModelAnalysisData.rejected, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-      )?.workflowTasks.modelAnalysis
+      const compareCompletedTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ? state.tab.workflowTasks.modelAnalysis : null
       const queryCase = action.meta.arg.metadata.queryCase as keyof IModelAnalysis
       if (compareCompletedTask && queryCase !== 'featureNames') {
         compareCompletedTask[queryCase].loading = false
@@ -157,9 +145,7 @@ export const modelAnalysisReducers = (
     .addCase(
       fetchAffected.fulfilled,
       (state, action) => {
-        const compareCompletedTask = state.tabs.find(
-          tab => tab.workflowId === `${action.meta.arg.workflowId}`,
-        )?.workflowTasks.modelAnalysis
+        const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.workflowId}` ? state.tab.workflowTasks.modelAnalysis : null
         const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
         console.log(compareCompletedTask, plotType)
         if (compareCompletedTask && plotType !== 'featureNames' ) {
@@ -170,18 +156,14 @@ export const modelAnalysisReducers = (
       },
     )
     .addCase(fetchAffected.pending, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === `${action.meta.arg.workflowId}`,
-      )?.workflowTasks.modelAnalysis
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.workflowId}` ? state.tab.workflowTasks.modelAnalysis : null
       const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
       if (compareCompletedTask && plotType !== 'featureNames') {
             compareCompletedTask[plotType].loading = true
       }
     })
     .addCase(fetchAffected.rejected, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === `${action.meta.arg.workflowId}`,
-      )?.workflowTasks.modelAnalysis
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.workflowId}` ? state.tab.workflowTasks.modelAnalysis : null
       const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
       if (compareCompletedTask && plotType !== 'featureNames') {
             compareCompletedTask[plotType].loading = false
@@ -189,11 +171,6 @@ export const modelAnalysisReducers = (
       }
     })
 }
-
-const api = axios.create({
-  baseURL: '/api', // Let Nginx handle the proxy
-  withCredentials: true, // If authentication is needed
-});
 
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_explainability_plot",
@@ -213,7 +190,7 @@ export const fetchAffected = createAsyncThunk(
 export const fetchModelAnalysisData = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "visualization/tabular"
+    const requestUrl = "data/tabular"
     return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)

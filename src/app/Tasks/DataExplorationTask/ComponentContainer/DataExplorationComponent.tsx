@@ -9,21 +9,21 @@ import {
 } from "../../../../shared/models/dataexploration.model" // Ensure correct path
 import GraphContainer from "./GraphContainer"
 import { useParams } from "react-router-dom"
-import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
+import { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
 import {
   fetchDataExplorationData,
   fetchMetaData,
 } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { grey } from "@mui/material/colors"
 import MultiTimeSeriesVisualization from "../multi-ts-visualization/MultiTimeSeriesVisualization"
-
+//TODO: make selectedDataset url query param in order to change datasets smoothly
 interface IDataExplorationComponent {
-  workflow: IWorkflowTabModel | null
+  workflow: IWorkflowPageModel | null
+  task: string | null
 }
 const DataExplorationComponent = (props: IDataExplorationComponent) => {
-  const { workflow } = props
+  const { workflow, task } = props
   const dispatch = useAppDispatch()
-  const {} = useAppSelector(state => state.workflowTabs)
   const [columns, setColumns] = useState<any[]>([])
   const [selectedColumns, setSelectedColumns] = useState<any>([])
   const [filters, setFilters] = useState<IFilter[]>([])
@@ -56,9 +56,10 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   // const [offset, setOffset] = useState((currentPage - 1) * pageSize)
 
   //mapcontrols
-  const [colorByMap, setColorByMap] = useState<string | null>("None") // Set initial color to 'default'
+  const [colorByMap, setColorByMap] = useState<string>("None") // Set initial color to 'default'
   const [tripsMode, setTripsMode] = useState<boolean>(false)
   const [selectedColumnsMap, setSelectedColumnsMap] = useState<string[]>([])
+  const [selectedDataset, setSelectedDataset] = useState<string>(workflow?.workflowConfiguration?.dataAssets?.[0]?.source || '')
 
   const handleFetchData = () => {
     if (
@@ -69,7 +70,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       dispatch(
         fetchDataExplorationData({
           query: {
-            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+            datasetId: selectedDataset,
             limit: 0, // Default row limit
             columns: [], // Include selected columns in the payload
             filters: [],
@@ -91,7 +92,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       dispatch(
         fetchDataExplorationData({
           query: {
-            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+            datasetId: selectedDataset,
             limit: pageSize, // Default row limit
             columns: selectedColumns, // Include selected columns in the payload
             filters: filters,
@@ -107,7 +108,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       dispatch(
         fetchDataExplorationData({
           query: {
-            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+            datasetId: selectedDataset,
             limit: 2000, // Default row limit
             columns: selectedColumns, // Include selected columns in the payload
             filters: filters,
@@ -154,7 +155,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           dispatch(
             fetchDataExplorationData({
               query: {
-                datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+                datasetId: selectedDataset,
                 limit: 10,
                 columns: [],
                 filters: [],
@@ -173,7 +174,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           dispatch(
             fetchMetaData({
               query: {
-                datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+                datasetId: selectedDataset,
                 limit: 10,
                 columns: [],
                 filters: [],
@@ -194,7 +195,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           dispatch(
             fetchDataExplorationData({
               query: {
-                datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+                datasetId: selectedDataset,
                 limit: 2000,
                 columns: [],
                 filters: [],
@@ -213,7 +214,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
           dispatch(
             fetchDataExplorationData({
               query: {
-                datasetId: "/test/newresult.csv",
+                datasetId: selectedDataset,
                 limit: 0,
                 columns: [],
                 filters: [],
@@ -230,7 +231,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
         }
       }
     }
-  }, [])
+  }, [selectedDataset])
 
   useEffect(() => {
     if (taskDependancies?.lineChart.data) {
@@ -265,7 +266,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
       dispatch(
         fetchDataExplorationData({
           query: {
-            datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+            datasetId: selectedDataset,
             limit: pageSize,
             columns: selectedColumns,
             filters: filters,
@@ -285,7 +286,7 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          datasetId: `${experimentId}/dataset/${experimentId}_dataset.csv`,
+          datasetId: selectedDataset,
           limit: 2000, // Default row limit
           columns: selectedColumns, // Include selected columns in the payload
           filters: filters,
@@ -356,14 +357,14 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             colorBy={colorBy}
             setColorBy={setColorBy}
             datamap={
-              workflow.workflowTasks.dataExploration?.mapChart.data?.data || []
+              workflow?.workflowTasks.dataExploration?.mapChart.data?.data || []
             }
             colorByMap={colorByMap}
             setColorByMap={setColorByMap}
-            columnsMap={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns
+            columnsMap={workflow?.workflowTasks.dataExploration?.mapChart.data?.originalColumns
               .filter(col => col.type === "STRING")
               .map(col => col.name)}
-            columnsMapDouble={workflow.workflowTasks.dataExploration?.mapChart.data?.originalColumns
+            columnsMapDouble={workflow?.workflowTasks.dataExploration?.mapChart.data?.originalColumns
               .filter(col => col.type === "DOUBLE")
               .map(col => col.name)}
             tripsMode={tripsMode}
@@ -375,6 +376,9 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
             lon={lon}
             setLon={setLon}
             setChartType={setChartType}
+            selectedDataset={selectedDataset}
+            setSelectedDataset={setSelectedDataset}
+            currentTask={task}
           />
 
           {/* Graph Container */}

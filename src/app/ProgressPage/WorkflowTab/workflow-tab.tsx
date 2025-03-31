@@ -5,10 +5,10 @@ import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Tabs, Tab, Card } from "@mui/material";
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent";
-import { initTabs } from "../../../store/slices/workflowTabsSlice";
+import { initTab } from "../../../store/slices/workflowPageSlice";
 
 const WorkflowTab = () => {
-  const { tabs } = useAppSelector((state: RootState) => state.workflowTabs);
+  const { tab } = useAppSelector((state: RootState) => state.workflowPage);
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage
   );
@@ -20,8 +20,8 @@ const WorkflowTab = () => {
   const { experimentId } = useParams()
  
   useEffect (() => {
-    if (!workflows.data.find(workflow => workflow.workflowId === workflowId)) navigate(`/${experimentId}/monitoring`)
-    else dispatch(initTabs({tab: workflowId, workflows}))
+    if (!workflows.data.find(workflow => workflow.id === workflowId)) navigate(`/${experimentId}/monitoring`)
+    else dispatch(initTab({tab: workflowId, workflows}))
   },[searchParams,workflows])
 
   return (
@@ -53,11 +53,9 @@ const WorkflowTab = () => {
       <Box sx={{overflow: "auto", px: 2}}>
         {selectedTabs === 0 && (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            {workflows.data
-              .find((workflow) => workflow.workflowId === workflowId)
-              ?.metrics.map((metric) => (
+            {tab?.workflowMetrics.data?.map((metric) => (
                 <Card
-                  key={metric.metricId}
+                  key={metric.name}
                   sx={{
                     flex: 1,
                     minWidth: 200,
@@ -76,7 +74,8 @@ const WorkflowTab = () => {
         )}
         {selectedTabs === 1 && (
           <DataExplorationComponent
-            workflow={tabs.find((tab) => tab.workflowId === workflowId) || null}
+            workflow={tab}
+            task={null}
           />
         )}
         {selectedTabs === 2 && <Typography>Source Code Content</Typography>}

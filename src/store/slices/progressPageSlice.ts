@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { defaultDataExplorationQuery, IDataExplorationQuery } from "../../shared/models/dataexploration.model"
+import { IExperiment } from "../../shared/models/experiment/experiment.model"
+import { IRun } from "../../shared/models/experiment/run.model"
+import { IMetric } from "../../shared/models/experiment/metric.model"
+import { experimentApi } from "../../app/api/api"
 import axios from "axios"
-import { IExperimentResponse } from "../../shared/models/experiment.model"
-import { IWorkflowResponse, MetricDetail } from "../../shared/models/workflow.model"
 
 const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
   if (!workflow.metrics) {
@@ -23,15 +24,15 @@ const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
   return ok
 }
 
-interface IWorkflowTab {
+interface IProgressPage {
   initialization: boolean
   experiment: {
-    data: IExperimentResponse["experiment"] | null
+    data: IExperiment | null
     loading: boolean
     error: string | null
   }
   workflows: {
-    data: IWorkflowResponse[]
+    data: IRun[]
     loading: boolean
     error: string | null
   }
@@ -42,86 +43,33 @@ interface IWorkflowTab {
     failed: number
     progress: number
   }
-  progressGauges: {
-    name: string
-    type: string
-    value: number
-  }[]
-  progressParallel: {
-    data: { [key: string]: any }[]
-    options: string[]
-    selected: string
-  }
-  progressWokflowsTable: {
-    order: "asc" | "desc"
-    orderBy: string
-    page: number
-    rowsPerPage: number
-    selectedWorkflows: number[]
-    filters: { column: string; operator: string; value: string }[]
-    rows: { [key: string]: any }[]
-    filteredRows: { [key: string]: any }[]
-    filtersCounter: number
-    visibleRows: { [key: string]: any }[]
-  }
-  progressScheduledTable: {
-    order: "asc" | "desc"
-    orderBy: string
-    page: number
-    rowsPerPage: number
-    selectedWorkflows: number[]
-    filters: { column: string; operator: string; value: string }[]
-    rows: { [key: string]: any }[]
-    filteredRows: { [key: string]: any }[]
-    filtersCounter: number
-    visibleRows: { [key: string]: any }[]
-  }
   statusController: {
     data: string;
     loading: boolean;
     error: string | null;
   }
+  menuOptions: {
+    selected: string | null
+    collapsed: boolean
+}
 }
 
-const initialState: IWorkflowTab = {
+const initialState: IProgressPage = {
   initialization: false,
   experiment: { data: null, loading: false, error: null },
   workflows: { data: [], loading: false, error: null },
   progressBar: { total: 0, completed: 0, running: 0, failed: 0, progress: 0 },
-  progressGauges: [],
-  progressParallel: { data: [], options: [], selected: "" },
-  progressWokflowsTable: {
-    order: "asc",
-    orderBy: "id",
-    page: 0,
-    rowsPerPage: 10,
-    selectedWorkflows: [],
-    filters: [],
-    rows: [],
-    filteredRows: [],
-    filtersCounter: 0,
-    visibleRows: [],
-  },
-  progressScheduledTable: {
-    order: "asc",
-    orderBy: "id",
-    page: 0,
-    rowsPerPage: 10,
-    selectedWorkflows: [],
-    filters: [],
-    rows: [],
-    filteredRows: [],
-    filtersCounter: 0,
-    visibleRows: [],
-  },
   statusController: {
     data: "",
     loading: false,
     error: null,
+  },
+  menuOptions: {
+    selected: null,
+    collapsed: false
   }
 }
 
-// explainabilitySlice
 export const progressPageSlice = createSlice({
   name: "ProgressPage",
   initialState,
@@ -132,24 +80,9 @@ export const progressPageSlice = createSlice({
     setIntialization: (state, action) => {
       state.initialization = action.payload
     },
-    setProgressGauges: (state, action) => {
-      state.progressGauges = action.payload
-    },
-    setProgressParallel: (state, action) => {
-      state.progressParallel = { ...state.progressParallel, ...action.payload }
-    },
-    setProgressWokflowsTable: (state, action) => {
-      state.progressWokflowsTable = {
-        ...state.progressWokflowsTable,
-        ...action.payload,
-      }
-    },
-    setProgressScheduledTable: (state, action) => {
-      state.progressScheduledTable = {
-        ...state.progressScheduledTable,
-        ...action.payload,
-      }
-    },
+    setMenuOptions: (state, action) => {
+      state.menuOptions = action.payload
+    }
   },
   extraReducers: builder => {
     builder
@@ -205,108 +138,24 @@ export const progressPageSlice = createSlice({
         state.statusController.error =
           action.error.message || "Error while fetching data"
       })
-      // TODO: Remove this when no longer needed: Hard Coded Cases for testing
-      .addCase(fetchExperimentTesting.fulfilled, (state, action) => {
-        state.experiment.data = action.payload
-        state.experiment.loading = false
-        state.experiment.error = null
-      })
-      .addCase(fetchExperimentWorkflowsTesting.fulfilled, (state, action) => {
-        state.workflows.data = action.payload
-        state.workflows.loading = false
-        state.workflows.error = null
-      })
-      .addCase(fetchExperimentWorkflowsTesting.pending, state => {
-        state.workflows.loading = true
-      })
-      .addCase(fetchExperimentTesting.pending, state => {
-        state.experiment.loading = true
-      })
-      .addCase(fetchExperimentWorkflowsTesting.rejected, (state, action) => {
-        state.workflows.loading = false
-        state.workflows.error =
-          action.error.message || "Error while fetching data"
-      })
-      .addCase(fetchExperimentTesting.rejected, (state, action) => {
-        state.experiment.loading = false
-        state.experiment.error =
-          action.error.message || "Error while fetching data"
-      })
-
   },
 })
 
 //Thunk Calls for Experiment/Workflows fetching
 
-const apiPath = "https://api.expvis.smartarch.cz/api"
-const apiKey = "3980f9c699c3e311f8d72bd0318038d976e5958a"
-
-const api = axios.create({
-  baseURL: '/api', // Let Nginx handle the proxy
-  withCredentials: true, // If authentication is needed
-});
-
-
-//TODO: Remove this when no longer needed
-export const fetchExperimentTesting = createAsyncThunk(
-  "progressPage/fetch_experiment_testing",
-  async (experimentId: string) => {
-    const request: IDataExplorationQuery = {...defaultDataExplorationQuery, 
-      datasetId: `${experimentId}/metadata/experiment.json`
-    }
-    const requestUrl = `visualization/tabular`
-    return api
-      .post<any>(requestUrl,request)
-      .then(response => JSON.parse(response.data.data).experiment)
-  },
-)
-
-//TODO: Remove this when no longer needed
-export const fetchExperimentWorkflowsTesting = createAsyncThunk(
-  "progressPage/fetch_experiment_workflows_testing",
-  async (payload: {experimentId: string, workflowIds: string[]}) => {
-    const {experimentId, workflowIds} = payload
-    const allData = await Promise.all(
-      workflowIds.map(async workflowId => {
-        const workflowRequestUrl = `visualization/tabular`
-        const workflowsResponse = api
-          .post<any>(workflowRequestUrl, {
-            ...defaultDataExplorationQuery,
-            datasetId: `${experimentId}/metadata/${workflowId}.json`,
-          })
-          .then(response => (workflowMetricsPreparation(JSON.parse(response.data.data).workflow, workflowId)))
-        return workflowsResponse
-      }),
-    )
-    return allData
-  },
-)
-
 export const fetchExperiment = createAsyncThunk(
   "progressPage/fetch_experiment",
   async (experimentId: string) => {
-    const headers = {
-      "access-token": apiKey,
-    }
-    const requestUrl = apiPath + `/experiments/${experimentId}`
-    return axios
-      .get<IExperimentResponse>(requestUrl, { headers })
-      .then(response => response.data.experiment)
-  },
-)
+      const requestUrl = `${experimentId}`
+      return experimentApi.get(requestUrl).then(response => response.data)
+})
 
 export const fetchExperimentWorkflows = createAsyncThunk(
-  "progressPage/fetch_experiment_workflows",
-  async (experimentId: string) => {
-    const headers = {
-      "access-token": apiKey,
-    }
-    const requestUrl = apiPath + `/workflows-query`
-    return axios
-      .post<IWorkflowResponse[]>(requestUrl, { experimentId }, { headers })
-      .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || "")))
-  },
-)
+    "progressPage/fetch_experiment_workflows",
+    async (experimentId: string) => {
+        const requestUrl = `${experimentId}/runs`
+        return experimentApi.get(requestUrl).then(response => response.data)
+})
 
 // Calls for Workflow Actions
 
@@ -315,56 +164,47 @@ export const workflowsReordering = createAsyncThunk(
   "progressPage/workflows_reordering",
   async (payload: { workflowId1: string; workflowId2: string, experimentId: string }) => {
     const { workflowId1, workflowId2, experimentId } = payload
-    const headers = {
-      "access-token": apiKey,
-    }
-    const requestUrl = apiPath + `/experiments-sort-workflows/${experimentId}`
+    const requestUrl = ``
     const requestPayload = {
       precedence: {
         [workflowId1]: workflowId2,
       },
     }
-    return axios
-      .post<IWorkflowResponse[]>(requestUrl, requestPayload, { headers })
+    return experimentApi
+      .post<IRun[]>(requestUrl, requestPayload)
       .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || "")))    
   }
 )
 
-// TODO: Test this once the table changes are done
+// TODO: create this once state changes done
 export const stateController = createAsyncThunk(
   "progressPage/state_controller",
   async (payload: {state: string, id: string, action: string}) => {
     const {state, id, action} = payload
-    const apiPath = `/exp/${state}/${action}/${id}`
+    const requestUrl = `/exp/${state}/${action}/${id}`
     return axios
-      .get(apiPath)
+      .get(requestUrl)
       .then(response => response.data)
   },
 )
 
 // TODO: Test this once the table changes are done
-export const workflowRating = (payload: {metric: MetricDetail, newValue: string}) => {
+export const workflowRating = (payload: {metric: IMetric, newValue: number}) => {
     const {metric, newValue} = payload
-    const headers = {
-      "access-token": apiKey,
-    }
-    const requestUrl = apiPath + `/metrics/metricId`
-    const requestPayload: Partial<MetricDetail> = {
+    const requestUrl = `/metrics/metricId`
+    const requestPayload: Partial<IMetric> = {
       ...metric,
       value: newValue,
     }
-    delete requestPayload.metricId
-    return axios.post<IWorkflowResponse[]>(requestUrl, requestPayload, { headers })
+    delete requestPayload.name
+    return axios.post<IRun[]>(requestUrl, requestPayload)
   }
 
 //Reducer exports
 export const {
   setProgressBarData,
-  setProgressGauges,
-  setProgressParallel,
-  setProgressWokflowsTable,
-  setProgressScheduledTable,
-  setIntialization
+  setIntialization,
+  setMenuOptions
 } = progressPageSlice.actions
 
 export default progressPageSlice.reducer

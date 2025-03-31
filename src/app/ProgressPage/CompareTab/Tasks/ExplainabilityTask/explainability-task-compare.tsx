@@ -15,11 +15,11 @@ import {
   fetchExplainabilityPlotPayloadDefault,
 } from "../../../../../shared/models/tasks/explainability.model"
 import { useParams } from "react-router-dom"
-import { IWorkflowTabModel } from "../../../../../shared/models/workflow.tab.model"
-import { IWorkflowResponse } from "../../../../../shared/models/workflow.model"
+import { IWorkflowPageModel } from "../../../../../shared/models/workflow.tab.model"
+import { IRun } from "../../../../../shared/models/experiment/run.model"
 
 interface IExplainabilityTaskCompare {
-  workflow: IWorkflowTabModel | null
+  workflow: IWorkflowPageModel | null
 }
 
 const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
@@ -34,17 +34,17 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
       console.log("here")
 
       // Create nessesary queries for the explainability plots
-      const query = {hyper_configs: workflows.data.reduce((acc: {}, workflow: IWorkflowResponse) => {
-        const savedModelDataset = workflow.tasks.flatMap(task => [
-          ...(task.input_datasets || []),
-          ...(task.output_datasets || []),
+      const query = {hyper_configs: workflows.data.reduce((acc: {}, workflow: IRun) => {
+        const savedModelDataset = workflow.tasks?.flatMap(task => [
+          ...(workflow.dataAssets?.map(asset => asset.role === "INPUT" && asset.task === task.name) || []),
+          ...(workflow.dataAssets?.map(asset => asset.role === "OUTPUT" && asset.task === task.name) || []),
         ]).find(dataset => dataset.name === "saved_model")
 
-        const workflowSavedModelParameters = workflow.tasks.flatMap(task => task.parameters || []).reduce((ac, param) => ({
+        const workflowSavedModelParameters = workflow.params?.reduce((ac, param) => ({
           ...ac,
           [param.name]: {
         values: param.value,
-        type: param.type === "integer" ? "numeric" : "categorical",
+        // type: param.type === "integer" ? "numeric" : "categorical",
           },
         }), {})
         //TODO: This should be an option for the user

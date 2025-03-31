@@ -1,9 +1,7 @@
 import { ActionReducerMapBuilder, createAsyncThunk } from "@reduxjs/toolkit"
 import { IPlotModel } from "../plotmodel.model"
-import { IWorkflowTab } from "../../../store/slices/workflowTabsSlice"
-import axios from "axios"
-import { I } from "vitest/dist/reporters-yx5ZTtEV.js"
-
+import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
+import { api } from "../../../app/api/api"
 export interface IExplainability {
   "2dpdp": {
     data: IPlotModel | null
@@ -55,13 +53,11 @@ export const explainabilityDefault: IExplainability = {
 }
 
 export const explainabilityReducers = (
-  builder: ActionReducerMapBuilder<IWorkflowTab>,
+  builder: ActionReducerMapBuilder<IWorkflowPage>,
 ) => {
   builder
     .addCase(fetchExplainabilityPlot.fulfilled, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === "compare-completed",
-      )?.workflowTasks.explainabilityTask
+      const compareCompletedTask = state.tab?.workflowId === "compare-completed" ? state.tab.workflowTasks.explainabilityTask : null
       const plotType = action.meta.arg.metadata
         .queryCase as keyof IExplainability
       if (compareCompletedTask && plotType !== "hyperparametersNames") {
@@ -71,9 +67,7 @@ export const explainabilityReducers = (
       }
     })
     .addCase(fetchExplainabilityPlot.pending, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === "compare-completed",
-      )?.workflowTasks.explainabilityTask
+      const compareCompletedTask = state.tab?.workflowId === "compare-completed" ? state.tab.workflowTasks.explainabilityTask : null
       const plotType = action.meta.arg.metadata
       .queryCase as keyof IExplainability
       if (compareCompletedTask && plotType !== "hyperparametersNames") {
@@ -81,9 +75,7 @@ export const explainabilityReducers = (
       }
     })
     .addCase(fetchExplainabilityPlot.rejected, (state, action) => {
-      const compareCompletedTask = state.tabs.find(
-        tab => tab.workflowId === "compare-completed",
-      )?.workflowTasks.explainabilityTask
+      const compareCompletedTask = state.tab?.workflowId === "compare-completed" ? state.tab.workflowTasks.explainabilityTask : null
       const plotType = action.meta.arg.metadata
       .queryCase as keyof IExplainability
       if (compareCompletedTask && plotType !== "hyperparametersNames") {
@@ -149,16 +141,10 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
       workflowId: "",
       queryCase: "",
     },
-  }
-
-  const api = axios.create({
-    baseURL: '/api', // Let Nginx handle the proxy
-    withCredentials: true, // If authentication is needed
-  });
-  
+  }  
 
 export const fetchExplainabilityPlot = createAsyncThunk(
-  "workflowTabs/explainability/fetch_explainability_plot",
+  "workflowPage/explainability/fetch_explainability_plot",
   async (payload: FetchExplainabilityPlotPayload) => {
     const requestUrl = "explainability"
     return api

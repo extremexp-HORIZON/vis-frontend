@@ -8,7 +8,7 @@ import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 import ScatterChart from "../Charts/ScatterChart"
 import MapChart from "../Charts/MapChart"
 import TableExpand from "../DataTable/TableExpand"
-import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
+import { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
 import { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
 
 interface IGraphContainer {
@@ -30,7 +30,7 @@ interface IGraphContainer {
   count: number
   page: number
   onChange: (event: React.ChangeEvent<unknown>, value: number) => void
-  workflow: IWorkflowTabModel
+  workflow: IWorkflowPageModel
   colorByMap: any
   tripsMode: boolean
   selectedColumnsMap: any
@@ -150,7 +150,7 @@ const GraphContainer = (props: IGraphContainer) => {
           {chartType === "map" && (
             <MapChart
               data={
-                workflow.workflowTasks.dataExploration?.mapChart.data?.data ||
+                workflow.workflowTasks?.dataExploration?.mapChart.data?.data ||
                 []
               }
               workflow={

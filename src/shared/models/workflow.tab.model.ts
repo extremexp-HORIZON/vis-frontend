@@ -1,15 +1,18 @@
-import { IDataExplorationQuery } from "./dataexploration.model";
+import { IDataAsset } from "./experiment/data-asset.model";
+import { IParam } from "./experiment/param.model";
+import { ITask } from "./experiment/task.model";
 import { IDataExploration } from "./tasks/data-exploration-task.model";
 import { IExplainability } from "./tasks/explainability.model";
 import { IModelAnalysis } from "./tasks/model-analysis.model";
 import { IUserInteraction } from "./tasks/user-interaction.model";
-import { Task } from "./workflow.model";
 
-export interface IWorkflowTabModel {
+export interface IWorkflowPageModel {
     workflowId: string;
     workflowName: string;
     workflowConfiguration: {
-        data: Task[] | null
+        tasks: ITask[] | null;
+        dataAssets: IDataAsset[] | null;
+        params: IParam[] | null
         loading: boolean;
     }
     workflowMetrics: {
@@ -17,7 +20,7 @@ export interface IWorkflowTabModel {
         loading: boolean;
     }
     workflowSvg: {
-        data: {tasks: Task[], start: string, end: string} | null
+        data: {tasks: ITask[] | undefined, start: number | undefined, end: number | undefined} | null
         loading: boolean;
     }
     workflowTasks: {
@@ -28,11 +31,13 @@ export interface IWorkflowTabModel {
     }
 }
 
-export const defaultWorkflowTabModel: IWorkflowTabModel = {
+export const defaultWorkflowPageModel: IWorkflowPageModel = {
     workflowId: "0",
     workflowName: "",
     workflowConfiguration: {
-        data: null,
+        tasks: null,
+        dataAssets: null,
+        params: null,
         loading: true
     },
     workflowMetrics: {

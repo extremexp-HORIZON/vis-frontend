@@ -7,16 +7,17 @@ import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
-import { Parameter, Task } from "../../../shared/models/workflow.model"
+import { ITask } from "../../../shared/models/experiment/task.model"
+import { IParam } from "../../../shared/models/experiment/param.model"
 
 interface ITaskConfiguration {
-  configuration: Task[] | null
+  configuration: ITask[] | null
 }
 
 const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
   const { configuration } = props
 
-  const convertParametersToString = (obj: Parameter[]) => obj
+  const convertParametersToString = (obj: IParam[]) => obj
     .map((param) => `${param.name}: ${param.value}`)
     .join(", ")
 

@@ -9,18 +9,18 @@ import Select from "@mui/material/Select"
 import MenuItem from "@mui/material/MenuItem"
 import type { RootState } from "../../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { setProgressParallel } from "../../../../store/slices/progressPageSlice"
+import { setParallel } from "../../../../store/slices/monitorPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 
 const ParallelCoordinatePlot = () => {
-  const { workflows, progressParallel, progressWokflowsTable, progressGauges } =
+  const { workflows } =
     useAppSelector((state: RootState) => state.progressPage)
+  const {parallel, workflowsTable } = useAppSelector((state: RootState) => state.monitorPage)
   const parallelData = useRef<any[]>([])
   const foldArray = useRef<string[]>([])
   const tooltipArray = useRef<{ [key: string]: string }[]>([])
-  const [metricExist, setMetricExist] = useState<boolean>(false)
 
   const dispatch = useAppDispatch()
 
@@ -28,9 +28,7 @@ const ParallelCoordinatePlot = () => {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.params
           let paramNames = []
           if (params) {
             paramNames = params.map(param => param.name)
@@ -42,11 +40,9 @@ const ParallelCoordinatePlot = () => {
       )
       foldArray.current = Array.from(uniqueParameters)
       const data = workflows.data
-        .filter(workflow => workflow.status === "completed")
+        .filter(workflow => workflow.status === "COMPLETED")
         .map(workflow => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.params
           return {
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
@@ -65,20 +61,16 @@ const ParallelCoordinatePlot = () => {
           }
         })
       parallelData.current = _.cloneDeep(data)
-      let selected = progressParallel.selected
-      let options = progressParallel.options
-      if (progressParallel.options.length === 0) {
+      let selected = parallel.selected
+      let options = parallel.options
+      if (parallel.options.length === 0) {
         options = Array.from(
           new Set(
             workflows.data
               // .filter(workflow => workflow.status === "completed")
               .reduce((acc: any[], workflow) => {
                 const metrics = workflow.metrics
-                  ? workflow.metrics
-                      ?.filter(
-                        m => m?.semantic_type && m.semantic_type.includes("ML"),
-                      )
-                      .map((metric: any) => metric.name)
+                  ? workflow.metrics.map((metric: any) => metric.name)
                   : []
                 return [...acc, ...metrics]
               }, []),
@@ -92,12 +84,8 @@ const ParallelCoordinatePlot = () => {
           : []
       ).map(key => ({ field: key }))
 
-      const gaugeValue = progressGauges.find(
-        gauge => gauge.name === selected,
-      )?.value
-      setMetricExist(Number.isNaN(gaugeValue) ? false : true)
       dispatch(
-        setProgressParallel({
+        setParallel({
           data,
           options,
           selected,
@@ -107,11 +95,7 @@ const ParallelCoordinatePlot = () => {
   }, [workflows])
 
   const handleMetricSelection = (event: SelectChangeEvent) => {
-    dispatch(setProgressParallel({ selected: event.target.value as string }))
-    const gaugeValue = progressGauges.find(
-      gauge => gauge.name === (event.target.value as string),
-    )?.value
-    setMetricExist(!Number.isNaN(gaugeValue))
+    dispatch(setParallel({ selected: event.target.value as string }))
   }
 
   return (
@@ -126,10 +110,10 @@ const ParallelCoordinatePlot = () => {
               size="small"
             >
               <Select
-                value={progressParallel.selected}
+                value={parallel.selected}
                 sx={{ fontSize: "0.8rem" }}
                 onChange={handleMetricSelection}
-                disabled={progressParallel.options.length === 0}
+                disabled={parallel.options.length === 0}
                 MenuProps={{
                   PaperProps: {
                     style: {
@@ -139,7 +123,7 @@ const ParallelCoordinatePlot = () => {
                   },
                 }}
               >
-                {progressParallel.options.map(feature => (
+                {parallel.options.map(feature => (
                   <MenuItem key={`${feature}`} value={feature}>
                     {feature}
                   </MenuItem>
@@ -152,16 +136,16 @@ const ParallelCoordinatePlot = () => {
           <DraggableColumns
             foldArray={foldArray}
             onOrderChange={() => {
-              dispatch(setProgressParallel({ ...progressParallel }))
+              dispatch(setParallel({ ...parallel }))
             }}
           />
-          {progressParallel.options.length > 0 ? (
+          {parallel.options.length > 0 ? (
             <ParallelCoordinateVega
               parallelData={parallelData}
-              progressParallel={progressParallel}
+              progressParallel={parallel}
               foldArray={foldArray}
               // map from progressWorkflowsTable.selectedWorkflows id (because it is rows ids) to actual workflowId
-              selectedWorkflows={progressWokflowsTable.selectedWorkflows}
+              selectedWorkflows={workflowsTable.selectedWorkflows}
             ></ParallelCoordinateVega>
           ) : (
             <Box

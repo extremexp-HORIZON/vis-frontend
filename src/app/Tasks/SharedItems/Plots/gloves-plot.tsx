@@ -14,7 +14,7 @@ import {
   CircularProgress,
   SelectChangeEvent,
 } from "@mui/material"
-import { IWorkflowTabModel } from "../../../../shared/models/workflow.tab.model"
+import { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
 import {
   fetchAffected,
   fetchModelAnalysisExplainabilityPlot,
@@ -29,7 +29,7 @@ import GlovesMetricSummary from "./gloves-metric-summary"
 import { useAppDispatch } from "../../../../store/store"
 
 interface CGlanceExecutionProps {
-  workflow: IWorkflowTabModel
+  workflow: IWorkflowPageModel
   availableCfMethods: string[]
   availableActionStrategies: string[]
   availableFeatures: string[]

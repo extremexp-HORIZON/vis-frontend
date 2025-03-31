@@ -8,21 +8,21 @@ export default function ProgressBar({workflowStatus, workflowId} : {workflowStat
         (state: RootState) => state.progressPage,
     )
     let progressValue
-    const workflow = workflows.data.find(workflow => workflow.workflowId === workflowId)
-    if (workflowStatus === "completed" || workflowStatus === "failed") {
+    const workflow = workflows.data.find(workflow => workflow.id === workflowId)
+    if (workflowStatus === "COMPLETED" || workflowStatus === "FAILED") {
         progressValue = 100
     } else {
         if (workflow?.tasks === undefined) {
             progressValue = 0
         } else { 
-            const completedTasks = workflow?.tasks.filter(task => task.end !== undefined).length
+            const completedTasks = workflow?.tasks.filter(task => task.endTime !== undefined).length
             progressValue = (completedTasks / workflow?.tasks.length) * 100
         }
     }
-    const color = workflowStatus === "completed" ? "success" : workflowStatus === "running" ? "primary" : "error"
+    const color = workflowStatus === "COMPLETED" ? "success" : workflowStatus === "RUNNING" ? "primary" : "error"
     return (
         <Box sx={{ display:"flex", alignItems:"center", justifyContent: "center", width:"100%", flexDirection:"column", height:"100%" }}>
-            <Typography variant="body2">{workflowStatus}</Typography>
+            <Typography variant="body2">{workflowStatus.toLowerCase()}</Typography>
             <Box sx={{width:"100%"}}>
                 <LinearProgress sx={{ borderRadius: 4}} color={color} value={progressValue} variant="determinate"/>
             </Box>

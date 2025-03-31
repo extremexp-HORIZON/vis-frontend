@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import LinearProgress from "@mui/material/LinearProgress"
 import Typography from "@mui/material/Typography"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import grey from "@mui/material/colors/grey"
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { setProgressBarData } from "../../store/slices/progressPageSlice"
@@ -18,16 +18,16 @@ const ProgressPageBar = () => {
     if (workflows.data.length > 0) {
       const total = workflows.data.length
       const completed = workflows.data.filter(
-        workflow => workflow.status === "completed",
+        workflow => workflow.status === "COMPLETED",
       ).length
       const running =
         workflows.data.filter(
-          workflow => workflow.status === "scheduled",
+          workflow => workflow.status === "SCHEDULED",
         ).length +
-        workflows.data.filter(workflow => workflow.status === "running")
+        workflows.data.filter(workflow => workflow.status === "RUNNING")
           .length
       const failed = workflows.data.filter(
-        workflow => workflow.status === "failed",
+        workflow => workflow.status === "FAILED",
       ).length
       const progress = Math.round(((completed + failed) / total) * 100)
       dispatch(setProgressBarData({ total, completed, running, failed, progress }))

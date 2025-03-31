@@ -1,5 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit"
-import { IWorkflowTab } from "../../../store/slices/workflowTabsSlice"
+import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
 
 export interface IUserInteraction {
   url: string
@@ -10,10 +10,8 @@ export const userInteractionDefault: IUserInteraction = {
 }
 
 export const additionalReducers = {
-  setUrl: (state: IWorkflowTab, action: PayloadAction<{ url: string, workflowId: any }>) => {
-    const userInteractionTaskFound = state.tabs.find(
-      tab => tab.workflowId === action.payload.workflowId
-    )?.workflowTasks?.userInteraction;
+  setUrl: (state: IWorkflowPage, action: PayloadAction<{ url: string, workflowId: any }>) => {
+    const userInteractionTaskFound = state.tab?.workflowId === action.payload.workflowId ? state.tab?.workflowTasks.userInteraction : null
     if (userInteractionTaskFound) {
         userInteractionTaskFound.url = action.payload.url;
     }

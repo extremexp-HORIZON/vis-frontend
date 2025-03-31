@@ -1,19 +1,15 @@
 import Box from "@mui/material/Box"
-import Grid from "@mui/material/Grid"
 import { useEffect, useRef, ReactNode } from "react"
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import {
   fetchExperiment,
-  fetchExperimentTesting,
   fetchExperimentWorkflows,
-  fetchExperimentWorkflowsTesting,
+  setMenuOptions,
 } from "../../store/slices/progressPageSlice"
 import ProgressPageLoading from "./progress-page-loading"
-import { updateTabs } from "../../store/slices/workflowTabsSlice"
 import LeftMenu from "./left-menu"
 import ExperimentControls from "./experiment-controls"
-import { useState } from "react"
 
 interface ProgressPageProps {
   children?: ReactNode;
@@ -21,11 +17,8 @@ interface ProgressPageProps {
 
 
 const ProgressPage = (props: ProgressPageProps) => {
-  const { experiment, workflows, initialization } = useAppSelector(
+  const { experiment, workflows, initialization, menuOptions } = useAppSelector(
     (state: RootState) => state.progressPage,
-  )
-  const { tabs } = useAppSelector(
-    (state: RootState) => state.workflowTabs,
   )
   const { experimentId } = useParams()
   const [ searchParams ] = useSearchParams()
@@ -34,7 +27,6 @@ const ProgressPage = (props: ProgressPageProps) => {
   const { children } = props
   const location = useLocation()
   const navigate = useNavigate()
-  const [collapsed, setCollapsed] = useState<boolean>(false)
 
   useEffect(() => {
     const pathParts = location.pathname.split("/").filter(Boolean);
@@ -44,16 +36,14 @@ const ProgressPage = (props: ProgressPageProps) => {
     }
     if(location.pathname.includes("workflow") && !searchParams.has("workflowId")) 
       navigate(`/${experimentId}/monitoring`, {replace: true});
+
+    if(location.pathname.includes("workflow")) dispatch(setMenuOptions({...menuOptions, selected: "monitoring"}))
+    else dispatch(setMenuOptions({...menuOptions, selected: pathParts[1]}))
   }, [location, history]);
 
   useEffect(() => {
     if (experimentId && experimentId !== experiment.data?.id) {
-      // TODO: Remove this if statement when no longer needed
-      if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
-        dispatch(fetchExperimentTesting(experimentId))
-      } else {
         dispatch(fetchExperiment(experimentId))
-      }
     }
   }, [])
 
@@ -61,17 +51,7 @@ const ProgressPage = (props: ProgressPageProps) => {
   useEffect(() => {
     const fetchWorkflows = () => {
       if (!experiment.loading && experiment.data) {
-        // TODO: Remove this if statement when no longer needed
-        if (experimentId === "ideko" || experimentId === "I2Cat_phising") {
-          dispatch(
-            fetchExperimentWorkflowsTesting({
-              experimentId: experimentId || "",
-              workflowIds: experiment.data.workflow_ids,
-            }),
-          )
-        } else {
           dispatch(fetchExperimentWorkflows(experimentId || ""))
-        }
       }
     }
     fetchWorkflows()
@@ -90,8 +70,7 @@ const ProgressPage = (props: ProgressPageProps) => {
   // TODO: Enable this for live data
   useEffect(() => {
     if (workflows.data && workflows.data.length > 0) {
-      dispatch(updateTabs({workflows, tabs}))
-      workflows.data.every(workflow => workflow.status === "completed") &&
+      workflows.data.every(workflow => workflow.status === "COMPLETED") &&
         intervalId.current &&
         clearInterval(intervalId.current)
     }
@@ -118,12 +97,12 @@ const ProgressPage = (props: ProgressPageProps) => {
               sx={{
                 position: "fixed",
                 left: 0,
-                width: !collapsed ? "15%" : "8%",
+                width: !menuOptions.collapsed ? "15%" : "8%",
                 height: "100%",
                 transition: "width 0.3s ease",
               }}
             >
-              <LeftMenu collapsed={collapsed} setCollapsed={setCollapsed} />
+              <LeftMenu />
             </Box>
             <Box
               sx={{
@@ -132,8 +111,8 @@ const ProgressPage = (props: ProgressPageProps) => {
                 rowGap: 2,
                 height:"100%",
                 overflow: "hidden",
-                width:  !collapsed ? "75%%" : "92%",
-                marginLeft: !collapsed ? "15%" : "8%",
+                width:  !menuOptions.collapsed ? "75%%" : "92%",
+                marginLeft: !menuOptions.collapsed ? "15%" : "8%",
                 transition: "margin-left 0.3s ease, width 0.3s ease",  
               }}
             >

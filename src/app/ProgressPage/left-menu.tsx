@@ -6,29 +6,23 @@ import {
   ListItemText,
   Paper,
   IconButton,
-  Divider
 } from "@mui/material"
-import { useParams, useNavigate, useLocation } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import ListRoundedIcon from "@mui/icons-material/ListRounded"
 import CompareRoundedIcon from '@mui/icons-material/CompareRounded'
 import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded'
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
-import useMediaQuery from "@mui/material/useMediaQuery"
-import { useTheme, Theme } from "@mui/material/styles"
+import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
+import { setMenuOptions } from "../../store/slices/progressPageSlice"
 
-type LeftMenuProps = {
-  collapsed: boolean
-  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-const LeftMenu = (props: LeftMenuProps) => {
+const LeftMenu = () => {
   const { experimentId } = useParams()
-  const theme: Theme = useTheme()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"))
   const navigate = useNavigate()
-  const location = useLocation()
-  const { collapsed, setCollapsed } = props
+  const { menuOptions } = useAppSelector(
+    (state: RootState) => state.progressPage
+  )
+  const dispatch = useAppDispatch()
 
   const navItems = [
     {
@@ -61,7 +55,7 @@ const LeftMenu = (props: LeftMenuProps) => {
       <Box>
         <List>
           {navItems.map(({ icon, label, path }) => {
-            const selected = location.pathname.includes(path)
+            const selected = menuOptions.selected === path
             const item = (
               <ListItem
                 key={path}
@@ -71,7 +65,7 @@ const LeftMenu = (props: LeftMenuProps) => {
                   border: "none",
                   cursor: "pointer",
                   borderBottom: "1px solid #ddd",
-                  justifyContent: collapsed ? "center" : "flex-start",
+                  justifyContent: menuOptions.collapsed ? "center" : "flex-start",
                   "&:hover": {
                     bgcolor: theme => theme.palette.customGrey.main
                   },
@@ -80,13 +74,13 @@ const LeftMenu = (props: LeftMenuProps) => {
                 onClick={() => navigate(`/${experimentId}/${path}`)}
               >
                 {icon}
-                {!collapsed && (
+                {!menuOptions.collapsed && (
                   <ListItemText sx={{ ml: 1.5 }} primary={label} />
                 )}
               </ListItem>
             )
 
-            return collapsed ? (
+            return menuOptions.collapsed ? (
               <Tooltip key={path} title={label} arrow placement="right">
                 {item}
               </Tooltip>
@@ -96,8 +90,8 @@ const LeftMenu = (props: LeftMenuProps) => {
           })}
         </List>
         <Box sx={{ display: "flex", justifyContent: "right", py: 1 }}>
-          <IconButton onClick={() => setCollapsed(prev => !prev)}>
-            {collapsed ? <ChevronRightRoundedIcon /> : <ChevronLeftRoundedIcon />}
+          <IconButton onClick={() => dispatch(setMenuOptions({...menuOptions, collapsed: !menuOptions.collapsed}))}>
+            {menuOptions.collapsed ? <ChevronRightRoundedIcon /> : <ChevronLeftRoundedIcon />}
           </IconButton>
         </Box>
       </Box>

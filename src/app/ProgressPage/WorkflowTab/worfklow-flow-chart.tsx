@@ -12,7 +12,7 @@ import {
 import { useTheme } from "@mui/material/styles"
 
 import "@xyflow/react/dist/style.css"
-import { Task } from "../../../shared/models/workflow.model"
+import { ITask } from "../../../shared/models/experiment/task.model"
 
 const startEndNodeStyle = {
   borderRadius: "100%",
@@ -29,7 +29,7 @@ const startEndNodeStyle = {
 const implementedTasks = ["read_data", "interactive", "evaluation"]
 
 interface IFlowGraphProps {
-  workflowSvg: { tasks: Task[]; start: string; end: string } | null
+  workflowSvg: { tasks: ITask[]; start: string; end: string } | null
   chosenTask: string | null
   setChosenTask: Dispatch<SetStateAction<string | null>>
 }
@@ -95,7 +95,7 @@ function FlowGraph(props: IFlowGraphProps) {
     }
   }
 
-  const getNodeSelectState = (task: Task) => {
+  const getNodeSelectState = (task: ITask) => {
     if (implementedTasks.includes(task.metadata?.type || "")) {
       if (task.metadata?.type === "interactive" && !task.end) {
         return true

@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, CircularProgress } from "@mui/material"
+import { Box, IconButton, Typography, CircularProgress, Tooltip } from "@mui/material"
 import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
@@ -59,11 +59,14 @@ const ExperimentControls = () => {
             <Box
               sx={{
                 whiteSpace: 'nowrap',
+                overflow: "hidden"
               }}
             >
-              <Typography variant="h6" sx={{ fontWeight: "bold" }} noWrap>
-                {experimentId}
-              </Typography>
+              <Tooltip title={experimentId} arrow>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }} noWrap>
+                  {experimentId}
+                </Typography>
+              </Tooltip>
             </Box>
           </Box>
           {!workflowId ? (

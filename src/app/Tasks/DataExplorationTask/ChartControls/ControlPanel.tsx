@@ -12,6 +12,7 @@ import {
   Tooltip,
   Slider,
   Chip,
+  SelectChangeEvent
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import InfoIcon from "@mui/icons-material/Info"
@@ -29,6 +30,7 @@ import BarChartControlPanel from "../Charts/BarChartControlPanel"
 import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
 import MapControls from "../Charts/MapChartControlPanel"
 import ChartButtonGroup from "./ChartButtonGroup"
+import { RootState, useAppSelector } from "../../../../store/store"
 
 interface IControlPanel {
   originalColumns: VisualColumn[]
@@ -70,7 +72,9 @@ interface IControlPanel {
   lon: VisualColumn
   setLon: React.Dispatch<React.SetStateAction<VisualColumn>>
   setChartType: React.Dispatch<React.SetStateAction<"datatable" | "line" | "bar" | "scatter" | "map">>
-
+  selectedDataset: string
+  setSelectedDataset: React.Dispatch<React.SetStateAction<string>>;
+  currentTask: string | null;
 }
 
 const ControlPanel = (props: IControlPanel) => {
@@ -111,7 +115,10 @@ const ControlPanel = (props: IControlPanel) => {
     lon,
     setLon,
     columnsMapDouble,
-    setChartType
+    setChartType,
+    selectedDataset,
+    setSelectedDataset,
+    currentTask
   } = props
   const handleChange = event => {
     const {
@@ -153,6 +160,15 @@ const ControlPanel = (props: IControlPanel) => {
   const [filterType, setFilterType] = useState("equals") // 'equals' or 'range'
   const [filterValue, setFilterValue] = useState("") // For equals, or range object {min, max}
   const [sliderRange, setSliderRange] = useState([0, 100]) // Min and Max values for the slider
+  const{ tab } = useAppSelector(
+    (state: RootState) => state.workflowPage
+  )
+  
+  const handleDatasetSelection = (event: SelectChangeEvent<string>) => {
+    setSelectedDataset(event.target.value)
+    setFilters([])
+    setSelectedColumns([])
+  }
 
   // useEffect(() => {
   //   onFetchData()
@@ -253,6 +269,27 @@ const ControlPanel = (props: IControlPanel) => {
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ width: "25%", padding: 2, borderRight: "1px solid #ccc" }}>
+      <FormControl fullWidth>
+        <InputLabel id="data-exploration-select-label">Select Dataset</InputLabel>
+        <Select
+          labelId="data-exploration-select-label"
+          value={selectedDataset}
+          label="Select Dataset"
+          onChange={handleDatasetSelection}
+        >
+          { tab?.workflowConfiguration.dataAssets && tab?.workflowConfiguration.dataAssets.length > 0 && (
+              tab?.workflowConfiguration.dataAssets.map(asset => {
+                const label = asset?.task ? `${asset.task}/${asset.name}` : asset.name
+                if( !currentTask || currentTask === asset.task)
+                  return (
+                    <MenuItem key={asset.source} value={asset.source}>
+                      {label}
+                    </MenuItem>
+                  )
+              })
+          )}
+        </Select>
+      </FormControl>
       <Box sx={{padding: 2}}>
               <ChartButtonGroup chartType={chartType} setChartType={setChartType} />
               </Box>

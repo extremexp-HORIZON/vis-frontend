@@ -17,7 +17,7 @@ import {
   fetchModelAnalysisData,
   fetchModelAnalysisExplainabilityPlot,
 } from "../../../shared/models/tasks/model-analysis.model"
-import { IWorkflowTabModel } from "../../../shared/models/workflow.tab.model"
+import { IWorkflowPageModel } from "../../../shared/models/workflow.tab.model"
 import {
   explainabilityQueryDefault,
   fetchExplainabilityPlotPayloadDefault,
@@ -26,7 +26,7 @@ import { Tab, Tabs } from "@mui/material"
 import CGlanceExecution from "../SharedItems/Plots/gloves-plot"
 
 interface IFeatureExplainability {
-  workflow: IWorkflowTabModel
+  workflow: IWorkflowPageModel
 }
 
 const ModelAnalysisTask = (props: IFeatureExplainability) => {
@@ -62,9 +62,9 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
           explanation_method: "global_counterfactuals",
           feature1: "",
           feature2: "",
-          gcfSize: 3,
-          cfGenerator: "Dice",
-          clusterActionChoiceAlgo: "max-eff",
+          gcf_size: 3,
+          cf_generator: "Dice",
+          cluster_action_choice_algo: "max-eff",
           ...plotRequestMetadata
           },
           metadata: {
@@ -90,7 +90,7 @@ const ModelAnalysisTask = (props: IFeatureExplainability) => {
 
   useEffect(() => {
     const workflowContent = workflows.data.find(
-      w => w.workflowId === workflow.workflowId,
+      w => w.id === workflow.workflowId,
     )
     const workflowDataset =
       workflowContent?.tasks

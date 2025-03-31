@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material"
 import MetricEvaluation from "./WorkflowMetricDetailsItems/metric-evaluation"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition";
-import { Task } from "../../../shared/models/workflow.model";
+import { ITask } from "../../../shared/models/experiment/task.model";
 
 
 interface Metric {
@@ -14,7 +14,7 @@ interface Metric {
 interface IWorkflowMetricDetails {
   metrics: Metric[] | null;
   workflowId: number | string;
-  info: Task[] | null;
+  info: ITask[] | null;
 }
 
 const WorkflowMetricDetails = (props: IWorkflowMetricDetails) => {

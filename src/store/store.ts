@@ -1,14 +1,16 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
 import { configureStore } from "@reduxjs/toolkit"
 import { dataExplorationSlice } from "./slices/dataExplorationSlice"
-import { workflowTabsSlice } from "./slices/workflowTabsSlice"
+import { workflowPageSlice } from "./slices/workflowPageSlice"
 import { progressPageSlice } from "./slices/progressPageSlice"
+import { monitoringPageSlice } from "./slices/monitorPageSlice"
 
 export const store = configureStore({
   reducer: {
     dataExploration: dataExplorationSlice.reducer,
-    workflowTabs: workflowTabsSlice.reducer,
+    workflowPage: workflowPageSlice.reducer,
     progressPage: progressPageSlice.reducer,
+    monitorPage: monitoringPageSlice.reducer
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

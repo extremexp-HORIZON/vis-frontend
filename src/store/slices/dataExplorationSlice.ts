@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { IDataExplorationRequest } from "../../shared/models/dataexploration.model";
-import { IFilter } from "../../shared/models/dataexploration.model";
 
 // Define the interface for the slice state
 interface IExploration {  

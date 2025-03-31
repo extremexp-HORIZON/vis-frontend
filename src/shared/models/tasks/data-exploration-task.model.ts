@@ -1,17 +1,14 @@
 import { ActionReducerMapBuilder, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
-import { IWorkflowTab } from "../../../store/slices/workflowTabsSlice"
-import axios from "axios"
+import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
 import {
   IDataExplorationRequest,
   IDataExplorationResponse,
-  IFilter,
-  VisualColumn,
 } from "../dataexploration.model"
 import {
   handleMultiTimeSeriesData,
   prepareDataExplorationResponse,
 } from "./model-analysis.model"
-import { P } from "vitest/dist/reporters-yx5ZTtEV.js"
+import { api } from "../../../app/api/api"
 
 export interface IDataExploration {
   multipleTimeSeries: {
@@ -107,7 +104,7 @@ export const dataExplorationDefault: IDataExploration = {
 }
 
 // export const additionalReducers = {
-//   updateFilters: (state: IWorkflowTab, action: PayloadAction<{ filter: IFilter, workflowId: any }>) => {
+//   updateFilters: (state: IWorkflowPage, action: PayloadAction<{ filter: IFilter, workflowId: any }>) => {
 //     const compareCompletedTask = state.tabs.find(
 //       tab => tab.workflowId === action.payload.workflowId
 //     )?.workflowTasks?.dataExploration;
@@ -115,7 +112,7 @@ export const dataExplorationDefault: IDataExploration = {
 //       compareCompletedTask.filters = [...compareCompletedTask.filters, action.payload.filter];
 //     }
 //   },
-//   updateColumns: (state: IWorkflowTab, action: PayloadAction<{ columns: VisualColumn[], workflowId: any }>) => {
+//   updateColumns: (state: IWorkflowPage, action: PayloadAction<{ columns: VisualColumn[], workflowId: any }>) => {
 //     const compareCompletedTask = state.tabs.find(
 //       tab => tab.workflowId === action.payload.workflowId
 //     )?.workflowTasks?.dataExploration;
@@ -123,7 +120,7 @@ export const dataExplorationDefault: IDataExploration = {
 //       compareCompletedTask.columns = action.payload.columns;
 //     }
 //   },
-//   updateChartData: (state: IWorkflowTab, action: PayloadAction<{ chartType: "lineChart" | "barChart", data: {xAxis?: string, yAxis?: string[], 
+//   updateChartData: (state: IWorkflowPage, action: PayloadAction<{ chartType: "lineChart" | "barChart", data: {xAxis?: string, yAxis?: string[], 
 //     aggregations?: {
 //     xAxis: string
 //     yAxis: string[] | null
@@ -142,12 +139,11 @@ export const dataExplorationDefault: IDataExploration = {
 // };
 
 export const explainabilityExtraReducers = (
-  builder: ActionReducerMapBuilder<IWorkflowTab>,
+  builder: ActionReducerMapBuilder<IWorkflowPage>,
 ) => {
   builder.addCase(fetchDataExplorationData.fulfilled, (state, action) => {
-    const dataExplorationTask = state.tabs.find(
-      tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-    )?.workflowTasks.dataExploration
+    const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
     console.log("Data exploration task:", dataExplorationTask); // Debugging log
 
@@ -158,18 +154,16 @@ export const explainabilityExtraReducers = (
         }
   })
   .addCase(fetchDataExplorationData.pending, (state, action) => {
-    const dataExplorationTask = state.tabs.find(
-      tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-    )?.workflowTasks.dataExploration
+    const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
         if (dataExplorationTask) {
           dataExplorationTask[queryCase].loading = true
         }
   })
   .addCase(fetchDataExplorationData.rejected, (state, action) => {
-    const dataExplorationTask = state.tabs.find(
-      tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-    )?.workflowTasks.dataExploration
+    const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
     const queryCase = action.meta.arg.metadata.queryCase as keyof IDataExploration
         if (dataExplorationTask) {
           dataExplorationTask[queryCase].loading = false
@@ -178,9 +172,8 @@ export const explainabilityExtraReducers = (
   })
 
   .addCase(fetchMetaData.fulfilled, (state, action) => {
-      const dataExplorationTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-      )?.workflowTasks.dataExploration;
+    const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
       if (dataExplorationTask) {
         dataExplorationTask.metaData.data = action.payload;
         dataExplorationTask.metaData.loading = false;
@@ -188,17 +181,15 @@ export const explainabilityExtraReducers = (
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {
-      const dataExplorationTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-      )?.workflowTasks.dataExploration;
+      const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
       if (dataExplorationTask) {
         dataExplorationTask.metaData.loading = true;
       }
     })
     .addCase(fetchMetaData.rejected, (state, action) => {
-      const dataExplorationTask = state.tabs.find(
-        tab => tab.workflowId === action.meta.arg.metadata.workflowId,
-      )?.workflowTasks.dataExploration;
+      const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
       if (dataExplorationTask) {
         dataExplorationTask.metaData.loading = false;
         dataExplorationTask.metaData.error = "Failed to fetch metadata";
@@ -206,16 +197,10 @@ export const explainabilityExtraReducers = (
     });
 }
 
-const api = axios.create({
-  baseURL: '/api', // Let Nginx handle the proxy
-  withCredentials: true, // If authentication is needed
-});
-
-
 export const fetchDataExplorationData = createAsyncThunk(
   "workflowTasks/data_exploration/fetch_data",
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = "visualization/tabular"
+    const requestUrl = "data/tabular"
     return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)
@@ -225,11 +210,9 @@ export const fetchDataExplorationData = createAsyncThunk(
 export const fetchMetaData=createAsyncThunk(
   "workflowTasks/data_exploration/fetch_metadata",
   async(payload:IDataExplorationRequest)=>{
-    const requestUrl="visualization/metadata"
+    const requestUrl="data/metadata"
     return api
     .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)
   }
-
-
 )

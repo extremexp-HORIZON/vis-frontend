@@ -8,7 +8,7 @@ import FilterBar from "./filter-bar"
 import { Popover, styled } from "@mui/material"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useRef, useState } from "react"
-import { setProgressScheduledTable } from "../../../../store/slices/progressPageSlice"
+import { setScheduledTable } from "../../../../store/slices/monitorPageSlice"
 import type { GridColDef, GridRowSelectionModel, GridColumnNode } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
@@ -88,17 +88,17 @@ const WorkflowActions = (props: {
 }) => {
   const { id } = props
   const dispatch = useAppDispatch();
-  const { progressScheduledTable } = useAppSelector(
-    (state: RootState) => state.progressPage,
+  const { scheduledTable } = useAppSelector(
+    (state: RootState) => state.monitorPage,
   )
 
   const handleIndexChange = (indexChange: number, id: number) => {
-    const rowIndex = progressScheduledTable.rows.findIndex(row => row.id === id)
+    const rowIndex = scheduledTable.rows.findIndex(row => row.id === id)
     const newIndex = rowIndex + indexChange
-    if (newIndex < 0 || newIndex >= progressScheduledTable.rows.length) {
+    if (newIndex < 0 || newIndex >= scheduledTable.rows.length) {
       return
     } else {
-      const updatedRows = [...progressScheduledTable.rows]
+      const updatedRows = [...scheduledTable.rows]
       const [movedRow] = updatedRows.splice(rowIndex, 1)
       updatedRows.splice(newIndex, 0, movedRow)
 
@@ -107,18 +107,18 @@ const WorkflowActions = (props: {
         id: index + 1,
       }))
       dispatch(
-        setProgressScheduledTable({ rows: newRows, visibleRows: newRows }),
+        setScheduledTable({ rows: newRows, visibleRows: newRows }),
       )
     }
   }
 
   const removeRow =
   (list: Number) => {
-    let filteredWorkflows = progressScheduledTable.rows.filter(
+    let filteredWorkflows = scheduledTable.rows.filter(
         row => !(row.id === id),
       )
     dispatch(
-      setProgressScheduledTable({
+      setScheduledTable({
         rows: filteredWorkflows,
         visibleRows: filteredWorkflows,
         selectedWorkflows: [],
@@ -133,7 +133,7 @@ const WorkflowActions = (props: {
     return false
   }
   const isEndRow = (id: number): boolean => {
-    if (id === progressScheduledTable.rows.length) {
+    if (id === scheduledTable.rows.length) {
       return true
     }
     return false
@@ -203,18 +203,13 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }))
 
-interface ScheduleTableProps {
-  visibleTable: string,
-  handleTableChange: (
-    newTable: string,
-  ) => (event: React.SyntheticEvent) => void
-}
 
-
-export default function ScheduleTable(props: ScheduleTableProps) {
-  const { visibleTable, handleTableChange } = props;
-  const { workflows, progressScheduledTable } = useAppSelector(
+export default function ScheduleTable() {
+  const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
+  )
+  const { scheduledTable } = useAppSelector(
+    (state: RootState) => state.monitorPage
   )
   const dispatch = useAppDispatch()
   const [uniqueParameters, setUniqueParameters] = useState<Set<string> | null>(
@@ -228,9 +223,7 @@ export default function ScheduleTable(props: ScheduleTableProps) {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.params
           let paramNames = []
           if (params) {
             paramNames = params.map(param => param.name)
@@ -242,11 +235,9 @@ export default function ScheduleTable(props: ScheduleTableProps) {
       )
       setUniqueParameters(uniqueParameters)
       const rows = workflows.data
-        .filter(workflow => workflow.status === "scheduled")
+        .filter(workflow => workflow.status === "SCHEDULED")
         .map(workflow => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.params
           return {
             id: idCounter++,
             workflowId: workflow.name,
@@ -265,12 +256,10 @@ export default function ScheduleTable(props: ScheduleTableProps) {
         })
         .sort((a, b) => a.id - b.id)
       const workflow = workflows.data[0]
-      const params = workflow.tasks.find(
-        task => task.id === "TrainModel",
-      )?.parameters
+      const params = workflow.params
       const infoRow = {
         id: idCounter++,
-        workflowId: workflow.name,
+        workflowId: workflow.id,
         // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
         ...Array.from(uniqueParameters).reduce((acc, variant) => {
           acc[variant] =
@@ -314,7 +303,6 @@ export default function ScheduleTable(props: ScheduleTableProps) {
                 headerClassName:
                 key === "action" ? "datagrid-header-fixed" : "datagrid-header",
                 minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
-                maxWidth: 200,
                 flex: 1,
                 align: "center",
                 headerAlign: "center",
@@ -333,7 +321,7 @@ export default function ScheduleTable(props: ScheduleTableProps) {
           : []
       paramLength.current = uniqueParameters.size
       dispatch(
-        setProgressScheduledTable({ rows, visibleRows: rows, rowsPerPage: 10 }),
+        setScheduledTable({ rows, visibleRows: rows, rowsPerPage: 10 }),
       )
     }
   }, [workflows])
@@ -347,16 +335,16 @@ export default function ScheduleTable(props: ScheduleTableProps) {
     (list: Number[] | string) => (e: React.SyntheticEvent) => {
       let filteredWorkflows
       if (typeof list !== "string") {
-        filteredWorkflows = progressScheduledTable.rows.filter(
+        filteredWorkflows = scheduledTable.rows.filter(
           row => !list.includes(row.id),
         )
       } else {
-        filteredWorkflows = progressScheduledTable.rows.filter(
-          row => !progressScheduledTable.selectedWorkflows.includes(row.id),
+        filteredWorkflows = scheduledTable.rows.filter(
+          row => !scheduledTable.selectedWorkflows.includes(row.id),
         )
       }
       dispatch(
-        setProgressScheduledTable({
+        setScheduledTable({
           rows: filteredWorkflows,
           visibleRows: filteredWorkflows,
           selectedWorkflows: [],
@@ -365,7 +353,7 @@ export default function ScheduleTable(props: ScheduleTableProps) {
     }
 
     const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
-      dispatch(setProgressScheduledTable({ selectedWorkflows: newSelection }))
+      dispatch(setScheduledTable({ selectedWorkflows: newSelection }))
     }
 
   const handleFilterChange = (
@@ -374,16 +362,16 @@ export default function ScheduleTable(props: ScheduleTableProps) {
     operator: string,
     value: string,
   ) => {
-    const newFilters = [...progressScheduledTable.filters]
+    const newFilters = [...scheduledTable.filters]
     newFilters[index] = { column, operator, value }
-    dispatch(setProgressScheduledTable({ filters: newFilters }))
+    dispatch(setScheduledTable({ filters: newFilters }))
   }
 
   const handleAddFilter = () => {
     dispatch(
-      setProgressScheduledTable({
+      setScheduledTable({
         filters: [
-          ...progressScheduledTable.filters,
+          ...scheduledTable.filters,
           { column: "", operator: "", value: "" },
         ],
       }),
@@ -391,25 +379,25 @@ export default function ScheduleTable(props: ScheduleTableProps) {
   }
 
   const handleRemoveFilter = (index: number) => {
-    const newFilters = progressScheduledTable.filters.filter(
+    const newFilters = scheduledTable.filters.filter(
       (_, i) => i !== index,
     )
-    dispatch(setProgressScheduledTable({ filters: newFilters }))
+    dispatch(setScheduledTable({ filters: newFilters }))
   }
 
   useEffect(() => {
-      if(progressScheduledTable.rows.length === 0) return
+      if(scheduledTable.rows.length === 0) return
       let counter = 0
-      let newRows = progressScheduledTable.rows
-      if(progressScheduledTable.filters.length > 0) {
-      for (let i = 0; i < progressScheduledTable.filters.length; i++) {
-        if (progressScheduledTable.filters[i].value !== "") {
+      let newRows = scheduledTable.rows
+      if(scheduledTable.filters.length > 0) {
+      for (let i = 0; i < scheduledTable.filters.length; i++) {
+        if (scheduledTable.filters[i].value !== "") {
           counter++
         }
       }
-      // dispatch(setProgressScheduledTable({ filtersCounter: counter }))
-       newRows = progressScheduledTable.rows.filter(row => {
-        return progressScheduledTable.filters.every(filter => {
+      // dispatch(setScheduledTable({ filtersCounter: counter }))
+       newRows = scheduledTable.rows.filter(row => {
+        return scheduledTable.filters.every(filter => {
           if (filter.value === "") return true
           const cellValue = row[filter.column as keyof Data]
             ?.toString()
@@ -433,26 +421,25 @@ export default function ScheduleTable(props: ScheduleTableProps) {
       })
     }
     dispatch(
-        setProgressScheduledTable({
+        setScheduledTable({
           filtersCounter: counter,
           filteredRows: newRows,
         }),
       )
-  }, [progressScheduledTable.filters])
+  }, [scheduledTable.filters])
 
   return (
     <Box sx={{height: "100%"}} >
       <Paper sx={{ height: "100%", width: "100%", mb: 2 }} elevation={2}>
         <Box sx={{height: "15%"}} >
           <ToolBarWorkflow
-            filterNumbers={progressScheduledTable.filtersCounter}
+            filterNumbers={scheduledTable.filtersCounter}
             filterClickedFunction={filterClicked}
             actionButtonName="Cancel selected workflows"
-            visibleTable={visibleTable}
-            numSelected={progressScheduledTable.selectedWorkflows.length}
+            numSelected={scheduledTable.selectedWorkflows.length}
             tableName={"Scheduled Workflows"}
             handleClickedFunction={removeSelected}
-            handleTableChange={handleTableChange}
+            tableId="scheduled"
           />
         </Box>
         <Popover
@@ -468,7 +455,7 @@ export default function ScheduleTable(props: ScheduleTableProps) {
           <Box sx={{ p: 2 }}>
             <FilterBar
               columns={columns}
-              filters={progressScheduledTable.filters}
+              filters={scheduledTable.filters}
               onFilterChange={handleFilterChange}
               onAddFilter={handleAddFilter}
               onRemoveFilter={handleRemoveFilter}
@@ -479,7 +466,7 @@ export default function ScheduleTable(props: ScheduleTableProps) {
           <StyledDataGrid
             disableVirtualization
             density="compact"
-            rows={progressScheduledTable.visibleRows}
+            rows={scheduledTable.visibleRows}
             columns={columns}
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}
             slotProps={{noRowsOverlay: {title: "No scheduled workflows"}}}
