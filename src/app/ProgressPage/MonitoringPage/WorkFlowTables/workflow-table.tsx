@@ -20,6 +20,7 @@ import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
 
 import theme from "../../../../mui-theme"
+import { useNavigate, useParams } from "react-router-dom"
 
 type CustomGridColDef = GridColDef & {
   field: string
@@ -142,6 +143,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   )
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [uniqueMetrics, setUniqueMetrics] = useState<Set<string> | null>(null)
+  const navigate = useNavigate()
+  const {experimentId} = useParams()
 
   const dispatch = useAppDispatch()
 
@@ -155,7 +158,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   const handleLaunchCompletedTab =
     (workflowId: any) => (e: React.SyntheticEvent) => {
-      handleChange(workflowId)(e)
+      navigate(`/${experimentId}/comparative-analysis`)
     }
 
   const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
