@@ -4,5 +4,8 @@ export interface IParam {
   
     /** The value assigned to the parameter (e.g., "0.001", "32", "RNN"). */
     value: string;
+
+    /** The task this parameter is associated with, if applicable */
+    task?: string;
   }
   

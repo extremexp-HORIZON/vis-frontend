@@ -14,7 +14,7 @@ import { setWorkflowsTable } from "../../../../store/slices/monitorPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
 import { useEffect, useState } from "react"
-import { Badge, Popover, Rating, styled, useTheme } from "@mui/material"
+import { Badge, IconButton, Popover, Rating, styled, useTheme } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
@@ -54,31 +54,37 @@ const WorkflowActions = (props: {
   return (
     <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
       <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== "pending_input"}>
-      <LaunchIcon
-        onClick={
-          (currentStatus === "COMPLETED" || currentStatus === "pending_input")
-            ? handleLaunchNewTab(workflowId)
-            : () => {}
-        }
-        style={{
-          cursor: (currentStatus === "COMPLETED" || currentStatus === "pending_input") ? "pointer" : "default",
-          color:
-          (currentStatus === "COMPLETED" || currentStatus === "pending_input")
-              ? theme.palette.primary.main
-              : theme.palette.action.disabled,
-        }}
-      />
+      <IconButton>
+        <LaunchIcon
+          onClick={
+            (currentStatus === "COMPLETED" || currentStatus === "pending_input")
+              ? handleLaunchNewTab(workflowId)
+              : () => {}
+          }
+          style={{
+            cursor: (currentStatus === "COMPLETED" || currentStatus === "pending_input") ? "pointer" : "default",
+            color:
+            (currentStatus === "COMPLETED" || currentStatus === "pending_input")
+                ? theme.palette.primary.main
+                : theme.palette.action.disabled,
+          }}
+        />
+      </IconButton>
         </Badge>
       {currentStatus !== "COMPLETED" && currentStatus !== "FAILED" && (
         <>
-          <PauseIcon
-            onClick={() => console.log("Pause clicked")}
-            style={{ cursor: "pointer", color: theme.palette.primary.main }}
-          />
-          <StopIcon
-            onClick={() => console.log("Stop clicked")}
-            style={{ cursor: "pointer", color: theme.palette.primary.main }}
-          />
+          <IconButton>
+            <PauseIcon
+              onClick={() => console.log("Pause clicked")}
+              style={{ cursor: "pointer", color: theme.palette.primary.main }}
+            />
+          </IconButton>
+          <IconButton>
+            <StopIcon
+              onClick={() => console.log("Stop clicked")}
+              style={{ cursor: "pointer", color: theme.palette.primary.main }}
+            />
+          </IconButton>
         </>
       )}
     </span>
@@ -315,11 +321,18 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           }),
         }))
 
+        const visibilityModel = columns.reduce((acc, col) => {
+          acc[col.field] = true;
+          return acc;
+        }, {} as Record<string, boolean>);        
+
       dispatch(
         setWorkflowsTable({
           rows,
           filteredRows: rows,
           visibleRows: rows.slice(0, workflowsTable.rowsPerPage),
+          columns: columns,
+          columnsVisibilityModel: visibilityModel
         }),
       )
     }
@@ -337,6 +350,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             filterClickedFunction={filterClicked}
             handleClickedFunction={handleLaunchCompletedTab}
             tableId="workflows"
+            onRemoveFilter={handleRemoveFilter}
           />
         </Box>
         <Popover
@@ -365,7 +379,11 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             disableVirtualization
             density="compact"
             rows={workflowsTable.filteredRows}
-            columns={columns}
+            columns={workflowsTable.columns as CustomGridColDef[]}
+            columnVisibilityModel={workflowsTable.columnsVisibilityModel}
+            onColumnVisibilityModelChange={(model) =>
+              dispatch(setWorkflowsTable({ columnsVisibilityModel: model }))
+            }          
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}
             slotProps={{noRowsOverlay: {title: "No workflows available"}}}
             checkboxSelection

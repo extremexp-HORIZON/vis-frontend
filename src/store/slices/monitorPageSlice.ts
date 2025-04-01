@@ -17,6 +17,8 @@ interface IMonitoringPageSlice {
         filteredRows: { [key: string]: any }[]
         filtersCounter: number
         visibleRows: { [key: string]: any }[]
+        columns: { [key: string]: any }[]
+        columnsVisibilityModel: { [field: string]: boolean }
       }
       scheduledTable: {
         order: "asc" | "desc"
@@ -29,6 +31,8 @@ interface IMonitoringPageSlice {
         filteredRows: { [key: string]: any }[]
         filtersCounter: number
         visibleRows: { [key: string]: any }[]
+        columns: { [key: string]: any }[]
+        columnsVisibilityModel: { [field: string]: boolean }
       }
       visibleTable: string
 }
@@ -46,6 +50,8 @@ const initialState: IMonitoringPageSlice = {
       filteredRows: [],
       filtersCounter: 0,
       visibleRows: [],
+      columns: [],
+      columnsVisibilityModel: {}
     },
     scheduledTable: {
       order: "asc",
@@ -58,6 +64,8 @@ const initialState: IMonitoringPageSlice = {
       filteredRows: [],
       filtersCounter: 0,
       visibleRows: [],
+      columns: [],
+      columnsVisibilityModel: {}
     },
     visibleTable: "workflows"
 }

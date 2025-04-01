@@ -320,8 +320,19 @@ export default function ScheduleTable() {
               }))
           : []
       paramLength.current = uniqueParameters.size
+        const visibilityModel = columns.reduce((acc, col) => {
+          acc[col.field] = true;
+          return acc;
+        }, {} as Record<string, boolean>);        
+
       dispatch(
-        setScheduledTable({ rows, visibleRows: rows, rowsPerPage: 10 }),
+        setScheduledTable({
+          rows,
+          filteredRows: rows,
+          visibleRows: rows.slice(0, scheduledTable.rowsPerPage),
+          columns: columns,
+          columnsVisibilityModel: visibilityModel
+        }),
       )
     }
   }, [workflows])
@@ -440,6 +451,7 @@ export default function ScheduleTable() {
             tableName={"Scheduled Workflows"}
             handleClickedFunction={removeSelected}
             tableId="scheduled"
+            onRemoveFilter={handleRemoveFilter}
           />
         </Box>
         <Popover
@@ -467,7 +479,11 @@ export default function ScheduleTable() {
             disableVirtualization
             density="compact"
             rows={scheduledTable.visibleRows}
-            columns={columns}
+            columns={scheduledTable.columns as CustomGridColDef[]}
+            columnVisibilityModel={scheduledTable.columnsVisibilityModel}
+            onColumnVisibilityModelChange={(model) =>
+              dispatch(setScheduledTable({ columnsVisibilityModel: model }))
+            }          
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}
             slotProps={{noRowsOverlay: {title: "No scheduled workflows"}}}
             checkboxSelection
