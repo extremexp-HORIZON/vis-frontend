@@ -55,13 +55,14 @@ const WorkflowActions = (props: {
   return (
     <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
       <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== "pending_input"}>
-      <IconButton>
+      <IconButton           
+        onClick={
+          (currentStatus === "COMPLETED" || currentStatus === "pending_input")
+            ? handleLaunchNewTab(workflowId)
+            : () => {}
+        }
+      >
         <LaunchIcon
-          onClick={
-            (currentStatus === "COMPLETED" || currentStatus === "pending_input")
-              ? handleLaunchNewTab(workflowId)
-              : () => {}
-          }
           style={{
             cursor: (currentStatus === "COMPLETED" || currentStatus === "pending_input") ? "pointer" : "default",
             color:
@@ -74,15 +75,13 @@ const WorkflowActions = (props: {
         </Badge>
       {currentStatus !== "COMPLETED" && currentStatus !== "FAILED" && (
         <>
-          <IconButton>
+          <IconButton onClick={() => console.log("Pause clicked")} >
             <PauseIcon
-              onClick={() => console.log("Pause clicked")}
               style={{ cursor: "pointer", color: theme.palette.primary.main }}
             />
           </IconButton>
-          <IconButton>
+          <IconButton onClick={() => console.log("Stop clicked")}>
             <StopIcon
-              onClick={() => console.log("Stop clicked")}
               style={{ cursor: "pointer", color: theme.palette.primary.main }}
             />
           </IconButton>
