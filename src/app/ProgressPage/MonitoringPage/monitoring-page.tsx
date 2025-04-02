@@ -1,16 +1,22 @@
-import { Box } from "@mui/material"
+import { Box, Tab, Tabs } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
 import { RootState, useAppSelector } from "../../../store/store"
+import { Resizable } from 're-resizable';
+import CompareCompleted from "../CompareTab/CompareCompleted/compare-completed"
+import { setSelectedTab } from "../../../store/slices/monitorPageSlice"
+import { useDispatch } from "react-redux"
+
 
 const MonitoringPage = () => {
-    const { visibleTable } = useAppSelector(
+    const { visibleTable, selectedTab } = useAppSelector(
       (state: RootState) => state.monitorPage
     )
     const navigate = useNavigate()
     const { experimentId } = useParams()
+    const dispatch = useDispatch()
 
       const handleChange =
       (newValue: number | string | null) => (event: React.SyntheticEvent) => {
@@ -24,6 +30,25 @@ const MonitoringPage = () => {
     
     return (
         <>
+              {/* Sticky Header with Tabs */}
+              <Box
+                sx={{
+                  borderColor: theme => theme.palette.customGrey.main,
+                  borderBottomWidth: 2,
+                  borderBottomStyle: "solid",
+                  width: "100%",
+                  px: 2
+                }}
+              >
+                <Tabs
+                  value={selectedTab}
+                  onChange={(event, newValue) => dispatch(setSelectedTab(newValue))}
+                  // aria-label="tab menu"
+                >
+                  <Tab label="WORKFLOWS" />
+                  <Tab label="COMPARATIVE ANALYSIS" />
+                </Tabs>
+              </Box>
             <Box
               sx={{
                 display: "flex",
@@ -33,17 +58,55 @@ const MonitoringPage = () => {
                 overflow: "auto"
               }}
             >
-                <Box sx={{height: "40%", px: 2}}>
-                  <ParallelCoordinatePlot />
+              {selectedTab === 0 &&
+                <Box>
+                  <Box sx={{height: "60%", minHeight: "350px", px: 2}}>
+                    {visibleTable === "workflows" ? 
+                      <WorkflowTable handleChange={handleChange} /> :  
+                      <ScheduleTable />
+                    }
+                  </Box>
+                  <Box sx={{height: "40%", px: 2}}>
+                    <ParallelCoordinatePlot />
+                  </Box>
                 </Box>
-                <Box sx={{height: "60%", minHeight: "350px", px: 2}}>
-                  {visibleTable === "workflows" ? 
-                    <WorkflowTable handleChange={handleChange} /> :  
-                    <ScheduleTable />
-                  }
+              }
+              {selectedTab === 1 &&
+                <Box 
+                  sx={{
+                    height: "100%",
+                    widht: "100%",
+                    display: "flex",
+                    px: 2
+                  }}
+                >
+                  <Resizable
+                    defaultSize={{
+                      width: "30%",
+                      height: "100%"
+                    }}
+                    minWidth="400px"
+                    enable={{ 
+                      top:false, 
+                      right:true, 
+                      bottom:false, 
+                      left:false, 
+                      topRight:false, 
+                      bottomRight:true, 
+                      bottomLeft:false, 
+                      topLeft:false 
+                    }}
+                    maxWidth="80%"
+                    maxHeight="100%"
+                    style={{height: "100%", overflow: "hidden"}}
+                  >
+                    <WorkflowTable handleChange={handleChange} />
+                  </Resizable>
+                  <Box sx={{flex: 1}}>
+                  </Box>
                 </Box>
+              }
             </Box>
-            
         </>
     )
 }

@@ -97,7 +97,7 @@ const ProgressPage = (props: ProgressPageProps) => {
               sx={{
                 position: "fixed",
                 left: 0,
-                width: !menuOptions.collapsed ? "15%" : "8%",
+                width: !menuOptions.collapsed ? "15%" : "5%",
                 height: "100%",
                 transition: "width 0.3s ease",
               }}
@@ -111,8 +111,8 @@ const ProgressPage = (props: ProgressPageProps) => {
                 rowGap: 2,
                 height:"100%",
                 overflow: "hidden",
-                width:  !menuOptions.collapsed ? "75%%" : "92%",
-                marginLeft: !menuOptions.collapsed ? "15%" : "8%",
+                width:  !menuOptions.collapsed ? "85%" : "95%",
+                marginLeft: !menuOptions.collapsed ? "15%" : "5%",
                 transition: "margin-left 0.3s ease, width 0.3s ease",  
               }}
             >

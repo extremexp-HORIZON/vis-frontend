@@ -10,7 +10,7 @@ import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import LaunchIcon from "@mui/icons-material/Launch"
-import { setWorkflowsTable } from "../../../../store/slices/monitorPageSlice"
+import { setSelectedTab, setWorkflowsTable } from "../../../../store/slices/monitorPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
 import { useEffect, useState } from "react"
@@ -20,7 +20,6 @@ import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
 
 import theme from "../../../../mui-theme"
-import { useNavigate, useParams } from "react-router-dom"
 
 type CustomGridColDef = GridColDef & {
   field: string
@@ -132,7 +131,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
-  const { workflowsTable } = useAppSelector(
+  const { workflowsTable, selectedTab } = useAppSelector(
     (state: RootState) => state.monitorPage
   )
   const { handleChange } = props
@@ -142,8 +141,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   )
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [uniqueMetrics, setUniqueMetrics] = useState<Set<string> | null>(null)
-  const navigate = useNavigate()
-  const {experimentId} = useParams()
 
   const dispatch = useAppDispatch()
 
@@ -157,7 +154,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   const handleLaunchCompletedTab =
     (workflowId: any) => (e: React.SyntheticEvent) => {
-      navigate(`/${experimentId}/comparative-analysis`)
+      dispatch(setSelectedTab(1))
     }
 
   const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -261,7 +258,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           const params = workflow.params
           const metrics = workflow?.metrics
           return {
-            id: idCounter++,
+            id: workflow.id,
             workflowId: workflow.id,
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
@@ -341,8 +338,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   }, [workflows])
 
   return (
-    <Box sx={{height: "100%"}}>
-      <Paper elevation={2} sx={{height: "100%", width: "100%", mb: 2}}>
+    <Box sx={{height: "100%", width: "100%" }}>
+      <Paper elevation={5} sx={{height: "100%", width: "100%", mb: 2}}>
         <Box sx={{height: "15%"}} >
           <ToolbarWorkflow
             actionButtonName="Compare selected workflows"
@@ -351,7 +348,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             filterNumbers={workflowsTable.filtersCounter}
             filterClickedFunction={filterClicked}
             handleClickedFunction={handleLaunchCompletedTab}
-            tableId="workflows"
             onRemoveFilter={handleRemoveFilter}
           />
         </Box>

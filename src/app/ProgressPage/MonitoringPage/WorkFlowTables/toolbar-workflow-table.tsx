@@ -17,13 +17,12 @@ interface ToolBarWorkflowProps {
   actionButtonName: string;
   handleClickedFunction: (workflowId: number[] | string) => (e: React.SyntheticEvent) => void;
   filterClickedFunction: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  tableId: string;
   onRemoveFilter: (index: number) => void
 }
 
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
-  const { filterNumbers, numSelected, tableName, actionButtonName, handleClickedFunction, filterClickedFunction, tableId, onRemoveFilter } = props;
-  const { visibleTable, workflowsTable, scheduledTable } = useAppSelector(
+  const { filterNumbers, numSelected, tableName, actionButtonName, handleClickedFunction, filterClickedFunction, onRemoveFilter } = props;
+  const { visibleTable, workflowsTable, scheduledTable, selectedTab } = useAppSelector(
     (state: RootState) => state.monitorPage
   )
   const dispatch = useAppDispatch()
@@ -43,7 +42,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 &&
+        ...(numSelected > 0 && selectedTab !== 1 &&
         {
           bgcolor: (theme) =>
             alpha(
@@ -53,7 +52,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
         }),
       }}
     >
-      {numSelected > 0 ? (
+      {numSelected > 0 && selectedTab !== 1 ? (
         <Typography
           sx={{ flex: '1 1 60%' }}
           color="inherit"
@@ -63,28 +62,29 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           {numSelected} selected
         </Typography>
       ) : (
-        <Tooltip title="" sx={{width: "15%"}}>
-          <Stack spacing={1} direction="row">
-              <Button
-                size="small"
-                variant={ visibleTable === "workflows" ? "contained" : "outlined"}
-                sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold', borderRadius: 4 }}
-                onClick={() => dispatch(setVisibleTable("workflows"))}
-              >
-                Workflows
-              </Button>
-              <Button
-                size="small"
-                variant={ visibleTable === "scheduled" ? "contained" : "outlined"}
-                sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold', borderRadius: 4 }}
-                onClick={() => dispatch(setVisibleTable("scheduled"))}
-              >
-                Scheduled
-              </Button>
-          </Stack>
-        </Tooltip>
+        selectedTab !== 1 &&
+          <Tooltip title="" sx={{width: "15%"}}>
+            <Stack spacing={1} direction="row">
+                <Button
+                  size="small"
+                  variant={ visibleTable === "workflows" ? "contained" : "outlined"}
+                  sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold', borderRadius: 4 }}
+                  onClick={() => dispatch(setVisibleTable("workflows"))}
+                >
+                  Workflows
+                </Button>
+                <Button
+                  size="small"
+                  variant={ visibleTable === "scheduled" ? "contained" : "outlined"}
+                  sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold', borderRadius: 4 }}
+                  onClick={() => dispatch(setVisibleTable("scheduled"))}
+                >
+                  Scheduled
+                </Button>       
+                </Stack>
+          </Tooltip>
       )}
-      {numSelected > 0 ? (
+      {numSelected > 0 && selectedTab !== 1 ? (
         <Tooltip title="">
           <Button
             sx={{ padding: 1, margin: 2 }}
@@ -99,7 +99,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           </Button>
         </Tooltip>
       ) : (
-        <Box sx={{ width: "85%", display: "flex",alignItems: "center",  flexDirection: "row", pl: 1}}>
+        <Box sx={{ width: selectedTab !== 1 ? "85%" : "90%", display: "flex",alignItems: "center",  flexDirection: "row", pl: 1}}>
           {visibleTable === "workflows" ? (
             workflowsTable.filters?.length > 0 &&
             <Box sx={{width: {lg: "70%", xl: "80%"}, overflowX: "auto", display: "flex", whiteSpace: 'nowrap', gap: 0.2}}>

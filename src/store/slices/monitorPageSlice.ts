@@ -11,7 +11,7 @@ interface IMonitoringPageSlice {
         orderBy: string
         page: number
         rowsPerPage: number
-        selectedWorkflows: number[]
+        selectedWorkflows: string[]
         filters: { column: string; operator: string; value: string }[]
         rows: { [key: string]: any }[]
         filteredRows: { [key: string]: any }[]
@@ -25,7 +25,7 @@ interface IMonitoringPageSlice {
         orderBy: string
         page: number
         rowsPerPage: number
-        selectedWorkflows: number[]
+        selectedWorkflows: string[]
         filters: { column: string; operator: string; value: string }[]
         rows: { [key: string]: any }[]
         filteredRows: { [key: string]: any }[]
@@ -35,6 +35,7 @@ interface IMonitoringPageSlice {
         columnsVisibilityModel: { [field: string]: boolean }
       }
       visibleTable: string
+      selectedTab: number
 }
 
 const initialState: IMonitoringPageSlice = {
@@ -67,7 +68,8 @@ const initialState: IMonitoringPageSlice = {
       columns: [],
       columnsVisibilityModel: {}
     },
-    visibleTable: "workflows"
+    visibleTable: "workflows",
+    selectedTab: 0
 }
 
 export const monitoringPageSlice = createSlice({
@@ -91,8 +93,11 @@ export const monitoringPageSlice = createSlice({
     },
     setVisibleTable: (state, action) => {
       state.visibleTable = action.payload
+    },
+    setSelectedTab: (state, action) => {
+      state.selectedTab = action.payload
     }
   }
 })
 
-export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable} = monitoringPageSlice.actions;
+export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab} = monitoringPageSlice.actions;

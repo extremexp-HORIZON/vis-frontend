@@ -450,7 +450,6 @@ export default function ScheduleTable() {
             numSelected={scheduledTable.selectedWorkflows.length}
             tableName={"Scheduled Workflows"}
             handleClickedFunction={removeSelected}
-            tableId="scheduled"
             onRemoveFilter={handleRemoveFilter}
           />
         </Box>
