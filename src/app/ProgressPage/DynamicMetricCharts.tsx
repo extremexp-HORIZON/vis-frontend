@@ -1,6 +1,13 @@
 import React, { useState } from "react"
 import { RootState, useAppSelector } from "../../store/store"
-import { Grid, Container, FormControlLabel, Switch } from "@mui/material"
+import {
+  Grid,
+  Container,
+  FormControlLabel,
+  Switch,
+  ButtonGroup,
+  Button,
+} from "@mui/material"
 import { useLocation } from "react-router-dom"
 import ResponsiveCardVegaLite from "../../shared/components/responsive-card-vegalite"
 import { max } from "lodash"
@@ -33,15 +40,6 @@ const WorkflowCharts: React.FC = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const [isMosaic, setIsMosaic] = useState(true)
 
-  const location = useLocation()
-  const searchParams = new URLSearchParams(location.search)
-  const workflowId = searchParams.get("workflowId")
-  // const filteredWorkflows = workflows.data.filter(
-  //   (workflow: IWorkflow) =>
-  //     [workflowId].includes(workflow.id),
-
-  // )
-  
   const filteredWorkflows = workflows.data.filter((workflow: IWorkflow) =>
     workflowsTable.selectedWorkflows.includes(workflow.id),
   )
@@ -63,9 +61,6 @@ const WorkflowCharts: React.FC = () => {
     },
     {},
   )
-
-  console.log("groupedMetrics", groupedMetrics)
-
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]
@@ -85,8 +80,8 @@ const WorkflowCharts: React.FC = () => {
           scale: {
             domain: [
               0, // Min value is 0 (or any other value you'd like)
-              Math.max(...metricSeries.map((d: any) => d.value)) * 1.05 // Max value with 10% padding
-            ]
+              Math.max(...metricSeries.map((d: any) => d.value)) * 1.05, // Max value with 10% padding
+            ],
           },
         },
         color: { field: "id", type: "nominal", legend: null },
@@ -97,9 +92,7 @@ const WorkflowCharts: React.FC = () => {
         ],
       },
       data: { values: metricSeries },
-    };
-    
-    
+    }
 
     return (
       <Grid
@@ -122,19 +115,24 @@ const WorkflowCharts: React.FC = () => {
     <Container sx={{ maxWidth: "100%" }}>
       <Grid
         container
-        justifyContent="space-between"
+        justifyContent="flex-end" // Align to the right
         alignItems="center"
         sx={{ marginBottom: 2 }}
       >
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isMosaic}
-              onChange={() => setIsMosaic(!isMosaic)}
-            />
-          }
-          label={isMosaic ? "Mosaic" : "One Row"}
-        />
+        <ButtonGroup
+          variant="contained"
+          aria-label="view mode"
+          sx={{
+            height: "25px", // Ensure consistent height for the button group
+          }}
+        >
+          <Button onClick={() => setIsMosaic(true)} disabled={isMosaic}>
+            Mosaic
+          </Button>
+          <Button onClick={() => setIsMosaic(false)} disabled={!isMosaic}>
+            One Row
+          </Button>
+        </ButtonGroup>
       </Grid>
       <Grid container spacing={2} sx={{ width: "100%", margin: "0 auto" }}>
         {renderCharts}
