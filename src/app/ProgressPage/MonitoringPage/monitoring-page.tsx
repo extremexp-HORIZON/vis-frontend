@@ -104,6 +104,7 @@ const MonitoringPage = () => {
               <WorkflowTable handleChange={handleChange} />
             </Resizable>
             <Box sx={{ flex: 1, overflow: "auto", height: "100%" }}>
+             
               <WorkflowCharts />
             </Box>
           </Box>

@@ -7,6 +7,8 @@ import {
   Switch,
   ButtonGroup,
   Button,
+  Typography,
+  Box,
 } from "@mui/material"
 import { useLocation } from "react-router-dom"
 import ResponsiveCardVegaLite from "../../shared/components/responsive-card-vegalite"
@@ -37,6 +39,8 @@ const WorkflowCharts: React.FC = () => {
   const { workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   )
+
+  console.log("workflowsTable", workflowsTable)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const [isMosaic, setIsMosaic] = useState(true)
 
@@ -73,6 +77,10 @@ const WorkflowCharts: React.FC = () => {
           field: uniqueSteps.size === 1 ? "id" : "step",
           type: "ordinal",
           axis: { labels: false }, // Hide x-axis labels
+          scale: {
+            padding: 0.05, // Adds 2% extra space to the right
+          }
+  
         },
         y: {
           field: "value",
@@ -110,6 +118,12 @@ const WorkflowCharts: React.FC = () => {
       </Grid>
     )
   })
+
+  if (workflowsTable.selectedWorkflows.length === 0) {
+    return  <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
+    <Typography align="center" fontWeight="bold">Select Workflows to display metrics.</Typography>
+    </Box> // Or you can return some placeholder text/UI
+  }
 
   return (
     <Container sx={{ maxWidth: "100%" }}>
