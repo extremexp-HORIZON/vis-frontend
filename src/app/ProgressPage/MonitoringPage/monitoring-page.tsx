@@ -4,6 +4,7 @@ import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-p
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
 import { RootState, useAppSelector } from "../../../store/store"
+import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from 're-resizable';
 import CompareCompleted from "../CompareTab/CompareCompleted/compare-completed"
 import { setSelectedTab } from "../../../store/slices/monitorPageSlice"
@@ -103,6 +104,7 @@ const MonitoringPage = () => {
                     <WorkflowTable handleChange={handleChange} />
                   </Resizable>
                   <Box sx={{flex: 1}}>
+                    <WorkflowCharts/>
                   </Box>
                 </Box>
               }

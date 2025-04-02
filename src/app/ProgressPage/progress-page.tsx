@@ -56,9 +56,9 @@ const ProgressPage = (props: ProgressPageProps) => {
     }
     fetchWorkflows()
     // TODO: Remove this if statement when no longer needed
-    if (experimentId !== "ideko" && experimentId !== "I2Cat_phising") {
-    intervalId.current = setInterval(fetchWorkflows, 5000)
-    }
+    // if (experimentId !== "ideko" && experimentId !== "I2Cat_phising") {
+    // intervalId.current = setInterval(fetchWorkflows, 5000)
+    // }
 
     return () => {
       if (intervalId.current) {
