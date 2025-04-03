@@ -28,9 +28,9 @@ const ParallelCoordinatePlot = () => {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.tasks.flatMap(task =>
+            task.parameters ? task.parameters : [],
+          )
           let paramNames = []
           if (params) {
             paramNames = params.map(param => param.name)
@@ -44,9 +44,9 @@ const ParallelCoordinatePlot = () => {
       const data = workflows.data
         .filter(workflow => workflow.status === "completed")
         .map(workflow => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.tasks.flatMap(task =>
+            task.parameters ? task.parameters : [],
+          )
           return {
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
@@ -116,6 +116,7 @@ const ParallelCoordinatePlot = () => {
 
   return (
     <>
+    {console.log("progressParallel", progressParallel)}
       <Paper elevation={2}>
         <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
           <Typography fontSize={"0.8rem"}>Color by:</Typography>
