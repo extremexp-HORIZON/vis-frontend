@@ -157,9 +157,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       dispatch(setSelectedTab(1))
     }
 
-  const filterClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const filterClicked = (event: React.MouseEvent<HTMLElement>) => {
     setFilterOpen(!isFilterOpen)
-    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
+    !isFilterOpen ? setAnchorEl(event.currentTarget as HTMLButtonElement) : setAnchorEl(null)
   }
 
   const handleFilterChange = (
@@ -340,7 +340,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   return (
     <Box sx={{height: "100%", width: "100%" }}>
       <Paper elevation={5} sx={{height: "100%", width: "100%", mb: 2}}>
-        <Box sx={{height: "15%"}} >
+        <Box sx={{height: "56px"}} >
           <ToolbarWorkflow
             actionButtonName="Compare selected workflows"
             tableName="Workflow Execution"
@@ -372,7 +372,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           </Box>
         </Popover>
 
-        <div style={{ height: "85%", width: "100%" }}>
+        <div style={{ height: 'calc(100% - 56px)', width: "100%" }}>
           <StyledDataGrid
             disableVirtualization
             density="compact"

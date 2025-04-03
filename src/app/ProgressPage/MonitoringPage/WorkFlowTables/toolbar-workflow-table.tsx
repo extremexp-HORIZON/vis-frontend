@@ -5,18 +5,19 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
-import { Button, Stack, Box, Chip, Popover, FormControlLabel, Checkbox } from '@mui/material';
+import { Button, Stack, Box, Chip, Popover, FormControlLabel, Checkbox, List, ListItemButton } from '@mui/material';
 import { RootState, useAppDispatch, useAppSelector } from '../../../../store/store';
 import { setScheduledTable, setVisibleTable, setWorkflowsTable } from '../../../../store/slices/monitorPageSlice';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { useState } from 'react';
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 interface ToolBarWorkflowProps {
   filterNumbers: number;
   numSelected: number;
   tableName: string;
   actionButtonName: string;
   handleClickedFunction: (workflowId: number[] | string) => (e: React.SyntheticEvent) => void;
-  filterClickedFunction: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  filterClickedFunction: (event: React.MouseEvent<HTMLElement>) => void;
   onRemoveFilter: (index: number) => void
 }
 
@@ -27,14 +28,22 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
   )
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElMenu(event.currentTarget);
+  };
+
   const handleClose = () => setAnchorEl(null);
 
+  const handleCloseMenu = () => setAnchorElMenu(null);
+
   const open = Boolean(anchorEl);
+  const openMenu = Boolean(anchorElMenu)
 
 
   return (
@@ -99,10 +108,10 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           </Button>
         </Tooltip>
       ) : (
-        <Box sx={{ width: selectedTab !== 1 ? "85%" : "90%", display: "flex",alignItems: "center",  flexDirection: "row", pl: 1}}>
+        <Box sx={{ width: selectedTab !== 1 ? "85%" : "100%", display: "flex",alignItems: "center",  flexDirection: "row", pl: 1}}>
           {visibleTable === "workflows" ? (
             workflowsTable.filters?.length > 0 &&
-            <Box sx={{width: {lg: "70%", xl: "80%"}, overflowX: "auto", display: "flex", whiteSpace: 'nowrap', gap: 0.2}}>
+            <Box sx={{ overflowX: "auto", display: "flex", whiteSpace: 'nowrap', gap: 0.2}}>
               {workflowsTable.filters.map((filter, index) => {
                 const label = `${filter.column} ${filter.operator} ${filter.value}`
                 return (
@@ -112,7 +121,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             </Box>
           ) : (
             scheduledTable.filters?.length > 0 &&
-            <Box sx={{width: {lg: "70%", xl: "20%"},overflowX: "auto", display: "flex", whiteSpace: 'nowrap', gap: 0.2}}>
+            <Box sx={{p: 1, overflowX: "auto", display: "flex", whiteSpace: 'nowrap', gap: 0.2}}>
               {scheduledTable.filters.map((filter, index) => {
                 const label = `${filter.column} ${filter.operator} ${filter.value}`
                 return (
@@ -121,16 +130,28 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               })}
             </Box>
           )}
-          <Box sx={{ width: {lg: "30%", xl: "20%"}, gap: 0.2, marginLeft: "auto" }}>
-            <IconButton sx={{gap: 0.2 }} onClick={(event) => filterClickedFunction(event)}>
-              <FilterListIcon sx={{ color: theme => theme.palette.primary.main }} />
-              <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }} > {filterNumbers > 0 ? ` (${filterNumbers})` : ''}</Typography>
-              <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }} >FILTERS</Typography>
+          <Box sx={{  gap: 0.2, marginLeft: "auto" }}>
+            <IconButton onClick={handleOpenMenu}>
+              <MoreVertRoundedIcon />
             </IconButton>
-            <IconButton sx={{gap: 0.2 }} onClick={handleOpen}>
-              <MenuRoundedIcon sx={{ color: theme => theme.palette.primary.main }} />
-              <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }}>COLUMNS</Typography>
-            </IconButton>
+            <Popover
+              open={openMenu}
+              anchorEl={anchorElMenu}
+              onClose={handleCloseMenu}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            >
+              <List>
+                <ListItemButton onClick={(event) => filterClickedFunction(event)}>
+                  <FilterListIcon sx={{ color: theme => theme.palette.primary.main }} />
+                  <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }} > {filterNumbers > 0 ? ` (${filterNumbers})` : ''}</Typography>
+                  <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }} >FILTERS</Typography>
+                </ListItemButton>
+                <ListItemButton onClick={handleOpen}>
+                  <MenuRoundedIcon sx={{ color: theme => theme.palette.primary.main }} />
+                  <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }}>COLUMNS</Typography>
+                </ListItemButton>
+              </List>
+            </Popover>
             <Popover
               open={open}
               anchorEl={anchorEl}

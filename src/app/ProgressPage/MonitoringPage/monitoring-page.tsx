@@ -86,25 +86,24 @@ const MonitoringPage = () => {
                 width: "30%",
                 height: "100%",
               }}
-              minWidth="400px"
+              minWidth="200px"
               enable={{
                 top: false,
                 right: true,
                 bottom: false,
                 left: false,
                 topRight: false,
-                bottomRight: true,
+                bottomRight: false,
                 bottomLeft: false,
                 topLeft: false,
               }}
               maxWidth="80%"
               maxHeight="100%"
-              style={{ height: "100%", overflow: "hidden" }}
+              style={{ height: "100%" }}
             >
               <WorkflowTable handleChange={handleChange} />
             </Resizable>
             <Box sx={{ flex: 1, overflow: "auto", height: "100%" }}>
-             
               <WorkflowCharts />
             </Box>
           </Box>
