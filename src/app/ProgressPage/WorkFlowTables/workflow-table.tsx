@@ -5,7 +5,6 @@ import type {
 } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
 import ToolbarWorkflow from "./toolbar-workflow-table"
-import ProgressPercentage from "./progress-percentage"
 import Paper from "@mui/material/Paper"
 import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
@@ -14,12 +13,8 @@ import LaunchIcon from "@mui/icons-material/Launch"
 import { setProgressWokflowsTable } from "../../../store/slices/progressPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import type { RootState } from "../../../store/store"
-import {
-  addCompareCompletedTab,
-  addTab,
-} from "../../../store/slices/workflowTabsSlice"
 import { useEffect, useState } from "react"
-import { Badge, Popover, Rating, styled, useTheme } from "@mui/material"
+import { Badge, Popover, Rating, styled } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
@@ -54,7 +49,7 @@ let idCounter = 1
 
 const WorkflowRating = (props: { rating: number }) => {
   const { rating } = props
-  return <Rating sx={{verticalAlign: "middle"}} value={rating} size="small" />
+  return <Rating sx={{ verticalAlign: "middle" }} value={rating} size="small" />
 }
 
 const WorkflowActions = (props: {
@@ -65,23 +60,39 @@ const WorkflowActions = (props: {
   const { currentStatus, workflowId, handleLaunchNewTab } = props
 
   return (
-    <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-      <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== "pending_input"}>
-      <LaunchIcon
-        onClick={
-          (currentStatus === "completed" || currentStatus === "pending_input")
-            ? handleLaunchNewTab(workflowId)
-            : () => {}
-        }
-        style={{
-          cursor: (currentStatus === "completed" || currentStatus === "pending_input") ? "pointer" : "default",
-          color:
-          (currentStatus === "completed" || currentStatus === "pending_input")
-              ? theme.palette.primary.main
-              : theme.palette.action.disabled,
-        }}
-      />
-        </Badge>
+    <span
+      onClick={event => event.stopPropagation()}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+      }}
+    >
+      <Badge
+        color="secondary"
+        badgeContent=""
+        variant="dot"
+        invisible={currentStatus !== "pending_input"}
+      >
+        <LaunchIcon
+          onClick={
+            currentStatus === "completed" || currentStatus === "pending_input"
+              ? handleLaunchNewTab(workflowId)
+              : () => {}
+          }
+          style={{
+            cursor:
+              currentStatus === "completed" || currentStatus === "pending_input"
+                ? "pointer"
+                : "default",
+            color:
+              currentStatus === "completed" || currentStatus === "pending_input"
+                ? theme.palette.primary.main
+                : theme.palette.action.disabled,
+          }}
+        />
+      </Badge>
       {currentStatus !== "completed" && currentStatus !== "failed" && (
         <>
           <PauseIcon
@@ -233,39 +244,59 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       //find unique parameters of each workflow -> model traning task
       const uniqueParameters = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.tasks.flatMap(task =>
+            task.parameters ? task.parameters : [],
+          )
           let paramNames = []
           if (params) {
             paramNames = params.map(param => param.name)
             return [...acc, ...paramNames]
           } else {
-            return [...acc]
+            return acc
           }
         }, []),
       )
       const uniqueMetrics = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const metrics = workflow.metrics?.filter(metric => metric.semantic_type && metric.semantic_type.includes("ML"))
+          const metrics = workflow.metrics?.filter(
+            metric =>
+              metric.semantic_type && metric.semantic_type.includes("ML"),
+          )
           let metricNames = []
-          if(metrics) {
+          if (metrics) {
             metricNames = metrics.map(metric => metric.name)
             return [...acc, ...metricNames]
           } else {
             return [...acc]
           }
-        }, [])
+        }, []),
       )
       setUniqueParameters(uniqueParameters)
       setUniqueMetrics(uniqueMetrics)
+
+      const row = {
+        id: 0,
+        workflowId: "",
+        ...Array.from(uniqueParameters).reduce((acc, variant) => {
+          acc[variant] = ""
+          return acc
+        }, {}),
+        ...Array.from(uniqueMetrics).reduce((acc, variant) => {
+          acc[variant] = ""
+          return acc
+        }, {}),
+        status: "",
+        rating: 2,
+        action: "",
+      }
+
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
         .filter(workflow => workflow.status !== "scheduled")
         .map(workflow => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.tasks.flatMap(task =>
+            task.parameters ? task.parameters : [],
+          )
           const metrics = workflow?.metrics
           return {
             id: idCounter++,
@@ -276,7 +307,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               return acc
             }, {}),
             ...Array.from(uniqueMetrics).reduce((acc, variant) => {
-              const value = metrics?.find(metric => metric.name === variant)?.value
+              const value = metrics?.find(
+                metric => metric.name === variant,
+              )?.value
               acc[variant] = value != null ? value : "n/a"
               return acc
             }, {}),
@@ -285,51 +318,58 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             action: "",
           }
         })
-
-      columns = Object.keys(rows[0])
-        .filter(key => key !== "id")
-        .map(key => ({
-          field: key,
-          headerName: key.replace("_", " "),
-          headerClassName:
-            key === "action" ? "datagrid-header-fixed" : "datagrid-header",
-          minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
-          maxWidth: 200,
-          flex: 1,
-          align: "center",
-          headerAlign: "center",
-          sortable: key !== "action",
-          type: rows.length > 0 && typeof rows[0][key] === "number" ? "number" : "string",
-          ...(key === "status" && {
-            renderCell: params => (
-              <ProgressBar
-                workflowStatus={params.value}
-                workflowId={params.row.workflowId}
-              />
-            ),
-          }),
-          ...(key === "action" && {
-            renderCell: params => {
-              const currentStatus = params.row.status
-              return (
-                <WorkflowActions
-                  currentStatus={currentStatus}
-                  workflowId={params.row.workflowId}
-                  handleLaunchNewTab={handleLaunchNewTab}
-                />
-              )
-            },
-          }),
-          ...(key === "rating" && {
-            renderCell: params => {
-              const currentRating = params.row.rating
-              return (
-                <WorkflowRating
-                  rating={currentRating} />
-              )
-            },
-          }),
-        }))
+        
+      columns = Object.keys(rows.length > 0 ? rows[0] : row)
+              .filter(key => key !== "id")
+              .map(key => ({
+                field: key,
+                headerName: key.replace("_", " "),
+                headerClassName:
+                  key === "action"
+                    ? "datagrid-header-fixed"
+                    : "datagrid-header",
+                minWidth:
+                  key === "action"
+                    ? 100
+                    : key === "status"
+                      ? key.length * 10 + 40
+                      : key.length * 10,
+                maxWidth: 200,
+                flex: 1,
+                align: "center",
+                headerAlign: "center",
+                sortable: key !== "action",
+                type:
+                  rows.length > 0 && typeof rows[0][key] === "number"
+                    ? "number"
+                    : "string",
+                ...(key === "status" && {
+                  renderCell: params => (
+                    <ProgressBar
+                      workflowStatus={params.value}
+                      workflowId={params.row.workflowId}
+                    />
+                  ),
+                }),
+                ...(key === "action" && {
+                  renderCell: params => {
+                    const currentStatus = params.row.status
+                    return (
+                      <WorkflowActions
+                        currentStatus={currentStatus}
+                        workflowId={params.row.workflowId}
+                        handleLaunchNewTab={handleLaunchNewTab}
+                      />
+                    )
+                  },
+                }),
+                ...(key === "rating" && {
+                  renderCell: params => {
+                    const currentRating = params.row.rating
+                    return <WorkflowRating rating={currentRating} />
+                  },
+                }),
+              }))
 
       dispatch(
         setProgressWokflowsTable({
@@ -379,8 +419,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             disableVirtualization
             rows={progressWokflowsTable.filteredRows}
             columns={columns}
-            slots={{noRowsOverlay: NoRowsOverlayWrapper}}
-            slotProps={{noRowsOverlay: {title: "No workflows available"}}}
+            slots={{ noRowsOverlay: NoRowsOverlayWrapper }}
+            slotProps={{ noRowsOverlay: { title: "No workflows available" } }}
             checkboxSelection
             onRowSelectionModelChange={handleSelectionChange}
             rowSelectionModel={progressWokflowsTable.selectedWorkflows}
@@ -421,7 +461,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                   bottom: 0,
                   left: 0,
                 },
-              }
+              },
             }}
             pageSizeOptions={[10, 25, 50]}
             initialState={{
@@ -444,14 +484,14 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               {
                 groupId: "Metrics",
                 headerClassName: "theme-parameters-group-2",
-                children: uniqueMetrics ? (
-                  Array.from(uniqueMetrics).map(
-                    (metric): GridColumnNode => ({
-                      field: metric,
-                    }),
-                  ) as GridColumnNode[]
-                ) : []
-              }
+                children: uniqueMetrics
+                  ? (Array.from(uniqueMetrics).map(
+                      (metric): GridColumnNode => ({
+                        field: metric,
+                      }),
+                    ) as GridColumnNode[])
+                  : [],
+              },
             ]}
           />
         </div>

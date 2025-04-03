@@ -227,15 +227,14 @@ export default function ScheduleTable() {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
         workflows.data.reduce((acc: any[], workflow) => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.tasks.flatMap(
+            task => task.parameters ? task.parameters : [])
           let paramNames = []
           if (params) {
             paramNames = params.map(param => param.name)
             return [...acc, ...paramNames]
           } else {
-            return [...acc]
+            return acc
           }
         }, []),
       )
@@ -243,9 +242,8 @@ export default function ScheduleTable() {
       const rows = workflows.data
         .filter(workflow => workflow.status === "scheduled")
         .map(workflow => {
-          const params = workflow.tasks.find(
-            task => task.id === "TrainModel",
-          )?.parameters
+          const params = workflow.tasks.flatMap(
+            task => task.parameters ? task.parameters : [])
           return {
             id: idCounter++,
             workflowId: workflow.name,
