@@ -12,6 +12,8 @@ interface IMonitoringPageSlice {
         page: number
         rowsPerPage: number
         selectedWorkflows: string[]
+        workflowColors: { [key: string]: string } // New mapping for workflow colors
+
         filters: { column: string; operator: string; value: string }[]
         rows: { [key: string]: any }[]
         filteredRows: { [key: string]: any }[]
@@ -38,6 +40,34 @@ interface IMonitoringPageSlice {
       selectedTab: number
 }
 
+const generateUniqueColor = (existingColors: Set<string>) => {
+  const colors = [
+    "#1F77B4", 
+  "#FF7F0E", 
+  "#2CA02C", 
+  "#D62728", 
+  "#9467BD", // Purple
+  "#8C564B", // Brown
+  "#E377C2", // Pink
+  "#17BECF", // Cyan
+  "#AEC7E8", // Light Blue
+  "#FFBB78", // Light Orange
+  "#98DF8A", // Light Green
+  "#FF9896", // Light Red
+  "#C5B0D5", // Light Purple
+  "#C49C94", // Light Brown
+  "#F7B6D2", // Light Pink
+  "#9EDAE5", // Light Cyan
+  ];
+
+  const availableColors = colors.filter(color => !existingColors.has(color));
+
+  // If all colors are used, recycle but prioritize uniqueness
+  if (availableColors.length === 0) return colors[Math.floor(Math.random() * colors.length)];
+
+  const newColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+  return newColor;
+};
 const initialState: IMonitoringPageSlice = {
     parallel: { data: [], options: [], selected: "" },
     workflowsTable: {
@@ -46,6 +76,8 @@ const initialState: IMonitoringPageSlice = {
       page: 0,
       rowsPerPage: 10,
       selectedWorkflows: [],
+      workflowColors: {}, // Initialize the color mapping
+
       filters: [],
       rows: [],
       filteredRows: [],
@@ -96,8 +128,26 @@ export const monitoringPageSlice = createSlice({
     },
     setSelectedTab: (state, action) => {
       state.selectedTab = action.payload
+    },
+    toggleWorkflowSelection: (state, action) => {
+      const workflowId = action.payload;
+      const index = state.workflowsTable.selectedWorkflows.indexOf(workflowId);
+
+      if (index === -1) {
+        // Add workflow and assign a unique color
+        state.workflowsTable.selectedWorkflows.push(workflowId);
+
+        const existingColors = new Set(Object.values(state.workflowsTable.workflowColors));
+        if (!state.workflowsTable.workflowColors[workflowId]) {
+          state.workflowsTable.workflowColors[workflowId] = generateUniqueColor(existingColors);
+        }
+      } else {
+        // Remove workflow but keep its color mapping
+        state.workflowsTable.selectedWorkflows.splice(index, 1);
+      }
     }
   }
 })
 
-export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab} = monitoringPageSlice.actions;
+export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab,    toggleWorkflowSelection 
+} = monitoringPageSlice.actions;

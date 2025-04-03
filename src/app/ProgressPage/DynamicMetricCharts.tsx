@@ -40,7 +40,6 @@ const WorkflowCharts: React.FC = () => {
     (state: RootState) => state.monitorPage,
   )
 
-  console.log("workflowsTable", workflowsTable)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const [isMosaic, setIsMosaic] = useState(true)
 
@@ -69,6 +68,11 @@ const WorkflowCharts: React.FC = () => {
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]
     const uniqueSteps = new Set(metricSeries.map(m => m.step))
+    const workflowColorMap = workflowsTable.workflowColors;
+    const workflowColorScale = filteredWorkflows.map(wf => ({
+      id: wf.id,
+      color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
+    }));
 
     const chartSpec = {
       mark: uniqueSteps.size === 1 ? "bar" : "line",
@@ -92,8 +96,15 @@ const WorkflowCharts: React.FC = () => {
             ],
           },
         },
-        color: { field: "id", type: "nominal", legend: null },
-        tooltip: [
+        color: {
+          field: "id",
+          type: "nominal",
+          scale: {
+            domain: workflowColorScale.map(w => w.id), // Workflow IDs
+            range: workflowColorScale.map(w => w.color), // Corresponding Colors
+          },
+          legend: null,
+        },        tooltip: [
           { field: "id", type: "nominal" },
           // { field: "step", type: "quantitative" },
           { field: "value", type: "quantitative" },

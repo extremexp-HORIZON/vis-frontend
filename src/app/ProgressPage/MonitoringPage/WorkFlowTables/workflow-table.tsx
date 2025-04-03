@@ -10,7 +10,7 @@ import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import LaunchIcon from "@mui/icons-material/Launch"
-import { setSelectedTab, setWorkflowsTable } from "../../../../store/slices/monitorPageSlice"
+import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection } from "../../../../store/slices/monitorPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
 import { useEffect, useState } from "react"
@@ -145,7 +145,13 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const dispatch = useAppDispatch()
 
   const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
-    dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }))
+    newSelection.forEach(workflowId => {
+      dispatch(toggleWorkflowSelection(workflowId));
+
+  });
+             dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }))
+
+
   }
 
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
