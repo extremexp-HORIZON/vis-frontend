@@ -347,7 +347,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   return (
     <Box sx={{height: "100%", width: "100%" }}>
-      <Paper elevation={5} sx={{height: "100%", width: "100%", mb: 2}}>
+      <Paper elevation={2} sx={{height: "100%", width: "100%", mb: 2}}>
         <Box sx={{height: "56px"}} >
           <ToolbarWorkflow
             actionButtonName="Compare selected workflows"
