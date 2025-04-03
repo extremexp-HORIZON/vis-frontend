@@ -39,30 +39,29 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
     if (containerRef.current) {
-    const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9 // Default to 90% of screen if too small
-      const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth)) // Use at least the minimum width and at most the maximum width
-      const newHeight = Math.max(
-        minHeight,
-        Math.min(newWidth / aspectRatio, maxHeight),
-      ) // Calculate height based on the aspect ratio while respecting the maximum height
+      const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9
+      const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
+      const newHeight = Math.max(minHeight, Math.min(newWidth / aspectRatio, maxHeight))
       setWidth(newWidth)
       setHeight(newHeight)
     }
-  }, [aspectRatio, containerRef, maxHeight, maxWidth, minHeight, minWidth])
+  }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio])
 
   useEffect(() => {
-    // Call updateSize whenever the window is resized
-    const handleResize = () => {
-      updateSize()
-    }
+    updateSize() 
 
-    window.addEventListener("resize", handleResize)
-    updateSize() // Initial update on mount
+    const observer = new ResizeObserver(() => {
+      updateSize()
+    })
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
 
     return () => {
-      window.removeEventListener("resize", handleResize) // Cleanup event listener
+      observer.disconnect()
     }
-  }, [minWidth, minHeight, aspectRatio, updateSize])
+  }, [updateSize])
 
   return (
     <Card sx={{ maxWidth: maxWidth, mx: "auto", my: 2, boxShadow: 3 }}>
