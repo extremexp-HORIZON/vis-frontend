@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
 import { Vega } from "react-vega"
+import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
@@ -115,7 +116,8 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
 
   return (
     <>
-<Vega spec={specification} actions={false} style={{ overflowY: "auto", height: "850px" }} />
+<ResponsiveVegaLite spec={specification} actions={false} style={{ overflowY: "auto", height: "850px" }}  height={800}
+          maxHeight={800} />
 </>
   )
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { VegaLite } from "react-vega"
 import { VisualColumn } from "../../../../shared/models/dataexploration.model"
 import { cloneDeep } from "lodash" // Import lodash for deep cloning
+import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 
 interface LineChartProps {
   viewMode: "overlay" | "stacked"
@@ -134,11 +135,13 @@ const LineChart = ({
   return chartSpecs.length > 0 ? (
     <>
       {chartSpecs.map((spec, index) => (
-        <VegaLite
+        <ResponsiveVegaLite
           key={index}
           spec={spec}
           data={{ table: dataCopy }}
           actions={false}
+          height={viewMode === "overlay" ? 800 : 800 / yAxis.length}
+          maxHeight={viewMode === "overlay" ? 800 : 800 / yAxis.length}
         />
       ))}
     </>

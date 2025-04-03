@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { VegaLite } from 'react-vega';
 import { VisualColumn } from '../../../../shared/models/dataexploration.model';
 import { cloneDeep } from 'lodash';
+import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
 
 interface ScatterChartProps {
   viewMode: 'overlay' | 'stacked';
@@ -156,7 +157,8 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
   return chartSpecs.length > 0 ? (
     <>
       {chartSpecs.map((spec, index) => (
-        <VegaLite key={index} spec={spec} data={{ table: dataCopy }} />
+        <ResponsiveVegaLite key={index} spec={spec} data={{ table: dataCopy }}     height={viewMode === "overlay" ? 800 : 800 / yAxis.length}
+        maxHeight={viewMode === "overlay" ? 800 : 800 / yAxis.length} />
       ))}
     </>
   ) : (
