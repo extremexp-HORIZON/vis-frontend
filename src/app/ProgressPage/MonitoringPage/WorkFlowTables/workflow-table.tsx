@@ -209,11 +209,19 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           case "contains":
             return cellValue.includes(filterValue)
           case "equals":
-            return cellValue === filterValue
+            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue
           case "startsWith":
             return cellValue.startsWith(filterValue)
           case "endsWith":
             return cellValue.endsWith(filterValue)
+          case "biggerThan":
+            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true
+          case "lessThan":
+            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true
+          case "biggerThanOrEqual":
+            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true
+          case "lessThanOrEqual":
+            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true
           default:
             return true
         }

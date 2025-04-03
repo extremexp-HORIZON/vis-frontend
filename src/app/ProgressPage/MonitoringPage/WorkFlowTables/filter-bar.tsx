@@ -24,6 +24,10 @@ const operators = [
   { id: "equals", label: "equals" },
   { id: "startsWith", label: "starts with" },
   { id: "endsWith", label: "ends with" },
+  {id: "biggerThan", label: "bigger than"},
+  {id: "lessThan", label: "less than"},
+  {id: "biggerThanOrEqual", label: "bigger than or equal"},
+  {id: "lessThanOrEqual", label: "less than or equal"},
 ]
 
 interface FilterBarProps {
