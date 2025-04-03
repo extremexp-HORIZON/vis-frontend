@@ -27,7 +27,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   title,
   minWidth = 100,
   minHeight = 100,
-  maxWidth = 500,
+  maxWidth = 1200,
   maxHeight = 300,
   aspectRatio = 1, // Default aspect ratio (1:1 -> square)
   ...otherProps
