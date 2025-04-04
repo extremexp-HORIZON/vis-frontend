@@ -4,7 +4,13 @@ export interface ITask {
   
     /** The type of the task. */
     type: string;
-  
+
+    /**
+     * The specific implementation of the task used in this run (e.g., `"TrainRNN"`,
+     * `"TrainNN"`)
+     */
+    variant: string;
+
     /** Optional: Unix timestamp (milliseconds) when the task started. */
     startTime?: number;
   

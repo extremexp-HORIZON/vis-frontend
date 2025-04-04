@@ -141,6 +141,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   )
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [uniqueMetrics, setUniqueMetrics] = useState<Set<string> | null>(null)
+  const [uniqueTasks, setUniqueTasks] = useState<Set<string> | null>(null)
 
   const dispatch = useAppDispatch()
 
@@ -255,19 +256,19 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         switch (filter.operator) {
           case "contains":
             return cellValue.includes(filterValue)
-          case "equals":
+          case "=":
             return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue
           case "startsWith":
             return cellValue.startsWith(filterValue)
           case "endsWith":
             return cellValue.endsWith(filterValue)
-          case "biggerThan":
+          case ">":
             return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true
-          case "lessThan":
+          case "<":
             return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true
-          case "biggerThanOrEqual":
+          case ">=":
             return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true
-          case "lessThanOrEqual":
+          case "<=":
             return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true
           default:
             return true
@@ -304,17 +305,37 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           }
         }, [])
       )
+      const uniqueTasks = new Set(
+        workflows.data.reduce((acc: any[], workflow) => {
+          const tasks = workflow?.tasks
+          let taskNames = []
+          if(tasks) {
+            taskNames = tasks.map(task => task.name)
+            return [...acc, ...taskNames]
+          } else {
+            return [...acc]
+          }
+        }, [])
+      )
+
       setUniqueParameters(uniqueParameters)
       setUniqueMetrics(uniqueMetrics)
+      setUniqueTasks(uniqueTasks)
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
         .filter(workflow => workflow.status !== "SCHEDULED")
         .map(workflow => {
           const params = workflow.params
           const metrics = workflow?.metrics
+          const tasks = workflow?.tasks
           return {
             id: workflow.id,
             workflowId: workflow.id,
+            ...Array.from(uniqueTasks).reduce((acc, variant) => {
+              acc[variant] =
+                tasks?.find(task => task.name === variant)?.variant || ""
+              return acc
+            }, {}),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 `${params?.find(param => param.name === variant)?.value}` || ""
@@ -421,7 +442,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       dispatch(setWorkflowsTable({
         visibleRows: workflowsTable.filteredRows,
         aggregatedRows: [],
-        visibleColumns: workflowsTable.columns      
+        visibleColumns: workflowsTable.columns
       }))
     }
   }, [workflowsTable.groupBy, workflowsTable.filteredRows])
@@ -439,7 +460,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             filterClickedFunction={filterClicked}
             handleClickedFunction={handleLaunchCompletedTab}
             onRemoveFilter={handleRemoveFilter}
-            groupByOptions={Array.from(uniqueParameters || [])}
+            groupByOptions={Array.from(new Set([...(uniqueTasks || []), ...(uniqueParameters || [])]))}
           />
         </Box>
         <Popover
@@ -543,6 +564,17 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                   Array.from(uniqueMetrics).map(
                     (metric): GridColumnNode => ({
                       field: metric,
+                    }),
+                  ) as GridColumnNode[]
+                ) : []
+              },
+              {
+                groupId: "Task Variants",
+                headerClassName: "theme-parameters-group-2",
+                children: uniqueTasks ? (
+                  Array.from(uniqueTasks).map(
+                    (task): GridColumnNode => ({
+                      field: task,
                     }),
                   ) as GridColumnNode[]
                 ) : []
