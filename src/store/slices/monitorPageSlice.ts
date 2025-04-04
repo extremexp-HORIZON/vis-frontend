@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
+import WorkflowTab from "../../app/ProgressPage/WorkflowTab/workflow-tab"
+import WorkflowTable from "../../app/ProgressPage/MonitoringPage/WorkFlowTables/workflow-table"
 
 interface IMonitoringPageSlice {
     parallel: {
@@ -20,7 +22,10 @@ interface IMonitoringPageSlice {
         filtersCounter: number
         visibleRows: { [key: string]: any }[]
         columns: { [key: string]: any }[]
+        visibleColumns: { [key: string]: any }[]
         columnsVisibilityModel: { [field: string]: boolean }
+        aggregatedRows: { [key: string]: any }[]
+        groupBy: string[]
       }
       scheduledTable: {
         order: "asc" | "desc"
@@ -84,7 +89,10 @@ const initialState: IMonitoringPageSlice = {
       filtersCounter: 0,
       visibleRows: [],
       columns: [],
-      columnsVisibilityModel: {}
+      visibleColumns: [],
+      columnsVisibilityModel: {},
+      aggregatedRows: [],
+      groupBy: []
     },
     scheduledTable: {
       order: "asc",
@@ -145,9 +153,12 @@ export const monitoringPageSlice = createSlice({
         // Remove workflow but keep its color mapping
         state.workflowsTable.selectedWorkflows.splice(index, 1);
       }
+    },
+    setGroupBy: (state, action) => {
+      state.workflowsTable.groupBy = action.payload
     }
   }
 })
 
-export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab,    toggleWorkflowSelection 
+export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, setGroupBy 
 } = monitoringPageSlice.actions;

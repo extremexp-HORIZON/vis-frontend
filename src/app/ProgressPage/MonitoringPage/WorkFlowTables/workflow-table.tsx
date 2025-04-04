@@ -149,9 +149,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       dispatch(toggleWorkflowSelection(workflowId));
 
   });
-             dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }))
-
-
+  dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }))
   }
 
   const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
@@ -192,6 +190,49 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       (_, i) => i !== index,
     )
     dispatch(setWorkflowsTable({ filters: newFilters }))
+  }
+
+  const handleAggregation = (
+    rows: any[],
+    groupKeys: string[],
+    metricKeys: string[]  
+  ): any[] => {
+    const grouped = new Map<string, any[]>()
+
+    rows.forEach(row => {
+      const key = groupKeys.map(k => row[k]).join('|')
+      if (!grouped.has(key)) grouped.set(key, [])
+      grouped.get(key)?.push(row)
+    })
+
+    let idCounter = 0
+    const aggregatedRows: any[] = []
+
+    for (const [key, group] of grouped.entries()) {
+      const values = group[0]
+      const summary: any = {
+        id: idCounter++,
+        isGroupSummary: true,
+        workflowId: `${group.length} workflows`,
+      }
+  
+      groupKeys.forEach(param => {
+        summary[param] = values[param]
+      })  
+
+      metricKeys.forEach(metric => {
+        const validValues = group.map(row => row[metric]).filter((v: any) => typeof v === 'number')
+        if (validValues.length > 0) {
+          const avg = validValues.reduce((sum, val) => sum + val, 0) / validValues.length
+          summary[metric] = Number(avg.toFixed(3))
+        } else {
+          summary[metric] = "n/a"
+        }
+      })
+      aggregatedRows.push(summary)
+    }
+  
+    return aggregatedRows
   }
 
   useEffect(() => {
@@ -346,11 +387,45 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           filteredRows: rows,
           visibleRows: rows.slice(0, workflowsTable.rowsPerPage),
           columns: columns,
+          visibleColumns: columns,
           columnsVisibilityModel: visibilityModel
         }),
       )
     }
   }, [workflows])
+
+  useEffect(() => {
+    if (workflowsTable.groupBy.length > 0 && workflowsTable.filteredRows.length > 0) {
+      const aggregatedRows = handleAggregation(
+        workflowsTable.filteredRows,
+        workflowsTable.groupBy,
+        Array.from(uniqueMetrics || [])
+      )
+
+      const allowedFields = new Set([
+        "workflowId",
+        ...workflowsTable.groupBy,
+        ...Array.from(uniqueMetrics || []),
+      ])
+  
+      const reducedColumns = workflowsTable.columns.filter(col =>
+        allowedFields.has(col.field)
+      )
+      
+      dispatch(setWorkflowsTable({
+        visibleRows: aggregatedRows,
+        aggregatedRows: aggregatedRows,
+        visibleColumns: reducedColumns
+      }))
+    } else {
+      dispatch(setWorkflowsTable({
+        visibleRows: workflowsTable.filteredRows,
+        aggregatedRows: [],
+        visibleColumns: workflowsTable.columns      
+      }))
+    }
+  }, [workflowsTable.groupBy, workflowsTable.filteredRows])
+    
 
   return (
     <Box sx={{height: "100%", width: "100%" }}>
@@ -364,6 +439,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             filterClickedFunction={filterClicked}
             handleClickedFunction={handleLaunchCompletedTab}
             onRemoveFilter={handleRemoveFilter}
+            groupByOptions={Array.from(uniqueParameters || [])}
           />
         </Box>
         <Popover
@@ -391,9 +467,10 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           <StyledDataGrid
             disableVirtualization
             density="compact"
-            rows={workflowsTable.filteredRows}
-            columns={workflowsTable.columns as CustomGridColDef[]}
+            rows={workflowsTable.visibleRows}
+            columns={workflowsTable.visibleColumns as CustomGridColDef[]}
             columnVisibilityModel={workflowsTable.columnsVisibilityModel}
+            disableColumnFilter
             onColumnVisibilityModelChange={(model) =>
               dispatch(setWorkflowsTable({ columnsVisibilityModel: model }))
             }          

@@ -7,10 +7,11 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
 import { Button, Stack, Box, Chip, Popover, FormControlLabel, Checkbox, List, ListItemButton } from '@mui/material';
 import { RootState, useAppDispatch, useAppSelector } from '../../../../store/store';
-import { setScheduledTable, setVisibleTable, setWorkflowsTable } from '../../../../store/slices/monitorPageSlice';
+import { setScheduledTable, setVisibleTable, setWorkflowsTable, setGroupBy } from '../../../../store/slices/monitorPageSlice';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { useState } from 'react';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import PivotTableChartRoundedIcon from '@mui/icons-material/PivotTableChartRounded';
 interface ToolBarWorkflowProps {
   filterNumbers: number;
   numSelected: number;
@@ -19,16 +20,22 @@ interface ToolBarWorkflowProps {
   handleClickedFunction: (workflowId: number[] | string) => (e: React.SyntheticEvent) => void;
   filterClickedFunction: (event: React.MouseEvent<HTMLElement>) => void;
   onRemoveFilter: (index: number) => void
+  groupByOptions?: string[]
 }
 
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
-  const { filterNumbers, numSelected, tableName, actionButtonName, handleClickedFunction, filterClickedFunction, onRemoveFilter } = props;
+  const { filterNumbers, numSelected, tableName, actionButtonName, handleClickedFunction, filterClickedFunction, onRemoveFilter, groupByOptions } = props;
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } = useAppSelector(
     (state: RootState) => state.monitorPage
   )
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null);
+  const [anchorElGroup, setAnchorElGroup] = useState<null | HTMLElement>(null)
+
+  const handleGroupClick = (e: React.MouseEvent<HTMLElement>) => setAnchorElGroup(e.currentTarget)
+  const handleGroupClose = () => setAnchorElGroup(null)
+
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -110,12 +117,25 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
       ) : (
         <Box sx={{ width: selectedTab !== 1 ? "85%" : "100%", display: "flex",alignItems: "center",  flexDirection: "row", pl: 1}}>
           {visibleTable === "workflows" ? (
-            workflowsTable.filters?.length > 0 &&
+            (workflowsTable.filters?.length > 0  || workflowsTable.groupBy?.length > 0) &&
             <Box sx={{ overflowX: "auto", display: "flex", whiteSpace: 'nowrap', gap: 0.2}}>
-              {workflowsTable.filters.map((filter, index) => {
-                const label = `${filter.column} ${filter.operator} ${filter.value}`
+              {workflowsTable?.filters?.map((filter, index) => {
+                if (filter.column && filter.operator && filter.value) {
+                  const label = `${filter.column} ${filter.operator} ${filter.value}`;
+                  return (
+                    <Chip
+                      key={`filter-${index}`}
+                      label={label}
+                      onDelete={() => onRemoveFilter(index)}
+                    />
+                  );
+                }
+                return null;
+              })}
+              {workflowsTable?.groupBy?.map((group, index) => {
+                const label = `GroupBy ${group}`
                 return (
-                  <Chip label={label} onDelete={() => onRemoveFilter(index)}/>
+                  <Chip key={`groupBy-${index}`} label={label} onDelete={() => dispatch(setGroupBy(workflowsTable.groupBy.filter(g => g !== group)))}/>
                 )
               })}
             </Box>
@@ -150,6 +170,12 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                   <MenuRoundedIcon sx={{ color: theme => theme.palette.primary.main }} />
                   <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }}>COLUMNS</Typography>
                 </ListItemButton>
+                {visibleTable === "workflows" &&
+                  <ListItemButton onClick={handleGroupClick}>
+                    <PivotTableChartRoundedIcon sx={{ color: theme => theme.palette.primary.main }} />
+                    <Typography variant="body2" sx={{ color: theme => theme.palette.primary.main }}>GROUP BY</Typography>
+                  </ListItemButton>
+                }
               </List>
             </Popover>
             <Popover
@@ -158,7 +184,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               onClose={handleClose}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             >
-              <Box sx={{p: 2, display: "flex", flexDirection: "column", height: "250px"}}>
+              <Box sx={{p: 2, display: "flex", flexDirection: "column", maxheight: "250px"}}>
                 {
                   visibleTable === "workflows" ? (
                     workflowsTable.columns.map(column => (
@@ -204,6 +230,37 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 }
               </Box>
             </Popover>
+            <Popover
+              open={Boolean(anchorElGroup)}
+              anchorEl={anchorElGroup}
+              onClose={handleGroupClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            >
+              <Box sx={{ p: 2, display: "flex", flexDirection: "column", maxheight: "250px" }}>
+                {groupByOptions?.map(option => (
+                  <FormControlLabel
+                    key={option}
+                    control={
+                      <Checkbox
+                        checked={workflowsTable.groupBy.includes(option)}
+                        onChange={() => {
+                          dispatch(setGroupBy(
+                            workflowsTable.groupBy.includes(option)
+                              ? workflowsTable.groupBy.filter(p => p !== option)
+                              : [...workflowsTable.groupBy, option]
+                          ))
+                        }}
+                      />
+                    }
+                    label={option}
+                  />
+                ))}
+                {workflowsTable.groupBy.length > 0 && 
+                  <Button onClick={() => dispatch(setGroupBy([]))}>Clear Grouping</Button>
+                }
+              </Box>
+            </Popover>
+
           </Box>
         </Box>
       )}

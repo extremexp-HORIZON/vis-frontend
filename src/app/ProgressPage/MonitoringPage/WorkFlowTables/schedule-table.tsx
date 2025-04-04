@@ -247,7 +247,7 @@ export default function ScheduleTable() {
                 `${params?.find(param => param.name === variant)?.value}` || ""
               return acc
             }, {}),
-            status: workflow.status,
+            status: workflow.status.toLowerCase(),
             // ...Object.keys(workflow.constraints)
             //   .map(key => ({ [key]: workflow.constraints[key] }))
             //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
@@ -487,6 +487,7 @@ export default function ScheduleTable() {
             disableVirtualization
             density="compact"
             rows={scheduledTable.visibleRows}
+            disableColumnFilter
             columns={scheduledTable.columns as CustomGridColDef[]}
             columnVisibilityModel={scheduledTable.columnsVisibilityModel}
             onColumnVisibilityModelChange={(model) =>

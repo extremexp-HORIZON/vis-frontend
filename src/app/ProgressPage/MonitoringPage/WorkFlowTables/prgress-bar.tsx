@@ -22,7 +22,7 @@ export default function ProgressBar({workflowStatus, workflowId} : {workflowStat
     const color = workflowStatus === "COMPLETED" ? "success" : workflowStatus === "RUNNING" ? "primary" : "error"
     return (
         <Box sx={{ display:"flex", alignItems:"center", justifyContent: "center", width:"100%", flexDirection:"column", height:"100%" }}>
-            <Typography variant="body2">{workflowStatus.toLowerCase()}</Typography>
+            <Typography variant="body2">{workflowStatus?.toLowerCase()}</Typography>
             <Box sx={{width:"100%"}}>
                 <LinearProgress sx={{ borderRadius: 4}} color={color} value={progressValue} variant="determinate"/>
             </Box>
