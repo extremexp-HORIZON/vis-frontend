@@ -67,11 +67,14 @@ export default function FilterBar({
                 )
               }
             >
-              {columns.map((column: CustomGridColDef) => (
-                <MenuItem key={column.field} value={column.field}>
-                  {column.headerName}
-                </MenuItem>
-              ))}
+              {columns.map((column: CustomGridColDef) => {
+                if (column.field !== "rating" && column.field !== "status" && column.field !== "action")
+                  return(
+                  <MenuItem key={column.field} value={column.field}>
+                    {column.headerName}
+                  </MenuItem>
+                  )
+              })}
             </Select>
           </FormControl>
           <FormControl sx={{ width: "200px" }}>
