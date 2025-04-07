@@ -176,8 +176,8 @@ const WorkflowCharts: React.FC = () => {
           </Button>
         </ButtonGroup>
       </Grid>
-      <Grid container spacing={2} sx={{ width: "100%", margin: "0 auto" }}>
-        {renderCharts}
+      <Grid container spacing={2} sx={{ width: "100%", margin: "0 auto", flexWrap: "wrap" }}>
+      {renderCharts}
       </Grid>
     </Container>
   )
