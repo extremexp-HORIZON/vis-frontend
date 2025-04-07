@@ -3,16 +3,12 @@ import { RootState, useAppSelector } from "../../store/store"
 import {
   Grid,
   Container,
-  FormControlLabel,
-  Switch,
   ButtonGroup,
   Button,
   Typography,
   Box,
 } from "@mui/material"
-import { useLocation } from "react-router-dom"
 import ResponsiveCardVegaLite from "../../shared/components/responsive-card-vegalite"
-import { max } from "lodash"
 
 interface IMetric {
   name: string
@@ -21,45 +17,32 @@ interface IMetric {
   step: number
 }
 
-interface IWorkflow {
-  id: string
-  name: string
-  experimentId: string
-  status: string
-  startTime: number
-  endTime: number
-  params: any[]
-  metrics: IMetric[]
-  dataAssets: any[]
-  tasks: any[]
-  tags: any
-}
-
 const WorkflowCharts: React.FC = () => {
   const { workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   )
-
-  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const [isMosaic, setIsMosaic] = useState(true)
+  
+  const filteredWorkflows = (workflowsTable.groupBy.length > 0
+    ? workflowsTable.aggregatedRows
+    : workflowsTable.filteredRows
+  ).filter(row => workflowsTable.selectedWorkflows.includes(row.id));
+  
+  const groupedMetrics = workflowsTable.uniqueMetrics.reduce(
+    (acc: any, metricName: string) => {
+      acc[metricName] = []
 
-  const filteredWorkflows = workflows.data.filter((workflow: IWorkflow) =>
-    workflowsTable.selectedWorkflows.includes(workflow.id),
-  )
-
-  const groupedMetrics = filteredWorkflows.reduce(
-    (acc: any, workflow: IWorkflow) => {
-      workflow.metrics.forEach(metric => {
-        if (!acc[metric.name]) {
-          acc[metric.name] = []
+      filteredWorkflows.forEach(workflow => {
+        if (workflow.hasOwnProperty(metricName)) {
+          acc[metricName].push({
+            value: workflow[metricName],
+            id: workflow.id,
+            metricName,
+            step: workflow.step ?? 0, // Fallback to 0 if step is missing
+          })
         }
-        acc[metric.name].push({
-          value: metric.value,
-          step: metric.step, // Use step or timestamp as x-axis
-          id: workflow.id,
-          metricName: metric.name,
-        })
       })
+
       return acc
     },
     {},
@@ -68,11 +51,11 @@ const WorkflowCharts: React.FC = () => {
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]
     const uniqueSteps = new Set(metricSeries.map(m => m.step))
-    const workflowColorMap = workflowsTable.workflowColors;
+    const workflowColorMap = workflowsTable.workflowColors
     const workflowColorScale = filteredWorkflows.map(wf => ({
       id: wf.id,
       color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
-    }));
+    }))
 
     const chartSpec = {
       mark: uniqueSteps.size === 1 ? "bar" : "line",
@@ -83,8 +66,7 @@ const WorkflowCharts: React.FC = () => {
           axis: { labels: false }, // Hide x-axis labels
           scale: {
             padding: 0.05, // Adds 2% extra space to the right
-          }
-  
+          },
         },
         y: {
           field: "value",
@@ -104,7 +86,8 @@ const WorkflowCharts: React.FC = () => {
             range: workflowColorScale.map(w => w.color), // Corresponding Colors
           },
           legend: null,
-        },        tooltip: [
+        },
+        tooltip: [
           { field: "id", type: "nominal" },
           // { field: "step", type: "quantitative" },
           { field: "value", type: "quantitative" },
@@ -131,9 +114,20 @@ const WorkflowCharts: React.FC = () => {
   })
 
   if (workflowsTable.selectedWorkflows.length === 0) {
-    return  <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
-    <Typography align="center" fontWeight="bold">Select Workflows to display metrics.</Typography>
-    </Box> // Or you can return some placeholder text/UI
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          height: "20rem",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Typography align="center" fontWeight="bold">
+          Select Workflows to display metrics.
+        </Typography>
+      </Box>
+    ) // Or you can return some placeholder text/UI
   }
 
   return (

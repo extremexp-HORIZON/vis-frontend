@@ -43,6 +43,7 @@ export interface IDataExplorationResponse {
   totalItems: number
   querySize: number
   uniqueColumnValues: any
+  hasLatLonColumns:boolean
 }
 
 export interface IFilter {
