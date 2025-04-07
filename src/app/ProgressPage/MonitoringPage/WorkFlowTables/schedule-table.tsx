@@ -212,13 +212,9 @@ export default function ScheduleTable() {
     (state: RootState) => state.monitorPage
   )
   const dispatch = useAppDispatch()
-  const [uniqueParameters, setUniqueParameters] = useState<Set<string> | null>(
-    null,
-  )
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [isFilterOpen, setFilterOpen] = useState(false)
   const paramLength = useRef(0)
-  const [uniqueTasks, setUniqueTasks] = useState<Set<string> | null>(null)
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -246,9 +242,6 @@ export default function ScheduleTable() {
           }
         }, [])
       )
-
-      setUniqueParameters(uniqueParameters)
-      setUniqueTasks(uniqueTasks)
 
       const rows = workflows.data
         .filter(workflow => workflow.status === "SCHEDULED")
@@ -360,7 +353,9 @@ export default function ScheduleTable() {
           filteredRows: rows,
           visibleRows: rows.slice(0, scheduledTable.rowsPerPage),
           columns: columns,
-          columnsVisibilityModel: visibilityModel
+          columnsVisibilityModel: visibilityModel,
+          uniqueParameters: Array.from(uniqueParameters),
+          uniqueTasks: Array.from(uniqueTasks)
         }),
       )
     }
@@ -574,8 +569,8 @@ export default function ScheduleTable() {
               {
                 groupId: "Parameters",
                 headerClassName: "theme-parameters-group",
-                children: uniqueParameters
-                  ? (Array.from(uniqueParameters).map(
+                children: scheduledTable.uniqueParameters.length > 0
+                  ? (scheduledTable.uniqueParameters.map(
                       (param): GridColumnNode => ({
                         field: param,
                       }),
@@ -585,8 +580,8 @@ export default function ScheduleTable() {
               {
                 groupId: "Task Variants",
                 headerClassName: "theme-parameters-group-2",
-                children: uniqueTasks ? (
-                  Array.from(uniqueTasks).map(
+                children: scheduledTable.uniqueTasks.length > 0 ? (
+                  scheduledTable.uniqueTasks.map(
                     (task): GridColumnNode => ({
                       field: task,
                     }),

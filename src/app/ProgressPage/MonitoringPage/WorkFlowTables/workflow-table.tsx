@@ -136,12 +136,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   )
   const { handleChange } = props
   const [isFilterOpen, setFilterOpen] = useState(false)
-  const [uniqueParameters, setUniqueParameters] = useState<Set<string> | null>(
-    null,
-  )
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-  const [uniqueMetrics, setUniqueMetrics] = useState<Set<string> | null>(null)
-  const [uniqueTasks, setUniqueTasks] = useState<Set<string> | null>(null)
 
   const dispatch = useAppDispatch()
 
@@ -318,9 +313,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         }, [])
       )
 
-      setUniqueParameters(uniqueParameters)
-      setUniqueMetrics(uniqueMetrics)
-      setUniqueTasks(uniqueTasks)
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
         .filter(workflow => workflow.status !== "SCHEDULED")
@@ -409,7 +401,10 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           visibleRows: rows.slice(0, workflowsTable.rowsPerPage),
           columns: columns,
           visibleColumns: columns,
-          columnsVisibilityModel: visibilityModel
+          columnsVisibilityModel: visibilityModel,
+          uniqueMetrics: Array.from(uniqueMetrics),
+          uniqueParameters: Array.from(uniqueParameters),
+          uniqueTasks: Array.from(uniqueTasks)
         }),
       )
     }
@@ -420,13 +415,13 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       const aggregatedRows = handleAggregation(
         workflowsTable.filteredRows,
         workflowsTable.groupBy,
-        Array.from(uniqueMetrics || [])
+        workflowsTable.uniqueMetrics
       )
 
       const allowedFields = new Set([
         "workflowId",
         ...workflowsTable.groupBy,
-        ...Array.from(uniqueMetrics || []),
+        ...workflowsTable.uniqueMetrics,
       ])
   
       const reducedColumns = workflowsTable.columns.filter(col =>
@@ -436,16 +431,18 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       dispatch(setWorkflowsTable({
         visibleRows: aggregatedRows,
         aggregatedRows: aggregatedRows,
+        aggregatedColumns: reducedColumns,
         visibleColumns: reducedColumns
       }))
     } else {
       dispatch(setWorkflowsTable({
         visibleRows: workflowsTable.filteredRows,
         aggregatedRows: [],
-        visibleColumns: workflowsTable.columns
+        aggregatedColumns: [],
+        visibleColumns: workflowsTable.columns,
       }))
     }
-  }, [workflowsTable.groupBy, workflowsTable.filteredRows])
+  }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics])
     
 
   return (
@@ -460,7 +457,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             filterClickedFunction={filterClicked}
             handleClickedFunction={handleLaunchCompletedTab}
             onRemoveFilter={handleRemoveFilter}
-            groupByOptions={Array.from(new Set([...(uniqueTasks || []), ...(uniqueParameters || [])]))}
+            groupByOptions={Array.from(new Set([...workflowsTable.uniqueTasks, ...workflowsTable.uniqueParameters]))}
           />
         </Box>
         <Popover
@@ -549,8 +546,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               {
                 groupId: "Parameters",
                 headerClassName: "theme-parameters-group",
-                children: uniqueParameters
-                  ? (Array.from(uniqueParameters).map(
+                children: workflowsTable.uniqueParameters.length > 0
+                  ? (workflowsTable.uniqueParameters.map(
                       (param): GridColumnNode => ({
                         field: param,
                       }),
@@ -560,8 +557,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               {
                 groupId: "Metrics",
                 headerClassName: "theme-parameters-group-2",
-                children: uniqueMetrics ? (
-                  Array.from(uniqueMetrics).map(
+                children: workflowsTable.uniqueMetrics.length > 0 ? (
+                  workflowsTable.uniqueMetrics.map(
                     (metric): GridColumnNode => ({
                       field: metric,
                     }),
@@ -571,8 +568,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               {
                 groupId: "Task Variants",
                 headerClassName: "theme-parameters-group-2",
-                children: uniqueTasks ? (
-                  Array.from(uniqueTasks).map(
+                children: workflowsTable.uniqueTasks.length > 0 ? (
+                  workflowsTable.uniqueTasks.map(
                     (task): GridColumnNode => ({
                       field: task,
                     }),

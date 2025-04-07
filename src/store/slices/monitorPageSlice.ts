@@ -25,7 +25,11 @@ interface IMonitoringPageSlice {
         visibleColumns: { [key: string]: any }[]
         columnsVisibilityModel: { [field: string]: boolean }
         aggregatedRows: { [key: string]: any }[]
+        aggregatedColumns: { [key: string]: any }[]
         groupBy: string[]
+        uniqueMetrics: string[]
+        uniqueParameters: string[]
+        uniqueTasks: string[]
       }
       scheduledTable: {
         order: "asc" | "desc"
@@ -39,7 +43,9 @@ interface IMonitoringPageSlice {
         filtersCounter: number
         visibleRows: { [key: string]: any }[]
         columns: { [key: string]: any }[]
-        columnsVisibilityModel: { [field: string]: boolean }
+        columnsVisibilityModel: { [field: string]: boolean },
+        uniqueParameters: string[]
+        uniqueTasks: string[]  
       }
       visibleTable: string
       selectedTab: number
@@ -92,7 +98,11 @@ const initialState: IMonitoringPageSlice = {
       visibleColumns: [],
       columnsVisibilityModel: {},
       aggregatedRows: [],
-      groupBy: []
+      aggregatedColumns: [],
+      groupBy: [],
+      uniqueMetrics: [],
+      uniqueParameters: [],
+      uniqueTasks: []
     },
     scheduledTable: {
       order: "asc",
@@ -106,7 +116,9 @@ const initialState: IMonitoringPageSlice = {
       filtersCounter: 0,
       visibleRows: [],
       columns: [],
-      columnsVisibilityModel: {}
+      columnsVisibilityModel: {},
+      uniqueParameters: [],
+      uniqueTasks: []
     },
     visibleTable: "workflows",
     selectedTab: 0
