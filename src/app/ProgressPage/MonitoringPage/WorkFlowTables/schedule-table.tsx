@@ -239,7 +239,7 @@ export default function ScheduleTable() {
           const tasks = workflow?.tasks
           let taskNames = []
           if(tasks) {
-            taskNames = tasks.map(task => task.name)
+            taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name)
             return [...acc, ...taskNames]
           } else {
             return [...acc]
