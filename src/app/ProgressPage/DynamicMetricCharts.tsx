@@ -22,26 +22,47 @@ const WorkflowCharts: React.FC = () => {
     (state: RootState) => state.monitorPage,
   )
   const [isMosaic, setIsMosaic] = useState(true)
-  
-  const filteredWorkflows = (workflowsTable.groupBy.length > 0
-    ? workflowsTable.aggregatedRows
-    : workflowsTable.filteredRows
-  ).filter(row => workflowsTable.selectedWorkflows.includes(row.id));
-  
+
+  const filteredWorkflows = (
+    workflowsTable.groupBy.length > 0
+      ? workflowsTable.aggregatedRows
+      : workflowsTable.filteredRows
+  ).filter(row => workflowsTable.selectedWorkflows.includes(row.id))
+  console.log("filteredWorkflows", filteredWorkflows)
+
   const groupedMetrics = workflowsTable.uniqueMetrics.reduce(
     (acc: any, metricName: string) => {
       acc[metricName] = []
 
       filteredWorkflows.forEach(workflow => {
+        console.log("workflow", workflow)
         if (workflow.hasOwnProperty(metricName)) {
           acc[metricName].push({
             value: workflow[metricName],
             id: workflow.id,
             metricName,
+            //i want to pass
+           
+              general: workflowsTable.uniqueParameters.reduce(
+                (obj: any, key: string) => {
+                  obj[key] = workflow[key]
+                  return obj
+                },
+                {},
+              ),
+              task: workflowsTable.uniqueTasks.reduce(
+                (obj: any, key: string) => {
+                  obj[key] = workflow[key]
+                  return obj
+                },
+                {},
+              ),
+            
             step: workflow.step ?? 0, // Fallback to 0 if step is missing
           })
         }
       })
+      console.log("acc", acc)
 
       return acc
     },
@@ -91,6 +112,8 @@ const WorkflowCharts: React.FC = () => {
           { field: "id", type: "nominal" },
           // { field: "step", type: "quantitative" },
           { field: "value", type: "quantitative" },
+          { field: "general", type: "nominal" },
+          { field: "task", type: "nominal" },
         ],
       },
       data: { values: metricSeries },
