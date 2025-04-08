@@ -1,16 +1,16 @@
-import type { ViewListener } from "react-vega";
+import type { ViewListener } from "react-vega"
 import { Vega } from "react-vega"
 import { scheme } from "vega"
 import vegaTooltip from "vega-tooltip"
 import type { Axis, Item, Scale } from "vega-typings/types"
 import type { View } from "vega"
-import { useEffect, useState } from "react"
 
 interface ParallelCoordinateVegaProps {
-  parallelData: React.MutableRefObject<any[]>
+  parallelData: any[]
   progressParallel: { selected: string }
   foldArray: React.MutableRefObject<string[]>
   selectedWorkflows: number[]
+  processedData: any[] //read-only
 }
 
 function setValuesIfSelectedAndDefault(
@@ -33,27 +33,8 @@ const ParallelCoordinateVega = ({
   progressParallel,
   foldArray,
   selectedWorkflows,
+  processedData,
 }: ParallelCoordinateVegaProps) => {
-  const [processedData, setProcessedData] = useState<any>([])
-
-  // Add new selected property to each item in the parallelData based on the selectedWorkflows array
-  useEffect(() => {
-    const updatedData = parallelData.current.map((item, index) => {
-      const newItem = { ...item }
-
-      for (const key in newItem) {
-        if (Array.isArray(newItem[key])) {
-          newItem[key] = newItem[key].join(",")
-        }
-      }
-
-      newItem.selected = selectedWorkflows.includes(index + 1) ? true : false
-      return newItem
-    })
-
-    setProcessedData(updatedData)
-  }, [selectedWorkflows, parallelData])
-
   const handleNewView: ViewListener = (view: View) => {
     if (!view) return
 
@@ -100,10 +81,10 @@ const ParallelCoordinateVega = ({
 
   // generate scales:
   const selectedLastColumnMin = Math.min(
-    ...parallelData.current.map((d: any) => d[progressParallel.selected]),
+    ...parallelData.map((d: any) => d[progressParallel.selected]),
   )
   const selectedLastColumnMax = Math.max(
-    ...parallelData.current.map((d: any) => d[progressParallel.selected]),
+    ...parallelData.map((d: any) => d[progressParallel.selected]),
   )
   const generatedScales: Scale[] = [
     {
