@@ -201,6 +201,14 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     zIndex: 90,
     borderLeft: "1px solid #ddd",
   },
+  // Add pagination styling
+  "& .MuiDataGrid-footerContainer": {
+    minHeight: "56px",
+    borderTop: "1px solid rgba(224, 224, 224, 1)",
+  },
+  "& .MuiTablePagination-root": {
+    overflow: "visible",
+  },
 }))
 
 
@@ -505,7 +513,8 @@ export default function ScheduleTable() {
             />
           </Box>
         </Popover>
-        <div style={{ height: 'calc(100% - 56px)', width: "100%" }}>
+
+        <div style={{ height: 'calc(100% - 64px)', width: "100%" }}>
           <StyledDataGrid
             disableVirtualization
             density="compact"
