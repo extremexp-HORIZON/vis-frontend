@@ -60,7 +60,6 @@ const WorkflowCharts: React.FC = () => {
     },
     {},
   )
-  console.log(groupedMetrics)
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]

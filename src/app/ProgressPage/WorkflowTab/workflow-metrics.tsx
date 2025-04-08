@@ -127,15 +127,11 @@
 
 import { Box, Typography } from "@mui/material"
 import WorkflowMetricsTable from "./workflow-metrics-table"
-import WorkflowCharts from "../DynamicMetricCharts"
 import WorkflowTrends from "./workflow-metrics-trend"
 
 const WorkflowMetrics = () => {
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-      {/* <Box key="workflow-flow-chart" sx={{width: "100%" }}>
-          <WorkflowCharts/>
-          </Box> */}
       <Box
         key="task-metrics"
         sx={{
