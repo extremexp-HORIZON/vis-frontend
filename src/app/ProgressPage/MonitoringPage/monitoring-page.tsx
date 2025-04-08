@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from "@mui/material"
+import { Box, Tab, Tabs, Paper } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
@@ -8,6 +8,7 @@ import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from "re-resizable"
 import { setSelectedTab } from "../../../store/slices/monitorPageSlice"
 import { useDispatch } from "react-redux"
+import DragIndicatorRoundedIcon from '@mui/icons-material/DragIndicatorRounded';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab } = useAppSelector(
@@ -75,8 +76,7 @@ const MonitoringPage = () => {
         {selectedTab === 1 && (
           <Box
             sx={{
-              height: "100%",
-              widht: "100%",
+              height: "98%",
               display: "flex",
               px: 2,
             }}
@@ -99,13 +99,37 @@ const MonitoringPage = () => {
               }}
               maxWidth="80%"
               maxHeight="100%"
-              style={{ height: "100%" }}
+              style={{ height: "100%", position: "relative", }}
+              handleStyles={{
+                right: {
+                  cursor: "ew-resize",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              }}            
+              handleComponent={{
+                right: (
+                <Box
+                  sx={{
+                    height: "100%",
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "ew-resize",
+                  }}        
+                >
+                  <DragIndicatorRoundedIcon />
+                </Box>
+                )
+              }}
             >
               <WorkflowTable handleChange={handleChange} />
             </Resizable>
-            <Box sx={{ flex: 1, overflow: "auto", height: "100%" }}>
-              <WorkflowCharts />
-            </Box>
+            <Paper elevation={2} sx={{ flex: 1, overflow: "auto", height: "100%", ml: 1 }}>
+                <WorkflowCharts />
+            </Paper>
           </Box>
         )}
       </Box>

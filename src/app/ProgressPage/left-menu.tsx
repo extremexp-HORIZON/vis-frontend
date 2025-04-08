@@ -30,16 +30,6 @@ const LeftMenu = () => {
       label: "Monitoring",
       path: "monitoring"
     },
-    {
-      icon: <CompareRoundedIcon />,
-      label: "Comparative Analysis",
-      path: "comparative-analysis"
-    },
-    {
-      icon: <PsychologyAltRoundedIcon />,
-      label: "Explainability",
-      path: "explainability"
-    }
   ]
 
   return (

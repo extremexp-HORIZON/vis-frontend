@@ -446,7 +446,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     
 
   return (
-    <Box sx={{height: "100%", width: "100%" }}>
+    <Box sx={{height: "100%", width: "calc(100% - 8px)" }}>
       <Paper elevation={2} sx={{height: "100%", width: "100%", mb: 2}}>
         <Box sx={{height: "56px"}} >
           <ToolbarWorkflow
