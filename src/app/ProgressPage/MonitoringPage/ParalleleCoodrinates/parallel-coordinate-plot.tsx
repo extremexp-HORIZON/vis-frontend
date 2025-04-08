@@ -102,7 +102,7 @@ const ParallelCoordinatePlot = () => {
     <>
       <Paper elevation={2}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Typography variant="h6" sx={{px: 2}}>Parallel Coordinates</Typography>
+        <Typography/>
           <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
             <Typography fontSize={"0.8rem"}>Color by:</Typography>
             <FormControl
