@@ -539,7 +539,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             pageSizeOptions={[10, 25, 50]}
             initialState={{
               pagination: {
-                paginationModel: { pageSize: 10 },
+                paginationModel: { pageSize: 50 },
               },
             }}
             columnGroupingModel={[

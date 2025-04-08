@@ -85,7 +85,7 @@ const initialState: IMonitoringPageSlice = {
       order: "asc",
       orderBy: "id",
       page: 0,
-      rowsPerPage: 10,
+      rowsPerPage: 50,
       selectedWorkflows: [],
       workflowColors: {}, // Initialize the color mapping
 
@@ -108,7 +108,7 @@ const initialState: IMonitoringPageSlice = {
       order: "asc",
       orderBy: "id",
       page: 0,
-      rowsPerPage: 10,
+      rowsPerPage: 50,
       selectedWorkflows: [],
       filters: [],
       rows: [],

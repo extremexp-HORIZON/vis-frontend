@@ -562,7 +562,7 @@ export default function ScheduleTable() {
             pageSizeOptions={[10, 25, 50]}
             initialState={{
               pagination: {
-                paginationModel: { pageSize: 10 },
+                paginationModel: { pageSize: 50 },
               },
             }}
             columnGroupingModel={[
