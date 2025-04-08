@@ -42,22 +42,19 @@ const WorkflowCharts: React.FC = () => {
             id: workflow.id,
             metricName,
             //i want to pass
-           
-              general: workflowsTable.uniqueParameters.reduce(
-                (obj: any, key: string) => {
-                  obj[key] = workflow[key]
-                  return obj
-                },
-                {},
-              ),
-              task: workflowsTable.uniqueTasks.reduce(
-                (obj: any, key: string) => {
-                  obj[key] = workflow[key]
-                  return obj
-                },
-                {},
-              ),
-            
+
+            general: workflowsTable.uniqueParameters.reduce(
+              (obj: any, key: string) => {
+                obj[key] = workflow[key]
+                return obj
+              },
+              {},
+            ),
+            task: workflowsTable.uniqueTasks.reduce((obj: any, key: string) => {
+              obj[key] = workflow[key]
+              return obj
+            }, {}),
+
             step: workflow.step ?? 0, // Fallback to 0 if step is missing
           })
         }
@@ -168,16 +165,28 @@ const WorkflowCharts: React.FC = () => {
             height: "25px", // Ensure consistent height for the button group
           }}
         >
-          <Button onClick={() => setIsMosaic(true)} disabled={isMosaic}>
+          <Button
+            variant={isMosaic ? "contained" : "outlined"}
+            color="primary"
+            onClick={() => setIsMosaic(true)}
+          >
             Mosaic
           </Button>
-          <Button onClick={() => setIsMosaic(false)} disabled={!isMosaic}>
+          <Button
+            variant={!isMosaic ? "contained" : "outlined"}
+            color="primary"
+            onClick={() => setIsMosaic(false)}
+          >
             One Row
           </Button>
         </ButtonGroup>
       </Grid>
-      <Grid container spacing={2} sx={{ width: "100%", margin: "0 auto", flexWrap: "wrap" }}>
-      {renderCharts}
+      <Grid
+        container
+        spacing={2}
+        sx={{ width: "100%", margin: "0 auto", flexWrap: "wrap" }}
+      >
+        {renderCharts}
       </Grid>
     </Container>
   )
