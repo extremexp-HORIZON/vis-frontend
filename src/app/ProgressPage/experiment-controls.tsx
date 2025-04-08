@@ -43,7 +43,7 @@ const ExperimentControls = () => {
               borderColor: theme => theme.palette.customGrey.main,
               borderRightWidth: 2,
               borderRightStyle: "solid",
-              paddingY: 1, // Add vertical padding for consistent spacing
+              padding: 1, 
             }}
           >
             <Box
