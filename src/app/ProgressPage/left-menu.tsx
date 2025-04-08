@@ -42,8 +42,8 @@ const LeftMenu = () => {
         justifyContent: "space-between"
       }}
     >
-      <Box>
-        <List>
+      <Box >
+        <List sx={{pt: 0}}>
           {navItems.map(({ icon, label, path }) => {
             const selected = menuOptions.selected === path
             const item = (
@@ -79,7 +79,7 @@ const LeftMenu = () => {
             )
           })}
         </List>
-        <Box sx={{ display: "flex", justifyContent: "right", py: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
           <IconButton onClick={() => dispatch(setMenuOptions({...menuOptions, collapsed: !menuOptions.collapsed}))}>
             {menuOptions.collapsed ? <ChevronRightRoundedIcon /> : <ChevronLeftRoundedIcon />}
           </IconButton>

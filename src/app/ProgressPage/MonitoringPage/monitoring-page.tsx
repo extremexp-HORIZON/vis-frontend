@@ -8,7 +8,8 @@ import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from "re-resizable"
 import { setSelectedTab } from "../../../store/slices/monitorPageSlice"
 import { useDispatch } from "react-redux"
-import DragIndicatorRoundedIcon from '@mui/icons-material/DragIndicatorRounded';
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import { useTheme } from '@mui/material/styles';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab } = useAppSelector(
@@ -17,6 +18,7 @@ const MonitoringPage = () => {
   const navigate = useNavigate()
   const { experimentId } = useParams()
   const dispatch = useDispatch()
+  const theme = useTheme()
 
   const handleChange =
     (newValue: number | string | null) => (event: React.SyntheticEvent) => {
@@ -120,7 +122,7 @@ const MonitoringPage = () => {
                     cursor: "ew-resize",
                   }}        
                 >
-                  <DragIndicatorRoundedIcon />
+                  <MoreVertRoundedIcon style={{ color: theme.palette.action.active }} />
                 </Box>
                 )
               }}
