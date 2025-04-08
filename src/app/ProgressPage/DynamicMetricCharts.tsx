@@ -153,7 +153,7 @@ const WorkflowCharts: React.FC = () => {
   }
 
   return (
-    <Container sx={{ maxWidth: "100%" }}>
+    <Container maxWidth={false} >
       <Grid
         container
         justifyContent="flex-end" // Align to the right

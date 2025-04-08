@@ -27,7 +27,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   title,
   minWidth = 100,
   minHeight = 100,
-  maxWidth = 1200,
+  maxWidth = 2000,
   maxHeight = 300,
   aspectRatio = 1, // Default aspect ratio (1:1 -> square)
   ...otherProps
@@ -64,7 +64,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   }, [updateSize])
 
   return (
-    <Card sx={{ maxWidth: maxWidth, mx: "auto", my: 2, boxShadow: 3 }}>
+    <Card sx={{ maxWidth: maxWidth, mx: "auto", mb: 1, boxShadow: 3 }}>
       <CardHeader
         action={
           <IconButton aria-label="settings">
