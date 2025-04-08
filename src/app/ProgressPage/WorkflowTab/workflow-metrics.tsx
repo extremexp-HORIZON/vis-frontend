@@ -127,30 +127,53 @@
 
 import { Box, Typography } from "@mui/material"
 import WorkflowMetricsTable from "./workflow-metrics-table"
+import WorkflowCharts from "../DynamicMetricCharts"
+import WorkflowTrends from "./workflow-metrics-trend"
 
-const WorkflowMetrics= () => {
-   
-    return (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2}}>
-          <Box
-            key="task-metrics"
-            sx={{ display: "flex", flexDirection: "column", rowGap: 2, width: "100%" }}
-          >
-            <Box key="task-metrics-title">
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 600 }}
-              >
-                Workflow Metrics
-              </Typography>
-            </Box>
-            <Box key="task-metrics-items" sx={{pb: 1}}>
-              <WorkflowMetricsTable/>
-            </Box>
-          </Box>
+const WorkflowMetrics = () => {
+  return (
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+      {/* <Box key="workflow-flow-chart" sx={{width: "100%" }}>
+          <WorkflowCharts/>
+          </Box> */}
+      <Box
+        key="task-metrics"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          rowGap: 2,
+          width: "100%",
+        }}
+      >
+        <Box key="task-metrics-title">
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            Overview
+          </Typography>
         </Box>
-        
-    )
+        <Box key="task-metrics-items" sx={{ pb: 1 }}>
+          <WorkflowMetricsTable />
+        </Box>
+      </Box>
+      <Box
+        key="task-metrics"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          rowGap: 2,
+          width: "100%",
+        }}
+      >
+        <Box key="task-metrics-title">
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            Metric Trend
+          </Typography>
+        </Box>
+        <Box key="task-metrics-items" sx={{ pb: 1 }}>
+          <WorkflowTrends />
+        </Box>
+      </Box>
+    </Box>
+  )
 }
 
 export default WorkflowMetrics
