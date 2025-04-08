@@ -187,47 +187,25 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               <Box sx={{p: 2, display: "flex", flexDirection: "column", maxheight: "250px"}}>
                 {
                   visibleTable === "workflows" ? (
-                    workflowsTable.aggregatedColumns.length > 0 ? (
-                      workflowsTable.aggregatedColumns.map(column => (
-                        <FormControlLabel 
-                          key={column.field}
-                          control={
-                            <Checkbox
-                              checked={workflowsTable.columnsVisibilityModel[column.field] ?? true}
-                              onChange={() => {
-                                dispatch(setWorkflowsTable({
-                                  columnsVisibilityModel: {
-                                    ...workflowsTable.columnsVisibilityModel,
-                                    [column.field]: !workflowsTable.columnsVisibilityModel[column.field],
-                                  },
-                                }));
-                              }}
-                            />  
-                          } 
-                          label={column.headerName}        
-                        />
-                      ))
-                    ) : (
-                      workflowsTable.columns.map(column => (
-                        <FormControlLabel 
-                          key={column.field}
-                          control={
-                            <Checkbox
-                              checked={workflowsTable.columnsVisibilityModel[column.field] ?? true}
-                              onChange={() => {
-                                dispatch(setWorkflowsTable({
-                                  columnsVisibilityModel: {
-                                    ...workflowsTable.columnsVisibilityModel,
-                                    [column.field]: !workflowsTable.columnsVisibilityModel[column.field],
-                                  },
-                                }));
-                              }}
-                            />  
-                          } 
-                          label={column.headerName}        
-                        />
-                      ))
-                    )
+                    workflowsTable.visibleColumns.map(column => (
+                      <FormControlLabel 
+                        key={column.field}
+                        control={
+                          <Checkbox
+                            checked={workflowsTable.columnsVisibilityModel[column.field] ?? true}
+                            onChange={() => {
+                              dispatch(setWorkflowsTable({
+                                columnsVisibilityModel: {
+                                  ...workflowsTable.columnsVisibilityModel,
+                                  [column.field]: !workflowsTable.columnsVisibilityModel[column.field],
+                                },
+                              }));
+                            }}
+                          />  
+                        } 
+                        label={column.headerName}        
+                      />
+                    ))
                   ) : (
                     scheduledTable.columns.map(column => (
                       <FormControlLabel 

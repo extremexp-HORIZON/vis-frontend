@@ -84,12 +84,12 @@ const ProgressPage = (props: ProgressPageProps) => {
         <Box
           sx={{height: "100vh", width:"100vw"}}
         >
-        <Box sx={{ height: {xs:"15%", xl:"10%"}, width: "100vw"}}>
+        <Box sx={{ height: "70px", width: "100vw"}}>
           <ExperimentControls />
         </Box>
         <Box
           sx={{
-            height: {xs:"85%", xl:"90%"},
+            height: "calc(100% - 70px)",
             width: "100vw",
           }}
         >
@@ -97,7 +97,7 @@ const ProgressPage = (props: ProgressPageProps) => {
               sx={{
                 position: "fixed",
                 left: 0,
-                width: !menuOptions.collapsed ? "15%" : "5%",
+                width: !menuOptions.collapsed ? "15%" : "56px",
                 height: "100%",
                 transition: "width 0.3s ease",
               }}
@@ -111,8 +111,8 @@ const ProgressPage = (props: ProgressPageProps) => {
                 rowGap: 2,
                 height:"100%",
                 overflow: "hidden",
-                width:  !menuOptions.collapsed ? "85%" : "95%",
-                marginLeft: !menuOptions.collapsed ? "15%" : "5%",
+                width:  !menuOptions.collapsed ? "85%" : "calc(100% - 56px)",
+                marginLeft: !menuOptions.collapsed ? "15%" : "56px",
                 transition: "margin-left 0.3s ease, width 0.3s ease",  
               }}
             >

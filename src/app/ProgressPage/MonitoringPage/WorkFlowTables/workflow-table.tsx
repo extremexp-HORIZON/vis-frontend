@@ -352,7 +352,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           headerClassName:
             key === "action" ? "datagrid-header-fixed" : "datagrid-header",
           minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
-          maxWidth: key === "action" ? 100 : 350,
+          maxWidth: key === "action" ? 100 : 500,
           flex: 1,
           align: "center",
           headerAlign: "center",
