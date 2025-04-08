@@ -12,10 +12,11 @@ import { IParam } from "../../../shared/models/experiment/param.model"
 
 interface ITaskConfiguration {
   configuration: ITask[] | null
+  params: IParam[] | null
 }
 
 const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
-  const { configuration } = props
+  const { configuration, params } = props
 
   const convertParametersToString = (obj: IParam[]) => obj
     .map((param) => `${param.name}: ${param.value}`)
@@ -40,18 +41,9 @@ const WorkflowTaskConfiguration = (props: ITaskConfiguration) => {
                     <TableCell>{task.name}</TableCell>
                     <TableCell>{task.variant || "-"}</TableCell>
                     <TableCell>
-                      {task.parameters ?
-                        convertParametersToString(task.parameters) : "-"}
+                      {params?.find(param => param.task === task.name) ?
+                        convertParametersToString(params) : "-"}
                     </TableCell>
-                    {/* {configuration.map((task: any, index: number) => (
-                      <TableCell key={`${task}-${index}`}>
-                        {typeof configuration[taskName][task] === "string"
-                          ? configuration[taskName][task]
-                          : convertParametersToString(
-                              configuration[taskName][task],
-                            )}
-                      </TableCell>
-                    ))} */}
                   </TableRow>
                 ))}
               </TableBody>

@@ -7,6 +7,9 @@ import { Tabs, Tab, Card } from "@mui/material"
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 import { initTab } from "../../../store/slices/workflowPageSlice"
 import WorkflowMetrics from "./workflow-metrics"
+import StaticDirectedGraph from "./worfklow-flow-chart"
+import WorkflowTaskConfiguration from "./workflow-task-configuration"
+import WorkflowDetails from "./workflow-details"
 
 const WorkflowTab = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -17,9 +20,7 @@ const WorkflowTab = () => {
   const workflowId = searchParams.get("workflowId")
   const dispatch = useAppDispatch()
   const { experimentId } = useParams()
-
-  console.log("tab", tab)
-  console.log("workflows", workflows)
+  const [chosenTask, setChosenTask] = useState<string | null>(null)
 
   useEffect(() => {
     if (!workflows.data.find(workflow => workflow.id === workflowId))
@@ -53,8 +54,9 @@ const WorkflowTab = () => {
 
       {/* Tab Content */}
       <Box sx={{ overflow: "auto", px: 2 }}>
-        {selectedTabs === 0 && <Typography>Details Code Content</Typography>}
-
+        {selectedTabs === 0 && (
+          <WorkflowDetails />
+        )}
         {selectedTabs === 1 && tab?.workflowMetrics?.data && (
           <WorkflowMetrics metrics={tab.workflowMetrics.data} />
         )}
