@@ -79,7 +79,12 @@ const LeftMenu = () => {
             )
           })}
         </List>
-        <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
+        <Box sx={{ 
+          display: "flex", 
+          justifyContent: menuOptions.collapsed ? "center" : "flex-end", 
+          py: 1,
+          px: menuOptions.collapsed ? 0 : 1
+        }}>
           <IconButton onClick={() => dispatch(setMenuOptions({...menuOptions, collapsed: !menuOptions.collapsed}))}>
             {menuOptions.collapsed ? <ChevronRightRoundedIcon /> : <ChevronLeftRoundedIcon />}
           </IconButton>

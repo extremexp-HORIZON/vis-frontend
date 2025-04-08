@@ -23,7 +23,6 @@ const ExperimentControls = () => {
           borderColor: theme => theme.palette.customGrey.main,
           borderBottomWidth: 2,
           borderBottomStyle: "solid",
-          paddingBottom:1
         }}
       >
         <Box
@@ -40,9 +39,11 @@ const ExperimentControls = () => {
               alignItems: "center",
               gap: 1,
               width: {md: "15%"},
+              height: "100%", // Make the box take full height
               borderColor: theme => theme.palette.customGrey.main,
               borderRightWidth: 2,
               borderRightStyle: "solid",
+              paddingY: 1, // Add vertical padding for consistent spacing
             }}
           >
             <Box

@@ -84,7 +84,7 @@ const ProgressPage = (props: ProgressPageProps) => {
         <Box
           sx={{height: "100vh", width:"100vw"}}
         >
-        <Box sx={{ height: "75px", width: "100vw"}}>
+        <Box sx={{ width: "100vw"}}>
           <ExperimentControls />
         </Box>
         <Box
