@@ -87,7 +87,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                   sx={{ padding: 1, margin: 2, fontSize: "11px", fontWeight: 'bold', borderRadius: 4 }}
                   onClick={() => dispatch(setVisibleTable("workflows"))}
                 >
-                  Workflows
+                  Completed
                 </Button>
                 <Button
                   size="small"

@@ -45,7 +45,7 @@ const MonitoringPage = () => {
           onChange={(event, newValue) => dispatch(setSelectedTab(newValue))}
           // aria-label="tab menu"
         >
-          <Tab label="WORKFLOWS" />
+          <Tab label="OVERVIEW" />
           <Tab label="COMPARATIVE ANALYSIS" />
         </Tabs>
       </Box>
