@@ -140,7 +140,7 @@ const WorkflowCharts: React.FC = () => {
       <Box
         sx={{
           display: "flex",
-          height: "20rem",
+          height: "100%",
           justifyContent: "center",
           alignItems: "center",
         }}
