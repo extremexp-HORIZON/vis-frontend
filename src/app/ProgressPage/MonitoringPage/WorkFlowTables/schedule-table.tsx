@@ -429,7 +429,6 @@ export default function ScheduleTable() {
   }
 
   useEffect(() => {
-      if(scheduledTable.rows.length === 0) return
       let counter = 0
       let newRows = scheduledTable.rows
       if(scheduledTable.filters.length > 0) {
@@ -484,6 +483,7 @@ export default function ScheduleTable() {
       <Paper sx={{ height: "100%", width: "100%", mb: 2 }} elevation={2}>
         <Box >
           <ToolBarWorkflow
+            key="scheduled-toolbar"
             filterNumbers={scheduledTable.filtersCounter}
             filterClickedFunction={filterClicked}
             actionButtonName="Cancel selected workflows"
@@ -491,6 +491,8 @@ export default function ScheduleTable() {
             tableName={"Scheduled Workflows"}
             handleClickedFunction={removeSelected}
             onRemoveFilter={handleRemoveFilter}
+            filters={scheduledTable.filters}
+            onFilterChange={handleFilterChange}
           />
         </Box>
         <Popover
@@ -510,6 +512,7 @@ export default function ScheduleTable() {
               onFilterChange={handleFilterChange}
               onAddFilter={handleAddFilter}
               onRemoveFilter={handleRemoveFilter}
+              setFilterOpen={setFilterOpen}
             />
           </Box>
         </Popover>

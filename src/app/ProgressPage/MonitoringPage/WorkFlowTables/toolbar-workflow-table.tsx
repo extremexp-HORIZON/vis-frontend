@@ -42,6 +42,13 @@ interface ToolBarWorkflowProps {
   filterClickedFunction: (event: React.MouseEvent<HTMLElement>) => void
   onRemoveFilter: (index: number) => void
   groupByOptions?: string[]
+  filters: { column: string; operator: string; value: string }[]
+  onFilterChange: (
+    index: number,
+    column: string,
+    operator: string,
+    value: string,
+  ) => void
 }
 
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
@@ -54,6 +61,8 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     filterClickedFunction,
     onRemoveFilter,
     groupByOptions,
+    filters,
+    onFilterChange
   } = props
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
     useAppSelector((state: RootState) => state.monitorPage)
@@ -80,6 +89,14 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
 
   const open = Boolean(anchorEl)
   const openMenu = Boolean(anchorElMenu)
+
+  const handleRemoveFilter = (index: number) => {
+    if (filters.length > 1) {
+      onRemoveFilter(index);
+    } else {
+      onFilterChange(index, '', '', '');
+    }
+  }
 
   return (
     <Toolbar
@@ -180,20 +197,22 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                   }}
                 >
                   {/* Filters */}
-                  {workflowsTable.filters?.length > 0 && (
+                  {workflowsTable.filters?.some(
+                    filter => filter.value
+                    ) && (
                     <>
                       <Chip
                         label="Filters:"
                         sx={{ fontWeight: "bold", bgcolor: "white" }}
                       />
                       {workflowsTable.filters.map((filter, index) => {
-                        if (filter.column && filter.operator && filter.value) {
+                        if (filter.value) {
                           const label = `${filter.column} ${filter.operator} ${filter.value}`
                           return (
                             <Chip
                               key={`filter-${index}`}
                               label={label}
-                              onDelete={() => onRemoveFilter(index)}
+                              onDelete={() => handleRemoveFilter(index)}
                             />
                           )
                         }
@@ -226,7 +245,9 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                   )}
                 </Box>
               )
-            : scheduledTable.filters?.length > 0 && (
+            : scheduledTable.filters?.some(
+                filter => filter.value
+              ) && (
                 <Box
                   sx={{
                     p: 1,
@@ -237,13 +258,15 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                   }}
                 >
                   {scheduledTable.filters.map((filter, index) => {
-                    const label = `${filter.column} ${filter.operator} ${filter.value}`
-                    return (
-                      <Chip
-                        label={label}
-                        onDelete={() => onRemoveFilter(index)}
-                      />
-                    )
+                    if (filter.value) {
+                      const label = `${filter.column} ${filter.operator} ${filter.value}`
+                      return (
+                        <Chip
+                          label={label}
+                          onDelete={() => handleRemoveFilter(index)}
+                        />
+                      )
+                    }
                   })}
                 </Box>
               )}
@@ -307,6 +330,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               anchorEl={anchorEl}
               onClose={handleClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              sx={{maxHeight: "400px"}}
             >
               <Box
                 sx={{
@@ -380,6 +404,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               anchorEl={anchorElGroup}
               onClose={handleGroupClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              sx={{maxHeight: "400px"}}
             >
               <Box
                 sx={{

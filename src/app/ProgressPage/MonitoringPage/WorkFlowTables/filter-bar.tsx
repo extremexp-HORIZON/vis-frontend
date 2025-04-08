@@ -41,6 +41,7 @@ interface FilterBarProps {
   ) => void
   onAddFilter: () => void
   onRemoveFilter: (index: number) => void
+  setFilterOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export default function FilterBar({
@@ -49,11 +50,22 @@ export default function FilterBar({
   onFilterChange,
   onAddFilter,
   onRemoveFilter,
+  setFilterOpen
 }: FilterBarProps) {
+
+  const handleRemoveFilter = (index: number) => {
+    if (filters.length > 1) {
+      onRemoveFilter(index)
+    } else {
+      onFilterChange(index, '', '', '')
+      setFilterOpen(false)
+    }
+  }
+
   return (
     <Box>
       {filters.map((filter, index) => (
-        <Box key={index} display="flex" gap={2} alignItems="center">
+        <Box key={index} display="flex" gap={1} alignItems="center" sx={{pb: 1}}>
           <FormControl sx={{ width: "200px" }}>
             <InputLabel>Columns</InputLabel>
             <Select
@@ -66,6 +78,7 @@ export default function FilterBar({
                   filter.value,
                 )
               }
+              label="Columns"
             >
               {columns.map((column: CustomGridColDef) => {
                 if (column.field !== "rating" && column.field !== "status" && column.field !== "action")
@@ -89,6 +102,7 @@ export default function FilterBar({
                   filter.value,
                 )
               }
+              label="Operator"
             >
               {operators.map(operator => (
                 <MenuItem key={operator.id} value={operator.id}>
@@ -110,16 +124,20 @@ export default function FilterBar({
             }
             variant="outlined"
           />
-          <IconButton onClick={() => onRemoveFilter(index)}>
+          <IconButton onClick={() => handleRemoveFilter(index)}>
             <CloseIcon />
           </IconButton>
         </Box>
       ))}
-      <Box display="flex" justifyContent="center" gap={2} mt={2}>
-        <IconButton onClick={onAddFilter}>
-          <AddIcon />
-        </IconButton>
-      </Box>
+      {
+        filters.at(-1)?.value && (
+          <Box display="flex" justifyContent="center" gap={1}>
+            <IconButton onClick={onAddFilter}>
+              <AddIcon />
+            </IconButton>
+          </Box>  
+        )
+      }
     </Box>
   )
 }

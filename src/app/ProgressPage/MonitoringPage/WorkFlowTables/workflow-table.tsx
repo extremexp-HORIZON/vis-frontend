@@ -453,14 +453,12 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       dispatch(setWorkflowsTable({
         visibleRows: aggregatedRows,
         aggregatedRows: aggregatedRows,
-        aggregatedColumns: reducedColumns,
         visibleColumns: reducedColumns
       }))
     } else {
       dispatch(setWorkflowsTable({
         visibleRows: workflowsTable.filteredRows,
         aggregatedRows: [],
-        aggregatedColumns: [],
         visibleColumns: workflowsTable.columns,
       }))
     }
@@ -472,6 +470,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       <Paper elevation={2} sx={{height: "100%", width: "100%", mb: 2}}>
         <Box >
           <ToolbarWorkflow
+            key="workflows-toolbar"
             actionButtonName="Compare selected workflows"
             tableName="Workflow Execution"
             numSelected={workflowsTable.selectedWorkflows.length}
@@ -480,6 +479,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             handleClickedFunction={handleLaunchCompletedTab}
             onRemoveFilter={handleRemoveFilter}
             groupByOptions={Array.from(new Set([...workflowsTable.uniqueTasks, ...workflowsTable.uniqueParameters]))}
+            filters={workflowsTable.filters}
+            onFilterChange={handleFilterChange}
           />
         </Box>
         <Popover
@@ -499,6 +500,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               onFilterChange={handleFilterChange}
               onAddFilter={handleAddFilter}
               onRemoveFilter={handleRemoveFilter}
+              setFilterOpen={setFilterOpen}
             />
           </Box>
         </Popover>

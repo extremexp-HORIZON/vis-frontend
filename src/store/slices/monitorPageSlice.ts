@@ -25,7 +25,6 @@ interface IMonitoringPageSlice {
         visibleColumns: { [key: string]: any }[]
         columnsVisibilityModel: { [field: string]: boolean }
         aggregatedRows: { [key: string]: any }[]
-        aggregatedColumns: { [key: string]: any }[]
         groupBy: string[]
         uniqueMetrics: string[]
         uniqueParameters: string[]
@@ -89,7 +88,7 @@ const initialState: IMonitoringPageSlice = {
       selectedWorkflows: [],
       workflowColors: {}, // Initialize the color mapping
 
-      filters: [],
+      filters: [{column: '', operator: '', value: ''}],
       rows: [],
       filteredRows: [],
       filtersCounter: 0,
@@ -98,7 +97,6 @@ const initialState: IMonitoringPageSlice = {
       visibleColumns: [],
       columnsVisibilityModel: {},
       aggregatedRows: [],
-      aggregatedColumns: [],
       groupBy: [],
       uniqueMetrics: [],
       uniqueParameters: [],
@@ -110,7 +108,7 @@ const initialState: IMonitoringPageSlice = {
       page: 0,
       rowsPerPage: 50,
       selectedWorkflows: [],
-      filters: [],
+      filters: [{column: '', operator: '', value: ''}],
       rows: [],
       filteredRows: [],
       filtersCounter: 0,
