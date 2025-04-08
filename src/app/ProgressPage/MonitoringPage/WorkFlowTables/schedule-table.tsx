@@ -474,7 +474,7 @@ export default function ScheduleTable() {
   return (
     <Box sx={{height: "100%"}} >
       <Paper sx={{ height: "100%", width: "100%", mb: 2 }} elevation={2}>
-        <Box sx={{height: "56px"}} >
+        <Box >
           <ToolBarWorkflow
             filterNumbers={scheduledTable.filtersCounter}
             filterClickedFunction={filterClicked}
