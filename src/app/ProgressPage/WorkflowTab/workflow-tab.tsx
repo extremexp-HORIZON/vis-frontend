@@ -1,28 +1,31 @@
-import Box from "@mui/material/Box";
-import { useEffect, useState } from "react";
-import Typography from "@mui/material/Typography";
-import { RootState, useAppDispatch, useAppSelector } from "../../../store/store";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Tabs, Tab, Card } from "@mui/material";
-import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent";
-import { initTab } from "../../../store/slices/workflowPageSlice";
+import Box from "@mui/material/Box"
+import { useEffect, useState } from "react"
+import Typography from "@mui/material/Typography"
+import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
+import { Tabs, Tab, Card } from "@mui/material"
+import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
+import { initTab } from "../../../store/slices/workflowPageSlice"
+import WorkflowMetrics from "./workflow-metrics"
 
 const WorkflowTab = () => {
-  const { tab } = useAppSelector((state: RootState) => state.workflowPage);
-  const { workflows } = useAppSelector(
-    (state: RootState) => state.progressPage
-  );
-  const navigate = useNavigate();
-  const [selectedTabs, setSelectedTabs] = useState(0);
-  const [ searchParams ] = useSearchParams()
+  const { tab } = useAppSelector((state: RootState) => state.workflowPage)
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  const navigate = useNavigate()
+  const [selectedTabs, setSelectedTabs] = useState(0)
+  const [searchParams] = useSearchParams()
   const workflowId = searchParams.get("workflowId")
   const dispatch = useAppDispatch()
   const { experimentId } = useParams()
- 
-  useEffect (() => {
-    if (!workflows.data.find(workflow => workflow.id === workflowId)) navigate(`/${experimentId}/monitoring`)
-    else dispatch(initTab({tab: workflowId, workflows}))
-  },[searchParams,workflows])
+
+  console.log("tab", tab)
+  console.log("workflows", workflows)
+
+  useEffect(() => {
+    if (!workflows.data.find(workflow => workflow.id === workflowId))
+      navigate(`/${experimentId}/monitoring`)
+    else dispatch(initTab({ tab: workflowId, workflows }))
+  }, [searchParams, workflows])
 
   return (
     <>
@@ -33,7 +36,7 @@ const WorkflowTab = () => {
           borderBottomWidth: 2,
           borderBottomStyle: "solid",
           width: "100%",
-          px: 2
+          px: 2,
         }}
       >
         <Tabs
@@ -41,49 +44,28 @@ const WorkflowTab = () => {
           onChange={(event, newValue) => setSelectedTabs(newValue)}
           // aria-label="tab menu"
         >
+          <Tab label="DETAILS" />
           <Tab label="METRICS" />
-          <Tab label="DATA EXPLORATION" />
-          <Tab label="SOURCE CODE" />
-          <Tab label="MONITORING" />
-          <Tab label="USER INPUT" />
+          <Tab label="SYSTEM" />
+          <Tab label="DATA" />
         </Tabs>
       </Box>
 
       {/* Tab Content */}
-      <Box sx={{overflow: "auto", px: 2}}>
-        {selectedTabs === 0 && (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            {tab?.workflowMetrics.data?.map((metric) => (
-                <Card
-                  key={metric.name}
-                  sx={{
-                    flex: 1,
-                    minWidth: 200,
-                    textAlign: "center",
-                    backgroundColor: "#f5f5f5",
-                    boxShadow: 2,
-                  }}
-                >
-                  <Typography variant="body1">{metric.name}</Typography>
-                  <Typography variant="h6" sx={{ color: "blue" }}>
-                    {metric.value}
-                  </Typography>
-                </Card>
-              ))}
-          </Box>
+      <Box sx={{ overflow: "auto", px: 2 }}>
+        {selectedTabs === 0 && <Typography>Details Code Content</Typography>}
+
+        {selectedTabs === 1 && tab?.workflowMetrics?.data && (
+          <WorkflowMetrics metrics={tab.workflowMetrics.data} />
         )}
-        {selectedTabs === 1 && (
-          <DataExplorationComponent
-            workflow={tab}
-            task={null}
-          />
+        {selectedTabs === 2 && <Typography>System Content</Typography>}
+
+        {selectedTabs === 3 && (
+          <DataExplorationComponent workflow={tab} task={null} />
         )}
-        {selectedTabs === 2 && <Typography>Source Code Content</Typography>}
-        {selectedTabs === 3 && <Typography>Monitoring Content</Typography>}
-        {selectedTabs === 4 && <Typography>User Input Content</Typography>}
       </Box>
     </>
-  );
-};
+  )
+}
 
-export default WorkflowTab;
+export default WorkflowTab
