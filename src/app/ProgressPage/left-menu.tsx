@@ -56,6 +56,7 @@ const LeftMenu = () => {
                   cursor: "pointer",
                   borderBottom: "1px solid #ddd",
                   justifyContent: menuOptions.collapsed ? "center" : "flex-start",
+                  height: "48px", // 48px is the standard MUI component height
                   "&:hover": {
                     bgcolor: theme => theme.palette.customGrey.main
                   },
