@@ -81,7 +81,7 @@ const WorkflowCharts: React.FC = () => {
         x: {
           field: uniqueSteps.size === 1 ? "id" : "step",
           type: "ordinal",
-          axis: { labels: false }, // Hide x-axis labels
+          axis: { labels: false,title:null }, // Hide x-axis labels
           scale: {
             padding: 0.05, // Adds 2% extra space to the right
           },
@@ -89,12 +89,14 @@ const WorkflowCharts: React.FC = () => {
         y: {
           field: "value",
           type: "quantitative",
+          axis:{title:null},
           scale: {
             domain: [
               0, // Min value is 0 (or any other value you'd like)
               Math.max(...metricSeries.map((d: any) => d.value)) * 1.05, // Max value with 10% padding
             ],
           },
+          
         },
         color: {
           field: "id",
