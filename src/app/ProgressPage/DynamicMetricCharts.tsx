@@ -28,14 +28,12 @@ const WorkflowCharts: React.FC = () => {
       ? workflowsTable.aggregatedRows
       : workflowsTable.filteredRows
   ).filter(row => workflowsTable.selectedWorkflows.includes(row.id))
-  console.log("filteredWorkflows", filteredWorkflows)
 
   const groupedMetrics = workflowsTable.uniqueMetrics.reduce(
     (acc: any, metricName: string) => {
       acc[metricName] = []
 
       filteredWorkflows.forEach(workflow => {
-        console.log("workflow", workflow)
         if (workflow.hasOwnProperty(metricName)) {
           acc[metricName].push({
             value: workflow[metricName],
@@ -59,7 +57,6 @@ const WorkflowCharts: React.FC = () => {
           })
         }
       })
-      console.log("acc", acc)
 
       return acc
     },

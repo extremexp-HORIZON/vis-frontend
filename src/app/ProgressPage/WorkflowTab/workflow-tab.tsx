@@ -7,8 +7,6 @@ import { Tabs, Tab, Card } from "@mui/material"
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 import { initTab } from "../../../store/slices/workflowPageSlice"
 import WorkflowMetrics from "./workflow-metrics"
-import StaticDirectedGraph from "./worfklow-flow-chart"
-import WorkflowTaskConfiguration from "./workflow-task-configuration"
 import WorkflowDetails from "./workflow-details"
 
 const WorkflowTab = () => {
@@ -58,7 +56,7 @@ const WorkflowTab = () => {
           <WorkflowDetails />
         )}
         {selectedTabs === 1 && tab?.workflowMetrics?.data && (
-          <WorkflowMetrics metrics={tab.workflowMetrics.data} />
+          <WorkflowMetrics />
         )}
         {selectedTabs === 2 && <Typography>System Content</Typography>}
 
