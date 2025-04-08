@@ -342,8 +342,22 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               return acc
             }, {}),
             ...Array.from(uniqueMetrics).reduce((acc, variant) => {
-              const value = metrics?.find(metric => metric.name === variant)?.value
-              acc[variant] = value != null ? value : "n/a"
+              if (metrics && metrics.length > 0) {
+                const matchingMetrics = metrics.filter(metric => metric.name === variant)
+            
+                // Pick the one with highest step or fallback to latest timestamp
+                const latestMetric = matchingMetrics.reduce((latest, current) => {
+                  if (current.step != null && latest.step != null) {
+                    return current.step > latest.step ? current : latest
+                  } else {
+                    return current.timestamp > latest.timestamp ? current : latest
+                  }
+                }, matchingMetrics[0])
+            
+                acc[variant] = latestMetric?.value != null ? latestMetric.value : "n/a"
+              } else {
+                acc[variant] = "n/a"
+              }
               return acc
             }, {}),
             status: workflow.status,
