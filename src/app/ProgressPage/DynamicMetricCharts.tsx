@@ -68,7 +68,8 @@ const WorkflowCharts: React.FC = () => {
           type: "ordinal",
           axis: { labels: false,title:null }, // Hide x-axis labels
           scale: {
-            padding: 0.05, // Adds 2% extra space to the right
+            paddingInner: 0.2,
+            paddingOuter: 1,
           },
         },
         y: {
