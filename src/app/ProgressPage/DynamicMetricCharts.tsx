@@ -33,7 +33,7 @@ const WorkflowCharts: React.FC = () => {
 
   
 
-  const groupedMetrics = workflowsTable.uniqueMetrics.reduce(
+  const groupedMetrics: Record<string, IMetric[]> = workflowsTable.uniqueMetrics.reduce(
     (acc: any, metricName: string) => {
       acc[metricName] = []
 
@@ -50,7 +50,7 @@ const WorkflowCharts: React.FC = () => {
 
       return acc
     },
-    {},
+    {} as Record<string, IMetric[]>
   )
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {

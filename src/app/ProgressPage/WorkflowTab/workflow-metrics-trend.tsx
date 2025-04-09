@@ -3,6 +3,7 @@ import { RootState, useAppSelector } from "../../../store/store"
 import { Container, Grid, ButtonGroup, Button, Box, Typography } from "@mui/material"
 import { useState } from "react"
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
+import { IMetric } from "../../../shared/models/experiment/metric.model"
 
 const WorkflowTrends = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -14,9 +15,9 @@ const WorkflowTrends = () => {
   const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId)
   console.log("filteredWorkflows", filteredWorkflows)
 
-  const groupedMetrics = filteredWorkflows.reduce(
+  const groupedMetrics: Record<string, IMetric[]> = filteredWorkflows.reduce(
     (acc: any, workflow) => {
-      workflow.metrics.forEach((m: { name: string, value: any, step: any, timestamp: any }) => {
+      workflow.metrics.forEach((m: IMetric) => {
         if (!acc[m.name]) acc[m.name] = []
         acc[m.name].push({
           value: m.value,
@@ -28,7 +29,7 @@ const WorkflowTrends = () => {
       })
       return acc
     },
-    {},
+    {} as Record<string, IMetric[]>
   )
 
   // Render charts for each grouped metric name
