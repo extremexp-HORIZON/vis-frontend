@@ -88,8 +88,7 @@ const ExperimentControls = () => {
             <>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 4 }}>
                 <ArrowBackIcon
-                  fontSize="large"
-                  sx={{ fontSize: 48, cursor: "pointer", color: "black" }}
+                  sx={{ fontSize: 24, cursor: "pointer", color: "grey" }}
                   onClick={() => navigate(-1)}
                 />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -115,7 +114,7 @@ const ExperimentControls = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       fontWeight: "bold",
-                      fontSize: "1rem",
+                      fontSize: "0.6rem",
                       width: "100%",
                       height: "100%",
                     }}
