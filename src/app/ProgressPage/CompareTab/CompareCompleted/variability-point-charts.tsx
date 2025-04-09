@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react"
-import { VegaLite } from "react-vega"
+import type {
+  SelectChangeEvent} from "@mui/material";
 import {
   Box,
   Typography,
   FormControl,
   Select,
   MenuItem,
-  Chip,
-  SelectChangeEvent,
+  Chip
 } from "@mui/material"
+import type {
+  RootState} from "../../../../store/store";
 import {
   useAppSelector,
-  RootState,
-  useAppDispatch,
 } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
@@ -27,7 +27,6 @@ interface ChartData {
 
 const VariabilityPointCharts = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
-  const dispatch = useAppDispatch()
 
   // Extract unique metrics and variability points from workflows
   const metrics = workflows.data
@@ -41,7 +40,6 @@ const VariabilityPointCharts = () => {
         ),
       )
     : []
-
   const variabilityPoints = workflows.data
     ? Array.from(
         new Set(
@@ -54,22 +52,25 @@ const VariabilityPointCharts = () => {
       )
     : []
 
-  const processData = (selectedMetric: string, variabilityPoint: string) => {
+  const processData = (selectedMetric: string, variabilityPoints: string[]) => {
     if (!workflows.data) return []
 
-      return  workflows.data
+    return variabilityPoints.flatMap(point =>
+      workflows.data
         .filter(
           workflow =>
             workflow.status === "completed" &&
             workflow.metrics &&
-            workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === variabilityPoint),
+            workflow.tasks.find(task => task.id === "TrainModel")?.parameters,
         )
         .map(workflow => ({
-          x: parseFloat(workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === variabilityPoint)?.value || "0")|| 0,
-          y: workflow.metrics?.find(m => m.name === selectedMetric)?.value ? parseFloat(workflow.metrics?.find(m => m.name === selectedMetric)?.value || "0") : null,
+          x: parseFloat(
+            workflow.tasks.find(task => task.id === "TrainModel")?.parameters?.find(param => param.name === point)?.value || "0"
+        ) || 0,        
+          y: workflow.metrics?.find(m => m.name === selectedMetric)?.value ? parseFloat(workflow.metrics?.find(m => m.name === selectedMetric)?.value || "0") : 0,
           id: workflow.workflowId,
-          point: variabilityPoint,
-        }),
+          point,
+        })),
     )
   }
 
@@ -83,37 +84,50 @@ const VariabilityPointCharts = () => {
   }
 
   const [selectedMetric, setSelectedMetric] = useState(metrics[0] || "accuracy")
-  const [selectedVariabilityPoint, setSelectedVariabilityPoint] = useState<string>(
-    variabilityPoints[0],
+  const [selectedVariabilityPoints, setSelectedVariabilityPoints] = useState(
+    variabilityPoints.slice(0, 1),
   )
+  const [chartWidth, setChartWidth] = useState(250) // Default width
 
-  const chartData = processData(selectedMetric, selectedVariabilityPoint)
+  const chartData = processData(selectedMetric, selectedVariabilityPoints)
   const yAxisDomain = getYAxisDomain(chartData)
 
   const handleMetricChange = (event: SelectChangeEvent<string>) => {
     setSelectedMetric(event.target.value)
   }
 
-  const handleVariabilityPointChange = (event: SelectChangeEvent<string>) => {
-    setSelectedVariabilityPoint(event.target.value)
+  const handleVariabilityPointChange = (event: SelectChangeEvent<string[]>) => {
+    setSelectedVariabilityPoints(
+      Array.isArray(event.target.value)
+        ? event.target.value
+        : [event.target.value],
+    )
   }
 
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+  }
 
   useEffect(() => {
     const handleResize = () => {
       const chartContainerWidth =
         (document.querySelector(".chart-container") as HTMLElement | null)
           ?.offsetWidth || 300
-      // if (chartContainerWidth) {
-      //   setChartWidth(
-      //     Math.max(
-      //       300,
-      //       chartContainerWidth / selectedVariabilityPoints.length - 20,
-      //     ),
-      //   ) // 20px for margin
-      // }
+      if (chartContainerWidth) {
+        setChartWidth(
+          Math.max(
+            300,
+            chartContainerWidth / selectedVariabilityPoints.length - 20,
+          ),
+        ) // 20px for margin
+      }
     }
 
     window.addEventListener("resize", handleResize)
@@ -122,7 +136,7 @@ const VariabilityPointCharts = () => {
     return () => {
       window.removeEventListener("resize", handleResize)
     }
-  }, [selectedVariabilityPoint.length])
+  }, [selectedVariabilityPoints.length])
 
   return (
     <WorkflowCard
@@ -135,10 +149,18 @@ const VariabilityPointCharts = () => {
         <FormControl sx={{ m: 1, minWidth: 120, maxHeight: 120 }} size="small">
           <Select
             labelId="variability-point-select-label"
+            multiple
             size="small"
-            value={selectedVariabilityPoint}
+            value={selectedVariabilityPoints}
             onChange={handleVariabilityPointChange}
-            sx={{ fontSize: "0.8rem" }}
+            renderValue={selected => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map(value => (
+                  <Chip key={value} label={value} />
+                ))}
+              </Box>
+            )}
+            MenuProps={MenuProps}
           >
             {variabilityPoints.map(point => (
               <MenuItem key={point} value={point}>
@@ -157,7 +179,6 @@ const VariabilityPointCharts = () => {
             size="small"
             value={selectedMetric}
             onChange={handleMetricChange}
-            sx={{ fontSize: "0.8rem" }}
           >
             {metrics.map(metric => (
               <MenuItem key={metric} value={metric}>
@@ -177,13 +198,14 @@ const VariabilityPointCharts = () => {
           alignItems: "center",
         }}
       >
-          <Box width="40%" key={"variability-point-chart"}>
+        {selectedVariabilityPoints.map(point => (
+          <Box width="40%" key={point}>
             <ResponsiveVegaLite
               minWidth={100}
               spec={{
                 mark: { type: "point", tooltip: true },
                 encoding: {
-                  x: { field: "x", type: "nominal", title: selectedVariabilityPoint },
+                  x: { field: "x", type: "nominal", title: point },
                   y: {
                     field: "y",
                     type: "quantitative",
@@ -198,17 +220,18 @@ const VariabilityPointCharts = () => {
                   },
                   tooltip: [
                     { field: "id", type: "nominal", title: "Workflow ID" },
-                    { field: "x", type: "nominal", title: selectedVariabilityPoint },
+                    { field: "x", type: "nominal", title: point },
                     { field: "y", type: "quantitative", title: selectedMetric },
                   ],
                 },
                 data: {
-                  values: chartData.filter(data => data.point === selectedVariabilityPoint),
+                  values: chartData.filter(data => data.point === point),
                 },
               }}
               actions={false}
             />
           </Box>
+        ))}
       </Box>
     </WorkflowCard>
   )
