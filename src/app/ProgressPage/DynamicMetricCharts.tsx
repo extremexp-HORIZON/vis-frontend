@@ -9,51 +9,41 @@ import {
   Box,
 } from "@mui/material"
 import ResponsiveCardVegaLite from "../../shared/components/responsive-card-vegalite"
-import { useParams } from "react-router-dom"
 
+interface IMetric {
+  name: string
+  value: number
+  timestamp: number
+  step: number
+}
 
 const WorkflowCharts: React.FC = () => {
   const { workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   )
-  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
- 
   const [isMosaic, setIsMosaic] = useState(true)
-  // const filteredWorkflows = (
-  //   workflowsTable.groupBy.length > 0
-  //     ? workflowsTable.aggregatedRows
-  //     : workflowsTable.filteredRows
-  // ).filter(row => workflowsTable.selectedWorkflows.includes(row.id))
-  const filteredWorkflows =
+
+  const filteredWorkflows = (
     workflowsTable.groupBy.length > 0
-      ? workflowsTable.aggregatedRows.filter(row =>
-          workflowsTable.selectedWorkflows.includes(row.id),
-        )
-      : workflows.data.filter(row =>
-          workflowsTable.selectedWorkflows.includes(row.id),
-        )
+      ? workflowsTable.aggregatedRows
+      : workflowsTable.filteredRows
+  ).filter(row => workflowsTable.selectedWorkflows.includes(row.id))
+
+  
 
   const groupedMetrics = workflowsTable.uniqueMetrics.reduce(
     (acc: any, metricName: string) => {
       acc[metricName] = []
 
       filteredWorkflows.forEach(workflow => {
-        const matchedMetrics =
-          workflow.metrics?.filter(
-            (m: { name: string }) => m.name === metricName,
-          ) || []
-
-        matchedMetrics.forEach(
-          (m: { value: any; step: any; timestamp: any }) => {
-            acc[metricName].push({
-              value: m.value,
-              id: workflow.id,
-              metricName,
-              step: m.step ?? 0,
-              timestamp: new Date(m.timestamp).toLocaleString(),
-            })
-          },
-        )
+        if (workflow.hasOwnProperty(metricName)) {
+          acc[metricName].push({
+            value: workflow[metricName],
+            id: workflow.id,
+            metricName,
+            step: workflow.step ?? 0, // Fallback to 0 if step is missing
+          })
+        }
       })
 
       return acc
@@ -63,8 +53,7 @@ const WorkflowCharts: React.FC = () => {
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]
-    const uniqueSteps = new Set(metricSeries.map((m: { step: any }) => m.step))
-
+    const uniqueSteps = new Set(metricSeries.map(m => m.step))
     const workflowColorMap = workflowsTable.workflowColors
     const workflowColorScale = filteredWorkflows.map(wf => ({
       id: wf.id,
@@ -77,7 +66,7 @@ const WorkflowCharts: React.FC = () => {
         x: {
           field: uniqueSteps.size === 1 ? "id" : "step",
           type: "ordinal",
-          axis: { labels: false, title: null }, // Hide x-axis labels
+          axis: { labels: false,title:null }, // Hide x-axis labels
           scale: {
             padding: 0.05, // Adds 2% extra space to the right
           },
@@ -85,13 +74,14 @@ const WorkflowCharts: React.FC = () => {
         y: {
           field: "value",
           type: "quantitative",
-          axis: { title: null },
+          axis:{title:null},
           scale: {
             domain: [
               0, // Min value is 0 (or any other value you'd like)
               Math.max(...metricSeries.map((d: any) => d.value)) * 1.05, // Max value with 10% padding
             ],
           },
+          
         },
         color: {
           field: "id",
@@ -103,10 +93,7 @@ const WorkflowCharts: React.FC = () => {
           legend: null,
         },
         tooltip: [
-          {
-            field: uniqueSteps.size === 1 ? "id" : "timestamp",
-            type: "nominal",
-          },
+          { field: "id", type: "nominal" },
           { field: "value", type: "quantitative" },
         ],
       },
@@ -148,7 +135,7 @@ const WorkflowCharts: React.FC = () => {
   }
 
   return (
-    <Container maxWidth={false}>
+    <Container maxWidth={false} >
       <Grid
         container
         justifyContent="flex-end" // Align to the right
