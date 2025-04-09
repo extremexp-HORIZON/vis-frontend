@@ -9,6 +9,8 @@ import {
   Box,
 } from "@mui/material"
 import ResponsiveCardVegaLite from "../../shared/components/responsive-card-vegalite"
+import InfoMessage from "../../shared/components/InfoMessage"
+import AssessmentIcon from "@mui/icons-material/Assessment"
 
 interface IMetric {
   name: string
@@ -119,19 +121,13 @@ const WorkflowCharts: React.FC = () => {
 
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          height: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography align="center" fontWeight="bold">
-          Select Workflows to display metrics.
-        </Typography>
-      </Box>
-    ) // Or you can return some placeholder text/UI
+      <InfoMessage 
+        message="Select Workflows to display metrics."
+        type="info"
+        icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+        fullHeight
+      />
+    )
   }
 
   return (

@@ -13,7 +13,8 @@ import type { GridColDef, GridRowSelectionModel, GridColumnNode } from "@mui/x-d
 import { DataGrid } from "@mui/x-data-grid"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 import theme from "../../../../mui-theme"
-
+import InfoMessage from "../../../../shared/components/InfoMessage"
+import ScheduleIcon from "@mui/icons-material/Schedule"
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -211,6 +212,17 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }))
 
+// Create a custom NoRowsOverlay component using InfoMessage
+const CustomNoRowsOverlay = () => {
+  return (
+    <InfoMessage 
+      message="No scheduled workflows available."
+      type="info"
+      icon={<ScheduleIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      fullHeight
+    />
+  )
+}
 
 export default function ScheduleTable() {
   const { workflows } = useAppSelector(
@@ -528,10 +540,10 @@ export default function ScheduleTable() {
             onColumnVisibilityModelChange={(model) =>
               dispatch(setScheduledTable({ columnsVisibilityModel: model }))
             }          
-            slots={{noRowsOverlay: NoRowsOverlayWrapper}}
-            slotProps={{noRowsOverlay: {title: "No scheduled workflows"}}}
+            slots={{
+              noRowsOverlay: CustomNoRowsOverlay
+            }}
             checkboxSelection
-            onRowSelectionModelChange={handleSelectionChange}
             sx={{
               "& .MuiDataGrid-selectedRowCount": {
                 visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header
