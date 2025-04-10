@@ -4,7 +4,7 @@ import { scheme } from "vega"
 import vegaTooltip from "vega-tooltip"
 import type { Axis, Item, Scale } from "vega-typings/types"
 import type { View } from "vega"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 interface ParallelCoordinateVegaProps {
   parallelData: React.MutableRefObject<any[]>
@@ -36,16 +36,25 @@ const ParallelCoordinateVega = ({
 }: ParallelCoordinateVegaProps) => {
   const [processedData, setProcessedData] = useState<any>([])
   const [chartHeight, setChartHeight] = useState(window.innerHeight * 0.25)
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [chartWidth, setChartWidth] = useState(0)
 
   useEffect(() => {
-    const handleResize = () => {
-      setChartHeight(window.innerHeight * 0.25)
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [])
-
+    const container = containerRef.current
+    if (!container) return
+  
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width } = entry.contentRect
+        setChartWidth(width)
+        setChartHeight(Math.max(window.innerHeight * 0.25,100))
+      }
+    })
+  
+    resizeObserver.observe(container)
+  
+    return () => resizeObserver.disconnect()
+  }, [])  
   // Add new selected property to each item in the parallelData based on the selectedWorkflows array
   useEffect(() => {
     const updatedData = parallelData.current.map((item, index) => {
@@ -171,12 +180,14 @@ const ParallelCoordinateVega = ({
   }
 
   return (
+    <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
     <Vega
       actions={false}
       onNewView={handleNewView}
       style={{ width: "100%" }}
       spec={{
         height: chartHeight,
+        width: chartWidth,
         padding: 15,
         autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
         config: {
@@ -226,11 +237,11 @@ const ParallelCoordinateVega = ({
               { events: "@oneDataLine:mouseout", update: "null" },
             ],
           },
-          {
-            name: "width",
-            init: "containerSize()[0]",
-            on: [{ events: "window:resize", update: "containerSize()[0]" }],
-          },
+          // {
+          //   name: "width",
+          //   init: "containerSize()[0]",
+          //   on: [{ events: "window:resize", update: "containerSize()[0]" }],
+          // },
         ],
 
         scales: generatedScales,
@@ -309,6 +320,7 @@ const ParallelCoordinateVega = ({
         ],
       }}
     />
+    </div>
   )
 }
 export default ParallelCoordinateVega
