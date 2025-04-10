@@ -12,17 +12,26 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import green from "@mui/material/colors/green"
 import red from "@mui/material/colors/red"
 import { RootState, useAppSelector } from "../../../store/store"
+import { useSearchParams } from "react-router-dom"
+
+import theme from "../../../mui-theme"
 
 const WorkflowMetricsTable = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
-  const metrics = tab?.workflowMetrics?.data || []
+  const [searchParams] = useSearchParams()
+  const task = searchParams.get("task")
+  
+  const metrics = !task ? 
+    tab?.workflowMetrics?.data 
+    : tab?.workflowMetrics?.data?.filter(metric => metric.task === task)
+
 
   return (
     <>
       <Box>
         <TableContainer component={Paper}>
-          <Table aria-label="task configuration table">
-            <TableHead>
+          <Table aria-label="task configuration table" >
+            <TableHead sx={{background: theme.palette.customGrey.main}}>
               <TableRow>
                 <TableCell>Metric</TableCell>
                 <TableCell>Value</TableCell>
@@ -30,7 +39,7 @@ const WorkflowMetricsTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {metrics.map(metric => {
+              {metrics?.map(metric => {
                 const value =
                   typeof metric.value === "string"
                     ? Number(parseFloat(metric.value).toFixed(3))

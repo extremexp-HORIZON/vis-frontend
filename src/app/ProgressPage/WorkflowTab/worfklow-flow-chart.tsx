@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   ReactFlow,
   Controls,
@@ -30,15 +30,14 @@ const startEndNodeStyle = {
 
 interface IFlowGraphProps {
   workflowSvg: { tasks: ITask[] | undefined; start: number | undefined; end: number | undefined } | null
-  chosenTask: string | null
-  setChosenTask: Dispatch<SetStateAction<string | null>>
   params: IParam[] | undefined | null
+  handleOpenTask: (taskName: string) => void
 }
 
 function FlowGraph(props: IFlowGraphProps) {
-  const { workflowSvg, chosenTask, setChosenTask, params } = props
+  const { workflowSvg, params, handleOpenTask } = props
   const flowWrapper = useRef(null)
-  const { fitView, setViewport } = useReactFlow()
+  const { fitView } = useReactFlow()
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
   const theme = useTheme()
   const [nodes, setNodes] = useState<Node[]>([])
@@ -63,39 +62,6 @@ function FlowGraph(props: IFlowGraphProps) {
     backgroundColor: "white",
   }
 
-  const getTaskStyleOnClick = (node: Node) => {
-    switch (node.data.type) {
-      case "interactive":
-        if (chosenTask === node.data.type) {
-          return {
-            ...node.style,
-            border: "1px solid orange",
-            backgroundColor: "white",
-          }
-        } else {
-          return {
-            ...node.style,
-            border: "1px solid #fff",
-            backgroundColor: "orange",
-          }
-        }
-      default:
-        if (chosenTask === node.data.type) {
-          return {
-            ...node.style,
-            border: `1px solid ${theme.palette.primary.main}`,
-            backgroundColor: "white",
-          }
-        } else {
-          return {
-            ...node.style,
-            border: `1px solid ${theme.palette.customGrey.dark}`,
-            backgroundColor: theme.palette.primary.main,
-          }
-        }
-    }
-  }
-
   const getNodeSelectState = (task: ITask) => {
       return false
   }
@@ -115,7 +81,7 @@ function FlowGraph(props: IFlowGraphProps) {
         case "explainability":
           return disabledNodeStyle
         default:
-          return disabledNodeStyle
+          return clickableNodeStyle
       }
     } else {
       const interactiveTask = tasks?.find(
@@ -176,7 +142,7 @@ function FlowGraph(props: IFlowGraphProps) {
         data: {
           label:  matchingParams.length > 0 ? (
             <Tooltip title={`Parameters: ${paramNames}`} arrow>
-              <div>{task.name}</div>
+              <div>{task.variant ? task.variant : task.name}</div>
             </Tooltip>
           ) : (
             <div>{task.name}</div>
@@ -189,12 +155,15 @@ function FlowGraph(props: IFlowGraphProps) {
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
         selectable: getNodeSelectState(task),
-        style: getInitialNodeStyle(
-          task.type || "",
-          workflowSvg.tasks,
-          workflowSvg.start,
-          workflowSvg.end,
-        ),
+        style: {
+          ...getInitialNodeStyle(
+            task.type || "",
+            workflowSvg.tasks,
+            workflowSvg.start,
+            workflowSvg.end,
+          ),
+          cursor: "pointer"
+      },
       }})
 
       const startNode = {
@@ -262,31 +231,29 @@ function FlowGraph(props: IFlowGraphProps) {
       node.id === "end"
     )
       return
-    if (chosenTask === node.data.type) {
-      setChosenTask(null)
-    } else {
-      setChosenTask(String(node.data.type))
+    else {
+      handleOpenTask(node.id)
     }
-    setNodes(state =>
-      state.map(n =>
-        n.data.type === node.data.type
-          ? {
-              ...n,
-              style: getTaskStyleOnClick(node),
-            }
-          : n.id === "start" || n.id === "end"
-            ? n
-            : {
-                ...n,
-                style: getInitialNodeStyle(
-                  String(n.data.type) || "",
-                  workflowSvg?.tasks || [],
-                  workflowSvg?.start,
-                  workflowSvg?.end,
-                ),
-              },
-      ),
-    )
+    // setNodes(state =>
+    //   state.map(n =>
+    //     n.data.type === node.data.type
+    //       ? {
+    //           ...n,
+    //           style: getTaskStyleOnClick(node),
+    //         }
+    //       : n.id === "start" || n.id === "end"
+    //         ? n
+    //         : {
+    //             ...n,
+    //             style: getInitialNodeStyle(
+    //               String(n.data.type) || "",
+    //               workflowSvg?.tasks || [],
+    //               workflowSvg?.start,
+    //               workflowSvg?.end,
+    //             ),
+    //           },
+    //   ),
+    // )
   }
 
   //   const xMin = Math.min(...nodes.map((node) => node.position.x)) - 200;
@@ -339,14 +306,13 @@ function FlowGraph(props: IFlowGraphProps) {
 }
 
 function StaticDirectedGraph(props: IFlowGraphProps) {
-  const { workflowSvg, chosenTask, setChosenTask, params } = props
+  const { workflowSvg, params, handleOpenTask } = props
   return (
     <ReactFlowProvider>
       <FlowGraph
         workflowSvg={workflowSvg}
-        chosenTask={chosenTask}
-        setChosenTask={setChosenTask}
         params={params}
+        handleOpenTask={handleOpenTask}
       />
     </ReactFlowProvider>
   )

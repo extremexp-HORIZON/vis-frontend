@@ -279,7 +279,9 @@ const ControlPanel = (props: IControlPanel) => {
         >
           { tab?.workflowConfiguration.dataAssets && tab?.workflowConfiguration.dataAssets.length > 0 && (
               tab?.workflowConfiguration.dataAssets.map(asset => {
-                const label = asset?.task ? `${asset.task}/${asset.name}` : asset.name
+                const label = !currentTask ?
+                  asset?.task ? `${asset.task}/${asset.name}` : asset.name
+                  : asset.name
                 if( !currentTask || currentTask === asset.task)
                   return (
                     <MenuItem key={asset.source} value={asset.source}>

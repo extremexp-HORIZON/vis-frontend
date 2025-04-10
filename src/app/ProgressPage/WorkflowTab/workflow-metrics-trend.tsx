@@ -4,6 +4,7 @@ import { Container, Grid, ButtonGroup, Button, Box, Typography } from "@mui/mate
 import { useState } from "react"
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
 import { IMetric } from "../../../shared/models/experiment/metric.model"
+import { useSearchParams } from "react-router-dom"
 
 const WorkflowTrends = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -11,22 +12,38 @@ const WorkflowTrends = () => {
   const queryParams = new URLSearchParams(location.search)
   const workflowId = queryParams.get("workflowId") // Get the workflowId from the query
   const [isMosaic, setIsMosaic] = useState(true)
+  const [searchParams] = useSearchParams()
+  const task = searchParams.get("task")
+  
   
   const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId)
   console.log("filteredWorkflows", filteredWorkflows)
 
   const groupedMetrics: Record<string, IMetric[]> = filteredWorkflows.reduce(
     (acc: any, workflow) => {
-      workflow.metrics.forEach((m: IMetric) => {
-        if (!acc[m.name]) acc[m.name] = []
-        acc[m.name].push({
-          value: m.value,
-          id: workflow.id,
-          metricName: m.name,
-          step: m.step,
-          timestamp: new Date(m.timestamp).toLocaleString(),
+      if (!task) {
+        workflow.metrics.forEach((m: IMetric) => {
+          if (!acc[m.name]) acc[m.name] = []
+          acc[m.name].push({
+            value: m.value,
+            id: workflow.id,
+            metricName: m.name,
+            step: m.step,
+            timestamp: new Date(m.timestamp).toLocaleString(),
+          })
         })
-      })
+      } else {
+        workflow.metrics.filter((m: IMetric) => m.task === task).forEach((m: IMetric) => {
+          if (!acc[m.name]) acc[m.name] = []
+          acc[m.name].push({
+            value: m.value,
+            id: workflow.id,
+            metricName: m.name,
+            step: m.step,
+            timestamp: new Date(m.timestamp).toLocaleString(),
+          })
+        })
+      }
       return acc
     },
     {} as Record<string, IMetric[]>

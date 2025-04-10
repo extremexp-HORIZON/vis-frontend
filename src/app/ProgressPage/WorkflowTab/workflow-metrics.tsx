@@ -128,8 +128,32 @@
 import { Box, Typography } from "@mui/material"
 import WorkflowMetricsTable from "./workflow-metrics-table"
 import WorkflowTrends from "./workflow-metrics-trend"
+import { useAppSelector, RootState } from "../../../store/store"
+import { useSearchParams } from "react-router-dom"
+import InfoMessage from "../../../shared/components/InfoMessage"
+import AssessmentIcon from "@mui/icons-material/Assessment"
+
 
 const WorkflowMetrics = () => {
+  const { tab } = useAppSelector((state: RootState) => state.workflowPage)
+  const [searchParams] = useSearchParams()
+  const task = searchParams.get("task")
+
+  const metrics = !task ? 
+    tab?.workflowMetrics?.data 
+    : tab?.workflowMetrics?.data?.filter(metric => metric.task === task)
+
+  if (!Array.isArray(metrics) || metrics.length === 0 ) {
+    return (
+      <InfoMessage 
+        message="No available metrics to display"
+        type="info"
+        icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+        fullHeight
+      />
+    )
+  }
+
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
       <Box
@@ -141,17 +165,17 @@ const WorkflowMetrics = () => {
           width: "100%",
         }}
       >
-        <Box key="task-metrics-title">
+        <Box key="task-metrics-overview-title">
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
             Overview
           </Typography>
         </Box>
-        <Box key="task-metrics-items" sx={{ pb: 1 }}>
+        <Box key="task-metrics-overview-items" sx={{ pb: 1 }}>
           <WorkflowMetricsTable />
         </Box>
       </Box>
       <Box
-        key="task-metrics"
+        key="task-metrics-trend"
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -159,12 +183,12 @@ const WorkflowMetrics = () => {
           width: "100%",
         }}
       >
-        <Box key="task-metrics-title">
+        <Box key="task-metrics-trend-title">
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
             Metric Trend
           </Typography>
         </Box>
-        <Box key="task-metrics-items" sx={{ pb: 1 }}>
+        <Box key="task-metrics-trend-items" sx={{ pb: 1 }}>
           <WorkflowTrends />
         </Box>
       </Box>

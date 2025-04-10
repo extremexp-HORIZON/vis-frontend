@@ -3,19 +3,44 @@ import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
-import { useAppSelector, RootState } from "../../store/store"
+import { useAppSelector, RootState, useAppDispatch } from "../../store/store"
 import Rating from "@mui/material/Rating";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
+import { useEffect } from "react"
+import { setProgressBarData } from "../../store/slices/progressPageSlice"
 
 const ExperimentControls = () => {
   const { experimentId } = useParams()
   const [ searchParams ] = useSearchParams()
   const navigate = useNavigate()
   const workflowId = searchParams.get("workflowId")
-  const { progressBar } = useAppSelector(
+  const task = searchParams.get("task")
+  const { progressBar, workflows } = useAppSelector(
     (state: RootState) => state.progressPage
-  );
+  )
+  const dispatch = useAppDispatch()
+  const taskVariant = task ? 
+    workflows.data.find(workflow => workflow.id === workflowId)?.tasks?.find(t => t.name === task)?.variant : ''
+
+    useEffect(() => {
+      if (workflows.data.length > 0) {
+        const total = workflows.data.length
+        const completed = workflows.data.filter(
+          workflow => workflow.status === "COMPLETED",
+        ).length
+        const running =
+          workflows.data.filter(
+            workflow => workflow.status === "SCHEDULED",
+          ).length +
+          workflows.data.filter(workflow => workflow.status === "RUNNING")
+            .length
+        const failed = workflows.data.filter(
+          workflow => workflow.status === "FAILED",
+        ).length
+        const progress = Math.round(((completed + failed) / total) * 100)
+        dispatch(setProgressBarData({ total, completed, running, failed, progress }))
+      }
+    }, [workflows])
 
     return (
       <Box
@@ -91,11 +116,23 @@ const ExperimentControls = () => {
                   sx={{ fontSize: 24, cursor: "pointer", color: "grey" }}
                   onClick={() => navigate(-1)}
                 />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {`Workflow ${workflowId}`}
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
-                <Rating name="simple-uncontrolled" size="large" defaultValue={2} />
+                {
+                  task ? (
+                    <>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {`${workflowId} / ${taskVariant}`}
+                      </Typography>
+                    </>
+                  ) : (
+                    <>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {`Workflow ${workflowId}`}
+                      </Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
+                      <Rating name="simple-uncontrolled" size="large" defaultValue={2} />
+                    </>
+                  )
+                }
               </Box>
 
               <Box sx={{ display: "flex", alignItems: "center", }}>

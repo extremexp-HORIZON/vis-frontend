@@ -16,13 +16,13 @@ import {
 } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { grey } from "@mui/material/colors"
 import MultiTimeSeriesVisualization from "../multi-ts-visualization/MultiTimeSeriesVisualization"
+import { useSearchParams } from "react-router-dom"
 //TODO: make selectedDataset url query param in order to change datasets smoothly
 interface IDataExplorationComponent {
   workflow: IWorkflowPageModel | null
-  task: string | null
 }
 const DataExplorationComponent = (props: IDataExplorationComponent) => {
-  const { workflow, task } = props
+  const { workflow } = props
   const dispatch = useAppDispatch()
   const [columns, setColumns] = useState<any[]>([])
   const [selectedColumns, setSelectedColumns] = useState<any>([])
@@ -31,6 +31,8 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [xAxis, setXAxis] = useState<VisualColumn>({ name: "", type: "" })
   const [lat, setLat] = useState<string>("")
   const [lon, setLon] = useState<string>("")
+  const [searchParams] = useSearchParams()
+  const task = searchParams.get("task")
 
   const [xAxisScatter, setXAxisScatter] = useState<VisualColumn>({
     name: "",
@@ -59,7 +61,12 @@ const DataExplorationComponent = (props: IDataExplorationComponent) => {
   const [colorByMap, setColorByMap] = useState<string>("None") // Set initial color to 'default'
   const [tripsMode, setTripsMode] = useState<boolean>(false)
   const [selectedColumnsMap, setSelectedColumnsMap] = useState<string[]>([])
-  const [selectedDataset, setSelectedDataset] = useState<string>(workflow?.workflowConfiguration?.dataAssets?.[0]?.source || '')
+  const [selectedDataset, setSelectedDataset] = useState<string>(() => {
+    if(!task)
+      return workflow?.workflowConfiguration?.dataAssets?.[0]?.source || ''
+    else
+      return workflow?.workflowConfiguration?.dataAssets?.find(asset => asset.task === task)?.source || ''
+  })
 
   const handleFetchData = () => {
     if (

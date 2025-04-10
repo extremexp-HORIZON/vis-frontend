@@ -1,9 +1,9 @@
 import Box from "@mui/material/Box"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import Typography from "@mui/material/Typography"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
-import { Tabs, Tab, Card } from "@mui/material"
+import { Tabs, Tab } from "@mui/material"
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 import { initTab } from "../../../store/slices/workflowPageSlice"
 import WorkflowMetrics from "./workflow-metrics"
@@ -13,18 +13,26 @@ const WorkflowTab = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const navigate = useNavigate()
-  const [selectedTabs, setSelectedTabs] = useState(0)
   const [searchParams] = useSearchParams()
   const workflowId = searchParams.get("workflowId")
+  const task = searchParams.get("task")
+  const tabParam = searchParams.get("tab")
+  const selectedTab = tabParam ?? (task ? "metrics" : "details")
   const dispatch = useAppDispatch()
   const { experimentId } = useParams()
-  const [chosenTask, setChosenTask] = useState<string | null>(null)
 
   useEffect(() => {
     if (!workflows.data.find(workflow => workflow.id === workflowId))
       navigate(`/${experimentId}/monitoring`)
     else dispatch(initTab({ tab: workflowId, workflows }))
   }, [searchParams, workflows])
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+    newParams.set("tab", newValue)
+    navigate({ search: `?${newParams.toString()}` }, { replace: true })      
+  }
+  
 
   return (
     <>
@@ -39,30 +47,35 @@ const WorkflowTab = () => {
         }}
       >
         <Tabs
-          value={selectedTabs}
-          onChange={(event, newValue) => setSelectedTabs(newValue)}
-          // aria-label="tab menu"
+          value={selectedTab}
+          onChange={handleTabChange}
         >
-          <Tab label="DETAILS" />
-          <Tab label="METRICS" />
-          <Tab label="SYSTEM" />
-          <Tab label="DATA" />
+          {!task && <Tab label="DETAILS" value="details" />}
+          <Tab label="METRICS" value="metrics" />
+          { !task && <Tab label="SYSTEM" value ="system" /> }
+          <Tab label="DATA" value="data"/>
+          { task && <Tab label="FEEDBACK" value ="feedback"/> }
+          { task && <Tab label="EXPLATIONS" value ="explanations"/> }
         </Tabs>
       </Box>
 
       {/* Tab Content */}
       <Box sx={{ overflow: "auto", px: 2 }}>
-        {selectedTabs === 0 && (
-          <WorkflowDetails />
+        {selectedTab === "details" && (
+          <WorkflowDetails /> //TODO: create task details
         )}
-        {selectedTabs === 1 && tab?.workflowMetrics?.data && (
+        {selectedTab === "metrics" && tab?.workflowMetrics?.data && (
           <WorkflowMetrics />
         )}
-        {selectedTabs === 2 && <Typography>System Content</Typography>}
+        {selectedTab === "system" && <Typography>System Content</Typography>}
 
-        {selectedTabs === 3 && (
-          <DataExplorationComponent workflow={tab} task={null} />
+        {selectedTab === "data" && (
+          <DataExplorationComponent workflow={tab} />
         )}
+
+        {selectedTab === "feedback" && <Typography>Feedback Content</Typography>}
+
+        {selectedTab === "explanations" && <Typography>Explanations Content</Typography>}
       </Box>
     </>
   )

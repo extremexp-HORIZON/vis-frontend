@@ -1,17 +1,29 @@
 import { Box, Typography } from "@mui/material"
 import StaticDirectedGraph from "./worfklow-flow-chart"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
-import { useState } from "react"
 import { useAppSelector, RootState } from "../../../store/store"
+import { useLocation, useNavigate } from "react-router-dom"
 
 const WorkflowDetails = () => {
-    const [chosenTask, setChosenTask] = useState<string | null>(null)
     const { tab } = useAppSelector((state: RootState) => state.workflowPage)
+    const location = useLocation()
+    const navigate = useNavigate()
+
+
+    const handleOpenTask = (taskName: string) => {
+      const currentParams = new URLSearchParams(location.search)
+      currentParams.set('task', taskName)
+      currentParams.delete('tab')
+      navigate({
+        pathname: location.pathname,
+        search: `?${currentParams.toString()}`,
+      })
+    }
 
     return (
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2}}>
           <Box key="workflow-flow-chart" sx={{width: "100%" }}>
-            <StaticDirectedGraph setChosenTask={setChosenTask} chosenTask={chosenTask} workflowSvg={tab?.workflowSvg.data || null} params={tab?.workflowConfiguration.params} />
+            <StaticDirectedGraph workflowSvg={tab?.workflowSvg.data || null} params={tab?.workflowConfiguration.params} handleOpenTask={handleOpenTask}/>
           </Box>
           <Box
             key="task-configuration"
@@ -29,6 +41,7 @@ const WorkflowDetails = () => {
               <WorkflowTaskConfiguration
                 configuration={ tab?.workflowConfiguration.tasks || null }
                 params={tab?.workflowConfiguration.params || null}
+                handleOpenTask={handleOpenTask}
               />
             </Box>
           </Box>

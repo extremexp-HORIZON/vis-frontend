@@ -10,5 +10,7 @@ export interface IMetric {
   
     /** Optional: The step index associated with the metric (e.g., epoch number). */
     step?: number;
+
+    task?: string;
   }
   

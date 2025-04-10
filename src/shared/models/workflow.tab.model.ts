@@ -16,7 +16,7 @@ export interface IWorkflowPageModel {
         loading: boolean;
     }
     workflowMetrics: {
-        data: { name: string, value: number, avgDiff: number, avgValue: number}[] | null
+        data: { name: string, value: number, avgDiff: number, avgValue: number, task?: string}[] | null
         loading: boolean;
     }
     workflowSvg: {

@@ -10,7 +10,7 @@ interface ParallelCoordinateVegaProps {
   parallelData: React.MutableRefObject<any[]>
   progressParallel: { selected: string }
   foldArray: React.MutableRefObject<string[]>
-  selectedWorkflows: number[]
+  selectedWorkflows: string[]
 }
 
 function setValuesIfSelectedAndDefault(
