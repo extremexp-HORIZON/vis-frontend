@@ -146,7 +146,7 @@ const WorkflowMetrics = () => {
   if (!Array.isArray(metrics) || metrics.length === 0 ) {
     return (
       <InfoMessage 
-        message="No available metrics to display"
+        message="Not available metrics to display"
         type="info"
         icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
         fullHeight
