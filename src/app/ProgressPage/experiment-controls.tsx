@@ -139,6 +139,8 @@ const ExperimentControls = () => {
                           <Box sx={{display: "flex", flexDirection: "row", gap: 0.5}}>
                             <Typography variant="body2">status: waiting feedback</Typography>
                             <ErrorIcon fontSize="small" color="error" />
+                            {paramsString && <Typography variant="body2">Parameters:</Typography>}
+                            {paramsString && <Typography variant="body2">{paramsString}</Typography>}
                           </Box>
                         )
                       }
