@@ -57,7 +57,7 @@ const ParallelCoordinatePlot = () => {
                   }
                 }, {})
               : {}),
-            workflowId: workflow.name,
+            workflowId: workflow.id,
           }
         })
       parallelData.current = _.cloneDeep(data)

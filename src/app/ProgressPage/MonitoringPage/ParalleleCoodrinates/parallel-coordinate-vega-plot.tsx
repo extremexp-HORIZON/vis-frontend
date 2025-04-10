@@ -57,7 +57,10 @@ const ParallelCoordinateVega = ({
         }
       }
 
-      newItem.selected = selectedWorkflows.includes(index + 1) ? true : false
+      newItem.selected = selectedWorkflows.includes(newItem?.workflowId) ? true : false
+      console.log("New Item")
+      console.log(newItem)
+      console.log(newItem.selected)
       return newItem
     })
 
