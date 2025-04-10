@@ -238,7 +238,7 @@ export const progressPageSlice = createSlice({
 
 //Thunk Calls for Experiment/Workflows fetching
 
-const apiPath = "http://146.124.106.171:8445/api"
+const apiPath = "ivis/api"
 const apiKey = "67770b80c01a7a7c9ee031021c9500f825a8750b"
 
 //TODO: Remove this when no longer needed
