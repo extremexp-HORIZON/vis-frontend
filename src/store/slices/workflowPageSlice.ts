@@ -81,6 +81,7 @@ const workflowMetricsInitializer = ({
         (metric.value * 100) /
           (metricsSum / filteredMetricsAll.length) -
         100,
+      task: metric.task
     }
   })
 

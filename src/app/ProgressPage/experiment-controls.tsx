@@ -8,6 +8,8 @@ import Rating from "@mui/material/Rating";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from "react"
 import { setProgressBarData } from "../../store/slices/progressPageSlice"
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import ErrorIcon from '@mui/icons-material/Error'
 
 const ExperimentControls = () => {
   const { experimentId } = useParams()
@@ -19,8 +21,10 @@ const ExperimentControls = () => {
     (state: RootState) => state.progressPage
   )
   const dispatch = useAppDispatch()
-  const taskVariant = task ? 
-    workflows.data.find(workflow => workflow.id === workflowId)?.tasks?.find(t => t.name === task)?.variant : ''
+  const currentTask = workflows.data.find(workflow => workflow.id === workflowId)?.
+    tasks?.find(t => t.name === task)
+  const params = workflows.data.find(workflow => workflow.id === workflowId)?.params.filter(param => param.task === task)
+  const paramsString = params?.map(param => `${param.name}: ${param.value}`).join(', ')
 
     useEffect(() => {
       if (workflows.data.length > 0) {
@@ -118,11 +122,27 @@ const ExperimentControls = () => {
                 />
                 {
                   task ? (
-                    <>
+                    <Box sx={{display: "flex", flexDirection: "column"}}>
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {`${workflowId} / ${taskVariant}`}
+                        {`${workflowId} / ${currentTask?.variant ? currentTask?.variant : currentTask?.name}`}
                       </Typography>
-                    </>
+                      {
+                        currentTask?.endTime && currentTask?.startTime ? (
+                        <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
+                          <Typography variant="body2">Status: completed</Typography>
+                          <CheckCircleIcon fontSize="small" color="success" />
+                          <Typography variant="body2">Duration: {(currentTask?.endTime - currentTask?.startTime)/1000}sec</Typography>
+                          {paramsString && <Typography variant="body2">Parameters:</Typography>}
+                          {paramsString && <Typography variant="body2">{paramsString}</Typography>}
+                        </Box>
+                        ) : (
+                          <Box sx={{display: "flex", flexDirection: "row", gap: 0.5}}>
+                            <Typography variant="body2">status: waiting feedback</Typography>
+                            <ErrorIcon fontSize="small" color="error" />
+                          </Box>
+                        )
+                      }
+                    </Box>
                   ) : (
                     <>
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
