@@ -57,10 +57,8 @@ const ParallelCoordinateVega = ({
         }
       }
 
-      newItem.selected = selectedWorkflows.includes(newItem?.workflowId) ? true : false
-      console.log("New Item")
-      console.log(newItem)
-      console.log(newItem.selected)
+      newItem.selected = selectedWorkflows.includes(newItem?.workflowId)
+
       return newItem
     })
 
@@ -223,7 +221,7 @@ const ParallelCoordinateVega = ({
               {
                 events: "@oneDataLine:mouseover",
                 update:
-                  "anySelected && group().datum.selected ? group().datum : null", // if any lines are filtered, then send data if that out is selected
+                  "!anySelected || group().datum.selected ? group().datum : null",
               },
               { events: "@oneDataLine:mouseout", update: "null" },
             ],
