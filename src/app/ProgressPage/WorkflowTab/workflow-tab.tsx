@@ -55,7 +55,7 @@ const WorkflowTab = () => {
           { !task && <Tab label="SYSTEM" value ="system" /> }
           <Tab label="DATA" value="data"/>
           { task && <Tab label="FEEDBACK" value ="feedback"/> }
-          { task && <Tab label="EXPLATIONS" value ="explanations"/> }
+          { task && <Tab label="EXPLAΝΑTIONS" value ="explanations"/> }
         </Tabs>
       </Box>
 
