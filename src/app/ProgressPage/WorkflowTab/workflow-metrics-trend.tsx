@@ -8,6 +8,7 @@ import { useSearchParams } from "react-router-dom"
 
 const WorkflowTrends = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
+  const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage)
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const workflowId = queryParams.get("workflowId") // Get the workflowId from the query
@@ -48,17 +49,17 @@ const WorkflowTrends = () => {
     },
     {} as Record<string, IMetric[]>
   )
-
+  
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]
     console.log("metricSeries", metricSeries)
 
-    // const workflowColorMap = workflows.workflowColors
-    // const workflowColorScale = filteredWorkflows.map(wf => ({
-    //   id: wf.id,
-    //   color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
-    // }))
+    const workflowColorMap = workflowsTable.workflowColors
+    const workflowColorScale = filteredWorkflows.map(wf => ({
+      id: wf.id,
+      color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
+    }))
 
     const chartSpec = {
       mark: metricSeries[0].step=== null ? "point" : "line", // Always use a line chart
@@ -82,10 +83,10 @@ const WorkflowTrends = () => {
         color: {
           field: "id",
           type: "nominal",
-        //   scale: {
-        //     domain: workflowColorScale.map(w => w.id), // Workflow IDs
-        //     range: workflowColorScale.map(w => w.color), // Corresponding Colors
-        //   },
+          scale: {
+            domain: workflowColorScale.map(w => w.id), // Workflow IDs
+            range: workflowColorScale.map(w => w.color), // Corresponding Colors
+          },
           legend:null,
         },
         tooltip: [

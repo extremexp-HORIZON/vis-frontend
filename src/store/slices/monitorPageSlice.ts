@@ -130,11 +130,31 @@ export const monitoringPageSlice = createSlice({
       state.parallel = { ...state.parallel, ...action.payload }
     },
     setWorkflowsTable: (state, action) => {
+      const { rows = [], ...rest } = action.payload;
+    
+      // If rows are included in the payload, assign colors
+      if (rows.length > 0) {
+        const existingColors = new Set(Object.values(state.workflowsTable.workflowColors));
+        const newWorkflowColors = { ...state.workflowsTable.workflowColors };
+    
+        rows.forEach(row => {
+          const workflowId = row.id; // Adjust if your workflow ID field has a different name
+          if (!newWorkflowColors[workflowId]) {
+            newWorkflowColors[workflowId] = generateUniqueColor(existingColors);
+            existingColors.add(newWorkflowColors[workflowId]);
+          }
+        });
+    
+        state.workflowsTable.workflowColors = newWorkflowColors;
+      }
+    
       state.workflowsTable = {
         ...state.workflowsTable,
-        ...action.payload,
-      }
+        ...rest,
+        ...(rows.length > 0 && { rows }) // only overwrite rows if included
+      };
     },
+    
     setScheduledTable: (state, action) => {
       state.scheduledTable = {
         ...state.scheduledTable,
