@@ -238,8 +238,8 @@ export const progressPageSlice = createSlice({
 
 //Thunk Calls for Experiment/Workflows fetching
 
-const apiPath = "https://api.expvis.smartarch.cz/api"
-const apiKey = "3980f9c699c3e311f8d72bd0318038d976e5958a"
+const apiPath = "http://146.124.106.171:8445/api"
+const apiKey = "67770b80c01a7a7c9ee031021c9500f825a8750b"
 
 //TODO: Remove this when no longer needed
 export const fetchExperimentTesting = createAsyncThunk(
