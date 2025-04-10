@@ -137,7 +137,7 @@ export const monitoringPageSlice = createSlice({
         const existingColors = new Set(Object.values(state.workflowsTable.workflowColors));
         const newWorkflowColors = { ...state.workflowsTable.workflowColors };
     
-        rows.forEach(row => {
+        rows.forEach((row: { id: any }) => {
           const workflowId = row.id; // Adjust if your workflow ID field has a different name
           if (!newWorkflowColors[workflowId]) {
             newWorkflowColors[workflowId] = generateUniqueColor(existingColors);

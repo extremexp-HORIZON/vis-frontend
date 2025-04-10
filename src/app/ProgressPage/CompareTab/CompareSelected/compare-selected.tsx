@@ -2,7 +2,6 @@ import Box from "@mui/material/Box"
 import { Grid, Typography } from "@mui/material"
 import { useState } from "react"
 import ExplainabilityTaskCompare from "../Tasks/ExplainabilityTask/explainability-task-compare"
-import CompareCompletedSvg from "../CompareCompleted/compare-completed-svg"
 import MetricsDistribution from "../CompareCompleted/metrics-distribution"
 import TopWorkflowMetric from "../CompareCompleted/top-workflow-metric"
 import VariabilityPointCharts from "../CompareCompleted/variability-point-charts"
@@ -87,7 +86,7 @@ const CompareSelected = () => {
             </Box>
           </Box>
         </>
-      ) : <ExplainabilityTaskCompare />}
+      ) : <ExplainabilityTaskCompare workflow={null} />}
     </Box>
   )
 }

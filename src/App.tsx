@@ -1,6 +1,5 @@
-import { BrowserRouter, RouterProvider } from "react-router-dom"
+import {RouterProvider } from "react-router-dom"
 import "./App.css"
-import Routes from "./routes"
 import MainRoutes from "./routes"
 
 const App = () => {
