@@ -8,6 +8,7 @@ import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentC
 import { initTab } from "../../../store/slices/workflowPageSlice"
 import WorkflowMetrics from "./workflow-metrics"
 import WorkflowDetails from "./workflow-details"
+import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition"
 
 const WorkflowTab = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -67,7 +68,7 @@ const WorkflowTab = () => {
         {selectedTab === "metrics" && tab?.workflowMetrics?.data && (
           <WorkflowMetrics />
         )}
-        {selectedTab === "system" && <Typography>System Content</Typography>}
+        {selectedTab === "system" && <RuntimeDecomposition/>}
 
         {selectedTab === "data" && (
           <DataExplorationComponent workflow={tab} />
