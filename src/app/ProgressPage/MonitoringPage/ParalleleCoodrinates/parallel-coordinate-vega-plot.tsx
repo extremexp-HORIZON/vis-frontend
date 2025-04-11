@@ -35,7 +35,7 @@ const ParallelCoordinateVega = ({
   selectedWorkflows,
 }: ParallelCoordinateVegaProps) => {
   const [processedData, setProcessedData] = useState<any>([])
-  const [chartHeight, setChartHeight] = useState(window.innerHeight * 0.25)
+  const [chartHeight, setChartHeight] = useState(window.innerHeight * 0.27)
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [chartWidth, setChartWidth] = useState(0)
 
@@ -47,7 +47,7 @@ const ParallelCoordinateVega = ({
       for (let entry of entries) {
         const { width } = entry.contentRect
         setChartWidth(width)
-        setChartHeight(Math.max(window.innerHeight * 0.25,100))
+        setChartHeight(Math.max(window.innerHeight * 0.27,100))
       }
     })
   

@@ -59,7 +59,7 @@ const MonitoringPage = () => {
           flexDirection: "column",
           rowGap: 1,
           height: "100%",
-          overflow: "hidden",
+          overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
           px: 2
         }}
       >
