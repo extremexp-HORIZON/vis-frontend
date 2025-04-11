@@ -1,6 +1,8 @@
 import Box from "@mui/material/Box"
-import { useEffect, useRef, ReactNode } from "react"
-import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
+import type { ReactNode } from "react";
+import { useEffect, useRef } from "react"
+import type { RootState} from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store"
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import {
   fetchExperiment,
@@ -82,43 +84,53 @@ const ProgressPage = (props: ProgressPageProps) => {
         <ProgressPageLoading />
       ) : (
         <Box
-          sx={{height: "100vh", width:"100vw"}}
-        >
-        <Box sx={{ width: "100vw"}}>
-          <ExperimentControls />
-        </Box>
-        <Box
           sx={{
-            height: "calc(100% - 75px)",
-            width: "100vw",
+            height: "100vh", 
+            width:"100vw",
+            display: "flex",
           }}
         >
-            <Box
-              sx={{
-                position: "fixed",
-                left: 0,
-                width: !menuOptions.collapsed ? "calc(15% + 16px)" : "56px",
-                height: "100%",
-                transition: "width 0.3s ease",
-              }}
-            >
-              <LeftMenu />
+          {/* Left Menu - Full Height */}
+          <Box
+            sx={{
+              width: !menuOptions.collapsed ? "calc(15% + 16px)" : "56px",
+              height: "100%",
+              transition: "width 0.3s ease",
+              flexShrink: 0
+            }}
+          >
+            <LeftMenu />
+          </Box>
+          
+          {/* Right Content Area */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+              width: !menuOptions.collapsed ? "calc(85% - 16px)" : "calc(100% - 56px)",
+              transition: "width 0.3s ease",
+            }}
+          >
+            {/* Experiment Controls */}
+            <Box sx={{ width: "100%"}}>
+              <ExperimentControls />
             </Box>
+            
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
                 rowGap: 2,
-                height:"100%",
-                overflow: "hidden",
-                width:  !menuOptions.collapsed ? "calc(85% - 16px)" : "calc(100% - 56px)",
-                marginLeft: !menuOptions.collapsed ? "calc(15% + 16px)" : "56px",
-                transition: "margin-left 0.3s ease, width 0.3s ease",  
+                flexGrow: 1,
+                overflow: "hidden", // Prevent overflow
+                width: "100%",
+                boxSizing: "border-box" 
               }}
             >
               {children}
             </Box>
-        </Box>
+          </Box>
         </Box>
       )}  
     </>

@@ -66,7 +66,7 @@ const initialState: IProgressPage = {
   },
   menuOptions: {
     selected: null,
-    collapsed: false
+    collapsed: true
   }
 }
 

@@ -3,7 +3,8 @@ import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
-import { useAppSelector, RootState, useAppDispatch } from "../../store/store"
+import type { RootState} from "../../store/store";
+import { useAppSelector, useAppDispatch } from "../../store/store"
 import Rating from "@mui/material/Rating";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from "react"
@@ -52,6 +53,11 @@ const ExperimentControls = () => {
           borderColor: theme => theme.palette.customGrey.main,
           borderBottomWidth: 2,
           borderBottomStyle: "solid",
+          height: "64px", // Fixed height to match left menu header
+          boxSizing: "border-box",
+          padding: 1,
+          display: "flex",
+          alignItems: "center"
         }}
       >
         <Box
@@ -60,48 +66,13 @@ const ExperimentControls = () => {
             display: "flex",
             alignItems: "center",
             gap: 1,
+            width: "100%",
+            height: "100%"
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              width: {md: "15%"},
-              height: "100%", // Make the box take full height
-              borderColor: theme => theme.palette.customGrey.main,
-              borderRightWidth: 2,
-              borderRightStyle: "solid",
-              padding: 1, 
-            }}
-          >
-            <Box
-              component="img"
-              src="/images\extremexp-logo-removebg-preview.png"
-              alt="ExtremeXP logo"
-              sx={{
-                width: "50px",
-                borderRadius: "8px",
-                objectFit: "cover",
-                userSelect: "none",
-              }}
-            />
-            <Box
-              sx={{
-                whiteSpace: 'nowrap',
-                overflow: "hidden"
-              }}
-            >
-              <Tooltip title={experimentId} arrow>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }} noWrap>
-                  {experimentId}
-                </Typography>
-              </Tooltip>
-            </Box>
-          </Box>
           {!workflowId ? (
             <>
-              <Box className={"progress-page-bar"} sx={{flex: 4}}>
+              <Box className={"progress-page-bar"} sx={{flex: 1}}>
                 <ProgressPageBar />
               </Box>
               <Box className={"progress-page-actions"} >

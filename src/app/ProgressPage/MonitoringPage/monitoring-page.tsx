@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
-import { RootState, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppSelector } from "../../../store/store"
 import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from "re-resizable"
 import { setSelectedTab } from "../../../store/slices/monitorPageSlice"
@@ -58,19 +59,20 @@ const MonitoringPage = () => {
           flexDirection: "column",
           rowGap: 1,
           height: "100%",
-          overflow: "auto",
+          overflow: "hidden",
+          px: 2
         }}
       >
         {selectedTab === 0 && (
           <Box sx={{height: "99%"}}>
-            <Box sx={{ height: "60%", minHeight: "350px", px: 2, paddingBottom: 1 }}>
+            <Box sx={{ height: "60%", minHeight: "350px", paddingBottom: 1 }}>
               {visibleTable === "workflows" ? (
                 <WorkflowTable handleChange={handleChange} />
               ) : (
                 <ScheduleTable />
               )}
             </Box>
-            <Box sx={{ height: "40%", px: 2 }}>
+            <Box sx={{ height: "40%" }}>
               <ParallelCoordinatePlot />
             </Box>
           </Box>
@@ -78,9 +80,9 @@ const MonitoringPage = () => {
         {selectedTab === 1 && (
           <Box
             sx={{
-              height: "98%",
+              height: "99%",
               display: "flex",
-              px: 2,
+              gap: 1,
             }}
           >
             <Resizable
@@ -101,13 +103,13 @@ const MonitoringPage = () => {
               }}
               maxWidth="80%"
               maxHeight="100%"
-              style={{ height: "100%", position: "relative", }}
+              style={{ height: "100%", position: "relative",  }}
               handleStyles={{
                 right: {
                   cursor: "ew-resize",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent: "middle",
                 },
               }}            
               handleComponent={{
@@ -118,7 +120,7 @@ const MonitoringPage = () => {
                     width: "100%",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "middle",
                     cursor: "ew-resize",
                   }}        
                 >
