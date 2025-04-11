@@ -505,7 +505,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           </Box>
         </Popover>
 
-        <div style={{ height: 'calc(100% - 64px)', width: "100%" }}>
+        <div style={{ height: 'calc(100% - 63px)', width: "100%" }}>
           <StyledDataGrid
             disableVirtualization
             density="compact"
