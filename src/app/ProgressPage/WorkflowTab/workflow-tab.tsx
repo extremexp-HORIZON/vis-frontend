@@ -9,6 +9,7 @@ import { initTab } from "../../../store/slices/workflowPageSlice"
 import WorkflowMetrics from "./workflow-metrics"
 import WorkflowDetails from "./workflow-details"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition"
+import DataTab from "../../Tasks/DataExplorationTask/ComponentContainer/data-tab"
 
 const WorkflowTab = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -26,7 +27,7 @@ const WorkflowTab = () => {
     if (!workflows.data.find(workflow => workflow.id === workflowId))
       navigate(`/${experimentId}/monitoring`)
     else dispatch(initTab({ tab: workflowId, workflows }))
-  }, [searchParams, workflows])
+  }, [workflows])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     const newParams = new URLSearchParams(searchParams.toString())
@@ -61,7 +62,7 @@ const WorkflowTab = () => {
       </Box>
 
       {/* Tab Content */}
-      <Box sx={{ overflow: "auto", px: 2 }}>
+      <Box sx={{ overflow: "auto", px: 2, height: "100%" }}>
         {selectedTab === "details" && (
           <WorkflowDetails /> //TODO: create task details
         )}
@@ -71,7 +72,7 @@ const WorkflowTab = () => {
         {selectedTab === "system" && <RuntimeDecomposition/>}
 
         {selectedTab === "data" && (
-          <DataExplorationComponent workflow={tab} />
+          <DataTab />
         )}
 
         {selectedTab === "feedback" && <Typography>Feedback Content</Typography>}

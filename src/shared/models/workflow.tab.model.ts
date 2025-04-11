@@ -35,6 +35,10 @@ export interface IWorkflowPageModel {
         explainabilityTask?: IExplainability;
         userInteraction?: IUserInteraction;
     }
+    dataAssetsTable: {
+        selectedDataset: number | null
+        rows: { [key: string]: any }[]
+    }
 }
 
 export const defaultWorkflowPageModel: IWorkflowPageModel = {
@@ -61,4 +65,8 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
     },
     workflowTasks: {
     },
+    dataAssetsTable: {
+        selectedDataset: null,
+        rows: [],
+    }
 }
