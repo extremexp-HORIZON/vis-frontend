@@ -1,4 +1,5 @@
 import { IDataAsset } from "./experiment/data-asset.model";
+import { IMetric } from "./experiment/metric.model";
 import { IParam } from "./experiment/param.model";
 import { ITask } from "./experiment/task.model";
 import { IDataExploration } from "./tasks/data-exploration-task.model";
@@ -18,6 +19,11 @@ export interface IWorkflowPageModel {
     workflowMetrics: {
         data: { name: string, value: number, avgDiff: number, avgValue: number, task?: string}[] | null
         loading: boolean;
+    }
+    workflowSeriesMetrics: {
+        data: {name: string; seriesMetric: IMetric[]}[]
+        loading: boolean;
+        error: string | null;
     }
     workflowSvg: {
         data: {tasks: ITask[] | undefined, start: number | undefined, end: number | undefined} | null
@@ -43,6 +49,11 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
     workflowMetrics: {
         data: null,
         loading: true
+    },
+    workflowSeriesMetrics: {
+        data: [],
+        loading: true,
+        error: null
     },
     workflowSvg: {
         data: null,

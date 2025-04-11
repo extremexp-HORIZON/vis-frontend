@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import {
   IWorkflowPageModel,
   defaultWorkflowPageModel,
@@ -18,6 +18,7 @@ import {
 import { userInteractionDefault } from "../../shared/models/tasks/user-interaction.model"
 import { IRun } from "../../shared/models/experiment/run.model"
 import { IMetric } from "../../shared/models/experiment/metric.model"
+import { experimentApi } from "../../app/api/api"
 
 export interface IWorkflowPage {
   tab: IWorkflowPageModel | null
@@ -40,7 +41,47 @@ export const workflowPageSlice = createSlice({
   extraReducers: builder => {
     explainabilityReducers(builder),
       modelAnalysisReducers(builder),
-      explainabilityExtraReducers(builder)
+      explainabilityExtraReducers(builder),
+      builder
+        .addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
+            const newMetrics = action.payload; // this is an array of { name, data }
+            if (!state.tab) return;
+            
+            const tab = state.tab
+
+            newMetrics.forEach(({ name, data }) => {
+              const newItem = {
+                name,
+                seriesMetric: data,
+              };
+
+
+              const existingIndex = tab.workflowSeriesMetrics.data.findIndex(
+                (item) => item.name === name
+              );
+            
+              if (existingIndex !== -1) {
+                tab.workflowSeriesMetrics.data[existingIndex] = newItem;
+              } else {
+                tab.workflowSeriesMetrics.data.push(newItem);
+              }
+            });
+        
+          state.tab.workflowSeriesMetrics.loading = false;
+        })
+        .addCase(fetchWorkflowMetrics.pending, state => {
+          if (!state.tab) return
+
+          state.tab.workflowSeriesMetrics.loading = true
+        })
+        .addCase(fetchWorkflowMetrics.rejected, (state, action) => {
+          if (!state.tab) return
+
+          state.tab.workflowSeriesMetrics.loading = false
+          state.tab.workflowSeriesMetrics.error =
+            action.error.message || "Error while fetching data"
+        })
+
   },
 })
 
@@ -163,6 +204,33 @@ const setTab = ({
   else if (tab !== null) return initializeTab({ workflowId: tab, workflows})
   else return null
 }
+
+
+export const fetchWorkflowMetrics = createAsyncThunk(
+  "progressPage/fetchWorkflowMetrics",
+  async ({ experimentId, workflowId, metricNames }: { experimentId: string; workflowId: string; metricNames: string[] }) => {
+      
+    const results = await Promise.allSettled(
+      metricNames.map((name) => {
+        const requestUrl = `${experimentId}/runs/${workflowId}/metrics/${name}`;
+        return experimentApi.get(requestUrl).then((response) => ({
+          name,
+          data: response.data,
+        }));
+      })
+    );
+    
+    const successful = results.filter(
+      (res): res is PromiseFulfilledResult<{ name: string; data: any }> => res.status === "fulfilled"
+    );
+    
+    if (successful.length === 0) {
+      throw new Error("Failed to fetch all metrics");
+    }
+    
+    return successful.map(res => res.value);
+})
+
 
 //Reducer exports
 export const { initTab } =

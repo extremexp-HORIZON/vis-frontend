@@ -1,55 +1,79 @@
-import { useLocation } from "react-router-dom"
-import { RootState, useAppSelector } from "../../../store/store"
+import { useLocation, useParams } from "react-router-dom"
+import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
 import { Container, Grid, ButtonGroup, Button, Box, Typography } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
 import { IMetric } from "../../../shared/models/experiment/metric.model"
 import { useSearchParams } from "react-router-dom"
+import { fetchWorkflowMetrics } from "../../../store/slices/workflowPageSlice"
+
+interface GroupMetrics {
+  value: number;
+  id: string | null;
+  metricName: string;
+  step: number | undefined;
+  timestamp: string;
+}
 
 const WorkflowTrends = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage)
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
+  const { experimentId } = useParams()
   const workflowId = queryParams.get("workflowId") // Get the workflowId from the query
   const [isMosaic, setIsMosaic] = useState(true)
   const [searchParams] = useSearchParams()
   const task = searchParams.get("task")
+  const { tab } = useAppSelector((state: RootState) => state.workflowPage)
+  const dispatch = useAppDispatch()
+
+
+  useEffect(() => {
+    const metricNames = tab?.workflowMetrics.data?.map((m) => m.name)
+    if (experimentId && workflowId && metricNames) {
+      dispatch(fetchWorkflowMetrics({experimentId, workflowId, metricNames}))
+    }
+    
+  },[])
   
   
   const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId)
   console.log("filteredWorkflows", filteredWorkflows)
 
-  const groupedMetrics: Record<string, IMetric[]> = filteredWorkflows.reduce(
-    (acc: any, workflow) => {
+  const groupedMetrics: Record<string, GroupMetrics[]> | undefined = tab?.workflowSeriesMetrics.data.reduce(
+    (acc: Record<string, GroupMetrics[]>, entry) => {
       if (!task) {
-        workflow.metrics.forEach((m: IMetric) => {
-          if (!acc[m.name]) acc[m.name] = []
+        entry.seriesMetric.forEach((m: IMetric) => {
+          if (!acc[m.name]) acc[m.name] = [];
           acc[m.name].push({
             value: m.value,
-            id: workflow.id,
+            id: workflowId,
             metricName: m.name,
             step: m.step,
             timestamp: new Date(m.timestamp).toLocaleString(),
-          })
-        })
+          });
+        });
       } else {
-        workflow.metrics.filter((m: IMetric) => m.task === task).forEach((m: IMetric) => {
-          if (!acc[m.name]) acc[m.name] = []
-          acc[m.name].push({
-            value: m.value,
-            id: workflow.id,
-            metricName: m.name,
-            step: m.step,
-            timestamp: new Date(m.timestamp).toLocaleString(),
-          })
-        })
+        entry.seriesMetric
+          .filter((m: IMetric) => m.task === task)
+          .forEach((m: IMetric) => {
+            if (!acc[m.name]) acc[m.name] = [];
+            acc[m.name].push({
+              value: m.value,
+              id: workflowId,
+              metricName: m.name,
+              step: m.step,
+              timestamp: new Date(m.timestamp).toLocaleString(),
+            });
+          });
       }
-      return acc
+      return acc;
     },
-    {} as Record<string, IMetric[]>
-  )
+    {}
+  );
   
+  if (!groupedMetrics) return //TODO: add spinner or something if fetches failed
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]
@@ -76,7 +100,10 @@ const WorkflowTrends = () => {
           scale: {
             domain: [
               0, // Min value is 0 (or any other value you'd like)
-              Math.max(...metricSeries.map((d: any) => d.value)) * 1.05, // Max value with 5% padding
+              metricSeries.reduce(
+                (max, d) => Math.max(max, d.value),
+                -Infinity
+              ) * 1.05, // Max value with 5% padding
             ],
           },
         },
