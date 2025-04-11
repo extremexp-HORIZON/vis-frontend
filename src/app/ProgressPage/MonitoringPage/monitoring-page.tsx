@@ -72,7 +72,7 @@ const MonitoringPage = () => {
                 <ScheduleTable />
               )}
             </Box>
-            <Box sx={{ height: "40%" }}>
+            <Box sx={{ height: "40%", minHeight: "250px" }}>
               <ParallelCoordinatePlot />
             </Box>
           </Box>
@@ -103,15 +103,17 @@ const MonitoringPage = () => {
               }}
               maxWidth="80%"
               maxHeight="100%"
-              style={{ height: "100%", position: "relative",  }}
+              style={{ height: "100%", position: "relative"}}          
               handleStyles={{
                 right: {
-                  cursor: "ew-resize",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "middle",
-                },
-              }}            
+                  justifyContent: "center",
+                  width: "16px",  // Fixed width for handle area
+                  right: "-16px",  // Position handle to overlap both components
+                  zIndex: 10,
+                }
+              }}
               handleComponent={{
                 right: (
                 <Box
@@ -120,7 +122,7 @@ const MonitoringPage = () => {
                     width: "100%",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "middle",
+                    justifyContent: "center", 
                     cursor: "ew-resize",
                   }}        
                 >
@@ -131,7 +133,7 @@ const MonitoringPage = () => {
             >
               <WorkflowTable handleChange={handleChange} />
             </Resizable>
-            <Paper elevation={2} sx={{ flex: 1, overflow: "auto", height: "100%", ml: 1 }}>
+            <Paper elevation={2} sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px", mr: "8px"}}>
                 <WorkflowCharts />
             </Paper>
           </Box>
