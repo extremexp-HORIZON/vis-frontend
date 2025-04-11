@@ -64,7 +64,7 @@ const MonitoringPage = () => {
         }}
       >
         {selectedTab === 0 && (
-          <Box sx={{height: "99%"}}>
+          <Box sx={{height: "98%"}}>
             <Box sx={{ height: "60%", minHeight: "350px", paddingBottom: 1 }}>
               {visibleTable === "workflows" ? (
                 <WorkflowTable handleChange={handleChange} />

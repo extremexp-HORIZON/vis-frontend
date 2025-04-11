@@ -99,82 +99,79 @@ const ParallelCoordinatePlot = () => {
   }
 
   return (
-    <>
-      <Paper elevation={2}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Typography/>
-          <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
-            <Typography fontSize={"0.8rem"}>Color by:</Typography>
-            <FormControl
-              sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
-              size="small"
-            >
-              <Select
-                value={parallel.selected}
-                sx={{ fontSize: "0.8rem" }}
-                onChange={handleMetricSelection}
-                disabled={parallel.options.length === 0}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 250,
-                      maxWidth: 300,
-                    },
+    <Paper elevation={2} sx={{height: "100%", width: "100%"}}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Typography/>
+        <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
+          <Typography fontSize={"0.8rem"}>Color by:</Typography>
+          <FormControl
+            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
+            size="small"
+          >
+            <Select
+              value={parallel.selected}
+              sx={{ fontSize: "0.8rem" }}
+              onChange={handleMetricSelection}
+              disabled={parallel.options.length === 0}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 250,
+                    maxWidth: 300,
                   },
-                }}
-              >
-                {parallel.options.map(feature => (
-                  <MenuItem key={`${feature}`} value={feature}>
-                    {feature}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </Box>
-        <Box sx={{ width: "99%", px: 1, position: "relative" }}>
-          <DraggableColumns
-            foldArray={foldArray}
-            onOrderChange={() => {
-              dispatch(setParallel({ ...parallel }))
-            }}
-          />
-          {parallel.options.length > 0 ? (
-            <ParallelCoordinateVega
-              parallelData={parallelData}
-              progressParallel={parallel}
-              foldArray={foldArray}
-              // map from progressWorkflowsTable.selectedWorkflows id (because it is rows ids) to actual workflowId
-              selectedWorkflows={workflowsTable.selectedWorkflows}
-            ></ParallelCoordinateVega>
-          ) : (
-            <Box
-              sx={{
-                width: "100%",
-                height: 300,
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                columnGap: 1,
+                },
               }}
             >
-              <ReportProblemRoundedIcon
-                sx={{ color: theme => theme.palette.customGrey.dark }}
-              />
-              <Typography
-                variant={"h6"}
-                sx={{ color: theme => theme.palette.customGrey.dark }}
-              >
-                No Metric Data Available
-              </Typography>
-            </Box>
-          )}
+              {parallel.options.map(feature => (
+                <MenuItem key={`${feature}`} value={feature}>
+                  {feature}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
-      </Paper>
-      {/* )} */}
-    </>
+      </Box>
+      <Box sx={{ width: "99%", px: 1, position: "relative" }}>
+        <DraggableColumns
+          foldArray={foldArray}
+          onOrderChange={() => {
+            dispatch(setParallel({ ...parallel }))
+          }}
+        />
+        {parallel.options.length > 0 ? (
+          <ParallelCoordinateVega
+            parallelData={parallelData}
+            progressParallel={parallel}
+            foldArray={foldArray}
+            // map from progressWorkflowsTable.selectedWorkflows id (because it is rows ids) to actual workflowId
+            selectedWorkflows={workflowsTable.selectedWorkflows}
+          ></ParallelCoordinateVega>
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: 300,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              columnGap: 1,
+            }}
+          >
+            <ReportProblemRoundedIcon
+              sx={{ color: theme => theme.palette.customGrey.dark }}
+            />
+            <Typography
+              variant={"h6"}
+              sx={{ color: theme => theme.palette.customGrey.dark }}
+            >
+              No Metric Data Available
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    </Paper>
   )
 }
 
-export default ParallelCoordinatePlot
+export default ParallelCoordinatePlot;
