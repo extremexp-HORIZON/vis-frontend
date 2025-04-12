@@ -42,8 +42,20 @@ export const workflowPageSlice = createSlice({
         ...state.tab.dataAssetsTable,
         ...action.payload,
       }    
-    }
+    },
     // ...additionalReducers
+    setControls: (state, action) => {
+      if (!state.tab?.workflowTasks.dataExploration) return
+      state.tab.workflowTasks.dataExploration.controlPanel = {
+        ...state.tab?.workflowTasks.dataExploration?.controlPanel,
+         ...action.payload}
+      },
+      setMetaData: (state, action) => {
+        if (!state.tab?.workflowTasks.dataExploration) return
+        state.tab.workflowTasks.dataExploration.metaData = {
+          ...state.tab?.workflowTasks.dataExploration?.metaData,
+           ...action.payload}
+      } 
   },
   extraReducers: builder => {
     explainabilityReducers(builder),
@@ -240,7 +252,8 @@ export const fetchWorkflowMetrics = createAsyncThunk(
 
 
 //Reducer exports
-export const { initTab, setDataTable } =
+export const { initTab,setControls,setMetaData,setDataTable } =
   workflowPageSlice.actions
 
 export default workflowPageSlice.reducer
+

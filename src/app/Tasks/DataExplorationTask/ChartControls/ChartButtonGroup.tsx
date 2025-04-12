@@ -5,20 +5,24 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import MapIcon from '@mui/icons-material/Map';
 import TableChartIcon from "@mui/icons-material/TableChartSharp"
+import { setControls } from '../../../../store/slices/workflowPageSlice';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 
 
-interface ChartButtonGroupProps {
-  chartType: 'datatable' | 'line' | 'bar' | 'scatter' | 'map';
-  setChartType: (chartType: 'datatable' |'line' | 'bar' | 'scatter' | 'map') => void;
-}
 
-const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChartType }) => {
+
+const ChartButtonGroup: React.FC= () => {
+
+  const dispatch = useAppDispatch()
+  const {tab}= useAppSelector(state => state.workflowPage)
+  const chartType= tab?.workflowTasks.dataExploration?.controlPanel.chartType
+
   return (
     <ButtonGroup variant="outlined" aria-label="Chart button group" fullWidth>
       <Tooltip title="Table">
       <Button
         variant={chartType === 'datatable' ? 'contained' : 'outlined'}
-        onClick={() => setChartType('datatable')}
+        onClick={() => dispatch(setControls({ chartType: 'datatable' }))}
       >
         <TableChartIcon />
       </Button>
@@ -26,7 +30,7 @@ const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChart
       <Tooltip title="Line">
       <Button
         variant={chartType === 'line' ? 'contained' : 'outlined'}
-        onClick={() => setChartType('line')}
+        onClick={() => dispatch(setControls({ chartType: 'line' }))}
       >
         <ShowChartIcon />
       </Button>
@@ -34,7 +38,7 @@ const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChart
       <Tooltip title="Bar">
       <Button
         variant={chartType === 'bar' ? 'contained' : 'outlined'}
-        onClick={() => setChartType('bar')}
+        onClick={() => dispatch(setControls({ chartType: 'bar' }))}
       >
         <BarChartIcon />
       </Button>
@@ -43,7 +47,7 @@ const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChart
       <Button
         variant={chartType === 'scatter' ? 'contained' : 'outlined'}
        
-        onClick={() => setChartType('scatter')}
+        onClick={() => dispatch(setControls({ chartType: 'scatter' }))}
       >
         <ScatterPlotIcon />
       </Button>
@@ -51,7 +55,7 @@ const ChartButtonGroup: React.FC<ChartButtonGroupProps> = ({ chartType, setChart
       <Tooltip title="Map">
       <Button
         variant={chartType === 'map' ? 'contained' : 'outlined'}
-        onClick={() => setChartType('map')}
+        onClick={() => dispatch(setControls({ chartType: 'map' }))}
       >
         <MapIcon />
       </Button>

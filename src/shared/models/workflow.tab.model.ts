@@ -30,10 +30,10 @@ export interface IWorkflowPageModel {
         loading: boolean;
     }
     workflowTasks: {
-        modelAnalysis?: IModelAnalysis;
-        dataExploration?: IDataExploration;
-        explainabilityTask?: IExplainability;
-        userInteraction?: IUserInteraction;
+        modelAnalysis?: IModelAnalysis | null;
+        dataExploration?: IDataExploration | null;
+        explainabilityTask?: IExplainability | null;
+        userInteraction?: IUserInteraction | null;
     }
     dataAssetsTable: {
         selectedDataset: number | null
@@ -64,6 +64,10 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
         loading: true
     },
     workflowTasks: {
+        modelAnalysis: null,
+        dataExploration: null,
+        explainabilityTask: null,
+        userInteraction: null
     },
     dataAssetsTable: {
         selectedDataset: null,

@@ -9,22 +9,12 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import { setControls } from "../../../../store/slices/workflowPageSlice"
 
-interface BarChartControlPanelProps {
-  originalColumns: Array<{ name: string; type: string }>
-  barGroupBy: string[]
-  setBarGroupBy: (value: string[]) => void
-  barAggregation: { [key: string]: string[] }
-  setBarAggregation: (value: { [key: string]: string[] }) => void
-}
-
-const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
-  originalColumns,
-  barGroupBy,
-  setBarGroupBy,
-  barAggregation,
-  setBarAggregation,
-}) => {
+const BarChartControlPanel = () => {
+  const dispatch = useAppDispatch()
+  const { tab } = useAppSelector(state => state.workflowPage)
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null) // Selected column for aggregation
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -34,21 +24,21 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
   ) => {
     const value = event.target.value as string[]
     if (!selectedColumn) return
-    setBarAggregation(prev => ({
-      ...prev,
-      [selectedColumn]: value,
-    }))
+    dispatch(
+      setControls({
+        barAggregation: {
+          [selectedColumn]: value,
+        },
+      }),
+    )
   }
 
-  // Handler for setting group-by columns
-  const handleGroupByChange = (selected: string[]) => {
-    setBarGroupBy(selected.includes("Not Group") ? [] : selected)
-  }
-
-  // Determines aggregation options based on column type
   const getAggregationOptions = () => {
     if (!selectedColumn) return []
-    const column = originalColumns.find(col => col.name === selectedColumn)
+    const column =
+      tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(
+        col => col.name === selectedColumn,
+      )
     return column?.type === "DOUBLE" ||
       column?.type === "FLOAT" ||
       column?.type === "INTEGER"
@@ -75,35 +65,108 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
     },
   })
 
-  // Function to remove a specific aggregation rule
-  const handleRemoveAggregation = (column: string, rule: string) => {
-    setBarAggregation(prev => ({
-      ...prev,
-      [column]: prev[column].filter(r => r !== rule),
-    }))
-  }
-
-  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null)
-  }
-
-  const open = Boolean(anchorEl)
   return (
     <ThemeProvider theme={theme}>
-   
-    <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem",flexDirection: "column" }}>
-          {/* Group By Selection */}
-      <FormControl fullWidth>
-            <InputLabel>Category</InputLabel>
+      <Box
+        sx={{
+          display: "flex",
+          gap: "1rem",
+          marginTop: "1rem",
+          flexDirection: "column",
+        }}
+      >
+        {/* Group By Selection */}
+        <FormControl fullWidth>
+          <InputLabel>Category</InputLabel>
+          <Select
+            label="Category"
+            multiple
+            value={
+              tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []
+            }
+            onChange={e =>
+              dispatch(setControls({ barGroupBy: e.target.value }))
+            }
+            renderValue={(selected: any) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                {selected.map((value: string) => (
+                  <Chip
+                    key={value}
+                    label={value}
+                    onDelete={() =>
+                      dispatch(
+                        setControls({
+                          barGroupBy: selected.filter(
+                            (v: string) => v !== value,
+                          ),
+                        }),
+                      )
+                    }
+                  />
+                ))}
+              </Box>
+            )}
+            MenuProps={{
+              PaperProps: {
+                style: { maxHeight: 224, width: 250 },
+              },
+            }}
+          >
+            {/* <MenuItem value="Not Group">Not Group</MenuItem> */}
+            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+              .filter(col => col.type === "STRING")
+              .map(col => (
+                <MenuItem key={col.name} value={col.name}>
+                  {col.name}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+
+        {/* Value Selection */}
+        <FormControl fullWidth>
+          <InputLabel>Value</InputLabel>
+          <Select
+            label="Value"
+            value={selectedColumn || ""}
+            onChange={e => setSelectedColumn(e.target.value as string)}
+            MenuProps={{
+              PaperProps: { style: { maxHeight: 224, width: 250 } },
+            }}
+          >
+            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+              .filter(col => col.type != "LOCAL_DATE_TIME")
+              .map(col => (
+                <MenuItem key={col.name} value={col.name}>
+                  {col.name}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+
+        {/* Aggregation Selection */}
+        {selectedColumn && (
+          <FormControl fullWidth>
+            <InputLabel>Aggregations</InputLabel>
             <Select
-              label="Category"
+              label="Aggregations"
               multiple
-              value={barGroupBy}
-              onChange={e => handleGroupByChange(e.target.value as string[])}
+              value={
+                tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[
+                  selectedColumn
+                ] || []
+              }
+              onChange={event => {
+                const value = event.target.value as string[]
+                if (!selectedColumn) return
+                dispatch(
+                  setControls({
+                    barAggregation: {
+                      [selectedColumn]: value,
+                    },
+                  }),
+                )
+              }}
               renderValue={(selected: any) => (
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                   {selected.map((value: string) => (
@@ -111,90 +174,28 @@ const BarChartControlPanel: React.FC<BarChartControlPanelProps> = ({
                       key={value}
                       label={value}
                       onDelete={() =>
-                        handleGroupByChange(barGroupBy.filter(s => s !== value))
+                        handleAggregationChange({
+                          target: {
+                            value: (selected as string[]).filter(
+                              v => v !== value,
+                            ),
+                          },
+                        } as any)
                       }
                     />
                   ))}
                 </Box>
               )}
-              MenuProps={{
-                PaperProps: {
-                  style: { maxHeight: 224, width: 250 },
-                },
-              }}
             >
-              {/* <MenuItem value="Not Group">Not Group</MenuItem> */}
-              {originalColumns
-                .filter(col => col.type === "STRING")
-                .map(col => (
-                  <MenuItem key={col.name} value={col.name}>
-                    {col.name}
-                  </MenuItem>
-                ))}
+              {aggregationOptions.map(rule => (
+                <MenuItem key={rule} value={rule}>
+                  {rule.charAt(0).toUpperCase() + rule.slice(1)}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
-
-          {/* Value Selection */}
-          <FormControl fullWidth>
-            <InputLabel>Value</InputLabel>
-            <Select
-              label="Value"
-              value={selectedColumn || ""}
-              onChange={e => setSelectedColumn(e.target.value as string)}
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {originalColumns
-                .filter(col => col.type != "LOCAL_DATE_TIME")
-                .map(col => (
-                  <MenuItem key={col.name} value={col.name}>
-                    {col.name}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-
-          {/* Aggregation Selection */}
-          {selectedColumn && (
-            <FormControl fullWidth>
-              <InputLabel>Aggregations</InputLabel>
-              <Select
-                label="Aggregations"
-                multiple
-                value={barAggregation[selectedColumn] || []}
-                onChange={handleAggregationChange}
-                renderValue={(selected: any) => (
-                  <Box
-                    sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}
-                  >
-                    {selected.map((value: string) => (
-                      <Chip
-                        key={value}
-                        label={value}
-                        onDelete={() =>
-                          handleAggregationChange({
-                            target: {
-                              value: (selected as string[]).filter(
-                                v => v !== value,
-                              ),
-                            },
-                          } as any)
-                        }
-                      />
-                    ))}
-                  </Box>
-                )}
-              >
-                {aggregationOptions.map(rule => (
-                  <MenuItem key={rule} value={rule}>
-                    {rule.charAt(0).toUpperCase() + rule.slice(1)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Box>
+        )}
+      </Box>
     </ThemeProvider>
   )
 }

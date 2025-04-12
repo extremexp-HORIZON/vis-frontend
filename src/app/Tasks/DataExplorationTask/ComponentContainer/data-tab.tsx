@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import DataTable from "../DataTable/data-table";
 import { RootState, useAppSelector } from "../../../../store/store";
+import DataExplorationComponent from "./DataExplorationComponent";
 
 
 const DataTab = () => {
@@ -11,6 +12,8 @@ const DataTab = () => {
                 {tab && <DataTable />}
             </Box>
             <Box sx={{width: "80%"}}>
+
+                <DataExplorationComponent/>
             </Box>
         </Box>
     )

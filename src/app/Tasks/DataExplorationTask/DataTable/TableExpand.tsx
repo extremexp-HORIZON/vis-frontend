@@ -60,6 +60,8 @@ const TableExpand: React.FC<DataTableProps> = ({
     )
   }
 
+  console.log(data)
+
   const rows = data.map((row: any, index: number) => ({
     id: row[datetimeColumn] ?? index, // Use index as fallback if datetimeColumn is null or undefined
     ...row,

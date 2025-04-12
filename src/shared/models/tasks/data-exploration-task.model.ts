@@ -3,6 +3,8 @@ import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
 import {
   IDataExplorationRequest,
   IDataExplorationResponse,
+  IFilter,
+  VisualColumn,
 } from "../dataexploration.model"
 import {
   handleMultiTimeSeriesData,
@@ -25,18 +27,11 @@ export interface IDataExploration {
     data: IDataExplorationResponse | null
     loading: boolean
     error: string | null
-    // xAxis: string
-    // yAxis: string[]
   }
   barChart: {
     data: IDataExplorationResponse | null
     loading: boolean
     error: string | null
-    // aggregations: {
-    //   xAxis: string
-    //   yAxis: string[] | null
-    //   groupFunction: string[]
-    // }[]
   }
   scatterChart:{
     data: IDataExplorationResponse | null
@@ -54,6 +49,32 @@ export interface IDataExploration {
     loading: boolean
     error: string | null
 
+  }
+  controlPanel:{
+    chartType: string
+  selectedColumns: VisualColumn[]
+  filters: IFilter[]
+  xAxis: VisualColumn
+  xAxisScatter: VisualColumn
+  yAxis: VisualColumn[]
+  yAxisScatter: VisualColumn[]
+  barGroupBy: string[]
+  barAggregation: any
+  viewMode: "overlay" | "stacked"
+  colorBy: string
+  colorByMap: string
+  tripsMode: boolean
+  selectedColumnsMap: string[]
+  selectedDataset: string
+  currentPage: number
+  lat: string
+  lon: string
+    
+  }
+  chart:{
+    data: IDataExplorationResponse | null
+    loading: boolean
+    error: string | null
   }
 }
 
@@ -74,14 +95,11 @@ export const dataExplorationDefault: IDataExploration = {
     data: null,
     loading: false,
     error: null,
-    // xAxis: "",
-    // yAxis: [],
   },
   barChart: {
     data: null,
     loading: false,
     error: null,
-    // aggregations: [],
   },
   scatterChart:{
     data: null,
@@ -100,43 +118,34 @@ export const dataExplorationDefault: IDataExploration = {
     loading: false,
     error:  null
 
+  },
+  controlPanel: {
+    chartType: "datatable",
+    selectedColumns: [],
+    filters: [],
+    xAxis: { name: "", type: "" },
+    xAxisScatter: { name: "", type: "" },
+    yAxis: [],
+    yAxisScatter: [],
+    barGroupBy: [],
+    barAggregation: {},
+    viewMode: "overlay",
+    colorBy: "None",
+    colorByMap: "None",
+    tripsMode: false,
+    selectedColumnsMap: [],
+    selectedDataset: "",
+    currentPage: 1,
+    lat: "",
+    lon: "",
+  },
+  chart:
+  {
+    data: null,
+    loading: false,
+    error: null
   }
 }
-
-// export const additionalReducers = {
-//   updateFilters: (state: IWorkflowPage, action: PayloadAction<{ filter: IFilter, workflowId: any }>) => {
-//     const compareCompletedTask = state.tabs.find(
-//       tab => tab.workflowId === action.payload.workflowId
-//     )?.workflowTasks?.dataExploration;
-//     if (compareCompletedTask) {
-//       compareCompletedTask.filters = [...compareCompletedTask.filters, action.payload.filter];
-//     }
-//   },
-//   updateColumns: (state: IWorkflowPage, action: PayloadAction<{ columns: VisualColumn[], workflowId: any }>) => {
-//     const compareCompletedTask = state.tabs.find(
-//       tab => tab.workflowId === action.payload.workflowId
-//     )?.workflowTasks?.dataExploration;
-//     if (compareCompletedTask) {
-//       compareCompletedTask.columns = action.payload.columns;
-//     }
-//   },
-//   updateChartData: (state: IWorkflowPage, action: PayloadAction<{ chartType: "lineChart" | "barChart", data: {xAxis?: string, yAxis?: string[], 
-//     aggregations?: {
-//     xAxis: string
-//     yAxis: string[] | null
-//     groupFunction: string[]
-//   }[]}, workflowId: any }>) => {
-//     const compareCompletedTask = state.tabs.find(
-//       tab => tab.workflowId === action.payload.workflowId
-//     )?.workflowTasks?.dataExploration;
-//     if (compareCompletedTask && action.payload.chartType === "lineChart") {
-//       compareCompletedTask[action.payload.chartType] = {...compareCompletedTask[action.payload.chartType], ...action.payload.data};
-//     }else if (compareCompletedTask && action.payload.chartType === "barChart") {
-//       compareCompletedTask[action.payload.chartType] = {...compareCompletedTask[action.payload.chartType], ...action.payload.data};
-//     }
-//   },
-//   // Add more reducers as needed
-// };
 
 export const explainabilityExtraReducers = (
   builder: ActionReducerMapBuilder<IWorkflowPage>,

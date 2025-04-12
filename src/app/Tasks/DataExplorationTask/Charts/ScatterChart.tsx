@@ -4,16 +4,11 @@ import { VegaLite } from 'react-vega';
 import { VisualColumn } from '../../../../shared/models/dataexploration.model';
 import { cloneDeep } from 'lodash';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import ControlPanel from '../ChartControls/ControlPanel';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 
-interface ScatterChartProps {
-  viewMode: 'overlay' | 'stacked';
-  data: any[];
-  xAxis: VisualColumn | null;
-  yAxis: VisualColumn[];
-  colorBy: string;
-  setColorBy: (colorBy: string) => void;
-  columns: VisualColumn[];
-}
+
 
 const getColumnType = (columnType: string) => {
   switch (columnType) {
@@ -28,14 +23,30 @@ const getColumnType = (columnType: string) => {
       return 'nominal';
   }
 };
+interface ControlPanel {
+  chartType: string;
+  selectedColumns: VisualColumn[];
+  xAxis: VisualColumn;
+  xAxisScatter: VisualColumn;
+  yAxis: VisualColumn[];
+  yAxisScatter: VisualColumn[];
+  viewMode: string;
+  colorBy: string; // add this property
+}
 
-const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, columns }: ScatterChartProps) => {
+const ScatterChart = () => {
   const [chartSpecs, setChartSpecs] = useState<any[]>([]);
   const [dataCopy, setDataCopy] = useState<any[]>([]);
 
+  const dispatch = useAppDispatch();
+  const { tab } = useAppSelector(state => state.workflowPage);
+  const { xAxisScatter, yAxisScatter, viewMode, colorBy } = tab?.workflowTasks.dataExploration?.controlPanel as ControlPanel;  
+
+  const data = tab?.workflowTasks.dataExploration?.chart.data?.data;
+
   useEffect(() => {
-    if (xAxis && yAxis.length > 0) {
-      const yAxisFields = yAxis.map(axis => axis.name);
+    if (xAxisScatter && yAxisScatter && yAxisScatter.length > 0) {
+      const yAxisFields = yAxisScatter.map(axis => axis.name);
       const dataCopy = cloneDeep(data);
       setDataCopy(dataCopy);
 
@@ -55,20 +66,20 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
           },
           encoding: {
             x: {
-              field: xAxis.name,
-              type: getColumnType(xAxis.type),
-              axis: { title: `${xAxis.name}` }
+              field: xAxisScatter.name,
+              type: getColumnType(xAxisScatter.type),
+              axis: { title: `${xAxisScatter.name}` }
             },
             y: {
               field: 'value',
-              type: getColumnType(yAxis[0].type),
+              type: getColumnType(yAxisScatter[0].type),
               axis: { title: 'Values' }
             },
             color: {
               condition: {
                 selection: 'paintbrush',
                 field: colorBy && colorBy !== "None" ? colorBy : 'variable',
-                type: getColumnType(columns.find(column => column.name === colorBy)?.type || 'nominal'),
+                // type: getColumnType(tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(column => column.name === colorBy)?.type || 'nominal'),
                 title: colorBy!=="None" ? colorBy: "Variables"
               },
               value: 'grey' // Default color for unselected points
@@ -99,7 +110,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
         };
         setChartSpecs([spec]);
       } else {
-        const specs = yAxis.map(axis => ({
+        const specs = yAxisScatter.map(axis => ({
           mark: 'point',
           autosize: { type: "fit", contains: "padding", resize: true },
           width: 1000,
@@ -110,12 +121,12 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
             //   nearest: true
             }
           },
-          height: 800/yAxis.length,
+          height: 800/yAxisScatter.length,
           encoding: {
             x: {
-              field: xAxis.name,
-              type: getColumnType(xAxis.type),
-              axis: { title: `${xAxis.name}` }
+              field: xAxisScatter.name,
+              type: getColumnType(xAxisScatter.type),
+              axis: { title: `${xAxisScatter.name}` }
             },
             y: {
               field: axis.name,
@@ -126,7 +137,7 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
               condition: {
                 selection: 'paintbrush',
                 field: colorBy && colorBy !== "None" ? colorBy : 'variable',
-                type: getColumnType(columns.find(column => column.name === colorBy)?.type || 'nominal'),
+                type: getColumnType(tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(column => column.name === colorBy)?.type || 'nominal'),
                 title: colorBy!=="None" ? colorBy: "variable"
               },
               value: 'grey'
@@ -152,13 +163,13 @@ const ScatterChart = ({ viewMode, data, xAxis, yAxis, colorBy, setColorBy, colum
         setChartSpecs(specs);
       }
     }
-  }, [xAxis, yAxis, viewMode, data, columns, colorBy]);
+  }, [xAxisScatter, yAxisScatter, viewMode, data, , colorBy]);
 
   return chartSpecs.length > 0 ? (
     <>
       {chartSpecs.map((spec, index) => (
-        <ResponsiveVegaLite key={index} spec={spec} data={{ table: dataCopy }}     height={viewMode === "overlay" ? 800 : 800 / yAxis.length}
-        maxHeight={viewMode === "overlay" ? 800 : 800 / yAxis.length} />
+        <ResponsiveCardVegaLite key={index} spec={spec} data={{ table: dataCopy }}     height={viewMode === "overlay" ? 800 : 800 / yAxisScatter.length}
+        maxHeight={viewMode === "overlay" ? 800 : 800 / yAxisScatter.length} />
       ))}
     </>
   ) : (

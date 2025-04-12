@@ -4,14 +4,10 @@ import { VegaLite } from "react-vega"
 import { VisualColumn } from "../../../../shared/models/dataexploration.model"
 import { cloneDeep } from "lodash" // Import lodash for deep cloning
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 
-interface LineChartProps {
-  viewMode: "overlay" | "stacked"
-  data: any[]
-  xAxis: VisualColumn | null
-  yAxis: VisualColumn[] // Accept array of columns for Y-Axis
-  groupFunction: string
-}
+
 
 const getColumnType = (columnType: string) => {
   switch (columnType) {
@@ -27,26 +23,26 @@ const getColumnType = (columnType: string) => {
   }
 }
 
-const LineChart = ({
-  viewMode,
-  data,
-  xAxis,
-  yAxis,
-  groupFunction,
-}: LineChartProps) => {
+const LineChart = (
+ ) => {
 
   const [chartSpecs, setChartSpecs] = useState<any[]>([])
   const [dataCopy, setDataCopy] = useState<any[]>([]) // Define dataCopy here
+  const dispatch = useAppDispatch()
+    const { tab } = useAppSelector(state => state.workflowPage)
 
   useEffect(() => {
-    if (xAxis && yAxis.length > 0) {
+   if (tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns && tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.length > 0) {
+      const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis
+      const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis
+      const data = tab?.workflowTasks.dataExploration?.chart.data?.data
       const yAxisFields = yAxis.map(axis => axis.name) // Get the names of the Y-axis fields
       const dataCopy = cloneDeep(data) // Deep clone the data
       
       setDataCopy(dataCopy)
 
       // Build the Vega-Lite specifications
-      if (viewMode === "overlay") {
+      if (tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay") {
         const spec = {
           mark: "line",
           autosize: { type: "fit", contains: "padding", resize: true },
@@ -70,7 +66,7 @@ const LineChart = ({
             },
             y: {
               field: "value", // Use the value field after folding
-              type: getColumnType(yAxis[0].type), // Assume the first yAxis type is representative
+              type: "quantitative", // Y-axis type is representative
               axis: { title: "Values" }, // Common title for Y-axis
             },
             color: {
@@ -130,18 +126,18 @@ const LineChart = ({
         setChartSpecs(specs) // Set specs for all Y-axes in stacked mode
       }
     }
-  }, [xAxis, yAxis, viewMode, groupFunction, data]) // Watch for changes in these dependencies
+  }, [tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns, tab?.workflowTasks.dataExploration?.controlPanel.xAxis, tab?.workflowTasks.dataExploration?.controlPanel.yAxis, tab?.workflowTasks.dataExploration?.controlPanel.viewMode, dataCopy]) // Watch for changes in these dependencies
 
   return chartSpecs.length > 0 ? (
     <>
       {chartSpecs.map((spec, index) => (
-        <ResponsiveVegaLite
+        <ResponsiveCardVegaLite
           key={index}
           spec={spec}
           data={{ table: dataCopy }}
           actions={false}
-          height={viewMode === "overlay" ? 800 : 800 / yAxis.length}
-          maxHeight={viewMode === "overlay" ? 800 : 800 / yAxis.length}
+          height={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length || 800}
+          maxHeight={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length}
         />
       ))}
     </>
