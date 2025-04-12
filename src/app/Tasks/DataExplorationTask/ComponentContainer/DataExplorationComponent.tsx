@@ -36,11 +36,7 @@ const DataExplorationComponent = () => {
         },
       }),
     )
-    if (tab.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.length===0){ 
-      console.log("mpainw")
-      dispatch(setControls({ selectedColumns: dataExploration?.metaData.data?.originalColumns }))
     
-  }
 
     dispatch(
       fetchDataExplorationData({
@@ -56,6 +52,12 @@ const DataExplorationComponent = () => {
       }),
     )
   }, [tab?.workflowId])
+  useEffect(() => {
+      console.log("mpainw")
+      dispatch(setControls({ selectedColumns: dataExploration?.metaData.data?.originalColumns }))
+    
+  
+  },[tab?.workflowId,dataExploration?.metaData.data?.originalColumns  ])
 
   useEffect(() => {
     const originalColumns = dataExploration?.metaData.data?.originalColumns
