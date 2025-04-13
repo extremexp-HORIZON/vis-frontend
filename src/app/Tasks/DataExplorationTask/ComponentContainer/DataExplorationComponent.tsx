@@ -36,8 +36,6 @@ const DataExplorationComponent = () => {
         },
       }),
     )
-    
-
     dispatch(
       fetchDataExplorationData({
         query: {
@@ -53,11 +51,13 @@ const DataExplorationComponent = () => {
     )
   }, [tab?.workflowId])
   useEffect(() => {
-      console.log("mpainw")
-      dispatch(setControls({ selectedColumns: dataExploration?.metaData.data?.originalColumns }))
-    
-  
-  },[tab?.workflowId,dataExploration?.metaData.data?.originalColumns  ])
+    console.log("mpainw")
+    dispatch(
+      setControls({
+        selectedColumns: dataExploration?.metaData.data?.originalColumns,
+      }),
+    )
+  }, [tab?.workflowId, dataExploration?.metaData.data?.originalColumns])
 
   useEffect(() => {
     const originalColumns = dataExploration?.metaData.data?.originalColumns
@@ -141,14 +141,7 @@ const DataExplorationComponent = () => {
             sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px" }}
           >
             {dataExploration?.controlPanel.chartType === "datatable" && (
-              <TableExpand
-                data={tab?.workflowTasks.dataExploration?.chart.data?.data ?? []}
-                columns={
-                  tab?.workflowTasks.dataExploration?.controlPanel.selectedColumns
-                   ?? []
-                }
-                datetimeColumn={""}
-              />
+              <TableExpand />
             )}
             {dataExploration?.controlPanel.chartType === "line" && (
               <LineChart />

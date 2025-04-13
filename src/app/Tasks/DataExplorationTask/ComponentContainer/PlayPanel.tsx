@@ -15,83 +15,53 @@ const PlayPanel = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
   const chartType =
     tab?.workflowTasks.dataExploration?.controlPanel.chartType || "line" // Default to line chart if no chart type is selected in data exploration
-  return (
-    <>
-      <Box sx={{ mb: 2 }}>
-        <ChartButtonGroup />
-      </Box>
-      <Box
+
+  const SectionHeader = ({
+    icon,
+    title,
+  }: {
+    icon: React.ReactNode
+    title: string
+  }) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        borderBottom: `1px solid ${grey[400]}`,
+      }}
+    >
+      {icon}
+      <Typography
+        variant="h6"
         sx={{
+          cursor: "pointer",
           display: "flex",
           alignItems: "center",
-          borderBottom: `1px solid ${grey[400]}`,
+          ml: 1,
+          fontWeight: "bold",
         }}
+        color="primary"
       >
-        <ViewColumnIcon />
-        <Typography
-          variant="h6"
-          sx={{
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            ml: 1,
-            fontWeight: "bold",
-          }}
-          color="primary"
-        >
-          Columns
-        </Typography>
+        {title}
+      </Typography>
+    </Box>
+  )
+
+  return (
+    <>
+      <Box>
+        <ChartButtonGroup />
       </Box>
+      <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
+      <SectionHeader icon={<ViewColumnIcon />} title="Columns" />
       <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
       <Controlaki />
       <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          borderBottom: `1px solid ${grey[400]}`,
-        }}
-      >
-        <FilterAltIcon />
-        <Typography
-          variant="h6"
-          sx={{
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            ml: 1,
-            fontWeight: "bold",
-          }}
-          color="primary"
-        >
-          Filters
-        </Typography>
-      </Box>
+      <SectionHeader icon={<FilterAltIcon />} title="Filters" />
       <Box sx={{ marginTop: 3 }} />
       <FilterBuilder />
       <Box sx={{ marginTop: 3 }} />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          borderBottom: `1px solid ${grey[400]}`,
-        }}
-      >
-        <SettingsSuggestIcon />
-        <Typography
-          variant="h6"
-          sx={{
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            ml: 1,
-            fontWeight: "bold",
-          }}
-          color="primary"
-        >
-          Options
-        </Typography>
-      </Box>
+      <SectionHeader icon={<SettingsSuggestIcon />} title="Options" />
       {chartType === "line" && <LineChartControlPanel />}
       {chartType === "scatter" && <ScatterChartControlPanel />}
       {chartType === "bar" && <BarChartControlPanel />}
