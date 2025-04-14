@@ -31,8 +31,8 @@ import {
 } from "../../../../store/slices/monitorPageSlice"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import { useState } from "react"
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded"
 import PivotTableChartRoundedIcon from "@mui/icons-material/PivotTableChartRounded"
+import ViewColumnIcon from "@mui/icons-material/ViewColumn"
 
 interface ToolBarWorkflowProps {
   filterNumbers: number
@@ -73,7 +73,6 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     useAppSelector((state: RootState) => state.monitorPage)
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null)
   const [anchorElGroup, setAnchorElGroup] = useState<null | HTMLElement>(null)
 
   const handleGroupClick = (e: React.MouseEvent<HTMLElement>) =>
@@ -84,16 +83,9 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     setAnchorEl(event.currentTarget)
   }
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElMenu(event.currentTarget)
-  }
-
   const handleClose = () => setAnchorEl(null)
 
-  const handleCloseMenu = () => setAnchorElMenu(null)
-
   const open = Boolean(anchorEl)
-  const openMenu = Boolean(anchorElMenu)
 
   const handleRemoveFilter = (index: number) => {
     if (filters.length > 1) {
@@ -200,43 +192,23 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 </IconButton>
               </Tooltip>
             )}
+            
+            <Tooltip title="Columns">
+              <IconButton onClick={handleOpen}>
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
 
-            <IconButton onClick={handleOpenMenu}>
-              <MoreVertRoundedIcon />
-            </IconButton>
-            <Popover
-              open={openMenu}
-              anchorEl={anchorElMenu}
-              onClose={handleCloseMenu}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-            >
-              <List>
-                <ListItemButton onClick={handleOpen}>
-                  <MenuRoundedIcon
-                    sx={{ color: theme => theme.palette.primary.main }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{ color: theme => theme.palette.primary.main }}
-                  >
-                    COLUMNS
-                  </Typography>
-                </ListItemButton>
-                {visibleTable === "workflows" && (
-                  <ListItemButton onClick={handleGroupClick}>
-                    <PivotTableChartRoundedIcon
-                      sx={{ color: theme => theme.palette.primary.main }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: theme => theme.palette.primary.main }}
-                    >
-                      GROUP BY
-                    </Typography>
-                  </ListItemButton>
-                )}
-              </List>
-            </Popover>
+            {visibleTable === "workflows" && (
+              <Tooltip title="Group by">
+                <IconButton onClick={handleGroupClick}>
+                  <Badge color="primary" badgeContent={workflowsTable.groupBy.length} invisible={workflowsTable.groupBy.length === 0}>
+                    <PivotTableChartRoundedIcon />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+            )}
+
             <Popover
               open={open}
               anchorEl={anchorEl}
