@@ -71,6 +71,12 @@ export default function FilterBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const [showAvailableColumns, setShowAvailableColumns] = useState<boolean>(true);
   const [showAvailableOperators, setShowAvailableOperators] = useState<boolean>(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number>(0);
+  const [showAllColumns, setShowAllColumns] = useState<boolean>(false);
+  const selectedItemRef = useRef<HTMLDivElement | null>(null);
+  const suggestionsContainerRef = useRef<HTMLDivElement | null>(null);
+  const prevSuggestions = useRef<any[]>([]);
+  const prevStep = useRef<FilterStep>(FilterStep.IDLE);
 
   const validColumns = columns.filter(col => 
     col.field !== "rating" && col.field !== "status" && col.field !== "action"
@@ -123,10 +129,14 @@ export default function FilterBar({
     if (event.key === 'Enter' || event.key === 'Tab') {
       event.preventDefault();
       
-      if (currentStep === FilterStep.COLUMN && suggestions.length > 0) {
-        selectColumn(suggestions[0].value);
-      } else if (currentStep === FilterStep.OPERATOR && suggestions.length > 0) {
-        selectOperator(suggestions[0].id);
+      if ((currentStep === FilterStep.COLUMN || currentStep === FilterStep.OPERATOR) && 
+          suggestions.length > 0) {
+        const selectedItem = suggestions[selectedSuggestionIndex];
+        if (currentStep === FilterStep.COLUMN) {
+          selectColumn(selectedItem.value);
+        } else {
+          selectOperator(selectedItem.id);
+        }
       } else if (currentStep === FilterStep.VALUE && inputValue) {
         addFilter(inputValue);
       }
@@ -135,8 +145,52 @@ export default function FilterBar({
     } else if (event.key === 'Backspace' && inputValue === '') {
       // Go back a step when pressing backspace on an empty input field
       handleBackStep();
+    } else if (event.key === 'ArrowDown' && suggestions.length > 0) {
+      event.preventDefault();
+      setSelectedSuggestionIndex(prev => 
+        prev < suggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (event.key === 'ArrowUp' && suggestions.length > 0) {
+      event.preventDefault();
+      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : 0);
     }
   };
+
+  // Reset selected suggestion index when suggestions change
+  useEffect(() => {
+    // Only reset the selection index when the suggestions array changes size
+    // or when transitioning between column and operator selection
+    const isNewSuggestionSet = 
+      prevSuggestions.current?.length !== suggestions.length ||
+      prevStep.current !== currentStep;
+      
+    if (isNewSuggestionSet) {
+      setSelectedSuggestionIndex(0);
+    }
+    
+    prevSuggestions.current = [...suggestions];
+    prevStep.current = currentStep;
+  }, [suggestions, currentStep]);
+
+  // Add effect to scroll selected suggestion into view
+  useEffect(() => {
+    if (selectedItemRef.current && suggestionsContainerRef.current) {
+      const container = suggestionsContainerRef.current;
+      const item = selectedItemRef.current;
+      
+      const containerRect = container.getBoundingClientRect();
+      const itemRect = item.getBoundingClientRect();
+      
+      // Check if the item is outside the visible area
+      if (itemRect.bottom > containerRect.bottom) {
+        // Item is below visible area
+        item.scrollIntoView({ behavior: 'auto', block: 'end' });
+      } else if (itemRect.top < containerRect.top) {
+        // Item is above visible area
+        item.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }
+  }, [selectedSuggestionIndex]);
 
   const selectColumn = (columnValue: string) => {
     setTempColumn(columnValue);
@@ -274,13 +328,16 @@ export default function FilterBar({
   const renderAvailableColumns = () => {
     if (!showAvailableColumns) return null;
     
+    const columnsToShow = showAllColumns ? validColumns : validColumns.slice(0, 5);
+    const hasMore = validColumns.length > 5;
+    
     return (
       <Box sx={{ mt: 2 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           Available Columns
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {validColumns.map((column, index) => (
+          {columnsToShow.map((column, index) => (
             <Chip
               key={index}
               size="small"
@@ -290,6 +347,24 @@ export default function FilterBar({
               clickable
             />
           ))}
+          {hasMore && !showAllColumns && (
+            <Button 
+              size="small" 
+              onClick={() => setShowAllColumns(true)}
+              sx={{ fontSize: '0.75rem', ml: 1 }}
+            >
+              Show More ({validColumns.length - 5})
+            </Button>
+          )}
+          {showAllColumns && (
+            <Button 
+              size="small" 
+              onClick={() => setShowAllColumns(false)}
+              sx={{ fontSize: '0.75rem', ml: 1 }}
+            >
+              Show Less
+            </Button>
+          )}
         </Box>
       </Box>
     );
@@ -321,7 +396,7 @@ export default function FilterBar({
   };
 
   return (
-    <Box sx={{ width: '100%'}}>
+    <Box sx={{ width: '100%', overflow: 'visible' }}>
       {/* Search input */}
       <Box sx={{ position: 'relative' }}>
         {renderInputWithPills()}
@@ -336,30 +411,37 @@ export default function FilterBar({
               zIndex: 1000,
               mt: 0.5,
               maxHeight: 300,
-              overflow: 'auto'
+              overflow: 'hidden' // Changed from 'auto' to 'hidden'
             }}
           >
-            {suggestions.map((item, index) => (
-              <Box 
-                key={index}
-                sx={{ 
-                  p: 1.5, 
-                  cursor: 'pointer',
-                  '&:hover': { backgroundColor: 'action.hover' }
-                }}
-                onClick={() => {
-                  if (currentStep === FilterStep.COLUMN) {
-                    selectColumn(item.value);
-                  } else if (currentStep === FilterStep.OPERATOR) {
-                    selectOperator(item.id);
-                  }
-                }}
-              >
-                <Typography variant="body2">
-                  {currentStep === FilterStep.COLUMN ? item.label : item.label}
-                </Typography>
-              </Box>
-            ))}
+            <Box 
+              ref={suggestionsContainerRef}
+              sx={{ maxHeight: 300, overflow: 'auto' }}
+            >
+              {suggestions.map((item, index) => (
+                <Box 
+                  key={index}
+                  ref={index === selectedSuggestionIndex ? selectedItemRef : null}
+                  sx={{ 
+                    p: 1.5, 
+                    cursor: 'pointer',
+                    backgroundColor: index === selectedSuggestionIndex ? 'action.selected' : 'inherit',
+                    '&:hover': { backgroundColor: 'action.hover' }
+                  }}
+                  onClick={() => {
+                    if (currentStep === FilterStep.COLUMN) {
+                      selectColumn(item.value);
+                    } else if (currentStep === FilterStep.OPERATOR) {
+                      selectOperator(item.id);
+                    }
+                  }}
+                >
+                  <Typography variant="body2">
+                    {currentStep === FilterStep.COLUMN ? item.label : item.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
           </Paper>
         )}
       </Box>
@@ -375,8 +457,8 @@ export default function FilterBar({
       {/* Help text only when not showing available options */}
       {currentStep !== FilterStep.IDLE && !showAvailableColumns && !showAvailableOperators && (
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-          {currentStep === FilterStep.COLUMN && "Select a column or type to filter columns"}
-          {currentStep === FilterStep.OPERATOR && "Select an operator (contains, =, >, <, etc.)"}
+          {currentStep === FilterStep.COLUMN && "Select a column or type to filter columns (use arrow keys to navigate)"}
+          {currentStep === FilterStep.OPERATOR && "Select an operator (contains, =, >, <, etc.) - use arrow keys to navigate"}
           {currentStep === FilterStep.VALUE && "Enter a value and press Enter to add the filter"}
         </Typography>
       )}
