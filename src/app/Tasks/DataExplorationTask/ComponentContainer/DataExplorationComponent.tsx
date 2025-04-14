@@ -10,13 +10,15 @@ import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded"
 import LineChart from "../Charts/LineChart"
 import ScatterChart from "../Charts/ScatterChart"
 import { BarChart } from "@mui/icons-material"
-import { Box, Paper, Typography } from "@mui/material"
+import { Box, CircularProgress, Paper, Typography } from "@mui/material"
 import { Resizable } from "re-resizable"
 import theme from "../../../../mui-theme"
 import TableExpand from "../DataTable/TableExpand"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+
 
 const DataExplorationComponent = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
@@ -62,76 +64,125 @@ const DataExplorationComponent = () => {
     )
   }, [tab?.workflowId, dataExploration?.metaData.data?.originalColumns,selectedDataset])
 
+  if(!selectedDataset) return (
+    <InfoMessage
+      message="Select a dataset to begin exploring your data."
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      fullHeight
+    />
+  )
+
+  if(tab.workflowTasks.dataExploration?.metaData.loading) return (
+    <Box sx={{
+      height: "100%",
+      width: "100%", 
+      display: "flex", 
+      justifyContent: "center", 
+      alignItems: "center"
+      }}
+    >
+      <CircularProgress />
+    </Box>
+  )
+
+  if(tab.workflowTasks.dataExploration?.metaData.error) return (
+    <InfoMessage
+      message="Failed to fetch dataset metadata."
+      type="info"
+      icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      fullHeight
+    />
+  )
+  
   return (
-    <>
-      {selectedDataset ? (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            rowGap: 1,
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 1,
+        height: "100%",
+        overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
+        px: 2,
+      }}
+    >
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          gap: 1,
+        }}
+      >
+        <Resizable
+          defaultSize={{
+            width: "30%",
             height: "100%",
-            overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
-            px: 2,
           }}
-        >
-          <Box
-            sx={{
-              height: "99%",
+          minWidth="200px"
+          enable={{
+            top: false,
+            right: true,
+            bottom: false,
+            left: false,
+            topRight: false,
+            bottomRight: false,
+            bottomLeft: false,
+            topLeft: false,
+          }}
+          maxWidth="80%"
+          maxHeight="100%"
+          style={{ height: "100%", position: "relative" }}
+          handleStyles={{
+            right: {
               display: "flex",
-              gap: 1,
-            }}
-          >
-            <Resizable
-              defaultSize={{
-                width: "30%",
-                height: "100%",
-              }}
-              minWidth="200px"
-              enable={{
-                top: false,
-                right: true,
-                bottom: false,
-                left: false,
-                topRight: false,
-                bottomRight: false,
-                bottomLeft: false,
-                topLeft: false,
-              }}
-              maxWidth="80%"
-              maxHeight="100%"
-              style={{ height: "100%", position: "relative" }}
-              handleStyles={{
-                right: {
+              alignItems: "center",
+              justifyContent: "center",
+              width: "16px", // Fixed width for handle area
+              right: "-16px", // Position handle to overlap both components
+              zIndex: 10,
+            },
+          }}
+          handleComponent={{
+            right: (
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "100%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "16px", // Fixed width for handle area
-                  right: "-16px", // Position handle to overlap both components
-                  zIndex: 10,
-                },
-              }}
-              handleComponent={{
-                right: (
-                  <Box
-                    sx={{
-                      height: "100%",
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "ew-resize",
-                    }}
-                  >
-                    <MoreVertRoundedIcon
-                      style={{ color: theme.palette.action.active }}
-                    />
-                  </Box>
-                ),
+                  cursor: "ew-resize",
+                }}
+              >
+                <MoreVertRoundedIcon
+                  style={{ color: theme.palette.action.active }}
+                />
+              </Box>
+            ),
+          }}
+        >
+          <PlayPanel />
+        </Resizable>
+        {
+          tab.workflowTasks.dataExploration?.chart.loading ? (
+            <Box sx={{
+              height: "100%",
+              width: "100%", 
+              display: "flex", 
+              justifyContent: "center", 
+              alignItems: "center"
               }}
             >
-              <PlayPanel />
-            </Resizable>
+              <CircularProgress />
+            </Box>
+          ) : tab.workflowTasks.dataExploration?.chart.error ? (
+            <InfoMessage
+              message="Failed to fetch dataset."
+              type="info"
+              icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+              fullHeight
+            />      
+          ) : (
             <Paper
               elevation={2}
               sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px" }}
@@ -148,18 +199,11 @@ const DataExplorationComponent = () => {
               {dataExploration?.controlPanel.chartType === "bar" && (
                 <BarChart />
               )}
-            </Paper>
-          </Box>
-        </Box>
-      ) : (
-        <InfoMessage
-          message="Select a dataset to begin exploring your data."
-          type="info"
-          icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
-          fullHeight
-        />
-      )}
-    </>
+            </Paper>  
+          )
+        }
+      </Box>
+    </Box>
   )
 }
 

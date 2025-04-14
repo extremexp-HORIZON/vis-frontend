@@ -24,9 +24,10 @@ interface ResponsiveCardVegaLiteProps {
   maxHeight?: number
   aspectRatio?: number // Aspect ratio (width / height)
   [key: string]: any // Capture all other props
-  controlPanel?: React.ReactNode // 👈 NEW
-  blinkOnStart?: boolean // 👈 Add this
-
+  controlPanel?: React.ReactNode
+  blinkOnStart?: boolean
+  infoMessage?: React.ReactElement
+  showInfoMessage?: boolean
 }
 const SectionHeader = ({
   icon,
@@ -71,6 +72,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   aspectRatio = 1,
   controlPanel,
   blinkOnStart = false, // Default aspect ratio (1:1 -> square)
+  infoMessage,
+  showInfoMessage,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth)
@@ -221,15 +224,23 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       />
       <CardContent sx={{ backgroundColor: "#ffffff", py: 2 }}>
         <Box ref={containerRef} sx={{ width: "100%", height: "100%" }}>
-          <VegaLite
-            spec={{
-              ...spec,
-              autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
-              width: width,
-              height: height,
-            }}
-            {...otherProps}
-          />
+          {
+            showInfoMessage ? (
+              <Box sx={{ width: width, height: height}}>
+              {infoMessage}
+              </Box>
+            ) : (
+              <VegaLite
+                spec={{
+                  ...spec,
+                  autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
+                  width: width,
+                  height: height,
+                }}
+                {...otherProps}
+              />  
+            )
+          }
         </Box>
       </CardContent>
     </Card>

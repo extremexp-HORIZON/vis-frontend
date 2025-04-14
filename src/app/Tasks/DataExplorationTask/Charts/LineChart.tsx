@@ -1,12 +1,11 @@
-import { Box, Paper, Typography } from "@mui/material"
-import { useEffect, useState } from "react"
-import { VegaLite } from "react-vega"
-import { VisualColumn } from "../../../../shared/models/dataexploration.model"
+import { Box } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
 import { cloneDeep } from "lodash" // Import lodash for deep cloning
-import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import { useAppSelector } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import LineChartControlPanel from "./LineChartControlPanel"
+import InfoMessage from "../../../../shared/components/InfoMessage"
+import AssessmentIcon from "@mui/icons-material/Assessment"
 
 
 
@@ -29,8 +28,7 @@ const LineChart = (
 
   const [chartSpecs, setChartSpecs] = useState<any[]>([])
   const [dataCopy, setDataCopy] = useState<any[]>([]) // Define dataCopy here
-  const dispatch = useAppDispatch()
-    const { tab } = useAppSelector(state => state.workflowPage)
+  const { tab } = useAppSelector(state => state.workflowPage)
 
   useEffect(() => {
    if (tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns && tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.length > 0) {
@@ -39,8 +37,7 @@ const LineChart = (
       const data = tab?.workflowTasks.dataExploration?.chart.data?.data
       const yAxisFields = yAxis.map(axis => axis.name) // Get the names of the Y-axis fields
       const dataCopy = cloneDeep(data) // Deep clone the data
-      
-      setDataCopy(data)
+      setDataCopy(dataCopy)
 
       // Build the Vega-Lite specifications
       if (tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay") {
@@ -127,23 +124,36 @@ const LineChart = (
         setChartSpecs(specs) // Set specs for all Y-axes in stacked mode
       }
     }
-  }, [tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns, tab?.workflowTasks.dataExploration?.controlPanel.xAxis, tab?.workflowTasks.dataExploration?.controlPanel.yAxis, tab?.workflowTasks.dataExploration?.controlPanel.viewMode, dataCopy]) // Watch for changes in these dependencies
+  }, [tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns, tab?.workflowTasks.dataExploration?.controlPanel.xAxis, tab?.workflowTasks.dataExploration?.controlPanel.yAxis, tab?.workflowTasks.dataExploration?.controlPanel.viewMode]) // Watch for changes in these dependencies
+
+  const info = (
+    <InfoMessage
+      message="Please select x-Axis and y-Axis to display the chart."
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      fullHeight
+  />
+  )
+  const shouldShowInfoMessage = !tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length &&
+  tab?.workflowTasks.dataExploration?.controlPanel?.xAxis.name === ""
+  
 
   return (
-    <>
+    <Box sx={{height: "100%"}}>
       {chartSpecs.map((spec, index) => (
         <ResponsiveCardVegaLite
           key={index}
           spec={spec}
           data={{ table: dataCopy }}
           actions={false}
-          height={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length || 800}
-          maxHeight={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length}
           controlPanel={<LineChartControlPanel/>}
           blinkOnStart={true}
+          infoMessage={info}
+          showInfoMessage={shouldShowInfoMessage}
+          maxHeight={650}
         />
       ))}
-    </>
+    </Box>
   ) 
 }
 
