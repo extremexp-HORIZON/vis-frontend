@@ -26,6 +26,7 @@
     "@mui/styles": "^5.15.15",
     "@mui/x-charts": "^7.9.0",
     "@mui/x-data-grid": "^7.5.1",
+    "@mui/x-tree-view": "^7.28.1",
     "@react-leaflet/core": "^3.0.0",
     "@reduxjs/toolkit": "^2.0.1",
     "@types/lodash": "^4.17.5",

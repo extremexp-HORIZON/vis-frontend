@@ -1,5 +1,5 @@
-import { Box } from "@mui/material";
-import DatasetTable from "../DataTable/dataset-table";
+import { Box, Paper } from "@mui/material";
+import DatasetTreeView from "./dataset-tree-view";
 import { RootState, useAppSelector } from "../../../../store/store";
 import DataExplorationComponent from "./DataExplorationComponent";
 import { useSearchParams } from "react-router-dom";
@@ -29,12 +29,12 @@ const DataTab = () => {
 
     return (
         <Box sx={{ display: "flex",flexDirection:"row", gap: 2, height: "100%"}}>
-            <Box sx={{width: "25%", height: "99%"}}>
-                {tab && <DatasetTable />}
-            </Box>
-            <Box sx={{width: "75%", height: "99%"}}>
+            <Paper elevation={2} sx={{width: "20%", height: "99%", overflow: "auto"}}>
+                {tab && <DatasetTreeView />}
+            </Paper>
+            <Paper elevation={2} sx={{width: "80%", height: "99%"}}>
                 <DataExplorationComponent/>
-            </Box>
+            </Paper>
         </Box>
     )
 }
