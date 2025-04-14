@@ -140,6 +140,7 @@ const LineChart = (
           height={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length || 800}
           maxHeight={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length}
           controlPanel={<LineChartControlPanel/>}
+          blinkOnStart={true}
         />
       ))}
     </>

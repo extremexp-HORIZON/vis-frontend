@@ -25,6 +25,8 @@ interface ResponsiveCardVegaLiteProps {
   aspectRatio?: number // Aspect ratio (width / height)
   [key: string]: any // Capture all other props
   controlPanel?: React.ReactNode // 👈 NEW
+  blinkOnStart?: boolean // 👈 Add this
+
 }
 const SectionHeader = ({
   icon,
@@ -59,6 +61,7 @@ const SectionHeader = ({
 )
 
 const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
+
   spec,
   title,
   minWidth = 100,
@@ -66,7 +69,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   maxWidth = 2000,
   maxHeight = 300,
   aspectRatio = 1,
-  controlPanel, // Default aspect ratio (1:1 -> square)
+  controlPanel,
+  blinkOnStart = false, // Default aspect ratio (1:1 -> square)
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth)
@@ -74,6 +78,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const menuOpen = Boolean(anchorEl)
+  const [hasClickedMenu, setHasClickedMenu] = useState(false)
+
 
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
@@ -108,8 +114,16 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
+    setHasClickedMenu(true) // 👈 Stop blinking after first click
+
   }
 
+  const blinkAnimation = {
+    animation: "blinker 1s linear infinite",
+    "@keyframes blinker": {
+      "50%": { opacity: 0 },
+    },
+  }
   const handleMenuClose = () => {
     setAnchorEl(null)
   }
@@ -119,7 +133,42 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       <CardHeader
         action={
           <>
-            <IconButton aria-label="settings" onClick={handleMenuClick}>
+            <IconButton aria-label="settings" onClick={handleMenuClick}   sx={{
+    position: "relative",
+    ...(blinkOnStart && !hasClickedMenu && {
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        top: -1,
+        left: -6,
+        right: -6,
+        bottom: -6,
+        borderRadius: "50%",
+        border: "2px solid #1976d2", // MUI primary.main color
+        animation: "pulse 1.5s ease-out infinite",
+        zIndex: 0,
+      },
+    }),
+    "& svg": {
+      zIndex: 1,
+      position: "relative",
+    },
+    "@keyframes pulse": {
+      "0%": {
+        transform: "scale(0.95)",
+        opacity: 0.7,
+      },
+      "70%": {
+        transform: "scale(1.2)",
+        opacity: 0,
+      },
+      "100%": {
+        transform: "scale(0.95)",
+        opacity: 0,
+      },
+    },
+  }}
+            >
               <MoreVertIcon />
             </IconButton>
             <Menu
