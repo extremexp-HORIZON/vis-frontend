@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import { RootState } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
+import InfoMessage from "../../../../shared/components/InfoMessage"
 
 const RuntimeDecomposition = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -28,12 +29,15 @@ const RuntimeDecomposition = () => {
         <Box
           sx={{
             width: "99%",
-            p: 1,
+            pt: 1,
             flex: 1,
             display: "flex",
             alignItems: "center",
+            flexDirection: "column",
+            gap: 1
           }}
         >
+           <Box sx={{ width: '100%' }}>
           <ResponsiveCardVegaLite
             title={"Runtime Decomposition per Task"}
             actions={false}
@@ -78,28 +82,15 @@ const RuntimeDecomposition = () => {
               },
             }}
           />
+          </Box>
         </Box>
       ) : (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: 500,
-          }}
-        >
-          <ReportProblemRoundedIcon
-            fontSize={"large"}
-            sx={{ color: theme => theme.palette.customGrey.dark }}
-          />
-          <Typography
-            sx={{ color: theme => theme.palette.customGrey.dark }}
-            variant={"h6"}
-          >
-            {"No Runtime Data Available"}
-          </Typography>
-        </Box>
+        <InfoMessage 
+          message="No runtime data available."
+          type="info"
+          icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+          fullHeight
+      />
       )}
     </>
   )

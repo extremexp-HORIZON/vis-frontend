@@ -6,6 +6,8 @@ import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-v
 import { IMetric } from "../../../shared/models/experiment/metric.model"
 import { useSearchParams } from "react-router-dom"
 import { fetchWorkflowMetrics } from "../../../store/slices/workflowPageSlice"
+import InfoMessage from "../../../shared/components/InfoMessage"
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 
 interface GroupMetrics {
   value: number;
@@ -39,7 +41,6 @@ const WorkflowTrends = () => {
   
   
   const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId)
-  console.log("filteredWorkflows", filteredWorkflows)
 
   const groupedMetrics: Record<string, GroupMetrics[]> | undefined = tab?.workflowSeriesMetrics.data.reduce(
     (acc: Record<string, GroupMetrics[]>, entry) => {
@@ -77,7 +78,8 @@ const WorkflowTrends = () => {
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     const metricSeries = groupedMetrics[metricName]
-    console.log("metricSeries", metricSeries)
+    
+    if(metricSeries.length <= 1) return null
 
     const workflowColorMap = workflowsTable.workflowColors
     const workflowColorScale = filteredWorkflows.map(wf => ({
@@ -140,6 +142,15 @@ const WorkflowTrends = () => {
       </Grid>
     )
   })
+  
+  if (renderCharts.every(chart => chart === null)) return (
+    <InfoMessage 
+      message="No metric trend available."
+      type="info"
+      icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      fullHeight
+    />
+  )
 
   return (
     <Container maxWidth={false}>

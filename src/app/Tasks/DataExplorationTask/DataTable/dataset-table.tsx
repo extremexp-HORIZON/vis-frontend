@@ -2,10 +2,9 @@ import Paper from "@mui/material/Paper"
 import Box from "@mui/material/Box"
 import { Checkbox, styled } from "@mui/material"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
-import { useEffect, useState } from "react"
-import type { GridColDef, GridRowSelectionModel } from "@mui/x-data-grid"
+import { useEffect } from "react"
+import type { GridColDef } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
-import theme from "../../../../mui-theme"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ScheduleIcon from "@mui/icons-material/Schedule"
 import { useSearchParams } from "react-router-dom"
@@ -37,28 +36,16 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }))
 
-// Create a custom NoRowsOverlay component using InfoMessage
-const CustomNoRowsOverlay = () => {
-  return (
-    <InfoMessage 
-      message="No data assets available."
-      type="info"
-      icon={<ScheduleIcon sx={{ fontSize: 40, color: "info.main" }} />}
-      fullHeight
-    />
-  )
-}
-
-export default function DataTable() {
+export default function DatasetTable() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
   const dispatch = useAppDispatch()
   const [searchParams] = useSearchParams()
   const task = searchParams.get("task")
 
-  const handleSelect = (id: number) => {
+  const handleSelect = (id: number, source: string) => {
     if (!tab?.dataAssetsTable) return;
-    if(tab?.dataAssetsTable.selectedDataset === id) dispatch(setDataTable({selectedDataset: null }))
-    else dispatch(setDataTable({ selectedDataset: id }))
+    if(tab?.dataAssetsTable.selectedDataset?.id === id) dispatch(setDataTable({selectedDataset: null }))
+    else dispatch(setDataTable({ selectedDataset: {id, source} }))
   }  
 
   useEffect(() => {
@@ -98,8 +85,8 @@ export default function DataTable() {
       align: "center",
       renderCell: (params: any) => (
         <Checkbox
-          checked={tab?.dataAssetsTable.selectedDataset === params.row.id}
-          onChange={() => handleSelect(params.row.id)}
+          checked={tab?.dataAssetsTable.selectedDataset?.id === params.row.id}
+          onChange={() => handleSelect(params.row.id, params.row.source)}
         />
       ),
     },
@@ -115,7 +102,6 @@ export default function DataTable() {
             flex: 1,
             align: "center",
             headerAlign: "center",
-            sortable: false,
           } as GridColDef))
       : []),
   ];  
@@ -130,9 +116,6 @@ export default function DataTable() {
             rows={tab?.dataAssetsTable.rows}
             disableColumnFilter
             columns={columns}
-            slots={{
-              noRowsOverlay: CustomNoRowsOverlay
-            }}
             sx={{
               "& .MuiDataGrid-selectedRowCount": {
                 visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header

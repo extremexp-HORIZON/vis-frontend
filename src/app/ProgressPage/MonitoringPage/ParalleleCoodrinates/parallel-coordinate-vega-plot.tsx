@@ -188,7 +188,7 @@ const ParallelCoordinateVega = ({
       spec={{
         height: chartHeight,
         width: chartWidth,
-        padding: 15,
+        padding: { top: 15, left: 2, right: 2, bottom: 2 },
         autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
         config: {
           axisY: {

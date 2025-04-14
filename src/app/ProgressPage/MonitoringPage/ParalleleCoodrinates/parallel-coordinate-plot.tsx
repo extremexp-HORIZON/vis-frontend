@@ -13,6 +13,7 @@ import { setParallel } from "../../../../store/slices/monitorPageSlice"
 import _ from "lodash"
 import ParallelCoordinateVega from "./parallel-coordinate-vega-plot"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+import InfoMessage from "../../../../shared/components/InfoMessage"
 
 const ParallelCoordinatePlot = () => {
   const { workflows } =
@@ -131,45 +132,34 @@ const ParallelCoordinatePlot = () => {
           </FormControl>
         </Box>
       </Box>
-      <Box sx={{ width: "99%", px: 1, position: "relative" }}>
-        <DraggableColumns
-          foldArray={foldArray}
-          onOrderChange={() => {
-            dispatch(setParallel({ ...parallel }))
-          }}
-        />
-        {parallel.options.length > 0 ? (
-          <ParallelCoordinateVega
-            parallelData={parallelData}
-            progressParallel={parallel}
-            foldArray={foldArray}
-            // map from progressWorkflowsTable.selectedWorkflows id (because it is rows ids) to actual workflowId
-            selectedWorkflows={workflowsTable.selectedWorkflows}
-          ></ParallelCoordinateVega>
-        ) : (
-          <Box
-            sx={{
-              width: "100%",
-              height: 300,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              columnGap: 1,
-            }}
-          >
-            <ReportProblemRoundedIcon
-              sx={{ color: theme => theme.palette.customGrey.dark }}
+      {
+        parallel.options.length > 0 ? (
+          <Box sx={{ width: "99%", px: 1, position: "relative" }}>
+            <DraggableColumns
+              foldArray={foldArray}
+              onOrderChange={() => {
+                dispatch(setParallel({ ...parallel }))
+              }}
             />
-            <Typography
-              variant={"h6"}
-              sx={{ color: theme => theme.palette.customGrey.dark }}
-            >
-              No Metric Data Available
-            </Typography>
+            <ParallelCoordinateVega
+              parallelData={parallelData}
+              progressParallel={parallel}
+              foldArray={foldArray}
+              // map from progressWorkflowsTable.selectedWorkflows id (because it is rows ids) to actual workflowId
+              selectedWorkflows={workflowsTable.selectedWorkflows}
+            ></ParallelCoordinateVega>
+          </Box>  
+        ) : (
+          <Box sx={{ width: "100%", px: 1 }}>
+            <InfoMessage 
+              message="No Metric Data Available."
+              type="info"
+              icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+              fullHeight
+            />
           </Box>
-        )}
-      </Box>
+        )
+      }
     </Paper>
   )
 }

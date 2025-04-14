@@ -3,6 +3,8 @@ import StaticDirectedGraph from "./worfklow-flow-chart"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
 import { useAppSelector, RootState } from "../../../store/store"
 import { useLocation, useNavigate } from "react-router-dom"
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+import InfoMessage from "../../../shared/components/InfoMessage"
 
 const WorkflowDetails = () => {
     const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -19,6 +21,15 @@ const WorkflowDetails = () => {
         search: `?${currentParams.toString()}`,
       })
     }
+
+    if(!tab?.workflowConfiguration?.tasks?.length) return (
+      <InfoMessage 
+        message="This workflow has no task details."
+        type="info"
+        icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+        fullHeight
+      />
+    )
 
     return (
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2}}>

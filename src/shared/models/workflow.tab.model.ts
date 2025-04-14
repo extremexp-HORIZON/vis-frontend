@@ -36,7 +36,7 @@ export interface IWorkflowPageModel {
         userInteraction?: IUserInteraction | null;
     }
     dataAssetsTable: {
-        selectedDataset: number | null
+        selectedDataset: {id: number; source: string;} | null
         rows: { [key: string]: any }[]
     }
 }

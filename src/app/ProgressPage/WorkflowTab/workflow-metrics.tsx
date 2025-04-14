@@ -131,7 +131,7 @@ import WorkflowTrends from "./workflow-metrics-trend"
 import { useAppSelector, RootState } from "../../../store/store"
 import { useSearchParams } from "react-router-dom"
 import InfoMessage from "../../../shared/components/InfoMessage"
-import AssessmentIcon from "@mui/icons-material/Assessment"
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 
 
 const WorkflowMetrics = () => {
@@ -143,12 +143,12 @@ const WorkflowMetrics = () => {
     tab?.workflowMetrics?.data 
     : tab?.workflowMetrics?.data?.filter(metric => metric.task === task)
 
-  if (!Array.isArray(metrics) || metrics.length === 0 ) {
+  if (!metrics?.length ) {
     return (
       <InfoMessage 
-        message="Not available metrics to display"
+        message="Not available metrics to display."
         type="info"
-        icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+        icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
         fullHeight
       />
     )

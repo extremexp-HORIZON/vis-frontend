@@ -64,7 +64,7 @@ const WorkflowTab = () => {
       {/* Tab Content */}
       <Box sx={{ overflow: "auto", px: 2, height: "100%" }}>
         {selectedTab === "details" && (
-          <WorkflowDetails /> //TODO: create task details
+          <WorkflowDetails />
         )}
         {selectedTab === "metrics" && tab?.workflowMetrics?.data && (
           <WorkflowMetrics />
