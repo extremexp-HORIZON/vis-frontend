@@ -40,7 +40,7 @@ const LineChart = (
       const yAxisFields = yAxis.map(axis => axis.name) // Get the names of the Y-axis fields
       const dataCopy = cloneDeep(data) // Deep clone the data
       
-      setDataCopy(dataCopy)
+      setDataCopy(data)
 
       // Build the Vega-Lite specifications
       if (tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay") {
