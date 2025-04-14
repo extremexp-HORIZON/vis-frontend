@@ -60,7 +60,7 @@ const PlayPanel = () => {
       <SectionHeader icon={<FilterAltIcon />} title="Filters" />
       <Box sx={{ marginTop: 3 }} />
       <FilterBuilder />
-      <Box sx={{ marginTop: 3 }} />
+      <Box sx={{ marginTop: 2 }} />
       <SectionHeader icon={<SettingsSuggestIcon />} title="Options" />
       {chartType === "line" && <LineChartControlPanel />}
       {chartType === "scatter" && <ScatterChartControlPanel />}

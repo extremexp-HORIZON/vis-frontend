@@ -7,6 +7,9 @@ import {
   TextField,
   Box,
   Button,
+  ThemeProvider,
+  createTheme,
+  Chip,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
@@ -21,7 +24,6 @@ const FilterBuilder = () => {
     tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
   const uniqueValues =
     tab?.workflowTasks.dataExploration?.metaData.data?.uniqueColumnValues || []
-  console.log("uniqueValues", uniqueValues)
 
   // Local states for selected filter input
   const [selectedColumn, setSelectedColumn] = useState("")
@@ -62,8 +64,65 @@ const FilterBuilder = () => {
       }),
     )
   }
+   const theme = createTheme({
+      palette: {
+        primary: {
+          main: "#1976d2",
+        },
+        secondary: {
+          main: "#dc004e",
+        },
+      },
+      typography: {
+        fontFamily: "Arial",
+        h6: {
+          fontWeight: 600,
+        },
+      },
+      components: {
+        MuiButton: {
+          styleOverrides: {
+            root: {
+              borderRadius: "20px", // Example of button customization
+            },
+          },
+        },
+      },
+    })
+
+    const handleDeleteFilter = (indexToDelete: number) => {
+      const existingFilters =
+        tab?.workflowTasks.dataExploration?.controlPanel?.filters || []
+    
+      const updatedFilters = existingFilters.filter(
+        (_: any, idx: number) => idx !== indexToDelete,
+      )
+    
+      dispatch(setControls({ filters: updatedFilters }))
+    
+      dispatch(
+        fetchDataExplorationData({
+          query: {
+            ...defaultDataExplorationQuery,
+            datasetId: "I2Cat_phising/dataset/I2Cat_phising_dataset.csv",
+            filters: updatedFilters,
+            columns:
+              tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(
+                col => col.name,
+              ) || [],
+          },
+          metadata: {
+            workflowId: tab?.workflowId || "",
+            queryCase: "chart",
+          },
+        }),
+      )
+    }
+    
 
   return (
+        <ThemeProvider theme={theme}>
+    
     <Box display="flex" flexDirection="column" gap={2}>
       {/* Column Selector */}
       <FormControl fullWidth>
@@ -134,13 +193,53 @@ const FilterBuilder = () => {
       <Button
         variant="contained"
         color="primary"
+        
         onClick={handleAddFilter}
         disabled={!filterType}
+        sx={{
+          mt: 2,
+          "&:hover": {
+            backgroundColor: theme => theme.palette.primary.dark,
+            transform: "scale(1.05)",
+          },
+        }}
       >
         Add Filter
       </Button>
+      <Box display="flex" flexWrap="wrap" gap={1} mt={2}>
+  {(tab?.workflowTasks.dataExploration?.controlPanel?.filters || []).map(
+    (filter: any, index: number) => (
+      <Chip
+        key={index}
+        label={`${filter.column} ${filter.type} ${
+          filter.type === "equals" ? filter.value : ""
+        }`}
+        onDelete={() => handleDeleteFilter(index)}
+        color="primary"
+        // variant="outlined"
+                    sx={{
+                      margin: 0.5,
+                      minWidth: "200px", // Set a minimum width to prevent shrinking
+                      maxWidth: "200px", // Set a max width so it won't grow indefinitely
+                      whiteSpace: "nowrap", // Prevent text from wrapping
+                      overflow: "hidden", // Hide the overflowed text
+                      textOverflow: "ellipsis", // Show ellipsis when text overflows
+                      transition: "max-width 0.3s ease", // Smooth transition when expanding
+                      "&:hover": {
+                        maxWidth: "500px", // Allow it to expand on hover (set to desired max width)
+                        whiteSpace: "normal", // Allow the text to wrap normally on hover
+                        // backgroundColor: theme => theme.palette.action.hover,  // Highlight on hover
+                      },
+                    }}
+      />
+    ),
+  )}
+</Box>
+      
     </Box>
+    </ThemeProvider>
   )
 }
 
 export default FilterBuilder
+

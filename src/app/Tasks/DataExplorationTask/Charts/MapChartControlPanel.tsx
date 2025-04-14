@@ -56,7 +56,6 @@ const MapControls: React.FC<MapControlsProps> = ({
   columnsMapDouble
   
 }) => {
-  console.log("columnsMapDoublemap", columnsMapDouble)
   const theme = createTheme({
     palette: {
       primary: { main: "#1976d2" },
@@ -68,7 +67,6 @@ const MapControls: React.FC<MapControlsProps> = ({
     },
   });
 
-  console.log("columns", columns);
   useEffect(() => {
     setTripsMode(!!timestampField && selectedColumns.length > 0)
   }, [timestampField, selectedColumns])

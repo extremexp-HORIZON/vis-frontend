@@ -128,7 +128,7 @@ const LineChart = (
     }
   }, [tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns, tab?.workflowTasks.dataExploration?.controlPanel.xAxis, tab?.workflowTasks.dataExploration?.controlPanel.yAxis, tab?.workflowTasks.dataExploration?.controlPanel.viewMode, dataCopy]) // Watch for changes in these dependencies
 
-  return chartSpecs.length > 0 ? (
+  return tab?.workflowTasks?.dataExploration?.controlPanel?.yAxis?.length > 0 ? (
     <>
       {chartSpecs.map((spec, index) => (
         <ResponsiveCardVegaLite

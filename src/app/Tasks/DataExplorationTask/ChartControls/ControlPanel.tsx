@@ -152,7 +152,6 @@ const ControlPanel = (props: IControlPanel) => {
       },
     },
   })
-  console.log("lat",lat,lon)
   const [showColumnDropdown, setShowColumnDropdown] = useState(true)
   const [showChartTypeDropdown, setShowChartTypeDropdown] = useState(true)
   const [showFilterDropdown, setShowFilterDropdown] = useState(true)
@@ -524,6 +523,7 @@ const ControlPanel = (props: IControlPanel) => {
                     }`}
                     onDelete={() => handleDeleteFilter(index)}
                     color="primary"
+                    variant="outlined"
                     sx={{
                       margin: 0.5,
                       minWidth: "200px", // Set a minimum width to prevent shrinking

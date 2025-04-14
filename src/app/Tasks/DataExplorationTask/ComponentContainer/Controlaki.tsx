@@ -42,6 +42,7 @@ const Controlaki = () => {
       <Select
         labelId="column-select-label"
         multiple
+        label="Select Columns"
         value={selectedColumns.map(col => col.name)}
         onChange={handleChange}
         onClose={handleFetchDataExploration}

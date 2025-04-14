@@ -61,7 +61,6 @@ const MapChart = ({
   lat,
   lon
 }: IMapChartProps) => {
-  console.log("lat,lon", lat,lon)
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef(null)
   const [colorMap, setColorMap] = useState<Record<string, string>>({})

@@ -18,6 +18,7 @@ import { setControls } from "../../../../store/slices/workflowPageSlice"
 
 const DataExplorationComponent = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
+  console.log("tab", tab?.workflowTasks.dataExploration?.chart)
   const dataExploration = tab?.workflowTasks.dataExploration
   const dispatch = useAppDispatch()
 
@@ -66,7 +67,6 @@ const DataExplorationComponent = () => {
     }
   }, [dataExploration?.metaData.data, dispatch])
 
-  console.log("tab", tab?.workflowTasks.dataExploration)
   return (
     <>
       <Box
