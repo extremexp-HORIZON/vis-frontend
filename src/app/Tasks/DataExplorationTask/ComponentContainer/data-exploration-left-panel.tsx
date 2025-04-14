@@ -1,17 +1,15 @@
 import { useAppSelector } from "../../../../store/store"
-import ChartButtonGroup from "../ChartControls/ChartButtonGroup"
-import Controlaki from "./Controlaki"
-import FilterBuilder from "./FilterBuilder"
-import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
-import LineChartControlPanel from "../Charts/LineChartControlPanel"
-import BarChartControlPanel from "../Charts/BarChartControlPanel"
+import ChartButtonGroup from "../ChartControls/data-exploration-chart-button-group"
+import Controlaki from "./data-exploration-columns-panel"
+import FilterBuilder from "./data-exploration-filter-builder"
+
+import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
 import { Box, Typography } from "@mui/material"
 import ViewColumnIcon from "@mui/icons-material/ViewColumn"
 import { grey } from "@mui/material/colors"
 import FilterAltIcon from "@mui/icons-material/FilterAlt"
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 
-const PlayPanel = () => {
+const LeftPanel = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
   const chartType =
     tab?.workflowTasks.dataExploration?.controlPanel.chartType || "line" // Default to line chart if no chart type is selected in data exploration
@@ -65,4 +63,4 @@ const PlayPanel = () => {
   )
 }
 
-export default PlayPanel
+export default LeftPanel

@@ -9,7 +9,7 @@ import { initTab } from "../../../store/slices/workflowPageSlice"
 import WorkflowMetrics from "./workflow-metrics"
 import WorkflowDetails from "./workflow-details"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition"
-import DataTab from "../../Tasks/DataExplorationTask/ComponentContainer/data-tab"
+import DataTab from "../../Tasks/DataExplorationTask/ComponentContainer/data-exploration-data-tab"
 
 const WorkflowTab = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)

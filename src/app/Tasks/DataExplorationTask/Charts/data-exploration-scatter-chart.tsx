@@ -5,7 +5,6 @@ import { VisualColumn } from '../../../../shared/models/dataexploration.model';
 import { cloneDeep } from 'lodash';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import ControlPanel from '../ChartControls/ControlPanel';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 
 
@@ -168,7 +167,11 @@ const ScatterChart = () => {
   return chartSpecs.length > 0 ? (
     <>
       {chartSpecs.map((spec, index) => (
-        <ResponsiveCardVegaLite key={index} spec={spec} data={{ table: dataCopy }}     height={viewMode === "overlay" ? 800 : 800 / yAxisScatter.length}
+        <ResponsiveCardVegaLite 
+        key={index} 
+        spec={spec} 
+        data={{ table: dataCopy }}     
+        height={viewMode === "overlay" ? 800 : 800 / yAxisScatter.length}
         maxHeight={viewMode === "overlay" ? 800 : 800 / yAxisScatter.length} />
       ))}
     </>

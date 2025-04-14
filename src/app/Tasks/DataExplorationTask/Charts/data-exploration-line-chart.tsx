@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { cloneDeep } from "lodash" // Import lodash for deep cloning
 import { useAppSelector } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import LineChartControlPanel from "./LineChartControlPanel"
+import LineChartControlPanel from "../ChartControls/data-exploration-line-control"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 
@@ -31,11 +31,10 @@ const LineChart = (
   const { tab } = useAppSelector(state => state.workflowPage)
 
   useEffect(() => {
-   if (tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns && tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.length > 0) {
       const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis
       const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis
       const data = tab?.workflowTasks.dataExploration?.chart.data?.data
-      const yAxisFields = yAxis.map(axis => axis.name) // Get the names of the Y-axis fields
+      const yAxisFields = yAxis?.map(axis => axis.name) // Get the names of the Y-axis fields
       const dataCopy = cloneDeep(data) // Deep clone the data
       setDataCopy(dataCopy)
 
@@ -123,8 +122,15 @@ const LineChart = (
         }))
         setChartSpecs(specs) // Set specs for all Y-axes in stacked mode
       }
-    }
-  }, [tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns, tab?.workflowTasks.dataExploration?.controlPanel.xAxis, tab?.workflowTasks.dataExploration?.controlPanel.yAxis, tab?.workflowTasks.dataExploration?.controlPanel.viewMode]) // Watch for changes in these dependencies
+    
+  }, 
+  [
+    tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns,
+    tab?.workflowTasks.dataExploration?.controlPanel?.xAxis,
+    tab?.workflowTasks.dataExploration?.controlPanel?.yAxis,
+    tab?.workflowTasks.dataExploration?.controlPanel?.viewMode,
+    tab?.workflowTasks.dataExploration?.chart?.data?.data,
+  ]) // Watch for changes in these dependencies
 
   const info = (
     <InfoMessage
@@ -134,8 +140,15 @@ const LineChart = (
       fullHeight
   />
   )
-  const shouldShowInfoMessage = !tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length &&
-  tab?.workflowTasks.dataExploration?.controlPanel?.xAxis.name === ""
+  const xAxis = tab?.workflowTasks.dataExploration?.controlPanel?.xAxis
+  const yAxis = tab?.workflowTasks.dataExploration?.controlPanel?.yAxis
+  
+  const hasValidXAxis = xAxis && xAxis.name
+  const hasValidYAxis = Array.isArray(yAxis) && yAxis.length > 0
+  
+  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis
+  
+  
   
 
   return (

@@ -4,7 +4,7 @@ import { setControls } from "../../../../store/slices/workflowPageSlice"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 
-const Controlaki = () => {
+const ColumnsPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
 
@@ -64,4 +64,4 @@ const Controlaki = () => {
   )
 }
 
-export default Controlaki
+export default ColumnsPanel

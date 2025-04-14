@@ -13,7 +13,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { VegaLite } from "react-vega"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { grey, red } from "@mui/material/colors"
-import LineChartControlPanel from "../../app/Tasks/DataExplorationTask/Charts/LineChartControlPanel"
+import LineChartControlPanel from "../../app/Tasks/DataExplorationTask/ChartControls/data-exploration-line-control"
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 
 interface ResponsiveCardVegaLiteProps {

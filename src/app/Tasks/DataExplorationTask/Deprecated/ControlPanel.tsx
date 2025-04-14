@@ -24,11 +24,11 @@ import {
   IFilter,
   VisualColumn,
 } from "../../../../shared/models/dataexploration.model"
-import LineChartControlPanel from "../Charts/LineChartControlPanel"
+import LineChartControlPanel from "../ChartControls/data-exploration-line-control"
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
-import BarChartControlPanel from "../Charts/BarChartControlPanel"
-import ScatterChartControlPanel from "../Charts/ScatterChartControlPanel"
-import MapControls from "../Charts/MapChartControlPanel"
+import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
+import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
+import MapControls from "../ChartControls/data-exploration-map-control"
 import ChartButtonGroup from "./ChartButtonGroup"
 import { RootState, useAppSelector } from "../../../../store/store"
 
