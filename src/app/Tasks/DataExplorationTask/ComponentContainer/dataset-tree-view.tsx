@@ -5,6 +5,13 @@ import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView"
 import { TreeItem2 } from "@mui/x-tree-view/TreeItem2"
 import { useAppDispatch, useAppSelector, RootState } from "../../../../store/store"
 import { setDataTable } from "../../../../store/slices/workflowPageSlice"
+import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
+import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
+import ImageRoundedIcon from '@mui/icons-material/ImageRounded';
+import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded';
+
+import theme from "../../../../mui-theme"
+
 
 type DatasetRow = {
   id: number
@@ -12,6 +19,7 @@ type DatasetRow = {
   source: string
   task: string
   role: string
+  format: string | null
 }
 
 export default function DatasetTreeView() {
@@ -36,10 +44,35 @@ export default function DatasetTreeView() {
         source: asset.source,
         task: asset.task,
         role: asset.role,
+        format: asset.format
       }))
       dispatch(setDataTable({ rows }))
     }
   }, [tab?.workflowConfiguration.dataAssets, task])
+
+  function getDatasetIcon(format: string | null | undefined) {
+    if (!format || format.trim() === "") return
+  
+    switch (format.toLowerCase()) {
+      case "csv":
+      case "xls":
+      case "xlsx":
+        return <TableChartRoundedIcon style={{color: theme.palette.primary.main}} fontSize="small" />
+  
+      case "json":
+      case "yaml":
+        return <DataObjectRoundedIcon style={{color: theme.palette.primary.main}} fontSize="small" />
+  
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "image":
+        return <ImageRoundedIcon style={{color: theme.palette.primary.main}} fontSize="small" />
+    
+      default:
+        return <InsertDriveFileRoundedIcon style={{color: theme.palette.primary.main}} fontSize="small" />
+    }
+  }  
 
   const groupedByTask =
      tab?.dataAssetsTable.rows?.reduce((acc, row) => {
@@ -77,7 +110,8 @@ export default function DatasetTreeView() {
                           bgcolor: "transparent",
                         }}
                       >
-                        <Typography variant="body2">{ds.dataset} {ds.role === "OUTPUT" ? "[out]" : "[in]"}</Typography>
+                        {getDatasetIcon(ds.format)}
+                        <Typography variant="body2">{ds.dataset} {ds.role === "OUTPUT" ? "[out]" : ds.role === "INPUT" && "[in]"}</Typography>
                       </Box>
                     }
                   />
