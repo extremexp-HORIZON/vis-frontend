@@ -15,9 +15,11 @@ import {
   Checkbox,
   List,
   ListItemButton,
+  Badge
 } from "@mui/material"
+import type {
+  RootState} from "../../../../store/store";
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from "../../../../store/store"
@@ -31,6 +33,7 @@ import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import { useState } from "react"
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded"
 import PivotTableChartRoundedIcon from "@mui/icons-material/PivotTableChartRounded"
+
 interface ToolBarWorkflowProps {
   filterNumbers: number
   numSelected: number
@@ -49,6 +52,7 @@ interface ToolBarWorkflowProps {
     operator: string,
     value: string,
   ) => void
+  showFilterButton?: boolean;
 }
 
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
@@ -62,7 +66,8 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     onRemoveFilter,
     groupByOptions,
     filters,
-    onFilterChange
+    onFilterChange,
+    showFilterButton = false
   } = props
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
     useAppSelector((state: RootState) => state.monitorPage)
@@ -185,92 +190,17 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             pl: 1,
           }}
         >
-          {visibleTable === "workflows"
-            ? (workflowsTable.filters?.length > 0 ||
-                workflowsTable.groupBy?.length > 0) && (
-                <Box
-                  sx={{
-                    overflowX: "auto",
-                    display: "flex",
-                    whiteSpace: "nowrap",
-                    gap: 0.5,
-                  }}
-                >
-                  {/* Filters */}
-                  {workflowsTable.filters?.some(
-                    filter => filter.value
-                    ) && (
-                    <>
-                      <Chip
-                        label="Filters:"
-                        sx={{ fontWeight: "bold", bgcolor: "white" }}
-                      />
-                      {workflowsTable.filters.map((filter, index) => {
-                        if (filter.value) {
-                          const label = `${filter.column} ${filter.operator} ${filter.value}`
-                          return (
-                            <Chip
-                              key={`filter-${index}`}
-                              label={label}
-                              onDelete={() => handleRemoveFilter(index)}
-                            />
-                          )
-                        }
-                        return null
-                      })}
-                    </>
-                  )}
-
-                  {/* Group By */}
-                  {workflowsTable.groupBy?.length > 0 && (
-                    <>
-                      <Chip
-                        label="Groups:"
-                        sx={{ fontWeight: "bold", bgcolor: "white" }}
-                      />
-                      {workflowsTable.groupBy.map((group, index) => (
-                        <Chip
-                          key={`groupBy-${index}`}
-                          label={group}
-                          onDelete={() =>
-                            dispatch(
-                              setGroupBy(
-                                workflowsTable.groupBy.filter(g => g !== group),
-                              ),
-                            )
-                          }
-                        />
-                      ))}
-                    </>
-                  )}
-                </Box>
-              )
-            : scheduledTable.filters?.some(
-                filter => filter.value
-              ) && (
-                <Box
-                  sx={{
-                    p: 1,
-                    overflowX: "auto",
-                    display: "flex",
-                    whiteSpace: "nowrap",
-                    gap: 0.2,
-                  }}
-                >
-                  {scheduledTable.filters.map((filter, index) => {
-                    if (filter.value) {
-                      const label = `${filter.column} ${filter.operator} ${filter.value}`
-                      return (
-                        <Chip
-                          label={label}
-                          onDelete={() => handleRemoveFilter(index)}
-                        />
-                      )
-                    }
-                  })}
-                </Box>
-              )}
           <Box sx={{ gap: 0.2, marginLeft: "auto" }}>
+            {showFilterButton && (
+              <Tooltip title="Filter list">
+                <IconButton onClick={filterClickedFunction}>
+                  <Badge color="primary" badgeContent={filterNumbers} invisible={filterNumbers === 0}>
+                    <FilterListIcon />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+            )}
+
             <IconButton onClick={handleOpenMenu}>
               <MoreVertRoundedIcon />
             </IconButton>
@@ -281,24 +211,6 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
             >
               <List>
-                <ListItemButton onClick={event => filterClickedFunction(event)}>
-                  <FilterListIcon
-                    sx={{ color: theme => theme.palette.primary.main }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{ color: theme => theme.palette.primary.main }}
-                  >
-                    {" "}
-                    {filterNumbers > 0 ? ` (${filterNumbers})` : ""}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: theme => theme.palette.primary.main }}
-                  >
-                    FILTERS
-                  </Typography>
-                </ListItemButton>
                 <ListItemButton onClick={handleOpen}>
                   <MenuRoundedIcon
                     sx={{ color: theme => theme.palette.primary.main }}

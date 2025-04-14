@@ -14,11 +14,10 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection } from "../.
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
 import { useEffect, useState } from "react"
-import { Badge, IconButton, Popover, Rating, styled, useTheme } from "@mui/material"
+import { Badge,  IconButton, Popover, Rating, styled, } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
-
 import theme from "../../../../mui-theme"
 
 type CustomGridColDef = GridColDef & {
@@ -144,7 +143,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   )
   const { handleChange } = props
   const [isFilterOpen, setFilterOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const dispatch = useAppDispatch()
 
@@ -167,7 +167,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   const filterClicked = (event: React.MouseEvent<HTMLElement>) => {
     setFilterOpen(!isFilterOpen)
-    !isFilterOpen ? setAnchorEl(event.currentTarget as HTMLButtonElement) : setAnchorEl(null)
+    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
   }
 
   const handleFilterChange = (
@@ -194,6 +194,10 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       (_, i) => i !== index,
     )
     dispatch(setWorkflowsTable({ filters: newFilters }))
+  }
+
+  const handleRemoveAllFilters = () => {
+    dispatch(setWorkflowsTable({ filters: [] }))
   }
 
   const handleAggregation = (
@@ -247,7 +251,23 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       }
     }
     dispatch(setWorkflowsTable({ filtersCounter: counter }))
-    const filteredRows = workflowsTable.rows.filter(row => {
+    
+    let filteredRows = workflowsTable.rows
+    
+    // Apply search term filter if it exists
+    if (searchTerm) {
+      const lowerSearchTerm = searchTerm.toLowerCase()
+      filteredRows = filteredRows.filter(row => {
+        // Check if any field contains the search term
+        return Object.entries(row).some(([key, value]) => {
+          if (key === 'id' || key === 'action' || !value) return false
+          return String(value).toLowerCase().includes(lowerSearchTerm)
+        })
+      })
+    }
+    
+    // Apply column filters
+    filteredRows = filteredRows.filter(row => {
       return workflowsTable.filters.every(filter => {
         if (filter.value === "") return true
         const cellValue = row[filter.column as keyof Data]
@@ -278,8 +298,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         }
       })
     })
+    
     dispatch(setWorkflowsTable({ filteredRows }))
-  }, [workflowsTable.filters, workflowsTable.rows])
+  }, [workflowsTable.filters, workflowsTable.rows, searchTerm])
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -464,6 +485,9 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     }
   }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics])
     
+  const activeFilters = workflowsTable.filters.filter(filter => 
+    filter.column && filter.operator && filter.value
+  )
 
   return (
     <Box sx={{height: "100%" }}>
@@ -479,6 +503,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             handleClickedFunction={handleLaunchCompletedTab}
             onRemoveFilter={handleRemoveFilter}
             groupByOptions={Array.from(new Set([...workflowsTable.uniqueTasks, ...workflowsTable.uniqueParameters]))}
+            showFilterButton={true}
             filters={workflowsTable.filters}
             onFilterChange={handleFilterChange}
           />
@@ -492,17 +517,27 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             vertical: "top",
             horizontal: "right",
           }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          PaperProps={{
+            sx: {
+              width: "550px",
+              p: 2,
+              borderRadius: 1,
+              boxShadow: 3
+            }
+          }}
         >
-          <Box sx={{ p: 2 }}>
-            <FilterBar
-              columns={columns}
-              filters={workflowsTable.filters}
-              onFilterChange={handleFilterChange}
-              onAddFilter={handleAddFilter}
-              onRemoveFilter={handleRemoveFilter}
-              setFilterOpen={setFilterOpen}
-            />
-          </Box>
+          <FilterBar
+            columns={columns}
+            filters={workflowsTable.filters}
+            onFilterChange={handleFilterChange}
+            onAddFilter={handleAddFilter}
+            onRemoveFilter={handleRemoveFilter}
+            setFilterOpen={setFilterOpen}
+          />
         </Popover>
 
         <div style={{ height: 'calc(100% - 63px)', width: "100%" }}>
