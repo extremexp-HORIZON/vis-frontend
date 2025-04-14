@@ -7,6 +7,8 @@ import {
   Select,
   OutlinedInput,
   Checkbox,
+  Button,
+  ButtonGroup,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
@@ -15,15 +17,22 @@ const LineChartControlPanel = () => {
   const dispatch = useAppDispatch()
   const tab = useAppSelector(state => state.workflowPage.tab)
   const controlPanel = tab?.workflowTasks.dataExploration?.controlPanel
-  const columns = tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
+  const columns =
+    tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
 
   const xAxis = controlPanel?.xAxis
   const yAxis = controlPanel?.yAxis || []
- 
+  const viewMode = useAppSelector(
+    state =>
+      state.workflowPage.tab?.workflowTasks.dataExploration?.controlPanel
+        ?.viewMode,
+  )
 
   // Auto-clean yAxis if columns no longer exist
   useEffect(() => {
-    const validYAxis = yAxis.filter(yCol => columns.find(col => col.name === yCol.name))
+    const validYAxis = yAxis.filter(yCol =>
+      columns.find(col => col.name === yCol.name),
+    )
     if (validYAxis.length !== yAxis.length) {
       dispatch(setControls({ yAxis: validYAxis }))
     }
@@ -46,7 +55,14 @@ const LineChartControlPanel = () => {
 
   return (
     columns.length > 0 && (
-      <Box sx={{ display: "flex", gap: "1rem", marginTop: "1rem", flexDirection: "column" }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: "1rem",
+          marginTop: "1rem",
+          flexDirection: "column",
+        }}
+      >
         {/* X-Axis Selector */}
         <FormControl fullWidth>
           <InputLabel id="x-axis-select-label">X-Axis</InputLabel>
@@ -55,7 +71,9 @@ const LineChartControlPanel = () => {
             value={xAxis?.name || ""}
             onChange={handleXAxisChange}
             label="X-Axis"
-            MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+            MenuProps={{
+              PaperProps: { style: { maxHeight: 224, width: 250 } },
+            }}
           >
             {columns.map(col => (
               <MenuItem key={col.name} value={col.name}>
@@ -74,17 +92,49 @@ const LineChartControlPanel = () => {
             value={yAxis.map(col => col.name)}
             onChange={handleYAxisChange}
             input={<OutlinedInput label="Y-Axis" />}
-            renderValue={(selected) => selected.join(", ")}
-            MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+            renderValue={selected => selected.join(", ")}
+            MenuProps={{
+              PaperProps: { style: { maxHeight: 224, width: 250 } },
+            }}
           >
             {columns.map(col => (
               <MenuItem key={col.name} value={col.name}>
-                <Checkbox checked={yAxis.some(yCol => yCol.name === col.name)} />
+                <Checkbox
+                  checked={yAxis.some(yCol => yCol.name === col.name)}
+                />
                 {col.name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            flexDirection: "column", // Stack elements verticall
+          }}
+        >
+          <ButtonGroup
+            variant="contained"
+            aria-label="view mode"
+            sx={{ height: "36px" }}
+          >
+            <Button
+              color={viewMode === "overlay" ? "primary" : "inherit"}
+              onClick={() => dispatch(setControls({ viewMode: "overlay" }))}
+            >
+              Overlay
+            </Button>
+            <Button
+              color={viewMode === "stacked" ? "primary" : "inherit"}
+              onClick={() => dispatch(setControls({ viewMode: "stacked" }))}
+            >
+              Stacked
+            </Button>
+          </ButtonGroup>
+        </Box>
       </Box>
     )
   )

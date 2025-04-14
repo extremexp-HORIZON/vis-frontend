@@ -6,6 +6,7 @@ import { cloneDeep } from "lodash" // Import lodash for deep cloning
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
+import LineChartControlPanel from "./LineChartControlPanel"
 
 
 
@@ -45,9 +46,9 @@ const LineChart = (
       if (tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay") {
         const spec = {
           mark: "line",
-          autosize: { type: "fit", contains: "padding", resize: true },
-          width: 1000,
-          height: 800,
+          // autosize: { type: "fit", contains: "padding", resize: true },
+          // width: 1000,
+          // height: 800,
           params: [
             {
               name: "grid",
@@ -91,8 +92,8 @@ const LineChart = (
         // Stacked mode: Create separate specs for each Y-axis
         const specs = yAxis.map(axis => ({
           mark: "line",
-          autosize: { type: "fit", contains: "padding", resize: true },
-          width: 1000,
+          // autosize: { type: "fit", contains: "padding", resize: true },
+          // width: 1000,
           params: [
             {
               name: "grid",
@@ -103,7 +104,7 @@ const LineChart = (
               bind: "scales", // Bind to the scales
             },
           ],
-          height: 800 / yAxis.length, // Height for individual stacked charts
+          // height: 800 / yAxis.length, // Height for individual stacked charts
           encoding: {
             x: {
               field: xAxis.name,
@@ -128,7 +129,7 @@ const LineChart = (
     }
   }, [tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns, tab?.workflowTasks.dataExploration?.controlPanel.xAxis, tab?.workflowTasks.dataExploration?.controlPanel.yAxis, tab?.workflowTasks.dataExploration?.controlPanel.viewMode, dataCopy]) // Watch for changes in these dependencies
 
-  return tab?.workflowTasks?.dataExploration?.controlPanel?.yAxis?.length > 0 ? (
+  return (
     <>
       {chartSpecs.map((spec, index) => (
         <ResponsiveCardVegaLite
@@ -138,14 +139,11 @@ const LineChart = (
           actions={false}
           height={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length || 800}
           maxHeight={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? 800 : 800 / tab?.workflowTasks.dataExploration?.controlPanel?.yAxis?.length}
+          controlPanel={<LineChartControlPanel/>}
         />
       ))}
     </>
-  ) : (
-    <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
-    <Typography align="center" fontWeight="bold">Select x-Axis and y-Axis to display the chart.</Typography>
-    </Box>
-  )
+  ) 
 }
 
 export default LineChart

@@ -5,12 +5,16 @@ import {
   CardContent,
   CardHeader,
   IconButton,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { VegaLite } from "react-vega"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
-import { red } from "@mui/material/colors"
+import { grey, red } from "@mui/material/colors"
+import LineChartControlPanel from "../../app/Tasks/DataExplorationTask/Charts/LineChartControlPanel"
+import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 
 interface ResponsiveCardVegaLiteProps {
   spec: any // VegaLite specification
@@ -20,7 +24,39 @@ interface ResponsiveCardVegaLiteProps {
   maxHeight?: number
   aspectRatio?: number // Aspect ratio (width / height)
   [key: string]: any // Capture all other props
+  controlPanel?: React.ReactNode // 👈 NEW
 }
+const SectionHeader = ({
+  icon,
+  title,
+}: {
+  icon: React.ReactNode
+  title: string
+}) => (
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      borderBottom: `1px solid ${grey[400]}`,
+      px: 1.5,
+    }}
+  >
+    {icon}
+    <Typography
+      variant="h6"
+      sx={{
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        ml: 1,
+        fontWeight: "bold",
+      }}
+      color="primary"
+    >
+      {title}
+    </Typography>
+  </Box>
+)
 
 const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   spec,
@@ -29,26 +65,33 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   minHeight = 100,
   maxWidth = 2000,
   maxHeight = 300,
-  aspectRatio = 1, // Default aspect ratio (1:1 -> square)
+  aspectRatio = 1,
+  controlPanel, // Default aspect ratio (1:1 -> square)
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth)
   const [height, setHeight] = useState(minHeight)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const menuOpen = Boolean(anchorEl)
 
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
     if (containerRef.current) {
-      const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9
+      const containerWidth =
+        containerRef.current.offsetWidth || window.innerWidth * 0.9
       const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
-      const newHeight = Math.max(minHeight, Math.min(newWidth / aspectRatio, maxHeight))
+      const newHeight = Math.max(
+        minHeight,
+        Math.min(newWidth / aspectRatio, maxHeight),
+      )
       setWidth(newWidth)
       setHeight(newHeight)
     }
   }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio])
 
   useEffect(() => {
-    updateSize() 
+    updateSize()
 
     const observer = new ResizeObserver(() => {
       updateSize()
@@ -63,20 +106,57 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     }
   }, [updateSize])
 
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
+
   return (
     <Card sx={{ maxWidth: maxWidth, mx: "auto", mb: 1, boxShadow: 3 }}>
       <CardHeader
         action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
+          <>
+            <IconButton aria-label="settings" onClick={handleMenuClick}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={menuOpen}
+              onClose={handleMenuClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              PaperProps={{
+                sx: {
+                  width: 300,
+                  maxHeight: 400,
+                  overflow: "hidden",
+                  padding: 0,
+                },
+              }}
+            >
+              <SectionHeader icon={<SettingsSuggestIcon />} title="Options"  />
+
+              <Box sx={{ padding: 2, overflowY: "auto", maxHeight: 350 }}>
+                {controlPanel}
+              </Box>
+            </Menu>
+          </>
         }
         title={
           <Typography
             variant="overline"
             sx={{
-              padding: '4px 8px',
-              textTransform: 'uppercase', // Optional: Makes the text uppercase (can be removed)
+              padding: "4px 8px",
+              textTransform: "uppercase", // Optional: Makes the text uppercase (can be removed)
             }}
           >
             {title}
