@@ -50,7 +50,7 @@ const FilterBuilder = () => {
       fetchDataExplorationData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: "I2Cat_phising/dataset/I2Cat_phising_dataset.csv",
+          datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
           filters: updatedFilters,
           columns:
             tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(
@@ -104,7 +104,7 @@ const FilterBuilder = () => {
         fetchDataExplorationData({
           query: {
             ...defaultDataExplorationQuery,
-            datasetId: "I2Cat_phising/dataset/I2Cat_phising_dataset.csv",
+            datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
             filters: updatedFilters,
             columns:
               tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(

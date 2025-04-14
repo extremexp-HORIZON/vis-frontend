@@ -24,7 +24,7 @@ const Controlaki = () => {
     dispatch(fetchDataExplorationData({
       query: {
         ...defaultDataExplorationQuery,
-        datasetId: "I2Cat_phising/dataset/I2Cat_phising_dataset.csv",
+        datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
         columns: selectedColumns.map(col => col.name),
         filters: tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
         limit: 100,
