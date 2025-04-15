@@ -62,6 +62,7 @@ const DataExplorationComponent = () => {
         selectedColumns: dataExploration?.metaData.data?.originalColumns,
       }),
     )
+    dispatch(setControls({xAxis:"",yAxis:[]}))
   }, [tab?.workflowId, dataExploration?.metaData.data?.originalColumns,selectedDataset])
 
   if(!selectedDataset) return (

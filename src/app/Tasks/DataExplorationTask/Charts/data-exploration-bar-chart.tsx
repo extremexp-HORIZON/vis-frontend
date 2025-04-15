@@ -1,29 +1,19 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material"
-import Paper from "@mui/material/Paper"
-import { Vega } from "react-vega"
-import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
+import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
+import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
+import InfoMessage from "../../../../shared/components/InfoMessage"
+import AssessmentIcon from "@mui/icons-material/Assessment"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
+  const dispatch = useAppDispatch()
+  const {tab} = useAppSelector(state => state.workflowPage)
   console.log("bar",barAggregation,barGroupBy)
     const theme = useTheme()
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
 
-  if (
-    (Array.isArray(barGroupBy) && barGroupBy.length === 0) ||
-    (typeof barAggregation === "object" && Object.keys(barAggregation).length === 0)
-  ) {
-    return (
-      <>
-      
-      <Box sx={{ display: "flex", height: "20rem", justifyContent: "center", alignItems: "center" }}>
-      <Typography align="center" fontWeight="bold" sx={{ mt: 2 }}>
-        Select both Group By and Aggregation to display the chart.
-      </Typography>
-      </Box>
-      </>
-    )
-  }
+  
   
   // Parse the data string from the dataExploration object
   const parsedData = dataExploration.data
@@ -45,7 +35,7 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
     .map(col => col.name)
 
   // Transform the data into a suitable format for grouped bar chart
-  const transformedData = parsedData.flatMap(item =>
+  const transformedData = tab?.workflowTasks.dataExploration?.chart.data?.data.flatMap(item =>
     yAxisColumns.map(col => ({
       [xAxisColumn]: item[xAxisColumn],
       type: col, // Each numeric column becomes a type/category
@@ -116,13 +106,28 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
   }
   
 
+  const info = (
+    <InfoMessage
+      message="Please select both Group By and Aggregation to display the chart."
+
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      fullHeight
+  />
+  
+  )
+  const shouldShowInfoMessage = !barGroupBy || !barAggregation
+
   return (
     <Box sx={{height: "100%"}}>
-      <ResponsiveVegaLite 
+      <ResponsiveCardVegaLite 
         spec={specification} 
         actions={false} 
         maxHeight={650}
         aspectRatio={isSmallScreen ? 1.9 : 1.4}
+        controlPanel={<BarChartControlPanel/>}
+        infoMessage={info}
+        showInfoMessage={shouldShowInfoMessage}
       />
     </Box>
   )
