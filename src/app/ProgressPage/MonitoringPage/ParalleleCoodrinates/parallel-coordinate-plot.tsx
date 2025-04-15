@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Typography from "@mui/material/Typography"
 import FormControl from "@mui/material/FormControl"
 import DraggableColumns from "./draggable-columns"
@@ -19,7 +19,7 @@ const ParallelCoordinatePlot = () => {
   const { workflows } =
     useAppSelector((state: RootState) => state.progressPage)
   const {parallel, workflowsTable } = useAppSelector((state: RootState) => state.monitorPage)
-  const parallelData = useRef<any[]>([])
+  const [parallelData, setParallelData] = useState<any[]>([])
   const foldArray = useRef<string[]>([])
   const tooltipArray = useRef<{ [key: string]: string }[]>([])
 
@@ -61,7 +61,7 @@ const ParallelCoordinatePlot = () => {
             workflowId: workflow.id,
           }
         })
-      parallelData.current = _.cloneDeep(data)
+      setParallelData(data)
       let selected = parallel.selected
       let options = parallel.options
       if (parallel.options.length === 0) {
@@ -80,8 +80,8 @@ const ParallelCoordinatePlot = () => {
         selected = options[0]
       }
       tooltipArray.current = (
-        parallelData.current.at(0)
-          ? Object.keys(parallelData.current.at(0))
+        parallelData.at(0)
+          ? Object.keys(parallelData.at(0))
           : []
       ).map(key => ({ field: key }))
 
@@ -98,6 +98,21 @@ const ParallelCoordinatePlot = () => {
   const handleMetricSelection = (event: SelectChangeEvent) => {
     dispatch(setParallel({ selected: event.target.value as string }))
   }
+
+  const processedData = useMemo(() => {
+    return parallelData.map((item, index) => {
+      const newItem = { ...item }
+
+      for (const key in newItem) {
+        if (Array.isArray(newItem[key])) {
+          newItem[key] = newItem[key].join(",")
+        }
+      }
+
+      newItem.selected = workflowsTable.selectedWorkflows.includes(newItem.workflowId)
+      return newItem
+    })
+  }, [parallelData, workflowsTable.selectedWorkflows])
 
   return (
     <Paper elevation={2} sx={{height: "100%", width: "100%"}}>
@@ -145,8 +160,8 @@ const ParallelCoordinatePlot = () => {
               parallelData={parallelData}
               progressParallel={parallel}
               foldArray={foldArray}
-              // map from progressWorkflowsTable.selectedWorkflows id (because it is rows ids) to actual workflowId
               selectedWorkflows={workflowsTable.selectedWorkflows}
+              processedData={processedData}
             ></ParallelCoordinateVega>
           </Box>  
         ) : (

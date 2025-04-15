@@ -7,10 +7,11 @@ import type { View } from "vega"
 import { useEffect, useState, useRef } from "react"
 
 interface ParallelCoordinateVegaProps {
-  parallelData: React.MutableRefObject<any[]>
+  parallelData: any[]
   progressParallel: { selected: string }
   foldArray: React.MutableRefObject<string[]>
   selectedWorkflows: string[]
+  processedData: any[]
 }
 
 function setValuesIfSelectedAndDefault(
@@ -33,8 +34,8 @@ const ParallelCoordinateVega = ({
   progressParallel,
   foldArray,
   selectedWorkflows,
+  processedData
 }: ParallelCoordinateVegaProps) => {
-  const [processedData, setProcessedData] = useState<any>([])
   const [chartHeight, setChartHeight] = useState(window.innerHeight * 0.27)
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [chartWidth, setChartWidth] = useState(0)
@@ -55,24 +56,6 @@ const ParallelCoordinateVega = ({
   
     return () => resizeObserver.disconnect()
   }, [])  
-  // Add new selected property to each item in the parallelData based on the selectedWorkflows array
-  useEffect(() => {
-    const updatedData = parallelData.current.map((item, index) => {
-      const newItem = { ...item }
-
-      for (const key in newItem) {
-        if (Array.isArray(newItem[key])) {
-          newItem[key] = newItem[key].join(",")
-        }
-      }
-
-      newItem.selected = selectedWorkflows.includes(newItem?.workflowId)
-
-      return newItem
-    })
-
-    setProcessedData(updatedData)
-  }, [selectedWorkflows, parallelData.current])
 
   const handleNewView: ViewListener = (view: View) => {
     if (!view) return
@@ -120,10 +103,10 @@ const ParallelCoordinateVega = ({
 
   // generate scales:
   const selectedLastColumnMin = Math.min(
-    ...parallelData.current.map((d: any) => d[progressParallel.selected]),
+    ...parallelData.map((d: any) => d[progressParallel.selected]),
   )
   const selectedLastColumnMax = Math.max(
-    ...parallelData.current.map((d: any) => d[progressParallel.selected]),
+    ...parallelData.map((d: any) => d[progressParallel.selected]),
   )
   const generatedScales: Scale[] = [
     {
