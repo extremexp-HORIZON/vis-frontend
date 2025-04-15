@@ -38,8 +38,8 @@ const WorkflowTab = () => {
   }
 
   return (
-    <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
-      <Box padding={1}>
+    <Box sx={{height: "100%", display: "flex", flexDirection: "column", gap: 1}}>
+      <Box sx={{px: 2}}>
         <StaticDirectedGraph
           workflowSvg={tab?.workflowSvg.data || null}
           params={tab?.workflowConfiguration.params}
@@ -48,11 +48,11 @@ const WorkflowTab = () => {
           }}
         />
       </Box>
-      <Box sx={{px: 2, pb: 1, flex: 1, height: "100%", display: "flex", direction: "row", gap: 1, overflow: "hidden"}}>
-        <Paper sx={{ width: "25%", height: "100%", overflow: "auto" }}>
+      <Box sx={{px: 2, pb: 1, height: "100%", display: "flex", direction: "row", gap: 1, overflow: "hidden"}}>
+        <Paper elevation={2} sx={{ width: "25%", height: "100%", overflow: "auto" }}>
           <WorkflowTreeView />
         </Paper>
-        <Paper sx={{width: "75%", height: "100%", overflow: "auto"}}>
+        <Paper elevation={2} sx={{width: "75%", height: "100%", overflow: "auto"}}>
           CONTENT
         </Paper>
       </Box>
