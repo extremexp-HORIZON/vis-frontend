@@ -15,7 +15,7 @@ const ColumnsPanel = () => {
     const selectedNames = event.target.value
 
     const selectedObjects = originalColumns.filter(col => selectedNames.includes(col.name))
-    dispatch(setControls({ selectedColumns: selectedObjects }))
+    dispatch(setControls({ selectedColumns: selectedObjects, xAxis: "", yAxis: [] }))
   }
 
   const handleFetchDataExploration = () => {
@@ -45,7 +45,7 @@ const ColumnsPanel = () => {
         label="Select Columns"
         value={selectedColumns.map(col => col.name)}
         onChange={handleChange}
-        onClose={handleFetchDataExploration}
+        // onClose={handleFetchDataExploration}
         renderValue={(selected) => selected.join(", ")}
         MenuProps={{
           PaperProps: { style: { maxHeight: 224, width: 250 } },
