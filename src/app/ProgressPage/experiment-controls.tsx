@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, CircularProgress, Tooltip } from "@mui/material"
+import { Box, IconButton, Typography, CircularProgress } from "@mui/material"
 import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
@@ -11,21 +11,24 @@ import { useEffect } from "react"
 import { setProgressBarData } from "../../store/slices/progressPageSlice"
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ErrorIcon from '@mui/icons-material/Error'
+import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
 
 const ExperimentControls = () => {
-  const { experimentId } = useParams()
   const [ searchParams ] = useSearchParams()
   const navigate = useNavigate()
   const workflowId = searchParams.get("workflowId")
-  const task = searchParams.get("task")
   const { progressBar, workflows } = useAppSelector(
     (state: RootState) => state.progressPage
   )
   const dispatch = useAppDispatch()
-  const currentTask = workflows.data.find(workflow => workflow.id === workflowId)?.
-    tasks?.find(t => t.name === task)
-  const params = workflows.data.find(workflow => workflow.id === workflowId)?.params.filter(param => param.task === task)
-  const paramsString = params?.map(param => `${param.name}: ${param.value}`).join(', ')
+  const workflow = workflows.data.find(workflow => workflow.id === workflowId)
+  const workflowStatus = workflow?.status
+  const completedTasks = workflow?.tasks?.filter(task => task.endTime !== undefined).length
+  const taskLength = workflow?.tasks?.length
+
+  const workflowIcon = workflowStatus === "COMPLETED" ? <CheckCircleIcon fontSize="small" color="success" /> :
+    workflowStatus === "FAILED" ? <ErrorIcon fontSize="small" color="error" /> : <AutorenewRoundedIcon fontSize="small" color="primary" />
+
 
     useEffect(() => {
       if (workflows.data.length > 0) {
@@ -91,41 +94,20 @@ const ExperimentControls = () => {
                   sx={{ fontSize: 24, cursor: "pointer", color: "grey" }}
                   onClick={() => navigate(-1)}
                 />
-                {
-                  task ? (
-                    <Box sx={{display: "flex", flexDirection: "column"}}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {`${workflowId} / ${currentTask?.variant ? currentTask?.variant : currentTask?.name}`}
-                      </Typography>
-                      {
-                        currentTask?.endTime && currentTask?.startTime ? (
-                        <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
-                          <Typography variant="body2">Status: completed</Typography>
-                          <CheckCircleIcon fontSize="small" color="success" />
-                          <Typography variant="body2">Duration: {(currentTask?.endTime - currentTask?.startTime)/1000}sec</Typography>
-                          {paramsString && <Typography variant="body2">Parameters:</Typography>}
-                          {paramsString && <Typography variant="body2">{paramsString}</Typography>}
-                        </Box>
-                        ) : (
-                          <Box sx={{display: "flex", flexDirection: "row", gap: 0.5}}>
-                            <Typography variant="body2">status: waiting feedback</Typography>
-                            <ErrorIcon fontSize="small" color="error" />
-                            {paramsString && <Typography variant="body2">Parameters:</Typography>}
-                            {paramsString && <Typography variant="body2">{paramsString}</Typography>}
-                          </Box>
-                        )
-                      }
-                    </Box>
-                  ) : (
-                    <>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                <Box sx={{display: "flex", flexDirection: "column"}}>
+                  <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       {`Workflow ${workflowId}`}
-                      </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
-                      <Rating name="simple-uncontrolled" size="large" defaultValue={2} />
-                    </>
-                  )
-                }
+                    </Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
+                    <Rating name="simple-uncontrolled" size="large" defaultValue={2} />
+                  </Box>
+                  <Box sx={{display: "flex", flexDirection: "row",alignItems: "center", gap: 1}}>
+                    <Typography variant="body2">Status: {workflowStatus?.toLowerCase()}</Typography>
+                    {workflowIcon}
+                    <Typography variant="body2">Completed Tasks: {completedTasks}/{taskLength}</Typography>
+                  </Box>
+                </Box>
               </Box>
 
               <Box sx={{ display: "flex", alignItems: "center", }}>

@@ -111,7 +111,7 @@ export default function WorkflowTreeView() {
       itemId={`task-${taskName}`}
       label={
         <Typography sx={{ fontWeight: 500 }}>
-          {taskName}
+          {!taskVariants[taskName] && taskName}
           {taskVariants[taskName] && (
             <Typography component="span" sx={{ fontWeight: 400, color: "text.secondary", ml: 1 }}>
               {taskVariants[taskName]}
