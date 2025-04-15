@@ -29,15 +29,17 @@ const WorkflowTab = () => {
  
   return (
     <Box sx={{height: "100%", display: "flex", flexDirection: "column", gap: 1}}>
-      <Box sx={{px: 2}}>
-        <StaticDirectedGraph
-          workflowSvg={tab?.workflowSvg.data || null}
-          params={tab?.workflowConfiguration.params}
-          handleOpenTask={function (taskName: string): void {
-            throw new Error("Function not implemented.")
-          }}
-        />
-      </Box>
+      {(tab?.workflowConfiguration?.tasks?.length ?? 0) > 0 &&
+        <Box sx={{px: 2}}>
+          <StaticDirectedGraph
+            workflowSvg={tab?.workflowSvg.data || null}
+            params={tab?.workflowConfiguration.params}
+            handleOpenTask={function (taskName: string): void {
+              throw new Error("Function not implemented.")
+            }}
+          />
+        </Box>
+      }
       <Box sx={{px: 2, pb: 1, height: "100%", display: "flex", direction: "row", gap: 1, overflow: "hidden"}}>
         <Paper elevation={2} sx={{ width: "25%", height: "100%", overflow: "auto" }}>
           <WorkflowTreeView />

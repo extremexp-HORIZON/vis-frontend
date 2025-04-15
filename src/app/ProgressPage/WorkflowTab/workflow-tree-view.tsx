@@ -126,17 +126,16 @@ export default function WorkflowTreeView() {
   }
 
 
-  const groupedByTask =
-    tab?.dataTaskTable.dataRows?.reduce(
-      (acc, row) => {
-        if (!acc[row.task]) acc[row.task] = []
-        acc[row.task].push(row)
-
-        return acc
-      },
-      {} as Record<string, DatasetRow[]>,
-    ) || {}
-
+  const groupedByTask = useMemo(() => {
+    if (!tab?.dataTaskTable?.dataRows) return {}
+  
+    return tab.dataTaskTable.dataRows.reduce((acc, row) => {
+      if (!acc[row.task]) acc[row.task] = []
+      acc[row.task].push(row)
+      return acc
+    }, {} as Record<string, DatasetRow[]>)
+  }, [tab?.dataTaskTable?.dataRows])
+  
 
   return (
     <Box sx={{ p: 2 }}>

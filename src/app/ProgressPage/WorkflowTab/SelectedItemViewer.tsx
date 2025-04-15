@@ -1,4 +1,4 @@
-import { Typography, Paper } from "@mui/material"
+import { Typography, Paper, Box } from "@mui/material"
 import { useAppSelector } from "../../../store/store"
 
 const SelectedItemViewer = () => {
@@ -6,7 +6,7 @@ const SelectedItemViewer = () => {
     state => state.workflowPage.tab?.dataTaskTable.selectedItem
   )
 
-  if (!selectedItem) return <Paper sx={{ p: 2, width: "100%" }}>No item selected</Paper>
+  if (!selectedItem) return <Box sx={{ height: "100%",width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>No item selected</Box>
 
   return (
     <>
