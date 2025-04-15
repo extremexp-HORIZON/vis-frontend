@@ -36,6 +36,9 @@ export const workflowPageSlice = createSlice({
     initTab: (state, action) => {
       state.tab = setTab(action.payload)
     },
+    resetWorkflowTab: (state) => {
+      state.tab = null
+    },
     setDataTable: (state, action) => {
       if(!state.tab) return
       state.tab.dataTaskTable = state.tab.dataTaskTable = {
@@ -262,7 +265,7 @@ export const fetchWorkflowMetrics = createAsyncThunk(
 
 
 //Reducer exports
-export const { initTab,setControls,setMetaData,setDataTable,setSelectedItem,setSelectedTask } =
+export const { initTab,resetWorkflowTab, setControls,setMetaData,setDataTable,setSelectedItem,setSelectedTask } =
   workflowPageSlice.actions
 
 export default workflowPageSlice.reducer

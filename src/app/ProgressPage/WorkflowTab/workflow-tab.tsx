@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import {  Paper } from "@mui/material"
-import { initTab } from "../../../store/slices/workflowPageSlice"
+import { initTab, resetWorkflowTab } from "../../../store/slices/workflowPageSlice"
 
 import StaticDirectedGraph from "./worfklow-flow-chart"
 import WorkflowTreeView from "./workflow-tree-view"
@@ -26,6 +26,11 @@ const WorkflowTab = () => {
     else dispatch(initTab({ tab: workflowId, workflows }))
   }, [workflows])
 
+  useEffect(() => {
+    return () => {
+      dispatch(resetWorkflowTab());
+    };
+  }, []);
  
   return (
     <Box sx={{height: "100%", display: "flex", flexDirection: "column", gap: 1}}>
