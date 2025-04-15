@@ -11,6 +11,9 @@ const SelectedItemViewer = () => {
         selectedDataset: null,
       },
   )
+  const tab = useAppSelector(state => state.workflowPage.tab)
+  console.log("tab",tab?.workflowConfiguration.params)
+
   if (selectedTask?.role === "TASK") {
     return (
       <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
@@ -57,17 +60,17 @@ const SelectedItemViewer = () => {
 
   if (selectedItem?.type === "DATASET" && selectedDataset) {
     return (
-      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
+      <Box sx={{ p:2, height: "96%", overflow: "auto" }}>
+        {/* <Typography variant="h6" sx={{ mb: 1 }}>
           {selectedItem.type} Details
         </Typography>
         <Divider sx={{ mb: 2 }} />
 
         <pre style={{ fontSize: 14 }}>
           {JSON.stringify(selectedItem.data, null, 2)}
-        </pre>
+        </pre> */}
         <DataExplorationComponent />
-      </Paper>
+      </Box>
     )
   }
   if (selectedItem?.type === "param") {
