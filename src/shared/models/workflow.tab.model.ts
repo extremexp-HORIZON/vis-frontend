@@ -41,6 +41,7 @@ export interface IWorkflowPageModel {
         parameters: { [key: string]: any }[]
         metrics: { [key: string]: any }[]
         selectedItem: { [key: string]: any } | null
+        selectedTask:  { [key: string]: any } | null
 
     }
 }
@@ -78,7 +79,9 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
         dataRows: [],
         parameters: [],
         metrics: [],
-        selectedItem: null, // <--- new
+        selectedItem: null, 
+        selectedTask: null, 
+
 
     }
 }

@@ -8,7 +8,7 @@ import DataObjectRoundedIcon from "@mui/icons-material/DataObjectRounded"
 import ImageRoundedIcon from "@mui/icons-material/ImageRounded"
 import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRounded"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
-import { setDataTable } from "../../../store/slices/workflowPageSlice"
+import { setDataTable, setSelectedTask } from "../../../store/slices/workflowPageSlice"
 import theme from "../../../mui-theme"
 
 import { setSelectedItem } from "../../../store/slices/workflowPageSlice"
@@ -29,10 +29,14 @@ export default function WorkflowTreeView() {
   const task = searchParams.get("task")
 
   const handleSelect = (id: number, source: string) => {
+    const dataset = tab?.dataTaskTable.dataRows.find(ds => ds.id === id)
+    if (dataset) {
+      dispatch(setSelectedItem({ type: "DATASET", data: dataset }))
+    }
+  
     dispatch(setDataTable({ selectedDataset: { id, source } }))
-    dispatch(setSelectedItem({ type: "dataset", data:id }))
-
   }
+  
 
   useEffect(() => {
     const dataAssets = !task
@@ -166,14 +170,30 @@ export default function WorkflowTreeView() {
 
           return (
             <TreeItem2
-              key={taskName}
-              itemId={`task-${taskName}`}
-              label={
-                <Typography sx={{ fontWeight: 500 }}>
-                  Task: {taskVariants[taskName]}
-                </Typography>
-              }
-            >
+  key={taskName}
+  itemId={`task-${taskName}`}
+  label={
+    <Box
+      onClick={() => {
+        dispatch(setSelectedTask({ name: taskName, variant: taskVariants[taskName] }))
+      }}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        px: 1,
+        py: 0.5,
+        borderRadius: 1,
+        cursor: "pointer",
+        bgcolor: "transparent",
+        "&:hover": { bgcolor: "action.hover" },
+      }}
+    >
+      <Typography sx={{ fontWeight: 500 }}>
+        Task: {taskVariants[taskName]}
+      </Typography>
+    </Box>
+  }
+>
               {/* Data Assets */}
               <TreeItem2
                 itemId={`task-${taskName}-assets`}
