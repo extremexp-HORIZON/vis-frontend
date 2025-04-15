@@ -35,9 +35,13 @@ export interface IWorkflowPageModel {
         explainabilityTask?: IExplainability | null;
         userInteraction?: IUserInteraction | null;
     }
-    dataAssetsTable: {
+    dataTaskTable: {
         selectedDataset: {id: number; source: string;} | null
-        rows: { [key: string]: any }[]
+        dataRows: { [key: string]: any }[]
+        parameters: { [key: string]: any }[]
+        metrics: { [key: string]: any }[]
+        selectedItem: { [key: string]: any } | null
+
     }
 }
 
@@ -69,8 +73,12 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
         explainabilityTask: null,
         userInteraction: null
     },
-    dataAssetsTable: {
+    dataTaskTable: {
         selectedDataset: null,
-        rows: [],
+        dataRows: [],
+        parameters: [],
+        metrics: [],
+        selectedItem: null, // <--- new
+
     }
 }

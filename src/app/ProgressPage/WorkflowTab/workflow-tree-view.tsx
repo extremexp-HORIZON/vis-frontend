@@ -10,6 +10,9 @@ import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRound
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
 import { setDataTable } from "../../../store/slices/workflowPageSlice"
 import theme from "../../../mui-theme"
+
+import { setSelectedItem } from "../../../store/slices/workflowPageSlice"
+
 type DatasetRow = {
   id: number
   dataset: string
@@ -27,6 +30,8 @@ export default function WorkflowTreeView() {
 
   const handleSelect = (id: number, source: string) => {
     dispatch(setDataTable({ selectedDataset: { id, source } }))
+    dispatch(setSelectedItem({ type: "dataset", data:id }))
+
   }
 
   useEffect(() => {
@@ -43,9 +48,38 @@ export default function WorkflowTreeView() {
         role: asset.role,
         format: asset.format,
       }))
-      dispatch(setDataTable({ rows }))
+      dispatch(setDataTable({ dataRows:rows }))
     }
   }, [tab?.workflowConfiguration.dataAssets, task])
+
+  useEffect(() => {
+    const params = tab?.workflowConfiguration.params
+    if (params && params.length > 0) {
+      const rows = params.map((param, index) => ({
+        id: index + 1,
+        dataset: param.name,
+        source: param.value,
+        task: param.task,
+        role: "PARAMETER",
+        format: null,
+      }))
+      dispatch(setDataTable({ parameters:rows }))
+    }
+  }, [tab?.workflowConfiguration.params])
+  useEffect(() => {
+    const metrics = tab?.workflowMetrics.data
+    if (metrics && metrics.length > 0) {
+      const rows = metrics.map((metric, index) => ({
+        id: index + 1,
+        dataset: metric.name,
+        source: metric.value,
+        task: metric.task,
+        role: "METRIC",
+        format: null,
+      }))
+      dispatch(setDataTable({ metrics:rows }))
+    }
+  }, [tab?.workflowMetrics.data])
 
   function getDatasetIcon(format: string | null | undefined) {
     if (!format || format.trim() === "") return
@@ -91,8 +125,9 @@ export default function WorkflowTreeView() {
     }
   }
 
+
   const groupedByTask =
-    tab?.dataAssetsTable.rows?.reduce(
+    tab?.dataTaskTable.dataRows?.reduce(
       (acc, row) => {
         if (!acc[row.task]) acc[row.task] = []
         acc[row.task].push(row)
@@ -192,8 +227,8 @@ export default function WorkflowTreeView() {
                       itemId={`param-${taskName}-${index}`}
                       label={
                         <Box
-                          onClick={() => console.log("Clicked param:", param)}
-                          sx={{
+                        onClick={() => dispatch(setSelectedItem({ type: "param", data: param }))}
+                        sx={{
                             px: 1,
                             py: 0.5,
                             borderRadius: 1,
@@ -225,8 +260,8 @@ export default function WorkflowTreeView() {
                       itemId={`metric-${taskName}-${index}`}
                       label={
                         <Box
-                          onClick={() => console.log("Clicked metric:", metric)}
-                          sx={{
+                        onClick={() => dispatch(setSelectedItem({ type: "metric", data: metric }))}
+                        sx={{
                             px: 1,
                             py: 0.5,
                             borderRadius: 1,
