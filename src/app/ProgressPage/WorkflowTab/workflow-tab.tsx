@@ -3,13 +3,15 @@ import { useEffect } from "react"
 import Typography from "@mui/material/Typography"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
-import { Tabs, Tab } from "@mui/material"
+import { Tabs, Tab, Paper } from "@mui/material"
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 import { initTab } from "../../../store/slices/workflowPageSlice"
 import WorkflowMetrics from "./workflow-metrics"
 import WorkflowDetails from "./workflow-details"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition"
 import DataTab from "../../Tasks/DataExplorationTask/ComponentContainer/data-exploration-data-tab"
+import StaticDirectedGraph from "./worfklow-flow-chart"
+import WorkflowTreeView from "./workflow-tree-view"
 
 const WorkflowTab = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -32,55 +34,68 @@ const WorkflowTab = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     const newParams = new URLSearchParams(searchParams.toString())
     newParams.set("tab", newValue)
-    navigate({ search: `?${newParams.toString()}` }, { replace: true })      
+    navigate({ search: `?${newParams.toString()}` }, { replace: true })
   }
-  
 
   return (
     <>
-      {/* Sticky Header with Tabs */}
-      <Box
-        sx={{
-          borderColor: theme => theme.palette.customGrey.main,
-          borderBottomWidth: 2,
-          borderBottomStyle: "solid",
-          width: "100%",
-          px: 2,
-        }}
-      >
-        <Tabs
-          value={selectedTab}
-          onChange={handleTabChange}
-        >
-          {!task && <Tab label="DETAILS" value="details" />}
-          <Tab label="METRICS" value="metrics" />
-          { !task && <Tab label="SYSTEM" value ="system" /> }
-          <Tab label="DATA" value="data"/>
-          { task && <Tab label="FEEDBACK" value ="feedback"/> }
-          { task && <Tab label="EXPLAΝΑTIONS" value ="explanations"/> }
-        </Tabs>
+      <Box padding={1}>
+        <StaticDirectedGraph
+          workflowSvg={tab?.workflowSvg.data || null}
+          params={tab?.workflowConfiguration.params}
+          handleOpenTask={function (taskName: string): void {
+            throw new Error("Function not implemented.")
+          }}
+        />
       </Box>
-
-      {/* Tab Content */}
-      <Box sx={{ overflow: "auto", px: 2, height: "100%" }}>
-        {selectedTab === "details" && (
-          <WorkflowDetails />
-        )}
-        {selectedTab === "metrics" && tab?.workflowMetrics?.data && (
-          <WorkflowMetrics />
-        )}
-        {selectedTab === "system" && <RuntimeDecomposition/>}
-
-        {selectedTab === "data" && (
-          <DataTab />
-        )}
-
-        {selectedTab === "feedback" && <Typography>Feedback Content</Typography>}
-
-        {selectedTab === "explanations" && <Typography>Explanations Content</Typography>}
+      <Box height={"99%"}>
+        <Paper sx={{ width: "25%", height: "100%", px: 2, overflow: "auto" }}>
+          <WorkflowTreeView />
+        </Paper>
       </Box>
     </>
   )
 }
 
 export default WorkflowTab
+
+// <Box
+// sx={{
+//   borderColor: theme => theme.palette.customGrey.main,
+//   borderBottomWidth: 2,
+//   borderBottomStyle: "solid",
+//   width: "100%",
+//   px: 2,
+// }}
+// >
+// <Tabs
+//   value={selectedTab}
+//   onChange={handleTabChange}
+// >
+//   {!task && <Tab label="DETAILS" value="details" />}
+//   <Tab label="METRICS" value="metrics" />
+//   { !task && <Tab label="SYSTEM" value ="system" /> }
+//   <Tab label="DATA" value="data"/>
+//   { task && <Tab label="FEEDBACK" value ="feedback"/> }
+//   { task && <Tab label="EXPLAΝΑTIONS" value ="explanations"/> }
+// </Tabs>
+// </Box>
+
+// {/* Tab Content */}
+// <Box sx={{ overflow: "auto", px: 2, height: "100%" }}>
+// {selectedTab === "details" && (
+//   <WorkflowDetails />
+// )}
+// {selectedTab === "metrics" && tab?.workflowMetrics?.data && (
+//   <WorkflowMetrics />
+// )}
+// {selectedTab === "system" && <RuntimeDecomposition/>}
+
+// {selectedTab === "data" && (
+//   <DataTab />
+// )}
+
+// {selectedTab === "feedback" && <Typography>Feedback Content</Typography>}
+
+// {selectedTab === "explanations" && <Typography>Explanations Content</Typography>}
+// </Box>

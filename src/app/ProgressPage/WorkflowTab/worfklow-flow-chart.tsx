@@ -280,7 +280,7 @@ function FlowGraph(props: IFlowGraphProps) {
   return (
     <div
       style={{
-        height: "30vh",
+        height: "15vh",
         width: "100%",
         border: "1px solid #ddd",
         borderRadius: "8px",
