@@ -3,7 +3,7 @@ import { useAppSelector } from "../../../store/store"
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 
 const SelectedItemViewer = () => {
-  const { selectedItem, selectedTask,selectedDataset } = useAppSelector(
+  const { selectedItem, selectedTask, selectedDataset } = useAppSelector(
     state =>
       state.workflowPage.tab?.dataTaskTable ?? {
         selectedItem: null,
@@ -11,39 +11,51 @@ const SelectedItemViewer = () => {
         selectedDataset: null,
       },
   )
-
-  if (selectedTask) {
+  if (selectedTask?.role === "TASK") {
     return (
       <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
           Task Overview
         </Typography>
         <Divider sx={{ mb: 2 }} />
-
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2">Name:</Typography>
-          <Typography>{selectedTask.name}</Typography>
-        </Box>
-
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2">Variant:</Typography>
-          <Typography>{selectedTask.variant}</Typography>
-        </Box>
-
-        {selectedTask.command && (
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2">Command:</Typography>
-            <Typography>{selectedTask.command}</Typography>
-          </Box>
-        )}
-
-        {/* You can add more fields if available like: runtime, env, etc */}
       </Paper>
     )
   }
 
-  if (selectedItem?.type==="DATASET" && selectedDataset) {
+  if (selectedTask?.role === "DATA_ASSETS") {
+    return (
+      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Data Overview
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+      </Paper>
+    )
+  }
 
+  if (selectedTask?.role === "Parameters") {
+    return (
+      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Variability Overview
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+      </Paper>
+    )
+  }
+
+  if (selectedTask?.role === "Metrics") {
+    return (
+      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Metrics Overview
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+      </Paper>
+    )
+  }
+
+  if (selectedItem?.type === "DATASET" && selectedDataset) {
     return (
       <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
@@ -54,12 +66,11 @@ const SelectedItemViewer = () => {
         <pre style={{ fontSize: 14 }}>
           {JSON.stringify(selectedItem.data, null, 2)}
         </pre>
-        <DataExplorationComponent/>
+        <DataExplorationComponent />
       </Paper>
     )
   }
-  if (selectedItem?.type==="param" ) {
-
+  if (selectedItem?.type === "param") {
     return (
       <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
@@ -73,8 +84,7 @@ const SelectedItemViewer = () => {
       </Paper>
     )
   }
-  if (selectedItem?.type==="metric" ) {
-
+  if (selectedItem?.type === "metric") {
     return (
       <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
