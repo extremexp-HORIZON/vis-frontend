@@ -1,12 +1,14 @@
 import { Paper, Typography, Divider, Box } from "@mui/material"
 import { useAppSelector } from "../../../store/store"
+import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 
 const SelectedItemViewer = () => {
-  const { selectedItem, selectedTask } = useAppSelector(
+  const { selectedItem, selectedTask,selectedDataset } = useAppSelector(
     state =>
       state.workflowPage.tab?.dataTaskTable ?? {
         selectedItem: null,
         selectedTask: null,
+        selectedDataset: null,
       },
   )
 
@@ -40,7 +42,39 @@ const SelectedItemViewer = () => {
     )
   }
 
-  if (selectedItem) {
+  if (selectedItem?.type==="DATASET" && selectedDataset) {
+
+    return (
+      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          {selectedItem.type} Details
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+
+        <pre style={{ fontSize: 14 }}>
+          {JSON.stringify(selectedItem.data, null, 2)}
+        </pre>
+        <DataExplorationComponent/>
+      </Paper>
+    )
+  }
+  if (selectedItem?.type==="param" ) {
+
+    return (
+      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          {selectedItem.type} Details
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+
+        <pre style={{ fontSize: 14 }}>
+          {JSON.stringify(selectedItem.data, null, 2)}
+        </pre>
+      </Paper>
+    )
+  }
+  if (selectedItem?.type==="metric" ) {
+
     return (
       <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1 }}>

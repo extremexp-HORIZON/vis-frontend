@@ -24,7 +24,7 @@ const DataExplorationComponent = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
   const dataExploration = tab?.workflowTasks.dataExploration
   const dispatch = useAppDispatch()
-  const selectedDataset = tab?.dataAssetsTable.selectedDataset?.source
+  const selectedDataset = tab?.dataTaskTable.selectedDataset?.source
 
   useEffect(() => {
     if (!tab?.workflowId) return // Ensure workflowId exists before dispatch
@@ -33,7 +33,7 @@ const DataExplorationComponent = () => {
       fetchMetaData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
+          datasetId: tab?.dataTaskTable.selectedDataset?.source || "",
         },
         metadata: {
           workflowId: tab.workflowId,
@@ -45,7 +45,7 @@ const DataExplorationComponent = () => {
       fetchDataExplorationData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
+          datasetId: tab?.dataTaskTable.selectedDataset?.source || "",
           limit: 100,
         },
         metadata: {
