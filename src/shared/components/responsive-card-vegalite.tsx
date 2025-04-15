@@ -132,7 +132,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   }
 
   return (
-    <Card sx={{ maxWidth: maxWidth, mx: "auto", mb: 1, boxShadow: 3 }}>
+    <Card sx={{ maxWidth: maxWidth, mx: "auto", mb: 1, boxShadow: 3, height: "100%", overflowY: "auto" }}>
       <CardHeader
         action={
           <>

@@ -14,10 +14,10 @@ interface ResponsiveVegaLiteProps {
 
 const ResponsiveVegaLite: React.FC<ResponsiveVegaLiteProps> = ({
   spec,
-  minWidth = 0,
-  minHeight = 0,
-  maxWidth = Infinity,
-  maxHeight = Infinity,
+  minWidth = 100,
+  minHeight = 100,
+  maxWidth = 2000,
+  maxHeight = 300,
   aspectRatio = 1, // Default aspect ratio (1:1 -> square)
   ...otherProps
 }) => {
@@ -56,7 +56,7 @@ const ResponsiveVegaLite: React.FC<ResponsiveVegaLiteProps> = ({
   return (
     <Box
       ref={containerRef}
-      sx={{ width: "100%", height: "100%", justifyContent: "center", m: 1 }}
+      sx={{ width: "100%", height: "100%", justifyContent: "center", mb: 1 }}
     >
       <VegaLite
         spec={{

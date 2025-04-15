@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, useTheme, useMediaQuery } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
 import { cloneDeep } from "lodash" // Import lodash for deep cloning
 import { useAppSelector } from "../../../../store/store"
@@ -29,6 +29,8 @@ const LineChart = (
   const [chartSpecs, setChartSpecs] = useState<any[]>([])
   const [dataCopy, setDataCopy] = useState<any[]>([]) // Define dataCopy here
   const { tab } = useAppSelector(state => state.workflowPage)
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
 
   useEffect(() => {
       const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis
@@ -57,9 +59,9 @@ const LineChart = (
           ],
           encoding: {
             x: {
-              field: xAxis.name,
-              type: getColumnType(xAxis.type), // Dynamically determine xAxis type
-              axis: { title: `${xAxis.name}` }, // Title for X-axis
+              field: xAxis?.name,
+              type: getColumnType(xAxis ? xAxis.type : ''), // Dynamically determine xAxis type
+              axis: { title: `${xAxis?.name}` }, // Title for X-axis
             },
             y: {
               field: "value", // Use the value field after folding
@@ -86,7 +88,7 @@ const LineChart = (
         setChartSpecs([spec]) // Set the single spec for overlay mode
       } else {
         // Stacked mode: Create separate specs for each Y-axis
-        const specs = yAxis.map(axis => ({
+        const specs = yAxis?.map(axis => ({
           mark: "line",
           // autosize: { type: "fit", contains: "padding", resize: true },
           // width: 1000,
@@ -103,9 +105,9 @@ const LineChart = (
           // height: 800 / yAxis.length, // Height for individual stacked charts
           encoding: {
             x: {
-              field: xAxis.name,
-              type: getColumnType(xAxis.type), // Dynamically determine xAxis type
-              axis: { title: `${xAxis.name}` }, // Title for X-axis
+              field: xAxis?.name,
+              type: getColumnType(xAxis ? xAxis.type : ''), // Dynamically determine xAxis type
+              axis: { title: `${xAxis?.name}` }, // Title for X-axis
             },
             y: {
               field: axis.name, // Each chart corresponds to one Y-axis
@@ -120,7 +122,7 @@ const LineChart = (
           },
           data: { name: "table" }, // Data for Vega-Lite
         }))
-        setChartSpecs(specs) // Set specs for all Y-axes in stacked mode
+        setChartSpecs(specs ?? []) // Set specs for all Y-axes in stacked mode
       }
     
   }, 
@@ -164,6 +166,7 @@ const LineChart = (
           infoMessage={info}
           showInfoMessage={shouldShowInfoMessage}
           maxHeight={650}
+          aspectRatio={isSmallScreen ? 1.9 : 1.4}
         />
       ))}
     </Box>

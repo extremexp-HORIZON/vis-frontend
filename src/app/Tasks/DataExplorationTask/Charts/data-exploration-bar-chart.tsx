@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Typography, useTheme, useMediaQuery } from "@mui/material"
 import Paper from "@mui/material/Paper"
 import { Vega } from "react-vega"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
@@ -6,6 +6,8 @@ import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalit
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
   console.log("bar",barAggregation,barGroupBy)
+    const theme = useTheme()
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
 
   if (
     (Array.isArray(barGroupBy) && barGroupBy.length === 0) ||
@@ -115,10 +117,14 @@ const BarChart = ({ dataExploration,barGroupBy,barAggregation }) => {
   
 
   return (
-    <>
-<ResponsiveVegaLite spec={specification} actions={false} style={{ overflowY: "auto", height: "850px" }}  height={800}
-          maxHeight={800} />
-</>
+    <Box sx={{height: "100%"}}>
+      <ResponsiveVegaLite 
+        spec={specification} 
+        actions={false} 
+        maxHeight={650}
+        aspectRatio={isSmallScreen ? 1.9 : 1.4}
+      />
+    </Box>
   )
 }
 
