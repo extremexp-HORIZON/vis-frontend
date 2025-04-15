@@ -22,6 +22,11 @@ import {
 import theme from "../../../mui-theme"
 
 import { setSelectedItem } from "../../../store/slices/workflowPageSlice"
+import InputIcon from "@mui/icons-material/Input"
+import OutputIcon from "@mui/icons-material/Output"
+import DatasetIcon from "@mui/icons-material/Dataset"
+import AssignmentIcon from "@mui/icons-material/Assignment"
+import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 
 type DatasetRow = {
   id: number
@@ -180,6 +185,7 @@ export default function WorkflowTreeView() {
 
           return (
             <TreeItem2
+            aria-expanded={true}
               key={taskName}
               itemId={`task-${taskName}`}
               label={
@@ -205,9 +211,15 @@ export default function WorkflowTreeView() {
                     "&:hover": { bgcolor: "action.hover" },
                   }}
                 >
-                  <Typography sx={{ fontWeight: 500 }}>
-                    Task: {taskVariants[taskName]}
-                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <AssignmentIcon
+                      fontSize="small"
+                      sx={{ mr: 1, color: theme.palette.primary.main }}
+                    />
+                    <Typography sx={{ fontWeight: 500 }}>
+                      Task: {taskVariants[taskName]}
+                    </Typography>
+                  </Box>
                 </Box>
               }
             >
@@ -236,9 +248,13 @@ export default function WorkflowTreeView() {
                       "&:hover": { bgcolor: "action.hover" },
                     }}
                   >
-                    <Typography sx={{ fontWeight: 500 }}>
-                      Data Assets
-                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <DatasetIcon
+                        fontSize="small"
+                        sx={{ mr: 1, color: theme.palette.primary.main }}
+                      />
+                      <Typography>Data Assets</Typography>
+                    </Box>
                   </Box>
                 }
               >
@@ -249,7 +265,13 @@ export default function WorkflowTreeView() {
                   <TreeItem2
                     itemId={`task-${taskName}-inputs`}
                     label={
-                      <Typography sx={{ fontWeight: 500 }}>Inputs</Typography>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <InputIcon
+                          fontSize="small"
+                          sx={{ mr: 1, color: theme.palette.primary.main }}
+                        />
+                        <Typography>Inputs</Typography>
+                      </Box>
                     }
                   >
                     {datasets
@@ -306,7 +328,13 @@ export default function WorkflowTreeView() {
                   <TreeItem2
                     itemId={`task-${taskName}-outputs`}
                     label={
-                      <Typography sx={{ fontWeight: 500 }}>Outputs</Typography>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <OutputIcon
+                          fontSize="small"
+                          sx={{ mr: 1, color: theme.palette.primary.main }}
+                        />
+                        <Typography>Outputs</Typography>
+                      </Box>
                     }
                   >
                     {datasets
@@ -383,9 +411,13 @@ export default function WorkflowTreeView() {
                         "&:hover": { bgcolor: "action.hover" },
                       }}
                     >
-                      <Typography sx={{ fontWeight: 500 }}>
-                        Parameters
-                      </Typography>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Grid3x3Icon
+                          fontSize="small"
+                          sx={{ mr: 1, color: theme.palette.primary.main }}
+                        />
+                        <Typography>Parameters</Typography>
+                      </Box>
                     </Box>
                   }
                 >

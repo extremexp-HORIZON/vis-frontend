@@ -100,11 +100,11 @@ const SelectedItemViewer = () => {
   }
 
   return (
-    <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+    <Box justifyContent={"center"} alignItems="center" display="flex" height="100%">
       <Typography variant="body1" color="text.secondary">
         No selection yet. Click a task or item to view its details.
       </Typography>
-    </Paper>
+    </Box>
   )
 }
 
