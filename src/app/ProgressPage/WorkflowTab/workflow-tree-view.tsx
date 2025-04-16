@@ -130,10 +130,10 @@ export default function WorkflowTreeView() {
 
     const seen = new Set<string>();
 
-    return tab.workflowConfiguration.tasks.reduce((acc: string[], task) => {
-      if (task.name && !seen.has(task.name)) {
-        seen.add(task.name);
-        acc.push(task.name);
+    return tab.workflowConfiguration.tasks.reduce((acc: { id: string, name: string }[], task) => {
+      if (task.name && !seen.has(task.id)) {
+        seen.add(task.id);
+        acc.push({id: task.id, name: task.name});
       }
       return acc;
     }, []);
@@ -150,15 +150,15 @@ export default function WorkflowTreeView() {
       {/* Adds a separator with some vertical margin */}
       {/* TreeView */}
       <SimpleTreeView defaultExpandedItems={["workflow-details", "tasks-root"]}>
-        {uniqueTasks.map((taskName) => {
+        {uniqueTasks.map(({id, name}) => {
           const paramsForTask =
             tab?.workflowConfiguration.params?.filter(
-              p => p.task === taskName,
+              p => p.task === id,
             ) || []
           const metricsForTask =
-            tab?.workflowMetrics.data?.filter(m => m.task === taskName) || []
+            tab?.workflowMetrics.data?.filter(m => m.task === id) || []
           const datasetsForTask = 
-            tab?.workflowConfiguration.dataAssets?.filter(d => d.task === taskName) || []
+            tab?.workflowConfiguration.dataAssets?.filter(d => d.task === id) || []
           const taskVariants: Record<string, string> =
             tab?.workflowConfiguration.tasks?.reduce(
               (acc, task) => {
@@ -172,8 +172,8 @@ export default function WorkflowTreeView() {
           return (
             <TreeItem2
             aria-expanded={true}
-              key={taskName}
-              itemId={`task-${taskName}`}
+              key={id}
+              itemId={`task-${id}`}
               label={
                 <Box
                   onClick={() => {
@@ -182,7 +182,7 @@ export default function WorkflowTreeView() {
                         type: "group",
                         role: "TASK",
                         data: datasetsForTask,
-                        task: taskName,
+                        task: id,
                       }),
                     )
                   }}
@@ -203,7 +203,7 @@ export default function WorkflowTreeView() {
                       sx={{ mr: 1, color: theme.palette.primary.main }}
                     />
                     <Typography sx={{ fontWeight: 500 }}>
-                      Task: {taskVariants[taskName] || taskName !== "null" ? taskName : ""}
+                      Task: {taskVariants[name] || name }
                     </Typography>
                   </Box>
                 </Box>
@@ -212,7 +212,7 @@ export default function WorkflowTreeView() {
               {/* Data Assets */}
               {datasetsForTask &&
               <TreeItem2
-                itemId={`task-${taskName}-assets`}
+                itemId={`task-${id}-assets`}
                 label={
                   <Box
                     onClick={() =>
@@ -221,7 +221,7 @@ export default function WorkflowTreeView() {
                           type: "group",
                           role: "DATA_ASSETS",
                           data: datasetsForTask, // the full list for that task
-                          task: taskName,
+                          task: id,
                         }),
                       )
                     }
@@ -250,7 +250,7 @@ export default function WorkflowTreeView() {
                   (ds) => ds.role === "INPUT",
                 ) && (
                   <TreeItem2
-                    itemId={`task-${taskName}-inputs`}
+                    itemId={`task-${id}-inputs`}
                     label={
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <InputIcon
@@ -266,8 +266,8 @@ export default function WorkflowTreeView() {
                       .map(
                         (ds, index) => (
                           <TreeItem2
-                            key={`input-${taskName}-${index}`}
-                            itemId={`input-ds-${taskName}-${index}`}
+                            key={`input-${id}-${index}`}
+                            itemId={`input-ds-${id}-${index}`}
                             label={
                               <Box
                                 onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
@@ -297,7 +297,7 @@ export default function WorkflowTreeView() {
                   (ds) => ds.role === "OUTPUT",
                 ) && (
                   <TreeItem2
-                    itemId={`task-${taskName}-outputs`}
+                    itemId={`task-${id}-outputs`}
                     label={
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <OutputIcon
@@ -313,8 +313,8 @@ export default function WorkflowTreeView() {
                       .map(
                         (ds, index) => (
                           <TreeItem2
-                            key={`output-${taskName}-${index}`}
-                            itemId={`output-ds-${taskName}-${index}`}
+                            key={`output-${id}-${index}`}
+                            itemId={`output-ds-${id}-${index}`}
                             label={
                               <Box
                                 onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
@@ -344,7 +344,7 @@ export default function WorkflowTreeView() {
               {/* Parameters */}
               {paramsForTask.length > 0 && (
                 <TreeItem2
-                  itemId={`task-${taskName}-parameters`}
+                  itemId={`task-${id}-parameters`}
                   label={
                     <Box
                       onClick={() =>
@@ -353,7 +353,7 @@ export default function WorkflowTreeView() {
                             type: "group",
                             role: "Parameters",
                             data: datasetsForTask, // the full list for that task
-                            task: taskName,
+                            task: id,
                           }),
                         )
                       }
@@ -380,7 +380,7 @@ export default function WorkflowTreeView() {
                   {paramsForTask.map((param, index) => (
                     <TreeItem2
                       key={`${param.name}-${index}`}
-                      itemId={`param-${taskName}-${index}`}
+                      itemId={`param-${id}-${index}`}
                       label={
                         <Box
                           onClick={() =>
@@ -409,7 +409,7 @@ export default function WorkflowTreeView() {
               {/* Metrics */}
               {metricsForTask.length > 0 && (
                 <TreeItem2
-                  itemId={`task-${taskName}-metrics`}
+                  itemId={`task-${id}-metrics`}
                   label={
                     <Box
                       onClick={() =>
@@ -418,7 +418,7 @@ export default function WorkflowTreeView() {
                             type: "group",
                             role: "Metrics",
                             data: datasetsForTask, // the full list for that task
-                            task: taskName,
+                            task: id,
                           }),
                         )
                       }
@@ -439,7 +439,7 @@ export default function WorkflowTreeView() {
                   {metricsForTask.map((metric, index) => (
                     <TreeItem2
                       key={`${metric.name}-${index}`}
-                      itemId={`metric-${taskName}-${index}`}
+                      itemId={`metric-${id}-${index}`}
                       label={
                         <Box
                           onClick={() =>

@@ -1,4 +1,7 @@
 export interface ITask {
+
+    id: string;
+    
     /** The name of the task. */
     name: string;
   
