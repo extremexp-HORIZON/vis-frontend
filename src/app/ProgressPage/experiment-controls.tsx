@@ -105,7 +105,7 @@ const ExperimentControls = () => {
                   <Box sx={{display: "flex", flexDirection: "row",alignItems: "center", gap: 1}}>
                     <Typography variant="body2">Status: {workflowStatus?.toLowerCase()}</Typography>
                     {workflowIcon}
-                    <Typography variant="body2">Completed Tasks: {completedTasks}/{taskLength}</Typography>
+                    {taskLength && <Typography variant="body2">Completed Tasks: {completedTasks}/{taskLength}</Typography>}
                   </Box>
                 </Box>
               </Box>

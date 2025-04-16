@@ -36,7 +36,6 @@ export interface IWorkflowPageModel {
         userInteraction?: IUserInteraction | null;
     }
     dataTaskTable: {
-        selectedDataset: {id: number; source: string;} | null
         dataRows: { [key: string]: any }[]
         parameters: { [key: string]: any }[]
         metrics: { [key: string]: any }[]
@@ -75,7 +74,6 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
         userInteraction: null
     },
     dataTaskTable: {
-        selectedDataset: null,
         dataRows: [],
         parameters: [],
         metrics: [],

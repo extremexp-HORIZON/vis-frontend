@@ -3,7 +3,7 @@ import { useAppSelector } from "../../../store/store"
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
 
 const SelectedItemViewer = () => {
-  const { selectedItem, selectedTask, selectedDataset } = useAppSelector(
+  const { selectedItem, selectedTask } = useAppSelector(
     state =>
       state.workflowPage.tab?.dataTaskTable ?? {
         selectedItem: null,
@@ -58,7 +58,7 @@ const SelectedItemViewer = () => {
     )
   }
 
-  if (selectedItem?.type === "DATASET" && selectedDataset) {
+  if (selectedItem?.type === "DATASET" ) {
     return (
       <Box sx={{ p:2, height: "96%", overflow: "auto" }}>
         {/* <Typography variant="h6" sx={{ mb: 1 }}>
