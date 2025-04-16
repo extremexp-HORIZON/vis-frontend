@@ -1,6 +1,7 @@
 import { Paper, Typography, Divider, Box } from "@mui/material"
 import { useAppSelector } from "../../../store/store"
 import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent"
+import { MetricBulletChart } from "./WorkflowMetricDetailsItems/metric-bullet-chart"
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -16,12 +17,15 @@ const SelectedItemViewer = () => {
 
   if (selectedTask?.role === "TASK") {
     return (
-      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+      <Box sx={{height: "100%"}}>
+        <Box sx={{ p: 3, overflow: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
           Task Overview
         </Typography>
         <Divider sx={{ mb: 2 }} />
-      </Paper>
+
+        </Box>
+      </Box>
     )
   }
 
@@ -89,16 +93,15 @@ const SelectedItemViewer = () => {
   }
   if (selectedItem?.type === "metric") {
     return (
-      <Paper sx={{ p: 3, height: "100%", overflow: "auto" }}>
+      <Box sx={{height: "100%"}}>
+        <Box sx={{ p: 3, overflow: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
-          {selectedItem.type} Details
+          {selectedItem.data.name} Details
         </Typography>
         <Divider sx={{ mb: 2 }} />
-
-        <pre style={{ fontSize: 14 }}>
-          {JSON.stringify(selectedItem.data, null, 2)}
-        </pre>
-      </Paper>
+        <MetricBulletChart />
+        </Box>
+      </Box>
     )
   }
 

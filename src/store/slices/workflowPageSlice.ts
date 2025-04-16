@@ -146,14 +146,18 @@ const workflowMetricsInitializer = ({
       (acc, metric) => acc + metric.value,
       0,
     )
+    const maxValue = Math.max(...filteredMetricsAll.map(metric => metric.value))
+    const minValue = Math.min(...filteredMetricsAll.map(metric => metric.value))
     return {
       name: metric.name,
       value: metric.value,
-      avgValue: metricsSum / filteredMetricsAll.length,
+      avgValue: Math.round((metricsSum / filteredMetricsAll.length) * 100) / 100,
       avgDiff:
         (metric.value * 100) /
           (metricsSum / filteredMetricsAll.length) -
         100,
+        maxValue: maxValue,
+        minValue: minValue,
       task: metric.task
     }
   })
