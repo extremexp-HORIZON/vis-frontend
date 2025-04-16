@@ -7,7 +7,7 @@ import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from "re-resizable"
-import { setSelectedTab } from "../../../store/slices/monitorPageSlice"
+import { setSelectedTab, setVisibleTable } from "../../../store/slices/monitorPageSlice"
 import { useDispatch } from "react-redux"
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
@@ -46,7 +46,14 @@ const MonitoringPage = () => {
       >
         <Tabs
           value={selectedTab}
-          onChange={(event, newValue) => dispatch(setSelectedTab(newValue))}
+          onChange={(event, newValue) => {
+            dispatch(setSelectedTab(newValue));
+          
+            if (newValue === 1) {
+              dispatch(setVisibleTable("workflows"));
+            }
+          }}
+          
           // aria-label="tab menu"
         >
           <Tab label="OVERVIEW" />
