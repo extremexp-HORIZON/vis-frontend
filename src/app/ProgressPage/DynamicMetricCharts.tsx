@@ -1,5 +1,7 @@
-import React, { useState } from "react"
-import { RootState, useAppSelector } from "../../store/store"
+import type React from "react";
+import { useState } from "react"
+import type { RootState} from "../../store/store";
+import { useAppSelector } from "../../store/store"
 import {
   Grid,
   Container,
@@ -22,7 +24,8 @@ const WorkflowCharts: React.FC = () => {
     (state: RootState) => state.monitorPage,
   )
   const [isMosaic, setIsMosaic] = useState(true)
-
+  const { hoveredWorkflowId } = workflowsTable;
+  
   const filteredWorkflows = (
     workflowsTable.groupBy.length > 0
       ? workflowsTable.aggregatedRows
@@ -30,13 +33,12 @@ const WorkflowCharts: React.FC = () => {
   ).filter(row => workflowsTable.selectedWorkflows.includes(row.id))
 
   
-
   const groupedMetrics: Record<string, IMetric[]> = workflowsTable.uniqueMetrics.reduce(
     (acc: any, metricName: string) => {
       acc[metricName] = []
 
       filteredWorkflows.forEach(workflow => {
-        if (workflow.hasOwnProperty(metricName)) {
+        if (Object.prototype.hasOwnProperty.call(workflow, metricName)) {
           acc[metricName].push({
             value: workflow[metricName],
             id: workflow.id,
@@ -66,7 +68,7 @@ const WorkflowCharts: React.FC = () => {
         x: {
           field: uniqueSteps.size === 1 ? "id" : "step",
           type: "ordinal",
-          axis: { labels: false,title:null }, // Hide x-axis labels
+          axis: { labels: false, title: null },
           scale: {
             paddingInner: 0.2,
             paddingOuter: 1,
@@ -75,24 +77,36 @@ const WorkflowCharts: React.FC = () => {
         y: {
           field: "value",
           type: "quantitative",
-          axis:{title:null},
+          axis: { title: null },
           scale: {
             domain: [
-              0, // Min value is 0 (or any other value you'd like)
-              Math.max(...metricSeries.map((d: any) => d.value)) * 1.05, // Max value with 10% padding
+              0,
+              Math.max(...metricSeries.map((d: any) => d.value)) * 1.05,
             ],
           },
-          
         },
         color: {
           field: "id",
           type: "nominal",
           scale: {
-            domain: workflowColorScale.map(w => w.id), // Workflow IDs
-            range: workflowColorScale.map(w => w.color), // Corresponding Colors
+            domain: workflowColorScale.map(w => w.id),
+            range: workflowColorScale.map(w => w.color),
           },
           legend: null,
         },
+        // Simplify the conditional encoding to maintain responsiveness
+        opacity: hoveredWorkflowId ? {
+          condition: { test: `datum.id === '${hoveredWorkflowId}'`, value: 1 },
+          value: 0.5
+        } : undefined,
+        // Only add these properties when needed
+        ...(hoveredWorkflowId ? {
+          strokeWidth: { value: 1 },
+          stroke: { 
+            condition: { test: `datum.id === '${hoveredWorkflowId}'`, value: "#868686" },
+            value: null 
+          }
+        } : {}),
         tooltip: [
           { field: "id", type: "nominal" },
           { field: "value", type: "quantitative" },

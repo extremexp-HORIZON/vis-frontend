@@ -15,6 +15,7 @@ interface IMonitoringPageSlice {
         rowsPerPage: number
         selectedWorkflows: string[]
         workflowColors: { [key: string]: string } // New mapping for workflow colors
+        hoveredWorkflowId: string | number | null; // Add this field
 
         filters: { column: string; operator: string; value: string }[]
         rows: { [key: string]: any }[]
@@ -87,6 +88,7 @@ const initialState: IMonitoringPageSlice = {
       rowsPerPage: 50,
       selectedWorkflows: [],
       workflowColors: {}, // Initialize the color mapping
+      hoveredWorkflowId: null, // Initialize as null
 
       filters: [{column: '', operator: '', value: ''}],
       rows: [],
@@ -186,9 +188,12 @@ export const monitoringPageSlice = createSlice({
     },
     setGroupBy: (state, action) => {
       state.workflowsTable.groupBy = action.payload
+    },
+    setHoveredWorkflow: (state, action) => {
+      state.workflowsTable.hoveredWorkflowId = action.payload;
     }
   }
 })
 
-export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, setGroupBy 
+export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, setGroupBy, setHoveredWorkflow 
 } = monitoringPageSlice.actions;

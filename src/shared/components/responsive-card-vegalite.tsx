@@ -9,7 +9,8 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react"
 import { VegaLite } from "react-vega"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { grey, red } from "@mui/material/colors"

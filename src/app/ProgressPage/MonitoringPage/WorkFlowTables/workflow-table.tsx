@@ -10,7 +10,7 @@ import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import LaunchIcon from "@mui/icons-material/Launch"
-import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection } from "../../../../store/slices/monitorPageSlice"
+import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow } from "../../../../store/slices/monitorPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
 import { useEffect, useState } from "react"
@@ -552,7 +552,21 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
               dispatch(setWorkflowsTable({ columnsVisibilityModel: model }))
             }          
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}
-            slotProps={{noRowsOverlay: {title: "No workflows available"}}}
+            slotProps={
+              {
+                noRowsOverlay: {title: "No workflows available"},
+                row: {
+                  onMouseEnter: (event) => {
+                    const rowId = event.currentTarget.getAttribute('data-id');
+                    dispatch(setHoveredWorkflow(rowId));
+                  },
+                  onMouseLeave: () => {
+                    dispatch(setHoveredWorkflow(null));
+                  }
+                }
+              }
+
+            }
             checkboxSelection
             onRowSelectionModelChange={handleSelectionChange}
             rowSelectionModel={workflowsTable.selectedWorkflows}

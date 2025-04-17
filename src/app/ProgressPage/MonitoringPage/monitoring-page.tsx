@@ -1,5 +1,6 @@
 import { Box, Tab, Tabs, Paper } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom"
+import { useEffect, useState } from "react"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
@@ -7,7 +8,7 @@ import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from "re-resizable"
-import { setSelectedTab, setVisibleTable } from "../../../store/slices/monitorPageSlice"
+import { setHoveredWorkflow, setSelectedTab, setVisibleTable } from "../../../store/slices/monitorPageSlice"
 import { useDispatch } from "react-redux"
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
@@ -138,7 +139,9 @@ const MonitoringPage = () => {
                 )
               }}
             >
-              <WorkflowTable handleChange={handleChange} />
+              <WorkflowTable 
+                handleChange={handleChange}
+              />
             </Resizable>
             <Paper elevation={2} sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px"}}>
                 <WorkflowCharts />
