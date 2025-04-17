@@ -7,12 +7,12 @@ import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
-import { ITask } from "../../../shared/models/experiment/task.model"
-import { IParam } from "../../../shared/models/experiment/param.model"
+import { ITask } from "../../../../shared/models/experiment/task.model"
+import { IParam } from "../../../../shared/models/experiment/param.model"
 import LaunchIcon from "@mui/icons-material/Launch"
 import { IconButton, Tooltip } from "@mui/material"
 
-import theme from "../../../mui-theme"
+import theme from "../../../../mui-theme"
 
 interface ITaskConfiguration {
   configuration: ITask[] | null

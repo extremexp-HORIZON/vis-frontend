@@ -27,6 +27,7 @@ import OutputIcon from "@mui/icons-material/Output"
 import DatasetIcon from "@mui/icons-material/Dataset"
 import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -182,7 +183,9 @@ export default function WorkflowTreeView() {
                         type: "group",
                         role: "TASK",
                         data: datasetsForTask,
-                        task: id,
+                        task: name,
+                        taskId: id,
+                        variant: taskVariants[name]
                       }),
                     )
                   }}
@@ -215,16 +218,16 @@ export default function WorkflowTreeView() {
                 itemId={`task-${id}-assets`}
                 label={
                   <Box
-                    onClick={() =>
-                      dispatch(
-                        setSelectedTask({
-                          type: "group",
-                          role: "DATA_ASSETS",
-                          data: datasetsForTask, // the full list for that task
-                          task: id,
-                        }),
-                      )
-                    }
+                    // onClick={() =>
+                    //   dispatch(
+                    //     setSelectedTask({
+                    //       type: "group",
+                    //       role: "DATA_ASSETS",
+                    //       data: datasetsForTask, // the full list for that task
+                    //       task: id,
+                    //     }),
+                    //   )
+                    // }
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -347,16 +350,16 @@ export default function WorkflowTreeView() {
                   itemId={`task-${id}-parameters`}
                   label={
                     <Box
-                      onClick={() =>
-                        dispatch(
-                          setSelectedTask({
-                            type: "group",
-                            role: "Parameters",
-                            data: datasetsForTask, // the full list for that task
-                            task: id,
-                          }),
-                        )
-                      }
+                      // onClick={() =>
+                      //   dispatch(
+                      //     setSelectedTask({
+                      //       type: "group",
+                      //       role: "Parameters",
+                      //       data: datasetsForTask, // the full list for that task
+                      //       task: id,
+                      //     }),
+                      //   )
+                      // }
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -412,16 +415,16 @@ export default function WorkflowTreeView() {
                   itemId={`task-${id}-metrics`}
                   label={
                     <Box
-                      onClick={() =>
-                        dispatch(
-                          setSelectedTask({
-                            type: "group",
-                            role: "Metrics",
-                            data: datasetsForTask, // the full list for that task
-                            task: id,
-                          }),
-                        )
-                      }
+                      // onClick={() =>
+                      //   dispatch(
+                      //     setSelectedTask({
+                      //       type: "group",
+                      //       role: "Metrics",
+                      //       data: datasetsForTask, // the full list for that task
+                      //       task: id,
+                      //     }),
+                      //   )
+                      // }
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -432,7 +435,13 @@ export default function WorkflowTreeView() {
                         "&:hover": { bgcolor: "action.hover" },
                       }}
                     >
-                      <Typography sx={{ fontWeight: 500 }}>Metrics</Typography>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <BarChartIcon
+                          fontSize="small"
+                          sx={{ mr: 1, color: theme.palette.primary.main }}
+                        />
+                        <Typography sx={{ fontWeight: 500 }}>Metrics</Typography>
+                      </Box>
                     </Box>
                   }
                 >
@@ -456,7 +465,7 @@ export default function WorkflowTreeView() {
                           }}
                         >
                           <Typography variant="body2">
-                            {metric.name}: {metric.value}
+                            {metric.name}: {Math.round(metric.value * 100) / 100}
                           </Typography>
                         </Box>
                       }
@@ -470,7 +479,6 @@ export default function WorkflowTreeView() {
 
         {/* Fallback for null-task entries if no unique tasks. Supporting mlflow */}
         {uniqueTasks.length === 0 && (() => {
-          const fallbackTaskName = "Unassigned";
           const nullTask = (val: any) => val.task == null;
         
           const fallbackParams = tab?.workflowConfiguration.params?.filter(nullTask) || [];
@@ -484,17 +492,7 @@ export default function WorkflowTreeView() {
           ) return null;
         
           return (
-            <TreeItem2
-              itemId="task-null"
-              label={
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <AssignmentIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
-                  <Typography sx={{ fontWeight: 500 }}>
-                    Task: {fallbackTaskName}
-                  </Typography>
-                </Box>
-              }
-            >
+              <>
               {/* Data Assets */}
               {fallbackDatasets.length > 0 && (
                 <TreeItem2
@@ -626,6 +624,10 @@ export default function WorkflowTreeView() {
                   itemId="task-null-metrics"
                   label={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <BarChartIcon
+                        fontSize="small"
+                        sx={{ mr: 1, color: theme.palette.primary.main }}
+                      />
                       <Typography sx={{ fontWeight: 500 }}>Metrics</Typography>
                     </Box>
                   }
@@ -645,7 +647,7 @@ export default function WorkflowTreeView() {
                           }}
                         >
                           <Typography variant="body2">
-                            {metric.name}: {metric.value}
+                            {metric.name}: {Math.round(metric.value * 100) / 100}
                           </Typography>
                         </Box>
                       }
@@ -653,7 +655,7 @@ export default function WorkflowTreeView() {
                   ))}
                 </TreeItem2>
               )}
-            </TreeItem2>
+            </>
           );
         })()}
       </SimpleTreeView>

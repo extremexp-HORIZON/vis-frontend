@@ -22,10 +22,12 @@ import { experimentApi } from "../../app/api/api"
 
 export interface IWorkflowPage {
   tab: IWorkflowPageModel | null
+  isTabInitialized: boolean;
 }
 
 const initialState: IWorkflowPage = {
   tab: null,
+  isTabInitialized: false
 }
 
 // explainabilitySlice
@@ -35,9 +37,11 @@ export const workflowPageSlice = createSlice({
   reducers: {
     initTab: (state, action) => {
       state.tab = setTab(action.payload)
+      state.isTabInitialized = true
     },
     resetWorkflowTab: (state) => {
       state.tab = null
+      state.isTabInitialized = false
     },
     setDataTable: (state, action) => {
       if(!state.tab) return
@@ -151,7 +155,7 @@ const workflowMetricsInitializer = ({
     return {
       name: metric.name,
       value: metric.value,
-      avgValue: Math.round((metricsSum / filteredMetricsAll.length) * 100) / 100,
+      avgValue: (metricsSum / filteredMetricsAll.length),
       avgDiff:
         (metric.value * 100) /
           (metricsSum / filteredMetricsAll.length) -

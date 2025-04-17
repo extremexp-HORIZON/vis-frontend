@@ -165,8 +165,8 @@ const LineChart = (
           blinkOnStart={true}
           infoMessage={info}
           showInfoMessage={shouldShowInfoMessage}
-          maxHeight={650}
-          aspectRatio={isSmallScreen ? 1.9 : 1.4}
+          maxHeight={500}
+          aspectRatio={isSmallScreen ? 2.8 : 1.8}
         />
       ))}
     </Box>
