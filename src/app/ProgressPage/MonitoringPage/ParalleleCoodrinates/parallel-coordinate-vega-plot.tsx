@@ -175,12 +175,10 @@ const ParallelCoordinateVega = ({
   }
   const numericFilteredData = processedData.filter((row: any) => {
     // Check every field in foldArray and the selected field
-    const allKeys = [...foldArray.current, progressParallel.selected]
-    return allKeys.every(key => {
-      const val = Number(row[key])
-      return !isNaN(val)
-    })
-  })  
+    const key = progressParallel.selected
+    const val = Number(row[key])
+    return !isNaN(val)
+  }) 
 
   return (
     <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
