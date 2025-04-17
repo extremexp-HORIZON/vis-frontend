@@ -15,7 +15,14 @@ import {
   Checkbox,
   List,
   ListItemButton,
-  Badge
+  Badge,
+  Paper,
+  Divider,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Switch,
+  ButtonGroup
 } from "@mui/material"
 import type {
   RootState} from "../../../../store/store";
@@ -33,6 +40,11 @@ import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import { useState } from "react"
 import PivotTableChartRoundedIcon from "@mui/icons-material/PivotTableChartRounded"
 import ViewColumnIcon from "@mui/icons-material/ViewColumn"
+import CheckBoxIcon from "@mui/icons-material/CheckBox"
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
+import TableRowsIcon from "@mui/icons-material/TableRows"
+import CategoryIcon from "@mui/icons-material/Category"
+import ClearAllIcon from "@mui/icons-material/ClearAll"
 
 interface ToolBarWorkflowProps {
   filterNumbers: number
@@ -94,6 +106,52 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
       onFilterChange(index, '', '', '');
     }
   }
+
+  // Custom header component for popover sections
+  const SectionHeader = ({
+    icon,
+    title,
+  }: {
+    icon: React.ReactNode
+    title: string
+  }) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        borderBottom: `1px solid rgba(0, 0, 0, 0.08)`,
+        px: 2,
+        py: 1.5,
+        background: 'linear-gradient(to right, #f1f5f9, #f8fafc)',
+        borderTopLeftRadius: '10px',
+        borderTopRightRadius: '10px',
+        margin: 0,
+        width: '100%',
+      }}
+    >
+      <Box sx={{ 
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#3566b5',
+        mr: 1.5
+      }}>
+        {icon}
+      </Box>
+      <Typography
+        variant="subtitle1"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          fontWeight: 600,
+          color: '#1e3a5f',
+          letterSpacing: '0.3px',
+        }}
+      >
+        {title}
+      </Typography>
+    </Box>
+  )
 
   return (
     <Toolbar
@@ -214,118 +272,179 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               anchorEl={anchorEl}
               onClose={handleClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              sx={{maxHeight: "400px"}}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  width: 300,
+                  maxHeight: 500,
+                  overflow: "hidden",
+                  padding: 0,
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  mt: 1,
+                  "& .MuiList-root": {
+                    padding: 0,
+                  }
+                },
+              }}
             >
-              <Box
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  maxheight: "250px",
-                }}
-              >
+              <SectionHeader icon={<TableRowsIcon fontSize="small" />} title="Visible Columns" />
+              
+              <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
                 {visibleTable === "workflows"
                   ? workflowsTable.visibleColumns.map(column => (
-                      <FormControlLabel
+                      <ListItem 
                         key={column.field}
-                        control={
-                          <Checkbox
-                            checked={
-                              workflowsTable.columnsVisibilityModel[
-                                column.field
-                              ] ?? true
-                            }
-                            onChange={() => {
-                              dispatch(
-                                setWorkflowsTable({
-                                  columnsVisibilityModel: {
-                                    ...workflowsTable.columnsVisibilityModel,
-                                    [column.field]:
-                                      !workflowsTable.columnsVisibilityModel[
-                                        column.field
-                                      ],
-                                  },
-                                }),
-                              )
-                            }}
+                        disablePadding
+                        sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+                      >
+                        <ListItemButton 
+                          onClick={() => {
+                            dispatch(
+                              setWorkflowsTable({
+                                columnsVisibilityModel: {
+                                  ...workflowsTable.columnsVisibilityModel,
+                                  [column.field]:
+                                    !workflowsTable.columnsVisibilityModel[
+                                      column.field
+                                    ],
+                                },
+                              }),
+                            )
+                          }}
+                          dense
+                        >
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            {workflowsTable.columnsVisibilityModel[column.field] !== false ? (
+                              <CheckBoxIcon color="primary" fontSize="small" />
+                            ) : (
+                              <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={column.headerName} 
+                            primaryTypographyProps={{ fontSize: '0.95rem' }} 
                           />
-                        }
-                        label={column.headerName}
-                      />
+                        </ListItemButton>
+                      </ListItem>
                     ))
                   : scheduledTable.columns.map(column => (
-                      <FormControlLabel
+                      <ListItem 
                         key={column.field}
-                        control={
-                          <Checkbox
-                            checked={
-                              scheduledTable.columnsVisibilityModel[
-                                column.field
-                              ] ?? true
-                            }
-                            onChange={() => {
-                              dispatch(
-                                setScheduledTable({
-                                  columnsVisibilityModel: {
-                                    ...scheduledTable.columnsVisibilityModel,
-                                    [column.field]:
-                                      !scheduledTable.columnsVisibilityModel[
-                                        column.field
-                                      ],
-                                  },
-                                }),
-                              )
-                            }}
+                        disablePadding
+                        sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+                      >
+                        <ListItemButton 
+                          onClick={() => {
+                            dispatch(
+                              setScheduledTable({
+                                columnsVisibilityModel: {
+                                  ...scheduledTable.columnsVisibilityModel,
+                                  [column.field]:
+                                    !scheduledTable.columnsVisibilityModel[
+                                      column.field
+                                    ],
+                                },
+                              }),
+                            )
+                          }}
+                          dense
+                        >
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            {scheduledTable.columnsVisibilityModel[column.field] !== false ? (
+                              <CheckBoxIcon color="primary" fontSize="small" />
+                            ) : (
+                              <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={column.headerName}
+                            primaryTypographyProps={{ fontSize: '0.95rem' }}
                           />
-                        }
-                        label={column.headerName}
-                      />
+                        </ListItemButton>
+                      </ListItem>
                     ))}
-              </Box>
+              </List>
             </Popover>
             <Popover
               open={Boolean(anchorElGroup)}
               anchorEl={anchorElGroup}
               onClose={handleGroupClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              sx={{maxHeight: "400px"}}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  width: 300,
+                  maxHeight: 500,
+                  overflow: "hidden",
+                  padding: 0,
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  mt: 1,
+                  "& .MuiList-root": {
+                    padding: 0,
+                  }
+                },
+              }}
             >
-              <Box
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  maxheight: "250px",
-                }}
-              >
+              <SectionHeader icon={<CategoryIcon fontSize="small" />} title="Group By" />
+              
+              <List sx={{ width: '100%', py: 0, maxHeight: 300, overflow: 'auto' }}>
                 {groupByOptions?.map(option => (
-                  <FormControlLabel
+                  <ListItem 
                     key={option}
-                    control={
-                      <Checkbox
-                        checked={workflowsTable.groupBy.includes(option)}
-                        onChange={() => {
-                          dispatch(
-                            setGroupBy(
-                              workflowsTable.groupBy.includes(option)
-                                ? workflowsTable.groupBy.filter(
-                                    p => p !== option,
-                                  )
-                                : [...workflowsTable.groupBy, option],
-                            ),
-                          )
-                        }}
+                    disablePadding
+                    sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+                  >
+                    <ListItemButton 
+                      onClick={() => {
+                        dispatch(
+                          setGroupBy(
+                            workflowsTable.groupBy.includes(option)
+                              ? workflowsTable.groupBy.filter(p => p !== option)
+                              : [...workflowsTable.groupBy, option],
+                          ),
+                        )
+                      }}
+                      dense
+                    >
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        {workflowsTable.groupBy.includes(option) ? (
+                          <CheckBoxIcon color="primary" fontSize="small" />
+                        ) : (
+                          <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                        )}
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={option} 
+                        primaryTypographyProps={{ fontSize: '0.95rem' }} 
                       />
-                    }
-                    label={option}
-                  />
+                    </ListItemButton>
+                  </ListItem>
                 ))}
-                {workflowsTable.groupBy.length > 0 && (
-                  <Button onClick={() => dispatch(setGroupBy([]))}>
+              </List>
+              
+              {workflowsTable.groupBy.length > 0 && (
+                <Box sx={{ 
+                  p: 2, 
+                  display: 'flex', 
+                  justifyContent: 'center',
+                  borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                  background: '#f8f9fa'
+                }}>
+                  <Button 
+                    onClick={() => dispatch(setGroupBy([]))}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    startIcon={<ClearAllIcon />}
+                  >
                     Clear Grouping
                   </Button>
-                )}
-              </Box>
+                </Box>
+              )}
             </Popover>
           </Box>
         </Box>
