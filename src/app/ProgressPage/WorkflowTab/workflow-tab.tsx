@@ -3,20 +3,18 @@ import { useEffect } from "react"
 import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import {  Paper } from "@mui/material"
-import { initTab, resetWorkflowTab } from "../../../store/slices/workflowPageSlice"
+import { fetchWorkflowMetrics, initTab, resetWorkflowTab } from "../../../store/slices/workflowPageSlice"
 
 import StaticDirectedGraph from "./worfklow-flow-chart"
 import WorkflowTreeView from "./workflow-tree-view"
 import SelectedItemViewer from "./SelectedItemViewer"
 
 const WorkflowTab = () => {
-  const { tab } = useAppSelector((state: RootState) => state.workflowPage)
+  const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const workflowId = searchParams.get("workflowId")
-  const task = searchParams.get("task")
-  const tabParam = searchParams.get("tab")
   const dispatch = useAppDispatch()
   const { experimentId } = useParams()
 
@@ -25,6 +23,14 @@ const WorkflowTab = () => {
       navigate(`/${experimentId}/monitoring`)
     else dispatch(initTab({ tab: workflowId, workflows }))
   }, [workflows])
+
+  useEffect(() => {
+    const metricNames = tab?.workflowMetrics.data?.map((m) => m.name)
+    if (experimentId && workflowId && metricNames && isTabInitialized) {
+      dispatch(fetchWorkflowMetrics({experimentId, workflowId, metricNames}))
+    }
+  },[isTabInitialized])
+  
 
   useEffect(() => {
     return () => {

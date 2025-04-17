@@ -11,10 +11,10 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import green from "@mui/material/colors/green"
 import red from "@mui/material/colors/red"
-import { RootState, useAppSelector } from "../../../store/store"
+import { RootState, useAppSelector } from "../../../../store/store"
 import { useSearchParams } from "react-router-dom"
 
-import theme from "../../../mui-theme"
+import theme from "../../../../mui-theme"
 
 const WorkflowMetricsTable = () => {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)

@@ -1,10 +1,10 @@
 import { Box, Typography } from "@mui/material"
-import StaticDirectedGraph from "./worfklow-flow-chart"
+import StaticDirectedGraph from "../worfklow-flow-chart"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
-import { useAppSelector, RootState } from "../../../store/store"
+import { useAppSelector, RootState } from "../../../../store/store"
 import { useLocation, useNavigate } from "react-router-dom"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
-import InfoMessage from "../../../shared/components/InfoMessage"
+import InfoMessage from "../../../../shared/components/InfoMessage"
 
 const WorkflowDetails = () => {
     const { tab } = useAppSelector((state: RootState) => state.workflowPage)

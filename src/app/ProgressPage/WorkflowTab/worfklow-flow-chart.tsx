@@ -134,7 +134,7 @@ function FlowGraph(props: IFlowGraphProps) {
     if (workflowSvg && Array.isArray(workflowSvg.tasks) && workflowSvg.tasks.length > 0) {
       //Nodes and Edges initialization
       const taskNodes = workflowSvg?.tasks?.map((task, index) => {
-        const matchingParams = params?.filter(param => param.task === task.name) || []
+        const matchingParams = params?.filter(param => param.task === task.id) || []
         const paramNames = matchingParams.map(p => p.name).join(", ")      
         return {
         id: task.name,

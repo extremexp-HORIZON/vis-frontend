@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material"
 import MetricEvaluation from "./WorkflowMetricDetailsItems/metric-evaluation"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition";
-import { ITask } from "../../../shared/models/experiment/task.model";
+import { ITask } from "../../../../shared/models/experiment/task.model";
 
 
 interface Metric {

@@ -126,7 +126,7 @@
 // export default WorkflowMetrics
 
 import { Box, Typography } from "@mui/material"
-import WorkflowMetricsTable from "./workflow-metrics-table"
+import WorkflowMetricsTable from "./Deprecated/workflow-metrics-table"
 import WorkflowTrends from "./workflow-metrics-trend"
 import { useAppSelector, RootState } from "../../../store/store"
 import { useSearchParams } from "react-router-dom"
