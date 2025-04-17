@@ -252,7 +252,7 @@ export const fetchWorkflowMetrics = createAsyncThunk(
       
     const results = await Promise.allSettled(
       metricNames.map((name) => {
-        const requestUrl = `${experimentId}/runs/${workflowId}/metrics/${name}`;
+        const requestUrl = `${experimentId}/runs/${workflowId}/metrics-all/${name}`;
         return experimentApi.get(requestUrl).then((response) => ({
           name,
           data: response.data,

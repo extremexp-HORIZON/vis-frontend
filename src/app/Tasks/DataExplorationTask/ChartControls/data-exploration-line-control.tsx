@@ -59,7 +59,6 @@ const LineChartControlPanel = () => {
         sx={{
           display: "flex",
           gap: "1rem",
-          marginTop: "1rem",
           flexDirection: "column",
         }}
       >
@@ -67,6 +66,7 @@ const LineChartControlPanel = () => {
         <FormControl fullWidth>
           <InputLabel id="x-axis-select-label">X-Axis</InputLabel>
           <Select
+            size="small"
             labelId="x-axis-select-label"
             value={xAxis?.name || ""}
             onChange={handleXAxisChange}
@@ -87,6 +87,7 @@ const LineChartControlPanel = () => {
         <FormControl fullWidth>
           <InputLabel id="y-axis-multi-select-label">Y-Axis</InputLabel>
           <Select
+          size="small"
             labelId="y-axis-multi-select-label"
             multiple
             value={yAxis.map(col => col.name)}
@@ -120,6 +121,7 @@ const LineChartControlPanel = () => {
             variant="contained"
             aria-label="view mode"
             sx={{ height: "36px" }}
+            size="small"
           >
             <Button
               color={viewMode === "overlay" ? "primary" : "inherit"}

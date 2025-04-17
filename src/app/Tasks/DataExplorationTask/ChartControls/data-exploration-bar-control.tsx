@@ -71,7 +71,6 @@ const BarChartControlPanel = () => {
         sx={{
           display: "flex",
           gap: "1rem",
-          marginTop: "1rem",
           flexDirection: "column",
         }}
       >
@@ -127,6 +126,7 @@ const BarChartControlPanel = () => {
         <FormControl fullWidth>
           <InputLabel>Value</InputLabel>
           <Select
+            size="small"
             label="Value"
             value={selectedColumn || ""}
             onChange={e => setSelectedColumn(e.target.value as string)}
@@ -149,6 +149,7 @@ const BarChartControlPanel = () => {
           <FormControl fullWidth>
             <InputLabel>Aggregations</InputLabel>
             <Select
+              size="small"
               label="Aggregations"
               multiple
               value={
@@ -171,6 +172,7 @@ const BarChartControlPanel = () => {
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                   {selected.map((value: string) => (
                     <Chip
+                      size="small"
                       key={value}
                       label={value}
                       onDelete={() =>
