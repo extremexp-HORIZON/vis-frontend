@@ -144,7 +144,12 @@ const ParallelCoordinateVega = ({
       },
       domainMin: selectedLastColumnMin,
       domainMax: selectedLastColumnMax,
-      range: (scheme("category20") ?? []).slice(0, 4),
+      range: [
+        scheme("category20")[0],
+        scheme("category20")[1],
+        scheme("category20")[5],
+        scheme("category20")[2],
+      ],
     })
   }
   
@@ -175,9 +180,7 @@ const ParallelCoordinateVega = ({
       const val = Number(row[key])
       return !isNaN(val)
     })
-  })
-  console.log(numericFilteredData)
-  
+  })  
 
   return (
     <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
