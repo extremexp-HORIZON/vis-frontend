@@ -158,7 +158,7 @@ const WorkflowTrends = () => {
         container
         justifyContent="flex-end" // Align to the right
         alignItems="center"
-        sx={{ marginBottom: 2 }}
+        sx={{ marginBottom: 2, }}
       >
         <ButtonGroup
           variant="contained"
@@ -179,7 +179,7 @@ const WorkflowTrends = () => {
             color="primary"
             onClick={() => setIsMosaic(false)}
           >
-            One Row
+            List
           </Button>
         </ButtonGroup>
       </Grid>

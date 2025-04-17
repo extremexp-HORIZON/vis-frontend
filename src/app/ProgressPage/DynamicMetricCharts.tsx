@@ -68,7 +68,7 @@ const WorkflowCharts: React.FC = () => {
         x: {
           field: uniqueSteps.size === 1 ? "id" : "step",
           type: "ordinal",
-          axis: { labels: false, title: null },
+          axis: { labels: false, title: uniqueSteps.size === 1 ? "Workflow" : "Step" },
           scale: {
             paddingInner: 0.2,
             paddingOuter: 1,
@@ -77,7 +77,7 @@ const WorkflowCharts: React.FC = () => {
         y: {
           field: "value",
           type: "quantitative",
-          axis: { title: null },
+          axis: { title: metricName },
           scale: {
             domain: [
               0,
@@ -144,7 +144,7 @@ const WorkflowCharts: React.FC = () => {
   }
 
   return (
-    <Container maxWidth={false} >
+    <Container maxWidth={false} sx={{padding: 2}} >
       <Grid
         container
         justifyContent="flex-end" // Align to the right
@@ -170,7 +170,7 @@ const WorkflowCharts: React.FC = () => {
             color="primary"
             onClick={() => setIsMosaic(false)}
           >
-            One Row
+           Stacked
           </Button>
         </ButtonGroup>
       </Grid>
