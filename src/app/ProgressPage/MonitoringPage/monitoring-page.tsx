@@ -8,7 +8,7 @@ import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from "re-resizable"
-import { setHoveredWorkflow, setSelectedTab, setVisibleTable } from "../../../store/slices/monitorPageSlice"
+import { setSelectedTab, setVisibleTable } from "../../../store/slices/monitorPageSlice"
 import { useDispatch } from "react-redux"
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';

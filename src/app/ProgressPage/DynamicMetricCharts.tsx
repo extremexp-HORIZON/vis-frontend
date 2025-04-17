@@ -41,7 +41,7 @@ const WorkflowCharts: React.FC = () => {
         if (Object.prototype.hasOwnProperty.call(workflow, metricName)) {
           acc[metricName].push({
             value: workflow[metricName],
-            id: workflow.id,
+            id: workflow.id.toString(),
             metricName,
             step: workflow.step ?? 0, // Fallback to 0 if step is missing
           })
@@ -58,8 +58,8 @@ const WorkflowCharts: React.FC = () => {
     const uniqueSteps = new Set(metricSeries.map(m => m.step))
     const workflowColorMap = workflowsTable.workflowColors
     const workflowColorScale = filteredWorkflows.map(wf => ({
-      id: wf.id,
-      color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
+      id: wf.id.toString(),
+      color: workflowColorMap[wf.id.toString()] || "#000000", // Default to black if not found
     }))
 
     const chartSpec = {
