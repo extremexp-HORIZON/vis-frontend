@@ -35,9 +35,17 @@ const  WorkflowParameter = () => {
     return (
         <>
             <Paper sx={{mb:1, display: "flex", flexDirection: "row", alignItems: "center"}}>
-                <Typography variant="subtitle1">
-                This workflow uses "{selectedParam.name}: {selectedParam.value}". In total {filteredWorkflows.length} workflows are using this configuration.
-                </Typography>
+                {
+                    filteredWorkflows.length > 1 ? (
+                        <Typography variant="subtitle1">
+                            This workflow uses "{selectedParam.name}: {selectedParam.value}". In total {filteredWorkflows.length} workflows are using this configuration.
+                        </Typography>
+                    ) : (
+                        <Typography variant="subtitle1">
+                            This workflow uses "{selectedParam.name}: {selectedParam.value}". In total {filteredWorkflows.length} workflow is using this configuration.
+                        </Typography>
+                    )
+                }
                 <Tooltip title="compare" placement="right">
                   <IconButton onClick={() => handleOpenComparison(filteredWorkflows)}>
                     <CompareArrowsRoundedIcon style={{color: theme.palette.primary.main }} />
