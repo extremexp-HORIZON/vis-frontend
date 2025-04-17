@@ -102,13 +102,17 @@ const ParallelCoordinateVega = ({
   const columnNames = [...foldArray.current, progressParallel.selected]
 
   // generate scales:
-  const selectedLastColumnMin = Math.min(
-    ...parallelData.map((d: any) => d[progressParallel.selected]),
-  )
-  const selectedLastColumnMax = Math.max(
-    ...parallelData.map((d: any) => d[progressParallel.selected]),
-  )
-  const generatedScales: Scale[] = [
+  const numericValues = processedData
+  .map(d => d[progressParallel.selected])
+  .filter(v => typeof v === "number" && !isNaN(v))
+
+  const selectedLastColumnMin = Math.min(...numericValues)
+  const selectedLastColumnMax = Math.max(...numericValues)
+
+  // fallback to avoid breaking Vega when data is empty
+  const isValidDomain = numericValues.length > 0
+
+    const generatedScales: Scale[] = [
     {
       name: "ord",
       type: "point",
@@ -124,23 +128,26 @@ const ParallelCoordinateVega = ({
         data: "mydata",
         field: progressParallel.selected,
       },
-      domainMin: selectedLastColumnMin,
-      domainMax: selectedLastColumnMax,
-    },
-    {
-      name: "selectedLastColumnColorScale",
-      type: "linear",
-      domain: { data: "mydata", field: progressParallel.selected },
-      domainMin: selectedLastColumnMin,
-      domainMax: selectedLastColumnMax,
-      range: [
-        scheme("category20")[0],
-        scheme("category20")[1],
-        scheme("category20")[5],
-        scheme("category20")[2],
-      ],
+      ...(isValidDomain && {
+        domainMin: selectedLastColumnMin,
+        domainMax: selectedLastColumnMax,
+      }),
     },
   ]
+  if (isValidDomain) {
+    generatedScales.push({
+      name: "selectedLastColumnColorScale",
+      type: "linear",
+      domain: {
+        data: "mydata",
+        field: progressParallel.selected,
+      },
+      domainMin: selectedLastColumnMin,
+      domainMax: selectedLastColumnMax,
+      range: (scheme("category20") ?? []).slice(0, 4),
+    })
+  }
+  
   for (const columnName of foldArray.current) {
     generatedScales.push({
       name: columnName,
@@ -161,6 +168,16 @@ const ParallelCoordinateVega = ({
       offset: { scale: "ord", value: columnName, mult: -1 },
     })
   }
+  const numericFilteredData = processedData.filter((row: any) => {
+    // Check every field in foldArray and the selected field
+    const allKeys = [...foldArray.current, progressParallel.selected]
+    return allKeys.every(key => {
+      const val = Number(row[key])
+      return !isNaN(val)
+    })
+  })
+  console.log(numericFilteredData)
+  
 
   return (
     <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
@@ -185,7 +202,7 @@ const ParallelCoordinateVega = ({
         data: [
           {
             name: "mydata",
-            values: processedData,
+            values: numericFilteredData,
           },
           {
             name: "columnNames",

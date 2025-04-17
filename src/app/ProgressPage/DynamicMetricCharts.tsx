@@ -39,15 +39,20 @@ const WorkflowCharts: React.FC = () => {
 
       filteredWorkflows.forEach(workflow => {
         if (Object.prototype.hasOwnProperty.call(workflow, metricName)) {
-          acc[metricName].push({
-            value: workflow[metricName],
-            id: workflow.id,
-            metricName,
-            step: workflow.step ?? 0, // Fallback to 0 if step is missing
-          })
+          const value = workflow[metricName]
+  
+          // Skip non-numeric or NaN values
+          if (typeof value === "number" && !isNaN(value)) {
+            acc[metricName].push({
+              value,
+              id: workflow.id,
+              metricName,
+              step: workflow.step ?? 0, // Fallback to 0 if step is missing
+            })
+          }
         }
       })
-
+  
       return acc
     },
     {} as Record<string, IMetric[]>

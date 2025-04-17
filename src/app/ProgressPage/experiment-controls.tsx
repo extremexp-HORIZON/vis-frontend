@@ -23,7 +23,7 @@ const ExperimentControls = () => {
   const dispatch = useAppDispatch()
   const workflow = workflows.data.find(workflow => workflow.id === workflowId)
   const workflowStatus = workflow?.status
-  const completedTasks = workflow?.tasks?.filter(task => task.endTime !== undefined).length
+  const completedTasks = workflow?.tasks?.filter(task => task.endTime).length
   const taskLength = workflow?.tasks?.length
 
   const workflowIcon = workflowStatus === "COMPLETED" ? <CheckCircleIcon fontSize="small" color="success" /> :
