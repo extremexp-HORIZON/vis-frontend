@@ -1,6 +1,6 @@
 import { Box, Tab, Tabs, Paper } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useRef } from "react"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"
 import ScheduleTable from "./WorkFlowTables/schedule-table"
@@ -8,19 +8,50 @@ import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 import WorkflowCharts from "../DynamicMetricCharts"
 import { Resizable } from "re-resizable"
-import { setSelectedTab, setVisibleTable } from "../../../store/slices/monitorPageSlice"
+import { bulkToggleWorkflowSelection, setSelectedTab, setVisibleTable, toggleWorkflowSelection } from "../../../store/slices/monitorPageSlice"
 import { useDispatch } from "react-redux"
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
+import { getCache } from "../../../shared/utils/localStorageCache"
 
 const MonitoringPage = () => {
-  const { visibleTable, selectedTab } = useAppSelector(
+  const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   )
   const navigate = useNavigate()
   const { experimentId } = useParams()
   const dispatch = useDispatch()
   const theme = useTheme()
+  const queryParams = new URLSearchParams(location.search);
+  const compare = queryParams.get("compare");
+  const tabParam = queryParams.get("tab");
+  const compareWorkflowsRef = useRef<string[] | null>(null)
+
+  useEffect(() => {
+    if (compare) {
+      const parsed = getCache<{ workflowIds: string[] }>(compare);
+      if (parsed?.workflowIds) {
+        compareWorkflowsRef.current = parsed.workflowIds
+      }
+    }
+
+    if (tabParam) {
+      dispatch(setSelectedTab(Number(tabParam)))
+    }
+  }, [compare, tabParam])
+
+  // Apply toggleWorkflowSelection only after workflowsTable is loaded
+  useEffect(() => {
+    if (
+      workflowsTable.initialized &&
+      compareWorkflowsRef.current &&
+      compareWorkflowsRef.current.length > 0
+    ) {
+      dispatch(bulkToggleWorkflowSelection(compareWorkflowsRef.current));
+      compareWorkflowsRef.current = null // avoid rerunning
+    }
+  }, [workflowsTable.initialized])
+
 
   const handleChange =
     (newValue: number | string | null) => (event: React.SyntheticEvent) => {
@@ -48,7 +79,13 @@ const MonitoringPage = () => {
         <Tabs
           value={selectedTab}
           onChange={(event, newValue) => {
-            dispatch(setSelectedTab(newValue));
+            const searchParams = new URLSearchParams(location.search);
+            searchParams.delete('compare');
+            searchParams.set('tab', newValue)
+            navigate({
+              pathname: location.pathname,
+              search: searchParams.toString(),
+            }, { replace: true });
           
             if (newValue === 1) {
               dispatch(setVisibleTable("workflows"));

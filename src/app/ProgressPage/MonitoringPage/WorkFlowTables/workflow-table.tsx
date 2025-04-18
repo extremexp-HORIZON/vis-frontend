@@ -13,12 +13,13 @@ import LaunchIcon from "@mui/icons-material/Launch"
 import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow } from "../../../../store/slices/monitorPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Badge,  IconButton, Popover, Rating, styled, } from "@mui/material"
 import FilterBar from "./filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
 import theme from "../../../../mui-theme"
+import { debounce } from "lodash";
 
 type CustomGridColDef = GridColDef & {
   field: string
@@ -33,8 +34,6 @@ let columns: CustomGridColDef[] = []
 export interface Data {
   [key: string]: any
 }
-
-let idCounter = 1
 
 // WorkflowActions
 
@@ -54,19 +53,22 @@ const WorkflowActions = (props: {
     <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
       <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== "pending_input"}>
       <IconButton           
-        onClick={
-          (currentStatus === "COMPLETED" || currentStatus === "pending_input")
-            ? handleLaunchNewTab(workflowId)
-            : () => {}
-        }
+        // onClick={
+        //   (currentStatus === "COMPLETED" || currentStatus === "pending_input")
+        //     ? handleLaunchNewTab(workflowId)
+        //     : () => {}
+        // }
+        onClick={handleLaunchNewTab(workflowId)}
       >
         <LaunchIcon
           style={{
-            cursor: (currentStatus === "COMPLETED" || currentStatus === "pending_input") ? "pointer" : "default",
-            color:
-            (currentStatus === "COMPLETED" || currentStatus === "pending_input")
-                ? theme.palette.primary.main
-                : theme.palette.action.disabled,
+            // cursor: (currentStatus === "COMPLETED" || currentStatus === "pending_input") ? "pointer" : "default",
+            // color:
+            // (currentStatus === "COMPLETED" || currentStatus === "pending_input")
+            //     ? theme.palette.primary.main
+            //     : theme.palette.action.disabled,
+            cursor: "pointer",
+            color: theme.palette.primary.main,
           }}
         />
       </IconButton>
@@ -145,6 +147,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   const [isFilterOpen, setFilterOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const lastHoveredIdRef = useRef<string | null>(null)
 
   const dispatch = useAppDispatch()
 
@@ -200,6 +203,20 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     dispatch(setWorkflowsTable({ filters: [] }))
   }
 
+  const debouncedDispatch = useRef(
+    debounce((workflowId: string | null) => {
+      dispatch(setHoveredWorkflow(workflowId))
+    }, 20)
+  ).current
+
+
+  const handleHover = (workflowId: string | null) => {
+    if (workflowId !== lastHoveredIdRef.current) {
+      lastHoveredIdRef.current = workflowId
+      debouncedDispatch(workflowId)
+    }
+  }
+
   const handleAggregation = (
     rows: any[],
     groupKeys: string[],
@@ -244,63 +261,98 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
   }
 
   useEffect(() => {
-    let counter = 0
-    for (let i = 0; i < workflowsTable.filters.length; i++) {
-      if (workflowsTable.filters[i].value !== "") {
-        counter++
+    if(workflowsTable.initialized) {
+      let counter = 0
+      for (let i = 0; i < workflowsTable.filters.length; i++) {
+        if (workflowsTable.filters[i].value !== "") {
+          counter++
+        }
       }
-    }
-    dispatch(setWorkflowsTable({ filtersCounter: counter }))
-    
-    let filteredRows = workflowsTable.rows
-    
-    // Apply search term filter if it exists
-    if (searchTerm) {
-      const lowerSearchTerm = searchTerm.toLowerCase()
+
+      let filteredRows = workflowsTable.rows
+
+      // Apply search term filter if it exists
+      if (searchTerm) {
+        const lowerSearchTerm = searchTerm.toLowerCase()
+        filteredRows = filteredRows.filter(row => {
+          // Check if any field contains the search term
+          return Object.entries(row).some(([key, value]) => {
+            if (key === 'id' || key === 'action' || !value) return false
+            return String(value).toLowerCase().includes(lowerSearchTerm)
+          })
+        })
+      }
+
+      // Apply column filters
       filteredRows = filteredRows.filter(row => {
-        // Check if any field contains the search term
-        return Object.entries(row).some(([key, value]) => {
-          if (key === 'id' || key === 'action' || !value) return false
-          return String(value).toLowerCase().includes(lowerSearchTerm)
+        return workflowsTable.filters.every(filter => {
+          if (filter.value === "") return true
+          const cellValue = row[filter.column as keyof Data]
+            ?.toString()
+            .toLowerCase()
+          const filterValue = filter.value.toLowerCase()
+          if (!cellValue) return false
+
+          switch (filter.operator) {
+            case "contains":
+              return cellValue.includes(filterValue)
+            case "=":
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue
+            case "startsWith":
+              return cellValue.startsWith(filterValue)
+            case "endsWith":
+              return cellValue.endsWith(filterValue)
+            case ">":
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true
+            case "<":
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true
+            case ">=":
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true
+            case "<=":
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true
+            default:
+              return true
+          }
         })
       })
-    }
-    
-    // Apply column filters
-    filteredRows = filteredRows.filter(row => {
-      return workflowsTable.filters.every(filter => {
-        if (filter.value === "") return true
-        const cellValue = row[filter.column as keyof Data]
-          ?.toString()
-          .toLowerCase()
-        const filterValue = filter.value.toLowerCase()
-        if (!cellValue) return false
 
-        switch (filter.operator) {
-          case "contains":
-            return cellValue.includes(filterValue)
-          case "=":
-            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue
-          case "startsWith":
-            return cellValue.startsWith(filterValue)
-          case "endsWith":
-            return cellValue.endsWith(filterValue)
-          case ">":
-            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true
-          case "<":
-            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true
-          case ">=":
-            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true
-          case "<=":
-            return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true
-          default:
-            return true
-        }
-      })
-    })
-    
-    dispatch(setWorkflowsTable({ filteredRows }))
+      dispatch(setWorkflowsTable({ filteredRows, filtersCounter: counter }))
+    }
   }, [workflowsTable.filters, workflowsTable.rows, searchTerm])
+
+  useEffect(() => {
+    if(workflowsTable.initialized) {
+      if (workflowsTable.groupBy.length > 0 && workflowsTable.filteredRows.length > 0) {
+        const aggregatedRows = handleAggregation(
+          workflowsTable.filteredRows,
+          workflowsTable.groupBy,
+          workflowsTable.uniqueMetrics
+        )
+
+        const allowedFields = new Set([
+          "workflowId",
+          ...workflowsTable.groupBy,
+          ...workflowsTable.uniqueMetrics,
+        ])
+      
+        const reducedColumns = workflowsTable.columns.filter(col =>
+          allowedFields.has(col.field)
+        )
+
+        dispatch(setWorkflowsTable({
+          visibleRows: aggregatedRows,
+          aggregatedRows: aggregatedRows,
+          visibleColumns: reducedColumns
+        }))
+      } else {
+        dispatch(setWorkflowsTable({
+          visibleRows: workflowsTable.filteredRows,
+          aggregatedRows: [],
+          visibleColumns: workflowsTable.columns,
+        }))
+      }
+    }
+  }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics])
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -447,47 +499,12 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           columnsVisibilityModel: visibilityModel,
           uniqueMetrics: Array.from(uniqueMetrics),
           uniqueParameters: Array.from(uniqueParameters),
-          uniqueTasks: Array.from(uniqueTasks)
+          uniqueTasks: Array.from(uniqueTasks),
+          initialized: true
         }),
       )
     }
   }, [workflows])
-
-  useEffect(() => {
-    if (workflowsTable.groupBy.length > 0 && workflowsTable.filteredRows.length > 0) {
-      const aggregatedRows = handleAggregation(
-        workflowsTable.filteredRows,
-        workflowsTable.groupBy,
-        workflowsTable.uniqueMetrics
-      )
-
-      const allowedFields = new Set([
-        "workflowId",
-        ...workflowsTable.groupBy,
-        ...workflowsTable.uniqueMetrics,
-      ])
-  
-      const reducedColumns = workflowsTable.columns.filter(col =>
-        allowedFields.has(col.field)
-      )
-      
-      dispatch(setWorkflowsTable({
-        visibleRows: aggregatedRows,
-        aggregatedRows: aggregatedRows,
-        visibleColumns: reducedColumns
-      }))
-    } else {
-      dispatch(setWorkflowsTable({
-        visibleRows: workflowsTable.filteredRows,
-        aggregatedRows: [],
-        visibleColumns: workflowsTable.columns,
-      }))
-    }
-  }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics])
-    
-  const activeFilters = workflowsTable.filters.filter(filter => 
-    filter.column && filter.operator && filter.value
-  )
 
   return (
     <Box sx={{height: "100%" }}>
@@ -557,11 +574,15 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                 noRowsOverlay: {title: "No workflows available"},
                 row: {
                   onMouseEnter: (event) => {
-                    const rowId = event.currentTarget.getAttribute('data-id');
-                    dispatch(setHoveredWorkflow(rowId));
+                    if(selectedTab === 1) {
+                      const rowId = event.currentTarget.getAttribute('data-id');
+                      const id = rowId ? workflowsTable.selectedWorkflows.includes(rowId) ? rowId : "notSelected" : null
+                      handleHover(id);
+                    }
                   },
                   onMouseLeave: () => {
-                    dispatch(setHoveredWorkflow(null));
+                    if(selectedTab === 1)
+                      handleHover(null);
                   }
                 }
               }

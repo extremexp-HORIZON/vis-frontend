@@ -31,7 +31,7 @@ const ProgressPageLoading = () => {
     ) {
       setTimeout(() => {
         dispatch(setIntialization(true))
-      }, 600)
+      }, 200)
     }
   }, [experiment, workflows])
 

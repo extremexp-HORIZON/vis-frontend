@@ -106,11 +106,18 @@ const ParallelCoordinateVega = ({
   .map(d => d[progressParallel.selected])
   .filter(v => typeof v === "number" && !isNaN(v))
 
-  const selectedLastColumnMin = Math.min(...numericValues)
-  const selectedLastColumnMax = Math.max(...numericValues)
+  let selectedLastColumnMin = Math.min(...numericValues)
+  let selectedLastColumnMax = Math.max(...numericValues)
 
   // fallback to avoid breaking Vega when data is empty
   const isValidDomain = numericValues.length > 0
+
+  if (isValidDomain && selectedLastColumnMin === selectedLastColumnMax) {
+    const padding = selectedLastColumnMin === 0 ? 1 : Math.abs(selectedLastColumnMin * 0.5)
+    selectedLastColumnMin -= padding
+    selectedLastColumnMax += padding
+  }
+  
 
     const generatedScales: Scale[] = [
     {
@@ -174,7 +181,6 @@ const ParallelCoordinateVega = ({
     })
   }
   const numericFilteredData = processedData.filter((row: any) => {
-    // Check every field in foldArray and the selected field
     const key = progressParallel.selected
     const val = Number(row[key])
     return !isNaN(val)

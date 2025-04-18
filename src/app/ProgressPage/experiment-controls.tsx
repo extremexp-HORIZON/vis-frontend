@@ -12,6 +12,8 @@ import { setProgressBarData } from "../../store/slices/progressPageSlice"
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ErrorIcon from '@mui/icons-material/Error'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
+import PauseCircleRoundedIcon from '@mui/icons-material/PauseCircleRounded';
+import StopRoundedIcon from '@mui/icons-material/StopRounded';
 
 const ExperimentControls = () => {
   const [ searchParams ] = useSearchParams()
@@ -26,9 +28,29 @@ const ExperimentControls = () => {
   const completedTasks = workflow?.tasks?.filter(task => task.endTime).length
   const taskLength = workflow?.tasks?.length
 
-  const workflowIcon = workflowStatus === "COMPLETED" ? <CheckCircleIcon fontSize="small" color="success" /> :
-    workflowStatus === "FAILED" ? <ErrorIcon fontSize="small" color="error" /> : <AutorenewRoundedIcon fontSize="small" color="primary" />
+  let workflowIcon;
 
+  switch (workflowStatus) {
+    case "COMPLETED":
+      workflowIcon = <CheckCircleIcon fontSize="small" color="success" />;
+      break;
+    case "FAILED":
+    case "KILLED":
+      workflowIcon = <ErrorIcon fontSize="small" color="error" />;
+      break;
+    case "RUNNING":
+      workflowIcon = <AutorenewRoundedIcon fontSize="small" color="primary" />;
+      break;
+    case "STOPPED":
+      workflowIcon = <StopRoundedIcon fontSize="small" color="primary" />;
+      break;
+    case "PAUSED":
+      workflowIcon = <PauseCircleRoundedIcon fontSize="small" color="primary" />;
+      break;
+    default:
+      break;
+  }
+  
 
     useEffect(() => {
       if (workflows.data.length > 0) {

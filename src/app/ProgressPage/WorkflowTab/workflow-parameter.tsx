@@ -1,35 +1,30 @@
-import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import { RootState, useAppSelector } from "../../../store/store"
 import WorkflowParameterDistribution from "./workflow-parameter-distribution"
 import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material"
 import CompareArrowsRoundedIcon from '@mui/icons-material/CompareArrowsRounded'
-import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection } from "../../../store/slices/monitorPageSlice"
 
 import theme from "../../../mui-theme"
-import { useNavigate, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { IRun } from "../../../shared/models/experiment/run.model"
+import { setCache } from "../../../shared/utils/localStorageCache"
 
 
 const  WorkflowParameter = () => {
     const { workflows } = useAppSelector((state: RootState) => state.progressPage)
     const { tab } = useAppSelector(state => state.workflowPage)
     const selectedParam = tab?.dataTaskTable.selectedItem?.data
-    const dispatch = useAppDispatch()
-    const navigate = useNavigate()
     const {experimentId} = useParams()
 
-    const filteredWorkflows = workflows.data?.filter(w => w.status === "COMPLETED").filter(w => w.params.find(param => 
+    const filteredWorkflows = workflows.data?.filter(w => w.status !== "SCHEDULED").filter(w => w.params.find(param => 
         param.name === selectedParam.name && param.value === selectedParam.value))
     
     const handleOpenComparison = (filteredWorkflows: IRun[]) => {
     
-        filteredWorkflows.forEach(workflow => {
-            dispatch(toggleWorkflowSelection(workflow.id))
-        })
         const workflowIds = filteredWorkflows?.map(workflow => workflow.id);
+        const compareKey = `compare-${Date.now()}`
+        setCache(compareKey, { workflowIds }, 1 * 60 * 1000);
 
-        dispatch(setWorkflowsTable({ selectedWorkflows: workflowIds }))
-        dispatch(setSelectedTab(1))
-        navigate(`/${experimentId}/monitoring`)
+        window.open(`/${experimentId}/monitoring?tab=1&compare=${compareKey}`, "_blank");
     }
     
     return (

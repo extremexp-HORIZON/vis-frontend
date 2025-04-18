@@ -68,12 +68,12 @@ const WorkflowCharts: React.FC = () => {
     }))
 
     const chartSpec = {
-      mark: uniqueSteps.size === 1 ? "bar" : "line",
+      mark: uniqueSteps.size <= 1 ? "bar" : "line",
       encoding: {
         x: {
-          field: uniqueSteps.size === 1 ? "id" : "step",
+          field: uniqueSteps.size <= 1 ? "id" : "step",
           type: "ordinal",
-          axis: { labels: false, title: uniqueSteps.size === 1 ? "Workflow" : "Step" },
+          axis: { labels: false, title: uniqueSteps.size <= 1 ? "Workflow" : "Step" },
           scale: {
             paddingInner: 0.2,
             paddingOuter: 1,

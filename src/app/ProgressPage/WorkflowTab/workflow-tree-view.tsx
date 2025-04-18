@@ -213,7 +213,7 @@ export default function WorkflowTreeView() {
               }
             >
               {/* Data Assets */}
-              {datasetsForTask &&
+              {datasetsForTask.length > 0 &&
               <TreeItem2
                 itemId={`task-${id}-assets`}
                 label={

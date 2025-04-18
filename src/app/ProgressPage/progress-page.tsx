@@ -53,14 +53,12 @@ const ProgressPage = (props: ProgressPageProps) => {
   useEffect(() => {
     const fetchWorkflows = () => {
       if (!experiment.loading && experiment.data) {
-          dispatch(fetchExperimentWorkflows(experimentId || ""))
+          dispatch(fetchExperimentWorkflows({ experimentId: experimentId || "", forceRefresh: false } ))
       }
     }
     fetchWorkflows()
     // TODO: Remove this if statement when no longer needed
-    // if (experimentId !== "ideko" && experimentId !== "I2Cat_phising") {
     // intervalId.current = setInterval(fetchWorkflows, 5000)
-    // }
 
     return () => {
       if (intervalId.current) {

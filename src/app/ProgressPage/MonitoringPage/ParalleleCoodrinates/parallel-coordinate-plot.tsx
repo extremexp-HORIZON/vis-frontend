@@ -41,7 +41,6 @@ const ParallelCoordinatePlot = () => {
       )
       foldArray.current = Array.from(uniqueParameters)
       const data = workflows.data
-        .filter(workflow => workflow.status === "COMPLETED")
         .map(workflow => {
           const params = workflow.params
           return {

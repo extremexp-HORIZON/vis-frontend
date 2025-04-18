@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit"
-import WorkflowTab from "../../app/ProgressPage/WorkflowTab/workflow-tab"
-import WorkflowTable from "../../app/ProgressPage/MonitoringPage/WorkFlowTables/workflow-table"
 
 interface IMonitoringPageSlice {
     parallel: {
@@ -30,6 +28,7 @@ interface IMonitoringPageSlice {
         uniqueMetrics: string[]
         uniqueParameters: string[]
         uniqueTasks: string[]
+        initialized: boolean
       }
       scheduledTable: {
         order: "asc" | "desc"
@@ -102,7 +101,8 @@ const initialState: IMonitoringPageSlice = {
       groupBy: [],
       uniqueMetrics: [],
       uniqueParameters: [],
-      uniqueTasks: []
+      uniqueTasks: [],
+      initialized: false
     },
     scheduledTable: {
       order: "asc",
@@ -186,6 +186,24 @@ export const monitoringPageSlice = createSlice({
         state.workflowsTable.selectedWorkflows.splice(index, 1);
       }
     },
+    bulkToggleWorkflowSelection: (state, action) => {
+      const workflowIds: string[] = action.payload;
+    
+      const existingColors = new Set(Object.values(state.workflowsTable.workflowColors));
+    
+      workflowIds.forEach((workflowId) => {
+        const index = state.workflowsTable.selectedWorkflows.indexOf(workflowId);
+    
+        if (index === -1) {
+          state.workflowsTable.selectedWorkflows.push(workflowId);
+    
+          if (!state.workflowsTable.workflowColors[workflowId]) {
+            state.workflowsTable.workflowColors[workflowId] = generateUniqueColor(existingColors);
+            existingColors.add(state.workflowsTable.workflowColors[workflowId]); // Avoid duplicates
+          }
+        }
+      });
+    },    
     setGroupBy: (state, action) => {
       state.workflowsTable.groupBy = action.payload
     },
@@ -195,5 +213,5 @@ export const monitoringPageSlice = createSlice({
   }
 })
 
-export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, setGroupBy, setHoveredWorkflow 
+export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection,bulkToggleWorkflowSelection, setGroupBy, setHoveredWorkflow 
 } = monitoringPageSlice.actions;

@@ -128,9 +128,10 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
     id: wf.id,
     color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
   }))
+  const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1
 
   const chartSpec = {
-    mark: metrics[0].step=== null ? "point" : "line", // Always use a line chart
+    mark: isSingleStep ? "point" : "line", // Always use a line chart
     encoding: {
       x: {
         field: metrics[0].step=== null?"timestamp":"step", // Use the 'step' field for the x-axis (time or step sequence)
