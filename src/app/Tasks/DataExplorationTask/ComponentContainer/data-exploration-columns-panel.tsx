@@ -24,7 +24,7 @@ const ColumnsPanel = () => {
     dispatch(fetchDataExplorationData({
       query: {
         ...defaultDataExplorationQuery,
-        datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
+        datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
         columns: selectedColumns.map(col => col.name),
         filters: tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
         limit: 100,
@@ -45,7 +45,7 @@ const ColumnsPanel = () => {
         label="Select Columns"
         value={selectedColumns.map(col => col.name)}
         onChange={handleChange}
-        // onClose={handleFetchDataExploration}
+        onClose={handleFetchDataExploration}
         renderValue={(selected) => selected.join(", ")}
         MenuProps={{
           PaperProps: { style: { maxHeight: 224, width: 250 } },
