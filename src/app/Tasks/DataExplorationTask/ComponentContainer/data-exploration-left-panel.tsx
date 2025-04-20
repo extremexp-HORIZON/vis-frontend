@@ -1,6 +1,5 @@
 import { useAppSelector } from "../../../../store/store"
 import ChartButtonGroup from "../ChartControls/data-exploration-chart-button-group"
-import Controlaki from "./data-exploration-columns-panel"
 import FilterBuilder from "./data-exploration-filter-builder"
 
 import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
@@ -8,6 +7,7 @@ import { Box, Typography } from "@mui/material"
 import ViewColumnIcon from "@mui/icons-material/ViewColumn"
 import { grey } from "@mui/material/colors"
 import FilterAltIcon from "@mui/icons-material/FilterAlt"
+import ColumnsPanel from "./data-exploration-columns-panel"
 
 const LeftPanel = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
@@ -53,7 +53,8 @@ const LeftPanel = () => {
       <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
       <SectionHeader icon={<ViewColumnIcon />} title="Columns" />
       <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-      <Controlaki />
+      <ColumnsPanel
+ />
       <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
       <SectionHeader icon={<FilterAltIcon />} title="Filters" />
       <Box sx={{ marginTop: 3 }} />
