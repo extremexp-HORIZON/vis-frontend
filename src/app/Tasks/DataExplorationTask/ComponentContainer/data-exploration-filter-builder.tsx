@@ -50,7 +50,7 @@ const FilterBuilder = () => {
       fetchDataExplorationData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
+          datasetId:  tab?.dataTaskTable.selectedItem?.data?.source || "",
           filters: updatedFilters,
           columns:
             tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(
@@ -104,7 +104,7 @@ const FilterBuilder = () => {
       fetchDataExplorationData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: tab?.dataAssetsTable.selectedDataset?.source || "",
+          datasetId:  tab?.dataTaskTable.selectedItem?.data?.source || "",
           filters: updatedFilters,
           columns:
             tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(

@@ -11,12 +11,14 @@ import {
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
+import CategoryIcon from "@mui/icons-material/Category"
+import BarChartIcon from "@mui/icons-material/BarChart"
+import FunctionsIcon from "@mui/icons-material/Functions"
 
 const BarChartControlPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null) // Selected column for aggregation
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   // Handler for updating aggregation rules for a column
   const handleAggregationChange = (
@@ -76,9 +78,14 @@ const BarChartControlPanel = () => {
       >
         {/* Group By Selection */}
         <FormControl fullWidth>
-          <InputLabel>Category</InputLabel>
+          <InputLabel>
+            <Box display="flex" alignItems="center" gap={1}>
+              <CategoryIcon fontSize="small" />
+              Group By (Category)
+            </Box>
+          </InputLabel>{" "}
           <Select
-            label="Category"
+            label="Group By (Category) okkk    "
             multiple
             value={
               tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []
@@ -86,25 +93,29 @@ const BarChartControlPanel = () => {
             onChange={e =>
               dispatch(setControls({ barGroupBy: e.target.value }))
             }
-            renderValue={(selected: any) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                {selected.map((value: string) => (
-                  <Chip
-                    key={value}
-                    label={value}
-                    onDelete={() =>
-                      dispatch(
-                        setControls({
-                          barGroupBy: selected.filter(
-                            (v: string) => v !== value,
-                          ),
-                        }),
-                      )
-                    }
-                  />
-                ))}
-              </Box>
-            )}
+            renderValue={(selected: any) =>
+              selected.length === 0 ? (
+                <em>Select categories to group by</em>
+              ) : (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  {selected.map((value: string) => (
+                    <Chip
+                      key={value}
+                      label={value}
+                      onDelete={() =>
+                        dispatch(
+                          setControls({
+                            barGroupBy: selected.filter(
+                              (v: string) => v !== value,
+                            ),
+                          }),
+                        )
+                      }
+                    />
+                  ))}
+                </Box>
+              )
+            }
             MenuProps={{
               PaperProps: {
                 style: { maxHeight: 224, width: 250 },
@@ -124,10 +135,14 @@ const BarChartControlPanel = () => {
 
         {/* Value Selection */}
         <FormControl fullWidth>
-          <InputLabel>Value</InputLabel>
+          <InputLabel>
+            <Box display="flex" alignItems="center" gap={1}>
+              <BarChartIcon fontSize="small" />
+              Measure (Value Column)
+            </Box>
+          </InputLabel>
           <Select
-            size="small"
-            label="Value"
+            label="Measure (Value Column)ooo"
             value={selectedColumn || ""}
             onChange={e => setSelectedColumn(e.target.value as string)}
             MenuProps={{
@@ -147,10 +162,15 @@ const BarChartControlPanel = () => {
         {/* Aggregation Selection */}
         {selectedColumn && (
           <FormControl fullWidth>
-            <InputLabel>Aggregations</InputLabel>
+            <InputLabel>
+              <Box display="flex" alignItems="center" gap={1}>
+                <FunctionsIcon fontSize="small" />
+                Apply Aggregation(s)
+              </Box>
+            </InputLabel>
             <Select
               size="small"
-              label="Aggregations"
+              label="Apply Aggregation(s)oook"
               multiple
               value={
                 tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[

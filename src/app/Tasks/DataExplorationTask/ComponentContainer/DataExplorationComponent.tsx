@@ -56,7 +56,6 @@ const DataExplorationComponent = () => {
     )
   }, [tab?.workflowId, selectedDataset])
   useEffect(() => {
-    console.log("mpainw")
     dispatch(
       setControls({
         selectedColumns: dataExploration?.metaData.data?.originalColumns,
@@ -197,7 +196,7 @@ const DataExplorationComponent = () => {
                 <ScatterChart />
               )}
               {dataExploration?.controlPanel.chartType === "bar" && (
-                <BarChart dataExploration={dataExploration.chart.data} barGroupBy={undefined} barAggregation={undefined} />
+                <BarChart/>
               )}
             </Paper>  
           )

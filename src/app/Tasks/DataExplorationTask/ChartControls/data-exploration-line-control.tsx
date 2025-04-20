@@ -13,6 +13,11 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 
+import TimelineIcon from "@mui/icons-material/Timeline"
+import ShowChartIcon from "@mui/icons-material/ShowChart"
+import ViewStreamIcon from "@mui/icons-material/ViewStream"
+
+
 const LineChartControlPanel = () => {
   const dispatch = useAppDispatch()
   const tab = useAppSelector(state => state.workflowPage.tab)
@@ -55,18 +60,24 @@ const LineChartControlPanel = () => {
 
   return (
     columns.length > 0 && (
+      <Box>
+
       <Box
         sx={{
           display: "flex",
           gap: "1rem",
-          flexDirection: "column",
+          flexDirection: "row",
         }}
       >
         {/* X-Axis Selector */}
         <FormControl fullWidth>
-          <InputLabel id="x-axis-select-label">X-Axis</InputLabel>
+        <InputLabel id="x-axis-select-label">
+  <Box display="flex" alignItems="center" gap={1}>
+  <ShowChartIcon fontSize="small" />
+  X-Axis
+  </Box>
+</InputLabel>
           <Select
-            size="small"
             labelId="x-axis-select-label"
             value={xAxis?.name || ""}
             onChange={handleXAxisChange}
@@ -85,9 +96,13 @@ const LineChartControlPanel = () => {
 
         {/* Y-Axis Multi-Selector */}
         <FormControl fullWidth>
-          <InputLabel id="y-axis-multi-select-label">Y-Axis</InputLabel>
+<InputLabel id="y-axis-multi-select-label">
+  <Box display="flex" alignItems="center" gap={1}>
+    <ShowChartIcon fontSize="small" />
+    Y-Axis
+  </Box>
+</InputLabel>
           <Select
-          size="small"
             labelId="y-axis-multi-select-label"
             multiple
             value={yAxis.map(col => col.name)}
@@ -109,35 +124,42 @@ const LineChartControlPanel = () => {
           </Select>
         </FormControl>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            flexDirection: "column", // Stack elements verticall
-          }}
-        >
-          <ButtonGroup
-            variant="contained"
-            aria-label="view mode"
-            sx={{ height: "36px" }}
-            size="small"
-          >
-            <Button
-              color={viewMode === "overlay" ? "primary" : "inherit"}
-              onClick={() => dispatch(setControls({ viewMode: "overlay" }))}
-            >
-              Overlay
-            </Button>
-            <Button
-              color={viewMode === "stacked" ? "primary" : "inherit"}
-              onClick={() => dispatch(setControls({ viewMode: "stacked" }))}
-            >
-              Stacked
-            </Button>
-          </ButtonGroup>
-        </Box>
+     
       </Box>
+         <Box
+         sx={{
+          mt: 2,
+           display: "flex",
+          gap: "1rem",
+          flexDirection: "row",
+          width: "100%"
+         }}
+       >
+
+         <ButtonGroup
+           variant="contained"
+           aria-label="view mode"
+           sx={{ height: "36px" }}
+           fullWidth
+         >
+           <Button
+             color={viewMode === "overlay" ? "primary" : "inherit"}
+             onClick={() => dispatch(setControls({ viewMode: "overlay" }))}
+           >
+             Overlay
+           </Button>
+           <Button
+             color={viewMode === "stacked" ? "primary" : "inherit"}
+             onClick={() => dispatch(setControls({ viewMode: "stacked" }))}
+             disabled={yAxis.length < 2}
+           >
+             Stacked
+           </Button>
+         </ButtonGroup>
+       </Box>
+       </Box>
+
+
     )
   )
 }

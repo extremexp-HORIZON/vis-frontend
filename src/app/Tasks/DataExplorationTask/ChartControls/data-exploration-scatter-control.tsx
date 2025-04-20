@@ -7,9 +7,15 @@ import {
   Select,
   OutlinedInput,
   Checkbox,
+  Button,
+  ButtonGroup,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
+
+import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
+import ShowChartIcon from "@mui/icons-material/ShowChart"
+import PaletteIcon from "@mui/icons-material/Palette"
 
 const ScatterChartControlPanel = () => {
   const dispatch = useAppDispatch()
@@ -57,7 +63,12 @@ const ScatterChartControlPanel = () => {
       >
         {/* X-Axis Selector */}
         <FormControl fullWidth>
-          <InputLabel id="x-axis-select-label">X-Axis</InputLabel>
+          <InputLabel id="x-axis-select-label">
+            <Box display="flex" alignItems="center" gap={1}>
+              <ScatterPlotIcon fontSize="small" />
+              X-Axis
+            </Box>
+          </InputLabel>
           <Select
             labelId="x-axis-select-label"
             value={xAxis ? xAxis.name : ""} // Display column name if xAxis is selected
@@ -85,7 +96,12 @@ const ScatterChartControlPanel = () => {
 
         {/* Y-Axis Multi-Selector */}
         <FormControl fullWidth>
-          <InputLabel id="y-axis-multi-select-label">Y-Axis</InputLabel>
+          <InputLabel id="y-axis-multi-select-label">
+            <Box display="flex" alignItems="center" gap={1}>
+              <ShowChartIcon fontSize="small" />
+              Y-Axis
+            </Box>
+          </InputLabel>
           <Select
             labelId="y-axis-multi-select-label"
             multiple
@@ -132,12 +148,17 @@ const ScatterChartControlPanel = () => {
 
         {/* Color By Selector */}
         <FormControl fullWidth>
-          <InputLabel id="color-by-select-label">Color By</InputLabel>
+          <InputLabel id="color-by-select-label">
+            <Box display="flex" alignItems="center" gap={1}>
+              <PaletteIcon fontSize="small" />
+              Color By
+            </Box>
+          </InputLabel>
           <Select
             labelId="color-by-select-label"
             value={
               tab?.workflowTasks.dataExploration?.controlPanel.colorBy
-                ? tab?.workflowTasks.dataExploration?.controlPanel.colorBy.name
+                ? tab?.workflowTasks.dataExploration?.controlPanel.colorBy
                 : ""
             }
             onChange={e => {
@@ -161,6 +182,26 @@ const ScatterChartControlPanel = () => {
             )}
           </Select>
         </FormControl>
+        <ButtonGroup
+           variant="contained"
+           aria-label="view mode"
+           sx={{ height: "36px" }}
+           fullWidth
+         >
+           <Button
+             color={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay" ? "primary" : "inherit"}
+             onClick={() => dispatch(setControls({ viewMode: "overlay" }))}
+           >
+             Overlay
+           </Button>
+           <Button
+             color={tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "stacked" ? "primary" : "inherit"}
+             onClick={() => dispatch(setControls({ viewMode: "stacked" }))}
+             disabled={tab?.workflowTasks.dataExploration?.controlPanel.yAxisScatter.length < 2}
+           >
+             Stacked
+           </Button>
+         </ButtonGroup>
       </Box>
     )
   )
