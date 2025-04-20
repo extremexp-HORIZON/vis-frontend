@@ -26,13 +26,18 @@ const BarChartControlPanel = () => {
   ) => {
     const value = event.target.value as string[]
     if (!selectedColumn) return
-    dispatch(
-      setControls({
-        barAggregation: {
-          [selectedColumn]: value,
-        },
-      }),
-    )
+    const currentAgg =
+  tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+
+dispatch(
+  setControls({
+    barAggregation: {
+      ...currentAgg,
+      [selectedColumn]: value,
+    },
+  }),
+)
+
   }
 
   const getAggregationOptions = () => {
@@ -180,13 +185,17 @@ const BarChartControlPanel = () => {
               onChange={event => {
                 const value = event.target.value as string[]
                 if (!selectedColumn) return
-                dispatch(
-                  setControls({
-                    barAggregation: {
-                      [selectedColumn]: value,
-                    },
-                  }),
-                )
+                const currentAgg =
+  tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+
+dispatch(
+  setControls({
+    barAggregation: {
+      ...currentAgg,
+      [selectedColumn]: value,
+    },
+  }),
+)
               }}
               renderValue={(selected: any) => (
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>

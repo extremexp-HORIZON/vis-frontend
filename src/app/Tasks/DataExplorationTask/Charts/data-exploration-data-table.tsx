@@ -3,9 +3,11 @@ import {
   DataGrid,
   GridFilterModel,
 } from "@mui/x-data-grid"
-import { Box, Paper, styled } from "@mui/material"
+import { Box, Paper, styled, Typography } from "@mui/material"
 
 import { useAppSelector } from "../../../../store/store"
+import InfoMessage from "../../../../shared/components/InfoMessage"
+import AssessmentIcon from "@mui/icons-material/Assessment"
 
 const TableExpand: React.FC = () => {
   const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] })
@@ -56,8 +58,11 @@ const TableExpand: React.FC = () => {
     },
   }))
 
-  return (
-    <Box sx={{ height: "100%" }}>
+  return (<>
+   
+
+    {Array.isArray(rows) && rows.length > 0&&Array.isArray(tab?.workflowTasks?.dataExploration?.controlPanel?.selectedColumns)&&  tab?.workflowTasks?.dataExploration?.controlPanel?.selectedColumns?.length>0  ? (
+      <Box sx={{ height: "100%" }}>
       <Paper sx={{ height: "100%", width: "100%" }} elevation={2}>
         <div style={{ height: "100%", width: "100%" }}>
           <StyledDataGrid
@@ -73,16 +78,19 @@ const TableExpand: React.FC = () => {
                     typeof col === "string"
                       ? col
                       : (col as { name: string }).name,
-                  width: 200,
+                  width: 125,
+                  headerAlign: "center", // 👈 Center the header text
+                  align: "center",  
 
+                  
                   type:
-                    typeof col === "string"
-                      ? "string"
-                      : (
-                          col as {
-                            type: "string" | "number" | "date" | "boolean"
-                          }
-                        ).type,
+                  typeof col === "string"
+                    ? "string"
+                    : (
+                        col as {
+                          type?: "string" | "number" | "date" | "boolean"
+                        }
+                      ).type || "string",
                 }),
               ) || []
             }
@@ -93,6 +101,15 @@ const TableExpand: React.FC = () => {
         </div>
       </Paper>
     </Box>
+ ) : (
+  <InfoMessage
+  message="Please select columns to display."
+  type="info"
+  icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+  fullHeight
+/>
+  )}
+  </>
   )
 }
 

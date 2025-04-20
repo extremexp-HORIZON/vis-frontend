@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   FormControl,
   InputLabel,
@@ -10,6 +10,8 @@ import {
   ThemeProvider,
   createTheme,
   Chip,
+  Slider,
+  Typography,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
@@ -29,6 +31,11 @@ const FilterBuilder = () => {
   const [selectedColumn, setSelectedColumn] = useState("")
   const [filterType, setFilterType] = useState("")
   const [equalsValue, setEqualsValue] = useState("")
+  const getMinMax = (values: number[] = []) => {
+    if (!values.length) return [0, 100]
+    return [Math.min(...values), Math.max(...values)]
+  }
+
 
   const handleAddFilter = () => {
     if (!selectedColumn || !filterType) return
@@ -36,7 +43,7 @@ const FilterBuilder = () => {
     const newFilter =
       filterType === "equals"
         ? { column: selectedColumn, type: "equals", value: equalsValue }
-        : { column: selectedColumn, type: "range" }
+        : { column: selectedColumn, type: "range",min: rangeValue[0], max: rangeValue[1] }
 
     // Step 1: Update Redux with new filter
     const existingFilters =
@@ -119,6 +126,14 @@ const FilterBuilder = () => {
     )
   }
 
+  const [rangeValue, setRangeValue] = useState<number[]>([0, 100])
+  useEffect(() => {
+    if (selectedColumn && filterType === "range") {
+      const values = uniqueValues[selectedColumn] || []
+      const [min, max] = getMinMax(values)
+      setRangeValue([min, max])
+    }
+  }, [selectedColumn, filterType])
   return (
     <ThemeProvider theme={theme}>
       <Box display="flex" flexDirection="column" gap={2}>
@@ -186,6 +201,20 @@ const FilterBuilder = () => {
             </Select>
           </FormControl>
         )}
+        {selectedColumn && filterType === "range" && (
+  <Box>
+    <Typography gutterBottom>
+      Range: {rangeValue[0]} - {rangeValue[1]}
+    </Typography>
+    <Slider
+      value={rangeValue}
+      onChange={(e, newValue) => setRangeValue(newValue as number[])}
+      valueLabelDisplay="auto"
+      min={getMinMax(uniqueValues[selectedColumn])[0]}
+      max={getMinMax(uniqueValues[selectedColumn])[1]}
+    />
+  </Box>
+)}
 
         {/* Submit */}
         <Button
@@ -238,3 +267,5 @@ const FilterBuilder = () => {
 }
 
 export default FilterBuilder
+
+

@@ -15,17 +15,20 @@ const ColumnsPanel = () => {
     const selectedNames = event.target.value
 
     const selectedObjects = originalColumns.filter(col => selectedNames.includes(col.name))
-    dispatch(setControls({ selectedColumns: selectedObjects, xAxis: "", yAxis: [] }))
+    dispatch(setControls({ selectedColumns: selectedObjects }))
+    if (selectedObjects.length) {
+      handleFetchDataExploration(selectedObjects);
+    }
   }
 
-  const handleFetchDataExploration = () => {
-    if (!selectedColumns?.length) return
-
+  const handleFetchDataExploration = (columns = selectedColumns) => {
+    if (!columns?.length) return;
+  
     dispatch(fetchDataExplorationData({
       query: {
         ...defaultDataExplorationQuery,
         datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
-        columns: selectedColumns.map(col => col.name),
+        columns: columns.map(col => col.name),
         filters: tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
         limit: 100,
       },
@@ -33,8 +36,8 @@ const ColumnsPanel = () => {
         workflowId: tab?.workflowId || "",
         queryCase: "chart",
       },
-    }))
-  }
+    }));
+  };
 
   return (
     <FormControl fullWidth>
@@ -45,7 +48,7 @@ const ColumnsPanel = () => {
         label="Select Columns"
         value={selectedColumns.map(col => col.name)}
         onChange={handleChange}
-        onClose={handleFetchDataExploration}
+        // onClose={handleFetchDataExploration}
         renderValue={(selected) => selected.join(", ")}
         MenuProps={{
           PaperProps: { style: { maxHeight: 224, width: 250 } },

@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import {
+  dataExplorationDefault,
   fetchDataExplorationData,
   fetchMetaData,
 } from "../../../../shared/models/tasks/data-exploration-task.model"
@@ -21,48 +22,28 @@ import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 
 
 const DataExplorationComponent = () => {
-  const { tab } = useAppSelector(state => state.workflowPage)
-  const dataExploration = tab?.workflowTasks.dataExploration
   const dispatch = useAppDispatch()
-  const selectedDataset = tab?.dataTaskTable.selectedItem?.data?.source
+
+  const { tab } = useAppSelector(state => state.workflowPage)
+  const selectedDataset = useAppSelector(state => state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.source || "")
+  const workflowId = useAppSelector(state => state.workflowPage?.tab?.workflowId || "")
+  const chartType = useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel?.chartType || "")
 
   useEffect(() => {
-    if (!tab?.workflowId) return // Ensure workflowId exists before dispatch
-
-    dispatch(
-      fetchMetaData({
+    if (selectedDataset && workflowId) {
+      dispatch(setControls({...dataExplorationDefault.controlPanel}))
+      dispatch(fetchMetaData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
+          datasetId: selectedDataset
         },
-        metadata: {
-          workflowId: tab.workflowId,
-          queryCase: "metaData",
-        },
-      }),
-    )
-    dispatch(
-      fetchDataExplorationData({
-        query: {
-          ...defaultDataExplorationQuery,
-          datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
-          limit: 100,
-        },
-        metadata: {
-          workflowId: tab.workflowId,
-          queryCase: "chart",
-        },
-      }),
-    )
-  }, [tab?.workflowId, selectedDataset])
-  useEffect(() => {
-    dispatch(
-      setControls({
-        selectedColumns: dataExploration?.metaData.data?.originalColumns,
-      }),
-    )
-    dispatch(setControls({xAxis:"",yAxis:[]}))
-  }, [tab?.workflowId, dataExploration?.metaData.data?.originalColumns,selectedDataset])
+         metadata: {
+           workflowId: workflowId,
+           queryCase: "metaData"
+         }
+      }))
+    }
+  }, [selectedDataset, workflowId, dispatch])
 
   if(!selectedDataset) return (
     <InfoMessage
@@ -73,7 +54,7 @@ const DataExplorationComponent = () => {
     />
   )
 
-  if(tab.workflowTasks.dataExploration?.metaData.loading) return (
+  if(tab?.workflowTasks.dataExploration?.metaData.loading) return (
     <Box sx={{
       height: "100%",
       width: "100%", 
@@ -86,7 +67,7 @@ const DataExplorationComponent = () => {
     </Box>
   )
 
-  if(tab.workflowTasks.dataExploration?.metaData.error) return (
+  if(tab?.workflowTasks.dataExploration?.metaData.error) return (
     <InfoMessage
       message="Failed to fetch dataset metadata."
       type="info"
@@ -163,7 +144,7 @@ const DataExplorationComponent = () => {
           <LeftPanel />
         </Resizable>
         {
-          tab.workflowTasks.dataExploration?.chart.loading ? (
+          tab?.workflowTasks.dataExploration?.chart.loading ? (
             <Box sx={{
               height: "100%",
               width: "100%", 
@@ -174,7 +155,7 @@ const DataExplorationComponent = () => {
             >
               <CircularProgress />
             </Box>
-          ) : tab.workflowTasks.dataExploration?.chart.error ? (
+          ) : tab?.workflowTasks.dataExploration?.chart.error ? (
             <InfoMessage
               message="Failed to fetch dataset."
               type="info"
@@ -186,16 +167,16 @@ const DataExplorationComponent = () => {
               elevation={2}
               sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px" }}
             >
-              {dataExploration?.controlPanel.chartType === "datatable" && (
+              {chartType === "datatable" && (
                 <TableExpand />
               )}
-              {dataExploration?.controlPanel.chartType === "line" && (
+              {chartType === "line" && (
                 <LineChart />
               )}
-              {dataExploration?.controlPanel.chartType === "scatter" && (
+              {chartType === "scatter" && (
                 <ScatterChart />
               )}
-              {dataExploration?.controlPanel.chartType === "bar" && (
+              {chartType === "bar" && (
                 <BarChart/>
               )}
             </Paper>  
