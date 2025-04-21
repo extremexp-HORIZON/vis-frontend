@@ -201,6 +201,7 @@ import LineChartControlPanel from "../ChartControls/data-exploration-line-contro
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
+import Uchart from "./data-exploration-u-chart"
 
 
 
@@ -346,27 +347,32 @@ const ScatterChart = (
   
   const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis
   
-  
+  const umap=tab?.workflowTasks.dataExploration?.controlPanel.umap
   
 
-  return (
-    <Box sx={{height: "100%"}}>
-      {chartSpecs.map((spec, index) => (
-        <ResponsiveCardVegaLite
-          key={index}
-          spec={spec}
-          data={{ table: dataCopy }}
-          actions={false}
-          controlPanel={<ScatterChartControlPanel/>}
-          blinkOnStart={true}
-          infoMessage={info}
-          showInfoMessage={shouldShowInfoMessage}
-          maxHeight={500}
-          aspectRatio={isSmallScreen ? 2.8 : 1.8}
-        />
-      ))}
-    </Box>
-  ) 
+    return (
+      <Box sx={{ height: "100%" }}>
+        {!umap ? (
+          <Uchart/>
+        ) : (
+          chartSpecs.map((spec, index) => (
+            <ResponsiveCardVegaLite
+              key={index}
+              spec={spec}
+              data={{ table: dataCopy }}
+              actions={false}
+              controlPanel={<ScatterChartControlPanel />}
+              blinkOnStart={true}
+              infoMessage={info}
+              showInfoMessage={shouldShowInfoMessage}
+              maxHeight={500}
+              aspectRatio={isSmallScreen ? 2.8 : 1.8}
+            />
+          ))
+        )}
+      </Box>
+    )
+  
 }
 
 export default ScatterChart

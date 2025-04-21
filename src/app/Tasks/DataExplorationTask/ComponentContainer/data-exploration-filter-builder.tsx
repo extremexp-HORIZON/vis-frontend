@@ -17,7 +17,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
-
+import AddIcon from "@mui/icons-material/Add"
 const FilterBuilder = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
@@ -36,14 +36,18 @@ const FilterBuilder = () => {
     return [Math.min(...values), Math.max(...values)]
   }
 
-
   const handleAddFilter = () => {
     if (!selectedColumn || !filterType) return
 
     const newFilter =
       filterType === "equals"
         ? { column: selectedColumn, type: "equals", value: equalsValue }
-        : { column: selectedColumn, type: "range",min: rangeValue[0], max: rangeValue[1] }
+        : {
+            column: selectedColumn,
+            type: "range",
+            min: rangeValue[0],
+            max: rangeValue[1],
+          }
 
     // Step 1: Update Redux with new filter
     const existingFilters =
@@ -57,7 +61,7 @@ const FilterBuilder = () => {
       fetchDataExplorationData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId:  tab?.dataTaskTable.selectedItem?.data?.source || "",
+          datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
           filters: updatedFilters,
           columns:
             tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(
@@ -111,7 +115,7 @@ const FilterBuilder = () => {
       fetchDataExplorationData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId:  tab?.dataTaskTable.selectedItem?.data?.source || "",
+          datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
           filters: updatedFilters,
           columns:
             tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(
@@ -202,36 +206,45 @@ const FilterBuilder = () => {
           </FormControl>
         )}
         {selectedColumn && filterType === "range" && (
-  <Box>
-    <Typography gutterBottom>
-      Range: {rangeValue[0]} - {rangeValue[1]}
-    </Typography>
-    <Slider
-      value={rangeValue}
-      onChange={(e, newValue) => setRangeValue(newValue as number[])}
-      valueLabelDisplay="auto"
-      min={getMinMax(uniqueValues[selectedColumn])[0]}
-      max={getMinMax(uniqueValues[selectedColumn])[1]}
-    />
-  </Box>
-)}
-
+          <Box sx={{ padding: 2 }}>
+            <Typography gutterBottom>
+              Range: {rangeValue[0]} - {rangeValue[1]}
+            </Typography>
+            <Slider
+              value={rangeValue}
+              onChange={(e, newValue) => setRangeValue(newValue as number[])}
+              valueLabelDisplay="auto"
+              min={getMinMax(uniqueValues[selectedColumn])[0]}
+              max={getMinMax(uniqueValues[selectedColumn])[1]}
+            />
+          </Box>
+        )}
         {/* Submit */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddFilter}
-          disabled={!filterType}
-          sx={{
-            mt: 2,
-            "&:hover": {
-              backgroundColor: theme => theme.palette.primary.dark,
-              transform: "scale(1.05)",
-            },
-          }}
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignContent={"center"}
+          alignItems={"center"}
         >
-          Add Filter
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddFilter}
+            disabled={!filterType}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1, // spacing between icon and text
+              "&:hover": {
+                backgroundColor: theme => theme.palette.primary.dark,
+                transform: "scale(1.05)",
+              },
+            }}
+          >
+            <AddIcon fontSize="small" />
+            Add Filter
+          </Button>
+        </Box>
         <Box display="flex" flexWrap="wrap" gap={1} mt={2}>
           {(
             tab?.workflowTasks.dataExploration?.controlPanel?.filters || []

@@ -9,6 +9,7 @@ import {
   Checkbox,
   Button,
   ButtonGroup,
+  Switch,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
@@ -202,6 +203,13 @@ const ScatterChartControlPanel = () => {
              Stacked
            </Button>
          </ButtonGroup>
+         <Switch
+           checked={tab?.workflowTasks.dataExploration?.controlPanel.umap}
+           onChange={() => dispatch(setControls({ umap: !tab?.workflowTasks.dataExploration?.controlPanel.umap }))}
+           color="primary"
+            name="umap"
+            inputProps={{ "aria-label": "controlled" }}
+         />
       </Box>
     )
   )

@@ -56,6 +56,7 @@ const ChartButtonGroup: React.FC= () => {
       <Button
         variant={chartType === 'map' ? 'contained' : 'outlined'}
         onClick={() => dispatch(setControls({ chartType: 'map' }))}
+        disabled={tab?.workflowTasks.dataExploration?.metaData.data?.hasLatLonColumns===false}
       >
         <MapIcon />
       </Button>

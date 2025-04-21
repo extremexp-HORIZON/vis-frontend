@@ -69,6 +69,7 @@ export interface IDataExploration {
   currentPage: number
   lat: string
   lon: string
+  umap:boolean
     
   }
   chart:{
@@ -138,6 +139,7 @@ export const dataExplorationDefault: IDataExploration = {
     currentPage: 1,
     lat: "",
     lon: "",
+    umap:false
   },
   chart:
   {
