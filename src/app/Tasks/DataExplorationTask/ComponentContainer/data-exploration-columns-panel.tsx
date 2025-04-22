@@ -3,6 +3,7 @@ import { Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Select } fro
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
+import { useEffect } from "react"
 
 const ColumnsPanel = () => {
   const dispatch = useAppDispatch()
@@ -10,6 +11,12 @@ const ColumnsPanel = () => {
 
   const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
   const selectedColumns = tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
+
+  useEffect(() => {
+    if(tab?.workflowTasks?.dataExploration?.controlPanel?.chartType === "datatable" && tab?.workflowTasks?.dataExploration?.metaData?.data) {
+      handleFetchDataExploration(tab?.workflowTasks?.dataExploration?.controlPanel?.selectedColumns)
+    }
+  }, [tab?.workflowTasks?.dataExploration?.metaData?.data])
 
   const handleChange = (event: any) => {
     const selectedNames = event.target.value

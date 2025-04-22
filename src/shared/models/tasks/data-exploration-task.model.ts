@@ -199,6 +199,7 @@ export const explainabilityExtraReducers = (
         dataExplorationTask.metaData.data = action.payload;
         dataExplorationTask.metaData.loading = false;
         dataExplorationTask.metaData.error = null;
+        dataExplorationTask.controlPanel.selectedColumns = action.payload.originalColumns?.slice(0,5) ?? [];
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {
