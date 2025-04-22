@@ -158,6 +158,17 @@ export default function WorkflowTreeView() {
             ) || []
           const metricsForTask =
             tab?.workflowMetrics.data?.filter(m => m.task === id) || []
+
+          const seenNames = new Set<string>();
+          const uniqueMetricsByName: typeof metricsForTask = [];
+          //keep only the first instance
+          for (const metric of metricsForTask) {
+            if (!seenNames.has(metric.name)) {
+              seenNames.add(metric.name);
+              uniqueMetricsByName.push(metric);
+            }
+          }            
+          
           const datasetsForTask = 
             tab?.workflowConfiguration.dataAssets?.filter(d => d.task === id) || []
           const taskVariants: Record<string, string> =
@@ -410,7 +421,7 @@ export default function WorkflowTreeView() {
               )}
 
               {/* Metrics */}
-              {metricsForTask.length > 0 && (
+              {uniqueMetricsByName.length > 0 && (
                 <TreeItem2
                   itemId={`task-${id}-metrics`}
                   label={
@@ -445,7 +456,7 @@ export default function WorkflowTreeView() {
                     </Box>
                   }
                 >
-                  {metricsForTask.map((metric, index) => (
+                  {uniqueMetricsByName.map((metric, index) => (
                     <TreeItem2
                       key={`${metric.name}-${index}`}
                       itemId={`metric-${id}-${index}`}
