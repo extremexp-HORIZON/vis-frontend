@@ -13,9 +13,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 
-import TimelineIcon from "@mui/icons-material/Timeline"
 import ShowChartIcon from "@mui/icons-material/ShowChart"
-import ViewStreamIcon from "@mui/icons-material/ViewStream"
 
 
 const LineChartControlPanel = () => {

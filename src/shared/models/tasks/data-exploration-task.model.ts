@@ -61,7 +61,7 @@ export interface IDataExploration {
   barGroupBy: string[]
   barAggregation: any
   viewMode: "overlay" | "stacked"
-  colorBy: string
+  colorBy: VisualColumn
   colorByMap: string
   tripsMode: boolean
   selectedColumnsMap: string[]

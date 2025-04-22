@@ -233,7 +233,7 @@ const ScatterChart = (
       const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxisScatter
       const data = tab?.workflowTasks.dataExploration?.chart.data?.data
       const yAxisFields = yAxis?.map(axis => axis.name) // Get the names of the Y-axis fields
-      const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy?.name as string
+      const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy?.name  
       const dataCopy = cloneDeep(data) // Deep clone the data
       setDataCopy(dataCopy)
 
@@ -267,7 +267,7 @@ const ScatterChart = (
               condition: {
                 selection: 'paintbrush',
                 field: colorBy && colorBy !== "None" ? colorBy : 'variable',
-                // type: getColumnType(tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(column => column.name === colorBy)?.type || 'nominal'),
+                type: getColumnType(tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(column => column.name === colorBy)?.type || 'nominal'),
                 title: colorBy!=="None" ? colorBy: "Variables"
               },
               value: 'grey' // Default color for unselected points
@@ -327,8 +327,9 @@ const ScatterChart = (
     tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns,
     tab?.workflowTasks.dataExploration?.controlPanel?.xAxisScatter,
     tab?.workflowTasks.dataExploration?.controlPanel?.yAxisScatter,
-    // tab?.workflowTasks.dataExploration?.controlPanel?.viewMode,
+    tab?.workflowTasks.dataExploration?.controlPanel?.viewMode,
     tab?.workflowTasks.dataExploration?.chart?.data?.data,
+    tab?.workflowTasks.dataExploration?.controlPanel?.colorBy,
   ]) // Watch for changes in these dependencies
 
   const info = (
