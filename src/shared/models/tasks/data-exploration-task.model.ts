@@ -77,6 +77,11 @@ export interface IDataExploration {
     loading: boolean
     error: string | null
   }
+  umap:{
+    data: any | null
+    loading: boolean
+    error: string | null
+}
 }
 
 // Define the initial state of the slice
@@ -146,6 +151,11 @@ export const dataExplorationDefault: IDataExploration = {
     data: null,
     loading: false,
     error: null
+  },
+  umap:{
+    data: null,
+    loading: false,
+    error: null
   }
 }
 
@@ -205,7 +215,30 @@ export const explainabilityExtraReducers = (
         dataExplorationTask.metaData.loading = false;
         dataExplorationTask.metaData.error = "Failed to fetch metadata";
       }
-    });
+    })
+    .addCase(fetchUmap.fulfilled, (state, action) => {
+      const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
+      if (dataExplorationTask) {
+        dataExplorationTask.umap.data = action.payload;
+        dataExplorationTask.umap.loading = false;
+        dataExplorationTask.umap.error = null;
+      }
+    })
+    .addCase(fetchUmap.pending, (state, action) => {
+      const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
+      if (dataExplorationTask) {
+        dataExplorationTask.umap.loading = true;
+      }
+    })
+    .addCase(fetchUmap.rejected, (state, action) => {
+      const dataExplorationTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ?
+      state.tab?.workflowTasks.dataExploration : null
+      if (dataExplorationTask) {
+        dataExplorationTask.umap.loading = false;
+        dataExplorationTask.umap.error = "Failed to fetch umap";
+      }})
 }
 
 export const fetchDataExplorationData = createAsyncThunk(
@@ -224,6 +257,15 @@ export const fetchMetaData=createAsyncThunk(
     const requestUrl="data/metadata"
     return api
     .post<IDataExplorationResponse>(requestUrl, payload.query)
+      .then(response => response.data)
+  }
+)
+export const fetchUmap = createAsyncThunk(
+  "workflowTasks/data_exploration/fetch_umap",
+  async (payload: { data: number[][], metadata: any }) => {
+    const requestUrl = "data/umap"
+    // Send just the array data directly as request body
+    return api.post<any>(requestUrl, payload.data)
       .then(response => response.data)
   }
 )

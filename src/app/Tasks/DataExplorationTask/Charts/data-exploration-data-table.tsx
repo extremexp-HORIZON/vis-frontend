@@ -78,7 +78,7 @@ const TableExpand: React.FC = () => {
                     typeof col === "string"
                       ? col
                       : (col as { name: string }).name,
-                  width: 125,
+                  width: 155,
                   headerAlign: "center", // 👈 Center the header text
                   align: "center",  
 

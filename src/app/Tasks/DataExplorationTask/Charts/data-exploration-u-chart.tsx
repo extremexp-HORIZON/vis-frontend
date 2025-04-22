@@ -1,58 +1,38 @@
 import { useEffect, useState } from "react"
-import { useAppSelector, RootState } from "../../../../store/store"
-import { VegaLite } from "react-vega"
+import { useAppSelector, RootState, useAppDispatch } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import { Box, useTheme, useMediaQuery } from "@mui/material"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
+import { fetchUmap } from "../../../../shared/models/tasks/data-exploration-task.model"
 
 
 const Uchart = () => {
-  const [umapResult, setUmapResult] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab)
 const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  const dispatch = useAppDispatch()
+
+  const raw = tab?.workflowTasks.dataExploration?.chart.data?.data
+  const parsedData = typeof raw === "string" ? JSON.parse(raw) : raw
 
   useEffect(() => {
-    const sendUmapRequest = async () => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        const raw = tab?.workflowTasks.dataExploration?.chart.data?.data
-        const parsedData = typeof raw === "string" ? JSON.parse(raw) : raw
-
-        const umapPayload = parsedData.map(row => Object.values(row))
-
-        const response = await fetch("http://localhost:8080/api/data/umap", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(umapPayload),
-        })
-
-        if (!response.ok) throw new Error("Failed to fetch UMAP results")
-
-        const result = await response.json()
-        setUmapResult(result)
-      } catch (err: any) {
-        console.error("UMAP error:", err)
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     if (tab?.workflowTasks.dataExploration?.chart.data?.data) {
-      sendUmapRequest()
+      // Ensure payload is proper 2D array of numbers
+      const umapPayload = parsedData.map(row => 
+        Object.values(row).map(val => parseFloat(val))
+      );
+      
+      dispatch(fetchUmap({
+        data: umapPayload,
+        metadata: {
+          workflowId: tab?.workflowId,
+          queryCase: "umap"
+        }
+      }))
     }
-  }, [tab?.workflowTasks.dataExploration?.chart.data?.data])
+  }, [tab?.workflowTasks.dataExploration?.chart.data?.data, dispatch])
 
-  if (loading) return <div>Loading UMAP...</div>
-  if (error) return <div>Error: {error}</div>
-  if (!umapResult || umapResult.length === 0) return <div>No UMAP data</div>
+  
 
   // Prepare VegaLite spec
   const spec = {
@@ -65,10 +45,12 @@ const theme = useTheme()
   }
 
   // Format result to match the spec's expectations
-  const chartData = umapResult.map((point: number[]) => ({
+  const chartData = tab?.workflowTasks.dataExploration?.umap?.data?.map((point: number[]) => ({
     x: point[0],
     y: point[1],
-  }))
+  })) || []; // Fallback to empty array if any part is null/undefined
+  console.log('Full umap object:', tab?.workflowTasks.dataExploration?.umap);
+  console.log('UMAP data:', tab?.workflowTasks.dataExploration?.umap?.data);
 
   return (
    

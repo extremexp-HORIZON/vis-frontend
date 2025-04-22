@@ -352,7 +352,7 @@ const ScatterChart = (
 
     return (
       <Box sx={{ height: "100%" }}>
-        {!umap ? (
+        {umap ? (
           <Uchart/>
         ) : (
           chartSpecs.map((spec, index) => (
