@@ -136,7 +136,7 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
       x: {
         field: metrics[0].step=== null?"timestamp":"step", // Use the 'step' field for the x-axis (time or step sequence)
         type: "ordinal",
-        axis: { labels: false, title: null }, // Hide x-axis labels
+        axis: { labels: false, title: metrics[0].step=== null?"Timestamp":"Step" }, // Hide x-axis labels
       },
       y: {
         field: "value", // Use the 'value' field for the y-axis (metric values like CPU Load)

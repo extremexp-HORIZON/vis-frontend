@@ -28,7 +28,8 @@ const ParallelCoordinatePlot = () => {
   useEffect(() => {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
+        workflows.data.filter(workflow => workflow.status !== "SCHEDULED")
+        .reduce((acc: any[], workflow) => {
           const params = workflow.params
           let paramNames = []
           if (params) {

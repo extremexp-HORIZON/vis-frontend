@@ -358,7 +358,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
     if (workflows.data.length > 0) {
       //find unique parameters of each workflow -> model traning task
       const uniqueParameters = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
+        workflows.data.filter(workflow => workflow.status !== "SCHEDULED")
+        .reduce((acc: any[], workflow) => {
           const params = workflow.params
           let paramNames = []
           if (params) {
@@ -370,7 +371,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         }, []),
       )
       const uniqueMetrics = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
+        workflows.data.filter(workflow => workflow.status !== "SCHEDULED")
+        .reduce((acc: any[], workflow) => {
           const metrics = workflow.metrics
           let metricNames = []
           if(metrics) {
@@ -382,7 +384,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
         }, [])
       )
       const uniqueTasks = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
+        workflows.data.filter(workflow => workflow.status !== "SCHEDULED")
+        .reduce((acc: any[], workflow) => {
           const tasks = workflow?.tasks
           let taskNames = []
           if(tasks) {
@@ -411,7 +414,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
             }, {}),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
-                `${params?.find(param => param.name === variant)?.value}` || ""
+                params?.find(param => param.name === variant)?.value || ""
               return acc
             }, {}),
             ...Array.from(uniqueMetrics).reduce((acc, variant) => {
@@ -446,8 +449,8 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           headerName: key.replace("_", " "),
           headerClassName:
             key === "action" ? "datagrid-header-fixed" : "datagrid-header",
-          minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
-          maxWidth: key === "action" ? 100 : 500,
+          minWidth: key === "action" ? 120 : key === "status" ? key.length * 10 + 40 : key.length * 10,
+          maxWidth: key === "action" ? 120 : 500,
           flex: 1,
           align: "center",
           headerAlign: "center",

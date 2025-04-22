@@ -24,7 +24,7 @@ const  WorkflowParameter = () => {
         const compareKey = `compare-${Date.now()}`
         setCache(compareKey, { workflowIds }, 1 * 60 * 1000);
 
-        window.open(`/${experimentId}/monitoring?tab=1&compare=${compareKey}`, "_blank");
+        window.open(`/${experimentId}/monitoring?tab=1&compareId=${compareKey}`, "_blank");
     }
     
     return (

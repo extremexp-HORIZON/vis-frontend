@@ -239,7 +239,8 @@ export default function ScheduleTable() {
   useEffect(() => {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
+        workflows.data.filter(workflow => workflow.status === "SCHEDULED")
+        .reduce((acc: any[], workflow) => {
           const params = workflow.params
           let paramNames = []
           if (params) {
@@ -251,7 +252,8 @@ export default function ScheduleTable() {
         }, []),
       )
       const uniqueTasks = new Set(
-        workflows.data.reduce((acc: any[], workflow) => {
+        workflows.data.filter(workflow => workflow.status === "SCHEDULED")
+        .reduce((acc: any[], workflow) => {
           const tasks = workflow?.tasks
           let taskNames = []
           if(tasks) {
@@ -279,7 +281,7 @@ export default function ScheduleTable() {
             }, {}),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
-                `${params?.find(param => param.name === variant)?.value}` || ""
+                params?.find(param => param.name === variant)?.value || ""
               return acc
             }, {}),
             status: workflow.status.toLowerCase(),

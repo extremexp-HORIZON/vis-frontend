@@ -23,13 +23,13 @@ const MonitoringPage = () => {
   const dispatch = useDispatch()
   const theme = useTheme()
   const queryParams = new URLSearchParams(location.search);
-  const compare = queryParams.get("compare");
+  const compareId = queryParams.get("compareId");
   const tabParam = queryParams.get("tab");
   const compareWorkflowsRef = useRef<string[] | null>(null)
 
   useEffect(() => {
-    if (compare) {
-      const parsed = getCache<{ workflowIds: string[] }>(compare);
+    if (compareId) {
+      const parsed = getCache<{ workflowIds: string[] }>(compareId);
       if (parsed?.workflowIds) {
         compareWorkflowsRef.current = parsed.workflowIds
       }
@@ -38,7 +38,7 @@ const MonitoringPage = () => {
     if (tabParam) {
       dispatch(setSelectedTab(Number(tabParam)))
     }
-  }, [compare, tabParam])
+  }, [compareId, tabParam])
 
   // Apply toggleWorkflowSelection only after workflowsTable is loaded
   useEffect(() => {
@@ -80,7 +80,7 @@ const MonitoringPage = () => {
           value={selectedTab}
           onChange={(event, newValue) => {
             const searchParams = new URLSearchParams(location.search);
-            searchParams.delete('compare');
+            searchParams.delete('compareId');
             searchParams.set('tab', newValue)
             navigate({
               pathname: location.pathname,
