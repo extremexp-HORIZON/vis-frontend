@@ -1,4 +1,9 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
+import type { Dispatch, SetStateAction} from "react";
+import type React from "react";
+import { useEffect, useState } from "react"
+import type {
+  SelectChangeEvent
+} from "@mui/material";
 import {
   Box,
   Typography,
@@ -11,8 +16,7 @@ import {
   ListItemText,
   Tooltip,
   Slider,
-  Chip,
-  SelectChangeEvent
+  Chip
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import InfoIcon from "@mui/icons-material/Info"
@@ -20,7 +24,7 @@ import { grey } from "@mui/material/colors"
 import ViewColumnIcon from "@mui/icons-material/ViewColumn"
 import FilterAltIcon from "@mui/icons-material/FilterAlt"
 import { createTheme, ThemeProvider } from "@mui/material"
-import {
+import type {
   IFilter,
   VisualColumn,
 } from "../../../../shared/models/dataexploration.model"
@@ -30,7 +34,8 @@ import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
 import MapControls from "../ChartControls/data-exploration-map-control"
 import ChartButtonGroup from "./ChartButtonGroup"
-import { RootState, useAppSelector } from "../../../../store/store"
+import type { RootState} from "../../../../store/store";
+import { useAppSelector } from "../../../../store/store"
 
 interface IControlPanel {
   originalColumns: VisualColumn[]

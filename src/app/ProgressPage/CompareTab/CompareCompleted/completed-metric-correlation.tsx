@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Vega, VisualizationSpec } from 'react-vega';
+import type React from 'react';
+import { useState } from 'react';
+import type { VisualizationSpec } from 'react-vega';
+import { Vega } from 'react-vega';
 import { Paper, Box, Typography, IconButton, Tooltip, FormControl, Select, MenuItem } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import { useAppSelector, RootState } from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
  
 interface Props {
     workflowIds?: string[];

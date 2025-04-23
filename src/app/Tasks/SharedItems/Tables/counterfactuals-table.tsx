@@ -19,7 +19,7 @@ import { useAppDispatch } from "../../../../store/store"
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import CircularProgress from "@mui/material/CircularProgress"
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
-import { IPlotModel } from "../../../../shared/models/plotmodel.model"
+import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
 
 const style = {

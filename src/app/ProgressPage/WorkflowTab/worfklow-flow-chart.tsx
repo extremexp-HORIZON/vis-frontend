@@ -1,20 +1,21 @@
 import { useEffect, useRef, useState } from "react"
+import type {
+  Node,
+  Edge} from "@xyflow/react";
 import {
   ReactFlow,
   Controls,
   Background,
   useReactFlow,
   ReactFlowProvider,
-  Position,
-  Node,
-  Edge,
+  Position
 } from "@xyflow/react"
 import { useTheme } from "@mui/material/styles"
 
 import "@xyflow/react/dist/style.css"
-import { ITask } from "../../../shared/models/experiment/task.model"
+import type { ITask } from "../../../shared/models/experiment/task.model"
 import { Tooltip } from "@mui/material"
-import { IParam } from "../../../shared/models/experiment/param.model"
+import type { IParam } from "../../../shared/models/experiment/param.model"
 
 const startEndNodeStyle = {
   borderRadius: "100%",

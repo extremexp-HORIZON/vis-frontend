@@ -1,6 +1,7 @@
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
-import { RootState, useAppSelector } from "../../../store/store"
-import { IMetric } from "../../../shared/models/experiment/metric.model"
+import type { RootState} from "../../../store/store";
+import { useAppSelector } from "../../../store/store"
+import type { IMetric } from "../../../shared/models/experiment/metric.model"
 
 interface GroupMetrics {
   value: number;

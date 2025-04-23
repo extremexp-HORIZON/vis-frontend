@@ -128,7 +128,8 @@
 import { Box, Typography } from "@mui/material"
 import WorkflowMetricsTable from "./Deprecated/workflow-metrics-table"
 import WorkflowTrends from "./workflow-metrics-trend"
-import { useAppSelector, RootState } from "../../../store/store"
+import type { RootState } from "../../../store/store";
+import { useAppSelector } from "../../../store/store"
 import { useSearchParams } from "react-router-dom"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"

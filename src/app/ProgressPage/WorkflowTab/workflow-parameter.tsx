@@ -1,11 +1,12 @@
-import { RootState, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppSelector } from "../../../store/store"
 import WorkflowParameterDistribution from "./workflow-parameter-distribution"
 import {IconButton, Paper, Tooltip, Typography } from "@mui/material"
 import CompareArrowsRoundedIcon from '@mui/icons-material/CompareArrowsRounded'
 
 import theme from "../../../mui-theme"
 import { useParams } from "react-router-dom"
-import { IRun } from "../../../shared/models/experiment/run.model"
+import type { IRun } from "../../../shared/models/experiment/run.model"
 import { setCache } from "../../../shared/utils/localStorageCache"
 
 

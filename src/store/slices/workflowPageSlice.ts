@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import type {
+  IWorkflowPageModel} from "../../shared/models/workflow.tab.model";
 import {
-  IWorkflowPageModel,
   defaultWorkflowPageModel,
 } from "../../shared/models/workflow.tab.model"
 import {
@@ -16,8 +17,8 @@ import {
   explainabilityExtraReducers,
 } from "../../shared/models/tasks/data-exploration-task.model"
 import { userInteractionDefault } from "../../shared/models/tasks/user-interaction.model"
-import { IRun } from "../../shared/models/experiment/run.model"
-import { IMetric } from "../../shared/models/experiment/metric.model"
+import type { IRun } from "../../shared/models/experiment/run.model"
+import type { IMetric } from "../../shared/models/experiment/metric.model"
 import { experimentApi } from "../../app/api/api"
 
 export interface IWorkflowPage {

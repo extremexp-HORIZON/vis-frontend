@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { CustomGridColDef } from "../../shared/types/table-types"
+import type { CustomGridColDef } from "../../shared/types/table-types"
 
 interface IMonitoringPageSlice {
     parallel: {

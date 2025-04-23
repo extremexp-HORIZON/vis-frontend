@@ -1,6 +1,7 @@
 import { Box, Paper } from "@mui/material";
 import DatasetTreeView from "./dataset-tree-view";
-import { RootState, useAppSelector } from "../../../../store/store";
+import type { RootState} from "../../../../store/store";
+import { useAppSelector } from "../../../../store/store";
 import DataExplorationComponent from "./DataExplorationComponent";
 import { useSearchParams } from "react-router-dom";
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"

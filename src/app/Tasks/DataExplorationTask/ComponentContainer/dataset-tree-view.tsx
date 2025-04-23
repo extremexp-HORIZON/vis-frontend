@@ -3,7 +3,8 @@ import { useEffect, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView"
 import { TreeItem2 } from "@mui/x-tree-view/TreeItem2"
-import { useAppDispatch, useAppSelector, RootState } from "../../../../store/store"
+import type { RootState } from "../../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setDataTable } from "../../../../store/slices/workflowPageSlice"
 import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
 import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';

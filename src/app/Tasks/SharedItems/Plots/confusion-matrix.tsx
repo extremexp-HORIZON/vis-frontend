@@ -7,7 +7,7 @@ import { VegaLite } from "react-vega"
 import InfoIcon from "@mui/icons-material/Info"
 import grey from "@mui/material/colors/grey"
 import { useEffect, useState } from "react"
-import { IDataExplorationResponse } from "../../../../shared/models/dataexploration.model"
+import type { IDataExplorationResponse } from "../../../../shared/models/dataexploration.model"
 import CircularProgress from "@mui/material/CircularProgress"
 import Skeleton from "@mui/material/Skeleton"
 

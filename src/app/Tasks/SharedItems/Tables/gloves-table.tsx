@@ -1,5 +1,6 @@
-import React from "react";
-import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
+import type React from "react";
+import type { GridColDef, GridRowsProp } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material";
 

@@ -1,8 +1,11 @@
 // ///////ORIGINAL
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import type { GridFilterModel
+} from '@mui/x-data-grid';
 import {
   DataGrid, GridColDef, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer,
-  GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton, GridFilterModel
+  GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton
 } from '@mui/x-data-grid';
 import { Box, Paper, Button } from '@mui/material';
 

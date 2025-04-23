@@ -1,4 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react"
+import type React from "react";
+import { useEffect, useMemo, useState } from "react"
+import type {
+  SelectChangeEvent} from "@mui/material";
 import {
   Button,
   Typography,
@@ -11,10 +14,9 @@ import {
   Collapse,
   Tooltip,
   Paper,
-  CircularProgress,
-  SelectChangeEvent,
+  CircularProgress
 } from "@mui/material"
-import { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
+import type { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
 import {
   fetchAffected,
   fetchModelAnalysisExplainabilityPlot,

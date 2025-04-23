@@ -1,4 +1,4 @@
-import {IPlotModel } from "./plotmodel.model";
+import type {IPlotModel } from "./plotmodel.model";
 
 export interface IInitialization {
   featureExplanation: {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useAppSelector } from "../../../../../store/store"
 import { Box} from "@mui/material"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
-import { RootState } from "../../../../../store/store"
+import type { RootState } from "../../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../../shared/components/responsive-card-vegalite"
 import InfoMessage from "../../../../../shared/components/InfoMessage"
 

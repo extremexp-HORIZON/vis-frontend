@@ -1,5 +1,6 @@
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
-import { RootState, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppSelector } from "../../../store/store"
 
 const WorkflowParameterDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)

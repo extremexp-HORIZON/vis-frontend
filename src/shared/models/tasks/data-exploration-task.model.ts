@@ -1,10 +1,11 @@
+import type {
+  ActionReducerMapBuilder} from "@reduxjs/toolkit";
 import {
-  ActionReducerMapBuilder,
   createAsyncThunk,
   PayloadAction,
 } from "@reduxjs/toolkit"
-import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
-import {
+import type { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
+import type {
   IDataExplorationRequest,
   IDataExplorationResponse,
   IFilter,

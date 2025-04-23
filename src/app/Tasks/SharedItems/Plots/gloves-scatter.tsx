@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
-import { VegaLite, VisualizationSpec } from "react-vega"
+import type { VisualizationSpec } from "react-vega";
+import { VegaLite } from "react-vega"
 import {
   FormControl,
   InputLabel,

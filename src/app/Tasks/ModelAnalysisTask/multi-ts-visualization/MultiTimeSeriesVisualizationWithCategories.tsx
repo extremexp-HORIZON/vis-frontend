@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef, SetStateAction, Dispatch } from 'react';
+import type { SetStateAction, Dispatch } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { View , VisualizationSpec } from 'react-vega';
 import { VegaLite } from 'react-vega';
 import * as vega from "vega";
@@ -11,7 +12,7 @@ import { getVlSpec } from './vegaLiteSpec';
 import type { SelectChangeEvent} from '@mui/material';
 import { Checkbox, CircularProgress, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import grey from "@mui/material/colors/grey"
-import { IDataExplorationResponse } from '../../../../shared/models/dataexploration.model';
+import type { IDataExplorationResponse } from '../../../../shared/models/dataexploration.model';
 
 interface Metadata {
   id: string;

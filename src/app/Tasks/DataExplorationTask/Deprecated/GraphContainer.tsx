@@ -1,15 +1,15 @@
-import React from "react"
+import type React from "react"
 import { Box, ButtonGroup, Button, Paper, Pagination } from "@mui/material"
 import LineChart from "../Charts/data-exploration-line-chart"
 import ChartButtonGroup from "../ChartControls/data-exploration-chart-button-group"
-import { VisualColumn } from "../../../../shared/models/dataexploration.model"
+import type { VisualColumn } from "../../../../shared/models/dataexploration.model"
 import BarChart from "../Charts/data-exploration-bar-chart"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
 import ScatterChart from "../Charts/data-exploration-scatter-chart"
 import MapChart from "../Charts/data-exploration-map-chart"
 import TableExpand from "../DataTable/TableExpand"
-import { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
-import { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
+import type { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
+import type { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
 
 interface IGraphContainer {
 

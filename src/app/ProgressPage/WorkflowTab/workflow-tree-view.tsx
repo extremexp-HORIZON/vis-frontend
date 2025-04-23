@@ -10,7 +10,8 @@ import TableChartRoundedIcon from "@mui/icons-material/TableChartRounded"
 import DataObjectRoundedIcon from "@mui/icons-material/DataObjectRounded"
 import ImageRoundedIcon from "@mui/icons-material/ImageRounded"
 import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRounded"
-import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store"
 import {
   setDataTable,
   setSelectedTask,

@@ -1,4 +1,4 @@
-import { IMetricDefinition } from "./metric-definition.model";
+import type { IMetricDefinition } from "./metric-definition.model";
 
 export interface IExperiment {
     /** Unique identifier for the experiment. */

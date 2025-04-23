@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import { RootState, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppSelector } from "../../../store/store"
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';

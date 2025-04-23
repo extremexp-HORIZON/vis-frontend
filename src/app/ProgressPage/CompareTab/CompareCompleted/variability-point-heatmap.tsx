@@ -1,16 +1,19 @@
-import React, { useState, useMemo } from "react"
-import {VisualizationSpec } from "react-vega"
+import type React from "react";
+import { useState, useMemo } from "react"
+import type {VisualizationSpec } from "react-vega"
+import type {
+  SelectChangeEvent} from "@mui/material";
 import {
   FormControl,
   Select,
   MenuItem,
   Typography,
-  SelectChangeEvent,
   Box,
 } from "@mui/material"
+import type {
+  RootState} from "../../../../store/store";
 import {
-  useAppSelector,
-  RootState,
+  useAppSelector
 } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"

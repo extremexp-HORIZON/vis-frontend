@@ -1,9 +1,10 @@
 import { useLocation, useParams } from "react-router-dom"
-import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store"
 import { Container, Grid, ButtonGroup, Button } from "@mui/material"
 import { useEffect, useState } from "react"
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
-import { IMetric } from "../../../shared/models/experiment/metric.model"
+import type { IMetric } from "../../../shared/models/experiment/metric.model"
 import { useSearchParams } from "react-router-dom"
 import { fetchWorkflowMetrics } from "../../../store/slices/workflowPageSlice"
 import InfoMessage from "../../../shared/components/InfoMessage"

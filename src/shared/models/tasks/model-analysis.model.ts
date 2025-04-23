@@ -1,12 +1,13 @@
-import { ActionReducerMapBuilder, createAsyncThunk } from "@reduxjs/toolkit"
-import { IPlotModel } from "../plotmodel.model"
-import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
-import {
+import type { ActionReducerMapBuilder} from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit"
+import type { IPlotModel } from "../plotmodel.model"
+import type { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
+import type {
   fetchAffectedRequest,
   IDataExplorationRequest,
   IDataExplorationResponse
 } from "../dataexploration.model"
-import { FetchExplainabilityPlotPayload } from "./explainability.model"
+import type { FetchExplainabilityPlotPayload } from "./explainability.model"
 import { api } from "../../../app/api/api"
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({

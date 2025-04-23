@@ -1,5 +1,6 @@
-import React from "react";
-import { Box, Typography, Paper, SvgIconProps } from "@mui/material";
+import type React from "react";
+import type { SvgIconProps } from "@mui/material";
+import { Box, Typography, Paper } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import WarningIcon from "@mui/icons-material/Warning";
 import ErrorIcon from "@mui/icons-material/Error";

@@ -1,7 +1,8 @@
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
+import type {
+  RootState} from "../../../../../store/store";
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from "../../../../../store/store"
@@ -13,8 +14,8 @@ import {
   explainabilityQueryDefault,
   fetchExplainabilityPlot,
 } from "../../../../../shared/models/tasks/explainability.model"
-import { IWorkflowPageModel } from "../../../../../shared/models/workflow.tab.model"
-import { IRun } from "../../../../../shared/models/experiment/run.model"
+import type { IWorkflowPageModel } from "../../../../../shared/models/workflow.tab.model"
+import type { IRun } from "../../../../../shared/models/experiment/run.model"
 
 interface IExplainabilityTaskCompare {
   workflow: IWorkflowPageModel | null

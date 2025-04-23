@@ -1,5 +1,6 @@
 import Grid from "@mui/material/Grid"
-import { RootState, useAppDispatch, useAppSelector } from "../../store/store"
+import type { RootState} from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store"
 import Typography from "@mui/material/Typography"
 import LinearProgress from "@mui/material/LinearProgress"
 import { useEffect, useState } from "react"

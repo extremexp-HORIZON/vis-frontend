@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material"
 import StaticDirectedGraph from "../worfklow-flow-chart"
 import WorkflowTaskConfiguration from "./workflow-task-configuration"
-import { useAppSelector, RootState } from "../../../../store/store"
+import type { RootState } from "../../../../store/store";
+import { useAppSelector } from "../../../../store/store"
 import { useLocation, useNavigate } from "react-router-dom"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import InfoMessage from "../../../../shared/components/InfoMessage"

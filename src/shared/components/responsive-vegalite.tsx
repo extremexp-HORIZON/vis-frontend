@@ -1,5 +1,6 @@
 import { Box } from "@mui/material"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react"
 import { VegaLite } from "react-vega"
 
 interface ResponsiveVegaLiteProps {

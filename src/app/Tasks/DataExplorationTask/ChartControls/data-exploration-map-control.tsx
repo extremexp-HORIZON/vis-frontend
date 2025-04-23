@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import type React from "react";
+import { useEffect } from "react";
 import {
   Box,
   Checkbox,
@@ -9,7 +10,7 @@ import {
   OutlinedInput,
   Select,
 } from "@mui/material";
-import { VisualColumn } from "../../../../shared/models/dataexploration.model";
+import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
 interface MapControlsProps {
   columns: string[];
   colorBy: string;

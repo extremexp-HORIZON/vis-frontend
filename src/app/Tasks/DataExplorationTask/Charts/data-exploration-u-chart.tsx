@@ -1,5 +1,6 @@
 import { useEffect } from "react"
-import { useAppSelector, RootState, useAppDispatch } from "../../../../store/store"
+import type { RootState} from "../../../../store/store";
+import { useAppSelector, useAppDispatch } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import { Box, useTheme, useMediaQuery } from "@mui/material"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"

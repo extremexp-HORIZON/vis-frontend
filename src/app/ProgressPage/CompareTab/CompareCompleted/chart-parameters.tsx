@@ -1,5 +1,5 @@
 import { Box } from "@mui/material"
-import React from "react"
+import type React from "react"
 
 const ChartParameters: React.FC<{ children: React.ReactNode }> = ({
   children = <></>,

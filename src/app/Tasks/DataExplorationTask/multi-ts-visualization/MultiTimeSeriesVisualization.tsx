@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import { getSpecConcat } from './vegaLiteSpecData';
-import { IDataExplorationResponse } from '../../../../shared/models/dataexploration.model';
+import type { IDataExplorationResponse } from '../../../../shared/models/dataexploration.model';
 
 interface Data {
   series: string;

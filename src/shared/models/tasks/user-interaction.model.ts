@@ -1,5 +1,5 @@
-import { PayloadAction } from "@reduxjs/toolkit"
-import { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
+import type { PayloadAction } from "@reduxjs/toolkit"
+import type { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
 
 export interface IUserInteraction {
   url: string

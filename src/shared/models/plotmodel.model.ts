@@ -1,4 +1,4 @@
-import { Axis, Features } from "./initialization.model";
+import type { Axis, Features } from "./initialization.model";
 
 export interface IPlotModel {
     explainabilityType: "featureExplanation" | "hyperparameterExplanation";

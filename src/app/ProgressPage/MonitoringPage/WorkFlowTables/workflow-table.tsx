@@ -20,7 +20,7 @@ import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
 import theme from "../../../../mui-theme"
 import { debounce } from "lodash";
-import { CustomGridColDef } from "../../../../shared/types/table-types"
+import type { CustomGridColDef } from "../../../../shared/types/table-types"
 
 export interface Data {
   [key: string]: any

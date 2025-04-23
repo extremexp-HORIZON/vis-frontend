@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react"
+import type {
+  SelectChangeEvent} from "@mui/material";
 import {
   Box,
   Typography,
   FormControl,
   Select,
-  MenuItem,
-  SelectChangeEvent,
+  MenuItem
 } from "@mui/material"
+import type {
+  RootState} from "../../../../store/store";
 import {
   useAppSelector,
-  RootState,
   useAppDispatch,
 } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"

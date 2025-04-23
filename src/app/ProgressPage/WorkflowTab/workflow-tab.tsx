@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box"
 import { useEffect } from "react"
-import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import {  Paper } from "@mui/material"
 import { fetchWorkflowMetrics, initTab, resetWorkflowTab } from "../../../store/slices/workflowPageSlice"

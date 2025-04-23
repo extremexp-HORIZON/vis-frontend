@@ -17,7 +17,7 @@ import {
   fetchModelAnalysisData,
   fetchModelAnalysisExplainabilityPlot,
 } from "../../../shared/models/tasks/model-analysis.model"
-import { IWorkflowPageModel } from "../../../shared/models/workflow.tab.model"
+import type { IWorkflowPageModel } from "../../../shared/models/workflow.tab.model"
 import {
   explainabilityQueryDefault,
   fetchExplainabilityPlotPayloadDefault,

@@ -1,7 +1,9 @@
-import React, { useState } from "react"
+import type React from "react";
+import { useState } from "react"
+import type {
+  GridFilterModel} from "@mui/x-data-grid";
 import {
-  DataGrid,
-  GridFilterModel,
+  DataGrid
 } from "@mui/x-data-grid"
 import { Box, Paper, styled } from "@mui/material"
 import { useAppSelector } from "../../../../store/store"

@@ -7,12 +7,13 @@ import {
   ListItemText,
   Box,
 } from "@mui/material"
-import { RootState, useAppSelector } from "../../../../store/store"
+import type { RootState} from "../../../../store/store";
+import { useAppSelector } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"
 import ChartParameters from "./chart-parameters"
 import ResponsiveVegaLite from "../../../../shared/components/responsive-vegalite"
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
-import { IMetric } from "../../../../shared/models/experiment/metric.model"
+import type { IMetric } from "../../../../shared/models/experiment/metric.model"
 
 const MetricsDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)

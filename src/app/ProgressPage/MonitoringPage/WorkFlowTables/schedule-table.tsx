@@ -6,7 +6,8 @@ import { Close } from "@mui/icons-material"
 import ToolBarWorkflow from "./toolbar-workflow-table"
 import FilterBar from "./filter-bar"
 import { Popover, styled } from "@mui/material"
-import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
+import type { RootState} from "../../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useRef, useState } from "react"
 import { setScheduledTable } from "../../../../store/slices/monitorPageSlice"
 import type { GridRowSelectionModel, GridColumnNode } from "@mui/x-data-grid"
@@ -14,7 +15,7 @@ import { DataGrid } from "@mui/x-data-grid"
 import theme from "../../../../mui-theme"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ScheduleIcon from "@mui/icons-material/Schedule"
-import { CustomGridColDef } from "../../../../shared/types/table-types"
+import type { CustomGridColDef } from "../../../../shared/types/table-types"
 export interface Data {
   [key: string]: string | number | boolean
 }

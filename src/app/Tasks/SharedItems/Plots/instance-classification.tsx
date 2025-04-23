@@ -13,7 +13,7 @@ import grey from "@mui/material/colors/grey"
 import { VegaLite } from "react-vega"
 import _ from "lodash"
 import { Checkbox, CircularProgress, LinearProgress, Skeleton, useTheme } from "@mui/material"
-import { IDataExplorationResponse } from "../../../../shared/models/dataexploration.model"
+import type { IDataExplorationResponse } from "../../../../shared/models/dataexploration.model"
 import { green } from "@mui/material/colors"
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 

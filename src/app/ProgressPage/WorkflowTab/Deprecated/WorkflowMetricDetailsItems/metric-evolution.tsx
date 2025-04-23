@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { VegaLite } from "react-vega"
 import InfoIcon from "@mui/icons-material/Info"
-import { VisualizationSpec } from "vega-embed"
+import type { VisualizationSpec } from "vega-embed"
 
 import {
   Paper,

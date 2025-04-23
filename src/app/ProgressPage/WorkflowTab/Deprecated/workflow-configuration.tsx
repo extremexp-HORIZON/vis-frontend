@@ -1,7 +1,8 @@
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
 import IconButton from "@mui/material/IconButton"
-import { useEffect, useRef, useState, MouseEvent } from "react"
+import type { MouseEvent } from "react";
+import { useEffect, useRef, useState } from "react"
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
 
