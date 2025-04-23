@@ -53,7 +53,10 @@ const WorkflowTaskOverview = () => {
                   variant="overline"
                   sx={{
                     padding: "4px 8px",
-                    textTransform: "uppercase", // Optional: Makes the text uppercase (can be removed)
+                    textTransform: "uppercase",
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                    color: '#2a3f5f'    
                   }}
                 >
                   Task Metadata
@@ -147,13 +150,15 @@ const WorkflowTaskOverview = () => {
                   variant="overline"
                   sx={{
                     padding: "4px 8px",
-                    textTransform: "uppercase", // Optional: Makes the text uppercase (can be removed)
+                    textTransform: "uppercase",
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                    color: '#2a3f5f'    
                   }}
                 >
                   Task Parameters
                 </Typography>
               }
-              // subheader="September 14, 2016"
               sx={{
                 background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
                 borderBottom: '1px solid rgba(0, 0, 0, 0.08)',

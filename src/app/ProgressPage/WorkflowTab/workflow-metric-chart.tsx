@@ -272,7 +272,10 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
             variant="overline"
             sx={{
               padding: "4px 8px",
-              textTransform: "uppercase", // Optional: Makes the text uppercase (can be removed)
+              textTransform: "uppercase",
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+              color: '#2a3f5f'
             }}
           >
             Metric Details
@@ -355,7 +358,10 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
             variant="overline"
             sx={{
               padding: "4px 8px",
-              textTransform: "uppercase", // Optional: Makes the text uppercase (can be removed)
+              textTransform: "uppercase",
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+              color: '#2a3f5f'
             }}
           >
             Comparison Across All Workflows
