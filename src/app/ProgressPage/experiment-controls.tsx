@@ -2,7 +2,7 @@ import { Box, IconButton, Typography, CircularProgress } from "@mui/material"
 import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
-import { useNavigate, useParams, useSearchParams } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import type { RootState} from "../../store/store";
 import { useAppSelector, useAppDispatch } from "../../store/store"
 import Rating from "@mui/material/Rating";

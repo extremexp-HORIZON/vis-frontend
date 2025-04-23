@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, IconButton, Paper, Tooltip, Checkbox, FormControlLabel, Autocomplete, TextField } from "@mui/material";
+import { useEffect, useState } from 'react';
+import { Box, Typography, IconButton, Paper, Tooltip, Autocomplete, TextField } from "@mui/material";
 import { VegaLite } from "react-vega";
 import InfoIcon from "@mui/icons-material/Info";
 import grey from "@mui/material/colors/grey";

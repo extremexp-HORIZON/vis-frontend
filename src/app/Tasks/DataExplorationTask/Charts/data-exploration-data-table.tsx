@@ -3,8 +3,7 @@ import {
   DataGrid,
   GridFilterModel,
 } from "@mui/x-data-grid"
-import { Box, Paper, styled, Typography } from "@mui/material"
-
+import { Box, Paper, styled } from "@mui/material"
 import { useAppSelector } from "../../../../store/store"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"

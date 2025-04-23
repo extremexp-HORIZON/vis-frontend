@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useAppSelector, RootState, useAppDispatch } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import { Box, useTheme, useMediaQuery } from "@mui/material"

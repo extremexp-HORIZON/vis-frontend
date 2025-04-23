@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, useMediaQuery } from "@mui/material"
+import { Box, useTheme, useMediaQuery } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
 import InfoMessage from "../../../../shared/components/InfoMessage"
@@ -13,6 +13,7 @@ const BarChart = () => {
   const dispatch = useAppDispatch()
   const {tab} = useAppSelector(state => state.workflowPage)
     const theme = useTheme()
+    
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
     useEffect(() => {
      

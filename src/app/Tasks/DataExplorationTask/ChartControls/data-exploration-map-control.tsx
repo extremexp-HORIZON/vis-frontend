@@ -8,10 +8,6 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  Slider,
-  ThemeProvider,
-  Typography,
-  createTheme,
 } from "@mui/material";
 import { VisualColumn } from "../../../../shared/models/dataexploration.model";
 interface MapControlsProps {
@@ -44,11 +40,8 @@ const MapControls: React.FC<MapControlsProps> = ({
   selectedColumns,
   setSelectedColumns,
   timestampField,
-  data,
   tripsMode,
   setTripsMode,
-  sliderValue,
-  setSliderValue,
   lat,
   setLat,
   lon,
@@ -56,16 +49,6 @@ const MapControls: React.FC<MapControlsProps> = ({
   columnsMapDouble
   
 }) => {
-  const theme = createTheme({
-    palette: {
-      primary: { main: "#1976d2" },
-      secondary: { main: "#dc004e" },
-    },
-    typography: {
-      fontFamily: "Arial",
-      h6: { fontWeight: 600 },
-    },
-  });
 
   useEffect(() => {
     setTripsMode(!!timestampField && selectedColumns.length > 0)
@@ -148,11 +131,7 @@ const MapControls: React.FC<MapControlsProps> = ({
             ))}
           </Select>
         </FormControl>
-
-        
       </Box>
-
-     
   );
 };
 

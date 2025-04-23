@@ -1,9 +1,5 @@
 import { Box, Divider, Typography } from "@mui/material"
 import {
-  JSXElementConstructor,
-  ReactElement,
-  ReactNode,
-  ReactPortal,
   useEffect,
   useMemo,
 } from "react"

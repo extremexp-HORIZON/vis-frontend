@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from "@mui/material"
+import { Box, Grid } from "@mui/material"
 import MetricEvaluation from "./WorkflowMetricDetailsItems/metric-evaluation"
 import RuntimeDecomposition from "./WorkflowMetricDetailsItems/runtime-decomposition";
 import { ITask } from "../../../../shared/models/experiment/task.model";

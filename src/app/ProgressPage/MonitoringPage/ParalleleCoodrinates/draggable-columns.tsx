@@ -1,7 +1,6 @@
 import { DndContext, closestCenter } from "@dnd-kit/core"
 import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { useState } from "react"
 import { Paper, styled } from "@mui/material"
 
 const StyledPaper = styled(Paper)(({ theme }) => ({

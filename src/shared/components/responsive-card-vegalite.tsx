@@ -311,6 +311,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     width: 320,
                     maxHeight: 500,
                     overflowY: "auto",
+                    overflowX: "hidden",
                     padding: 0,
                     borderRadius: '12px',
                     boxShadow: '0 10px 30px rgba(0,0,0,0.16)',

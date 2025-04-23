@@ -1,6 +1,6 @@
 import { RootState, useAppSelector } from "../../../store/store"
 import WorkflowParameterDistribution from "./workflow-parameter-distribution"
-import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material"
+import {IconButton, Paper, Tooltip, Typography } from "@mui/material"
 import CompareArrowsRoundedIcon from '@mui/icons-material/CompareArrowsRounded'
 
 import theme from "../../../mui-theme"

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react"
-import { VegaLite, VisualizationSpec } from "react-vega"
+import {VisualizationSpec } from "react-vega"
 import {
   FormControl,
   Select,
@@ -10,7 +10,6 @@ import {
 } from "@mui/material"
 import {
   useAppSelector,
-  useAppDispatch,
   RootState,
 } from "../../../../store/store"
 import WorkflowCard from "../../../../shared/components/workflow-card"
@@ -26,7 +25,6 @@ interface ChartData {
 
 const VariabilityPointHeatmap: React.FC = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
-  const dispatch = useAppDispatch()
 
   // Derive available metrics and variability points from the workflows data
   const metrics = useMemo(() => {

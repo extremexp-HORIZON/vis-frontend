@@ -1,7 +1,6 @@
 import grey from "@mui/material/colors/grey"
 import Box from "@mui/material/Box"
 import { Dispatch, SetStateAction, useEffect, useRef } from "react"
-import blue from "@mui/material/colors/blue"
 import Svg from "../../../shared/data/new.svg?react"
 import { useTheme } from "@mui/material"
 

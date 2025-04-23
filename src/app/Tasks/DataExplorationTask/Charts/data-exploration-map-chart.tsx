@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import {
   Box,
-  Chip,
   Paper,
-  Slider,
-  ThemeProvider,
   Typography,
   createTheme,
 } from "@mui/material"
@@ -53,8 +50,6 @@ interface IMapChartProps {
 
 const MapChart = ({
   data,
-  workflow,
-  columns,
   colorBy,
   tripsMode,
   selectedColumns,

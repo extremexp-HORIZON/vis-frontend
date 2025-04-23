@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react"
-import { VegaLite } from "react-vega"
 import {
   Box,
   Typography,
   FormControl,
   Select,
   MenuItem,
-  Chip,
   SelectChangeEvent,
 } from "@mui/material"
 import {
@@ -94,14 +92,8 @@ const VariabilityPointCharts = () => {
     setSelectedVariabilityPoint(event.target.value)
   }
 
-  const ITEM_HEIGHT = 48
-  const ITEM_PADDING_TOP = 8
-
   useEffect(() => {
     const handleResize = () => {
-      const chartContainerWidth =
-        (document.querySelector(".chart-container") as HTMLElement | null)
-          ?.offsetWidth || 300
       // if (chartContainerWidth) {
       //   setChartWidth(
       //     Math.max(

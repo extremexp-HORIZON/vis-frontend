@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Vega, VisualizationSpec } from 'react-vega';
 import { Paper, Box, Typography, IconButton, Tooltip, FormControl, Select, MenuItem } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import { useAppSelector, useAppDispatch, RootState } from '../../../../store/store';
+import { useAppSelector, RootState } from '../../../../store/store';
  
 interface Props {
     workflowIds?: string[];
@@ -12,7 +12,6 @@ const CompletedMetricCorrelation: React.FC<Props> = ({ workflowIds }) => {
     const { workflows  } = useAppSelector(
         (state: RootState) => state.progressPage,
       )
-    const dispatch = useAppDispatch();
     let filteredWorkflows = workflows.data.filter(wf => wf.status === "COMPLETED");
     if (workflowIds && workflowIds.length > 0) {
         filteredWorkflows = filteredWorkflows.filter(wf => workflowIds.includes(wf.id));

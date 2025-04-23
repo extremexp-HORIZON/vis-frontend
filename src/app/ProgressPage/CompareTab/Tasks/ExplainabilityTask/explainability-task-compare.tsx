@@ -12,9 +12,7 @@ import Typography from "@mui/material/Typography"
 import {
   explainabilityQueryDefault,
   fetchExplainabilityPlot,
-  fetchExplainabilityPlotPayloadDefault,
 } from "../../../../../shared/models/tasks/explainability.model"
-import { useParams } from "react-router-dom"
 import { IWorkflowPageModel } from "../../../../../shared/models/workflow.tab.model"
 import { IRun } from "../../../../../shared/models/experiment/run.model"
 

@@ -8,7 +8,6 @@ import CompareCompletedSvg from "./compare-completed-svg"
 import { useEffect, useState } from "react"
 import ExplainabilityTaskCompare from "../Tasks/ExplainabilityTask/explainability-task-compare"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
-import ExperimentControls from "../../experiment-controls"
 import { initTab } from "../../../../store/slices/workflowPageSlice"
 
 const CompareCompleted = () => {

@@ -9,20 +9,13 @@ import {
   Button,
   Stack,
   Box,
-  Chip,
   Popover,
-  FormControlLabel,
-  Checkbox,
   List,
   ListItemButton,
   Badge,
-  Paper,
-  Divider,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Switch,
-  ButtonGroup
 } from "@mui/material"
 import type {
   RootState} from "../../../../store/store";
@@ -36,7 +29,6 @@ import {
   setWorkflowsTable,
   setGroupBy,
 } from "../../../../store/slices/monitorPageSlice"
-import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import { useState } from "react"
 import PivotTableChartRoundedIcon from "@mui/icons-material/PivotTableChartRounded"
 import ViewColumnIcon from "@mui/icons-material/ViewColumn"

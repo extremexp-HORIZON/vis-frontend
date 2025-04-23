@@ -10,7 +10,6 @@ import {
   Button,
   ButtonGroup,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Checkbox,
