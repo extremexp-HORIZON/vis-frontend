@@ -6,9 +6,11 @@ import {
 } from "@reduxjs/toolkit"
 import type { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
 import type {
+  IDataExplorationMetaDataResponse,
   IDataExplorationRequest,
   IDataExplorationResponse,
   IFilter,
+  IMetaDataRequest,
   VisualColumn,
 } from "../dataexploration.model"
 import {
@@ -49,7 +51,7 @@ export interface IDataExploration {
     error: string | null
   }
   metaData: {
-    data: IDataExplorationResponse | null
+    data: IDataExplorationMetaDataResponse | null
     loading: boolean
     error: string | null
   }
@@ -284,10 +286,10 @@ export const fetchDataExplorationData = createAsyncThunk(
 
 export const fetchMetaData = createAsyncThunk(
   "workflowTasks/data_exploration/fetch_metadata",
-  async (payload: IDataExplorationRequest) => {
+  async (payload: IMetaDataRequest) => {
     const requestUrl = "data/metadata"
     return api
-      .post<IDataExplorationResponse>(requestUrl, payload.query)
+      .post<IDataExplorationMetaDataResponse>(requestUrl, payload.query)
       .then(response => response.data)
   },
 )

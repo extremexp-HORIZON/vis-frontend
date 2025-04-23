@@ -37,7 +37,6 @@ const ColumnsPanel = () => {
         datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
         columns: columns.map(col => col.name),
         filters: tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
-        limit: 100,
       },
       metadata: {
         workflowId: tab?.workflowId || "",

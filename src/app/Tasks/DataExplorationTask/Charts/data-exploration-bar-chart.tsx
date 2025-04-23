@@ -24,7 +24,6 @@ const BarChart = () => {
                 datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
                 groupBy:tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy,
                 aggregation:tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,
-                limit: 1000,
               },
               metadata: {
                 workflowId: tab?.workflowId || "",

@@ -1,5 +1,3 @@
-import { IModelAnalysis } from "./tasks/model-analysis.model"
-
 export interface IDataExplorationQuery {
   datasetId: string
   columns?: string[]
@@ -22,6 +20,19 @@ export interface IDataExplorationRequest {
   }
 }
 
+export interface IMetaDataQuery{
+  datasetId: string
+  type?: "csv" | "zenoh"
+}
+export interface IMetaDataRequest {
+  query: IMetaDataQuery
+  metadata: {
+    workflowId: string | number
+    queryCase: any
+  }
+}
+
+
 export interface fetchAffectedRequest{
     workflowId: string | number
     queryCase: any
@@ -30,20 +41,24 @@ export interface fetchAffectedRequest{
 export interface VisualColumn {
   name: string
   type: string
-  // Add any other properties specific to the column metadata
 }
 
 // Model for TabularResults
 export interface IDataExplorationResponse {
   data: any
-  fileNames: string[]
-  columns: VisualColumn[]
-  originalColumns: VisualColumn[]
-  timestampColumn?: string
   totalItems: number
   querySize: number
+  columns: VisualColumn[]
+
+}
+export interface IDataExplorationMetaDataResponse {
+  datasetType: string
+  fileNames: string[]
+  originalColumns: VisualColumn[]
+  totalItems: number
   uniqueColumnValues: any
   hasLatLonColumns:boolean
+  timeColumn?: string[]
 }
 
 export interface IFilter {
