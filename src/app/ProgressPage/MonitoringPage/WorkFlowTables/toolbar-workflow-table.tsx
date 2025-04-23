@@ -217,7 +217,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             variant="contained"
             disabled={numSelected < 2 && tableName === "Workflow Execution"}
             style={{ fontSize: "11px" }}
-            onClick={handleClickedFunction("compare-completed")} // TODO: Get the selected and get right value to open new tab or cancel scheduled
+            onClick={handleClickedFunction("compare-completed")}
           >
             {actionButtonName}
           </Button>
