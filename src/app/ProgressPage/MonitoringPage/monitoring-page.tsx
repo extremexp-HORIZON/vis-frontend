@@ -52,18 +52,6 @@ const MonitoringPage = () => {
     }
   }, [workflowsTable.initialized])
 
-
-  const handleChange =
-    (newValue: number | string | null) => (event: React.SyntheticEvent) => {
-      const queryParams = new URLSearchParams()
-
-      if (newValue !== null)
-        queryParams.append("workflowId", newValue.toString())
-
-      navigate(`/${experimentId}/workflow?${queryParams.toString()}`)
-      window.scrollTo(0, 0)
-    }
-
   return (
     <>
       {/* Sticky Header with Tabs */}
@@ -112,7 +100,7 @@ const MonitoringPage = () => {
           <Box sx={{height: "98%"}}>
             <Box sx={{ height: "60%", minHeight: "350px", paddingBottom: 1 }}>
               {visibleTable === "workflows" ? (
-                <WorkflowTable handleChange={handleChange} />
+                <WorkflowTable />
               ) : (
                 <ScheduleTable />
               )}
@@ -176,9 +164,7 @@ const MonitoringPage = () => {
                 )
               }}
             >
-              <WorkflowTable 
-                handleChange={handleChange}
-              />
+              <WorkflowTable />
             </Resizable>
             <Paper elevation={2} sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px"}}>
                 <WorkflowCharts />

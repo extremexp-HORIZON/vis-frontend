@@ -21,6 +21,7 @@ import ProgressBar from "./prgress-bar"
 import theme from "../../../../mui-theme"
 import { debounce } from "lodash";
 import type { CustomGridColDef } from "../../../../shared/types/table-types"
+import { Link, useParams } from "react-router-dom"
 
 export interface Data {
   [key: string]: any
@@ -35,34 +36,24 @@ const WorkflowRating = (props: { rating: number }) => {
 
 const WorkflowActions = (props: {
   currentStatus: string
-  workflowId: string
-  handleLaunchNewTab: (workflowId: string) => (e: React.SyntheticEvent) => void
+  workflowId: string,
+  experimentId: string | undefined,
 }) => {
-  const { currentStatus, workflowId, handleLaunchNewTab } = props
+  const { currentStatus, workflowId, experimentId } = props
 
   return (
     <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
       <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== "pending_input"}>
-      <IconButton           
-        // onClick={
-        //   (currentStatus === "COMPLETED" || currentStatus === "pending_input")
-        //     ? handleLaunchNewTab(workflowId)
-        //     : () => {}
-        // }
-        onClick={handleLaunchNewTab(workflowId)}
+      <Link
+        to={`/${experimentId}/workflow?workflowId=${workflowId}`}
       >
         <LaunchIcon
           style={{
-            // cursor: (currentStatus === "COMPLETED" || currentStatus === "pending_input") ? "pointer" : "default",
-            // color:
-            // (currentStatus === "COMPLETED" || currentStatus === "pending_input")
-            //     ? theme.palette.primary.main
-            //     : theme.palette.action.disabled,
             cursor: "pointer",
             color: theme.palette.primary.main,
           }}
         />
-      </IconButton>
+      </Link>
         </Badge>
       {currentStatus !== "COMPLETED" && currentStatus !== "FAILED" && (
         <>
@@ -121,24 +112,18 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }))
 
-interface WorkFlowTableProps {
-  handleChange: (
-    newValue: number | string,
-  ) => (event: React.SyntheticEvent) => void
-}
-
-export default function WorkflowTable(props: WorkFlowTableProps) {
+export default function WorkflowTable() {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
   )
   const { workflowsTable, selectedTab } = useAppSelector(
     (state: RootState) => state.monitorPage
   )
-  const { handleChange } = props
   const [isFilterOpen, setFilterOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const lastHoveredIdRef = useRef<string | null>(null)
+  const { experimentId } = useParams()
 
   const dispatch = useAppDispatch()
 
@@ -148,10 +133,6 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
 
   });
   dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }))
-  }
-
-  const handleLaunchNewTab = (workflowId: any) => (e: React.SyntheticEvent) => {
-    handleChange(workflowId)(e)
   }
 
   const handleLaunchCompletedTab =
@@ -462,7 +443,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
                 <WorkflowActions
                   currentStatus={currentStatus}
                   workflowId={params.row.workflowId}
-                  handleLaunchNewTab={handleLaunchNewTab}
+                  experimentId={experimentId}
                 />
               )
             },

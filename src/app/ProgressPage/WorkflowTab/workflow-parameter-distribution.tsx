@@ -12,7 +12,7 @@ const WorkflowParameterDistribution = () => {
     const completedWorkflows = workflows.data.filter(
       workflow =>
         workflow.params &&
-        workflow.status === "COMPLETED"
+        workflow.status !== "SCHEDULED"
     )
   
     const paramWorkflows = completedWorkflows

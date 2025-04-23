@@ -2,7 +2,7 @@ import { Box, IconButton, Typography, CircularProgress } from "@mui/material"
 import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import type { RootState} from "../../store/store";
 import { useAppSelector, useAppDispatch } from "../../store/store"
 import Rating from "@mui/material/Rating";
@@ -22,6 +22,7 @@ const ExperimentControls = () => {
   const { progressBar, workflows } = useAppSelector(
     (state: RootState) => state.progressPage
   )
+  const { experimentId } = useParams()
   const dispatch = useAppDispatch()
   const workflow = workflows.data.find(workflow => workflow.id === workflowId)
   const workflowStatus = workflow?.status
@@ -114,7 +115,7 @@ const ExperimentControls = () => {
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 4 }}>
                 <ArrowBackIcon
                   sx={{ fontSize: 24, cursor: "pointer", color: "grey" }}
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate(`/${experimentId}/monitoring`)}
                 />
                 <Box sx={{display: "flex", flexDirection: "column"}}>
                   <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
