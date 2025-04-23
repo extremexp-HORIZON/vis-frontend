@@ -2,87 +2,24 @@ import Paper from "@mui/material/Paper"
 import Box from "@mui/material/Box"
 import ArrowUp from "@mui/icons-material/KeyboardArrowUp"
 import ArrowDown from "@mui/icons-material/KeyboardArrowDown"
-import { Close, Visibility } from "@mui/icons-material"
+import { Close } from "@mui/icons-material"
 import ToolBarWorkflow from "./toolbar-workflow-table"
 import FilterBar from "./filter-bar"
 import { Popover, styled } from "@mui/material"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useRef, useState } from "react"
 import { setScheduledTable } from "../../../../store/slices/monitorPageSlice"
-import type { GridColDef, GridRowSelectionModel, GridColumnNode } from "@mui/x-data-grid"
+import type { GridRowSelectionModel, GridColumnNode } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
-import NoRowsOverlayWrapper from "./no-rows-overlay"
 import theme from "../../../../mui-theme"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ScheduleIcon from "@mui/icons-material/Schedule"
-
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1
-  }
-  return 0
-}
-
-export type Order = "asc" | "desc"
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string | boolean },
-  b: { [key in Key]: number | string | boolean },
-) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy)
-}
-
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number,
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number])
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0])
-    if (order !== 0) {
-      return order
-    }
-    return a[1] - b[1]
-  })
-  return stabilizedThis.map(el => el[0])
-}
-
-export interface Column {
-  id: keyof Data
-  label: string
-  minWidth?: number
-  align?: "right" | "left" | "center" | "inherit" | "justify" | undefined
-  numeric?: boolean
-  sortable?: boolean
-  // format?: (value: number) => string;
-}
-
-type CustomGridColDef = GridColDef & {
-  field: string
-  minWidth?: number
-  flex?: number
-  align?: "left" | "right" | "center"
-  headerAlign?: "left" | "right" | "center"
-}
-let columns: CustomGridColDef[] = []
-
+import { CustomGridColDef } from "../../../../shared/types/table-types"
 export interface Data {
   [key: string]: string | number | boolean
 }
 
 let idCounter = 1
-
-// interface ScheduleTableProps {
-//   handleChange: (newValue: number) => (event: React.SyntheticEvent) => void;
-// }
 
 const WorkflowActions = (props: {
   id: number,
@@ -336,7 +273,7 @@ export default function ScheduleTable() {
       //     action: "",
       //   }
       // })
-      columns =
+      const columns: CustomGridColDef[] =
         infoRow
           ? Object.keys(infoRow)
               .filter(key => key !== "id")
@@ -507,6 +444,7 @@ export default function ScheduleTable() {
             onRemoveFilter={handleRemoveFilter}
             filters={scheduledTable.filters}
             onFilterChange={handleFilterChange}
+            showFilterButton={true}
           />
         </Box>
         <Popover
@@ -521,7 +459,7 @@ export default function ScheduleTable() {
         >
           <Box sx={{ p: 2 }}>
             <FilterBar
-              columns={columns}
+              columns={scheduledTable.columns}
               filters={scheduledTable.filters}
               onFilterChange={handleFilterChange}
               onAddFilter={handleAddFilter}

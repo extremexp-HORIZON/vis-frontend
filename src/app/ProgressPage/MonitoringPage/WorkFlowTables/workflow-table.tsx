@@ -20,16 +20,7 @@ import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"
 import theme from "../../../../mui-theme"
 import { debounce } from "lodash";
-
-type CustomGridColDef = GridColDef & {
-  field: string
-  minWidth?: number
-  flex?: number
-  align?: "left" | "right" | "center"
-  headerAlign?: "left" | "right" | "center"
-}
-
-let columns: CustomGridColDef[] = []
+import { CustomGridColDef } from "../../../../shared/types/table-types"
 
 export interface Data {
   [key: string]: any
@@ -238,7 +229,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
       const summary: any = {
         id: idCounter++,
         isGroupSummary: true,
-        workflowId: `${group.length} workflows`,
+        workflowId: group.length > 1 ? `${group.length} workflows` : `${group.length} workflow`,
       }
   
       groupKeys.forEach(param => {
@@ -442,7 +433,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           }
         })
 
-      columns = Object.keys(rows[0])
+      const columns: CustomGridColDef[] = Object.keys(rows[0])
         .filter(key => key !== "id")
         .map(key => ({
           field: key,
@@ -551,7 +542,7 @@ export default function WorkflowTable(props: WorkFlowTableProps) {
           }}
         >
           <FilterBar
-            columns={columns}
+            columns={workflowsTable.columns}
             filters={workflowsTable.filters}
             onFilterChange={handleFilterChange}
             onAddFilter={handleAddFilter}

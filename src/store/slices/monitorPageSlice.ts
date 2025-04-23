@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
+import { CustomGridColDef } from "../../shared/types/table-types"
 
 interface IMonitoringPageSlice {
     parallel: {
@@ -20,7 +21,7 @@ interface IMonitoringPageSlice {
         filteredRows: { [key: string]: any }[]
         filtersCounter: number
         visibleRows: { [key: string]: any }[]
-        columns: { [key: string]: any }[]
+        columns: CustomGridColDef[]
         visibleColumns: { [key: string]: any }[]
         columnsVisibilityModel: { [field: string]: boolean }
         aggregatedRows: { [key: string]: any }[]
@@ -41,7 +42,7 @@ interface IMonitoringPageSlice {
         filteredRows: { [key: string]: any }[]
         filtersCounter: number
         visibleRows: { [key: string]: any }[]
-        columns: { [key: string]: any }[]
+        columns: CustomGridColDef[]
         columnsVisibilityModel: { [field: string]: boolean },
         uniqueParameters: string[]
         uniqueTasks: string[]  
