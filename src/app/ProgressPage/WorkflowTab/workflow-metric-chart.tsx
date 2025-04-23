@@ -235,22 +235,22 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
       avgDiff: tab?.dataTaskTable.selectedItem?.data?.avgDiff,
   }
 
+  if (!metrics || metrics.length === 0) return null;
+
   const filteredWorkflows = workflows?.data?.flatMap(w =>
     w.metrics.filter(metric => metric.name === metrics[0]?.metricName).map(metric => ({ parent: w, value: metric.value }))
    )
-  
-   const minEntry = filteredWorkflows.reduce((min, curr) =>
+
+   const minEntry = filteredWorkflows?.reduce((min, curr) =>
     curr.value < min.value ? curr : min
   );
   
-  const maxEntry = filteredWorkflows.reduce((max, curr) =>
+  const maxEntry = filteredWorkflows?.reduce((max, curr) =>
     curr.value > max.value ? curr : max
   );
   
   const minWorkflow = minEntry.parent;
   const maxWorkflow = maxEntry.parent;
-
-  if (!metrics || metrics.length === 0) return null;
 
   return (
     <Box sx={{display: "flex", flexDirection: "row", gap: 2, width: "100%"}}>
@@ -320,7 +320,7 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
               <Divider />
             </Box>
           }
-          { metrics[0].step && 
+          { metrics[0].step !== null && 
             <Box>
               <Typography sx={{mb: 1}} variant="body1">
                 Step: {metrics[0].step}
