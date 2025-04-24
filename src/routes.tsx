@@ -5,6 +5,7 @@ import NotFound from "./not-found";
 import MonitoringPage from "./app/ProgressPage/MonitoringPage/monitoring-page";
 import WorkflowTab from "./app/ProgressPage/WorkflowTab/workflow-tab";
 import CompareCompleted from "./app/ProgressPage/CompareTab/CompareCompleted/compare-completed";
+import DummyExplains from "./app/ProgressPage/DummyExplains/dumm-explains";
 
 const routes = createBrowserRouter([
   {
@@ -26,6 +27,15 @@ const routes = createBrowserRouter([
     element: (
       <ProgressPage>
         <WorkflowTab />
+      </ProgressPage>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/:experimentId/explains",
+    element: (
+      <ProgressPage>
+        <DummyExplains />
       </ProgressPage>
     ),
     errorElement: <ErrorPage />

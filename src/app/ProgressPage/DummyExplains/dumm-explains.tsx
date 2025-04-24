@@ -1,35 +1,35 @@
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import type {
-  RootState} from "../../../../../store/store";
+  RootState} from "../../../store/store";
 import {
   useAppDispatch,
   useAppSelector,
-} from "../../../../../store/store"
-import ContourPlot from "../../../../Tasks/SharedItems/Plots/contour-plot"
-import LinePlot from "../../../../Tasks/SharedItems/Plots/line-plot"
+} from "../../../store/store"
+import ContourPlot from "../../Tasks/SharedItems/Plots/contour-plot"
+import LinePlot from "../../Tasks/SharedItems/Plots/line-plot";
 import { useEffect, useState } from "react"
 import Typography from "@mui/material/Typography"
 import {
   explainabilityQueryDefault,
   fetchExplainabilityPlot,
-} from "../../../../../shared/models/tasks/explainability.model"
-import type { IWorkflowPageModel } from "../../../../../shared/models/workflow.tab.model"
-import type { IRun } from "../../../../../shared/models/experiment/run.model"
+} from "../../../shared/models/tasks/explainability.model"
+import type { IRun } from "../../../shared/models/experiment/run.model";
+import { initTab } from "../../../store/slices/workflowPageSlice";
 
-interface IExplainabilityTaskCompare {
-  workflow: IWorkflowPageModel | null
-}
-
-const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
-  const { workflow } = props
+const DummyExplains = () => {
+  const { tab } = useAppSelector((state: RootState) => state.workflowPage)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const [plotRequestMetadata, setPlotRequestMetadata] = useState<any>(null)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (workflow) {
-      const taskVariables = workflow.workflowTasks.explainabilityTask || null
+    dispatch(initTab({ tab: workflows.data[0].id, workflows }))
+  }, [])
+
+  useEffect(() => {
+    if (tab) {
+      const taskVariables = tab.workflowTasks.explainabilityTask || null
       console.log("here")
 
       // Create nessesary queries for the explainability plots
@@ -56,6 +56,7 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
           [savedModelDataset?.source || ""]: {hyperparameter: workflowSavedModelParameters, metric_value: workflowSelectedMetric},
         }
       }, {})}
+      console.log(query)
 
       setPlotRequestMetadata(query)
 
@@ -104,27 +105,11 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
         }),
       )
     }
-  }, [])
+  }, [tab])
 
   return (
     <>
       <Box sx={{ mb: "2rem" }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
-            columnGap: 1,
-          }}
-        >
-          <Typography
-            variant="body1"
-            sx={{ fontWeight: 600, fontSize: "1.5rem" }}
-          >
-            Model Training Task
-          </Typography>
-          <Typography variant="body1">Explainability</Typography>
-        </Box>
         <Box
           sx={{
             px: 5,
@@ -142,10 +127,10 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                 <LinePlot
                   key={`pdp-plot`}
                   plotModel={
-                    workflow?.workflowTasks.explainabilityTask?.pdp || null
+                    tab?.workflowTasks.explainabilityTask?.pdp || null
                   }
                   options={
-                    workflow?.workflowTasks.explainabilityTask?.pdp.data
+                    tab?.workflowTasks.explainabilityTask?.pdp.data
                       ?.hyperparameterList || null
                   }
                   fetchFunction={fetchExplainabilityPlot}
@@ -157,10 +142,10 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
                 <LinePlot
                   key={`ale-plot`}
                   plotModel={
-                    workflow?.workflowTasks.explainabilityTask?.ale || null
+                    tab?.workflowTasks.explainabilityTask?.ale || null
                   }
                   options={
-                    workflow?.workflowTasks.explainabilityTask?.ale.data
+                    tab?.workflowTasks.explainabilityTask?.ale.data
                       ?.hyperparameterList || null
                   }
                   fetchFunction={fetchExplainabilityPlot}
@@ -173,10 +158,10 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
               <ContourPlot
                 key={`2dpdp-plot`}
                 plotModel={
-                  workflow?.workflowTasks.explainabilityTask?.["2dpdp"] || null
+                  tab?.workflowTasks.explainabilityTask?.["2dpdp"] || null
                 }
                 options={
-                  workflow?.workflowTasks.explainabilityTask?.["2dpdp"].data
+                  tab?.workflowTasks.explainabilityTask?.["2dpdp"].data
                     ?.hyperparameterList || null
                 }
                 fetchFunction={fetchExplainabilityPlot}
@@ -190,4 +175,4 @@ const ExplainabilityTaskCompare = (props: IExplainabilityTaskCompare) => {
     </>
   )
 }
-export default ExplainabilityTaskCompare
+export default DummyExplains
