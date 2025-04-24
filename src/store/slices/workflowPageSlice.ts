@@ -161,9 +161,11 @@ const workflowMetricsInitializer = ({
         (metric.value * 100) /
           (metricsSum / filteredMetricsAll.length) -
         100,
-        maxValue: maxValue,
-        minValue: minValue,
-      task: metric.task
+      maxValue: maxValue,
+      minValue: minValue,
+      task: metric.task,
+      step: metric.step,
+      timestamp: metric.timestamp
     }
   })
 

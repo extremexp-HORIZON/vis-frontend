@@ -23,6 +23,9 @@ const WorkflowCharts: React.FC = () => {
   const { workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   )
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  )
   const [isMosaic, setIsMosaic] = useState(true)
   const { hoveredWorkflowId } = workflowsTable;
   
@@ -59,6 +62,8 @@ const WorkflowCharts: React.FC = () => {
   )
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
+    // task name is the same across workflows
+    const metricTask = workflows.data.find(w => w.metrics.some(m => m.name === metricName))?.metrics?.find(m => m.name === metricName)?.task
     const metricSeries = groupedMetrics[metricName]
     const uniqueSteps = new Set(metricSeries.map(m => m.step))
     const workflowColorMap = workflowsTable.workflowColors
@@ -130,7 +135,7 @@ const WorkflowCharts: React.FC = () => {
         <ResponsiveCardVegaLite
           spec={chartSpec}
           actions={false}
-          title={metricName}
+          title={metricTask ? `${metricTask}／${metricName}` : metricName}
           sx={{ width: "100%", maxWidth: "100%" }} // Ensure it expands properly
         />
       </Grid>

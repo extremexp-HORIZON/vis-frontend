@@ -148,6 +148,16 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   "& .MuiTablePagination-root": {
     overflow: "visible",
   },
+  '& .MuiDataGrid-columnHeader[data-field="__action_group__"]': {
+    position: 'sticky',
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: theme.palette.customGrey.main,
+    borderLeft: "1px solid #ddd",
+    display: 'flex',
+    justifyContent: 'center', // Center the header content
+    alignItems: 'center', // Vertically center
+  },
 }))
 
 // Create a custom NoRowsOverlay component using InfoMessage
@@ -280,7 +290,7 @@ export default function ScheduleTable() {
               .filter(key => key !== "id")
               .map(key => ({
                 field: key,
-                headerName: key.replace("_", " "),
+                headerName:  key === "action" ? "" : key.replace("_", " "),
                 headerClassName:
                 key === "action" ? "datagrid-header-fixed" : "datagrid-header",
                 minWidth: key === "action" ? 100 : key === "status" ? key.length * 10 + 40 : key.length * 10,
@@ -552,6 +562,16 @@ export default function ScheduleTable() {
                     }),
                   ) as GridColumnNode[]
                 ) : []
+              },
+              {
+                groupId: "Actions",
+                headerClassName: "datagrid-header-fixed",
+                headerAlign: "center",
+                children: [
+                  {
+                    field: "action",
+                  } as GridColumnNode
+                ]
               }
             ]}
           />

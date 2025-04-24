@@ -19,6 +19,18 @@ interface GroupMetrics {
   task: string | undefined;
 }
 
+interface MetricData {
+  title?: string;
+  value?: number;
+  average?: number;
+  min?: number;
+  max?: number;
+  avgDiff?: number;
+  step?: number | null;
+  timestamp?: number;
+  task?: string;
+}
+
 export const MetricBulletChart = () => {
     const { tab } = useAppSelector(state => state.workflowPage)
     const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -182,7 +194,7 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
     <ResponsiveCardVegaLite
       spec={chartSpec}
       actions={false}
-      title={metrics[0].metricName}
+      title={metrics[0].task ? `${metrics[0].task}／${metrics[0].metricName}` : metrics[0].metricName}
       aspectRatio={2}
       maxHeight={400}
     />
@@ -217,40 +229,42 @@ export const WorkflowMetricChart = () => {
   return (
     (metrics?.length ?? 0) > 1 ?
     <MetricLineChart metrics={metrics} /> :
-    <MetricCards metrics={metrics} />
+    <MetricCards />
   )
 }
 
-export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
+export const MetricCards = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const location = useLocation()
 
-  const metricData = {
+  const metricData: MetricData = {
       title: tab?.dataTaskTable.selectedItem?.data?.name,
       value: tab?.dataTaskTable.selectedItem?.data?.value,
       average: tab?.dataTaskTable.selectedItem?.data?.avgValue,
       min: tab?.dataTaskTable.selectedItem?.data?.minValue,
       max: tab?.dataTaskTable.selectedItem?.data?.maxValue,
       avgDiff: tab?.dataTaskTable.selectedItem?.data?.avgDiff,
+      step: tab?.dataTaskTable.selectedItem?.data?.step,
+      timestamp: tab?.dataTaskTable.selectedItem?.data?.timestamp,
+      task: tab?.dataTaskTable.selectedItem?.data?.task
   }
 
-  if (!metrics || metrics.length === 0) return null;
-
   const filteredWorkflows = workflows?.data?.flatMap(w =>
-    w.metrics.filter(metric => metric.name === metrics[0]?.metricName).map(metric => ({ parent: w, value: metric.value }))
-   )
+    w.metrics?.filter(metric => metric.name === metricData.title)
+      .map(metric => ({ parent: w, value: metric.value })) ?? []
+  );
 
-   const minEntry = filteredWorkflows?.reduce((min, curr) =>
+  const minEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((min, curr) => 
     curr.value < min.value ? curr : min
-  );
+  ) : null;
   
-  const maxEntry = filteredWorkflows?.reduce((max, curr) =>
+  const maxEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((max, curr) => 
     curr.value > max.value ? curr : max
-  );
+  ) : null;
   
-  const minWorkflow = minEntry.parent;
-  const maxWorkflow = maxEntry.parent;
+  const minWorkflow = minEntry?.parent;
+  const maxWorkflow = maxEntry?.parent;
 
   return (
     <Box sx={{display: "flex", flexDirection: "row", gap: 2, width: "100%"}}>
@@ -305,35 +319,35 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
         <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", gap: 1 }} >
           <Box>
             <Typography sx={{mb: 1}} variant="body1">
-              Metric: {metrics[0].metricName}
+              Metric: {metricData.title}
             </Typography>
             <Divider />
           </Box>
           <Box>
             <Typography sx={{mb: 1}} variant="body1">
-              Value: {metrics[0].value.toFixed(2)}
+              Value: {metricData.value?.toFixed(2)}
             </Typography>
             <Divider />
           </Box>
-          { metrics[0].task && 
+          { metricData.task && 
             <Box>
               <Typography sx={{mb: 1}} variant="body1">
-                Logged in Task: {metrics[0].task}
+                Logged in Task: {metricData.task}
               </Typography>
               <Divider />
             </Box>
           }
-          { metrics[0].step !== null && 
+          { metricData.step != null && 
             <Box>
               <Typography sx={{mb: 1}} variant="body1">
-                Step: {metrics[0].step}
+                Step: {metricData.step}
               </Typography>
               <Divider />
             </Box>
           }
           <Box>
             <Typography sx={{mb: 1}} variant="body1">
-              Timestamp: {new Date(metrics[0].timestamp).toLocaleString()}
+              Timestamp: {typeof metricData.timestamp === 'number' && new Date(metricData.timestamp).toLocaleString()}
             </Typography>
             <Divider />
           </Box>
@@ -399,11 +413,11 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
               }}
             >
               <Typography sx={{mb: 1}} variant="body1">
-                Average: {metricData.average.toFixed(2)} — Difference: {metricData.avgDiff.toFixed(2)}%
+                Average: {metricData.average?.toFixed(2)} — Difference: {metricData.avgDiff ? metricData.avgDiff.toFixed(2) : 0}%
               </Typography>
-              {metricData.avgDiff > 0 ? (
+              {metricData.avgDiff && metricData.avgDiff > 0 ? (
                 <ArrowDropUpIcon sx={{ color: green[500],mb: 1 }} />
-              ) : metricData.avgDiff < 0 ? (
+              ) : metricData.avgDiff && metricData.avgDiff < 0 ? (
                 <ArrowDropDownIcon sx={{ color: red[500], mb: 1 }} />
               ) : null}
             </Box>
@@ -412,8 +426,8 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
         </Box>
         <Box>
           <Typography sx={{mb: 1}} variant="body1">
-            Minimum: {metricData.min.toFixed(2)}
-            {metrics[0].value !== metricData.min && (
+            Minimum: {metricData.min?.toFixed(2)}
+            {metricData.value !== metricData.min && minWorkflow && (
             <>
               {' — View Workflow '}
               <a
@@ -430,8 +444,8 @@ export const MetricCards = ({metrics}: {metrics: GroupMetrics[]}) => {
         </Box>
         <Box>
           <Typography sx={{mb: 1}} variant="body1">
-            Maximum: {metricData.max.toFixed(2)}   
-            {metrics[0].value !== metricData.max && (
+            Maximum: {metricData.max?.toFixed(2)}   
+            {metricData.value !== metricData.max && maxWorkflow && (
             <>
               {' — View Workflow '}
               <a
