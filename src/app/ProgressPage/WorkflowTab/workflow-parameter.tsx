@@ -34,7 +34,7 @@ const WorkflowParameter = () => {
         <Typography variant="subtitle1">
           This workflow uses "{selectedParam.name}: {selectedParam.value}". In total{" "}
           {filteredWorkflows.length} workflow
-          {filteredWorkflows.length !== 1 ? "s are" : "is"} using this configuration.
+          {filteredWorkflows.length !== 1 ? "s are" : " is"} using this configuration.
         </Typography>
         {filteredWorkflows.length > 1 && (
           <Tooltip title="Compare" placement="right">

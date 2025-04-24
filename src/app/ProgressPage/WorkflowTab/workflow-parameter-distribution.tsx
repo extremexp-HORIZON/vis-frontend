@@ -2,11 +2,15 @@ import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-v
 import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 
+interface DensityDataPoint {
+  paramName: string;
+  value: number;
+}
+
 const WorkflowParameterDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const { tab } = useAppSelector(state => state.workflowPage)
   const selectedParam = tab?.dataTaskTable.selectedItem?.data?.name
-  const selectetParamValue = tab?.dataTaskTable.selectedItem?.data?.value
 
   const getData = (param: string) => {
     const completedWorkflows = workflows.data.filter(
@@ -28,7 +32,7 @@ const WorkflowParameterDistribution = () => {
 
 
   if (!selectedParam) return null
-  const data = getData(selectedParam)
+  const data: DensityDataPoint[] = getData(selectedParam)
   if (data?.length === 0) return null
 
   const spec = {
