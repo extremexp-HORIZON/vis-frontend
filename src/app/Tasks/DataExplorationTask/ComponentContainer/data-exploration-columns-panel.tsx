@@ -119,7 +119,7 @@ const ColumnsPanel = () => {
     <>
       <Tooltip title="Columns">
         <IconButton onClick={handleOpen}>
-          <ViewColumnIcon />
+          <ViewColumnIcon color="primary" fontSize="medium"  />
         </IconButton>
       </Tooltip>
       
@@ -144,7 +144,7 @@ const ColumnsPanel = () => {
       >
         <SectionHeader icon={<TableRowsIcon fontSize="small" />} title="Visible Columns" />
         
-        <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+        <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
           <List dense>
             {originalColumns.map((column) => (
               <ListItem key={column.name} disablePadding>

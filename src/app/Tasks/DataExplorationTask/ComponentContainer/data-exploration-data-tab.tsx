@@ -33,7 +33,7 @@ const DataTab = () => {
             <Paper elevation={2} sx={{width: "20%", height: "99%", overflow: "auto"}}>
                 {tab && <DatasetTreeView />}
             </Paper>
-            <Paper elevation={2} sx={{width: "80%", height: "99%"}}>
+            <Paper elevation={2} sx={{width: "99%", height: "99%"}}>
                 <DataExplorationComponent/>
             </Paper>
         </Box>

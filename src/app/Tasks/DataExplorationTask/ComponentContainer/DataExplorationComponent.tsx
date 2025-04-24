@@ -88,63 +88,8 @@ const DataExplorationComponent = () => {
         overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
       }}
     >
-      <Box
-        sx={{
-          height: "100%",
-          display: "flex",
-          gap: 1,
-        }}
-      >
-        <Resizable
-          defaultSize={{
-            width: "30%",
-            height: "100%",
-          }}
-          minWidth="200px"
-          enable={{
-            top: false,
-            right: true,
-            bottom: false,
-            left: false,
-            topRight: false,
-            bottomRight: false,
-            bottomLeft: false,
-            topLeft: false,
-          }}
-          maxWidth="80%"
-          maxHeight="100%"
-          style={{ height: "100%", position: "relative" }}
-          handleStyles={{
-            right: {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "16px", // Fixed width for handle area
-              right: "-16px", // Position handle to overlap both components
-              zIndex: 10,
-            },
-          }}
-          handleComponent={{
-            right: (
-              <Box
-                sx={{
-                  height: "100%",
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "ew-resize",
-                }}
-              >
-                <MoreVertRoundedIcon
-                  style={{ color: theme.palette.action.active }}
-                />
-              </Box>
-            ),
-          }}
-        >
-          <LeftPanel />
-        </Resizable>
+     
+       <LeftPanel />
         {
           tab?.workflowTasks.dataExploration?.chart.loading ? (
             <Box sx={{
@@ -166,8 +111,8 @@ const DataExplorationComponent = () => {
             />      
           ) : (
             <Paper
-              elevation={2}
-              sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px" }}
+              elevation={1}
+              sx={{ flex: 1, overflow: "auto", height: "100%",width:"100%"}}
             >
               {chartType === "datatable" && (
                 <TableExpand />
@@ -188,7 +133,6 @@ const DataExplorationComponent = () => {
           )
         }
       </Box>
-    </Box>
   )
 }
 

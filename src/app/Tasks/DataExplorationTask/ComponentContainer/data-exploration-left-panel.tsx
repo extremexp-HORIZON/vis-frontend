@@ -3,64 +3,30 @@ import ChartButtonGroup from "../ChartControls/data-exploration-chart-button-gro
 import FilterBuilder from "./data-exploration-filter-builder"
 
 import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
-import { Box, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import ViewColumnIcon from "@mui/icons-material/ViewColumn"
 import { grey } from "@mui/material/colors"
 import FilterAltIcon from "@mui/icons-material/FilterAlt"
 import ColumnsPanel from "./data-exploration-columns-panel"
 
 const LeftPanel = () => {
-  const { tab } = useAppSelector(state => state.workflowPage)
-  const chartType =
-    tab?.workflowTasks.dataExploration?.controlPanel.chartType || "line" // Default to line chart if no chart type is selected in data exploration
-
-  const SectionHeader = ({
-    icon,
-    title,
-  }: {
-    icon: React.ReactNode
-    title: string
-  }) => (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        borderBottom: `1px solid ${grey[400]}`,
-      }}
-    >
-      {icon}
-      <Typography
-        variant="h6"
-        sx={{
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          ml: 1,
-          fontWeight: "bold",
-        }}
-        color="primary"
-      >
-        {title}
-      </Typography>
-    </Box>
-  )
-
   return (
-    <>
-      <Box>
-        <ChartButtonGroup />
-      </Box>
-      <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-      <SectionHeader icon={<ViewColumnIcon />} title="Columns" />
-      <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-      <ColumnsPanel
- />
-      <Box sx={{ marginTop: 3 }} /> {/* Adjust spacing as needed */}
-      <SectionHeader icon={<FilterAltIcon />} title="Filters" />
-      <Box sx={{ marginTop: 3 }} />
-      <FilterBuilder />
+    <Box sx={{ 
+      display: 'flex',
+      justifyContent: 'flex-end', // This pushes content to the right
+      width: '100%'
+    }}>
+        <Stack direction="row" spacing={1}>
+           <ColumnsPanel/>
+           <FilterBuilder/>
 
-    </>
+        <ChartButtonGroup />
+
+     
+        </Stack>
+    </Box>
+
+
   )
 }
 
