@@ -47,12 +47,14 @@ const WorkflowActions = (props: {
       <Link
         to={`/${experimentId}/workflow?workflowId=${workflowId}`}
       >
-        <LaunchIcon
-          style={{
-            cursor: "pointer",
-            color: theme.palette.primary.main,
-          }}
-        />
+        <IconButton>
+          <LaunchIcon
+            style={{
+              cursor: "pointer",
+              color: theme.palette.primary.main,
+            }}
+          />
+        </IconButton>
       </Link>
         </Badge>
       {currentStatus !== "COMPLETED" && currentStatus !== "FAILED" && (
