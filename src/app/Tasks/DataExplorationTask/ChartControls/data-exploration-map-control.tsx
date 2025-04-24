@@ -1,138 +1,108 @@
-import type React from "react";
-import { useEffect } from "react";
-import {
-  Box,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-} from "@mui/material";
-import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
-interface MapControlsProps {
-  columns: string[];
-  colorBy: string;
-  setColorBy: React.Dispatch<React.SetStateAction<string>>;
-  selectedColumns: string[];
-  setSelectedColumns: React.Dispatch<React.SetStateAction<string[]>>;
-  timestampField: string | null;
-  data: { timestamp: string }[]; // Assuming data is an array of objects with a `timestamp` field
-  sliderValue: number;
-  setSliderValue: React.Dispatch<React.SetStateAction<number>>;
-  tripsMode: boolean;
-  setTripsMode: React.Dispatch<React.SetStateAction<boolean>>;
-  lat: VisualColumn
-  setLat: React.Dispatch<React.SetStateAction<VisualColumn>>
-  lon: VisualColumn
-  setLon: React.Dispatch<React.SetStateAction<VisualColumn>>
-  columnsMapDouble:any
-  
+import { Box, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText } from "@mui/material";
+import { setControls } from "../../../../store/slices/workflowPageSlice";
+import { useAppDispatch, useAppSelector } from "../../../../store/store";
 
+const MapControls = () => {
+  const dispatch = useAppDispatch();
+  const { tab } = useAppSelector(state => state.workflowPage);
 
-}
+  const selectedColumns = tab?.workflowTasks?.dataExploration?.controlPanel.selectedColumns || [];
 
+  const stringColumns = selectedColumns.filter(col => col.type === 'STRING');
+  const doubleColumns = selectedColumns.filter(col => col.type === 'DOUBLE');
 
-const MapControls: React.FC<MapControlsProps> = ({
-  columns,
-  colorBy,
-  setColorBy,
-  selectedColumns,
-  setSelectedColumns,
-  timestampField,
-  tripsMode,
-  setTripsMode,
-  lat,
-  setLat,
-  lon,
-  setLon,
-  columnsMapDouble
-  
-}) => {
+  const lat = tab?.workflowTasks?.dataExploration?.controlPanel.lat || '';
+  const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon || '';
+  const colorByMap = tab?.workflowTasks?.dataExploration?.controlPanel.colorByMap || 'None';
+  const segmentBy = tab?.workflowTasks?.dataExploration?.controlPanel.segmentBy || [];
 
-  useEffect(() => {
-    setTripsMode(!!timestampField && selectedColumns.length > 0)
-  }, [timestampField, selectedColumns])
+  const handleChange = (key: string, value: any) => {
+    dispatch(setControls({ [key]: value }));
+  };
 
+  const handleSegmentByChange = (e: any) => {
+    const value = e.target.value;
+    handleChange('segmentBy', value);
 
-  const handleSegmentByChange = (event) => {
-    const selected = event.target.value;
-    setSelectedColumns(selected);
-    if (selected.length > 0) {
-      setColorBy("None");
+    if (value.length > 0 && colorByMap !== 'None') {
+      handleChange('colorByMap', 'None');
     }
   };
 
   return (
-      
-    <Box sx={{ display: "flex", gap: "1rem",marginTop: "1rem",flexDirection: "column" }}>
-      <FormControl fullWidth >
-          <InputLabel>Latitude Field</InputLabel>
-          <Select
-            value={lat}
-            onChange={(e) => setLat(e.target.value)}
-            // disabled={tripsMode}
-            input={<OutlinedInput label="Latitude Field" />}
-          >
-            {columnsMapDouble?.map((col) => (
-              <MenuItem key={col} value={col}>
-                {col}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+    <Box display="flex" flexDirection="column" gap={2}>
+            <Box display="flex" gap={2}>
 
-        <FormControl fullWidth >
-          <InputLabel>Longitude Field</InputLabel>
-          <Select
-            value={lon}
-            onChange={(e) => setLon(e.target.value)}
-            // disabled={tripsMode}
-            input={<OutlinedInput label="Longitude Field" />}
-          >
-            {columnsMapDouble?.map((col) => (
-              <MenuItem key={col} value={col}>
-                {col}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth >
-          <InputLabel>Color By</InputLabel>
-          <Select
-            value={colorBy}
-            onChange={(e) => setColorBy(e.target.value)}
-            disabled={tripsMode}
-            input={<OutlinedInput label="Color By" />}
-          >
-            <MenuItem value="None">None</MenuItem>
-            {columns?.map((col) => (
-              <MenuItem key={col} value={col}>
-                {col}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
 
-        <FormControl fullWidth disabled={!timestampField} >
-          <InputLabel>Segment By</InputLabel>
-          <Select
-            multiple
-            value={selectedColumns}
-            onChange={handleSegmentByChange}
-            renderValue={(selected) => selected.join(", ")}
-            input={<OutlinedInput label="Segment By" />}
-          >
-            {columns?.map((col) => (
-              <MenuItem key={col} value={col}>
-                <Checkbox checked={selectedColumns.includes(col)} />
-                <ListItemText primary={col} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      {/* Latitude Selector */}
+      <FormControl fullWidth>
+        <InputLabel>Latitude</InputLabel>
+        <Select
+          value={lat}
+          onChange={(e) => handleChange('lat', e.target.value)}
+          input={<OutlinedInput label="Latitude" />}
+        >
+          {doubleColumns.map(col => (
+            <MenuItem key={col.name} value={col.name}>{col.name}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {/* Longitude Selector */}
+      <FormControl fullWidth>
+        <InputLabel>Longitude</InputLabel>
+        <Select
+          value={lon}
+          onChange={(e) => handleChange('lon', e.target.value)}
+          input={<OutlinedInput label="Longitude" />}
+        >
+          {doubleColumns.map(col => (
+            <MenuItem key={col.name} value={col.name}>{col.name}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
       </Box>
+
+      <Box display="flex" gap={2}>
+
+
+      {/* Color By Selector */}
+      <FormControl disabled={segmentBy.length > 0} fullWidth>
+        <InputLabel>Color By</InputLabel>
+        <Select
+          value={segmentBy.length > 0 ? 'None' : colorByMap}
+          onChange={(e) => handleChange('colorByMap', e.target.value)}
+          input={<OutlinedInput label="Color By" />}
+        >
+          <MenuItem value="None">None</MenuItem>
+          {stringColumns.map(col => (
+            <MenuItem key={col.name} value={col.name}>{col.name}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {/* Segment By Selector */}
+      <FormControl fullWidth>
+        <InputLabel>Segment By</InputLabel>
+        <Select
+          multiple
+          value={segmentBy}
+          onChange={handleSegmentByChange}
+          input={<OutlinedInput label="Segment By" />}
+          renderValue={(selected) => (selected as string[]).join(', ')}
+        >
+          {stringColumns.map(col => (
+            <MenuItem key={col.name} value={col.name}>
+              <Checkbox checked={segmentBy.includes(col.name)} />
+              <ListItemText primary={col.name} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      </Box>  
+
+    </Box>
   );
 };
 

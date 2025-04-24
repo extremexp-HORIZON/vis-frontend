@@ -19,6 +19,8 @@ import { setControls } from "../../../../store/slices/workflowPageSlice"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+import MapControls from "../ChartControls/data-exploration-map-control"
+import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 
 
 const DataExplorationComponent = () => {
@@ -178,6 +180,9 @@ const DataExplorationComponent = () => {
               )}
               {chartType === "bar" && (
                 <BarChart/>
+              )}
+               {chartType === "map" && (
+                <ResponsiveCardVegaLite spec={[]} controlPanel={<MapControls/>}/>
               )}
             </Paper>  
           )
