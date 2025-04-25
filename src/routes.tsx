@@ -4,8 +4,7 @@ import ErrorPage from "./error-page";
 import NotFound from "./not-found";
 import MonitoringPage from "./app/ProgressPage/MonitoringPage/monitoring-page";
 import WorkflowTab from "./app/ProgressPage/WorkflowTab/workflow-tab";
-import CompareCompleted from "./app/ProgressPage/CompareTab/CompareCompleted/compare-completed";
-import DummyExplains from "./app/ProgressPage/DummyExplains/dumm-explains";
+import DummyExplains from "./app/ProgressPage/DummyExplains/dummy-explains";
 
 const routes = createBrowserRouter([
   {

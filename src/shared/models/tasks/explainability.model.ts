@@ -58,7 +58,8 @@ export const explainabilityReducers = (
 ) => {
   builder
     .addCase(fetchExplainabilityPlot.fulfilled, (state, action) => {
-      const compareCompletedTask = state.tab?.workflowId === "compare-completed" ? state.tab.workflowTasks.explainabilityTask : null
+      if (state.tab) {
+      const compareCompletedTask =  state.tab.workflowTasks.explainabilityTask
       const plotType = action.meta.arg.metadata
         .queryCase as keyof IExplainability
       if (compareCompletedTask && plotType !== "hyperparametersNames") {
@@ -66,23 +67,28 @@ export const explainabilityReducers = (
         compareCompletedTask[plotType].loading = false
         compareCompletedTask[plotType].error = null
       }
+    }
     })
     .addCase(fetchExplainabilityPlot.pending, (state, action) => {
-      const compareCompletedTask = state.tab?.workflowId === "compare-completed" ? state.tab.workflowTasks.explainabilityTask : null
+      if (state.tab) {
+      const compareCompletedTask =  state.tab.workflowTasks.explainabilityTask
       const plotType = action.meta.arg.metadata
       .queryCase as keyof IExplainability
       if (compareCompletedTask && plotType !== "hyperparametersNames") {
         compareCompletedTask[plotType].loading = true
       }
+    }
     })
     .addCase(fetchExplainabilityPlot.rejected, (state, action) => {
-      const compareCompletedTask = state.tab?.workflowId === "compare-completed" ? state.tab.workflowTasks.explainabilityTask : null
+      if (state.tab) {
+      const compareCompletedTask = state.tab.workflowTasks.explainabilityTask
       const plotType = action.meta.arg.metadata
       .queryCase as keyof IExplainability
       if (compareCompletedTask && plotType !== "hyperparametersNames") {
         compareCompletedTask[plotType].loading = false
         compareCompletedTask[plotType].error = "failed to fetch data"
       }
+    }
     })
 }
 
