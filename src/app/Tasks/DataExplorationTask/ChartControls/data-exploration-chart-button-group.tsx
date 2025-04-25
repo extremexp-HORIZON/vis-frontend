@@ -18,8 +18,20 @@ const ChartButtonGroup: React.FC= () => {
   const chartType= tab?.workflowTasks.dataExploration?.controlPanel.chartType
 
   return (
-    <ButtonGroup variant="outlined" aria-label="Chart button group" fullWidth>
-      <Tooltip title="Table">
+<ButtonGroup
+  size="small"
+  aria-label="Small button group"
+  variant="outlined"
+  sx={{
+    marginLeft: 'auto',
+    height: 30, // Adjust this value to your desired height
+    '& .MuiButton-root': {
+      minHeight: 30,
+      padding: '2px 2px',
+      marginTop: 0.5,
+    },
+  }}
+>      <Tooltip title="Table">
       <Button
         variant={chartType === 'datatable' ? 'contained' : 'outlined'}
         onClick={() => dispatch(setControls({ chartType: 'datatable' }))}
