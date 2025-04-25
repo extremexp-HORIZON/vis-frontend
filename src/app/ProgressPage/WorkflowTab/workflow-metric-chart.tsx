@@ -2,12 +2,13 @@ import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-v
 import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 import type { IMetric } from "../../../shared/models/experiment/metric.model"
-import { Box, Card, CardContent, CardHeader, Divider, Typography } from "@mui/material"
+import { Box, Divider, Typography } from "@mui/material"
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import green from "@mui/material/colors/green"
 import red from "@mui/material/colors/red"
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { DetailsCard, DetailsCardItem } from "../../../shared/components/details-card";
 
 
 interface GroupMetrics {
@@ -233,235 +234,110 @@ export const WorkflowMetricChart = () => {
   )
 }
 
+
+const WorkflowLink = ({ workflowId }: { workflowId: string }) => {
+  const location = useLocation();
+  return (
+    <a
+      href={`${location.pathname}?workflowId=${workflowId}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {workflowId}
+    </a>
+  );
+};
+
 export const MetricCards = () => {
-  const { tab } = useAppSelector(state => state.workflowPage)
-  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
-  const location = useLocation()
+  const { tab } = useAppSelector(state => state.workflowPage);
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage);
 
   const metricData: MetricData = {
-      title: tab?.dataTaskTable.selectedItem?.data?.name,
-      value: tab?.dataTaskTable.selectedItem?.data?.value,
-      average: tab?.dataTaskTable.selectedItem?.data?.avgValue,
-      min: tab?.dataTaskTable.selectedItem?.data?.minValue,
-      max: tab?.dataTaskTable.selectedItem?.data?.maxValue,
-      avgDiff: tab?.dataTaskTable.selectedItem?.data?.avgDiff,
-      step: tab?.dataTaskTable.selectedItem?.data?.step,
-      timestamp: tab?.dataTaskTable.selectedItem?.data?.timestamp,
-      task: tab?.dataTaskTable.selectedItem?.data?.task
-  }
+    title: tab?.dataTaskTable.selectedItem?.data?.name,
+    value: tab?.dataTaskTable.selectedItem?.data?.value,
+    average: tab?.dataTaskTable.selectedItem?.data?.avgValue,
+    min: tab?.dataTaskTable.selectedItem?.data?.minValue,
+    max: tab?.dataTaskTable.selectedItem?.data?.maxValue,
+    avgDiff: tab?.dataTaskTable.selectedItem?.data?.avgDiff,
+    step: tab?.dataTaskTable.selectedItem?.data?.step,
+    timestamp: tab?.dataTaskTable.selectedItem?.data?.timestamp,
+    task: tab?.dataTaskTable.selectedItem?.data?.task
+  };
 
   const filteredWorkflows = workflows?.data?.flatMap(w =>
     w.metrics?.filter(metric => metric.name === metricData.title)
       .map(metric => ({ parent: w, value: metric.value })) ?? []
   );
 
-  const minEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((min, curr) => 
+  const minEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((min, curr) =>
     curr.value < min.value ? curr : min
   ) : null;
-  
-  const maxEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((max, curr) => 
+
+  const maxEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((max, curr) =>
     curr.value > max.value ? curr : max
   ) : null;
-  
+
   const minWorkflow = minEntry?.parent;
   const maxWorkflow = maxEntry?.parent;
 
+  const renderDiffIcon = () => {
+    if (!metricData.avgDiff) return null;
+    return metricData.avgDiff > 0 ? (
+      <ArrowDropUpIcon sx={{ color: green[500], mb: 1 }} />
+    ) : (
+      <ArrowDropDownIcon sx={{ color: red[500], mb: 1 }} />
+    );
+  };
+
   return (
-    <Box sx={{display: "flex", flexDirection: "row", gap: 2, width: "100%"}}>
-    <Card sx={{
-      minWidth: "20%",
-      boxShadow: '0 4px 20px rgba(0,0,0,0.09)', 
-      height: "100%", 
-      borderRadius: '12px',
-      border: '1px solid rgba(0, 0, 0, 0.06)',
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-      '&:hover': {
-        boxShadow: '0 6px 25px rgba(0,0,0,0.12)',
-        transform: 'translateY(-2px)'
-      }     
-    }}>
-      <CardHeader
-        title={
-          <Typography
-            variant="overline"
-            sx={{
-              padding: "4px 8px",
-              textTransform: "uppercase",
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-              color: '#2a3f5f'
-            }}
-          >
-            Metric Details
-          </Typography>
-        }
-        sx={{
-          background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          padding: "4px 16px",
-          height: "40px",
-          borderTopLeftRadius: '12px',
-          borderTopRightRadius: '12px',
-        }}
-      
-      />
-      <CardContent 
-        sx={{
-          backgroundColor: "#ffffff", 
-          py: 2,
-          px: 3,
-          '&:last-child': { 
-            paddingBottom: 3 
-          },
-          borderRadius: '0 0 12px 12px'              
-        }}
-      >
-        <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", gap: 1 }} >
-          <Box>
-            <Typography sx={{mb: 1}} variant="body1">
-              Metric: {metricData.title}
-            </Typography>
-            <Divider />
-          </Box>
-          <Box>
-            <Typography sx={{mb: 1}} variant="body1">
-              Value: {metricData.value?.toFixed(2)}
-            </Typography>
-            <Divider />
-          </Box>
-          { metricData.task && 
-            <Box>
-              <Typography sx={{mb: 1}} variant="body1">
-                Logged in Task: {metricData.task}
-              </Typography>
-              <Divider />
-            </Box>
-          }
-          { metricData.step != null && 
-            <Box>
-              <Typography sx={{mb: 1}} variant="body1">
-                Step: {metricData.step}
-              </Typography>
-              <Divider />
-            </Box>
-          }
-          <Box>
-            <Typography sx={{mb: 1}} variant="body1">
-              Timestamp: {typeof metricData.timestamp === 'number' && new Date(metricData.timestamp).toLocaleString()}
-            </Typography>
-            <Divider />
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-    <Card sx={{
-      minWidth: "20%",
-      boxShadow: '0 4px 20px rgba(0,0,0,0.09)', 
-      height: "100%", 
-      borderRadius: '12px',
-      border: '1px solid rgba(0, 0, 0, 0.06)',
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-      '&:hover': {
-        boxShadow: '0 6px 25px rgba(0,0,0,0.12)',
-        transform: 'translateY(-2px)'
-      }     
-    }}>
-      <CardHeader
-        title={
-          <Typography
-            variant="overline"
-            sx={{
-              padding: "4px 8px",
-              textTransform: "uppercase",
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-              color: '#2a3f5f'
-            }}
-          >
-            Comparison Across All Workflows
-          </Typography>
-        }
-        sx={{
-          background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          padding: "4px 16px",
-          height: "40px",
-          borderTopLeftRadius: '12px',
-          borderTopRightRadius: '12px',
-        }}
-      
-      />
-      <CardContent 
-        sx={{
-          backgroundColor: "#ffffff", 
-          py: 2,
-          px: 3,
-          '&:last-child': { 
-            paddingBottom: 3 
-          },
-          borderRadius: '0 0 12px 12px'              
-        }}
-      >
-        <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", gap: 1 }} >
-          <Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                // gap: 1,
-                alignItems: "center",
-              }}
-            >
-              <Typography sx={{mb: 1}} variant="body1">
-                Average: {metricData.average?.toFixed(2)} — Difference: {metricData.avgDiff ? metricData.avgDiff.toFixed(2) : 0}%
-              </Typography>
-              {metricData.avgDiff && metricData.avgDiff > 0 ? (
-                <ArrowDropUpIcon sx={{ color: green[500],mb: 1 }} />
-              ) : metricData.avgDiff && metricData.avgDiff < 0 ? (
-                <ArrowDropDownIcon sx={{ color: red[500], mb: 1 }} />
-              ) : null}
-            </Box>
-            <Divider />
-          </Box>
-        </Box>
+    <Box sx={{ display: "flex", flexDirection: "row", gap: 2, width: "100%" }}>
+      <DetailsCard title="Metric Details">
+        <DetailsCardItem label="Metric" value={metricData.title} />
+        <DetailsCardItem label="Value" value={metricData.value?.toFixed(2)} />
+        {metricData.task && <DetailsCardItem label="Logged in Task" value={metricData.task} />}
+        {metricData.step != null && <DetailsCardItem label="Step" value={metricData.step} />}
+        <DetailsCardItem 
+          label="Timestamp" 
+          value={typeof metricData.timestamp === 'number' ? 
+            new Date(metricData.timestamp).toLocaleString() : 
+            undefined
+          } 
+        />
+      </DetailsCard>
+
+      <DetailsCard title="Comparison Across All Workflows">
         <Box>
-          <Typography sx={{mb: 1}} variant="body1">
-            Minimum: {metricData.min?.toFixed(2)}
-            {metricData.value !== metricData.min && minWorkflow && (
-            <>
-              {' — View Workflow '}
-              <a
-                href={`${location.pathname}?workflowId=${minWorkflow.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {minWorkflow.id}
-              </a>
-            </>
-            )}
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <Typography sx={{ mb: 1 }} variant="body1">
+              Average: {metricData.average?.toFixed(2)} — Difference: {metricData.avgDiff ? metricData.avgDiff.toFixed(2) : 0}%
+            </Typography>
+            {renderDiffIcon()}
+          </Box>
           <Divider />
         </Box>
-        <Box>
-          <Typography sx={{mb: 1}} variant="body1">
-            Maximum: {metricData.max?.toFixed(2)}   
-            {metricData.value !== metricData.max && maxWorkflow && (
+        <DetailsCardItem 
+          label="Minimum" 
+          value={
             <>
-              {' — View Workflow '}
-              <a
-                href={`${location.pathname}?workflowId=${maxWorkflow.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {maxWorkflow.id}
-              </a>
+              {metricData.min?.toFixed(2)}
+              {metricData.value !== metricData.min && minWorkflow && (
+                <> — View Workflow <WorkflowLink workflowId={minWorkflow.id} /></>
+              )}
             </>
-            )}
-          </Typography>
-          <Divider />
-        </Box>
-      </CardContent>
-    </Card>
-  </Box>
-  )
-}
+          } 
+        />
+        <DetailsCardItem 
+          label="Maximum" 
+          value={
+            <>
+              {metricData.max?.toFixed(2)}
+              {metricData.value !== metricData.max && maxWorkflow && (
+                <> — View Workflow <WorkflowLink workflowId={maxWorkflow.id} /></>
+              )}
+            </>
+          } 
+        />
+      </DetailsCard>
+    </Box>
+  );
+};
