@@ -8,12 +8,18 @@ export default defineConfig({
   server: {
     open: true,
     proxy: {
+      // "/api": "http://pulsar.imsi.athenarc.gr:9680",
       "/api": {
         target: 'http://localhost:8080',
       },
       "/experiments": {
         target: 'http://localhost:8080',
       },
+      "/auth": {
+        target: "http://localhost:5521",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/auth/, '')
+      }
     },
   },
   test: {

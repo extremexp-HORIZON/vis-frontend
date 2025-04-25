@@ -4,8 +4,13 @@ import { useAppDispatch, useAppSelector } from "../../store/store"
 import Typography from "@mui/material/Typography"
 import LinearProgress from "@mui/material/LinearProgress"
 import { useEffect, useState } from "react"
-import { setIntialization } from "../../store/slices/progressPageSlice"
+import {
+  fetchExperiment,
+  fetchExperimentWorkflows,
+  setIntialization,
+} from "../../store/slices/progressPageSlice"
 import "../../index.css"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 
 const ProgressPageLoading = () => {
   const { workflows, experiment } = useAppSelector(
@@ -13,6 +18,24 @@ const ProgressPageLoading = () => {
   )
   const dispatch = useAppDispatch()
   const [progress, setProgress] = useState(0)
+  const [searchParams] = useSearchParams()
+  const params = useParams();
+  const navigate = useNavigate();
+  
+  // Get experimentId from either path params or query params
+  const experimentId = params.experimentId || searchParams.get("experimentId");
+
+  useEffect(() => {
+      if (experimentId && experimentId !== experiment.data?.id) {
+        dispatch(fetchExperiment(experimentId))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!experiment.loading && experiment.data) {
+            dispatch(fetchExperimentWorkflows({experimentId: experimentId || ""}))
+    }
+  }, [experiment])
 
   useEffect(() => {
     if (!experiment.loading && experiment.data) {
@@ -21,9 +44,6 @@ const ProgressPageLoading = () => {
     if (!workflows.loading && workflows.data.length > 0) {
       setProgress(100)
     }
-  }, [workflows, experiment])
-
-  useEffect(() => {
     if (
       !experiment.loading &&
       experiment.data &&
@@ -32,9 +52,10 @@ const ProgressPageLoading = () => {
     ) {
       setTimeout(() => {
         dispatch(setIntialization(true))
+        navigate(`/${experimentId}/monitoring`, { replace: true })
       }, 600)
     }
-  }, [experiment, workflows])
+  }, [workflows, experiment])
 
   return (
     <>
@@ -49,7 +70,11 @@ const ProgressPageLoading = () => {
         }}
       >
         <Grid sx={{ display: "flex", rowGap: 2, flexDirection: "column" }}>
-          <img src="/images/extremexp-logo.png" height={130} style={{ objectFit: "contain" }} />
+          <img
+            src="/images/extremexp-logo.png"
+            height={130}
+            style={{ objectFit: "contain" }}
+          />
           <Typography variant="h4">Initializing Progress Page</Typography>
           {!experiment.data && experiment.loading && (
             <Typography variant="h6">Fetching Experiment Data...</Typography>

@@ -32,6 +32,7 @@
     "@types/lodash": "^4.17.5",
     "@xyflow/react": "^12.4.2",
     "axios": "^1.6.8",
+    "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
     "loadash": "^1.0.0",
