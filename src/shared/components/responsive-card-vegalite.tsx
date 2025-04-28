@@ -25,9 +25,8 @@ import CloseIcon from "@mui/icons-material/Close"
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react"
 import { VegaLite } from "react-vega"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
+import SettingsIcon from "@mui/icons-material/Settings"
 import { grey, red } from "@mui/material/colors"
-import LineChartControlPanel from "../../app/Tasks/DataExplorationTask/ChartControls/data-exploration-line-control"
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 import DownloadIcon from "@mui/icons-material/Download"
 import FullscreenIcon from "@mui/icons-material/Fullscreen"
@@ -44,6 +43,7 @@ interface ResponsiveCardVegaLiteProps {
   controlPanel?: React.ReactNode
   infoMessage?: React.ReactElement
   showInfoMessage?: boolean
+  pulsate?: boolean
 }
 const SectionHeader = ({
   icon,
@@ -91,7 +91,6 @@ const SectionHeader = ({
 )
 
 const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
-
   spec,
   title,
   minWidth = 100,
@@ -102,6 +101,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   controlPanel,
   infoMessage,
   showInfoMessage,
+  pulsate,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth)
@@ -117,13 +117,14 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
     if (containerRef.current) {
-      const containerWidth =
-        containerRef.current.offsetWidth || window.innerWidth * 0.9
+      const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9
+      const containerHeight = containerRef.current.offsetHeight || window.innerHeight * 0.5
+      
+      // Adjust to fit exactly within the container with no overflow
       const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
-      const newHeight = Math.max(
-        minHeight,
-        Math.min(newWidth / aspectRatio, maxHeight),
-      )
+      const calculatedHeight = newWidth / aspectRatio
+      const newHeight = Math.max(minHeight, Math.min(calculatedHeight, containerHeight, maxHeight))
+      
       setWidth(newWidth)
       setHeight(newHeight)
     }
@@ -232,15 +233,16 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         mx: "auto", 
         mb: 1, 
         boxShadow: '0 4px 20px rgba(0,0,0,0.09)', 
-        height: "100%", 
-        overflowY: "auto",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
         borderRadius: '12px',
         border: '1px solid rgba(0, 0, 0, 0.06)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        '&:hover': {
+        '&:hover': pulsate ? {
           boxShadow: '0 6px 25px rgba(0,0,0,0.12)',
           transform: 'translateY(-2px)'
-        }
+        } : {}
       }}>
         <CardHeader
           action={
@@ -251,23 +253,10 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   zIndex: 1,
                   position: "relative",
                 },
-                "@keyframes pulse": {
-                  "0%": {
-                    transform: "scale(0.95)",
-                    opacity: 0.7,
-                  },
-                  "70%": {
-                    transform: "scale(1.2)",
-                    opacity: 0,
-                  },
-                  "100%": {
-                    transform: "scale(0.95)",
-                    opacity: 0,
-                  },
-                },
               }}
               >
-                <MoreVertIcon />
+                {/* <MoreVertIcon /> */}
+                <SettingsIcon />
               </IconButton>
               <Menu
                 anchorEl={anchorEl}
@@ -286,7 +275,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   sx: {
                     width: 320,
                     maxHeight: 500,
-                    overflowY: "auto",
+                    overflowY: "hidden",
                     overflowX: "hidden",
                     padding: 0,
                     borderRadius: '12px',
@@ -305,7 +294,15 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 }}
               >
                 <SectionHeader icon={<SettingsSuggestIcon fontSize="small" />} title="Chart Options" />
-
+                {/* Advanced Controls Divider */}
+                {controlPanel && (
+                  <>
+                    <Box sx={{ p: 2}}>
+                      {controlPanel}
+                    </Box>
+                    <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                  </>
+                )}
                 {/* Quick Actions */}
                 <Box sx={{ py: 1 }}>
                   <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
@@ -315,18 +312,6 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     <ListItemText 
                       primary="Download as PNG"
                       secondary="Save chart as image" 
-                      primaryTypographyProps={{ fontWeight: 500 }}
-                      secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                    />
-                  </MenuItem>
-                  
-                  <MenuItem onClick={handleFullScreen} sx={{ py: 1.5 }}>
-                    <ListItemIcon>
-                      <FullscreenIcon fontSize="small" color="primary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="Full Screen" 
-                      secondary="Expand chart to entire screen"
                       primaryTypographyProps={{ fontWeight: 500 }}
                       secondaryTypographyProps={{ fontSize: '0.75rem' }}
                     />
@@ -344,21 +329,22 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     />
                   </MenuItem>
                 </Box>
-                
-                {/* Advanced Controls Divider */}
-                {controlPanel && (
-                  <>
-                    <Divider sx={{ my: 1, opacity: 0.6 }} />
-                    <Typography sx={{ px: 3, py: 1, fontSize: '0.85rem', color: 'text.secondary', fontWeight: 500 }}>
-                      Advanced Controls
-                    </Typography>
-                    
-                    <Box sx={{ px: 2, pt: 1, pb: 2, overflowY: "auto", maxHeight: 250 }}>
-                      {controlPanel}
-                    </Box>
-                  </>
-                )}
               </Menu>
+              <Tooltip title="Fullscreen">
+                <IconButton 
+                  aria-label="fullscreen" 
+                  onClick={handleFullScreen}
+                  sx={{
+                    mr: 0.5,
+                    "& svg": {
+                      position: "relative",
+                      zIndex: 1,
+                    },
+                  }}
+                >
+                  <FullscreenIcon />
+                </IconButton>
+              </Tooltip>
             </>
           }
           title={
@@ -383,6 +369,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             height: "40px",
             borderTopLeftRadius: '12px',
             borderTopRightRadius: '12px',
+            flexShrink: 0, // Prevent header from shrinking
           }}
         />
         <CardContent sx={{ 
@@ -392,9 +379,24 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           '&:last-child': { 
             paddingBottom: 3 
           },
-          borderRadius: '0 0 12px 12px'
+          borderRadius: '0 0 12px 12px',
+          flexGrow: 1, // Allow content to grow
+          overflow: "auto", // Only make the content scrollable
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}>
-          <Box ref={containerRef} sx={{ width: "100%", height: "100%" }}>
+          <Box 
+            ref={containerRef} 
+            sx={{ 
+              width: "100%", 
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
             {
               showInfoMessage ? (
                 <Box sx={{ width: width, height: height}}>
@@ -404,7 +406,11 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 <VegaLite
                   spec={{
                     ...spec,
-                    autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
+                    autosize: { 
+                      type: "fit", 
+                      contains: "padding",
+                      resize: true 
+                    },
                     width: width,
                     height: height,
                   }}

@@ -154,11 +154,12 @@ const LineChart = (
   
 
   return (
-    <Box sx={{height: "100%"}}>
+    <Box sx={{height: "99%"}}>
       {chartSpecs.map((spec, index) => (
         <ResponsiveCardVegaLite
           key={index}
           spec={spec}
+          title={"Line Chart"}
           data={{ table: dataCopy }}
           actions={false}
           controlPanel={<LineChartControlPanel/>}
@@ -167,6 +168,7 @@ const LineChart = (
           showInfoMessage={shouldShowInfoMessage}
           maxHeight={500}
           aspectRatio={isSmallScreen ? 2.8 : 1.8}
+          pulsate={false}
         />
       ))}
     </Box>

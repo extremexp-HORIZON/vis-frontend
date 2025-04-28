@@ -149,15 +149,17 @@ const BarChart = () => {
   const shouldShowInfoMessage =
   tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy.length === 0 || Object.keys(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation).length === 0
   return (
-    <Box sx={{height: "100%"}}>
+    <Box sx={{height: "99%"}}>
       <ResponsiveCardVegaLite 
         spec={specification} 
         actions={false} 
+        title={"Bar Chart"}
         maxHeight={500}
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
         controlPanel={<BarChartControlPanel/>}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
+        pulsate={false}
 
       />
     </Box>
