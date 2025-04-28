@@ -140,64 +140,61 @@ export default function WorkflowTreeView() {
   },[tab?.workflowConfiguration.tasks])
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Title and Separator */}
-      <Typography variant="h6" sx={{ fontWeight: 500 }}>
-        Workflow Details
-      </Typography>
-      <Divider sx={{ my: 2 }} />{" "}
-      {/* Adds a separator with some vertical margin */}
-      {/* TreeView */}
-      <SimpleTreeView defaultExpandedItems={["workflow-details", "tasks-root"]}>
-        {uniqueTasks.map(({id, name}) => {
-          const paramsForTask =
-            tab?.workflowConfiguration.params?.filter(
-              p => p.task === id,
-            ) || []
-          const metricsForTask =
-            tab?.workflowMetrics.data?.filter(m => m.task === id) || []
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Enhanced Title and Separator */}
+      <Box sx={{ 
+        p: 2, 
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        bgcolor: 'background.paper',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1
+      }}>
+        <AssignmentIcon color="primary" />
+        <Typography variant="h6" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>
+          Workflow Details
+        </Typography>
+      </Box>
+      
+      {/* TreeView with adjusted padding */}
+      <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
+        <SimpleTreeView defaultExpandedItems={["workflow-details", "tasks-root"]}>
+          {uniqueTasks.map(({id, name}) => {
+            const paramsForTask =
+              tab?.workflowConfiguration.params?.filter(
+                p => p.task === id,
+              ) || []
+            const metricsForTask =
+              tab?.workflowMetrics.data?.filter(m => m.task === id) || []
 
-          const seenNames = new Set<string>();
-          const uniqueMetricsByName: typeof metricsForTask = [];
-          //keep only the first instance
-          for (const metric of metricsForTask) {
-            if (!seenNames.has(metric.name)) {
-              seenNames.add(metric.name);
-              uniqueMetricsByName.push(metric);
-            }
-          }            
-          
-          const datasetsForTask = 
-            tab?.workflowConfiguration.dataAssets?.filter(d => d.task === id) || []
-          const taskVariants: Record<string, string> =
-            tab?.workflowConfiguration.tasks?.reduce(
-              (acc, task) => {
-                acc[task.name] = task.variant
+            const seenNames = new Set<string>();
+            const uniqueMetricsByName: typeof metricsForTask = [];
+            //keep only the first instance
+            for (const metric of metricsForTask) {
+              if (!seenNames.has(metric.name)) {
+                seenNames.add(metric.name);
+                uniqueMetricsByName.push(metric);
+              }
+            }            
+            
+            const datasetsForTask = 
+              tab?.workflowConfiguration.dataAssets?.filter(d => d.task === id) || []
+            const taskVariants: Record<string, string> =
+              tab?.workflowConfiguration.tasks?.reduce(
+                (acc, task) => {
+                  acc[task.name] = task.variant
 
-                return acc
-              },
-              {} as Record<string, string>,
-            ) || {}
+                  return acc
+                },
+                {} as Record<string, string>,
+              ) || {}
 
-          return (
-            <TreeItem2
-            aria-expanded={true}
-              key={id}
-              itemId={`task-${id}`}
-              label={
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    px: 1,
-                    py: 0.5,
-                    borderRadius: 1,
-                    cursor: "pointer",
-                    bgcolor: "transparent",
-                    "&:hover": { bgcolor: "action.hover" },
-                  }}
-                >
+            return (
+              <TreeItem2
+              aria-expanded={true}
+                key={id}
+                itemId={`task-${id}`}
+                label={
                   <Box
                     onClick={() => {
                       dispatch(
@@ -211,51 +208,6 @@ export default function WorkflowTreeView() {
                         }),
                       )
                     }}
-                    sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}
-                  >
-                    <AssignmentIcon
-                      fontSize="small"
-                      sx={{ mr: 1, color: theme.palette.primary.main }}
-                    />
-                    <Typography sx={{ fontWeight: 500 }}>
-                      Task: {taskVariants[name] || name}
-                    </Typography>
-                  </Box>
-                  
-                  {/* IconButton on the right side */}
-                  { name.includes("Train") && (
-                    <Tooltip title="Explanations">
-                      <IconButton
-                        size="small"
-                        edge="end"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent expanding/collapsing TreeItem
-                          dispatch(setSelectedItem({ type: "explains", data: {task: taskVariants[name] || name} }))
-                        }}
-                      >
-                        <PsychologyAltRoundedIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Box>
-              }
-            >
-              {/* Data Assets */}
-              {datasetsForTask.length > 0 &&
-              <TreeItem2
-                itemId={`task-${id}-assets`}
-                label={
-                  <Box
-                    // onClick={() =>
-                    //   dispatch(
-                    //     setSelectedTask({
-                    //       type: "group",
-                    //       role: "DATA_ASSETS",
-                    //       data: datasetsForTask, // the full list for that task
-                    //       task: id,
-                    //     }),
-                    //   )
-                    // }
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -263,126 +215,50 @@ export default function WorkflowTreeView() {
                       py: 0.5,
                       borderRadius: 1,
                       cursor: "pointer",
+                      bgcolor: "transparent",
                       "&:hover": { bgcolor: "action.hover" },
+                      
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <DatasetIcon
+                    <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1, flexWrap: "wrap", minWidth: 0 }}>
+                      <AssignmentIcon
                         fontSize="small"
                         sx={{ mr: 1, color: theme.palette.primary.main }}
                       />
-                      <Typography>Data Assets</Typography>
+                      <Typography sx={{ fontWeight: 500 }}>
+                        Task: {taskVariants[name] || name}
+                      </Typography>
                     </Box>
+                                
+                    {name.includes("Train") && (
+                      <Tooltip title="Explanations">
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch(setSelectedItem({ type: "explains", data: { task: taskVariants[name] || name } }))
+                          }}
+                          sx={{ ml: 1 }}
+                        >
+                          <PsychologyAltRoundedIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </Box>
                 }
               >
-                {/* Inputs */}
-                {datasetsForTask.some(
-                  (ds) => ds.role === "INPUT",
-                ) && (
-                  <TreeItem2
-                    itemId={`task-${id}-inputs`}
-                    label={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <InputIcon
-                          fontSize="small"
-                          sx={{ mr: 1, color: theme.palette.primary.main }}
-                        />
-                        <Typography>Inputs</Typography>
-                      </Box>
-                    }
-                  >
-                    {datasetsForTask
-                      .filter((ds) => ds.role === "INPUT")
-                      .map(
-                        (ds, index) => (
-                          <TreeItem2
-                            key={`input-${id}-${index}`}
-                            itemId={`input-ds-${id}-${index}`}
-                            label={
-                              <Box
-                                onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {getDatasetIcon(ds.format)}
-                                <Typography variant="body2" sx={{ ml: 1 }}>
-                                  {ds.name}
-                                </Typography>
-                              </Box>
-                            }
-                          />
-                        ),
-                      )}
-                  </TreeItem2>
-                )}
-
-                {/* Outputs */}
-                {datasetsForTask.some(
-                  (ds) => ds.role === "OUTPUT",
-                ) && (
-                  <TreeItem2
-                    itemId={`task-${id}-outputs`}
-                    label={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <OutputIcon
-                          fontSize="small"
-                          sx={{ mr: 1, color: theme.palette.primary.main }}
-                        />
-                        <Typography>Outputs</Typography>
-                      </Box>
-                    }
-                  >
-                    {datasetsForTask
-                      .filter((ds) => ds.role === "OUTPUT")
-                      .map(
-                        (ds, index) => (
-                          <TreeItem2
-                            key={`output-${id}-${index}`}
-                            itemId={`output-ds-${id}-${index}`}
-                            label={
-                              <Box
-                                onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {getDatasetIcon(ds.format)}
-                                <Typography variant="body2" sx={{ ml: 1 }}>
-                                  {ds.name}
-                                </Typography>
-                              </Box>
-                            }
-                          />
-                        ),
-                      )}
-                  </TreeItem2>
-                )}
-              </TreeItem2>
-              }
-
-              {/* Parameters */}
-              {paramsForTask.length > 0 && (
+                {/* Data Assets */}
+                {datasetsForTask.length > 0 &&
                 <TreeItem2
-                  itemId={`task-${id}-parameters`}
+                  itemId={`task-${id}-assets`}
                   label={
                     <Box
                       // onClick={() =>
                       //   dispatch(
                       //     setSelectedTask({
                       //       type: "group",
-                      //       role: "Parameters",
+                      //       role: "DATA_ASSETS",
                       //       data: datasetsForTask, // the full list for that task
                       //       task: id,
                       //     }),
@@ -399,70 +275,390 @@ export default function WorkflowTreeView() {
                       }}
                     >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Grid3x3Icon
+                        <DatasetIcon
                           fontSize="small"
                           sx={{ mr: 1, color: theme.palette.primary.main }}
                         />
-                        <Typography>Parameters</Typography>
+                        <Typography>Data Assets</Typography>
                       </Box>
                     </Box>
                   }
                 >
-                  {paramsForTask.map((param, index) => (
+                  {/* Inputs */}
+                  {datasetsForTask.some(
+                    (ds) => ds.role === "INPUT",
+                  ) && (
                     <TreeItem2
-                      key={`${param.name}-${index}`}
-                      itemId={`param-${id}-${index}`}
+                      itemId={`task-${id}-inputs`}
                       label={
-                        <Box
-                          onClick={() =>
-                            dispatch(
-                              setSelectedItem({ type: "param", data: param }),
-                            )
-                          }
-                          sx={{
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                            cursor: "pointer",
-                            bgcolor: "transparent",
-                          }}
-                        >
-                          <Typography variant="body2">
-                            {param.name}: {param.value}
-                          </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <InputIcon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
+                          <Typography>Inputs</Typography>
                         </Box>
                       }
-                    />
-                  ))}
-                </TreeItem2>
-              )}
-
-              {/* Metrics */}
-              {uniqueMetricsByName.length > 0 && (
-                <TreeItem2
-                  itemId={`task-${id}-metrics`}
-                  label={
-                    <Box
-                      // onClick={() =>
-                      //   dispatch(
-                      //     setSelectedTask({
-                      //       type: "group",
-                      //       role: "Metrics",
-                      //       data: datasetsForTask, // the full list for that task
-                      //       task: id,
-                      //     }),
-                      //   )
-                      // }
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        px: 1,
-                        py: 0.5,
-                        borderRadius: 1,
-                        cursor: "pointer",
-                        "&:hover": { bgcolor: "action.hover" },
-                      }}
                     >
+                      {datasetsForTask
+                        .filter((ds) => ds.role === "INPUT")
+                        .map(
+                          (ds, index) => (
+                            <TreeItem2
+                              key={`input-${id}-${index}`}
+                              itemId={`input-ds-${id}-${index}`}
+                              label={
+                                <Box
+                                  onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  {getDatasetIcon(ds.format)}
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {ds.name}
+                                  </Typography>
+                                </Box>
+                              }
+                            />
+                          ),
+                        )}
+                    </TreeItem2>
+                  )}
+
+                  {/* Outputs */}
+                  {datasetsForTask.some(
+                    (ds) => ds.role === "OUTPUT",
+                  ) && (
+                    <TreeItem2
+                      itemId={`task-${id}-outputs`}
+                      label={
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <OutputIcon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
+                          <Typography>Outputs</Typography>
+                        </Box>
+                      }
+                    >
+                      {datasetsForTask
+                        .filter((ds) => ds.role === "OUTPUT")
+                        .map(
+                          (ds, index) => (
+                            <TreeItem2
+                              key={`output-${id}-${index}`}
+                              itemId={`output-ds-${id}-${index}`}
+                              label={
+                                <Box
+                                  onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  {getDatasetIcon(ds.format)}
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {ds.name}
+                                  </Typography>
+                                </Box>
+                              }
+                            />
+                          ),
+                        )}
+                    </TreeItem2>
+                  )}
+                </TreeItem2>
+                }
+
+                {/* Parameters */}
+                {paramsForTask.length > 0 && (
+                  <TreeItem2
+                    itemId={`task-${id}-parameters`}
+                    label={
+                      <Box
+                        // onClick={() =>
+                        //   dispatch(
+                        //     setSelectedTask({
+                        //       type: "group",
+                        //       role: "Parameters",
+                        //       data: datasetsForTask, // the full list for that task
+                        //       task: id,
+                        //     }),
+                        //   )
+                        // }
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          cursor: "pointer",
+                          "&:hover": { bgcolor: "action.hover" },
+                        }}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Grid3x3Icon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
+                          <Typography>Parameters</Typography>
+                        </Box>
+                      </Box>
+                    }
+                  >
+                    {paramsForTask.map((param, index) => (
+                      <TreeItem2
+                        key={`${param.name}-${index}`}
+                        itemId={`param-${id}-${index}`}
+                        label={
+                          <Box
+                            onClick={() =>
+                              dispatch(
+                                setSelectedItem({ type: "param", data: param }),
+                              )
+                            }
+                            sx={{
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              cursor: "pointer",
+                              bgcolor: "transparent",
+                            }}
+                          >
+                            <Typography variant="body2">
+                              {param.name}: {param.value}
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    ))}
+                  </TreeItem2>
+                )}
+
+                {/* Metrics */}
+                {uniqueMetricsByName.length > 0 && (
+                  <TreeItem2
+                    itemId={`task-${id}-metrics`}
+                    label={
+                      <Box
+                        // onClick={() =>
+                        //   dispatch(
+                        //     setSelectedTask({
+                        //       type: "group",
+                        //       role: "Metrics",
+                        //       data: datasetsForTask, // the full list for that task
+                        //       task: id,
+                        //     }),
+                        //   )
+                        // }
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          cursor: "pointer",
+                          "&:hover": { bgcolor: "action.hover" },
+                        }}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <BarChartIcon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
+                          <Typography sx={{ fontWeight: 500 }}>Metrics</Typography>
+                        </Box>
+                      </Box>
+                    }
+                  >
+                    {uniqueMetricsByName.map((metric, index) => (
+                      <TreeItem2
+                        key={`${metric.name}-${index}`}
+                        itemId={`metric-${id}-${index}`}
+                        label={
+                          <Box
+                            onClick={() =>
+                              dispatch(
+                                setSelectedItem({ type: "metric", data: metric }),
+                              )
+                            }
+                            sx={{
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              cursor: "pointer",
+                              bgcolor: "transparent",
+                            }}
+                          >
+                            <Typography variant="body2">
+                              {metric.name}: {Math.round(metric.value * 100) / 100}
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    ))}
+                  </TreeItem2>
+                )}
+              </TreeItem2>
+            )
+          })}
+
+          {/* Fallback for null-task entries if no unique tasks. Supporting mlflow */}
+          {uniqueTasks.length === 0 && (() => {
+            const nullTask = (val: any) => val.task == null;
+          
+            const fallbackParams = tab?.workflowConfiguration.params?.filter(nullTask) || [];
+            const fallbackDatasets = tab?.workflowConfiguration.dataAssets?.filter(nullTask) || [];
+            const fallbackMetrics = tab?.workflowMetrics.data?.filter(nullTask) || [];
+          
+            if (
+              fallbackParams.length === 0 &&
+              fallbackDatasets.length === 0 &&
+              fallbackMetrics.length === 0
+            ) return null;
+          
+            return (
+                <>
+                {/* Data Assets */}
+                {fallbackDatasets.length > 0 && (
+                  <TreeItem2
+                    itemId="task-null-assets"
+                    label={
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <DatasetIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
+                        <Typography>Data Assets</Typography>
+                      </Box>
+                    }
+                  >
+                    {/* Inputs */}
+                    {fallbackDatasets.some(ds => ds.role === "INPUT") && (
+                      <TreeItem2
+                        itemId="task-null-inputs"
+                        label={
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <InputIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
+                            <Typography>Inputs</Typography>
+                          </Box>
+                        }
+                      >
+                        {fallbackDatasets
+                          .filter(ds => ds.role === "INPUT")
+                          .map((ds, index) => (
+                            <TreeItem2
+                              key={`null-input-${index}`}
+                              itemId={`null-input-${index}`}
+                              label={
+                                <Box
+                                  onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  {getDatasetIcon(ds.format)}
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {ds.name}
+                                  </Typography>
+                                </Box>
+                              }
+                            />
+                          ))}
+                      </TreeItem2>
+                    )}
+                    {/* Outputs */}
+                    {fallbackDatasets.some(ds => ds.role === "OUTPUT") && (
+                      <TreeItem2
+                        itemId="task-null-outputs"
+                        label={
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <OutputIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
+                            <Typography>Outputs</Typography>
+                          </Box>
+                        }
+                      >
+                        {fallbackDatasets
+                          .filter(ds => ds.role === "OUTPUT")
+                          .map((ds, index) => (
+                            <TreeItem2
+                              key={`null-output-${index}`}
+                              itemId={`null-output-${index}`}
+                              label={
+                                <Box
+                                  onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  {getDatasetIcon(ds.format)}
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {ds.name}
+                                  </Typography>
+                                </Box>
+                              }
+                            />
+                          ))}
+                      </TreeItem2>
+                    )}
+                  </TreeItem2>
+                )}
+                {/* Parameters */}
+                {fallbackParams.length > 0 && (
+                  <TreeItem2
+                    itemId="task-null-parameters"
+                    label={
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Grid3x3Icon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
+                        <Typography>Parameters</Typography>
+                      </Box>
+                    }
+                  >
+                    {fallbackParams.map((param, index) => (
+                      <TreeItem2
+                        key={`null-param-${index}`}
+                        itemId={`null-param-${index}`}
+                        label={
+                          <Box
+                            onClick={() => dispatch(setSelectedItem({ type: "param", data: param }))}
+                            sx={{
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <Typography variant="body2">
+                              {param.name}: {param.value}
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    ))}
+                  </TreeItem2>
+                )}
+                {/* Metrics */}
+                {fallbackMetrics.length > 0 && (
+                  <TreeItem2
+                    itemId="task-null-metrics"
+                    label={
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <BarChartIcon
                           fontSize="small"
@@ -470,223 +666,36 @@ export default function WorkflowTreeView() {
                         />
                         <Typography sx={{ fontWeight: 500 }}>Metrics</Typography>
                       </Box>
-                    </Box>
-                  }
-                >
-                  {uniqueMetricsByName.map((metric, index) => (
-                    <TreeItem2
-                      key={`${metric.name}-${index}`}
-                      itemId={`metric-${id}-${index}`}
-                      label={
-                        <Box
-                          onClick={() =>
-                            dispatch(
-                              setSelectedItem({ type: "metric", data: metric }),
-                            )
-                          }
-                          sx={{
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                            cursor: "pointer",
-                            bgcolor: "transparent",
-                          }}
-                        >
-                          <Typography variant="body2">
-                            {metric.name}: {Math.round(metric.value * 100) / 100}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  ))}
-                </TreeItem2>
-              )}
-            </TreeItem2>
-          )
-        })}
-
-        {/* Fallback for null-task entries if no unique tasks. Supporting mlflow */}
-        {uniqueTasks.length === 0 && (() => {
-          const nullTask = (val: any) => val.task == null;
-        
-          const fallbackParams = tab?.workflowConfiguration.params?.filter(nullTask) || [];
-          const fallbackDatasets = tab?.workflowConfiguration.dataAssets?.filter(nullTask) || [];
-          const fallbackMetrics = tab?.workflowMetrics.data?.filter(nullTask) || [];
-        
-          if (
-            fallbackParams.length === 0 &&
-            fallbackDatasets.length === 0 &&
-            fallbackMetrics.length === 0
-          ) return null;
-        
-          return (
-              <>
-              {/* Data Assets */}
-              {fallbackDatasets.length > 0 && (
-                <TreeItem2
-                  itemId="task-null-assets"
-                  label={
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <DatasetIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
-                      <Typography>Data Assets</Typography>
-                    </Box>
-                  }
-                >
-                  {/* Inputs */}
-                  {fallbackDatasets.some(ds => ds.role === "INPUT") && (
-                    <TreeItem2
-                      itemId="task-null-inputs"
-                      label={
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <InputIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
-                          <Typography>Inputs</Typography>
-                        </Box>
-                      }
-                    >
-                      {fallbackDatasets
-                        .filter(ds => ds.role === "INPUT")
-                        .map((ds, index) => (
-                          <TreeItem2
-                            key={`null-input-${index}`}
-                            itemId={`null-input-${index}`}
-                            label={
-                              <Box
-                                onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {getDatasetIcon(ds.format)}
-                                <Typography variant="body2" sx={{ ml: 1 }}>
-                                  {ds.name}
-                                </Typography>
-                              </Box>
-                            }
-                          />
-                        ))}
-                    </TreeItem2>
-                  )}
-                  {/* Outputs */}
-                  {fallbackDatasets.some(ds => ds.role === "OUTPUT") && (
-                    <TreeItem2
-                      itemId="task-null-outputs"
-                      label={
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <OutputIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
-                          <Typography>Outputs</Typography>
-                        </Box>
-                      }
-                    >
-                      {fallbackDatasets
-                        .filter(ds => ds.role === "OUTPUT")
-                        .map((ds, index) => (
-                          <TreeItem2
-                            key={`null-output-${index}`}
-                            itemId={`null-output-${index}`}
-                            label={
-                              <Box
-                                onClick={() => dispatch(setSelectedItem({ type: "DATASET", data: ds }))}
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {getDatasetIcon(ds.format)}
-                                <Typography variant="body2" sx={{ ml: 1 }}>
-                                  {ds.name}
-                                </Typography>
-                              </Box>
-                            }
-                          />
-                        ))}
-                    </TreeItem2>
-                  )}
-                </TreeItem2>
-              )}
-              {/* Parameters */}
-              {fallbackParams.length > 0 && (
-                <TreeItem2
-                  itemId="task-null-parameters"
-                  label={
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Grid3x3Icon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
-                      <Typography>Parameters</Typography>
-                    </Box>
-                  }
-                >
-                  {fallbackParams.map((param, index) => (
-                    <TreeItem2
-                      key={`null-param-${index}`}
-                      itemId={`null-param-${index}`}
-                      label={
-                        <Box
-                          onClick={() => dispatch(setSelectedItem({ type: "param", data: param }))}
-                          sx={{
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                            cursor: "pointer",
-                          }}
-                        >
-                          <Typography variant="body2">
-                            {param.name}: {param.value}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  ))}
-                </TreeItem2>
-              )}
-              {/* Metrics */}
-              {fallbackMetrics.length > 0 && (
-                <TreeItem2
-                  itemId="task-null-metrics"
-                  label={
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <BarChartIcon
-                        fontSize="small"
-                        sx={{ mr: 1, color: theme.palette.primary.main }}
+                    }
+                  >
+                    {fallbackMetrics.map((metric, index) => (
+                      <TreeItem2
+                        key={`null-metric-${index}`}
+                        itemId={`null-metric-${index}`}
+                        label={
+                          <Box
+                            onClick={() => dispatch(setSelectedItem({ type: "metric", data: metric }))}
+                            sx={{
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <Typography variant="body2">
+                              {metric.name}: {Math.round(metric.value * 100) / 100}
+                            </Typography>
+                          </Box>
+                        }
                       />
-                      <Typography sx={{ fontWeight: 500 }}>Metrics</Typography>
-                    </Box>
-                  }
-                >
-                  {fallbackMetrics.map((metric, index) => (
-                    <TreeItem2
-                      key={`null-metric-${index}`}
-                      itemId={`null-metric-${index}`}
-                      label={
-                        <Box
-                          onClick={() => dispatch(setSelectedItem({ type: "metric", data: metric }))}
-                          sx={{
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                            cursor: "pointer",
-                          }}
-                        >
-                          <Typography variant="body2">
-                            {metric.name}: {Math.round(metric.value * 100) / 100}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  ))}
-                </TreeItem2>
-              )}
-            </>
-          );
-        })()}
-      </SimpleTreeView>
+                    ))}
+                  </TreeItem2>
+                )}
+              </>
+            );
+          })()}
+        </SimpleTreeView>
+      </Box>
     </Box>
   )
 }

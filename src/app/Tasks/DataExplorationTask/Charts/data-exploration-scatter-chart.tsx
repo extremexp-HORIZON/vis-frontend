@@ -155,14 +155,13 @@ const ScatterChart = (
   
 
     return (
-      <Box sx={{ height: "100%" }}>
+      <Box sx={{ height: "99%" }}>
         {umap ? (
           <ResponsiveCardVegaLite
           spec={[]}
           data={{ table: dataCopy }}
           actions={false}
           controlPanel={<ScatterChartControlPanel />}
-          blinkOnStart={true}
           infoMessage={info}
           showInfoMessage={false}
           maxHeight={500}
@@ -174,14 +173,15 @@ const ScatterChart = (
             <ResponsiveCardVegaLite
               key={index}
               spec={spec}
+              title={"Scatter Plot"}
               data={{ table: dataCopy }}
               actions={false}
               controlPanel={<ScatterChartControlPanel />}
-              blinkOnStart={true}
               infoMessage={info}
               showInfoMessage={shouldShowInfoMessage}
               maxHeight={500}
               aspectRatio={isSmallScreen ? 2.8 : 1.8}
+              pulsate={false}
             />
           ))
         )}
