@@ -22,27 +22,27 @@ const ColumnSelectionPanel: React.FC = () => {
     
     dispatch(setControls({ selectedColumns: newSelectedColumns }));
     
-    if (newSelectedColumns.length) {
-      handleFetchDataExploration(newSelectedColumns);
-    }
+    // if (newSelectedColumns.length) {
+    //   handleFetchDataExploration(newSelectedColumns);
+    // }
   };
 
-  const handleFetchDataExploration = (columns = selectedColumns) => {
-    if (!columns?.length) return;
+  // const handleFetchDataExploration = (columns = selectedColumns) => {
+  //   if (!columns?.length) return;
   
-    dispatch(fetchDataExplorationData({
-      query: {
-        ...defaultDataExplorationQuery,
-        datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
-        columns: columns.map(col => col.name),
-        filters: tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
-      },
-      metadata: {
-        workflowId: tab?.workflowId || "",
-        queryCase: "chart",
-      },
-    }));
-  };
+  //   dispatch(fetchDataExplorationData({
+  //     query: {
+  //       ...defaultDataExplorationQuery,
+  //       datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
+  //       columns: columns.map(col => col.name),
+  //       filters: tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
+  //     },
+  //     metadata: {
+  //       workflowId: tab?.workflowId || "",
+  //       queryCase: "chart",
+  //     },
+  //   }));
+  // };
 
   return (
     <Box sx={{ width: '100%' }}>

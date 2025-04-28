@@ -1,16 +1,16 @@
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { 
-  Box, 
-  Checkbox,  
-  IconButton, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  Popover, 
-  Tooltip, 
-  Typography 
+import {
+  Box,
+  Checkbox,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Popover,
+  Tooltip,
+  Typography,
 } from "@mui/material"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
@@ -23,9 +23,11 @@ const ColumnsPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  
-  const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
-  const selectedColumns = tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
+
+  const originalColumns =
+    tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
+  const selectedColumns =
+    tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
   const selectedColumnNames = selectedColumns.map(col => col.name)
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -34,41 +36,49 @@ const ColumnsPanel = () => {
   const handleClose = () => setAnchorEl(null)
   const open = Boolean(anchorEl)
 
-  useEffect(() => {
-    if(tab?.workflowTasks?.dataExploration?.controlPanel?.chartType === "datatable" && 
-       tab?.workflowTasks?.dataExploration?.metaData?.data) {
-      handleFetchDataExploration(selectedColumns)
-    }
-  }, [tab?.workflowTasks?.dataExploration?.metaData?.data])
+  // useEffect(() => {
+  //   if(tab?.workflowTasks?.dataExploration?.controlPanel?.chartType === "datatable" &&
+  //      tab?.workflowTasks?.dataExploration?.metaData?.data) {
+  //     handleFetchDataExploration(selectedColumns)
+  //   }
+  // }, [tab?.workflowTasks?.dataExploration?.metaData?.data])
 
   const handleColumnToggle = (columnName: string) => () => {
-    const newSelectedColumns = selectedColumns.some(col => col.name === columnName)
+    const newSelectedColumns = selectedColumns.some(
+      col => col.name === columnName,
+    )
       ? selectedColumns.filter(col => col.name !== columnName)
-      : [...selectedColumns, originalColumns.find(col => col.name === columnName)!]
-    
+      : [
+          ...selectedColumns,
+          originalColumns.find(col => col.name === columnName)!,
+        ]
+
     dispatch(setControls({ selectedColumns: newSelectedColumns }))
-    
-    if (newSelectedColumns.length) {
-      handleFetchDataExploration(newSelectedColumns)
-    }
+
+    // if (newSelectedColumns.length) {
+    //   // handleFetchDataExploration(newSelectedColumns)
+    // }
   }
 
   const handleFetchDataExploration = (columns = selectedColumns) => {
-    if (!columns?.length) return;
-  
-    dispatch(fetchDataExplorationData({
-      query: {
-        ...defaultDataExplorationQuery,
-        datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
-        columns: columns.map(col => col.name),
-        filters: tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
-      },
-      metadata: {
-        workflowId: tab?.workflowId || "",
-        queryCase: "chart",
-      },
-    }));
-  };
+    if (!columns?.length) return
+
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          ...defaultDataExplorationQuery,
+          datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
+          columns: columns.map(col => col.name),
+          filters:
+            tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
+        },
+        metadata: {
+          workflowId: tab?.workflowId || "",
+          queryCase: "chart",
+        },
+      }),
+    )
+  }
 
   const SectionHeader = ({
     icon,
@@ -84,20 +94,22 @@ const ColumnsPanel = () => {
         borderBottom: `1px solid rgba(0, 0, 0, 0.08)`,
         px: 2,
         py: 1.5,
-        background: 'linear-gradient(to right, #f1f5f9, #f8fafc)',
-        borderTopLeftRadius: '10px',
-        borderTopRightRadius: '10px',
+        background: "linear-gradient(to right, #f1f5f9, #f8fafc)",
+        borderTopLeftRadius: "10px",
+        borderTopRightRadius: "10px",
         margin: 0,
-        width: '100%',
+        width: "100%",
       }}
     >
-      <Box sx={{ 
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#3566b5',
-        mr: 1.5
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#3566b5",
+          mr: 1.5,
+        }}
+      >
         {icon}
       </Box>
       <Typography
@@ -106,8 +118,8 @@ const ColumnsPanel = () => {
           display: "flex",
           alignItems: "center",
           fontWeight: 600,
-          color: '#1e3a5f',
-          letterSpacing: '0.3px',
+          color: "#1e3a5f",
+          letterSpacing: "0.3px",
         }}
       >
         {title}
@@ -119,10 +131,10 @@ const ColumnsPanel = () => {
     <>
       <Tooltip title="Columns">
         <IconButton onClick={handleOpen}>
-          <ViewColumnIcon color="primary" fontSize="medium"  />
+          <ViewColumnIcon color="primary" fontSize="medium" />
         </IconButton>
       </Tooltip>
-      
+
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -135,18 +147,21 @@ const ColumnsPanel = () => {
             maxHeight: 500,
             overflow: "hidden",
             padding: 0,
-            borderRadius: '12px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
-            border: '1px solid rgba(0,0,0,0.04)',
+            borderRadius: "12px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
+            border: "1px solid rgba(0,0,0,0.04)",
             mt: 1,
           },
         }}
       >
-        <SectionHeader icon={<TableRowsIcon fontSize="small" />} title="Visible Columns" />
-        
-        <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+        <SectionHeader
+          icon={<TableRowsIcon fontSize="small" />}
+          title="Visible Columns"
+        />
+
+        <Box sx={{ maxHeight: 300, overflow: "auto" }}>
           <List dense>
-            {originalColumns.map((column) => (
+            {originalColumns.map(column => (
               <ListItem key={column.name} disablePadding>
                 <ListItemButton onClick={handleColumnToggle(column.name)}>
                   <ListItemIcon>

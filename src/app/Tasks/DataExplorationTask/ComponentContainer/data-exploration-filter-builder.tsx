@@ -11,7 +11,6 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   MenuItem,
   Popover,
@@ -23,8 +22,6 @@ import {
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
-import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import AddIcon from "@mui/icons-material/Add"
 import FilterListIcon from "@mui/icons-material/FilterList"
 import CloseIcon from "@mui/icons-material/Close"
@@ -35,9 +32,12 @@ const FilterBuilder = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
-  const uniqueValues = tab?.workflowTasks.dataExploration?.metaData.data?.uniqueColumnValues || []
-  const activeFilters = tab?.workflowTasks.dataExploration?.controlPanel?.filters || []
+  const originalColumns =
+    tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
+  const uniqueValues =
+    tab?.workflowTasks.dataExploration?.metaData.data?.uniqueColumnValues || []
+  const activeFilters =
+    tab?.workflowTasks.dataExploration?.controlPanel?.filters || []
 
   // Local states for selected filter input
   const [selectedColumn, setSelectedColumn] = useState("")
@@ -97,25 +97,28 @@ const FilterBuilder = () => {
   const handleAddFilter = () => {
     if (!selectedColumn || !filterType) return
 
-    const newFilter = filterType === "equals"
-      ? { column: selectedColumn, type: "equals", value: equalsValue }
-      : {
-          column: selectedColumn,
-          type: "range",
-          min: rangeValue[0],
-          max: rangeValue[1],
-        }
+    const newFilter =
+      filterType === "equals"
+        ? { column: selectedColumn, type: "equals", value: equalsValue }
+        : {
+            column: selectedColumn,
+            type: "range",
+            min: rangeValue[0],
+            max: rangeValue[1],
+          }
 
     const updatedFilters = [...activeFilters, newFilter]
     dispatch(setControls({ filters: updatedFilters }))
-    fetchDataWithFilters(updatedFilters)
+    // fetchDataWithFilters(updatedFilters)
     resetForm()
   }
 
   const handleDeleteFilter = (indexToDelete: number) => {
-    const updatedFilters = activeFilters.filter((_, idx) => idx !== indexToDelete)
+    const updatedFilters = activeFilters.filter(
+      (_, idx) => idx !== indexToDelete,
+    )
     dispatch(setControls({ filters: updatedFilters }))
-    fetchDataWithFilters(updatedFilters)
+    // fetchDataWithFilters(updatedFilters)
   }
 
   const resetForm = () => {
@@ -124,22 +127,22 @@ const FilterBuilder = () => {
     setEqualsValue("")
   }
 
-  const fetchDataWithFilters = (filters: any[]) => {
-    dispatch(
-      fetchDataExplorationData({
-        query: {
-          ...defaultDataExplorationQuery,
-          datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
-          filters,
-          columns: tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(col => col.name) || [],
-        },
-        metadata: {
-          workflowId: tab?.workflowId || "",
-          queryCase: "chart",
-        },
-      })
-    )
-  }
+  // const fetchDataWithFilters = (filters: any[]) => {
+  //   dispatch(
+  //     fetchDataExplorationData({
+  //       query: {
+  //         ...defaultDataExplorationQuery,
+  //         datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
+  //         filters,
+  //         columns: tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(col => col.name) || [],
+  //       },
+  //       metadata: {
+  //         workflowId: tab?.workflowId || "",
+  //         queryCase: "chart",
+  //       },
+  //     })
+  //   )
+  // }
 
   const handleColumnSelect = (columnName: string) => {
     setSelectedColumn(columnName)
@@ -162,20 +165,22 @@ const FilterBuilder = () => {
         borderBottom: `1px solid rgba(0, 0, 0, 0.08)`,
         px: 2,
         py: 1.5,
-        background: 'linear-gradient(to right, #f1f5f9, #f8fafc)',
-        borderTopLeftRadius: '10px',
-        borderTopRightRadius: '10px',
+        background: "linear-gradient(to right, #f1f5f9, #f8fafc)",
+        borderTopLeftRadius: "10px",
+        borderTopRightRadius: "10px",
         margin: 0,
-        width: '100%',
+        width: "100%",
       }}
     >
-      <Box sx={{ 
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#3566b5',
-        mr: 1.5
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#3566b5",
+          mr: 1.5,
+        }}
+      >
         {icon}
       </Box>
       <Typography
@@ -184,8 +189,8 @@ const FilterBuilder = () => {
           display: "flex",
           alignItems: "center",
           fontWeight: 600,
-          color: '#1e3a5f',
-          letterSpacing: '0.3px',
+          color: "#1e3a5f",
+          letterSpacing: "0.3px",
         }}
       >
         {title}
@@ -194,52 +199,66 @@ const FilterBuilder = () => {
   )
 
   const SuggestedColumns = () => {
-    const columnsToShow = showAllColumns ? originalColumns : originalColumns.slice(0, 5)
+    const columnsToShow = showAllColumns
+      ? originalColumns
+      : originalColumns.slice(0, 5)
     const hasMore = originalColumns.length > 5
-    
+
     return (
       <Box sx={{ px: 2, py: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 1,
+          }}
+        >
           <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
             Suggested Columns
           </Typography>
           {hasMore && (
-            <Button 
-              size="small" 
+            <Button
+              size="small"
               onClick={() => setShowAllColumns(!showAllColumns)}
-              sx={{ fontSize: '0.75rem', ml: 1 }}
+              sx={{ fontSize: "0.75rem", ml: 1 }}
             >
-              {showAllColumns ? 'Show Less' : `Show More (${originalColumns.length - 5})`}
+              {showAllColumns
+                ? "Show Less"
+                : `Show More (${originalColumns.length - 5})`}
             </Button>
           )}
         </Box>
-        
-        <Box sx={{ 
-          display: 'flex', 
-          gap: 1, 
-          overflowX: 'auto', 
-          py: 1,
-          '&::-webkit-scrollbar': {
-            height: '6px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,0.2)',
-            borderRadius: '3px',
-          },
-        }}>
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            overflowX: "auto",
+            py: 1,
+            "&::-webkit-scrollbar": {
+              height: "6px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "rgba(0,0,0,0.2)",
+              borderRadius: "3px",
+            },
+          }}
+        >
           {columnsToShow.map((col: any) => (
             <Chip
               key={col.name}
               label={col.name}
               onClick={() => handleColumnSelect(col.name)}
-              variant={selectedColumn === col.name ? 'filled' : 'outlined'}
-              color={selectedColumn === col.name ? 'primary' : 'default'}
-              sx={{ 
+              variant={selectedColumn === col.name ? "filled" : "outlined"}
+              color={selectedColumn === col.name ? "primary" : "default"}
+              sx={{
                 flexShrink: 0,
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: selectedColumn === col.name ? '' : 'action.hover',
-                }
+                cursor: "pointer",
+                "&:hover": {
+                  backgroundColor:
+                    selectedColumn === col.name ? "" : "action.hover",
+                },
               }}
             />
           ))}
@@ -252,7 +271,7 @@ const FilterBuilder = () => {
     <Box display="flex" flexDirection="column" gap={2} p={2}>
       {/* Suggested Columns */}
       <SuggestedColumns />
-      
+
       {/* Filter Type Selector */}
       {selectedColumn && (
         <FormControl fullWidth size="small">
@@ -294,15 +313,15 @@ const FilterBuilder = () => {
           <Typography variant="body2" gutterBottom>
             Range: {rangeValue[0]} - {rangeValue[1]}
           </Typography>
-          <ThemeProvider  theme={theme}>
-          <Slider
-            value={rangeValue}
-            onChange={(e, newValue) => setRangeValue(newValue as number[])}
-            valueLabelDisplay="auto"
-            min={getMinMax(uniqueValues[selectedColumn])[0]}
-            max={getMinMax(uniqueValues[selectedColumn])[1]}
-            size="small"
-          />
+          <ThemeProvider theme={theme}>
+            <Slider
+              value={rangeValue}
+              onChange={(e, newValue) => setRangeValue(newValue as number[])}
+              valueLabelDisplay="auto"
+              min={getMinMax(uniqueValues[selectedColumn])[0]}
+              max={getMinMax(uniqueValues[selectedColumn])[1]}
+              size="small"
+            />
           </ThemeProvider>
         </Box>
       )}
@@ -315,7 +334,7 @@ const FilterBuilder = () => {
         disabled={!filterType}
         startIcon={<AddIcon />}
         size="small"
-        sx={{ alignSelf: 'center', mt: 1 }}
+        sx={{ alignSelf: "center", mt: 1 }}
       >
         Add Filter
       </Button>
@@ -327,19 +346,26 @@ const FilterBuilder = () => {
       <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
         Active Filters
       </Typography>
-      
+
       {activeFilters.length === 0 ? (
-        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontStyle: "italic" }}
+        >
           No active filters
         </Typography>
       ) : (
-        <List dense sx={{ maxHeight: 200, overflow: 'auto' }}>
+        <List dense sx={{ maxHeight: 200, overflow: "auto" }}>
           {activeFilters.map((filter: any, index: number) => (
-            <ListItem 
-              key={index} 
+            <ListItem
+              key={index}
               disablePadding
               secondaryAction={
-                <IconButton edge="end" onClick={() => handleDeleteFilter(index)}>
+                <IconButton
+                  edge="end"
+                  onClick={() => handleDeleteFilter(index)}
+                >
                   <CloseIcon fontSize="small" />
                 </IconButton>
               }
@@ -347,9 +373,11 @@ const FilterBuilder = () => {
               <ListItemButton sx={{ px: 1 }}>
                 <ListItemText
                   primary={`${filter.column} ${filter.type}`}
-                  secondary={filter.type === "equals" 
-                    ? filter.value 
-                    : `${filter.min} - ${filter.max}`}
+                  secondary={
+                    filter.type === "equals"
+                      ? filter.value
+                      : `${filter.min} - ${filter.max}`
+                  }
                 />
               </ListItemButton>
             </ListItem>
@@ -366,7 +394,7 @@ const FilterBuilder = () => {
           <FilterListIcon color="primary" fontSize="medium" />
         </IconButton>
       </Tooltip>
-      
+
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -379,14 +407,17 @@ const FilterBuilder = () => {
             maxHeight: 500,
             overflow: "hidden",
             padding: 0,
-            borderRadius: '12px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
-            border: '1px solid rgba(0,0,0,0.04)',
+            borderRadius: "12px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
+            border: "1px solid rgba(0,0,0,0.04)",
             mt: 1,
           },
         }}
       >
-        <SectionHeader icon={<FilterListIcon fontSize="small" />} title="Filter Data" />
+        <SectionHeader
+          icon={<FilterListIcon fontSize="small" />}
+          title="Filter Data"
+        />
         <FilterForm />
         <Divider />
         <ActiveFiltersList />
@@ -396,438 +427,3 @@ const FilterBuilder = () => {
 }
 
 export default FilterBuilder
-
-
-// import React, { useEffect, useState, useRef } from "react";
-// import {
-//   Box,
-//   Button,
-//   Chip,
-//   Divider,
-//   IconButton,
-//   List,
-//   ListItem,
-//   ListItemButton,
-//   ListItemText,
-//   Popover,
-//   Slider,
-//   TextField,
-//   Tooltip,
-//   Typography,
-//   Paper,
-//   InputAdornment,
-//   MenuItem,
-// } from "@mui/material";
-// import { useAppDispatch, useAppSelector } from "../../../../store/store";
-// import { setControls } from "../../../../store/slices/workflowPageSlice";
-// import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model";
-// import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model";
-// import AddIcon from "@mui/icons-material/Add";
-// import FilterListIcon from "@mui/icons-material/FilterList";
-// import CloseIcon from "@mui/icons-material/Close";
-// import SearchIcon from "@mui/icons-material/Search";
-
-// const FilterBuilder = () => {
-//   const dispatch = useAppDispatch();
-//   const { tab } = useAppSelector((state) => state.workflowPage);
-//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-//   const originalColumns =
-//     tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || [];
-//   const uniqueValues =
-//     tab?.workflowTasks.dataExploration?.metaData.data?.uniqueColumnValues || [];
-//   const activeFilters =
-//     tab?.workflowTasks.dataExploration?.controlPanel?.filters || [];
-
-//   // Filter state
-//   const [searchText, setSearchText] = useState("");
-//   const [selectedColumn, setSelectedColumn] = useState("");
-//   const [filterType, setFilterType] = useState<"equals" | "range">("equals");
-//   const [equalsValue, setEqualsValue] = useState("");
-//   const [rangeValue, setRangeValue] = useState<[number, number]>([0, 100]);
-//   const [suggestions, setSuggestions] = useState<any[]>([]);
-//   const inputRef = useRef<HTMLInputElement>(null);
-
-//   // Popover controls
-//   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-//     setAnchorEl(event.currentTarget);
-//   };
-//   const handleClose = () => {
-//     setAnchorEl(null);
-//     setSearchText("");
-//     setSelectedColumn("");
-//     setFilterType("equals");
-//     setEqualsValue("");
-//   };
-//   const open = Boolean(anchorEl);
-
-//   // Helper functions
-//   const getMinMax = (values: number[] = []) => {
-//     if (!values.length) return [0, 100];
-//     return [Math.min(...values), Math.max(...values)];
-//   };
-
-//   // Effects
-//   useEffect(() => {
-//     if (selectedColumn && filterType === "range") {
-//       const values = uniqueValues[selectedColumn] || [];
-//       const [min, max] = getMinMax(values);
-//       setRangeValue([min, max]);
-//     }
-//   }, [selectedColumn, filterType]);
-
-//   useEffect(() => {
-//     if (searchText) {
-//       const filtered = originalColumns.filter((col) =>
-//         col.name.toLowerCase().includes(searchText.toLowerCase())
-//       );
-//       setSuggestions(filtered);
-//     } else {
-//       setSuggestions(originalColumns.slice(0, 5));
-//     }
-//   }, [searchText, originalColumns]);
-
-//   // Handler functions
-//   const handleAddFilter = () => {
-//     if (!selectedColumn) return;
-
-//     const newFilter =
-//       filterType === "equals"
-//         ? { column: selectedColumn, type: "equals", value: equalsValue }
-//         : {
-//             column: selectedColumn,
-//             type: "range",
-//             min: rangeValue[0],
-//             max: rangeValue[1],
-//           };
-
-//     const updatedFilters = [...activeFilters, newFilter];
-//     dispatch(setControls({ filters: updatedFilters }));
-//     fetchDataWithFilters(updatedFilters);
-//     resetForm();
-//   };
-
-//   const handleDeleteFilter = (indexToDelete: number) => {
-//     const updatedFilters = activeFilters.filter((_, idx) => idx !== indexToDelete);
-//     dispatch(setControls({ filters: updatedFilters }));
-//     fetchDataWithFilters(updatedFilters);
-//   };
-
-//   const resetForm = () => {
-//     setSelectedColumn("");
-//     setFilterType("equals");
-//     setEqualsValue("");
-//     setSearchText("");
-//   };
-
-//   const fetchDataWithFilters = (filters: any[]) => {
-//     dispatch(
-//       fetchDataExplorationData({
-//         query: {
-//           ...defaultDataExplorationQuery,
-//           datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
-//           filters,
-//           columns:
-//             tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.map(
-//               (col) => col.name
-//             ) || [],
-//         },
-//         metadata: {
-//           workflowId: tab?.workflowId || "",
-//           queryCase: "chart",
-//         },
-//       })
-//     );
-//   };
-
-//   const handleColumnSelect = (columnName: string) => {
-//     setSelectedColumn(columnName);
-//     setFilterType("equals");
-//     setEqualsValue("");
-//     setSearchText("");
-//     if (inputRef.current) {
-//       inputRef.current.focus();
-//     }
-//   };
-
-//   // Component sections
-//   const SectionHeader = ({
-//     icon,
-//     title,
-//   }: {
-//     icon: React.ReactNode;
-//     title: string;
-//   }) => (
-//     <Box
-//       sx={{
-//         display: "flex",
-//         alignItems: "center",
-//         borderBottom: `1px solid rgba(0, 0, 0, 0.08)`,
-//         px: 2,
-//         py: 1.5,
-//         background: "linear-gradient(to right, #f1f5f9, #f8fafc)",
-//         borderTopLeftRadius: "10px",
-//         borderTopRightRadius: "10px",
-//         margin: 0,
-//         width: "100%",
-//       }}
-//     >
-//       <Box
-//         sx={{
-//           display: "flex",
-//           alignItems: "center",
-//           justifyContent: "center",
-//           color: "#3566b5",
-//           mr: 1.5,
-//         }}
-//       >
-//         {icon}
-//       </Box>
-//       <Typography
-//         variant="subtitle1"
-//         sx={{
-//           display: "flex",
-//           alignItems: "center",
-//           fontWeight: 600,
-//           color: "#1e3a5f",
-//           letterSpacing: "0.3px",
-//         }}
-//       >
-//         {title}
-//       </Typography>
-//     </Box>
-//   );
-
-//   const ColumnSearch = () => (
-//     <Box sx={{ px: 2, py: 1.5 }}>
-//       <TextField
-//         fullWidth
-//         size="small"
-//         placeholder="Search columns..."
-//         value={searchText}
-//         onChange={(e) => setSearchText(e.target.value)}
-//         inputRef={inputRef}
-//         InputProps={{
-//           startAdornment: (
-//             <InputAdornment position="start">
-//               <SearchIcon />
-//             </InputAdornment>
-//           ),
-//           endAdornment: searchText && (
-//             <IconButton
-//               size="small"
-//               onClick={() => setSearchText("")}
-//               edge="end"
-//             >
-//               <CloseIcon fontSize="small" />
-//             </IconButton>
-//           ),
-//         }}
-//       />
-//       <Box
-//         sx={{
-//           display: "flex",
-//           flexWrap: "wrap",
-//           gap: 1,
-//           mt: 2,
-//           maxHeight: 120,
-//           overflowY: "auto",
-//           "&::-webkit-scrollbar": {
-//             width: "6px",
-//           },
-//           "&::-webkit-scrollbar-thumb": {
-//             backgroundColor: "rgba(0,0,0,0.2)",
-//             borderRadius: "3px",
-//           },
-//         }}
-//       >
-//         {suggestions.map((col) => (
-//           <Chip
-//             key={col.name}
-//             label={col.name}
-//             onClick={() => handleColumnSelect(col.name)}
-//             variant={selectedColumn === col.name ? "filled" : "outlined"}
-//             color={selectedColumn === col.name ? "primary" : "default"}
-//             sx={{
-//               flexShrink: 0,
-//               cursor: "pointer",
-//               "&:hover": {
-//                 backgroundColor:
-//                   selectedColumn === col.name ? "" : "action.hover",
-//               },
-//             }}
-//           />
-//         ))}
-//       </Box>
-//     </Box>
-//   );
-
-//   const FilterForm = () => (
-//     <Box sx={{ px: 2, py: 1 }}>
-//       {selectedColumn ? (
-//         <>
-//           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-//             <Chip
-//               label={selectedColumn}
-//               onDelete={() => setSelectedColumn("")}
-//               color="primary"
-//               sx={{ mr: 1 }}
-//             />
-//             <Button
-//               variant={filterType === "equals" ? "contained" : "outlined"}
-//               size="small"
-//               onClick={() => setFilterType("equals")}
-//               sx={{ mr: 1 }}
-//             >
-//               =
-//             </Button>
-//             <Button
-//               variant={filterType === "range" ? "contained" : "outlined"}
-//               size="small"
-//               onClick={() => setFilterType("range")}
-//             >
-//               Range
-//             </Button>
-//           </Box>
-
-//           {filterType === "equals" ? (
-//             <TextField
-//               fullWidth
-//               size="small"
-//               select
-//               label="Value"
-//               value={equalsValue}
-//               onChange={(e) => setEqualsValue(e.target.value)}
-//               sx={{ mb: 2 }}
-//             >
-//               {uniqueValues[selectedColumn]?.map((value: any) => (
-//                 <MenuItem key={value} value={value}>
-//                   {value}
-//                 </MenuItem>
-//               ))}
-//             </TextField>
-//           ) : (
-//             <Box sx={{ px: 1, mb: 2 }}>
-//               <Typography variant="body2" gutterBottom>
-//                 Range: {rangeValue[0]} - {rangeValue[1]}
-//               </Typography>
-//               <Slider
-//                 value={rangeValue}
-//                 onChange={(_, newValue) =>
-//                   setRangeValue(newValue as [number, number])
-//                 }
-//                 valueLabelDisplay="auto"
-//                 min={getMinMax(uniqueValues[selectedColumn])[0]}
-//                 max={getMinMax(uniqueValues[selectedColumn])[1]}
-//                 size="small"
-//               />
-//             </Box>
-//           )}
-
-//           <Button
-//             fullWidth
-//             variant="contained"
-//             color="primary"
-//             onClick={handleAddFilter}
-//             disabled={filterType === "equals" && !equalsValue}
-//             startIcon={<AddIcon />}
-//           >
-//             Add Filter
-//           </Button>
-//         </>
-//       ) : (
-//         <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
-//           Select a column to add filter
-//         </Typography>
-//       )}
-//     </Box>
-//   );
-
-//   const ActiveFiltersList = () => (
-//     <Box sx={{ p: 2 }}>
-//       <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
-//         Active Filters
-//       </Typography>
-
-//       {activeFilters.length === 0 ? (
-//         <Typography
-//           variant="body2"
-//           color="text.secondary"
-//           sx={{ fontStyle: "italic" }}
-//         >
-//           No active filters
-//         </Typography>
-//       ) : (
-//         <List dense sx={{ maxHeight: 200, overflow: "auto" }}>
-//           {activeFilters.map((filter: any, index: number) => (
-//             <ListItem
-//               key={index}
-//               disablePadding
-//               secondaryAction={
-//                 <IconButton
-//                   edge="end"
-//                   onClick={() => handleDeleteFilter(index)}
-//                 >
-//                   <CloseIcon fontSize="small" />
-//                 </IconButton>
-//               }
-//             >
-//               <ListItemButton sx={{ px: 1 }}>
-//                 <ListItemText
-//                   primary={`${filter.column} ${filter.type}`}
-//                   secondary={
-//                     filter.type === "equals"
-//                       ? filter.value
-//                       : `${filter.min} - ${filter.max}`
-//                   }
-//                 />
-//               </ListItemButton>
-//             </ListItem>
-//           ))}
-//         </List>
-//       )}
-//     </Box>
-//   );
-
-//   return (
-//     <>
-//       <Tooltip title="Filters">
-//         <IconButton onClick={handleOpen}>
-//           <FilterListIcon />
-//         </IconButton>
-//       </Tooltip>
-
-//       <Popover
-//         open={open}
-//         anchorEl={anchorEl}
-//         onClose={handleClose}
-//         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-//         PaperProps={{
-//           elevation: 3,
-//           sx: {
-//             width: 350,
-//             maxHeight: 500,
-//             overflow: "hidden",
-//             padding: 0,
-//             borderRadius: "12px",
-//             boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
-//             border: "1px solid rgba(0,0,0,0.04)",
-//             mt: 1,
-//           },
-//         }}
-//       >
-//         <SectionHeader
-//           icon={<FilterListIcon fontSize="small" />}
-//           title="Filter Data"
-//         />
-//         <ColumnSearch />
-//         <Divider />
-//         <FilterForm />
-//         <Divider />
-//         <ActiveFiltersList />
-//       </Popover>
-//     </>
-//   );
-// };
-
-// export default FilterBuilder;
