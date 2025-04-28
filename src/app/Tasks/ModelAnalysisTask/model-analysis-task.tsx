@@ -50,22 +50,26 @@ const ModelAnalysisTask = () => {
           spacing={2}
         >
           <Grid item xs={isMosaic ? 6 : 12}>
-            <PdpPlot 
-              model={workflowModels} 
-              data={workflowDataset} 
-              train_index={trainIndexMetric} 
-              test_index={testIndexMetric}
-              target_column={targetColumnMetric}
-            />
+            <Box sx={{ minHeight: 400 }}>
+              <PdpPlot 
+                model={workflowModels} 
+                data={workflowDataset} 
+                train_index={trainIndexMetric} 
+                test_index={testIndexMetric}
+                target_column={targetColumnMetric}
+              />
+            </Box>
           </Grid>
           <Grid item xs={isMosaic ? 6 : 12}>
-            <AlePlot 
-              model={workflowModels} 
-              data={workflowDataset} 
-              train_index={trainIndexMetric} 
-              test_index={testIndexMetric}
-              target_column={targetColumnMetric}
-            />
+            <Box sx={{ minHeight: 400 }}>
+              <AlePlot 
+                model={workflowModels} 
+                data={workflowDataset} 
+                train_index={trainIndexMetric} 
+                test_index={testIndexMetric}
+                target_column={targetColumnMetric}
+              />
+            </Box>
           </Grid>
         </Grid>
       </Box>
