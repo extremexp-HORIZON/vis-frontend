@@ -8,21 +8,8 @@ import { defaultDataExplorationQuery } from "../../../../shared/models/dataexplo
 import LeftPanel from "./data-exploration-left-panel"
 import LineChart from "../Charts/data-exploration-line-chart"
 import ScatterChart from "../Charts/data-exploration-scatter-chart"
-<<<<<<< HEAD
-import BarChart from "../Charts/data-exploration-bar-chart"
-import {
-  Box,
-  CircularProgress,
-  Paper,
-  Typography,
-  useMediaQuery,
-} from "@mui/material"
-import { Resizable } from "re-resizable"
-import theme from "../../../../mui-theme"
-=======
 import  BarChart from "../Charts/data-exploration-bar-chart"
-import { Box, CircularProgress, Paper, Typography } from "@mui/material"
->>>>>>> 78cc3dea2ed3958f9fcb81b5ed99300243c01153
+import { Box, CircularProgress, Paper, Typography, useMediaQuery } from "@mui/material"
 import TableExpand from "../Charts/data-exploration-data-table"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import InfoMessage from "../../../../shared/components/InfoMessage"
@@ -31,6 +18,7 @@ import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import MapControls from "../ChartControls/data-exploration-map-control"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import MapCard from "../../../../shared/components/map-card"
+import theme from "../../../../mui-theme"
 
 const DataExplorationComponent = () => {
   const dispatch = useAppDispatch()
