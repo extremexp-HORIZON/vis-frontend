@@ -52,7 +52,7 @@ const ProgressPageLoading = () => {
     ) {
       setTimeout(() => {
         dispatch(setIntialization(true))
-        navigate(`/${experimentId}/monitoring`, { replace: true })
+        // navigate(`/${experimentId}/monitoring`, { replace: true })
       }, 600)
     }
   }, [workflows, experiment])

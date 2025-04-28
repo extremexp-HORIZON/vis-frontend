@@ -9,6 +9,7 @@ import type {
 } from "../dataexploration.model"
 import type { FetchExplainabilityPlotPayload } from "./explainability.model"
 import { api } from "../../../app/api/api"
+import { createAction } from "@reduxjs/toolkit";
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
@@ -33,8 +34,8 @@ export const handleMultiTimeSeriesData = (payload : any) => {
 
 export interface IModelAnalysis {
   featureNames: string[]
-  pdp: { data: IPlotModel | null; loading: boolean; error: string | null }
-  ale: { data: IPlotModel | null; loading: boolean; error: string | null }
+  pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
+  ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
   counterfactuals: {
     data: IPlotModel | null
     loading: boolean
@@ -75,8 +76,8 @@ export interface IModelAnalysis {
 
 export const modelAnalysisDefault: IModelAnalysis = {
   featureNames: [],
-  pdp: { data: null, loading: false, error: null },
-  ale: { data: null, loading: false, error: null },
+  pdp: { data: null, loading: false, error: null, selectedFeature: null },
+  ale: { data: null, loading: false, error: null, selectedFeature: null },
   counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals: { data: null, loading: false, error: null },
   influenceFunctions: { data: null, loading: false, error: null },
@@ -87,24 +88,33 @@ export const modelAnalysisDefault: IModelAnalysis = {
   affected: { data: null, loading: false, error: null },
 }
 
+export const setSelectedFeature = createAction<{plotType: keyof IModelAnalysis; feature: string}>("modelAnalysis/set_selected_feature");
+
 export const modelAnalysisReducers = (
   builder: ActionReducerMapBuilder<IWorkflowPage>,
 ) => {
   builder
-    .addCase(
-      fetchModelAnalysisExplainabilityPlot.fulfilled,
-      (state, action) => {
-        const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.metadata.workflowId}` ? state.tab.workflowTasks.modelAnalysis : null
-        const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
-        console.log(compareCompletedTask, plotType)
-        if (compareCompletedTask && plotType !== 'featureNames') {
-              compareCompletedTask[plotType].data = action.payload
-              compareCompletedTask[plotType].loading = false
-              compareCompletedTask[plotType].error = null
+  .addCase(fetchModelAnalysisExplainabilityPlot.fulfilled, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.metadata.workflowId}`
+        ? state.tab.workflowTasks.modelAnalysis
+        : null;
+    
+      const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
+    
+      if (compareCompletedTask && plotType !== 'featureNames') {
+        const plotSection = compareCompletedTask[plotType];
+      
+        // Check if 'selectedFeature' exists on the plotSection
+        if ('selectedFeature' in plotSection) {
+          (plotSection as { selectedFeature: string | null }).selectedFeature = action.payload.features.feature1;
         }
-      },
-    )
-    .addCase(fetchModelAnalysisData.fulfilled, (state, action) => {
+      
+        (plotSection as { data: any; loading: boolean; error: string | null }).data = action.payload;
+        (plotSection as { data: any; loading: boolean; error: string | null }).loading = false;
+        (plotSection as { data: any; loading: boolean; error: string | null }).error = null;
+      }
+    })
+      .addCase(fetchModelAnalysisData.fulfilled, (state, action) => {
       const compareCompletedTask = state.tab?.workflowId === action.meta.arg.metadata.workflowId ? state.tab.workflowTasks.modelAnalysis : null
       const queryCase = action.meta.arg.metadata.queryCase as keyof IModelAnalysis
       if (compareCompletedTask && queryCase !== 'featureNames') {
@@ -170,6 +180,21 @@ export const modelAnalysisReducers = (
             compareCompletedTask[plotType].loading = false
             compareCompletedTask[plotType].error = "Failed to fetch data"
       }
+    })
+    .addCase(setSelectedFeature, (state, action) => {
+      const { plotType, feature } = action.payload;
+      const modelAnalysis = state.tab?.workflowTasks.modelAnalysis;
+
+      if (modelAnalysis && plotType in modelAnalysis && plotType !== 'featureNames') {
+        const section = modelAnalysis[plotType] as
+          | { selectedFeature: string | null }
+          | { data: any; loading: boolean; error: string | null; selectedFeature?: string | null };
+
+        if ('selectedFeature' in section) {
+          section.selectedFeature = feature;
+        }
+      }
+
     })
 }
 
