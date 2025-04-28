@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from "@mui/material"
+import { Box, Divider, IconButton, Tooltip, Typography } from "@mui/material"
 import {
   useEffect,
   useMemo,
@@ -24,7 +24,8 @@ import OutputIcon from "@mui/icons-material/Output"
 import DatasetIcon from "@mui/icons-material/Dataset"
 import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
-import BarChartIcon from '@mui/icons-material/BarChart';
+import BarChartIcon from '@mui/icons-material/BarChart'
+import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded'
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -185,21 +186,10 @@ export default function WorkflowTreeView() {
               itemId={`task-${id}`}
               label={
                 <Box
-                  onClick={() => {
-                    dispatch(
-                      setSelectedTask({
-                        type: "group",
-                        role: "TASK",
-                        data: datasetsForTask,
-                        task: name,
-                        taskId: id,
-                        variant: taskVariants[name]
-                      }),
-                    )
-                  }}
                   sx={{
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "space-between",
                     px: 1,
                     py: 0.5,
                     borderRadius: 1,
@@ -208,15 +198,45 @@ export default function WorkflowTreeView() {
                     "&:hover": { bgcolor: "action.hover" },
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Box
+                    onClick={() => {
+                      dispatch(
+                        setSelectedTask({
+                          type: "group",
+                          role: "TASK",
+                          data: datasetsForTask,
+                          task: name,
+                          taskId: id,
+                          variant: taskVariants[name]
+                        }),
+                      )
+                    }}
+                    sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}
+                  >
                     <AssignmentIcon
                       fontSize="small"
                       sx={{ mr: 1, color: theme.palette.primary.main }}
                     />
                     <Typography sx={{ fontWeight: 500 }}>
-                      Task: {taskVariants[name] || name }
+                      Task: {taskVariants[name] || name}
                     </Typography>
                   </Box>
+                  
+                  {/* IconButton on the right side */}
+                  { name.includes("Train") && (
+                    <Tooltip title="Explanations">
+                      <IconButton
+                        size="small"
+                        edge="end"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent expanding/collapsing TreeItem
+                          dispatch(setSelectedItem({ type: "explains", data: {task: taskVariants[name] || name} }))
+                        }}
+                      >
+                        <PsychologyAltRoundedIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Box>
               }
             >

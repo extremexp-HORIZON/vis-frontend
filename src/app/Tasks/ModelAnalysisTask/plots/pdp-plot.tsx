@@ -63,7 +63,6 @@ const PdpPlot = (props: PdpPlotProps) => {
 
     const spec={
         width: "container",
-        height: 300,
         autosize: { type: "fit", contains: "padding", resize: true },
         data: {
           values: getVegaliteData(tab?.workflowTasks.modelAnalysis?.pdp?.data || null),
@@ -149,7 +148,6 @@ const PdpPlot = (props: PdpPlotProps) => {
         </Select>
       </FormControl>
     )
-    console.log(plotModel)
 
     const loading = (
         <Box
@@ -179,7 +177,7 @@ const PdpPlot = (props: PdpPlotProps) => {
         <ResponsiveCardVegaLite
           spec={spec}
           actions={false}
-          title={"Pdp Plot"}
+          title={plotModel?.data?.plotName || "pdp plot"}
           aspectRatio={2}
           maxHeight={400}
           controlPanel={controlPanel}

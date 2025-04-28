@@ -27,7 +27,6 @@ const ProgressPage = (props: ProgressPageProps) => {
     (state: RootState) => state.progressPage,
   )
   const { experimentId } = useParams()
-  const [searchParams] = useSearchParams()
   const dispatch = useAppDispatch()
   const intervalId = useRef<NodeJS.Timeout | null>(null)
   const { children } = props
@@ -36,15 +35,6 @@ const ProgressPage = (props: ProgressPageProps) => {
 
   useEffect(() => {
     const pathParts = location.pathname.split("/").filter(Boolean)
-
-    if (pathParts.length === 1) {
-      navigate(`/${experimentId}/monitoring`, { replace: true })
-    }
-    if (
-      location.pathname.includes("workflow") &&
-      !searchParams.has("workflowId")
-    )
-      navigate(`/${experimentId}/monitoring`, { replace: true })
 
     if (location.pathname.includes("workflow"))
       dispatch(setMenuOptions({ ...menuOptions, selected: "monitoring" }))

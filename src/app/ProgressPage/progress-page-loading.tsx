@@ -52,7 +52,16 @@ const ProgressPageLoading = () => {
     ) {
       setTimeout(() => {
         dispatch(setIntialization(true))
-        // navigate(`/${experimentId}/monitoring`, { replace: true })
+        const pathParts = location.pathname.split("/").filter(Boolean)
+    
+        if (pathParts.length === 1) {
+          navigate(`/${experimentId}/monitoring`, { replace: true })
+        }
+        if (
+          location.pathname.includes("workflow") &&
+          !searchParams.has("workflowId")
+        )
+          navigate(`/${experimentId}/monitoring`, { replace: true })
       }, 600)
     }
   }, [workflows, experiment])

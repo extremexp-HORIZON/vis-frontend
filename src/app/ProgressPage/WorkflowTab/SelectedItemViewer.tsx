@@ -6,6 +6,7 @@ import WorkflowTaskOverview from "./workflow-task-overview"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import WorkflowParameter from "./workflow-parameter"
+import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
 
 
 const SelectedItemViewer = () => {
@@ -120,6 +121,25 @@ const SelectedItemViewer = () => {
         </Box>
       </Box>
     )
+  }
+
+  if (selectedItem?.type === "explains") {
+    return (
+      <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
+        <Box sx={{ pt: 3, px: 3 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            {selectedItem.data.task} Explanations
+          </Typography>
+        <Divider sx={{ mb: 2 }} />
+        </Box>
+        <Box sx={{ px: 3, pb: 1, flexGrow: 1,overflow: "auto" }}>
+          <Box>
+            <ModelAnalysisTask />
+          </Box>
+        </Box>
+      </Box>
+    )
+
   }
 
   return (

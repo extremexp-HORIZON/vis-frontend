@@ -62,7 +62,6 @@ const AlePlot = (props: AlePlotProps) => {
 
     const spec={
         width: "container",
-        height: 300,
         autosize: { type: "fit", contains: "padding", resize: true },
         data: {
           values: getVegaliteData(tab?.workflowTasks.modelAnalysis?.ale?.data || null),
@@ -148,7 +147,6 @@ const AlePlot = (props: AlePlotProps) => {
         </Select>
       </FormControl>
     )
-    console.log(plotModel)
 
     const loading = (
         <Box
@@ -179,7 +177,7 @@ const AlePlot = (props: AlePlotProps) => {
         <ResponsiveCardVegaLite
           spec={spec}
           actions={false}
-          title={"Ale Plot"}
+          title={plotModel?.data?.plotName || "ale plot"}
           aspectRatio={2}
           maxHeight={400}
           controlPanel={controlPanel}
