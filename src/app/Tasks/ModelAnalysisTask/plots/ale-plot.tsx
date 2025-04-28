@@ -153,7 +153,7 @@ const AlePlot = (props: AlePlotProps) => {
           display="flex"
           justifyContent="center"
           alignItems="center"
-          height="100%"  // so it takes full available height
+          height="100%"
         >
           <CircularProgress />
         </Box>
