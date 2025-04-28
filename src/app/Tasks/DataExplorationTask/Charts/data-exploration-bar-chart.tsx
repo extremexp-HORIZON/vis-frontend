@@ -16,22 +16,38 @@ const BarChart = () => {
     
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
     useEffect(() => {
-     
+      const groupBy = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy
+      const aggregation = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
+      const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || ""
+      const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
+    
+      if (!datasetId || !groupBy?.length || !Object.keys(aggregation || {}).length ) {
+        return // Don't dispatch if missing dataset, groupBy, or aggregation
+      }
+    
       dispatch(
-            fetchDataExplorationData({
-              query: {
-                ...defaultDataExplorationQuery,
-                datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
-                groupBy:tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy,
-                aggregation:tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,
-              },
-              metadata: {
-                workflowId: tab?.workflowId || "",
-                queryCase: "barChart",
-              },
-            }),
-          )
-    }, [tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy,tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,tab?.dataTaskTable.selectedItem?.data?.source])
+        fetchDataExplorationData({
+          query: {
+            ...defaultDataExplorationQuery,
+            datasetId,
+            groupBy,
+            aggregation,
+            filters
+          },
+          metadata: {
+            workflowId: tab?.workflowId || "",
+            queryCase: "barChart",
+          },
+        })
+      )
+    }, [
+      tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy,
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,
+      tab?.dataTaskTable.selectedItem?.data?.source,
+      tab?.workflowTasks.dataExploration?.controlPanel.filters
+
+    ])
+    
 
   
   

@@ -15,6 +15,7 @@ const MapControls = () => {
   const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon || '';
   const colorByMap = tab?.workflowTasks?.dataExploration?.controlPanel.colorByMap || 'None';
   const segmentBy = tab?.workflowTasks?.dataExploration?.controlPanel.segmentBy || [];
+  const timestampField = tab?.workflowTasks?.dataExploration?.controlPanel.timestampField || '';
 
   const handleChange = (key: string, value: any) => {
     dispatch(setControls({ [key]: value }));
@@ -83,7 +84,7 @@ const MapControls = () => {
       </FormControl>
 
       {/* Segment By Selector */}
-      <FormControl fullWidth>
+      <FormControl fullWidth disabled={timestampField===null || timestampField===""}>
         <InputLabel>Segment By</InputLabel>
         <Select
           multiple

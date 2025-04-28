@@ -9,6 +9,7 @@ import {
 } from "@mui/material"
 
 import type { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 
 const COLOR_PALETTE = [
   "#E6194B",
@@ -37,32 +38,23 @@ const layers = {
   osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   satellite: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
 }
-interface IMapChartProps {
-  data: any
-  workflow: IDataExploration
-  columns: any
-  colorBy: any
-  tripsMode: boolean
-  selectedColumns: any
-  lat:any
-  lon:any
-}
 
-const MapChart = ({
-  data,
-  colorBy,
-  tripsMode,
-  selectedColumns,
-  lat,
-  lon
-}: IMapChartProps) => {
+
+const MapChart = () => {
+  const dispatch = useAppDispatch()
+  const { tab } = useAppSelector(state => state.workflowPage)
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef(null)
   const [colorMap, setColorMap] = useState<Record<string, string>>({})
   const [mapLayer, setMapLayer] = useState<keyof typeof layers>("osm")
-  const [timestampField, setTimestampField] = useState<string>("timestamp")
   const [sliderValue, setSliderValue] = useState(0)
-
+  const colorBy= useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel?.colorByMap || "")
+  const data= useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.chart.data?.data || [])
+  const lat= useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel?.lat || "")
+  const lon= useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel?.lon || "")
+  const selectedColumns= useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel?.selectedColumnsMap || [])
+  const tripsMode= useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel?.tripsMode || false)
+const timestampField= useAppSelector(state => state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel?.timestampField || "")
   useEffect(() => {
     const handleResize = () => {
       if (mapContainerRef.current) {
@@ -74,17 +66,17 @@ const MapChart = ({
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  useEffect(() => {
-    if (colorBy && colorBy !== "None") {
-      const newColorMap = generateColorMap(data, colorBy)
-      setColorMap(newColorMap)
-    } else if (selectedColumns.length > 0) {
-      const newColorMap = generateColorMap(data, selectedColumns.join("-"))
-      setColorMap(newColorMap)
-    } else {
-      setColorMap({})
-    }
-  }, [data, colorBy, selectedColumns])
+  // useEffect(() => {
+  //   if (colorBy && colorBy !== "None") {
+  //     const newColorMap = generateColorMap(data, colorBy)
+  //     setColorMap(newColorMap)
+  //   } else if (selectedColumns.length > 0) {
+  //     const newColorMap = generateColorMap(data, selectedColumns.join("-"))
+  //     setColorMap(newColorMap)
+  //   } else {
+  //     setColorMap({})
+  //   }
+  // }, [data, colorBy, selectedColumns])
 
   useEffect(() => {
     if (!lat || !lon) return // Skip map creation if fields are empty
@@ -348,6 +340,7 @@ const MapChart = ({
     }
   }, [colorMap, colorBy])
 
+  console.log("pamexs")
   return (
     <>
       {/* <Box
