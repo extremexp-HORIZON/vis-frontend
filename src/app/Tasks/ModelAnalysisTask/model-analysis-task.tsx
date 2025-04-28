@@ -50,7 +50,7 @@ const ModelAnalysisTask = () => {
           spacing={2}
         >
           <Grid item xs={isMosaic ? 6 : 12}>
-            <Box sx={{ minHeight: 400 }}>
+            <Box sx={{ minHeight: isMosaic ? undefined : 400 }}>
               <PdpPlot 
                 model={workflowModels} 
                 data={workflowDataset} 
@@ -61,7 +61,7 @@ const ModelAnalysisTask = () => {
             </Box>
           </Grid>
           <Grid item xs={isMosaic ? 6 : 12}>
-            <Box sx={{ minHeight: 400 }}>
+            <Box sx={{ minHeight: isMosaic ? undefined : 400 }}>
               <AlePlot 
                 model={workflowModels} 
                 data={workflowDataset} 
