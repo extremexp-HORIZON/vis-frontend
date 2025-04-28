@@ -353,7 +353,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
             </IconButton>
           </DialogTitle>
           <DialogContent dividers sx={{ 
-            p: 4, 
+            p: noPadding ? 0 : 4, 
             display: 'flex', 
             alignItems: 'center',
             justifyContent: 'center',
@@ -363,8 +363,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
             {children}
           </DialogContent>
           <DialogActions sx={{ 
-            px: 3, 
-            py: 2,
+            p: 2,
             borderTop: '1px solid rgba(0, 0, 0, 0.08)',
             background: '#f8f9fa',
           }}>

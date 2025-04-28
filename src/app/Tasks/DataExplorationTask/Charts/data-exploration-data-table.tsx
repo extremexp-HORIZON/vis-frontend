@@ -165,6 +165,8 @@ const TableExpand: React.FC = () => {
                   headerAlign: "center",
                   align: "center",
                   type: typeof col === "string" ? "string" : col.type || "string",
+                  flex: 1, // Add flex to make columns expand to fill space
+                  minWidth: 120, // Ensure minimum width for readability
                 }))}
                 filterModel={filterModel}
                 disableColumnMenu
@@ -180,6 +182,18 @@ const TableExpand: React.FC = () => {
                 sx={{
                   width: '100%',
                   border: 'none',
+                  '& .MuiDataGrid-cell': {
+                    whiteSpace: 'normal', // Allow text to wrap
+                    wordWrap: 'break-word',
+                  },
+                  '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
+                    // Add border to make cells more distinct
+                    borderRight: '1px solid rgba(224, 224, 224, 0.4)',
+                  },
+                  // Make the grid look better when fewer columns
+                  '& .MuiDataGrid-main': {
+                    overflow: 'hidden',
+                  },
                 }}
               />
             </Box>
