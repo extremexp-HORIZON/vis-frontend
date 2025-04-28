@@ -1,15 +1,14 @@
 import { useEffect } from "react"
 import {
   dataExplorationDefault,
-  fetchDataExplorationData,
   fetchMetaData,
 } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 import LeftPanel from "./data-exploration-left-panel"
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded"
 import LineChart from "../Charts/data-exploration-line-chart"
 import ScatterChart from "../Charts/data-exploration-scatter-chart"
+<<<<<<< HEAD
 import BarChart from "../Charts/data-exploration-bar-chart"
 import {
   Box,
@@ -20,6 +19,10 @@ import {
 } from "@mui/material"
 import { Resizable } from "re-resizable"
 import theme from "../../../../mui-theme"
+=======
+import  BarChart from "../Charts/data-exploration-bar-chart"
+import { Box, CircularProgress, Paper, Typography } from "@mui/material"
+>>>>>>> 78cc3dea2ed3958f9fcb81b5ed99300243c01153
 import TableExpand from "../Charts/data-exploration-data-table"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import InfoMessage from "../../../../shared/components/InfoMessage"
