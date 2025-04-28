@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from "@mui/material"
+import { Box, Divider, IconButton, Tooltip, Typography } from "@mui/material"
 import {
   useEffect,
   useMemo,
@@ -24,7 +24,8 @@ import OutputIcon from "@mui/icons-material/Output"
 import DatasetIcon from "@mui/icons-material/Dataset"
 import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
-import BarChartIcon from '@mui/icons-material/BarChart';
+import BarChartIcon from '@mui/icons-material/BarChart'
+import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded'
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -216,17 +217,34 @@ export default function WorkflowTreeView() {
                       cursor: "pointer",
                       bgcolor: "transparent",
                       "&:hover": { bgcolor: "action.hover" },
+                      
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1, flexWrap: "wrap", minWidth: 0 }}>
                       <AssignmentIcon
                         fontSize="small"
                         sx={{ mr: 1, color: theme.palette.primary.main }}
                       />
                       <Typography sx={{ fontWeight: 500 }}>
-                        Task: {taskVariants[name] || name }
+                        Task: {taskVariants[name] || name}
                       </Typography>
                     </Box>
+                                
+                    {name.includes("Train") && (
+                      <Tooltip title="Explanations">
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch(setSelectedItem({ type: "explains", data: { task: taskVariants[name] || name } }))
+                          }}
+                          sx={{ ml: 1 }}
+                        >
+                          <PsychologyAltRoundedIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </Box>
                 }
               >

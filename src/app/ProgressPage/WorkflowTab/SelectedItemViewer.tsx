@@ -10,6 +10,7 @@ import DatasetIcon from "@mui/icons-material/Dataset"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import theme from "../../../mui-theme"
+import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -93,6 +94,20 @@ const SelectedItemViewer = () => {
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: "auto" }}>
           <WorkflowMetricChart />
+        </Box>
+      </Box>
+    )
+  }
+
+  if (selectedItem?.type === "explains") {
+    return (
+      <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
+        <Header 
+          title={`${selectedItem.data.task} Explanations`} 
+          icon={<AssessmentIcon color="primary" />} 
+        />
+        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+            <ModelAnalysisTask />
         </Box>
       </Box>
     )
