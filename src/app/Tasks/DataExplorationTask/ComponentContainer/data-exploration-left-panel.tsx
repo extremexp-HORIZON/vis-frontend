@@ -17,12 +17,12 @@ const LeftPanel = () => {
 
   // Get columns from the Redux store
   const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
-  
+  console.log(originalColumns);
   // Format columns for FilterBar
   const formattedColumns = originalColumns.map((col: any) => ({
     field: col.name,
     headerName: col.name,
-    type: col.type,
+    originalType: col.type,
   }))
 
   // Get filters from Redux store
@@ -186,7 +186,6 @@ const LeftPanel = () => {
     } else {
       allFilters.push(storeFilter)
     }
-    
     dispatch(setControls({ filters: allFilters }))
   }
 

@@ -21,17 +21,26 @@ type CustomGridColDef = GridColDef & {
   flex?: number
   align?: "left" | "right" | "center"
   headerAlign?: "left" | "right" | "center"
+  originalType?: string
 }
 
-const operators = [
+const stringOperators = [
   { id: "contains", label: "contains" },
   { id: "startsWith", label: "starts with" },
   { id: "endsWith", label: "ends with" },
   { id: "=", label: "=" },
-  {id: ">", label: ">"},
-  {id: "<", label: "<"},
-  {id: ">=", label: ">="},
-  {id: "<=", label: "<="},
+];
+
+const numberOperators = [
+  { id: "=", label: "=" },
+  { id: ">", label: ">" },
+  { id: "<", label: "<" },
+  { id: ">=", label: ">=" },
+  { id: "<=", label: "<=" },
+]
+
+const booleanOperators = [
+  { id: "=", label: "=" },
 ]
 
 interface FilterBarProps {
@@ -77,6 +86,7 @@ export default function FilterBar({
   const suggestionsContainerRef = useRef<HTMLDivElement | null>(null);
   const prevSuggestions = useRef<any[]>([]);
   const prevStep = useRef<FilterStep>(FilterStep.IDLE);
+  const [availableOperators, setAvailableOperators] = useState<typeof stringOperators | typeof numberOperators>(stringOperators);
 
   const validColumns = columns.filter(col => 
     col.field !== "rating" && col.field !== "status" && col.field !== "action"
@@ -102,7 +112,7 @@ export default function FilterBar({
       setShowAvailableColumns(inputValue.length === 0);
       setShowAvailableOperators(false);
     } else if (currentStep === FilterStep.OPERATOR) {
-      const filtered = operators.filter(op => 
+      const filtered = availableOperators.filter(op => 
         op.label.toLowerCase().includes(inputValue.toLowerCase())
       );
       setSuggestions(filtered);
@@ -113,7 +123,7 @@ export default function FilterBar({
       setShowAvailableColumns(currentStep === FilterStep.IDLE);
       setShowAvailableOperators(false);
     }
-  }, [currentStep, inputValue, validColumns]);
+  }, [currentStep, inputValue, validColumns, availableOperators]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -192,12 +202,28 @@ export default function FilterBar({
     }
   }, [selectedSuggestionIndex]);
 
+  console.log(columns);
   const selectColumn = (columnValue: string) => {
     setTempColumn(columnValue);
     setCurrentStep(FilterStep.OPERATOR);
     setShowAvailableColumns(false);
     setShowAvailableOperators(true);
     setInputValue("");
+    
+    // Set available operators based on column type
+    const selectedColumn = columns.find(col => col.field === columnValue);
+    const columnType = selectedColumn?.originalType;
+    console.log(columnType);
+    if (columnType === 'INTEGER' || columnType === 'DOUBLE') {
+      setAvailableOperators(numberOperators);
+    } else if (columnType === 'BOOLEAN') {
+      setAvailableOperators(booleanOperators);
+    } else if (columnType === 'STRING') {
+      setAvailableOperators(stringOperators);
+    } else {
+      // Default to all operators if there's no column type
+      setAvailableOperators([...stringOperators, ...numberOperators.filter(op => op.id !== '=')]);
+    }
   };
 
   const selectOperator = (operatorValue: string) => {
@@ -380,7 +406,7 @@ export default function FilterBar({
           Available Operators for {tempColumn}
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {operators.map((op, index) => (
+          {availableOperators.map((op, index) => (
             <Chip
               key={index}
               size="small"
