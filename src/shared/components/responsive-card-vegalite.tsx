@@ -118,12 +118,14 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   const updateSize = useCallback(() => {
     if (containerRef.current) {
       const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9
-      const containerHeight = containerRef.current.offsetHeight || window.innerHeight * 0.5
       
       // Adjust to fit exactly within the container with no overflow
       const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
       const calculatedHeight = newWidth / aspectRatio
-      const newHeight = Math.max(minHeight, Math.min(calculatedHeight, containerHeight, maxHeight))
+      const newHeight = Math.max(
+        minHeight,
+        Math.min(newWidth / aspectRatio, maxHeight),
+      )
       
       setWidth(newWidth)
       setHeight(newHeight)
