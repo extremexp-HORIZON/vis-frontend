@@ -106,7 +106,7 @@ const LineChartControlPanel = () => {
             labelId="x-axis-select-label"
             value={xAxis?.name || ""}
             onChange={handleXAxisChange}
-            label="X-Axis"
+            label="X-Axis-----"
             MenuProps={{
               PaperProps: { style: { maxHeight: 224, width: 250 } },
             }}
@@ -132,7 +132,7 @@ const LineChartControlPanel = () => {
             multiple
             value={yAxis.map(col => col.name)}
             onChange={handleYAxisChange}
-            input={<OutlinedInput label="Y-Axis" />}
+            input={<OutlinedInput label="Y-Axis-----" />}
             renderValue={selected => selected.join(", ")}
             MenuProps={{
               PaperProps: { style: { maxHeight: 224, width: 250 } },
