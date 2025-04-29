@@ -7,6 +7,7 @@ import FilterListIcon from "@mui/icons-material/FilterList"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import type { IFilter } from "../../../../shared/models/dataexploration.model"
+import { parse } from "vega"
 
 const LeftPanel = () => {
   
@@ -17,7 +18,6 @@ const LeftPanel = () => {
 
   // Get columns from the Redux store
   const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
-  console.log(originalColumns);
   // Format columns for FilterBar
   const formattedColumns = originalColumns.map((col: any) => ({
     field: col.name,
@@ -109,31 +109,44 @@ const LeftPanel = () => {
     value: string,
   ) => {
     const updatedFilters = [...formattedFilters]
+    
+    // Find the column type from originalColumns
+    const columnInfo = originalColumns.find((col: any) => col.name === column);
+    const columnType = columnInfo?.type?.toLowerCase();
+    
     // Convert to the format used in the store
     let storeFilter: any;
     if (['>', '<', '>=', '<=', '='].includes(operator)) {
-      // Handle range type filters
-      const numValue = parseFloat(value)
+      // Handle numeric type filters
+      let parsedValue: number | string = value;
+      
+      // Parse based on column type
+      if (columnType === 'integer') {
+        parsedValue = parseInt(value, 10);
+      } else if (columnType === 'double' || columnType === 'float') {
+        parsedValue = parseFloat(value);
+      }
+      
       if (operator === '>=') {
         storeFilter = {
           column,
           type: 'inequality',
           operator: 'gte',
-          value: numValue,
+          value: parsedValue,
         }
       } else if (operator === '>') {
         storeFilter = {
           column,
           type: 'inequality',
           operator: 'gt',
-          value: numValue,
+          value: parsedValue,
         }
       } else if (operator === '<=') {
         storeFilter = {
           column,
           type: 'inequality',
           operator: 'lte',
-          value: numValue,
+          value: parsedValue,
         }
       }
       else if (operator === '<') {
@@ -141,7 +154,7 @@ const LeftPanel = () => {
           column,
           type: 'inequality',
           operator: 'lt',
-          value: numValue,
+          value: parsedValue,
         }
       }
       else {
@@ -180,7 +193,6 @@ const LeftPanel = () => {
       }
     }
     const allFilters = [...activeFilters]
-    console.log(allFilters);
     if (index < allFilters.length) {
       allFilters[index] = storeFilter
     } else {

@@ -202,7 +202,6 @@ export default function FilterBar({
     }
   }, [selectedSuggestionIndex]);
 
-  console.log(columns);
   const selectColumn = (columnValue: string) => {
     setTempColumn(columnValue);
     setCurrentStep(FilterStep.OPERATOR);
