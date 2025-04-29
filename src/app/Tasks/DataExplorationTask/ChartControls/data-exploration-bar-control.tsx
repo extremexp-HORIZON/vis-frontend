@@ -1,4 +1,4 @@
-import type React from "react";
+import type React from "react"
 import { useState } from "react"
 import {
   Box,
@@ -19,7 +19,8 @@ import FunctionsIcon from "@mui/icons-material/Functions"
 const BarChartControlPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
-  const [selectedColumn, setSelectedColumn] = useState<string | null>(null) // Selected column for aggregation
+  const selectedColumn =
+  tab?.workflowTasks.dataExploration?.controlPanel.selectedMeasureColumn || null
 
   // Handler for updating aggregation rules for a column
   const handleAggregationChange = (
@@ -28,17 +29,16 @@ const BarChartControlPanel = () => {
     const value = event.target.value as string[]
     if (!selectedColumn) return
     const currentAgg =
-  tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
 
-dispatch(
-  setControls({
-    barAggregation: {
-      ...currentAgg,
-      [selectedColumn]: value,
-    },
-  }),
-)
-
+    dispatch(
+      setControls({
+        barAggregation: {
+          ...currentAgg,
+          [selectedColumn]: value,
+        },
+      }),
+    )
   }
 
   const getAggregationOptions = () => {
@@ -55,6 +55,25 @@ dispatch(
   }
 
   const aggregationOptions = getAggregationOptions()
+
+  const handleAggregationDelete = (toDelete: string) => {
+    if (!selectedColumn) return
+    const currentAgg =
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+    const updated = (currentAgg[selectedColumn] || []).filter(
+      (agg: string) => agg !== toDelete,
+    )
+  
+    dispatch(
+      setControls({
+        barAggregation: {
+          ...currentAgg,
+          [selectedColumn]: updated,
+        },
+      }),
+    )
+  }
+  
 
   // Custom theme
   const theme = createTheme({
@@ -150,8 +169,10 @@ dispatch(
           <Select
             label="Measure (Value Column)ooo"
             value={selectedColumn || ""}
-            onChange={e => setSelectedColumn(e.target.value as string)}
-            MenuProps={{
+            onChange={e =>
+              dispatch(setControls({ selectedMeasureColumn: e.target.value }))
+            }
+                        MenuProps={{
               PaperProps: { style: { maxHeight: 224, width: 250 } },
             }}
           >
@@ -175,7 +196,6 @@ dispatch(
               </Box>
             </InputLabel>
             <Select
-              size="small"
               label="Apply Aggregation(s)oook"
               multiple
               value={
@@ -187,37 +207,40 @@ dispatch(
                 const value = event.target.value as string[]
                 if (!selectedColumn) return
                 const currentAgg =
-  tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+                  tab?.workflowTasks.dataExploration?.controlPanel
+                    .barAggregation || {}
 
-dispatch(
-  setControls({
-    barAggregation: {
-      ...currentAgg,
-      [selectedColumn]: value,
-    },
-  }),
-)
+                dispatch(
+                  setControls({
+                    barAggregation: {
+                      ...currentAgg,
+                      [selectedColumn]: value,
+                    },
+                  }),
+                )
               }}
               renderValue={(selected: any) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                  {selected.map((value: string) => (
-                    <Chip
-                      size="small"
-                      key={value}
-                      label={value}
-                      onDelete={() =>
-                        handleAggregationChange({
-                          target: {
-                            value: (selected as string[]).filter(
-                              v => v !== value,
-                            ),
-                          },
-                        } as any)
-                      }
-                    />
-                  ))}
-                </Box>
+<Box
+    sx={{
+      display: "flex",
+      flexWrap: "nowrap",
+      gap: "0.25rem",
+      overflowX: "auto",
+      whiteSpace: "nowrap",
+    }}
+  >
+    {selected.map((value: string) => (
+      <Chip
+        key={value}
+        label={value}
+        size="small"
+        sx={{ height: 24, fontSize: "0.75rem" }}
+        onDelete={() => handleAggregationDelete(value)}
+      />
+    ))}
+  </Box>
               )}
+              
             >
               {aggregationOptions.map(rule => (
                 <MenuItem key={rule} value={rule}>
@@ -228,6 +251,53 @@ dispatch(
           </FormControl>
         )}
       </Box>
+      {/* Selection Summary */}
+{/* <Box
+  sx={{
+    p: 2,
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    backgroundColor: "#f9f9f9",
+    mt: 2,
+  }}
+>
+  <strong>Selections Summary:</strong>
+
+  <Box mt={1}>
+    <strong>Group By:</strong>{" "}
+    {(tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length > 0 ? (
+      (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).map((item: string) => (
+        <Chip key={item} label={item} size="small" sx={{ m: 0.5 }} />
+      ))
+    ) : (
+      <em>None</em>
+    )}
+  </Box>
+
+  <Box mt={1}>
+    <strong>Measure:</strong>{" "}
+    {selectedColumn ? (
+      <Chip label={selectedColumn} size="small" sx={{ m: 0.5 }} />
+    ) : (
+      <em>None</em>
+    )}
+  </Box>
+
+  <Box mt={1}>
+    <strong>Aggregations:</strong>{" "}
+    {selectedColumn &&
+    (tab?.workflowTasks.dataExploration?.controlPanel.barAggregation?.[selectedColumn] || []).length > 0 ? (
+      (tab?.workflowTasks.dataExploration?.controlPanel.barAggregation?.[selectedColumn] || []).map(
+        (agg: string) => (
+          <Chip key={agg} label={agg} size="small" sx={{ m: 0.5 }} />
+        ),
+      )
+    ) : (
+      <em>None</em>
+    )}
+  </Box>
+</Box> */}
+
     </ThemeProvider>
   )
 }

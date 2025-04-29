@@ -77,6 +77,8 @@ export interface IDataExploration {
     umap: boolean
     segmentBy: string[]
     timestampField: string | null
+    selectedMeasureColumn: null,
+
   }
   chart: {
     data: IDataExplorationResponse | null
@@ -150,6 +152,8 @@ export const dataExplorationDefault: IDataExploration = {
     umap: false,
     segmentBy: [],
     timestampField: null,
+    selectedMeasureColumn: null,
+
     
   },
   chart: {
