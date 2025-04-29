@@ -125,13 +125,20 @@ function FlowGraph(props: IFlowGraphProps) {
   }, [])
 
   useEffect(() => {
-    if (containerSize.width > 0 && containerSize.height > 0) {
-      fitView()
+    if (containerSize.width > 0 && containerSize.height > 0 && nodes.length > 0) {
+      setTimeout(() => {
+        fitView({
+          padding: 0.2,
+          includeHiddenNodes: true,
+          minZoom: 0.5,
+          maxZoom: 1.5,
+        });
+      }, 50);
     }
-  }, [containerSize])
+  }, [containerSize, nodes, fitView]);
+
 
   useEffect(() => {
-
     if (workflowSvg && Array.isArray(workflowSvg.tasks) && workflowSvg.tasks.length > 0) {
       //Nodes and Edges initialization
       const taskNodes = workflowSvg?.tasks?.map((task, index) => {
@@ -207,6 +214,7 @@ function FlowGraph(props: IFlowGraphProps) {
             )
           : [];
       
+      // After setting nodes and edges, add a timeout to allow rendering before fitting view
       setNodes([startNode, ...taskNodes, endNode])
       setEdges([
         {
@@ -223,8 +231,18 @@ function FlowGraph(props: IFlowGraphProps) {
           animated: true,
         },
       ])
+      
+      // Add a small delay to ensure nodes are rendered before attempting to fit view
+      setTimeout(() => {
+        fitView({
+          padding: 0.2,
+          includeHiddenNodes: true,
+          minZoom: 0.5,
+          maxZoom: 1.5,
+        });
+      }, 50);
     }
-  }, [workflowSvg])
+  }, [workflowSvg, fitView])
 
   const onNodeClick = (_: any, node: Node) => {
     if (
@@ -257,26 +275,6 @@ function FlowGraph(props: IFlowGraphProps) {
     // )
   }
 
-  //   const xMin = Math.min(...nodes.map((node) => node.position.x)) - 200;
-  //   const xMax = Math.max(...nodes.map((node) => node.position.x)) + 200;
-  //   const yMin = Math.min(...nodes.map((node) => node.position.y)) - 200;
-  //   const yMax = Math.max(...nodes.map((node) => node.position.y)) + 200;
-
-  // interface Viewport {
-  //     x: number;
-  //     y: number;
-  //     zoom: number;
-  // }
-
-  // const handleMove = (event: any, viewport: Viewport) => {
-  //     const clampedX = Math.min(Math.max(viewport.x, -xMax), -xMin);
-  //     const clampedY = Math.min(Math.max(viewport.y, -yMax), -yMin);
-  //     console.log(xMin, xMax, yMin, yMax)
-  //     console.log(clampedX, clampedY)
-  //     if (clampedX !== viewport.x || clampedY !== viewport.y) {
-  //         setViewport({ x: clampedX, y: clampedY, zoom: viewport.zoom });
-  //     }
-  // };
 
   return (
     <div
@@ -291,13 +289,19 @@ function FlowGraph(props: IFlowGraphProps) {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        fitView
         panOnDrag={true}
         zoomOnScroll={true}
-        // onMove={handleMove}
+        defaultViewport={{ x:0, y:0, zoom: 1 }}
         onNodeClick={onNodeClick}
         zoomOnPinch={false}
         proOptions={{ hideAttribution: true }}
+        fitView={true}
+        fitViewOptions={{ 
+          padding: 0.2,
+          includeHiddenNodes: true,
+          minZoom: 0.5,
+          maxZoom: 1.5,
+        }}
       >
         <Background />
         <Controls />
