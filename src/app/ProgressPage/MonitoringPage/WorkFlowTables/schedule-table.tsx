@@ -4,7 +4,7 @@ import ArrowUp from "@mui/icons-material/KeyboardArrowUp"
 import ArrowDown from "@mui/icons-material/KeyboardArrowDown"
 import { Close } from "@mui/icons-material"
 import ToolBarWorkflow from "./toolbar-workflow-table"
-import FilterBar from "./filter-bar"
+import FilterBar from "../../../../shared/components/filter-bar"
 import { Popover, styled } from "@mui/material"
 import type { RootState} from "../../../../store/store";
 import { useAppDispatch, useAppSelector } from "../../../../store/store"

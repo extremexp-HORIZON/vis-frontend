@@ -64,9 +64,8 @@ export interface IDataExplorationMetaDataResponse {
 export interface IFilter {
   column: string;
   type: string;
-  value?: number | string; // For "equals" type
-  min?: number | string;   // For "range" type
-  max?: number | string;   // For "range" type
+  operator: string;
+  value?: number | string | any; 
 }
 
 

@@ -18,9 +18,9 @@ const routes = createBrowserRouter([
   {
     path: "/:experimentId",
     element: (
-      <ProtectedRoute>
+      // <ProtectedRoute>
         <ProgressPageLoading />
-      </ProtectedRoute>
+      // </ProtectedRoute>
     ),
     errorElement: <ErrorPage />
   },
@@ -32,22 +32,42 @@ const routes = createBrowserRouter([
   {
     path: "/:experimentId/monitoring",
     element: (
-      <ProtectedRoute>
+      // <ProtectedRoute>
         <ProgressPage>
           <MonitoringPage />
         </ProgressPage>
-      </ProtectedRoute>
+      // </ProtectedRoute>
     ),
     errorElement: <ErrorPage />
   },
   {
     path: "/:experimentId/workflow",
     element: (
-      <ProtectedRoute>
+      // <ProtectedRoute>
         <ProgressPage>
           <WorkflowTab />
         </ProgressPage>
       </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/:experimentId/comparative-analysis",
+    element: (
+      <ProtectedRoute>
+        <ProgressPage>
+          <CompareCompleted />
+        </ProgressPage>
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/:experimentId/explains",
+    element: (
+      <ProgressPage>
+        <DummyExplains />
+      </ProgressPage>
     ),
     errorElement: <ErrorPage />
   },

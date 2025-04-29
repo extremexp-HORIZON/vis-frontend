@@ -45,7 +45,7 @@ interface FilterBarProps {
   ) => void
   onAddFilter: () => void
   onRemoveFilter: (index: number) => void
-  setFilterOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 enum FilterStep {
