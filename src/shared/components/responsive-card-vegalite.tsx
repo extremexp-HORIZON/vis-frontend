@@ -112,7 +112,9 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
+  // Add a new state for fullscreen menu
+  const [fullscreenAnchorEl, setFullscreenAnchorEl] = useState<null | HTMLElement>(null);
+  const fullscreenMenuOpen = Boolean(fullscreenAnchorEl);
 
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
@@ -224,6 +226,14 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       URL.revokeObjectURL(url);
     }
     handleMenuClose();
+  };
+
+  const handleFullscreenMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setFullscreenAnchorEl(event.currentTarget);
+  };
+
+  const handleFullscreenMenuClose = () => {
+    setFullscreenAnchorEl(null);
   };
 
   return (
@@ -380,9 +390,9 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             paddingBottom: 3 
           },
           borderRadius: '0 0 12px 12px',
+          display: "flex",
           flexGrow: 1, // Allow content to grow
           overflow: "auto", // Only make the content scrollable
-          display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
@@ -458,14 +468,73 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           }}>
             {title}
           </Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={handleCloseFullscreen}
-            aria-label="close"
-          >
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {controlPanel && (
+              <>
+                <IconButton 
+                  aria-label="settings" 
+                  onClick={handleFullscreenMenuClick}
+                  sx={{
+                    mr: 1,
+                    "& svg": {
+                      position: "relative",
+                      zIndex: 1,
+                    },
+                  }}
+                >
+                  <SettingsIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={fullscreenAnchorEl}
+                  open={fullscreenMenuOpen}
+                  onClose={handleFullscreenMenuClose}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  PaperProps={{
+                    elevation: 3,
+                    sx: {
+                      width: 320,
+                      maxHeight: 500,
+                      overflowY: "hidden",
+                      overflowX: "hidden",
+                      padding: 0,
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                      border: '1px solid rgba(0,0,0,0.04)',
+                      mt: 1,
+                      "& .MuiMenu-list": {
+                        padding: 0,
+                      },
+                    },
+                  }}
+                  MenuListProps={{
+                    sx: {
+                      padding: 0,
+                    }
+                  }}
+                >
+                  <SectionHeader icon={<SettingsSuggestIcon fontSize="small" />} title="Chart Options" />
+                  <Box sx={{ p: 2 }}>
+                    {controlPanel}
+                  </Box>
+                </Menu>
+              </>
+            )}
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={handleCloseFullscreen}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </DialogTitle>
         <DialogContent dividers sx={{ 
           p: 4, 

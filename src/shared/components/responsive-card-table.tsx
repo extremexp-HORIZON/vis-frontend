@@ -109,6 +109,9 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   const menuOpen = Boolean(anchorEl);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  // Add state for fullscreen settings menu
+  const [fullscreenAnchorEl, setFullscreenAnchorEl] = useState<null | HTMLElement>(null);
+  const fullscreenMenuOpen = Boolean(fullscreenAnchorEl);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -146,6 +149,14 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
       onFullScreen(fullscreenOpen);
     }
   }, [fullscreenOpen, onFullScreen]);
+
+  const handleFullscreenMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setFullscreenAnchorEl(event.currentTarget);
+  };
+
+  const handleFullscreenMenuClose = () => {
+    setFullscreenAnchorEl(null);
+  };
 
   return (
     <>
@@ -343,14 +354,92 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
             }}>
               {title}
             </Typography>
-            <IconButton
-              edge="end"
-              color="inherit"
-              onClick={handleCloseFullscreen}
-              aria-label="close"
-            >
-              <CloseIcon />
-            </IconButton>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              {controlPanel && (
+                <>
+                  <IconButton 
+                    aria-label="settings" 
+                    onClick={handleFullscreenMenuClick}
+                    sx={{
+                      mr: 1,
+                      "& svg": {
+                        position: "relative",
+                        zIndex: 1,
+                      },
+                    }}
+                  >
+                    <SettingsIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={fullscreenAnchorEl}
+                    open={fullscreenMenuOpen}
+                    onClose={handleFullscreenMenuClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    PaperProps={{
+                      elevation: 3,
+                      sx: {
+                        width: 320,
+                        maxHeight: 500,
+                        overflowY: "hidden",
+                        overflowX: "hidden",
+                        padding: 0,
+                        borderRadius: '12px',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                        border: '1px solid rgba(0,0,0,0.04)',
+                        mt: 1,
+                        "& .MuiMenu-list": {
+                          padding: 0,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: '100%',
+                          maxHeight: 500,
+                        },
+                      },
+                    }}
+                    MenuListProps={{
+                      sx: {
+                        padding: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
+                      }
+                    }}
+                  >
+                    <SectionHeader icon={<SettingsSuggestIcon fontSize="small" />} title="Options" />
+                    <Box sx={{ 
+                      p: 2,
+                      overflowY: "auto",
+                      flexGrow: 1,
+                    }}>
+                      {controlPanel}
+                    </Box>
+                    {additionalMenuItems && (
+                      <>
+                        <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                        <Box sx={{ py: 0.5 }}>
+                          {additionalMenuItems}
+                        </Box>
+                      </>
+                    )}
+                  </Menu>
+                </>
+              )}
+              <IconButton
+                edge="end"
+                color="inherit"
+                onClick={handleCloseFullscreen}
+                aria-label="close"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Box>
           </DialogTitle>
           <DialogContent dividers sx={{ 
             p: noPadding ? 0 : 4, 

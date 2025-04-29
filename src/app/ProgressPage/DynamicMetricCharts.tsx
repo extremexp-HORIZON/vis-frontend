@@ -137,6 +137,7 @@ const WorkflowCharts: React.FC = () => {
           actions={false}
           title={metricTask ? `${metricTask}／${metricName}` : metricName}
           sx={{ width: "100%", maxWidth: "100%" }} // Ensure it expands properly
+          pulsate={true}
         />
       </Grid>
     )
