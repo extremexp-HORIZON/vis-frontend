@@ -23,7 +23,7 @@ const ScatterChartControlPanel = () => {
   const tab = useAppSelector(state => state.workflowPage.tab)
   const controlPanel = tab?.workflowTasks.dataExploration?.controlPanel
   const columns =
-    tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
+    tab?.workflowTasks.dataExploration?.metaData?.data?.originalColumns || []
 
   const xAxis = controlPanel?.xAxisScatter
   const yAxis = controlPanel?.yAxisScatter || []
@@ -64,6 +64,34 @@ const ScatterChartControlPanel = () => {
       dispatch(setControls({ colorBy: selected }))
     }
   }
+
+  useEffect(() => {
+      const validYAxis = yAxis.filter(yCol =>
+        columns.find(col => col.name === yCol.name),
+      )
+      if (validYAxis.length !== yAxis.length) {
+        dispatch(setControls({ yAxis: validYAxis }))
+      }
+    
+      // Ensure selectedColumns includes xAxis and yAxis
+      const currentSelected = controlPanel?.selectedColumns || []
+      const requiredCols = [xAxis, ...validYAxis]
+      if (colorBy) {
+        requiredCols.push(colorBy)
+      }    
+      const missingCols = requiredCols.filter(
+        reqCol => !currentSelected.find(sel => sel.name === reqCol?.name)
+      )
+    
+      if (missingCols.length > 0) {
+        const updatedSelected = [
+          ...currentSelected,
+          ...missingCols.filter(Boolean), // Avoid null/undefined
+        ]
+        const cleanedSelected = updatedSelected.filter(col => col?.name && col.type)
+        dispatch(setControls({ selectedColumns: cleanedSelected }))
+      }
+    }, [columns, yAxis, xAxis, colorBy])
 
   return (
     columns.length > 0 && (

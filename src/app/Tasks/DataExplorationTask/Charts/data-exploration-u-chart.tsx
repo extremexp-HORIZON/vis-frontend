@@ -14,14 +14,14 @@ const Uchart = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
   const dispatch = useAppDispatch()
 
-  const raw = tab?.workflowTasks.dataExploration?.chart.data?.data
+  const raw = tab?.workflowTasks.dataExploration?.scatterChart.data?.data
   const parsedData = typeof raw === "string" ? JSON.parse(raw) : raw
 
   useEffect(() => {
-    if (tab?.workflowTasks.dataExploration?.chart.data?.data) {
+    if (tab?.workflowTasks.dataExploration?.scatterChart.data?.data) {
       // Ensure payload is proper 2D array of numbers
-      const umapPayload = parsedData.map(row =>
-        Object.values(row).map(val => parseFloat(val)),
+      const umapPayload = parsedData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) =>
+        Object.values(row).map(val => parseFloat(val as string)),
       )
 
       dispatch(
@@ -72,6 +72,7 @@ const Uchart = () => {
         spec={spec}
         data={{ table: chartData }}
         actions={false}
+        title={"UMAP"}
         maxHeight={500}
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
         controlPanel={<ScatterChartControlPanel />}

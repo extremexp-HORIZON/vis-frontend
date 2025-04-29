@@ -73,9 +73,6 @@ const BarChart = () => {
     })),
   )
 
-
-  
-  // Create a dynamic Vega specification
   const specification = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "A grouped bar chart showing different numeric values by category.",
@@ -134,6 +131,7 @@ const BarChart = () => {
       },
     },
   }
+
   
 
   const info = (
@@ -167,3 +165,101 @@ const BarChart = () => {
 }
 
 export default BarChart
+
+
+
+//   const groupByFields = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || [];
+
+// let specification;
+
+// if (groupByFields.length === 2) {
+//   // Render heatmap
+//   specification = {
+//     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+//     description: "Heatmap showing aggregation values by two categorical variables.",
+//     data: { values: transformedData },
+//     mark: "rect",
+//     encoding: {
+//       x: {
+//         field: groupByFields[0],
+//         type: "nominal",
+//         axis: { title: groupByFields[0] }
+//       },
+//       y: {
+//         field: groupByFields[1],
+//         type: "nominal",
+//         axis: { title: groupByFields[1] }
+//       },
+//       color: {
+//         field: "value",
+//         type: "quantitative",
+//         title: "Value"
+//       },
+//       tooltip: [
+//         { field: groupByFields[0], type: "nominal" },
+//         { field: groupByFields[1], type: "nominal" },
+//         { field: "value", type: "quantitative" },
+//         { field: "type", type: "nominal" },
+//       ]
+//     }
+//   };
+// } else {
+//   // Fallback to your current bar chart spec
+//   specification = {
+//     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+//     description: "A grouped bar chart showing different numeric values by category.",
+//     autosize: { type: "fit", contains: "padding", resize: true },
+//     data: { values: transformedData },
+//     mark: "bar",
+//     params: [
+//       {
+//         name: "industry",
+//         select: { type: "point", fields: ["type"] },
+//         bind: "legend",
+//       },
+//     ],
+//     encoding: {
+//       y: {
+//         field: xAxisColumn,
+//         type: "nominal",
+//         axis: {
+//           labelAngle: 0,
+//           labelLimit: 100,
+//           labelOverlap: "parity",
+//           tickCount: Math.floor(500 / 20),
+//         },
+//         sort: null,
+//       },
+//       x: {
+//         field: "value",
+//         type: "quantitative",
+//         title: "Value",
+//       },
+//       color: {
+//         field: "type",
+//         type: "nominal",
+//         title: "Metric",
+//       },
+//       xOffset: {
+//         field: "type",
+//         type: "nominal",
+//       },
+//       tooltip: [
+//         { field: xAxisColumn, type: "nominal", title: xAxisColumn },
+//         ...(categoricalColumns || []).map(col => ({
+//           field: col.name,
+//           type: "nominal",
+//           title: col.name,
+//         })),
+//         { field: "value", type: "quantitative", title: "Value" },
+//         { field: "type", type: "nominal", title: "Metric" },
+//       ],
+//       opacity: {
+//         condition: { param: "industry", value: 1 },
+//         value: 0.01,
+//       },
+//     },
+//   };
+// }
+
+  
