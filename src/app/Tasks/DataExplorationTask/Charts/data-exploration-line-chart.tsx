@@ -1,138 +1,131 @@
 import { Box, useTheme, useMediaQuery } from "@mui/material"
-import { useEffect, useState } from "react"
-import { cloneDeep } from "lodash" // Import lodash for deep cloning
-import { useAppSelector } from "../../../../store/store"
+import { useEffect } from "react"
+import { cloneDeep } from "lodash"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import LineChartControlPanel from "../ChartControls/data-exploration-line-control"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
+import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { defaultDataExplorationQuery, VisualColumn } from "../../../../shared/models/dataexploration.model"
 
-
-
-const getColumnType = (columnType: string) => {
+const getColumnType = (columnType: string, fieldName?: string) => {
+  if (fieldName?.toLowerCase() === "timestamp") return "temporal"
   switch (columnType) {
     case "DOUBLE":
     case "FLOAT":
     case "INTEGER":
-      return "quantitative" // Numbers -> quantitative
+      return "quantitative"
     case "LOCAL_DATE_TIME":
       return "temporal"
     case "STRING":
     default:
-      return "nominal" // Text -> nominal or ordinal
+      return "ordinal"
   }
 }
 
-const LineChart = (
- ) => {
+const getAxisEncoding = (type: string, name?: string) => {
+  const fieldType = getColumnType(type, name)
+  return {
+    type: fieldType,
+    axis: {
+      labelAngle: fieldType === "ordinal" ? -40 : 0,
+      labelColor: "#333",
+      titleColor: "#444",
+      labelOverlap: fieldType === "ordinal" ? "greedy" : undefined,
+    },
+  }
+}
 
-  const [chartSpecs, setChartSpecs] = useState<any[]>([])
-  const [dataCopy, setDataCopy] = useState<any[]>([]) // Define dataCopy here
+const LineChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage)
   const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-      const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis
-      const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis
-      const data = tab?.workflowTasks.dataExploration?.chart.data?.data
-      const yAxisFields = yAxis?.map(axis => axis.name) // Get the names of the Y-axis fields
-      const dataCopy = cloneDeep(data) // Deep clone the data
-      setDataCopy(dataCopy)
+    const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis
+    const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis
+    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || ""
 
-      // Build the Vega-Lite specifications
-      if (tab?.workflowTasks.dataExploration?.controlPanel.viewMode === "overlay") {
-        const spec = {
-          mark: "line",
-          // autosize: { type: "fit", contains: "padding", resize: true },
-          // width: 1000,
-          // height: 800,
-          params: [
-            {
-              name: "grid",
-              select: {
-                type: "interval",
-                encodings: ["x"], // Enable interval selection for zooming on the x-axis
-              },
-              bind: "scales",
-            },
-          ],
-          encoding: {
-            x: {
-              field: xAxis?.name,
-              type: getColumnType(xAxis ? xAxis.type : ''), // Dynamically determine xAxis type
-              axis: { title: `${xAxis?.name}` }, // Title for X-axis
-            },
-            y: {
-              field: "value", // Use the value field after folding
-              type: "quantitative", // Y-axis type is representative
-              axis: { title: "Values" }, // Common title for Y-axis
-            },
-            color: {
-              field: "variable",
-              type: "nominal",
-              legend: {
-                // Add this line if you want to keep the legend in overlay mode
-                title: "Variables",
-              },
-            }, // Color based on the variable
-          },
-          transform: [
-            {
-              fold: yAxisFields, // Fold Y-axis fields to render multiple lines
-              as: ["variable", "value"], // Rename folded fields to 'variable' and 'value'
-            },
-          ],
-          data: { name: "table" }, // Data for Vega-Lite
-        }
-        setChartSpecs([spec]) // Set the single spec for overlay mode
-      } else {
-        // Stacked mode: Create separate specs for each Y-axis
-        const specs = yAxis?.map(axis => ({
-          mark: "line",
-          // autosize: { type: "fit", contains: "padding", resize: true },
-          // width: 1000,
-          params: [
-            {
-              name: "grid",
-              select: {
-                type: "interval",
-                encodings: ["x"], // Enable interval selection for zooming on the x-axis
-              },
-              bind: "scales", // Bind to the scales
-            },
-          ],
-          // height: 800 / yAxis.length, // Height for individual stacked charts
-          encoding: {
-            x: {
-              field: xAxis?.name,
-              type: getColumnType(xAxis ? xAxis.type : ''), // Dynamically determine xAxis type
-              axis: { title: `${xAxis?.name}` }, // Title for X-axis
-            },
-            y: {
-              field: axis.name, // Each chart corresponds to one Y-axis
-              type: getColumnType(axis.type),
-              axis: { title: `${axis.name}` }, // Title for each Y-axis
-            },
-            color: {
-              field: "variable",
-              type: "nominal",
-              legend: null, // This will hide the legend in stacked mode
-            }, // Color based on the variable
-          },
-          data: { name: "table" }, // Data for Vega-Lite
-        }))
-        setChartSpecs(specs ?? []) // Set specs for all Y-axes in stacked mode
+    const cols = Array.from(new Set([xAxis?.name, ...(yAxis?.length ? yAxis.map((axis: any) => axis.name) : [])]))
+    if (!datasetId || !xAxis || !yAxis?.length) return
+
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          ...defaultDataExplorationQuery,
+          datasetId,
+          columns: cols,
+          filters,
+          // limit: 5000,
+        },
+        metadata: {
+          workflowId: tab?.workflowId || "",
+          queryCase: "lineChart",
+        },
+      })
+    )
+  }, [
+    tab?.workflowTasks.dataExploration?.controlPanel.xAxis,
+    tab?.workflowTasks.dataExploration?.controlPanel.yAxis,
+    tab?.workflowTasks.dataExploration?.controlPanel.filters,
+    tab?.dataTaskTable.selectedItem?.data?.source,
+  ])
+
+  const chartData = tab?.workflowTasks.dataExploration?.lineChart?.data?.data || []
+  const xAxis = tab?.workflowTasks.dataExploration?.controlPanel?.xAxis
+  const yAxis = tab?.workflowTasks.dataExploration?.controlPanel?.yAxis
+  const displayMode = tab?.workflowTasks.dataExploration?.controlPanel?.viewMode || "overlay"
+
+  const getLineChartSpec = ({
+    data,
+    xAxis,
+    yAxis,
+    displayMode,
+  }: {
+    data: any[]
+    xAxis: VisualColumn
+    yAxis: VisualColumn[]
+    displayMode: "overlay" | "stack"
+  }) => {
+    const xField = xAxis.name
+
+    if (displayMode === "overlay") {
+      const longData: any[] = []
+      data.forEach(row => {
+        yAxis.forEach(y => {
+          longData.push({
+            [xField]: row[xField],
+            value: row[y.name],
+            variable: y.name,
+          })
+        })
+      })
+
+      return {
+        data: { values: longData },
+        mark: "line",
+        encoding: {
+          x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
+          y: { field: "value", type: "quantitative", title: "Value" },
+          color: { field: "variable", type: "nominal", title: "Metric" },
+        },
       }
-    
-  }, 
-  [
-    tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns,
-    tab?.workflowTasks.dataExploration?.controlPanel?.xAxis,
-    tab?.workflowTasks.dataExploration?.controlPanel?.yAxis,
-    tab?.workflowTasks.dataExploration?.controlPanel?.viewMode,
-    tab?.workflowTasks.dataExploration?.chart?.data?.data,
-  ]) // Watch for changes in these dependencies
+    } else {
+      return {
+        vconcat: yAxis.map(y => ({
+          data: { values: cloneDeep(data) },
+          mark: "line",
+          encoding: {
+            x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
+            y: { field: y.name, ...getAxisEncoding(y.type, y.name), title: y.name },
+          },
+        })),
+      }
+    }
+  }
 
   const info = (
     <InfoMessage
@@ -140,39 +133,34 @@ const LineChart = (
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
       fullHeight
-  />
+    />
   )
-  const xAxis = tab?.workflowTasks.dataExploration?.controlPanel?.xAxis
-  const yAxis = tab?.workflowTasks.dataExploration?.controlPanel?.yAxis
-  
+
   const hasValidXAxis = xAxis && xAxis.name
   const hasValidYAxis = Array.isArray(yAxis) && yAxis.length > 0
-  
   const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis
-  
-  
-  
 
   return (
-    <Box sx={{height: "99%"}}>
-      {chartSpecs.map((spec, index) => (
-        <ResponsiveCardVegaLite
-          key={index}
-          spec={spec}
-          title={"Line Chart"}
-          data={{ table: dataCopy }}
-          actions={false}
-          controlPanel={<LineChartControlPanel/>}
-          blinkOnStart={true}
-          infoMessage={info}
-          showInfoMessage={shouldShowInfoMessage}
-          maxHeight={500}
-          aspectRatio={isSmallScreen ? 2.8 : 1.8}
-          pulsate={false}
-        />
-      ))}
+    <Box sx={{ height: "99%" }}>
+      <ResponsiveCardVegaLite
+        spec={getLineChartSpec({
+          data: chartData,
+          xAxis: xAxis as VisualColumn,
+          yAxis: yAxis as VisualColumn[],
+          displayMode: displayMode as "overlay" | "stack",
+        })}
+        title={"Line Chart"}
+        actions={false}
+        controlPanel={<LineChartControlPanel />}
+        blinkOnStart={true}
+        infoMessage={info}
+        showInfoMessage={shouldShowInfoMessage}
+        maxHeight={500}
+        aspectRatio={isSmallScreen ? 2.8 : 1.8}
+        pulsate={false}
+      />
     </Box>
-  ) 
+  )
 }
 
 export default LineChart
