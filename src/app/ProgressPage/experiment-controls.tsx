@@ -74,6 +74,14 @@ const ExperimentControls = () => {
       }
     }, [workflows])
 
+    const taskInfo = taskLength ? (
+      <Typography variant="body2">
+        Completed Tasks: {completedTasks}/{taskLength}
+      </Typography>
+    ) : (
+      <Typography variant="body2">No task input</Typography>
+    );
+
     return (
       <Box
         sx={{
@@ -131,7 +139,7 @@ const ExperimentControls = () => {
                   <Box sx={{display: "flex", flexDirection: "row",alignItems: "center", gap: 1}}>
                     <Typography variant="body2">Status: {workflowStatus?.toLowerCase()}</Typography>
                     {workflowIcon}
-                    {taskLength && <Typography variant="body2">Completed Tasks: {completedTasks}/{taskLength}</Typography>}
+                    {taskInfo}
                   </Box>
                 </Box>
               </Box>
