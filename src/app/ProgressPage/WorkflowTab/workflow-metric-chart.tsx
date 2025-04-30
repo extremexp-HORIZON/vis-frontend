@@ -2,7 +2,7 @@ import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-v
 import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 import type { IMetric } from "../../../shared/models/experiment/metric.model"
-import { Box, Divider, Typography } from "@mui/material"
+import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material"
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import green from "@mui/material/colors/green"
@@ -140,6 +140,8 @@ export const MetricBulletChart = () => {
 export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage)
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
   
   const queryParams = new URLSearchParams(location.search)
   const workflowId = queryParams.get("workflowId") // Get the workflowId from the query
@@ -192,14 +194,15 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
   }
 
   return (
-    <ResponsiveCardVegaLite
-      spec={chartSpec}
-      actions={false}
-      title={metrics[0].task ? `${metrics[0].task}／${metrics[0].metricName}` : metrics[0].metricName}
-      aspectRatio={2}
-      maxHeight={400}
-    />
-    
+    <Box sx={{height: "99%"}}>
+      <ResponsiveCardVegaLite
+        spec={chartSpec}
+        actions={false}
+        title={metrics[0].task ? `${metrics[0].task}／${metrics[0].metricName}` : metrics[0].metricName}
+        aspectRatio={isSmallScreen ? 4 : 2}
+        maxHeight={500}
+      />
+    </Box>
   )
 }
 
@@ -229,7 +232,18 @@ export const WorkflowMetricChart = () => {
       const metrics = groupedMetrics?.[tab?.dataTaskTable.selectedItem?.data?.name] || []
   return (
     (metrics?.length ?? 0) > 1 ?
-    <MetricLineChart metrics={metrics} /> :
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          rowGap: 1,
+          height: "100%",
+          overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
+        }}
+      >
+       <MetricLineChart metrics={metrics} /> 
+      </Box>
+    :
     <MetricCards />
   )
 }

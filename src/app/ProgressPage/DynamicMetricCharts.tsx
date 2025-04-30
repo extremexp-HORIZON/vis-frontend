@@ -35,6 +35,17 @@ const WorkflowCharts: React.FC = () => {
       : workflowsTable.filteredRows
   ).filter(row => workflowsTable.selectedWorkflows.includes(row.id))
 
+  const groupByTooltipFields = workflowsTable.groupBy.map(col => ({
+    field: col,
+    type: "nominal",
+    title: col
+  }))
+
+  const tooltipFields = [
+    { field: "id", type: "nominal" },
+    ...groupByTooltipFields,
+    { field: "value", type: "quantitative", title: workflowsTable.groupBy.length > 0 ? "average value" : "value" },
+  ]
   
   const groupedMetrics: Record<string, IMetric[]> = workflowsTable.uniqueMetrics.reduce(
     (acc: any, metricName: string) => {
@@ -46,12 +57,18 @@ const WorkflowCharts: React.FC = () => {
   
           // Skip non-numeric or NaN values
           if (typeof value === "number" && !isNaN(value)) {
-            acc[metricName].push({
+            const metricPoint: any = {
               value,
               id: workflow.id,
               metricName,
-              step: workflow.step ?? 0, // Fallback to 0 if step is missing
+              step: workflow.step ?? 0
+            }
+            
+            workflowsTable.groupBy.forEach(groupKey => {
+              metricPoint[groupKey] = workflow[groupKey];
             })
+            
+            acc[metricName].push(metricPoint)
           }
         }
       })
@@ -72,13 +89,20 @@ const WorkflowCharts: React.FC = () => {
       color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
     }))
 
+    const isGrouped = workflowsTable.groupBy.length > 0;
+    const hasMultipleSteps = uniqueSteps.size > 1;
+    
+    const xAxisTitle = isGrouped
+      ? (hasMultipleSteps ? "Group Step" : "Workflow Group")
+      : (hasMultipleSteps ? "Step" : "Workflow");
+  
     const chartSpec = {
       mark: uniqueSteps.size <= 1 ? "bar" : "line",
       encoding: {
         x: {
           field: uniqueSteps.size <= 1 ? "id" : "step",
           type: "ordinal",
-          axis: { labels: false, title: uniqueSteps.size <= 1 ? "Workflow" : "Step" },
+          axis: { labels: false, title: xAxisTitle },
           scale: {
             paddingInner: 0.2,
             paddingOuter: 1,
@@ -117,10 +141,7 @@ const WorkflowCharts: React.FC = () => {
             value: null 
           }
         } : {}),
-        tooltip: [
-          { field: "id", type: "nominal" },
-          { field: "value", type: "quantitative" },
-        ],
+        tooltip: tooltipFields,
       },
       data: { values: metricSeries },
     }

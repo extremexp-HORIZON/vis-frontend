@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import type { RootState } from "../../../store/store"
 import { useAppSelector } from "../../../store/store"
 import WorkflowParameterDistribution from "./workflow-parameter-distribution"
-import { IconButton, Paper, Tooltip, Typography } from "@mui/material"
+import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material"
 import CompareArrowsRoundedIcon from "@mui/icons-material/CompareArrowsRounded"
 import theme from "../../../mui-theme"
 import { useParams } from "react-router-dom"
@@ -29,8 +29,16 @@ const WorkflowParameter = () => {
   };
 
   return (
-    <>
-      <Paper sx={{ mb: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 1,
+        height: "100%",
+        overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
+      }}
+    >
+      <Box sx={{ mb: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
         <Typography variant="subtitle1">
           This workflow uses "{selectedParam.name}: {selectedParam.value}". In total{" "}
           {filteredWorkflows.length} workflow
@@ -51,9 +59,14 @@ const WorkflowParameter = () => {
             </a>
           </Tooltip>
         )}
-      </Paper>
+      </Box>
+      <Paper
+          elevation={1}
+          sx={{ flex: 1, overflow: "auto", height: "100%", width: "100%" }}
+        >
       <WorkflowParameterDistribution />
-    </>
+      </Paper>
+    </Box>
   );
 };
 

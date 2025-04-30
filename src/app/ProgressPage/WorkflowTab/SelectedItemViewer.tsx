@@ -78,8 +78,10 @@ const SelectedItemViewer = () => {
           title={`${selectedItem.data.name} Details`} 
           icon={<Grid3x3Icon color="primary" />} 
         />
-        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: "auto" }}>
-          <WorkflowParameter />
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          <Box sx={{ overflow: "auto", height: "100%" }}>
+            <WorkflowParameter />
+          </Box>
         </Box>
       </Box>
     )
@@ -92,8 +94,10 @@ const SelectedItemViewer = () => {
           title={`${selectedItem.data.name} Details`} 
           icon={<BarChartIcon color="primary" />} 
         />
-        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: "auto" }}>
-          <WorkflowMetricChart />
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          <Box sx={{ overflow: "auto", height: "100%" }}>
+            <WorkflowMetricChart />
+          </Box>
         </Box>
       </Box>
     )

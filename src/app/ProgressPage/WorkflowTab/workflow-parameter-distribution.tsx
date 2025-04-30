@@ -1,3 +1,4 @@
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
 import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
@@ -11,6 +12,9 @@ const WorkflowParameterDistribution = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
   const { tab } = useAppSelector(state => state.workflowPage)
   const selectedParam = tab?.dataTaskTable.selectedItem?.data?.name
+    const theme = useTheme()
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  
 
   const getData = (param: string) => {
     const completedWorkflows = workflows.data.filter(
@@ -217,13 +221,15 @@ const WorkflowParameterDistribution = () => {
   }
 
   return (
-    <ResponsiveCardVegaLite
-      spec={spec}
-      title={`Distribution of ${selectedParam} Across Workflows`}
-      maxHeight={350}
-      aspectRatio={2.5}
-      actions={false}
-    />
+    <Box sx={{height: "99%"}}>
+      <ResponsiveCardVegaLite
+        spec={spec}
+        title={`Distribution of ${selectedParam} Across Workflows`}
+        maxHeight={500}
+        aspectRatio={isSmallScreen ? 4 : 2}
+        actions={false}
+      />
+    </Box>
   )
 }
 
