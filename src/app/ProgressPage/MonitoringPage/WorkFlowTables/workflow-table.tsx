@@ -10,7 +10,7 @@ import Box from "@mui/material/Box"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
 import LaunchIcon from "@mui/icons-material/Launch"
-import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow } from "../../../../store/slices/monitorPageSlice"
+import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable } from "../../../../store/slices/monitorPageSlice"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
 import { useEffect, useRef, useState } from "react"
@@ -445,6 +445,13 @@ export default function WorkflowTable() {
             action: "",
           }
         })
+
+      // Check if there are no rows completed then set the table to scheduled
+        if (rows.length=== 0) {
+          dispatch(setVisibleTable("scheduled"))
+          return 
+        }
+
 
       const columns: CustomGridColDef[] = Object.keys(rows[0])
         .filter(key => key !== "id")
