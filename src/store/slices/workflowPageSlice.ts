@@ -19,7 +19,8 @@ import {
 import { userInteractionDefault } from "../../shared/models/tasks/user-interaction.model"
 import type { IRun } from "../../shared/models/experiment/run.model"
 import type { IMetric } from "../../shared/models/experiment/metric.model"
-import { experimentApi } from "../../app/api/api"
+import { api, experimentApi } from "../../app/api/api"
+import axios from "axios";
 
 export interface IWorkflowPage {
   tab: IWorkflowPageModel | null
@@ -247,6 +248,19 @@ const setTab = ({
   else if (tab !== null) return initializeTab({ workflowId: tab, workflows})
   else return null
 }
+
+export const fetchUserEvaluation = createAsyncThunk(
+  "workflowTasks/user_evaluation/fetch_data",
+  async (
+    payload: { experimentId: string; runId: string; data: any }
+  ) => {
+    const { experimentId, runId, data } = payload
+    const requestUrl = `/experiments/${experimentId}/runs/${runId}/user-evaluation`
+    return axios
+      .post<any>(requestUrl, data)
+      .then(response => response.data)
+  },
+)
 
 
 export const fetchWorkflowMetrics = createAsyncThunk(

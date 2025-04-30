@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from "../../store/store"
 import Rating from "@mui/material/Rating";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from "react"
-import { setProgressBarData } from "../../store/slices/progressPageSlice"
+import { fetchUserEvaluation, setProgressBarData } from "../../store/slices/progressPageSlice"
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ErrorIcon from '@mui/icons-material/Error'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
@@ -28,6 +28,7 @@ const ExperimentControls = () => {
   const workflowStatus = workflow?.status
   const completedTasks = workflow?.tasks?.filter(task => task.endTime).length
   const taskLength = workflow?.tasks?.length
+  const workflowRating= workflow?.metrics?.find(metric => metric.name === "rating")?.value
 
   let workflowIcon;
 
@@ -123,7 +124,9 @@ const ExperimentControls = () => {
                       {`Workflow ${workflowId}`}
                     </Typography>
                     <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
-                    <Rating name="simple-uncontrolled" size="large" defaultValue={2} />
+                    <Rating name="simple-uncontrolled" size="large" defaultValue={workflowRating} onChange={(event, value) => {
+                            dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
+                          }} />
                   </Box>
                   <Box sx={{display: "flex", flexDirection: "row",alignItems: "center", gap: 1}}>
                     <Typography variant="body2">Status: {workflowStatus?.toLowerCase()}</Typography>

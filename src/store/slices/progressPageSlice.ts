@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import type { IExperiment } from "../../shared/models/experiment/experiment.model"
 import type { IRun } from "../../shared/models/experiment/run.model"
 import type { IMetric } from "../../shared/models/experiment/metric.model"
-import { experimentApi } from "../../app/api/api"
+import { api, experimentApi } from "../../app/api/api"
 import axios from "axios"
 import { getCache, setCache } from "../../shared/utils/localStorageCache"
 
@@ -214,17 +214,31 @@ export const stateController = createAsyncThunk(
 )
 
 // TODO: Test this once the table changes are done
-export const workflowRating = (payload: {metric: IMetric, newValue: number}) => {
-    const {metric, newValue} = payload
-    const requestUrl = `/metrics/metricId`
-    const requestPayload: Partial<IMetric> = {
-      ...metric,
-      value: newValue,
-    }
-    delete requestPayload.name
-    return axios.post<IRun[]>(requestUrl, requestPayload)
-  }
+// export const workflowRating = (payload: {metric: IMetric, newValue: number}) => {
+//     const {metric, newValue} = payload
+//     const requestUrl = `/metrics/metricId`
+//     const requestPayload: Partial<IMetric> = {
+//       ...metric,
+//       value: newValue,
+//     }
+//     delete requestPayload.name
+//     return axios.post<IRun[]>(requestUrl, requestPayload)
+//   }
 
+
+export const fetchUserEvaluation = createAsyncThunk(
+  "workflowTasks/user_evaluation/fetch_data",
+  async (
+    payload: { experimentId: string; runId: string; data: any }
+  ) => {
+    const { experimentId, runId, data } = payload
+    const requestUrl = `${experimentId}/runs/${runId}/user-evaluation`
+    return experimentApi
+      .post<any>(requestUrl, data)
+      .then(response => response.data)
+      
+  },
+)
 //Reducer exports
 export const {
   setProgressBarData,

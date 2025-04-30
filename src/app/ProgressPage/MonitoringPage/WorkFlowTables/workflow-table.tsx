@@ -22,6 +22,7 @@ import theme from "../../../../mui-theme"
 import { debounce } from "lodash";
 import type { CustomGridColDef } from "../../../../shared/types/table-types"
 import { Link, useParams } from "react-router-dom"
+import { fetchUserEvaluation } from "../../../../store/slices/progressPageSlice"
 
 export interface Data {
   [key: string]: any
@@ -29,9 +30,26 @@ export interface Data {
 
 // WorkflowActions
 
-const WorkflowRating = (props: { rating: number }) => {
-  const { rating } = props
-  return <Rating sx={{verticalAlign: "middle"}} value={rating} size="small" />
+const WorkflowRating = (props: { rating: number | string | undefined, workflowId: string }) => {
+  let { rating, workflowId } = props
+  console.log("rating raw:", rating)
+
+  const parsedRating = typeof rating === "string" ? parseFloat(rating) : rating
+  const safeRating = isNaN(parsedRating as number) ? null : parsedRating
+const dispatch =useAppDispatch()
+const experimentId = useParams().experimentId
+
+
+  return (
+    <Rating
+      sx={{ verticalAlign: "middle" }}
+      value={safeRating}
+      size="small"
+      onChange={(event, value) => {
+        dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
+      }}
+    />
+  )
 }
 
 const WorkflowActions = (props: {
@@ -109,6 +127,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     minHeight: "56px",
     borderTop: "1px solid rgba(224, 224, 224, 1)",
   },
+  
   "& .MuiTablePagination-root": {
     overflow: "visible",
   },
@@ -193,6 +212,7 @@ export default function WorkflowTable() {
     }, 20)
   ).current
 
+  const workflowId = workflowsTable.selectedWorkflows[0] || null
 
   const handleHover = (workflowId: string | null) => {
     if (workflowId !== lastHoveredIdRef.current) {
@@ -302,7 +322,7 @@ export default function WorkflowTable() {
 
       dispatch(setWorkflowsTable({ filteredRows, filtersCounter: counter }))
     }
-  }, [workflowsTable.filters, workflowsTable.rows, searchTerm])
+  }, [workflowsTable.filters, workflowsTable.rows, searchTerm,workflowsTable.rows])
 
   useEffect(() => {
     if(workflowsTable.initialized) {
@@ -421,7 +441,7 @@ export default function WorkflowTable() {
               return acc
             }, {}),
             status: workflow.status,
-            rating: 2,
+            // rating: 2,
             action: "",
           }
         })
@@ -461,11 +481,13 @@ export default function WorkflowTable() {
             },
           }),
           ...(key === "rating" && {
-            renderCell: params => {
-              const currentRating = params.row.rating
+            renderCell: metrics => {
+              const currentRating = metrics.row.rating
+              console.log("rating:", currentRating)
               return (
                 <WorkflowRating
-                  rating={currentRating} />
+                //here must be the workflow id that i selected somehow
+                  rating={currentRating} workflowId={"WjRdgpYBwbSNbg2qdK9b"} />
               )
             },
           }),
