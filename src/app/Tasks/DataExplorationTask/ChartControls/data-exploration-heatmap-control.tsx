@@ -16,7 +16,7 @@ import CategoryIcon from "@mui/icons-material/Category"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import FunctionsIcon from "@mui/icons-material/Functions"
 
-const BarChartControlPanel = () => {
+const HeatMapControlPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
   const selectedColumn =
@@ -111,35 +111,39 @@ const BarChartControlPanel = () => {
           </InputLabel>{" "}
           <Select
             label="Group By (Category) okkk    "
+            multiple
             value={
-              tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy?.[0] || ""
+              tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []
             }
-            onChange={e =>
-              dispatch(setControls({ barGroupBy: [e.target.value] }))
+            onChange={e => {
+                const selected = e.target.value as string[]
+                if (selected.length <= 2) {
+                  dispatch(setControls({ barGroupBy: selected }))
+                }
+              }}
+            renderValue={(selected: any) =>
+              selected.length === 0 ? (
+                <em>Select categories to group by</em>
+              ) : (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  {selected.map((value: string) => (
+                    <Chip
+                      key={value}
+                      label={value}
+                      onDelete={() =>
+                        dispatch(
+                          setControls({
+                            barGroupBy: selected.filter(
+                              (v: string) => v !== value,
+                            ),
+                          }),
+                        )
+                      }
+                    />
+                  ))}
+                </Box>
+              )
             }
-            // renderValue={(selected: any) =>
-            //   selected.length === 0 ? (
-            //     <em>Select categories to group by</em>
-            //   ) : (
-            //     <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            //       {selected.map((value: string) => (
-            //         <Chip
-            //           key={value}
-            //           label={value}
-            //           onDelete={() =>
-            //             dispatch(
-            //               setControls({
-            //                 barGroupBy: selected.filter(
-            //                   (v: string) => v !== value,
-            //                 ),
-            //               }),
-            //             )
-            //           }
-            //         />
-            //       ))}
-            //     </Box>
-            //   )
-            // }
             MenuProps={{
               PaperProps: {
                 style: { maxHeight: 224, width: 250 },
@@ -150,9 +154,16 @@ const BarChartControlPanel = () => {
             {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
               .filter(col => col.type === "STRING")
               .map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
+                <MenuItem
+                key={col.name}
+                value={col.name}
+                disabled={
+                  (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy?.length ?? 0) >= 2 &&
+                  !tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy?.includes(col.name)
+                }
+              >
+                {col.name}
+              </MenuItem>
               ))}
           </Select>
         </FormControl>
@@ -166,23 +177,34 @@ const BarChartControlPanel = () => {
             </Box>
           </InputLabel>
           <Select
-            label="Measure (Value Column)ooo"
-            value={selectedColumn || ""}
-            onChange={e =>
-              dispatch(setControls({ selectedMeasureColumn: e.target.value }))
-            }
-                        MenuProps={{
-              PaperProps: { style: { maxHeight: 224, width: 250 } },
-            }}
-          >
-            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type != "LOCAL_DATE_TIME")
-              .map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-          </Select>
+  label="Measure (Value Column)"
+  value={selectedColumn || ""}
+  onChange={e => {
+    const newColumn = e.target.value as string
+    const currentAgg = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+
+    // Clear previous aggregation and set new selected column
+    dispatch(
+      setControls({
+        selectedMeasureColumn: newColumn,
+        barAggregation: {
+          [newColumn]: [], // Reset aggregation for new column
+        },
+      }),
+    )
+  }}
+  MenuProps={{
+    PaperProps: { style: { maxHeight: 224, width: 250 } },
+  }}
+>
+  {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+    .filter(col => col.type !== "LOCAL_DATE_TIME")
+    .map(col => (
+      <MenuItem key={col.name} value={col.name}>
+        {col.name}
+      </MenuItem>
+    ))}
+</Select>
         </FormControl>
 
         {/* Aggregation Selection */}
@@ -195,58 +217,32 @@ const BarChartControlPanel = () => {
               </Box>
             </InputLabel>
             <Select
-              label="Apply Aggregation(s)oook"
-              multiple
-              value={
-                tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[
-                  selectedColumn
-                ] || []
-              }
-              onChange={event => {
-                const value = event.target.value as string[]
-                if (!selectedColumn) return
-                const currentAgg =
-                  tab?.workflowTasks.dataExploration?.controlPanel
-                    .barAggregation || {}
+  label="Apply Aggregation"
+  value={
+    tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[selectedColumn]?.[0] || ""
+  }
+  onChange={event => {
+    const value = event.target.value as string
+    if (!selectedColumn) return
+    const currentAgg =
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
 
-                dispatch(
-                  setControls({
-                    barAggregation: {
-                      ...currentAgg,
-                      [selectedColumn]: value,
-                    },
-                  }),
-                )
-              }}
-              renderValue={(selected: any) => (
-<Box
-    sx={{
-      display: "flex",
-      flexWrap: "nowrap",
-      gap: "0.25rem",
-      overflowX: "auto",
-      whiteSpace: "nowrap",
-    }}
-  >
-    {selected.map((value: string) => (
-      <Chip
-        key={value}
-        label={value}
-        size="small"
-        sx={{ height: 24, fontSize: "0.75rem" }}
-        onDelete={() => handleAggregationDelete(value)}
-      />
-    ))}
-  </Box>
-              )}
-              
-            >
-              {aggregationOptions.map(rule => (
-                <MenuItem key={rule} value={rule}>
-                  {rule.charAt(0).toUpperCase() + rule.slice(1)}
-                </MenuItem>
-              ))}
-            </Select>
+    dispatch(
+      setControls({
+        barAggregation: {
+          ...currentAgg,
+          [selectedColumn]: [value], // wrap in array since your state expects an array
+        },
+      }),
+    )
+  }}
+>
+  {aggregationOptions.map(rule => (
+    <MenuItem key={rule} value={rule}>
+      {rule.charAt(0).toUpperCase() + rule.slice(1)}
+    </MenuItem>
+  ))}
+</Select>
           </FormControl>
         )}
       </Box>
@@ -301,4 +297,4 @@ const BarChartControlPanel = () => {
   )
 }
 
-export default BarChartControlPanel
+export default HeatMapControlPanel

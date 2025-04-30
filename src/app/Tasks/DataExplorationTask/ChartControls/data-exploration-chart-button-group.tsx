@@ -5,6 +5,7 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import MapIcon from '@mui/icons-material/Map';
 import TableChartIcon from "@mui/icons-material/TableChartSharp"
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 
@@ -53,6 +54,14 @@ const ChartButtonGroup: React.FC= () => {
         onClick={() => dispatch(setControls({ chartType: 'bar' }))}
       >
         <BarChartIcon />
+      </Button>
+      </Tooltip>
+      <Tooltip title="Heatmap">
+      <Button
+        variant={chartType === 'heatmap' ? 'contained' : 'outlined'}
+        onClick={() => dispatch(setControls({ chartType: 'heatmap' }))}
+      >
+        <LocalFireDepartmentIcon />
       </Button>
       </Tooltip>
       <Tooltip title="Scatter">

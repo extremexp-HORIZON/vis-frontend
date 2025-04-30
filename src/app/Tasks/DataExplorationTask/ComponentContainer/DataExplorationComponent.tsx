@@ -19,6 +19,7 @@ import MapControls from "../ChartControls/data-exploration-map-control"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import MapCard from "../../../../shared/components/map-card"
 import theme from "../../../../mui-theme"
+import HeatMap from "../Charts/data-exploration-heatmap"
 
 const DataExplorationComponent = () => {
   const dispatch = useAppDispatch()
@@ -136,6 +137,8 @@ const DataExplorationComponent = () => {
           {chartType === "line" && <LineChart />}
           {chartType === "scatter" && <ScatterChart />}
           {chartType === "bar" && <BarChart />}
+          {chartType === "heatmap" && <HeatMap/>}
+
           {chartType === "map" && (
             <>
             <Typography> soon....</Typography>

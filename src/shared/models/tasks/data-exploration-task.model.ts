@@ -50,6 +50,12 @@ export interface IDataExploration {
     loading: boolean
     error: string | null
   }
+  heatChart: {
+    data: IDataExplorationResponse | null
+    loading: boolean
+    error: string | null
+  }
+  
   metaData: {
     data: IDataExplorationMetaDataResponse | null
     loading: boolean
@@ -115,6 +121,11 @@ export const dataExplorationDefault: IDataExploration = {
     loading: false,
     error: null,
   },
+  heatChart: {
+    data: null,
+    loading: false,
+    error: null,
+  },
   scatterChart: {
     data: null,
     loading: false,
@@ -156,6 +167,7 @@ export const dataExplorationDefault: IDataExploration = {
 
     
   },
+  
   chart: {
     data: null,
     loading: false,
