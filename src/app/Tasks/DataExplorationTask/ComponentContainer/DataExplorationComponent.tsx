@@ -15,11 +15,9 @@ import { setControls } from "../../../../store/slices/workflowPageSlice"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
-import MapControls from "../ChartControls/data-exploration-map-control"
-import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import MapCard from "../../../../shared/components/map-card"
 import theme from "../../../../mui-theme"
 import HeatMap from "../Charts/data-exploration-heatmap"
+import MapChart from "../Charts/data-exploration-new-map-chart"
 
 const DataExplorationComponent = () => {
   const dispatch = useAppDispatch()
@@ -139,16 +137,7 @@ const DataExplorationComponent = () => {
           {chartType === "bar" && <BarChart />}
           {chartType === "heatmap" && <HeatMap/>}
 
-          {chartType === "map" && (
-            <>
-            <Typography> soon....</Typography>
-              {/* <MapCard
-                controlPanel={<MapControls />}
-                maxHeight={500}
-                aspectRatio={isSmallScreen ? 2.8 : 1.8}
-              /> */}
-            </>
-          )}
+          {chartType === "map" && (<MapChart/>)}
         </Paper>
       )}
     </Box>

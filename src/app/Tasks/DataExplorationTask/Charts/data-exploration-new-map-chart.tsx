@@ -1,0 +1,207 @@
+import { useState, useRef, useEffect } from "react"
+
+import "leaflet/dist/leaflet.css"
+import { useMediaQuery, useTheme } from "@mui/material"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
+import MapControls from "../ChartControls/data-exploration-map-control"
+import InfoMessage from "../../../../shared/components/InfoMessage"
+import AssessmentIcon from "@mui/icons-material/Assessment"
+import L from "leaflet"
+import ResponsiveMapCard from "../../../../shared/components/map-card"
+
+const COLOR_PALETTE = [
+  "#1f77b4", // blue
+  "#ff7f0e", // orange
+  "#2ca02c", // green
+  "#d62728", // red
+  "#9467bd", // purple
+]
+
+const MapChart = () => {
+  const mapRef = useRef<HTMLDivElement | null>(null)
+  const leafletMapRef = useRef<L.Map | null>(null)
+  const markerLayerRef = useRef<L.LayerGroup | null>(null)
+
+  const { tab } = useAppSelector(state => state.workflowPage)
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  console.log("isSmallScreen", isSmallScreen)
+  const dispatch = useAppDispatch()
+
+  const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat
+  const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon
+  const data = tab?.workflowTasks.dataExploration?.mapChart.data?.data || []
+  const colorByMap = tab?.workflowTasks.dataExploration?.controlPanel.colorByMap
+  const [colorMap, setColorMap] = useState<Map<string, string>>(new Map())
+
+  // Fetch data
+  useEffect(() => {
+    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || ""
+    if (!datasetId || !lat || !lon || !colorByMap || colorByMap === "None")
+      return
+
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          ...defaultDataExplorationQuery,
+          datasetId,
+          columns: [lat, lon, colorByMap],
+          filters,
+          limit: 200,
+        },
+        metadata: {
+          workflowId: tab?.workflowId || "",
+          queryCase: "mapChart",
+        },
+      }),
+    )
+  }, [lat, lon, tab?.dataTaskTable.selectedItem?.data?.source, colorByMap])
+
+  // Initialize map
+  useEffect(() => {
+    if (
+      !mapRef.current ||
+      leafletMapRef.current ||
+      !lat ||
+      !lon ||
+      colorByMap === "None"
+    )
+      return
+
+    leafletMapRef.current = L.map(mapRef.current).setView([38.015, 23.834], 16)
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+      leafletMapRef.current,
+    )
+
+    markerLayerRef.current = L.layerGroup().addTo(leafletMapRef.current)
+  }, [lat, lon, colorByMap])
+
+  useEffect(() => {
+    if (!data.length || !colorByMap || colorByMap === "None") return
+
+    const categories = Array.from(
+      new Set(data.map((row: any) => row[colorByMap])),
+    )
+    const newColorMap = new Map<string, string>()
+
+    categories.forEach((category, index) => {
+      // Get a color from the COLOR_PALETTE or generate your own strategy here
+      newColorMap.set(category, COLOR_PALETTE[index % COLOR_PALETTE.length])
+    })
+
+    setColorMap(newColorMap)
+  }, [colorByMap, data])
+
+  // Update markers
+  useEffect(() => {
+    if (
+      !leafletMapRef.current ||
+      !lat ||
+      !lon ||
+      !markerLayerRef.current ||
+      !colorMap ||
+      colorByMap === "None"
+    )
+      return
+
+    markerLayerRef.current.clearLayers()
+
+    data.forEach((row: any) => {
+      const latVal = parseFloat(row[lat])
+      const lonVal = parseFloat(row[lon])
+      const category = row[colorByMap || ""]
+
+      if (!isNaN(latVal) && !isNaN(lonVal) && category) {
+        const color = colorMap.get(category) || "#000000" // fallback to black if no color is assigned
+        L.marker([latVal, lonVal], {
+          icon: L.divIcon({
+            className: "", // avoid default Leaflet icon styling
+            html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
+            iconSize: [12, 12], // match your dot size
+            iconAnchor: [6, 6], // center the dot
+          }),
+        })
+          .bindTooltip(category, { permanent: false, direction: "top" })
+
+          .addTo(markerLayerRef.current!)
+      }
+    })
+    // Remove existing legend if it exists
+    const existingLegend = document.querySelector(".leaflet-legend")
+    if (existingLegend) existingLegend.remove()
+
+    const legend = L.control({ position: "topright" })
+
+    legend.onAdd = function () {
+      const div = L.DomUtil.create("div", "leaflet-legend")
+      div.style.background = "white"
+      div.style.padding = "8px"
+      div.style.borderRadius = "4px"
+      div.style.boxShadow = "0 0 6px rgba(0,0,0,0.2)"
+      div.innerHTML = `<strong>${colorByMap}</strong><br/>`
+
+      colorMap.forEach((color, category) => {
+        div.innerHTML += `
+      <div style="display: flex; align-items: center; margin-bottom: 4px;">
+        <div style="width: 12px; height: 12px; background:${color}; border-radius: 50%; margin-right: 6px;"></div>
+        ${category}
+      </div>
+    `
+      })
+
+      return div
+    }
+
+    legend.addTo(leafletMapRef.current!)
+    // Optionally pan to average center
+    if (data.length) {
+      const avgLat =
+        data.reduce(
+          (sum: number, r: { [x: string]: string }) => sum + parseFloat(r[lat]),
+          0,
+        ) / data.length
+      const avgLon =
+        data.reduce(
+          (sum: number, r: { [x: string]: string }) => sum + parseFloat(r[lon]),
+          0,
+        ) / data.length
+      leafletMapRef.current.setView([avgLat, avgLon], 16)
+    }
+  }, [data, lat, lon, colorMap])
+  useEffect(() => {
+    setTimeout(() => {
+      leafletMapRef.current?.invalidateSize()
+    }, 100) // give the layout a moment to settle
+  }, [lat, lon])
+  const hasValidXAxis = lat
+  const hasValidYAxis = lon
+  const hascolr = colorByMap
+  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hascolr
+
+  const info = (
+    <InfoMessage
+      message="Please select x-Axis and y-Axis to display the chart."
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      fullHeight
+    />
+  )
+
+  return (
+    <ResponsiveMapCard
+      mapRef={mapRef}
+      controlPanel={<MapControls />}
+      infoMessage={info}
+      showInfoMessage={shouldShowInfoMessage}
+      maxHeight={500}
+      aspectRatio={isSmallScreen ? 2.8 : 1.8}
+      pulsate={false}
+      title="Map Chart"
+    />
+  )
+}
+
+export default MapChart

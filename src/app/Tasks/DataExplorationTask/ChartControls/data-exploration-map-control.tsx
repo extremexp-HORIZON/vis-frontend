@@ -6,7 +6,7 @@ const MapControls = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
 
-  const selectedColumns = tab?.workflowTasks?.dataExploration?.controlPanel.selectedColumns || [];
+  const selectedColumns = tab?.workflowTasks?.dataExploration?.metaData.data?.originalColumns || [];
 
   const stringColumns = selectedColumns.filter(col => col.type === 'STRING');
   const doubleColumns = selectedColumns.filter(col => col.type === 'DOUBLE');
