@@ -76,7 +76,7 @@ const ScatterChart = () => {
 
   const info = (
     <InfoMessage
-      message="Please select x-Axis and y-Axis to display the chart."
+      message="Please select x-Axis, y-Axis and color fields to display the chart."
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
       fullHeight

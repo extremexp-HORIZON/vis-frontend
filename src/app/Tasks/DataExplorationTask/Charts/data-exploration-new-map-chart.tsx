@@ -228,7 +228,7 @@ const MapChart = () => {
 
   const info = (
     <InfoMessage
-      message="Please select x-Axis and y-Axis to display the chart."
+      message="Please select Latitude, Longitude and Color fields to display the map."
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
       fullHeight
