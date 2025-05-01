@@ -84,6 +84,7 @@ export interface IDataExploration {
     segmentBy: string[]
     timestampField: string | null
     selectedMeasureColumn: null,
+    heatmap: boolean
 
   }
   chart: {
@@ -164,6 +165,7 @@ export const dataExplorationDefault: IDataExploration = {
     segmentBy: [],
     timestampField: null,
     selectedMeasureColumn: null,
+    heatmap: false
 
     
   },

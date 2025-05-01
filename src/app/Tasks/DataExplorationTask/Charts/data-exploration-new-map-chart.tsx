@@ -10,6 +10,11 @@ import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import L from "leaflet"
 import ResponsiveMapCard from "../../../../shared/components/map-card"
+// @ts-ignore
+import "leaflet.heat"
+
+import { Switch, FormControlLabel } from "@mui/material"
+import { filter, has } from "lodash"
 
 const COLOR_PALETTE = [
   "#1f77b4", // blue
@@ -23,6 +28,8 @@ const MapChart = () => {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const leafletMapRef = useRef<L.Map | null>(null)
   const markerLayerRef = useRef<L.LayerGroup | null>(null)
+  const heatLayerRef = useRef<L.HeatLayer | null>(null)
+
 
   const { tab } = useAppSelector(state => state.workflowPage)
   const theme = useTheme()
@@ -32,9 +39,18 @@ const MapChart = () => {
 
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat
   const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon
+  const useHeatmap= tab?.workflowTasks.dataExploration?.controlPanel.heatmap
+  const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
+
+  // const lat="latitude"
+  // const lon="longitude"
+  // const colorByMap="timestamp"
+
   const data = tab?.workflowTasks.dataExploration?.mapChart.data?.data || []
   const colorByMap = tab?.workflowTasks.dataExploration?.controlPanel.colorByMap
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map())
+  const segmentBy= tab?.workflowTasks.dataExploration?.controlPanel.segmentBy
+  const timestampField= "timestamp"
 
   // Fetch data
   useEffect(() => {
@@ -58,7 +74,7 @@ const MapChart = () => {
         },
       }),
     )
-  }, [lat, lon, tab?.dataTaskTable.selectedItem?.data?.source, colorByMap])
+  }, [lat, lon, tab?.dataTaskTable.selectedItem?.data?.source, colorByMap,filters])
 
   // Initialize map
   useEffect(() => {
@@ -77,7 +93,8 @@ const MapChart = () => {
     )
 
     markerLayerRef.current = L.layerGroup().addTo(leafletMapRef.current)
-  }, [lat, lon, colorByMap])
+  }, [lat, lon, colorByMap,data,filters])
+  console.log("data", data)
 
   useEffect(() => {
     if (!data.length || !colorByMap || colorByMap === "None") return
@@ -93,7 +110,7 @@ const MapChart = () => {
     })
 
     setColorMap(newColorMap)
-  }, [colorByMap, data])
+  }, [colorByMap, data,filters])
 
   // Update markers
   useEffect(() => {
@@ -107,31 +124,56 @@ const MapChart = () => {
     )
       return
 
-    markerLayerRef.current.clearLayers()
-
-    data.forEach((row: any) => {
-      const latVal = parseFloat(row[lat])
-      const lonVal = parseFloat(row[lon])
-      const category = row[colorByMap || ""]
-
-      if (!isNaN(latVal) && !isNaN(lonVal) && category) {
-        const color = colorMap.get(category) || "#000000" // fallback to black if no color is assigned
-        L.marker([latVal, lonVal], {
-          icon: L.divIcon({
-            className: "", // avoid default Leaflet icon styling
-            html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
-            iconSize: [12, 12], // match your dot size
-            iconAnchor: [6, 6], // center the dot
-          }),
+      if (markerLayerRef.current) markerLayerRef.current.clearLayers()
+        if (heatLayerRef.current) {
+          heatLayerRef.current.remove()
+          heatLayerRef.current = null
+        }
+        
+    if (useHeatmap) {
+      const heatData = data
+        .map((row: any) => {
+          const latVal = parseFloat(row[lat])
+          const lonVal = parseFloat(row[lon])
+          if (!isNaN(latVal) && !isNaN(lonVal)) {
+            return [latVal, lonVal, 0.5] // [lat, lon, intensity]
+          }
+          return null
         })
-          .bindTooltip(category, { permanent: false, direction: "top" })
-
-          .addTo(markerLayerRef.current!)
-      }
-    })
+        .filter(Boolean)
+    
+      heatLayerRef.current = (L as any).heatLayer(heatData, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
+      })
+      heatLayerRef.current.addTo(leafletMapRef.current!)
+    } else {
+      // Marker rendering as before
+      data.forEach((row: any) => {
+        const latVal = parseFloat(row[lat])
+        const lonVal = parseFloat(row[lon])
+        const category = row[colorByMap || ""]
+        if (!isNaN(latVal) && !isNaN(lonVal) && category) {
+          const color = colorMap.get(category) || "#000000"
+          L.marker([latVal, lonVal], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
+              iconSize: [12, 12],
+              iconAnchor: [6, 6],
+            }),
+          })
+            .bindTooltip(category, { permanent: false, direction: "top" })
+            .addTo(markerLayerRef.current!)
+        }
+      })
+    }
+    
     // Remove existing legend if it exists
     const existingLegend = document.querySelector(".leaflet-legend")
-    if (existingLegend) existingLegend.remove()
+    if (existingLegend ) existingLegend.remove()
+      if (!useHeatmap && data.length>0) {
 
     const legend = L.control({ position: "topright" })
 
@@ -143,19 +185,22 @@ const MapChart = () => {
       div.style.boxShadow = "0 0 6px rgba(0,0,0,0.2)"
       div.innerHTML = `<strong>${colorByMap}</strong><br/>`
 
-      colorMap.forEach((color, category) => {
-        div.innerHTML += `
+      const firstEntries = Array.from(colorMap.entries()).slice(0, 10);
+
+  // Iterate through the first 10 entries
+  firstEntries.forEach(([category, color]) => {
+    div.innerHTML += `
       <div style="display: flex; align-items: center; margin-bottom: 4px;">
         <div style="width: 12px; height: 12px; background:${color}; border-radius: 50%; margin-right: 6px;"></div>
         ${category}
       </div>
-    `
-      })
+    `;
+  });
 
-      return div
-    }
-
+  return div;
+};
     legend.addTo(leafletMapRef.current!)
+  }
     // Optionally pan to average center
     if (data.length) {
       const avgLat =
@@ -170,7 +215,7 @@ const MapChart = () => {
         ) / data.length
       leafletMapRef.current.setView([avgLat, avgLon], 16)
     }
-  }, [data, lat, lon, colorMap])
+  }, [data, lat, lon, colorMap,useHeatmap,filters])
   useEffect(() => {
     setTimeout(() => {
       leafletMapRef.current?.invalidateSize()
@@ -179,7 +224,7 @@ const MapChart = () => {
   const hasValidXAxis = lat
   const hasValidYAxis = lon
   const hascolr = colorByMap
-  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hascolr
+  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || hascolr==="None"
 
   const info = (
     <InfoMessage
@@ -191,6 +236,9 @@ const MapChart = () => {
   )
 
   return (
+    
+    
+
     <ResponsiveMapCard
       mapRef={mapRef}
       controlPanel={<MapControls />}
@@ -199,7 +247,7 @@ const MapChart = () => {
       maxHeight={500}
       aspectRatio={isSmallScreen ? 2.8 : 1.8}
       pulsate={false}
-      title="Map Chart"
+      title={useHeatmap ? "Heatmap" : "Map Chart"}
     />
   )
 }
