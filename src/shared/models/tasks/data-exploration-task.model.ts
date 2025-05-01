@@ -65,26 +65,37 @@ export interface IDataExploration {
     chartType: string
     selectedColumns: VisualColumn[]
     filters: IFilter[]
-    xAxis: VisualColumn
-    xAxisScatter: VisualColumn
-    yAxis: VisualColumn[]
-    yAxisScatter: VisualColumn[]
-    barGroupBy: string[]
-    barAggregation: any
     viewMode: "overlay" | "stacked"
-    colorBy: VisualColumn
-    colorByMap: string
-    tripsMode: boolean
-    selectedColumnsMap: string[]
     selectedDataset: string
     currentPage: number
+    timestampField: string | null
+
+    //Line
+    xAxis: VisualColumn
+    yAxis: VisualColumn[]
+    //Bar
+    barGroupBy: string[]
+    barAggregation: any
+    selectedMeasureColumn: null,
+
+    //Scatter
+    xAxisScatter: VisualColumn
+    yAxisScatter: VisualColumn[]
+    colorBy: VisualColumn
+    umap: boolean
+    //Heatmap
+    barGroupByHeat: string[]
+    barAggregationHeat: any
+    selectedMeasureColumnHeat: null,
+
+    //Map
+    colorByMap: string
+    segmentBy: string[]
     lat: string
     lon: string
-    umap: boolean
-    segmentBy: string[]
-    timestampField: string | null
-    selectedMeasureColumn: null,
     heatmap: boolean
+    tripsMode: boolean
+    selectedColumnsMap: string[]
 
   }
   chart: {
@@ -165,7 +176,10 @@ export const dataExplorationDefault: IDataExploration = {
     segmentBy: [],
     timestampField: null,
     selectedMeasureColumn: null,
-    heatmap: false
+    heatmap: false,
+    barGroupByHeat: [],
+    barAggregationHeat: {},
+    selectedMeasureColumnHeat: null,
 
     
   },
