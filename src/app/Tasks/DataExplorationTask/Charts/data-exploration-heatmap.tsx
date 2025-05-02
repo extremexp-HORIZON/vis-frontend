@@ -17,8 +17,8 @@ const HeatMap = () => {
     
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
     useEffect(() => {
-      const groupBy = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy
-      const aggregation = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
+      const groupBy = tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat
+      const aggregation = tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat
       const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || ""
       const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
     
@@ -42,8 +42,8 @@ const HeatMap = () => {
         })
       )
     }, [
-      tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy,
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,
+      tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat,
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat,
       tab?.dataTaskTable.selectedItem?.data?.source,
       tab?.workflowTasks.dataExploration?.controlPanel.filters
 
@@ -55,7 +55,7 @@ const HeatMap = () => {
 
   const columns = tab?.workflowTasks.dataExploration?.heatChart.data?.columns
   const xAxisColumn = columns?.find(col => col.type === "STRING")?.name
-  const aggregation = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
+  const aggregation = tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat
   console.log("Aggregation:", aggregation)
 
   const categoricalColumns = columns?.filter(
@@ -77,7 +77,7 @@ const HeatMap = () => {
     })),
   )
 
-  const groupByFields = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || [];
+  const groupByFields = tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [];
 
   let specification;
   
@@ -186,7 +186,7 @@ const HeatMap = () => {
   
   )
   const shouldShowInfoMessage =
-  tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy.length === 0 || Object.keys(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation).length === 0
+  tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat.length === 0 || Object.keys(tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat).length === 0
   return (
     <Box sx={{height: "99%"}}>
       <ResponsiveCardVegaLite 

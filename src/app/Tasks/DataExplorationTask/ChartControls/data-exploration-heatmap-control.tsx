@@ -20,7 +20,7 @@ const HeatMapControlPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
   const selectedColumn =
-  tab?.workflowTasks.dataExploration?.controlPanel.selectedMeasureColumn || null
+  tab?.workflowTasks.dataExploration?.controlPanel.selectedMeasureColumnHeat || null
 
   // Handler for updating aggregation rules for a column
   const handleAggregationChange = (
@@ -29,11 +29,11 @@ const HeatMapControlPanel = () => {
     const value = event.target.value as string[]
     if (!selectedColumn) return
     const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
 
     dispatch(
       setControls({
-        barAggregation: {
+        barAggregationHeat: {
           ...currentAgg,
           [selectedColumn]: value,
         },
@@ -59,14 +59,14 @@ const HeatMapControlPanel = () => {
   const handleAggregationDelete = (toDelete: string) => {
     if (!selectedColumn) return
     const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
     const updated = (currentAgg[selectedColumn] || []).filter(
       (agg: string) => agg !== toDelete,
     )
   
     dispatch(
       setControls({
-        barAggregation: {
+        barAggregationHeat: {
           ...currentAgg,
           [selectedColumn]: updated,
         },
@@ -113,12 +113,12 @@ const HeatMapControlPanel = () => {
             label="Group By (Category) okkk    "
             multiple
             value={
-              tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []
+              tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || []
             }
             onChange={e => {
                 const selected = e.target.value as string[]
                 if (selected.length <= 2) {
-                  dispatch(setControls({ barGroupBy: selected }))
+                  dispatch(setControls({ barGroupByHeat: selected }))
                 }
               }}
             renderValue={(selected: any) =>
@@ -133,7 +133,7 @@ const HeatMapControlPanel = () => {
                       onDelete={() =>
                         dispatch(
                           setControls({
-                            barGroupBy: selected.filter(
+                            barGroupByHeat: selected.filter(
                               (v: string) => v !== value,
                             ),
                           }),
@@ -158,8 +158,8 @@ const HeatMapControlPanel = () => {
                 key={col.name}
                 value={col.name}
                 disabled={
-                  (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy?.length ?? 0) >= 2 &&
-                  !tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy?.includes(col.name)
+                  (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat?.length ?? 0) >= 2 &&
+                  !tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat?.includes(col.name)
                 }
               >
                 {col.name}
@@ -181,13 +181,13 @@ const HeatMapControlPanel = () => {
   value={selectedColumn || ""}
   onChange={e => {
     const newColumn = e.target.value as string
-    const currentAgg = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+    const currentAgg = tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
 
     // Clear previous aggregation and set new selected column
     dispatch(
       setControls({
-        selectedMeasureColumn: newColumn,
-        barAggregation: {
+        selectedMeasureColumnHeat: newColumn,
+        barAggregationHeat: {
           [newColumn]: [], // Reset aggregation for new column
         },
       }),
@@ -219,17 +219,17 @@ const HeatMapControlPanel = () => {
             <Select
   label="Apply Aggregation"
   value={
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[selectedColumn]?.[0] || ""
+    tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat[selectedColumn]?.[0] || ""
   }
   onChange={event => {
     const value = event.target.value as string
     if (!selectedColumn) return
     const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
 
     dispatch(
       setControls({
-        barAggregation: {
+        barAggregationHeat: {
           ...currentAgg,
           [selectedColumn]: [value], // wrap in array since your state expects an array
         },
