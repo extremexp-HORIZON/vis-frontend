@@ -525,215 +525,206 @@ export default function WorkflowTreeView() {
 
               return (
                 <>
-                  {/* Data Assets */}
-                  {fallbackDatasets.length > 0 && (
-                    <TreeItem2
-                      itemId="task-null-assets"
-                      label={
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <DatasetIcon
-                            fontSize="small"
-                            sx={{ mr: 1, color: theme.palette.primary.main }}
-                          />
-                          <Typography>Data Assets</Typography>
-                        </Box>
-                      }
-                    >
-                      {/* Inputs */}
-                      {fallbackDatasets.some(ds => ds.role === "INPUT") && (
-                        <TreeItem2
-                          itemId="task-null-inputs"
-                          label={
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                              <InputIcon
-                                fontSize="small"
-                                sx={{
-                                  mr: 1,
-                                  color: theme.palette.primary.main,
-                                }}
-                              />
-                              <Typography>Inputs</Typography>
-                            </Box>
-                          }
-                        >
-                          {fallbackDatasets
-                            .filter(ds => ds.role === "INPUT")
-                            .map((ds, index) => (
-                              <TreeItem2
-                                key={`null-input-${index}`}
-                                itemId={`null-input-${index}`}
-                                label={
-                                  <Box
-                                    onClick={() =>
-                                      dispatch(
-                                        setSelectedItem({
-                                          type: "DATASET",
-                                          data: ds,
-                                        }),
-                                      )
-                                    }
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      px: 1,
-                                      py: 0.5,
-                                      borderRadius: 1,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    {getDatasetIcon(ds.format)}
-                                    <Typography variant="body2" sx={{ ml: 1 }}>
-                                      {ds.name}
-                                    </Typography>
-                                  </Box>
-                                }
-                              />
-                            ))}
-                        </TreeItem2>
-                      )}
-                      {/* Outputs */}
-                      {fallbackDatasets.some(ds => ds.role === "OUTPUT") && (
-                        <TreeItem2
-                          itemId="task-null-outputs"
-                          label={
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                              <OutputIcon
-                                fontSize="small"
-                                sx={{
-                                  mr: 1,
-                                  color: theme.palette.primary.main,
-                                }}
-                              />
-                              <Typography>Outputs</Typography>
-                            </Box>
-                          }
-                        >
-                          {fallbackDatasets
-                            .filter(ds => ds.role === "OUTPUT")
-                            .map((ds, index) => (
-                              <TreeItem2
-                                key={`null-output-${index}`}
-                                itemId={`null-output-${index}`}
-                                label={
-                                  <Box
-                                    onClick={() =>
-                                      dispatch(
-                                        setSelectedItem({
-                                          type: "DATASET",
-                                          data: ds,
-                                        }),
-                                      )
-                                    }
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      px: 1,
-                                      py: 0.5,
-                                      borderRadius: 1,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    {getDatasetIcon(ds.format)}
-                                    <Typography variant="body2" sx={{ ml: 1 }}>
-                                      {ds.name}
-                                    </Typography>
-                                  </Box>
-                                }
-                              />
-                            ))}
-                        </TreeItem2>
-                      )}
-                    </TreeItem2>
-                  )}
                   {/* Parameters */}
-                  {fallbackParams.length > 0 && (
+                  {fallbackParams.map((param, index) => (
                     <TreeItem2
-                      itemId="task-null-parameters"
+                      key={`null-param-${index}`}
+                      itemId={`null-param-${index}`}
                       label={
+                        <Box
+                        onClick={() =>
+                          dispatch(
+                            setSelectedItem({
+                              type: "param",
+                              data: param,
+                            }),
+                          )
+                        }
+                        sx={{
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          cursor: "pointer",
+                          bgcolor: "transparent",
+                        }}
+                      >
                         <Box sx={{ display: "flex", alignItems: "center" }}>
                           <Grid3x3Icon
                             fontSize="small"
                             sx={{ mr: 1, color: theme.palette.primary.main }}
                           />
-                          <Typography>Parameters</Typography>
-                        </Box>
-                      }
-                    >
-                      {fallbackParams.map((param, index) => (
-                        <TreeItem2
-                          key={`null-param-${index}`}
-                          itemId={`null-param-${index}`}
-                          label={
-                            <Box
-                              onClick={() =>
-                                dispatch(
-                                  setSelectedItem({
-                                    type: "param",
-                                    data: param,
-                                  }),
-                                )
-                              }
-                              sx={{
-                                px: 1,
-                                py: 0.5,
-                                borderRadius: 1,
-                                cursor: "pointer",
-                              }}
-                            >
                               <Typography variant="body2">
-                                {param.name}: {param.value}
-                              </Typography>
-                            </Box>
-                          }
-                        />
-                      ))}
-                    </TreeItem2>
-                  )}
+                            {param.name}: {param.value}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      }
+                    />
+                  ))}
                   {/* Metrics */}
-                  {fallbackMetrics.length > 0 && (
+                  {fallbackMetrics.map((metric, index) => (
                     <TreeItem2
-                      itemId="task-null-metrics"
+                      key={`null-metric-${index}`}
+                      itemId={`null-metric-${index}`}
                       label={
+                      <Box
+                        onClick={() =>
+                          dispatch(
+                            setSelectedItem({ type: "metric", data: metric }),
+                          )
+                        }
+                        sx={{
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          cursor: "pointer",
+                          bgcolor: "transparent",
+                        }}
+                      >
                         <Box sx={{ display: "flex", alignItems: "center" }}>
                           <BarChartIcon
                             fontSize="small"
                             sx={{ mr: 1, color: theme.palette.primary.main }}
                           />
-                          <Typography sx={{ fontWeight: 500 }}>
-                            Metrics
-                          </Typography>
+                            <Typography variant="body2">
+                              {metric.name}:{" "}
+                              {Math.round(metric.value * 100) / 100}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      }
+                    />
+                  ))}
+                  {/* Inputs */}
+                  {fallbackDatasets.some(ds => ds.role === "INPUT") && (
+                    <TreeItem2
+                      itemId="task-null-inputs"
+                      label={
+                        <Box
+                          sx={{
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            cursor: "pointer",
+                            bgcolor: "transparent",
+                          }}
+                        >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <InputIcon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
+                              <Typography variant="body2">
+                              Inputs (
+                              {
+                                fallbackDatasets.filter(ds => ds.role === "INPUT")
+                                  .length
+                              }
+                              )
+                              </Typography>
+                          </Box>
                         </Box>
                       }
                     >
-                      {fallbackMetrics.map((metric, index) => (
-                        <TreeItem2
-                          key={`null-metric-${index}`}
-                          itemId={`null-metric-${index}`}
-                          label={
-                            <Box
-                              onClick={() =>
-                                dispatch(
-                                  setSelectedItem({
-                                    type: "metric",
-                                    data: metric,
-                                  }),
-                                )
-                              }
-                              sx={{
-                                px: 1,
-                                py: 0.5,
-                                borderRadius: 1,
-                                cursor: "pointer",
-                              }}
-                            >
+                      {fallbackDatasets
+                        .filter(ds => ds.role === "INPUT")
+                        .map((ds, index) => (
+                          <TreeItem2
+                            key={`null-input-${index}`}
+                            itemId={`null-input-${index}`}
+                            label={
+                              <Box
+                                onClick={() =>
+                                  dispatch(
+                                    setSelectedItem({
+                                      type: "DATASET",
+                                      data: ds,
+                                    }),
+                                  )
+                                }
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  px: 1,
+                                  py: 0.5,
+                                  borderRadius: 1,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {getDatasetIcon(ds.format)}
+                                <Typography variant="body2" sx={{ ml: 1 }}>
+                                  {ds.name}
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                        ))}
+                    </TreeItem2>
+                  )}
+                  {/* Outputs */}
+                  {fallbackDatasets.some(ds => ds.role === "OUTPUT") && (
+                    <TreeItem2
+                      itemId="task-null-outputs"
+                      label={
+                        <Box
+                          sx={{
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            cursor: "pointer",
+                            bgcolor: "transparent",
+                          }}
+                        >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <OutputIcon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
                               <Typography variant="body2">
-                                {metric.name}:{" "}
-                                {Math.round(metric.value * 100) / 100}
+                              Outputs (
+                              {
+                                fallbackDatasets.filter(ds => ds.role === "OUTPUT")
+                                  .length
+                              }
+                              )
                               </Typography>
-                            </Box>
-                          }
-                        />
-                      ))}
+                          </Box>
+                        </Box>
+                      }
+                    >
+                      {fallbackDatasets
+                        .filter(ds => ds.role === "OUTPUT")
+                        .map((ds, index) => (
+                          <TreeItem2
+                            key={`null-output-${index}`}
+                            itemId={`null-output-${index}`}
+                            label={
+                              <Box
+                                onClick={() =>
+                                  dispatch(
+                                    setSelectedItem({
+                                      type: "DATASET",
+                                      data: ds,
+                                    }),
+                                  )
+                                }
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  px: 1,
+                                  py: 0.5,
+                                  borderRadius: 1,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {getDatasetIcon(ds.format)}
+                                <Typography variant="body2" sx={{ ml: 1 }}>
+                                  {ds.name}
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                        ))}
                     </TreeItem2>
                   )}
                 </>
