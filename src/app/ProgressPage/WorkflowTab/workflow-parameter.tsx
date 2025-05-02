@@ -85,7 +85,7 @@ const WorkflowParameter = () => {
                 }}
               />
             </Box>
-            <Typography variant="caption">{count}</Typography>
+            <Typography variant="caption">{count} workflows</Typography>
           </Box>
         ))}
       </Box>
