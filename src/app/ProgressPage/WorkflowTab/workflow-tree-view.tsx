@@ -1,4 +1,4 @@
-import { Box, Divider, IconButton, Tooltip, Typography } from "@mui/material"
+import { Box, IconButton, Tooltip, Typography } from "@mui/material"
 import { useEffect, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView"
@@ -138,6 +138,25 @@ export default function WorkflowTreeView() {
     )
   }, [tab?.workflowConfiguration.tasks])
 
+  const expandedTaskItemIds = useMemo(() => {
+    if (!tab?.workflowConfiguration.tasks) return []
+  
+    return tab.workflowConfiguration.tasks
+      .filter(task => {
+        const hasParams =
+          tab?.workflowConfiguration.params?.some(p => p.task === task.id) ?? false
+        const hasMetrics =
+          tab?.workflowMetrics.data?.some(m => m.task === task.id && m.name !== "rating") ?? false
+        return hasParams || hasMetrics
+      })
+      .map(task => `task-${task.id}`)
+  }, [tab?.workflowConfiguration.tasks, tab?.workflowConfiguration.params, tab?.workflowMetrics.data])
+    
+  console.log("Expanded IDs:", expandedTaskItemIds)
+
+  if (!tab?.workflowConfiguration) return null
+
+
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       {/* Enhanced Title and Separator */}
@@ -163,7 +182,7 @@ export default function WorkflowTreeView() {
       {/* TreeView with adjusted padding */}
       <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
         <SimpleTreeView
-          defaultExpandedItems={["workflow-details", "tasks-root"]}
+          defaultExpandedItems={expandedTaskItemIds}
         >
           {uniqueTasks.map(({ id, name }) => {
             const paramsForTask =
@@ -197,7 +216,7 @@ export default function WorkflowTreeView() {
                 },
                 {} as Record<string, string>,
               ) || {}
-
+              console.log(`task-${id}`)
             return (
               <TreeItem2
                 aria-expanded={true}
@@ -351,19 +370,29 @@ export default function WorkflowTreeView() {
                   <TreeItem2
                     itemId={`task-${id}-inputs`}
                     label={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <InputIcon
-                          fontSize="small"
-                          sx={{ mr: 1, color: theme.palette.primary.main }}
-                        />
-                        <Typography>
-                          Inputs (
-                          {
-                            datasetsForTask.filter(ds => ds.role === "INPUT")
-                              .length
-                          }
-                          )
-                        </Typography>
+                      <Box
+                        sx={{
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          cursor: "pointer",
+                          bgcolor: "transparent",
+                        }}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <InputIcon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
+                          <Typography>
+                            Inputs (
+                            {
+                              datasetsForTask.filter(ds => ds.role === "INPUT")
+                                .length
+                            }
+                            )
+                          </Typography>
+                        </Box>
                       </Box>
                     }
                   >
@@ -408,19 +437,29 @@ export default function WorkflowTreeView() {
                   <TreeItem2
                     itemId={`task-${id}-outputs`}
                     label={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <OutputIcon
-                          fontSize="small"
-                          sx={{ mr: 1, color: theme.palette.primary.main }}
-                        />
-                        <Typography>
-                          Outputs (
-                          {
-                            datasetsForTask.filter(ds => ds.role === "OUTPUT")
-                              .length
-                          }
-                          )
-                        </Typography>
+                      <Box
+                        sx={{
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          cursor: "pointer",
+                          bgcolor: "transparent",
+                        }}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <OutputIcon
+                            fontSize="small"
+                            sx={{ mr: 1, color: theme.palette.primary.main }}
+                          />
+                          <Typography>
+                            Outputs (
+                            {
+                              datasetsForTask.filter(ds => ds.role === "OUTPUT")
+                                .length
+                            }
+                            )
+                          </Typography>
+                        </Box>
                       </Box>
                     }
                   >
