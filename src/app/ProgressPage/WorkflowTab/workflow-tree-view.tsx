@@ -402,15 +402,18 @@ export default function WorkflowTreeView() {
                         <TreeItem2
                           key={`input-${id}-${index}`}
                           itemId={`input-ds-${id}-${index}`}
+                          disabled={!ds.source}
                           label={
                             <Box
-                              onClick={() =>
-                                dispatch(
-                                  setSelectedItem({
-                                    type: "DATASET",
-                                    data: ds,
-                                  }),
-                                )
+                              onClick={() => {
+                                if(ds.source)
+                                  dispatch(
+                                    setSelectedItem({
+                                      type: "DATASET",
+                                      data: ds,
+                                    }),
+                                  )
+                                }
                               }
                               sx={{
                                 display: "flex",
@@ -469,15 +472,18 @@ export default function WorkflowTreeView() {
                         <TreeItem2
                           key={`output-${id}-${index}`}
                           itemId={`output-ds-${id}-${index}`}
+                          disabled={!ds.source}
                           label={
                             <Box
-                              onClick={() =>
-                                dispatch(
-                                  setSelectedItem({
-                                    type: "DATASET",
-                                    data: ds,
-                                  }),
-                                )
+                              onClick={() => {
+                                if(ds.source)
+                                  dispatch(
+                                    setSelectedItem({
+                                      type: "DATASET",
+                                      data: ds,
+                                    }),
+                                  )
+                                }
                               }
                               sx={{
                                 display: "flex",
@@ -632,15 +638,18 @@ export default function WorkflowTreeView() {
                           <TreeItem2
                             key={`null-input-${index}`}
                             itemId={`null-input-${index}`}
+                            disabled={!ds.source}
                             label={
                               <Box
-                                onClick={() =>
-                                  dispatch(
-                                    setSelectedItem({
-                                      type: "DATASET",
-                                      data: ds,
-                                    }),
-                                  )
+                                onClick={() =>{
+                                  if(ds.source)
+                                    dispatch(
+                                      setSelectedItem({
+                                        type: "DATASET",
+                                        data: ds,
+                                      }),
+                                    )
+                                  }
                                 }
                                 sx={{
                                   display: "flex",
@@ -698,15 +707,18 @@ export default function WorkflowTreeView() {
                           <TreeItem2
                             key={`null-output-${index}`}
                             itemId={`null-output-${index}`}
+                            disabled={!ds.source}
                             label={
                               <Box
-                                onClick={() =>
-                                  dispatch(
-                                    setSelectedItem({
-                                      type: "DATASET",
-                                      data: ds,
-                                    }),
-                                  )
+                                onClick={() =>{
+                                  if(ds.source)
+                                    dispatch(
+                                      setSelectedItem({
+                                        type: "DATASET",
+                                        data: ds,
+                                      }),
+                                    )
+                                  }
                                 }
                                 sx={{
                                   display: "flex",
