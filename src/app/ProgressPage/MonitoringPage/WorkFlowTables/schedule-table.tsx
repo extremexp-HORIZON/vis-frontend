@@ -329,7 +329,7 @@ export default function ScheduleTable() {
         }),
       )
     }
-  }, [workflows])
+  }, [workflows.data])
 
   const filterClicked = (event: React.MouseEvent<HTMLElement>) => {
     setFilterOpen(!isFilterOpen)

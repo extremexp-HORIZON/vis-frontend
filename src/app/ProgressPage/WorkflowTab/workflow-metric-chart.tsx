@@ -252,13 +252,18 @@ export const WorkflowMetricChart = () => {
 const WorkflowLink = ({ workflowId }: { workflowId: string }) => {
   const location = useLocation();
   return (
-    <a
-      href={`${location.pathname}?workflowId=${workflowId}`}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {workflowId}
-    </a>
+  <Typography
+  variant="body2"
+  color="primary"
+  sx={{ cursor: "pointer", textDecoration: "underline" }}
+  component="a"
+  href={`${location.pathname}?workflowId=${workflowId}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  >
+    {workflowId}
+  </Typography>
+
   );
 };
 

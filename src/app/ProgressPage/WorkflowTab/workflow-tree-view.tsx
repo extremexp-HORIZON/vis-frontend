@@ -165,7 +165,7 @@ export default function WorkflowTreeView() {
                 p => p.task === id,
               ) || []
             const metricsForTask =
-              tab?.workflowMetrics.data?.filter(m => m.task === id) || []
+              tab?.workflowMetrics.data?.filter(m => m.task === id && m.name !== "rating") || []
 
             const seenNames = new Set<string>();
             const uniqueMetricsByName: typeof metricsForTask = [];
@@ -175,7 +175,7 @@ export default function WorkflowTreeView() {
                 seenNames.add(metric.name);
                 uniqueMetricsByName.push(metric);
               }
-            }            
+            }
             
             const datasetsForTask = 
               tab?.workflowConfiguration.dataAssets?.filter(d => d.task === id) || []
@@ -424,7 +424,7 @@ export default function WorkflowTreeView() {
                           <Box
                             onClick={() =>
                               dispatch(
-                                setSelectedItem({ type: "param", data: param }),
+                                setSelectedItem({ type: "param", data: {...param, variant: taskVariants[name]} }),
                               )
                             }
                             sx={{
@@ -519,7 +519,7 @@ export default function WorkflowTreeView() {
           
             const fallbackParams = tab?.workflowConfiguration.params?.filter(nullTask) || [];
             const fallbackDatasets = tab?.workflowConfiguration.dataAssets?.filter(nullTask) || [];
-            const fallbackMetrics = tab?.workflowMetrics.data?.filter(nullTask) || [];
+            const fallbackMetrics = tab?.workflowMetrics.data?.filter((m) => nullTask(m) && m.name !== "rating") || [];
           
             if (
               fallbackParams.length === 0 &&

@@ -52,6 +52,10 @@ interface IProgressPage {
   menuOptions: {
     selected: string | null
     collapsed: boolean
+},
+workflowEvaluation: {
+  loading: boolean
+  error: string | null
 }
 }
 
@@ -68,7 +72,11 @@ const initialState: IProgressPage = {
   menuOptions: {
     selected: null,
     collapsed: true
-  }
+  },
+  workflowEvaluation: {
+    loading: false,
+    error: null
+  }  
 }
 
 export const progressPageSlice = createSlice({
@@ -139,6 +147,38 @@ export const progressPageSlice = createSlice({
         state.statusController.error =
           action.error.message || "Error while fetching data"
       })
+      .addCase(fetchUserEvaluation.fulfilled, (state, action) => {
+        state.workflowEvaluation.loading = false
+      })
+      .addCase(fetchUserEvaluation.pending, (state, action) => {
+        state.workflowEvaluation.loading = true
+      })
+      .addCase(fetchUserEvaluation.rejected, (state, action) => {
+        state.workflowEvaluation.loading = false
+        state.workflowEvaluation.error = action.error.message || "Error while fetching data"
+      })
+      .addCase(fetchExperimentSingleWorkflow.fulfilled, (state, action) => {
+        const { workflow } = action.payload;
+        const index = state.workflows.data.findIndex(w => w.id === workflow.id);
+      
+        if (index !== -1) {
+          // Replace existing workflow
+          state.workflows.data[index] = workflow;
+        } else {
+          // Append new workflow
+          state.workflows.data.push(workflow);
+        }
+      
+        state.workflows.loading = false;
+        state.workflows.error = null;
+      })
+      .addCase(fetchExperimentSingleWorkflow.pending, state => {
+        state.workflows.loading = true;
+      })
+      .addCase(fetchExperimentSingleWorkflow.rejected, (state, action) => {
+        state.workflows.loading = false;
+        state.workflows.error = action.error.message || "Error while fetching single workflow";
+      })      
   },
 })
 
@@ -183,6 +223,36 @@ export const fetchExperimentWorkflows = createAsyncThunk(
 // })
 
 // Calls for Workflow Actions
+
+export const fetchExperimentSingleWorkflow = createAsyncThunk(
+  "progressPage/fetch_experiment_single_workflow",
+  async ({ experimentId, workflowId }: { experimentId: string; workflowId: string }) => {
+    const key = `workflows-${experimentId}`;
+    const requestUrl = `${experimentId}/runs/${workflowId}`;
+    const res = await experimentApi.get(requestUrl);
+    const updatedWorkflow = res.data
+
+    // Update the localStorage cache
+    const cached = getCache<IRun[]>(key);
+    if (cached) {
+      const index = cached.findIndex(w => w.id === workflowId);
+      let updatedList: IRun[];
+    
+      if (index !== -1) {
+        // Replace existing workflow
+        updatedList = [...cached];
+        updatedList[index] = updatedWorkflow;
+      } else {
+        // Append new workflow
+        updatedList = [...cached, updatedWorkflow];
+      }
+    
+      setCache(key, updatedList);
+    }
+
+    return { experimentId, workflow: updatedWorkflow };
+  }
+);
 
 // TODO: Test this once the reordering changes are done
 export const workflowsReordering = createAsyncThunk(

@@ -1,12 +1,12 @@
 import { useMemo } from "react"
 import type { RootState } from "../../../store/store"
 import { useAppSelector } from "../../../store/store"
-import WorkflowParameterDistribution from "./workflow-parameter-distribution"
-import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material"
+import { Box, IconButton, Tooltip, Typography, Chip, LinearProgress } from "@mui/material"
 import CompareArrowsRoundedIcon from "@mui/icons-material/CompareArrowsRounded"
 import theme from "../../../mui-theme"
 import { useParams } from "react-router-dom"
 import { setCache } from "../../../shared/utils/localStorageCache"
+import { DetailsCard, DetailsCardItem } from "../../../shared/components/details-card"
 
 const WorkflowParameter = () => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage)
@@ -22,52 +22,90 @@ const WorkflowParameter = () => {
       )
     )
 
+  const allParams = workflows?.data
+    ?.filter(w => w.status !== "SCHEDULED")
+    ?.flatMap(w => w.params?.filter(p => p.name === selectedParam.name) ?? []) ?? []
+
+  const paramValueCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const param of allParams) {
+      const key = String(param.value)
+      counts[key] = (counts[key] || 0) + 1
+    }
+    return Object.entries(counts)
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => parseFloat(a.value) - parseFloat(b.value))
+  }, [allParams])
+
   const compareKey = useMemo(() => `compare-${Date.now()}`, [])
   const handleClick = () => {
     const workflowIds = filteredWorkflows?.map(workflow => workflow.id)
     setCache(compareKey, { workflowIds }, 1 * 60 * 1000)
-  };
+  }
+
+  const maxCount = Math.max(...paramValueCounts.map(d => d.count))
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        rowGap: 1,
-        height: "100%",
-        overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
-      }}
-    >
-      <Box sx={{ mb: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
-        <Typography variant="subtitle1">
-          This workflow uses "{selectedParam.name}: {selectedParam.value}". In total{" "}
-          {filteredWorkflows.length} workflow
-          {filteredWorkflows.length !== 1 ? "s are" : " is"} using this configuration.
-        </Typography>
-        {filteredWorkflows.length > 1 && (
-          <Tooltip title="Compare" placement="right">
-            <a
-              href={`/${experimentId}/monitoring?tab=1&compareId=${compareKey}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleClick}
-              style={{ textDecoration: "none" }}
-            >
-              <IconButton>
-                <CompareArrowsRoundedIcon style={{ color: theme.palette.primary.main }} />
-              </IconButton>
-            </a>
-          </Tooltip>
-        )}
-      </Box>
-      <Paper
-          elevation={1}
-          sx={{ flex: 1, overflow: "auto", height: "100%", width: "100%" }}
-        >
-      <WorkflowParameterDistribution />
-      </Paper>
-    </Box>
-  );
-};
+    <DetailsCard title="Parameter Details">
+      <DetailsCardItem
+        label={selectedParam.name}
+        value={selectedParam.value}
+      />
+      <DetailsCardItem
+        label="Used in task"
+        value={
+          <>
+            {selectedParam.task}
+            { selectedParam.variant && <Chip size="small" color="primary" label={selectedParam?.variant} sx={{ ml: 1 }} />}
+          </>
+        }
+      />
 
-export default WorkflowParameter;
+      <Typography sx={{ mt: 2 }}>
+        Value Distribution Across Workflows
+      </Typography>
+
+      <Box mt={1}>
+        {paramValueCounts.map(({ value, count }) => (
+          <Box key={value} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+            <Box sx={{ width: 60 }}>
+              <Typography variant="body2">{value}</Typography>
+            </Box>
+            <Box sx={{ flexGrow: 1, mx: 1 }}>
+              <LinearProgress
+                variant="determinate"
+                value={(count / maxCount) * 100}
+                sx={{
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: "#f0f0f0",
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: value === String(selectedParam.value) ? "primary" : "#bdbdbd",
+                  },
+                }}
+              />
+            </Box>
+            <Typography variant="caption">{count}</Typography>
+          </Box>
+        ))}
+      </Box>
+
+      <Box mt={2}>
+        <Typography
+          variant="body2"
+          color="primary"
+          sx={{ cursor: "pointer", textDecoration: "underline" }}
+          component="a"
+          href={`/${experimentId}/monitoring?tab=1&compareId=${compareKey}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleClick}
+          >
+          View workflows using this value
+        </Typography>
+      </Box>
+    </DetailsCard>
+  )
+}
+
+export default WorkflowParameter

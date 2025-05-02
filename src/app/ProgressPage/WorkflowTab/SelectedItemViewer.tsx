@@ -80,7 +80,9 @@ const SelectedItemViewer = () => {
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
           <Box sx={{ overflow: "auto", height: "100%" }}>
-            <WorkflowParameter />
+            <Box>
+              <WorkflowParameter />
+            </Box>
           </Box>
         </Box>
       </Box>

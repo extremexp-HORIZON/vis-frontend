@@ -26,7 +26,7 @@ const WorkflowTab = () => {
     if (!workflows.data.find(workflow => workflow.id === workflowId))
       navigate(`/${experimentId}/monitoring`)
     else dispatch(initTab({ tab: workflowId, workflows }))
-  }, [workflows])
+  }, [workflows.data])
 
   useEffect(() => {
     const metricNames = tab?.workflowMetrics.data?.map((m) => m.name)

@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from "../../store/store"
 import Rating from "@mui/material/Rating";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from "react"
-import { fetchUserEvaluation, setProgressBarData } from "../../store/slices/progressPageSlice"
+import { fetchExperimentSingleWorkflow, fetchUserEvaluation, setProgressBarData } from "../../store/slices/progressPageSlice"
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ErrorIcon from '@mui/icons-material/Error'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
@@ -52,6 +52,12 @@ const ExperimentControls = () => {
     default:
       break;
   }
+
+  const handleUserEvaluation = async (value: number | null) => {
+    await dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
+    dispatch(fetchExperimentSingleWorkflow({experimentId: experimentId || "", workflowId: workflowId || ""}))
+  }
+  
   
 
     useEffect(() => {
@@ -132,9 +138,7 @@ const ExperimentControls = () => {
                       {`Workflow ${workflowId}`}
                     </Typography>
                     <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
-                    <Rating name="simple-uncontrolled" size="large" defaultValue={workflowRating} onChange={(event, value) => {
-                            dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
-                          }} />
+                    <Rating name="simple-uncontrolled" size="large" defaultValue={workflowRating} onChange={(event, value) => {handleUserEvaluation(value)}} />
                   </Box>
                   <Box sx={{display: "flex", flexDirection: "row",alignItems: "center", gap: 1}}>
                     <Typography variant="body2">Status: {workflowStatus?.toLowerCase()}</Typography>

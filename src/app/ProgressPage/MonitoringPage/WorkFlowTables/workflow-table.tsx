@@ -22,7 +22,7 @@ import theme from "../../../../mui-theme"
 import { debounce } from "lodash";
 import type { CustomGridColDef } from "../../../../shared/types/table-types"
 import { Link, useParams } from "react-router-dom"
-import { fetchUserEvaluation } from "../../../../store/slices/progressPageSlice"
+import { fetchExperimentSingleWorkflow, fetchUserEvaluation } from "../../../../store/slices/progressPageSlice"
 
 export interface Data {
   [key: string]: any
@@ -40,14 +40,17 @@ const dispatch =useAppDispatch()
 const experimentId = useParams().experimentId
 
 
+  const handleUserEvaluation = async (value: number | null) => {
+    await dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
+    dispatch(fetchExperimentSingleWorkflow({experimentId: experimentId || "", workflowId: workflowId || ""}))
+  }
+
   return (
     <Rating
       sx={{ verticalAlign: "middle" }}
       value={safeRating}
       size="small"
-      onChange={(event, value) => {
-        dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
-      }}
+      onChange={(event, value) => {handleUserEvaluation(value)}}
     />
   )
 }

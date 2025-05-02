@@ -68,10 +68,10 @@ const ParallelCoordinatePlot = () => {
         options = Array.from(
           new Set(
             workflows.data
-              // .filter(workflow => workflow.status === "completed")
+              .filter(workflow => workflow.status !== "SCHEDULED")
               .reduce((acc: any[], workflow) => {
                 const metrics = workflow.metrics
-                  ? workflow.metrics.map((metric: any) => metric.name)
+                  ? workflow.metrics.filter(metric => metric.name !== 'rating').map((metric: any) => metric.name)
                   : []
                 return [...acc, ...metrics]
               }, []),
@@ -93,7 +93,7 @@ const ParallelCoordinatePlot = () => {
         }),
       )
     }
-  }, [workflows])
+  }, [workflows.data])
 
   const handleMetricSelection = (event: SelectChangeEvent) => {
     dispatch(setParallel({ selected: event.target.value as string }))
