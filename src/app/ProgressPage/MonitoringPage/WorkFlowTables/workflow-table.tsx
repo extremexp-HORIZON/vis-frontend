@@ -488,13 +488,13 @@ export default function WorkflowTable() {
             },
           }),
           ...(key === "rating" && {
-            renderCell: metrics => {
-              const currentRating = metrics.row.rating
+            renderCell: params => {
+              const currentRating = params.row.rating
               console.log("rating:", currentRating)
               return (
                 <WorkflowRating
                 //here must be the workflow id that i selected somehow
-                  rating={currentRating} workflowId={"WjRdgpYBwbSNbg2qdK9b"} />
+                  rating={currentRating} workflowId={params.row.id} />
               )
             },
           }),
