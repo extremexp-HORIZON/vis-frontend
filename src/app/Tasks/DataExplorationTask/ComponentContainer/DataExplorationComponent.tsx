@@ -17,7 +17,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import theme from "../../../../mui-theme"
 import HeatMap from "../Charts/data-exploration-heatmap"
-import MapChart from "../Charts/data-exploration-new-map-chart"
+import MapCardWrapper from "../Charts/map-wrap"
 
 const DataExplorationComponent = () => {
   const dispatch = useAppDispatch()
@@ -136,8 +136,7 @@ const DataExplorationComponent = () => {
           {chartType === "scatter" && <ScatterChart />}
           {chartType === "bar" && <BarChart />}
           {chartType === "heatmap" && <HeatMap/>}
-
-          {chartType === "map" && (<MapChart/>)}
+          {chartType === "map" && (<MapCardWrapper/>)}
         </Paper>
       )}
     </Box>
