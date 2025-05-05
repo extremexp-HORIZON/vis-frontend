@@ -555,7 +555,6 @@ export default function WorkflowTable() {
           <StyledDataGrid
             disableVirtualization
             density="compact"
-            disableRowSelectionOnClick
             rows={workflowsTable.visibleRows}
             columns={workflowsTable.visibleColumns as CustomGridColDef[]}
             columnVisibilityModel={workflowsTable.columnsVisibilityModel}
