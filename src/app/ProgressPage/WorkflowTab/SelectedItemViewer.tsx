@@ -11,6 +11,7 @@ import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import theme from "../../../mui-theme"
 import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
+import ModelDetails from "./workflow-model-details"
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -112,6 +113,11 @@ const SelectedItemViewer = () => {
           title={`${selectedItem.data.model} Details`} 
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+        <Box sx={{ overflow: "auto", height: "100%" }}>
+
+        <ModelDetails/>
+        </Box>
+
         </Box>
       </Box>
     )
