@@ -23,6 +23,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
+import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -747,7 +748,7 @@ export default function WorkflowTreeView() {
         </SimpleTreeView>
       </Box>
 
-      <Box sx={{ height: "50%", display: "flex", flexDirection: "column" }}>
+      <Box sx={{ height: "50%", display: "flex", flexDirection: "column",mt:2 }}>
         {" "}
         {/* Simple Title */}{" "}
         <Box
@@ -761,7 +762,7 @@ export default function WorkflowTreeView() {
           }}
         >
           {" "}
-          <AssignmentIcon color="primary" />{" "}
+          <PsychologyAltRoundedIcon color="primary" />{" "}
           <Typography
             variant="h6"
             sx={{ fontWeight: 500, color: theme.palette.text.primary }}
@@ -778,8 +779,26 @@ export default function WorkflowTreeView() {
             <TreeItem2
               aria-expanded={true}
               itemId="model"
-              label="model.pkl"
+              label={
+                <Box
+                  sx={{
+                    px: 1,
+                    py: 0.5,
+                    borderRadius: 1,
+                    cursor: "pointer",
+                    bgcolor: "transparent",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    
+                    <Typography>
+                      Model.pkl
+                    </Typography>
+                  </Box>
+                </Box>
+              }
               onClick={() => console.log("Model clicked")}
+
             >
               {""}
               <TreeItem2
