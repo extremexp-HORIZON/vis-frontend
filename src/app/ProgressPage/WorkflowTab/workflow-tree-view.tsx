@@ -13,16 +13,15 @@ import {
   setDataTable,
   setSelectedTask,
 } from "../../../store/slices/workflowPageSlice"
-import theme from "../../../mui-theme"
 
 import { setSelectedItem } from "../../../store/slices/workflowPageSlice"
 import InputIcon from "@mui/icons-material/Input"
 import OutputIcon from "@mui/icons-material/Output"
-import DatasetIcon from "@mui/icons-material/Dataset"
 import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
+import theme from "../../../mui-theme"
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -260,9 +259,15 @@ export default function WorkflowTreeView() {
                         fontSize="small"
                         sx={{ mr: 1, color: theme.palette.primary.main }}
                       />
-                      <Typography sx={{ fontWeight: 500 }}>
-                        Task: {taskVariants[name] || name}
+                      <Typography sx={{ fontWeight: 500, mr: 1 }}>
+                        {name}
                       </Typography>
+                      {taskVariants[name] && taskVariants[name] !== name &&
+                        <Typography sx={{ fontWeight: 500, color: theme.palette.primary.main}}>
+                          {`[${taskVariants[name]}]`}
+                        </Typography>
+                      
+                      }
                     </Box>
 
                     {name.includes("Train") && (
