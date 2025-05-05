@@ -140,22 +140,28 @@ export default function WorkflowTreeView() {
 
   const expandedTaskItemIds = useMemo(() => {
     if (!tab?.workflowConfiguration.tasks) return []
-  
+
     return tab.workflowConfiguration.tasks
       .filter(task => {
         const hasParams =
-          tab?.workflowConfiguration.params?.some(p => p.task === task.id) ?? false
+          tab?.workflowConfiguration.params?.some(p => p.task === task.id) ??
+          false
         const hasMetrics =
-          tab?.workflowMetrics.data?.some(m => m.task === task.id && m.name !== "rating") ?? false
+          tab?.workflowMetrics.data?.some(
+            m => m.task === task.id && m.name !== "rating",
+          ) ?? false
         return hasParams || hasMetrics
       })
       .map(task => `task-${task.id}`)
-  }, [tab?.workflowConfiguration.tasks, tab?.workflowConfiguration.params, tab?.workflowMetrics.data])
-    
+  }, [
+    tab?.workflowConfiguration.tasks,
+    tab?.workflowConfiguration.params,
+    tab?.workflowMetrics.data,
+  ])
+
   console.log("Expanded IDs:", expandedTaskItemIds)
 
   if (!tab?.workflowConfiguration) return null
-
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -181,9 +187,7 @@ export default function WorkflowTreeView() {
 
       {/* TreeView with adjusted padding */}
       <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
-        <SimpleTreeView
-          defaultExpandedItems={expandedTaskItemIds}
-        >
+        <SimpleTreeView defaultExpandedItems={expandedTaskItemIds}>
           {uniqueTasks.map(({ id, name }) => {
             const paramsForTask =
               tab?.workflowConfiguration.params?.filter(p => p.task === id) ||
@@ -216,7 +220,7 @@ export default function WorkflowTreeView() {
                 },
                 {} as Record<string, string>,
               ) || {}
-              console.log(`task-${id}`)
+            console.log(`task-${id}`)
             return (
               <TreeItem2
                 aria-expanded={true}
@@ -406,15 +410,14 @@ export default function WorkflowTreeView() {
                           label={
                             <Box
                               onClick={() => {
-                                if(ds.source)
+                                if (ds.source)
                                   dispatch(
                                     setSelectedItem({
                                       type: "DATASET",
                                       data: ds,
                                     }),
                                   )
-                                }
-                              }
+                              }}
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
@@ -476,15 +479,14 @@ export default function WorkflowTreeView() {
                           label={
                             <Box
                               onClick={() => {
-                                if(ds.source)
+                                if (ds.source)
                                   dispatch(
                                     setSelectedItem({
                                       type: "DATASET",
                                       data: ds,
                                     }),
                                   )
-                                }
-                              }
+                              }}
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
@@ -538,32 +540,32 @@ export default function WorkflowTreeView() {
                       itemId={`null-param-${index}`}
                       label={
                         <Box
-                        onClick={() =>
-                          dispatch(
-                            setSelectedItem({
-                              type: "param",
-                              data: param,
-                            }),
-                          )
-                        }
-                        sx={{
-                          px: 1,
-                          py: 0.5,
-                          borderRadius: 1,
-                          cursor: "pointer",
-                          bgcolor: "transparent",
-                        }}
-                      >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <Grid3x3Icon
-                            fontSize="small"
-                            sx={{ mr: 1, color: theme.palette.primary.main }}
-                          />
-                              <Typography variant="body2">
-                            {param.name}: {param.value}
-                          </Typography>
+                          onClick={() =>
+                            dispatch(
+                              setSelectedItem({
+                                type: "param",
+                                data: param,
+                              }),
+                            )
+                          }
+                          sx={{
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            cursor: "pointer",
+                            bgcolor: "transparent",
+                          }}
+                        >
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid3x3Icon
+                              fontSize="small"
+                              sx={{ mr: 1, color: theme.palette.primary.main }}
+                            />
+                            <Typography variant="body2">
+                              {param.name}: {param.value}
+                            </Typography>
+                          </Box>
                         </Box>
-                      </Box>
                       }
                     />
                   ))}
@@ -573,25 +575,25 @@ export default function WorkflowTreeView() {
                       key={`null-metric-${index}`}
                       itemId={`null-metric-${index}`}
                       label={
-                      <Box
-                        onClick={() =>
-                          dispatch(
-                            setSelectedItem({ type: "metric", data: metric }),
-                          )
-                        }
-                        sx={{
-                          px: 1,
-                          py: 0.5,
-                          borderRadius: 1,
-                          cursor: "pointer",
-                          bgcolor: "transparent",
-                        }}
-                      >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <BarChartIcon
-                            fontSize="small"
-                            sx={{ mr: 1, color: theme.palette.primary.main }}
-                          />
+                        <Box
+                          onClick={() =>
+                            dispatch(
+                              setSelectedItem({ type: "metric", data: metric }),
+                            )
+                          }
+                          sx={{
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            cursor: "pointer",
+                            bgcolor: "transparent",
+                          }}
+                        >
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <BarChartIcon
+                              fontSize="small"
+                              sx={{ mr: 1, color: theme.palette.primary.main }}
+                            />
                             <Typography variant="body2">
                               {metric.name}:{" "}
                               {Math.round(metric.value * 100) / 100}
@@ -615,19 +617,20 @@ export default function WorkflowTreeView() {
                             bgcolor: "transparent",
                           }}
                         >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <InputIcon
-                            fontSize="small"
-                            sx={{ mr: 1, color: theme.palette.primary.main }}
-                          />
-                              <Typography variant="body2">
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <InputIcon
+                              fontSize="small"
+                              sx={{ mr: 1, color: theme.palette.primary.main }}
+                            />
+                            <Typography variant="body2">
                               Inputs (
                               {
-                                fallbackDatasets.filter(ds => ds.role === "INPUT")
-                                  .length
+                                fallbackDatasets.filter(
+                                  ds => ds.role === "INPUT",
+                                ).length
                               }
                               )
-                              </Typography>
+                            </Typography>
                           </Box>
                         </Box>
                       }
@@ -641,16 +644,15 @@ export default function WorkflowTreeView() {
                             disabled={!ds.source}
                             label={
                               <Box
-                                onClick={() =>{
-                                  if(ds.source)
+                                onClick={() => {
+                                  if (ds.source)
                                     dispatch(
                                       setSelectedItem({
                                         type: "DATASET",
                                         data: ds,
                                       }),
                                     )
-                                  }
-                                }
+                                }}
                                 sx={{
                                   display: "flex",
                                   alignItems: "center",
@@ -684,19 +686,20 @@ export default function WorkflowTreeView() {
                             bgcolor: "transparent",
                           }}
                         >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <OutputIcon
-                            fontSize="small"
-                            sx={{ mr: 1, color: theme.palette.primary.main }}
-                          />
-                              <Typography variant="body2">
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <OutputIcon
+                              fontSize="small"
+                              sx={{ mr: 1, color: theme.palette.primary.main }}
+                            />
+                            <Typography variant="body2">
                               Outputs (
                               {
-                                fallbackDatasets.filter(ds => ds.role === "OUTPUT")
-                                  .length
+                                fallbackDatasets.filter(
+                                  ds => ds.role === "OUTPUT",
+                                ).length
                               }
                               )
-                              </Typography>
+                            </Typography>
                           </Box>
                         </Box>
                       }
@@ -710,16 +713,15 @@ export default function WorkflowTreeView() {
                             disabled={!ds.source}
                             label={
                               <Box
-                                onClick={() =>{
-                                  if(ds.source)
+                                onClick={() => {
+                                  if (ds.source)
                                     dispatch(
                                       setSelectedItem({
                                         type: "DATASET",
                                         data: ds,
                                       }),
                                     )
-                                  }
-                                }
+                                }}
                                 sx={{
                                   display: "flex",
                                   alignItems: "center",
@@ -743,6 +745,61 @@ export default function WorkflowTreeView() {
               )
             })()}
         </SimpleTreeView>
+      </Box>
+
+      <Box sx={{ height: "50%", display: "flex", flexDirection: "column" }}>
+        {" "}
+        {/* Simple Title */}{" "}
+        <Box
+          sx={{
+            p: 2,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            bgcolor: "background.paper",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          {" "}
+          <AssignmentIcon color="primary" />{" "}
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+          >
+            {" "}
+            Model Insights{" "}
+          </Typography>{" "}
+        </Box>{" "}
+        {/* TreeView */}{" "}
+        <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
+          {" "}
+          <SimpleTreeView>
+            {" "}
+            <TreeItem2
+              aria-expanded={true}
+              itemId="model"
+              label="model.pkl"
+              onClick={() => console.log("Model clicked")}
+            >
+              {""}
+              <TreeItem2
+                itemId="instance-view"
+                label="Instance View"
+                onClick={() => console.log("Instance View clicked")}
+              />{" "}
+              <TreeItem2
+                itemId="feature-effects"
+                label="Feature Effects"
+                onClick={() => console.log("Feature Effects clicked")}
+              />{" "}
+              <TreeItem2
+                itemId="hyperparameters"
+                label="Hyperparameter Impact"
+                onClick={() => console.log("Hyperparameters clicked")}
+              />{" "}
+            </TreeItem2>{" "}
+          </SimpleTreeView>{" "}
+        </Box>{" "}
       </Box>
     </Box>
   )
