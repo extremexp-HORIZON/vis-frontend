@@ -361,7 +361,7 @@ export default function WorkflowTreeView() {
                             sx={{ mr: 1, color: theme.palette.primary.main }}
                           />
                           <Typography variant="body2">
-                            {metric.name}:{" "}
+                            {metric.name}:
                             {Math.round(metric.value * 100) / 100}
                           </Typography>
                         </Box>
@@ -596,7 +596,7 @@ export default function WorkflowTreeView() {
                               sx={{ mr: 1, color: theme.palette.primary.main }}
                             />
                             <Typography variant="body2">
-                              {metric.name}:{" "}
+                              {metric.name}:
                               {Math.round(metric.value * 100) / 100}
                             </Typography>
                           </Box>
@@ -749,8 +749,7 @@ export default function WorkflowTreeView() {
       </Box>
 
       <Box sx={{ height: "50%", display: "flex", flexDirection: "column",mt:2 }}>
-        {" "}
-        {/* Simple Title */}{" "}
+        {/* Simple Title */}
         <Box
           sx={{
             p: 2,
@@ -761,21 +760,17 @@ export default function WorkflowTreeView() {
             gap: 1,
           }}
         >
-          {" "}
-          <PsychologyAltRoundedIcon color="primary" />{" "}
+          <PsychologyAltRoundedIcon color="primary" />
           <Typography
             variant="h6"
             sx={{ fontWeight: 500, color: theme.palette.text.primary }}
           >
-            {" "}
-            Model Insights{" "}
-          </Typography>{" "}
-        </Box>{" "}
-        {/* TreeView */}{" "}
+            Model Insights
+          </Typography>
+        </Box>
+        {/* TreeView */}
         <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
-          {" "}
           <SimpleTreeView>
-            {" "}
             <TreeItem2
               aria-expanded={true}
               itemId="model"
@@ -798,27 +793,25 @@ export default function WorkflowTreeView() {
                 </Box>
               }
               onClick={() => console.log("Model clicked")}
-
             >
-              {""}
               <TreeItem2
                 itemId="instance-view"
                 label="Instance View"
                 onClick={() => console.log("Instance View clicked")}
-              />{" "}
+              />
               <TreeItem2
                 itemId="feature-effects"
                 label="Feature Effects"
                 onClick={() => console.log("Feature Effects clicked")}
-              />{" "}
+              />
               <TreeItem2
                 itemId="hyperparameters"
                 label="Hyperparameter Impact"
                 onClick={() => console.log("Hyperparameters clicked")}
-              />{" "}
-            </TreeItem2>{" "}
-          </SimpleTreeView>{" "}
-        </Box>{" "}
+              />
+            </TreeItem2>
+          </SimpleTreeView>
+        </Box>
       </Box>
     </Box>
   )
