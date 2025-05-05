@@ -85,7 +85,9 @@ const WorkflowParameter = () => {
                 }}
               />
             </Box>
-            <Typography variant="caption">{count} workflow{count > 1 && "s"} </Typography>
+            <Box sx={{width: 100, textAlign: "right"}}>
+              <Typography variant="caption">{count} workflow{count > 1 && "s"} </Typography>
+            </Box>
           </Box>
         ))}
       </Box>
