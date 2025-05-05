@@ -22,38 +22,13 @@ import theme from "../../../../mui-theme"
 import { debounce } from "lodash";
 import type { CustomGridColDef } from "../../../../shared/types/table-types"
 import { Link, useParams } from "react-router-dom"
-import { fetchExperimentSingleWorkflow, fetchUserEvaluation } from "../../../../store/slices/progressPageSlice"
+import WorkflowRating from "./workflow-rating"
 
 export interface Data {
   [key: string]: any
 }
 
 // WorkflowActions
-
-const WorkflowRating = (props: { rating: number | string | undefined, workflowId: string }) => {
-  let { rating, workflowId } = props
-  console.log("rating raw:", rating)
-
-  const parsedRating = typeof rating === "string" ? parseFloat(rating) : rating
-  const safeRating = isNaN(parsedRating as number) ? null : parsedRating
-const dispatch =useAppDispatch()
-const experimentId = useParams().experimentId
-
-
-  const handleUserEvaluation = async (value: number | null) => {
-    await dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
-    dispatch(fetchExperimentSingleWorkflow({experimentId: experimentId || "", workflowId: workflowId || ""}))
-  }
-
-  return (
-    <Rating
-      sx={{ verticalAlign: "middle" }}
-      value={safeRating}
-      size="small"
-      onChange={(event, value) => {handleUserEvaluation(value)}}
-    />
-  )
-}
 
 const WorkflowActions = (props: {
   currentStatus: string
@@ -497,7 +472,7 @@ export default function WorkflowTable() {
               return (
                 <WorkflowRating
                 //here must be the workflow id that i selected somehow
-                  rating={currentRating} workflowId={params.row.id} />
+                currentRating={currentRating} experimentId={experimentId || ""} workflowId={params.row.id} />
               )
             },
           }),
@@ -523,7 +498,7 @@ export default function WorkflowTable() {
         }),
       )
     }
-  }, [workflows])
+  }, [workflows.data])
 
   return (
     <Box sx={{height: "100%" }}>
@@ -580,6 +555,7 @@ export default function WorkflowTable() {
           <StyledDataGrid
             disableVirtualization
             density="compact"
+            disableRowSelectionOnClick
             rows={workflowsTable.visibleRows}
             columns={workflowsTable.visibleColumns as CustomGridColDef[]}
             columnVisibilityModel={workflowsTable.columnsVisibilityModel}

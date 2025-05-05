@@ -7,13 +7,14 @@ import type { RootState} from "../../store/store";
 import { useAppSelector, useAppDispatch } from "../../store/store"
 import Rating from "@mui/material/Rating";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useEffect } from "react"
-import { fetchExperimentSingleWorkflow, fetchUserEvaluation, setProgressBarData } from "../../store/slices/progressPageSlice"
+import { useEffect, useState } from "react"
+import { fetchWorkflowWithRating, fetchUserEvaluation, setProgressBarData } from "../../store/slices/progressPageSlice"
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ErrorIcon from '@mui/icons-material/Error'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
 import PauseCircleRoundedIcon from '@mui/icons-material/PauseCircleRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
+import type { IRun } from "../../shared/models/experiment/run.model"
 
 const ExperimentControls = () => {
   const [ searchParams ] = useSearchParams()
@@ -29,6 +30,8 @@ const ExperimentControls = () => {
   const completedTasks = workflow?.tasks?.filter(task => task.endTime).length
   const taskLength = workflow?.tasks?.length
   const workflowRating= workflow?.metrics?.find(metric => metric.name === "rating")?.value
+  const [isPolling, setPolling] = useState(false);
+  const [localRating, setLocalRating] = useState<number | null>(null);
 
   let workflowIcon;
 
@@ -54,10 +57,47 @@ const ExperimentControls = () => {
   }
 
   const handleUserEvaluation = async (value: number | null) => {
-    await dispatch(fetchUserEvaluation({experimentId: experimentId || "", runId: workflowId || "", data: {rating: value}}))
-    dispatch(fetchExperimentSingleWorkflow({experimentId: experimentId || "", workflowId: workflowId || ""}))
-  }
+    if (!experimentId || !workflowId) return;
   
+    setPolling(true);
+    setLocalRating(value);
+    
+    const updateResult = await dispatch(
+      fetchUserEvaluation({
+        experimentId,
+        runId: workflowId,
+        data: { rating: value },
+      })
+    );
+  
+    if (!fetchUserEvaluation.fulfilled.match(updateResult)) {
+      setPolling(false);
+      return;
+    }
+  
+    // Poll until backend reflects rating
+    for (let i = 0; i < 5; i++) {
+      const result = await dispatch(
+        fetchWorkflowWithRating({ experimentId, workflowId })
+      );
+  
+      if (fetchWorkflowWithRating.fulfilled.match(result)) {
+        const updatedWorkflow: IRun = result.payload.workflow;
+        const ratingMetric = updatedWorkflow.metrics.find((m) => m.name === "rating");
+        const fetchedRating = ratingMetric?.value;
+  
+        if (fetchedRating === value) {
+          setLocalRating(null);
+          break;
+        }
+      }
+  
+      await new Promise((res) => setTimeout(res, 200));
+    }
+  
+    setPolling(false);
+  };
+      
   
 
     useEffect(() => {
@@ -137,8 +177,18 @@ const ExperimentControls = () => {
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       {`Workflow ${workflowId}`}
                     </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography>
-                    <Rating name="simple-uncontrolled" size="large" defaultValue={workflowRating} onChange={(event, value) => {handleUserEvaluation(value)}} />
+                    {workflowRating !== undefined && <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography> }
+                    {workflowRating !== undefined &&
+                      <Rating
+                        name="workflow-rating"
+                        size="large"
+                        value={ localRating !== null ? localRating : workflowRating}                      
+                        disabled={isPolling}
+                        onChange={(_, value) => {
+                          if (value !== null && Number(workflowRating) !== value) handleUserEvaluation(value);
+                        }}
+                      />
+                    }
                   </Box>
                   <Box sx={{display: "flex", flexDirection: "row",alignItems: "center", gap: 1}}>
                     <Typography variant="body2">Status: {workflowStatus?.toLowerCase()}</Typography>

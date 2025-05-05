@@ -210,9 +210,24 @@ export const monitoringPageSlice = createSlice({
     },
     setHoveredWorkflow: (state, action) => {
       state.workflowsTable.hoveredWorkflowId = action.payload;
-    }
+    },
+    updateWorkflowRatingLocally: (state, action) => {
+      const { workflowId, rating } = action.payload;
+    
+      const updateRowRating = (rows: any[]) =>
+        rows.map((row) =>
+          row.workflowId === workflowId
+            ? { ...row, rating }
+            : row
+        );
+    
+      state.workflowsTable.rows = updateRowRating(state.workflowsTable.rows);
+      state.workflowsTable.filteredRows = updateRowRating(state.workflowsTable.filteredRows);
+      state.workflowsTable.visibleRows = updateRowRating(state.workflowsTable.visibleRows);
+    },    
   }
 })
 
-export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection,bulkToggleWorkflowSelection, setGroupBy, setHoveredWorkflow 
+export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection,bulkToggleWorkflowSelection, setGroupBy, 
+  setHoveredWorkflow, updateWorkflowRatingLocally
 } = monitoringPageSlice.actions;
