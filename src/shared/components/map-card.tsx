@@ -43,7 +43,6 @@ interface ResponsiveMapCardProps {
   controlPanel?: React.ReactNode
   infoMessage?: React.ReactElement
   showInfoMessage?: boolean
-  pulsate?: boolean
 }
 const SectionHeader = ({
   icon,
@@ -102,7 +101,6 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
   controlPanel,
   infoMessage,
   showInfoMessage,
-  pulsate,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth)
@@ -252,10 +250,6 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
         borderRadius: '12px',
         border: '1px solid rgba(0, 0, 0, 0.06)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        '&:hover': pulsate ? {
-          boxShadow: '0 6px 25px rgba(0,0,0,0.12)',
-          transform: 'translateY(-2px)'
-        } : {}
       }}>
         <CardHeader
           action={

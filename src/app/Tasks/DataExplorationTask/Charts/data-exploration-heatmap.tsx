@@ -198,8 +198,6 @@ const HeatMap = () => {
         controlPanel={<HeatMapControlPanel/>}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
-        pulsate={false}
-
       />
     </Box>
   )

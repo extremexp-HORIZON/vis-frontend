@@ -151,14 +151,14 @@ const WorkflowCharts: React.FC = () => {
         item
         xs={isMosaic ? 6 : 12}
         key={metricName}
-        sx={{ textAlign: "left", width: "100%" }} // Ensure full width
+        sx={{ textAlign: "left", width: "100%"}} // Ensure full width
       >
         <ResponsiveCardVegaLite
           spec={chartSpec}
           actions={false}
+          isStatic={false}
           title={metricTask ? `${metricTask}／${metricName}` : metricName}
           sx={{ width: "100%", maxWidth: "100%" }} // Ensure it expands properly
-          pulsate={true}
         />
       </Grid>
     )

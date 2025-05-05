@@ -152,12 +152,10 @@ const LineChart = () => {
         title={"Line Chart"}
         actions={false}
         controlPanel={<LineChartControlPanel />}
-        blinkOnStart={true}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
         maxHeight={500}
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
-        pulsate={false}
       />
     </Box>
   )
