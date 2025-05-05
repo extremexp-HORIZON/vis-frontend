@@ -136,6 +136,7 @@ const SelectedItemViewer = () => {
           title={`Feature Effects`}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+          <ModelAnalysisTask />
         </Box>
       </Box>
     )
@@ -148,7 +149,6 @@ const SelectedItemViewer = () => {
           title={`Hyperparameter Impact`}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
-          <ModelAnalysisTask />
         </Box>
       </Box>
     )
