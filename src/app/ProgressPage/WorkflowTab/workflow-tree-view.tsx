@@ -21,6 +21,8 @@ import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import CommitIcon from '@mui/icons-material/Commit';
 import theme from "../../../mui-theme"
 
 export default function WorkflowTreeView() {
@@ -169,7 +171,7 @@ export default function WorkflowTreeView() {
           gap: 1,
         }}
       >
-        <AssignmentIcon color="primary" />
+        <AccountTreeIcon color="primary" />
         <Typography
           variant="h6"
           sx={{ fontWeight: 500, color: theme.palette.text.primary }}
@@ -255,7 +257,7 @@ export default function WorkflowTreeView() {
                         minWidth: 0,
                       }}
                     >
-                      <AssignmentIcon
+                      <CommitIcon
                         fontSize="small"
                         sx={{ mr: 1, color: theme.palette.primary.main }}
                       />

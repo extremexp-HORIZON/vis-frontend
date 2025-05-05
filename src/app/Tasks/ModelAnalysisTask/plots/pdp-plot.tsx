@@ -183,6 +183,7 @@ const PdpPlot = (props: PdpPlotProps) => {
           controlPanel={controlPanel}
           showInfoMessage={ shouldShowLoading || shouldShowError}
           infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
+          isStatic={false}
         />
     )
 }

@@ -183,6 +183,7 @@ const AlePlot = (props: AlePlotProps) => {
           controlPanel={controlPanel}
           showInfoMessage={ shouldShowLoading || shouldShowError}
           infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
+          isStatic={false}
         />
     )
 }
