@@ -18,12 +18,10 @@ import theme from "../../../mui-theme"
 import { setSelectedItem } from "../../../store/slices/workflowPageSlice"
 import InputIcon from "@mui/icons-material/Input"
 import OutputIcon from "@mui/icons-material/Output"
-import DatasetIcon from "@mui/icons-material/Dataset"
 import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
-import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -269,30 +267,6 @@ export default function WorkflowTreeView() {
                         Task: {taskVariants[name] || name}
                       </Typography>
                     </Box>
-
-                    {name.includes("Train") && (
-                      <Tooltip title="Explanations">
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          onClick={e => {
-                            e.stopPropagation()
-                            dispatch(
-                              setSelectedItem({
-                                type: "explains",
-                                data: { task: taskVariants[name] || name },
-                              }),
-                            )
-                          }}
-                          sx={{ ml: 1 }}
-                        >
-                          <PsychologyAltRoundedIcon
-                            fontSize="small"
-                            sx={{ color: theme.palette.primary.main }}
-                          />
-                        </IconButton>
-                      </Tooltip>
-                    )}
                   </Box>
                 }
               >
@@ -783,6 +757,14 @@ export default function WorkflowTreeView() {
                     cursor: "pointer",
                     bgcolor: "transparent",
                   }}
+                  onClick={e => {
+                    dispatch(
+                      setSelectedItem({
+                        type: "model",
+                        data: {model: "Model.pkl"}
+                      }),
+                    )
+                  }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     
@@ -797,17 +779,38 @@ export default function WorkflowTreeView() {
               <TreeItem2
                 itemId="instance-view"
                 label="Instance View"
-                onClick={() => console.log("Instance View clicked")}
+                onClick={e => {
+                  dispatch(
+                    setSelectedItem({
+                      type: "instance-view",
+                    }),
+                  )
+                }}
+
               />
               <TreeItem2
                 itemId="feature-effects"
                 label="Feature Effects"
-                onClick={() => console.log("Feature Effects clicked")}
+                onClick={e => {
+                  dispatch(
+                    setSelectedItem({
+                      type: "feature-effects",
+                    }),
+                  )
+                }}
+
               />
               <TreeItem2
                 itemId="hyperparameters"
                 label="Hyperparameter Impact"
-                onClick={() => console.log("Hyperparameters clicked")}
+                onClick={e => {
+                  dispatch(
+                    setSelectedItem({
+                      type: "hyperparameters",
+                    }),
+                  )
+                }}
+
               />
             </TreeItem2>
           </SimpleTreeView>

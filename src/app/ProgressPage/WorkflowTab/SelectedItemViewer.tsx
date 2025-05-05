@@ -23,7 +23,7 @@ const SelectedItemViewer = () => {
   )
 
   // Enhanced header component for consistency
-  const Header = ({ title, icon }: { title: string; icon: React.ReactNode }) => (
+  const Header = ({ title, icon }: { title: string; icon?: React.ReactNode }) => (
     <Box sx={{ 
       pt: 0, 
       px: 0, 
@@ -105,15 +105,50 @@ const SelectedItemViewer = () => {
     )
   }
 
-  if (selectedItem?.type === "explains") {
+  if (selectedItem?.type === "model") {
     return (
       <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
         <Header 
-          title={`${selectedItem.data.task} Explanations`} 
-          icon={<AssessmentIcon color="primary" />} 
+          title={`${selectedItem.data.model} Details`} 
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
-            <ModelAnalysisTask />
+        </Box>
+      </Box>
+    )
+  }
+
+  if (selectedItem?.type === "instance-view") {
+    return (
+      <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
+        <Header 
+          title={`Instance View`} 
+        />
+        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+        </Box>
+      </Box>
+    )
+  }
+
+  if (selectedItem?.type === "feature-effects") {
+    return (
+      <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
+        <Header 
+          title={`Feature Effects`}
+        />
+        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+        </Box>
+      </Box>
+    )
+  }
+
+  if (selectedItem?.type === "hyperparameters") {
+    return (
+      <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
+        <Header 
+          title={`Hyperparameter Impact`}
+        />
+        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+          <ModelAnalysisTask />
         </Box>
       </Box>
     )
