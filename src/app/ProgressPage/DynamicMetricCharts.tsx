@@ -42,7 +42,7 @@ const WorkflowCharts: React.FC = () => {
   }))
 
   const tooltipFields = [
-    { field: "id", type: "nominal" },
+    ...(workflowsTable.groupBy.length === 0 ? [{ field: "id", type: "nominal" }] : []),
     ...groupByTooltipFields,
     { field: "value", type: "quantitative", title: workflowsTable.groupBy.length > 0 ? "average value" : "value" },
   ]
