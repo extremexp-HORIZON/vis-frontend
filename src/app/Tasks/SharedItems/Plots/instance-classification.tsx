@@ -38,7 +38,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const getVegaData = (data: any) => {
     let newData: any[] = _.cloneDeep(data)
     if (checkbox) {
-      newData = newData.filter(d => d.label !== d.predicted)
+      newData = newData.filter(d => d.label !== d.prediction)
     }
     return newData
   }

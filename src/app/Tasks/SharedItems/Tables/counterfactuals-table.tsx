@@ -68,8 +68,9 @@ const CounterfactualsTable = (props: ITableComponent) => {
 
   useEffect(() => {
     const query = point
-    delete query["_vgsid_"]
+    delete query["_vgsid_"] 
     delete query["Symbol(vega_id)"]
+    delete query["C0"]
     dispatch(fetchModelAnalysisExplainabilityPlot({
     ...fetchExplainabilityPlotPayloadDefault,
     explanationType:"hyperparameterExplanation",
@@ -84,25 +85,8 @@ const CounterfactualsTable = (props: ITableComponent) => {
 
   return (
     <>
-      <Modal
-        open={point !== null}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-      <Paper
-        className="Category-Item"
-        elevation={2}
-        sx={{
-          borderRadius: 4,
-          display: "flex",
-          flexDirection: "column",
-          rowGap: 0,
-          minWidth: "300px",
-          overflow: "hidden",
-          ...style
-        }}
-      >
+
+     
         <Box
           sx={{
             // px: 1.5,
@@ -204,8 +188,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
             </Table>
           </TableContainer>}
         </Box>
-      </Paper>
-      </Modal>
     </>
   )
 }
