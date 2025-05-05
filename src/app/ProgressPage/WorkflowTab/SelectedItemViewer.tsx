@@ -12,6 +12,7 @@ import BarChartIcon from "@mui/icons-material/BarChart"
 import theme from "../../../mui-theme"
 import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
 import ModelDetails from "./workflow-model-details"
+import InstanceView from "./workflow-instance-view"
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -130,6 +131,7 @@ const SelectedItemViewer = () => {
           title={`Instance View`} 
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+          <InstanceView/>
         </Box>
       </Box>
     )

@@ -1,8 +1,5 @@
 import {
   Box,
-  Typography,
-  Divider,
-  useMediaQuery,
   Grid,
   Button,
   ButtonGroup,
@@ -12,7 +9,6 @@ import {
   DetailsCardItem,
 } from "../../../shared/components/details-card"
 import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
-import theme from "../../../mui-theme"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import { useState } from "react"
@@ -34,7 +30,7 @@ const ModelDetails = () => {
       <Box
         sx={{ display: "flex", flexDirection: "row", gap: 3, width: "100%" }}
       >
-        <DetailsCard title="Model Details">
+        <DetailsCard title="Model Summary">
           <DetailsCardItem label="Model Type" value="Random Forest" />
           <DetailsCardItem label="Input Shape" value="[128, 64]" />
           <DetailsCardItem label="Number of Parameters" value="1,024,000" />
@@ -56,40 +52,6 @@ const ModelDetails = () => {
           <DetailsCardItem label="F1 Score" value="90.5%" />
           <DetailsCardItem label="ROC AUC" value="0.94" />
         </DetailsCard>
-
-        {/* <DetailsCard title="Comparison Across All Workflows">
-      <Box>
-        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-          <Typography sx={{ mb: 1 }} variant="body1">
-            Average: {metricData.average?.toFixed(2)} — Difference: {metricData.avgDiff ? metricData.avgDiff.toFixed(2) : 0}%
-          </Typography>
-          {renderDiffIcon()}
-        </Box>
-        <Divider />
-      </Box>
-      <DetailsCardItem 
-        label="Minimum" 
-        value={
-          <>
-            {metricData.min?.toFixed(2)}
-            {metricData.value !== metricData.min && minWorkflow && (
-              <> — View Workflow <WorkflowLink workflowId={minWorkflow.id} /></>
-            )}
-          </>
-        } 
-      />
-      <DetailsCardItem 
-        label="Maximum" 
-        value={
-          <>
-            {metricData.max?.toFixed(2)}
-            {metricData.value !== metricData.max && maxWorkflow && (
-              <> — View Workflow <WorkflowLink workflowId={maxWorkflow.id} /></>
-            )}
-          </>
-        } 
-      />
-    </DetailsCard> */}
       </Box>
 
       <Box paddingTop={5}>
