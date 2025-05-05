@@ -218,7 +218,7 @@ export default function WorkflowTable() {
     for (const [key, group] of grouped.entries()) {
       const values = group[0]
       const summary: any = {
-        id: idCounter++,
+        id: (idCounter++).toString(),
         isGroupSummary: true,
         workflowId: group.length > 1 ? `${group.length} workflows` : `${group.length} workflow`,
       }

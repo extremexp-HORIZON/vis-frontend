@@ -157,8 +157,6 @@ const BarChart = () => {
         controlPanel={<BarChartControlPanel/>}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
-        pulsate={false}
-
       />
     </Box>
   )

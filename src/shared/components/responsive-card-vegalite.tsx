@@ -43,7 +43,7 @@ interface ResponsiveCardVegaLiteProps {
   controlPanel?: React.ReactNode
   infoMessage?: React.ReactElement
   showInfoMessage?: boolean
-  pulsate?: boolean
+  isStatic?: boolean // If true, means the chart will be inside a static panel
 }
 const SectionHeader = ({
   icon,
@@ -101,7 +101,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   controlPanel,
   infoMessage,
   showInfoMessage,
-  pulsate,
+  isStatic = true,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth)
@@ -120,11 +120,11 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   const updateSize = useCallback(() => {
     if (containerRef.current) {
       const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9
-      
+      const containerHeight = isStatic ? containerRef.current.offsetHeight || window.innerHeight * 0.5 : 0;
       // Adjust to fit exactly within the container with no overflow
       const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
-      const calculatedHeight = newWidth / aspectRatio
-      const newHeight = Math.max(
+    
+      const newHeight = isStatic ? Math.max(minHeight, Math.min(newWidth / aspectRatio, maxHeight, containerHeight)) : Math.max(
         minHeight,
         Math.min(newWidth / aspectRatio, maxHeight),
       )
@@ -251,10 +251,6 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         borderRadius: '12px',
         border: '1px solid rgba(0, 0, 0, 0.06)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        '&:hover': pulsate ? {
-          boxShadow: '0 6px 25px rgba(0,0,0,0.12)',
-          transform: 'translateY(-2px)'
-        } : {}
       }}>
         <CardHeader
           action={
@@ -424,7 +420,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                       resize: true 
                     },
                     width: width,
-                    height: height,
+                    height: height, // Adjust height based on padding?!
                   }}
                   {...otherProps}
                 />  
