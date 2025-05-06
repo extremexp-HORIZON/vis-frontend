@@ -752,8 +752,9 @@ export default function WorkflowTreeView() {
         </Box>
         {/* TreeView */}
         <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
-          <SimpleTreeView>
+          <SimpleTreeView defaultExpandedItems={["model"]}>
             <TreeItem2
+            
               aria-expanded={true}
               itemId="model"
               label={
