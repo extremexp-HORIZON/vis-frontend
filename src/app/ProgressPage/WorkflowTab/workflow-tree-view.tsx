@@ -815,7 +815,7 @@ export default function WorkflowTreeView() {
                       sx={{ mr: 1, color: theme.palette.primary.main }}
                     />
                     <Typography>
-                      Model.pkl
+                      TrainedModel (Model.pkl)
                     </Typography>
                   </Box>
                 </Box>
