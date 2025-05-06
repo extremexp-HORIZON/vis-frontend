@@ -47,7 +47,8 @@ const WorkflowCharts: React.FC = () => {
     { field: "value", type: "quantitative", title: workflowsTable.groupBy.length > 0 ? "average value" : "value" },
   ]
   
-  const groupedMetrics: Record<string, IMetric[]> = workflowsTable.uniqueMetrics.reduce(
+  const groupedMetrics: Record<string, IMetric[]> = workflowsTable.uniqueMetrics.filter(metric => metric !== "rating")
+  .reduce(
     (acc: any, metricName: string) => {
       acc[metricName] = []
 
