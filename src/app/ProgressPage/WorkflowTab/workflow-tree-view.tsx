@@ -11,6 +11,7 @@ import type { RootState } from "../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import {
   setDataTable,
+  setSelectedId,
   setSelectedTask,
 } from "../../../store/slices/workflowPageSlice"
 
@@ -188,7 +189,8 @@ export default function WorkflowTreeView() {
 
       {/* TreeView with adjusted padding */}
       <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
-        <SimpleTreeView defaultExpandedItems={expandedTaskItemIds}>
+        <SimpleTreeView defaultExpandedItems={expandedTaskItemIds} selectedItems={ tab.dataTaskTable.selectedId ? tab.dataTaskTable.selectedId : null}
+        >
           {uniqueTasks.map(({ id, name }) => {
             const paramsForTask =
               tab?.workflowConfiguration.params?.filter(p => p.task === id) ||
@@ -230,6 +232,7 @@ export default function WorkflowTreeView() {
                 label={
                   <Box
                     onClick={() => {
+                      dispatch(setSelectedId(`task-${id}`))
                       dispatch(
                         setSelectedTask({
                           type: "group",
@@ -286,14 +289,15 @@ export default function WorkflowTreeView() {
                     itemId={`param-${id}-${index}`}
                     label={
                       <Box
-                        onClick={() =>
+                        onClick={() => {
+                          dispatch(setSelectedId(`param-${id}-${index}`))
                           dispatch(
                             setSelectedItem({
                               type: "param",
                               data: { ...param, variant: taskVariants[name] },
                             }),
                           )
-                        }
+                        }}
                         sx={{
                           px: 1,
                           py: 0.5,
@@ -324,11 +328,12 @@ export default function WorkflowTreeView() {
                     itemId={`metric-${id}-${index}`}
                     label={
                       <Box
-                        onClick={() =>
+                        onClick={() => {
+                          dispatch(setSelectedId(`metric-${id}-${index}`))
                           dispatch(
                             setSelectedItem({ type: "metric", data: metric }),
                           )
-                        }
+                        }}
                         sx={{
                           px: 1,
                           py: 0.5,
@@ -393,13 +398,15 @@ export default function WorkflowTreeView() {
                           label={
                             <Box
                               onClick={() => {
-                                if (ds.source)
+                                if (ds.source) {
+                                  dispatch(setSelectedId(`input-ds-${id}-${index}`))
                                   dispatch(
                                     setSelectedItem({
                                       type: "DATASET",
                                       data: ds,
                                     }),
                                   )
+                                }
                               }}
                               sx={{
                                 display: "flex",
@@ -462,13 +469,15 @@ export default function WorkflowTreeView() {
                           label={
                             <Box
                               onClick={() => {
-                                if (ds.source)
+                                if (ds.source) {
+                                  dispatch(setSelectedId(`output-ds-${id}-${index}`))
                                   dispatch(
                                     setSelectedItem({
                                       type: "DATASET",
                                       data: ds,
                                     }),
                                   )
+                                }
                               }}
                               sx={{
                                 display: "flex",
@@ -523,14 +532,15 @@ export default function WorkflowTreeView() {
                       itemId={`null-param-${index}`}
                       label={
                         <Box
-                          onClick={() =>
+                          onClick={() => {
+                            dispatch(setSelectedId(`null-param-${index}`))
                             dispatch(
                               setSelectedItem({
                                 type: "param",
                                 data: param,
                               }),
                             )
-                          }
+                          }}
                           sx={{
                             px: 1,
                             py: 0.5,
@@ -559,11 +569,12 @@ export default function WorkflowTreeView() {
                       itemId={`null-metric-${index}`}
                       label={
                         <Box
-                          onClick={() =>
+                          onClick={() => {
+                            dispatch(setSelectedId(`null-metric-${index}`))
                             dispatch(
                               setSelectedItem({ type: "metric", data: metric }),
                             )
-                          }
+                          }}
                           sx={{
                             px: 1,
                             py: 0.5,
@@ -628,13 +639,15 @@ export default function WorkflowTreeView() {
                             label={
                               <Box
                                 onClick={() => {
-                                  if (ds.source)
+                                  if (ds.source) {
+                                    dispatch(setSelectedId(`null-input-${index}`))
                                     dispatch(
                                       setSelectedItem({
                                         type: "DATASET",
                                         data: ds,
                                       }),
                                     )
+                                  }
                                 }}
                                 sx={{
                                   display: "flex",
@@ -697,13 +710,15 @@ export default function WorkflowTreeView() {
                             label={
                               <Box
                                 onClick={() => {
-                                  if (ds.source)
+                                  if (ds.source) {
+                                    dispatch(setSelectedId(`null-output-${index}`))
                                     dispatch(
                                       setSelectedItem({
                                         type: "DATASET",
                                         data: ds,
                                       }),
                                     )
+                                  }
                                 }}
                                 sx={{
                                   display: "flex",
@@ -752,7 +767,7 @@ export default function WorkflowTreeView() {
         </Box>
         {/* TreeView */}
         <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
-          <SimpleTreeView defaultExpandedItems={["model"]}>
+          <SimpleTreeView defaultExpandedItems={["model"]} selectedItems={ tab.dataTaskTable.selectedId ? tab.dataTaskTable.selectedId : null }>
             <TreeItem2
             
               aria-expanded={true}
@@ -767,6 +782,7 @@ export default function WorkflowTreeView() {
                     bgcolor: "transparent",
                   }}
                   onClick={e => {
+                    dispatch(setSelectedId(`model`))
                     dispatch(
                       setSelectedItem({
                         type: "model",
@@ -789,6 +805,7 @@ export default function WorkflowTreeView() {
                 itemId="instance-view"
                 label="Instance View"
                 onClick={e => {
+                  dispatch(setSelectedId(`instance-view`))
                   dispatch(
                     setSelectedItem({
                       type: "instance-view",
@@ -801,6 +818,7 @@ export default function WorkflowTreeView() {
                 itemId="feature-effects"
                 label="Feature Effects"
                 onClick={e => {
+                  dispatch(setSelectedId(`feature-effects`))
                   dispatch(
                     setSelectedItem({
                       type: "feature-effects",
@@ -813,6 +831,7 @@ export default function WorkflowTreeView() {
                 itemId="hyperparameters"
                 label="Hyperparameter Impact"
                 onClick={e => {
+                  dispatch(setSelectedId(`hyperparameters`))
                   dispatch(
                     setSelectedItem({
                       type: "hyperparameters",
