@@ -13,6 +13,7 @@ import theme from "../../../mui-theme"
 import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
 import ModelDetails from "./workflow-model-details"
 import InstanceView from "./workflow-instance-view"
+import HyperparameterImpact from "./workflow-hyperparameter-impact"
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -115,8 +116,7 @@ const SelectedItemViewer = () => {
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
         <Box sx={{ overflow: "auto", height: "100%" }}>
-
-        <ModelDetails/>
+          <ModelDetails/>
         </Box>
 
         </Box>
@@ -157,6 +157,7 @@ const SelectedItemViewer = () => {
           title={`Hyperparameter Impact`}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
+          <HyperparameterImpact />
         </Box>
       </Box>
     )

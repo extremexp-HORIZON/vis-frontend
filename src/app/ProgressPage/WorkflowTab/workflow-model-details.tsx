@@ -12,6 +12,7 @@ import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-v
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import { useState } from "react"
+import ConfusionMatrixPlot from "../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot"
 
 const ModelDetails = () => {
   const info = (
@@ -25,6 +26,7 @@ const ModelDetails = () => {
   const [isMosaic, setIsMosaic] = useState(true)
 
   const showInfoMessage = true
+
   return (
     <>
       <Box
@@ -88,13 +90,7 @@ const ModelDetails = () => {
         <Grid container spacing={2}>
           <Grid item xs={isMosaic ? 6 : 12}>
             <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-              <ResponsiveCardVegaLite
-                spec={[undefined]}
-                aspectRatio={2}
-                title="Confusion matrix "
-                infoMessage={info}
-                showInfoMessage={showInfoMessage}
-              />
+              <ConfusionMatrixPlot />
             </Box>
           </Grid>
           <Grid item xs={isMosaic ? 6 : 12}>
@@ -102,6 +98,7 @@ const ModelDetails = () => {
               <ResponsiveCardVegaLite
                 spec={[undefined]}
                 aspectRatio={2}
+                maxHeight={400}
                 title="ROC curve"
                 infoMessage={info}
                 showInfoMessage={showInfoMessage}

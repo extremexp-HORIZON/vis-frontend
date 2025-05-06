@@ -57,6 +57,7 @@ const ModelAnalysisTask = () => {
                 train_index={trainIndexMetric} 
                 test_index={testIndexMetric}
                 target_column={targetColumnMetric}
+                explanation_type="featureExplanation"
               />
             </Box>
           </Grid>
@@ -68,6 +69,7 @@ const ModelAnalysisTask = () => {
                 train_index={trainIndexMetric} 
                 test_index={testIndexMetric}
                 target_column={targetColumnMetric}
+                explanation_type="featureExplanation"
               />
             </Box>
           </Grid>

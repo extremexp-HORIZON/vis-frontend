@@ -10,15 +10,17 @@ import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 
 interface AlePlotProps {
-    model: string[]
-    data: string
-    train_index: any[]
-    test_index: any[]
-    target_column: string
+    model?: string[]
+    data?: string
+    train_index?: any[]
+    test_index?: any[]
+    target_column?: string
+    query?: any
+    explanation_type: string
 }
 
 const AlePlot = (props: AlePlotProps) => {
-    const {model, data, train_index, test_index, target_column} = props
+    const {model, data, train_index, test_index, target_column, query, explanation_type} = props
     const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage)
     const dispatch = useAppDispatch()
     const featureList = tab?.workflowTasks.modelAnalysis?.ale.data?.featureList || null
@@ -30,13 +32,14 @@ const AlePlot = (props: AlePlotProps) => {
                 fetchModelAnalysisExplainabilityPlot({
                   query: {
                     ...explainabilityQueryDefault,
-                    explanation_type: "featureExplanation",
+                    explanation_type: explanation_type,
                     explanation_method: "ale",
                     model: model,
                     data: data,
                     train_index: train_index,
                     test_index: test_index,
                     target_column: target_column,
+                    ...query
                     },
                     metadata: {
                       workflowId: tab.workflowId,
@@ -105,6 +108,7 @@ const AlePlot = (props: AlePlotProps) => {
                 train_index: train_index,
                 test_index: test_index,
                 target_column: target_column,
+                ...query
           },
               metadata: {
                 workflowId: tab?.workflowId || "",

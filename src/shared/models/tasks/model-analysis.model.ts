@@ -8,7 +8,7 @@ import type {
   IDataExplorationResponse
 } from "../dataexploration.model"
 import type { FetchExplainabilityPlotPayload } from "./explainability.model"
-import { api } from "../../../app/api/api"
+import { api, experimentApi } from "../../../app/api/api"
 import { createAction } from "@reduxjs/toolkit";
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
@@ -53,7 +53,7 @@ export interface IModelAnalysis {
   }
   modelInstances: { data: IDataExplorationResponse | null; loading: boolean; error: string | null }
   modelConfusionMatrix: {
-    data: IDataExplorationResponse | null
+    data: {labels: any, matrix: any} | null
     loading: boolean
     error: string | null
   }
@@ -194,6 +194,28 @@ export const modelAnalysisReducers = (
           section.selectedFeature = feature;
         }
       }
+    })
+    .addCase(
+      fetchConfusionMatrix.fulfilled,
+      (state, action) => {
+        const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.runId}` ? state.tab.workflowTasks.modelAnalysis : null
+        if(compareCompletedTask) {
+          compareCompletedTask.modelConfusionMatrix.loading = false
+          compareCompletedTask.modelConfusionMatrix.data = action.payload
+          compareCompletedTask.modelConfusionMatrix.error = null
+        }
+      },
+    )
+    .addCase(fetchConfusionMatrix.pending, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.runId}` ? state.tab.workflowTasks.modelAnalysis : null
+      if(compareCompletedTask) compareCompletedTask.modelConfusionMatrix.loading = true
+    })
+    .addCase(fetchConfusionMatrix.rejected, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.runId}` ? state.tab.workflowTasks.modelAnalysis : null
+      if(compareCompletedTask) {
+        compareCompletedTask.modelConfusionMatrix.loading = false
+        compareCompletedTask.modelConfusionMatrix.error = action.error.message || "Failed to fetch confusion matrix"
+      }
 
     })
 }
@@ -220,5 +242,14 @@ export const fetchModelAnalysisData = createAsyncThunk(
     return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data)
+  }
+)
+
+export const fetchConfusionMatrix = createAsyncThunk(
+  "workflowTasks/model_analysis/fetch_confusion_matrix",
+  async (payload: {experimentId: string, runId: string}) => {
+    const { experimentId, runId } = payload;
+    const requestUrl = `${experimentId}/runs/${runId}/evaluation/confusion-matrix`
+    return experimentApi.get<any>(requestUrl).then(response => response.data)
   }
 )
