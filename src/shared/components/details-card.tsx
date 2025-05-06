@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Box, Card, CardContent, CardHeader, Typography, Divider } from '@mui/material';
 
 interface DetailsCardProps {

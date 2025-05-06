@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom"
-import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
+import type { RootState} from "../../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useState } from "react"
 import { fetchConfusionMatrix } from "../../../../shared/models/tasks/model-analysis.model"
 import { Box, CircularProgress } from "@mui/material"

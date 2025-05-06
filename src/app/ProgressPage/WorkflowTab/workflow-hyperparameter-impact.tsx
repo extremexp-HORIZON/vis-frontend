@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { IRun } from "../../../shared/models/experiment/run.model";
-import { RootState, useAppSelector } from "../../../store/store";
+import type { RootState} from "../../../store/store";
+import { useAppSelector } from "../../../store/store";
 import { Box, Button, ButtonGroup, Grid } from "@mui/material";
 import PdpPlot from "../../Tasks/ModelAnalysisTask/plots/pdp-plot";
 import AlePlot from "../../Tasks/ModelAnalysisTask/plots/ale-plot";

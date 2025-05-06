@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import InstanceClassification from "../../Tasks/SharedItems/Plots/instance-classification"
-import { RootState, useAppDispatch, useAppSelector } from "../../../store/store"
+import type { RootState} from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store"
 import {
   getLabelTestInstances,
 } from "../../../shared/models/tasks/model-analysis.model"

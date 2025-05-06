@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import axios from "axios"
-import {
+import type {
   CredentialsResponse,
   LoginCredentials,
 } from "../../shared/models/auth.model"

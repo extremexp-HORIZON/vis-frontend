@@ -1,8 +1,9 @@
 import { useEffect } from "react"
-import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
+import type { RootState} from "../../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature } from "../../../../shared/models/tasks/model-analysis.model"
 import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
-import { IPlotModel } from "../../../../shared/models/plotmodel.model"
+import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import theme from "../../../../mui-theme"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import { Box, CircularProgress, FormControl, InputLabel, MenuItem, Select } from "@mui/material"

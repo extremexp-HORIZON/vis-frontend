@@ -7,7 +7,8 @@ import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
 import Uchart from "./data-exploration-u-chart"
-import { defaultDataExplorationQuery, VisualColumn } from "../../../../shared/models/dataexploration.model"
+import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
+import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 
 const getColumnType = (columnType: string, fieldName?: string) => {

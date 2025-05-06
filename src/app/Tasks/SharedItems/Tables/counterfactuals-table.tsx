@@ -14,8 +14,9 @@ import grey from "@mui/material/colors/grey"
 // import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
 import { useEffect, useState } from "react"
+import type {
+  RootState} from "../../../../store/store";
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from "../../../../store/store"
