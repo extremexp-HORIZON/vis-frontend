@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import type { RootState } from "../../../../store/store"
 import { useAppSelector, useAppDispatch } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import { Box, useTheme, useMediaQuery } from "@mui/material"
+import { Box, useTheme, useMediaQuery, CircularProgress } from "@mui/material"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
 import { fetchUmap } from "../../../../shared/models/tasks/data-exploration-task.model"
 import InfoMessage from "../../../../shared/components/InfoMessage"
@@ -18,7 +18,7 @@ const Uchart = () => {
   const parsedData = typeof raw === "string" ? JSON.parse(raw) : raw
 
   useEffect(() => {
-    if (tab?.workflowTasks.dataExploration?.scatterChart.data?.data) {
+    if (tab?.workflowTasks.dataExploration?.scatterChart.data?.data ) {
       // Ensure payload is proper 2D array of numbers
       const umapPayload = parsedData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) =>
         Object.values(row).map(val => parseFloat(val as string)),
@@ -26,7 +26,7 @@ const Uchart = () => {
 
       dispatch(
         fetchUmap({
-          data: umapPayload,
+          data: umapPayload.slice(0, 2000), // Limit to first 1000 rows
           metadata: {
             workflowId: tab?.workflowId,
             queryCase: "umap",
@@ -55,16 +55,21 @@ const Uchart = () => {
   console.log("Full umap object:", tab?.workflowTasks.dataExploration?.umap)
   console.log("UMAP data:", tab?.workflowTasks.dataExploration?.umap?.data)
   const info = (
-    <InfoMessage
-      message="Please select x-Axis and y-Axis to display the chart."
-      type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
-      fullHeight
-    />
+    <Box
+    sx={{
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <CircularProgress />
+  </Box>
   )
 
   const shouldShowInfoMessage =
-    !tab?.workflowTasks.dataExploration?.controlPanel.selectedColumns
+    !tab?.workflowTasks.dataExploration?.controlPanel.selectedColumns ||!chartData.length
 
   return (
     <Box sx={{ height: "100%" }}>
