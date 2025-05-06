@@ -3,7 +3,7 @@ import LinearProgress from "@mui/material/LinearProgress"
 import Typography from "@mui/material/Typography"
 import grey from "@mui/material/colors/grey"
 import type { RootState} from "../../store/store";
-import { useAppDispatch, useAppSelector } from "../../store/store"
+import { useAppSelector } from "../../store/store"
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 

@@ -7,8 +7,6 @@ import {
 } from "../../../shared/models/tasks/model-analysis.model"
 import CounterfactualsTable from "../../Tasks/SharedItems/Tables/counterfactuals-table"
 import { useParams } from "react-router-dom"
-import { fetchUmap } from "../../../shared/models/tasks/data-exploration-task.model"
-import Uchart from "../../Tasks/DataExplorationTask/Charts/data-exploration-u-chart"
 
 const InstanceView = () => {
   const [point, setPoint] = useState<any | null>(null)

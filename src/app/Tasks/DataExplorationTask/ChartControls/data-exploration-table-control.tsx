@@ -3,8 +3,6 @@ import { Box, Typography, List, ListItem, ListItemButton, ListItemIcon, Checkbox
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import { useAppSelector, useAppDispatch } from "../../../../store/store";
 import { setControls } from "../../../../store/slices/workflowPageSlice";
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model";
-import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model";
 
 // Column selection panel component
 const ColumnSelectionPanel: React.FC = () => {

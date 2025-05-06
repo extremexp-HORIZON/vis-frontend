@@ -5,8 +5,6 @@ import ResponsiveCardVegaLite from "../../../../shared/components/responsive-car
 import { Box, useTheme, useMediaQuery, CircularProgress } from "@mui/material"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
 import { fetchUmap } from "../../../../shared/models/tasks/data-exploration-task.model"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import AssessmentIcon from "@mui/icons-material/Assessment"
 
 const Uchart = () => {
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab)

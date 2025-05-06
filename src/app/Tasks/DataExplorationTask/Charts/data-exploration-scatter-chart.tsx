@@ -1,6 +1,6 @@
-import { Box, useTheme, useMediaQuery, Typography } from "@mui/material"
-import { useEffect, useRef, useState } from "react"
-import { cloneDeep, get } from "lodash" // Import lodash for deep cloning
+import { Box, useTheme, useMediaQuery } from "@mui/material"
+import { useEffect } from "react"
+import { cloneDeep } from "lodash" // Import lodash for deep cloning
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import InfoMessage from "../../../../shared/components/InfoMessage"

@@ -1,5 +1,4 @@
 import type {
-  GridColDef,
   GridColumnNode,
   GridRowSelectionModel,
 } from "@mui/x-data-grid"
@@ -14,7 +13,7 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredW
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import type { RootState } from "../../../../store/store"
 import { useEffect, useRef, useState } from "react"
-import { Badge,  IconButton, Popover, Rating, styled, } from "@mui/material"
+import { Badge,  IconButton, Popover, styled, } from "@mui/material"
 import FilterBar from "../../../../shared/components/filter-bar"
 import NoRowsOverlayWrapper from "./no-rows-overlay"
 import ProgressBar from "./prgress-bar"

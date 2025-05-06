@@ -1,6 +1,5 @@
 import { Box, useTheme, useMediaQuery } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"

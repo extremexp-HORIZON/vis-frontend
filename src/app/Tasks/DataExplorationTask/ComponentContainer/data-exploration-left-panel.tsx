@@ -1,13 +1,11 @@
 import ChartButtonGroup from "../ChartControls/data-exploration-chart-button-group"
 import { Box, IconButton, Popover, Stack, Tooltip, Badge, Typography } from "@mui/material"
-import ColumnsPanel from "./data-exploration-columns-panel"
 import FilterBar from "../../../../shared/components/filter-bar"
 import { useState } from "react"
 import FilterListIcon from "@mui/icons-material/FilterList"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import type { IFilter } from "../../../../shared/models/dataexploration.model"
-import { parse } from "vega"
 
 const LeftPanel = () => {
   

@@ -7,10 +7,8 @@ import {
   useLocation,
   useNavigate,
   useParams,
-  useSearchParams,
 } from "react-router-dom"
 import {
-  fetchExperiment,
   fetchExperimentWorkflows,
   setMenuOptions,
 } from "../../store/slices/progressPageSlice"
