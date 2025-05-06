@@ -1,4 +1,4 @@
-import { Box, IconButton, Tooltip, Typography } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Tooltip, Typography } from "@mui/material"
 import { useEffect, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView"
@@ -18,13 +18,17 @@ import {
 import { setSelectedItem } from "../../../store/slices/workflowPageSlice"
 import InputIcon from "@mui/icons-material/Input"
 import OutputIcon from "@mui/icons-material/Output"
-import AssignmentIcon from "@mui/icons-material/Assignment"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import CommitIcon from '@mui/icons-material/Commit';
 import theme from "../../../mui-theme"
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
+import InsightsIcon from '@mui/icons-material/Insights';
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage)
@@ -166,31 +170,35 @@ export default function WorkflowTreeView() {
   if (!tab?.workflowConfiguration) return null
 
   return (
-    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ overflow: "auto" }}>
       {/* Enhanced Title and Separator */}
-      <Box
-        sx={{
-          p: 2,
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          bgcolor: "background.paper",
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-        }}
+      <Accordion
+        defaultExpanded disableGutters
       >
-        <AccountTreeIcon color="primary" />
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Box
+          sx={{
+            pb: 1,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            width: "100%",
+          }}
         >
-          Workflow Details
-        </Typography>
-      </Box>
+          <AccountTreeIcon color="primary" />
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+          >
+            Workflow Details
+          </Typography>
+        </Box>
+      </AccordionSummary>
 
       {/* TreeView with adjusted padding */}
-      <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
-        <SimpleTreeView defaultExpandedItems={expandedTaskItemIds} selectedItems={ tab.dataTaskTable.selectedId ? tab.dataTaskTable.selectedId : null}
-        >
+      <AccordionDetails>
+        <SimpleTreeView defaultExpandedItems={expandedTaskItemIds} selectedItems={ tab.dataTaskTable.selectedId ? tab.dataTaskTable.selectedId : null}>
           {uniqueTasks.map(({ id, name }) => {
             const paramsForTask =
               tab?.workflowConfiguration.params?.filter(p => p.task === id) ||
@@ -223,7 +231,6 @@ export default function WorkflowTreeView() {
                 },
                 {} as Record<string, string>,
               ) || {}
-            console.log(`task-${id}`)
             return (
               <TreeItem2
                 aria-expanded={true}
@@ -743,33 +750,36 @@ export default function WorkflowTreeView() {
               )
             })()}
         </SimpleTreeView>
-      </Box>
+      </AccordionDetails>
+      </Accordion>
 
-      <Box sx={{ height: "50%", display: "flex", flexDirection: "column",mt:2 }}>
-        {/* Simple Title */}
-        <Box
-          sx={{
-            p: 2,
-            borderBottom: `1px solid ${theme.palette.divider}`,
-            bgcolor: "background.paper",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <PsychologyAltRoundedIcon color="primary" />
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+      <Accordion defaultExpanded disableGutters>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          {/* Simple Title */}
+          <Box
+            sx={{
+              pb: 1,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              bgcolor: "background.paper",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              width: "100%"
+            }}
           >
-            Model Insights
-          </Typography>
-        </Box>
-        {/* TreeView */}
-        <Box sx={{ p: 2, flexGrow: 1, overflow: "auto" }}>
+            <PsychologyAltRoundedIcon color="primary" />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+            >
+              Model Insights
+            </Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
+          {/* TreeView */}
           <SimpleTreeView defaultExpandedItems={["model"]} selectedItems={ tab.dataTaskTable.selectedId ? tab.dataTaskTable.selectedId : null }>
             <TreeItem2
-            
               aria-expanded={true}
               itemId="model"
               label={
@@ -791,8 +801,19 @@ export default function WorkflowTreeView() {
                     )
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexGrow: 1,
+                      flexWrap: "wrap",
+                      minWidth: 0,
+                    }}
+                  >
+                    <ModelTrainingIcon                               
+                      fontSize="small"
+                      sx={{ mr: 1, color: theme.palette.primary.main }}
+                    />
                     <Typography>
                       Model.pkl
                     </Typography>
@@ -803,47 +824,128 @@ export default function WorkflowTreeView() {
             >
               <TreeItem2
                 itemId="instance-view"
-                label="Instance View"
-                onClick={e => {
-                  dispatch(setSelectedId(`instance-view`))
-                  dispatch(
-                    setSelectedItem({
-                      type: "instance-view",
-                    }),
-                  )
-                }}
-
+                label={
+                  <Box
+                  sx={{
+                    px: 1,
+                    py: 0.5,
+                    borderRadius: 1,
+                    cursor: "pointer",
+                    bgcolor: "transparent",
+                  }}
+                  onClick={e => {
+                    dispatch(setSelectedId(`instance-view`))
+                    dispatch(
+                      setSelectedItem({
+                        type: "instance-view",
+                      }),
+                    )
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexGrow: 1,
+                      flexWrap: "wrap",
+                      minWidth: 0,
+                    }}
+                  >
+                    <QueryStatsIcon
+                      fontSize="small"
+                      sx={{ mr: 1, color: theme.palette.primary.main }}
+                    />
+                    <Typography>
+                      Instance View
+                    </Typography>
+                  </Box>
+                </Box>
+                }
               />
               <TreeItem2
                 itemId="feature-effects"
-                label="Feature Effects"
-                onClick={e => {
-                  dispatch(setSelectedId(`feature-effects`))
-                  dispatch(
-                    setSelectedItem({
-                      type: "feature-effects",
-                    }),
-                  )
-                }}
-
+                label={
+                  <Box
+                    sx={{
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: 1,
+                      cursor: "pointer",
+                      bgcolor: "transparent",
+                    }}
+                    onClick={e => {
+                      dispatch(setSelectedId(`feature-effects`))
+                      dispatch(
+                        setSelectedItem({
+                          type: "feature-effects",
+                        }),
+                      )
+                    }}
+                  >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexGrow: 1,
+                      flexWrap: "wrap",
+                      minWidth: 0,
+                    }}
+                  >
+                    <InsightsIcon
+                      fontSize="small"
+                      sx={{ mr: 1, color: theme.palette.primary.main }}
+                    />
+                    <Typography>
+                      Feature Effects
+                    </Typography>
+                  </Box>
+                </Box>
+                }
               />
               <TreeItem2
                 itemId="hyperparameters"
-                label="Hyperparameter Impact"
-                onClick={e => {
-                  dispatch(setSelectedId(`hyperparameters`))
-                  dispatch(
-                    setSelectedItem({
-                      type: "hyperparameters",
-                    }),
-                  )
-                }}
-
+                label={
+                  <Box
+                    sx={{
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: 1,
+                      cursor: "pointer",
+                      bgcolor: "transparent",
+                    }}
+                    onClick={e => {
+                      dispatch(setSelectedId(`hyperparameters`))
+                      dispatch(
+                        setSelectedItem({
+                          type: "hyperparameters",
+                        }),
+                      )
+                    }}    
+                  >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexGrow: 1,
+                      flexWrap: "wrap",
+                      minWidth: 0,
+                    }}
+                  >
+                    <PermDataSettingIcon
+                      fontSize="small"
+                      sx={{ mr: 1, color: theme.palette.primary.main }}
+                    />
+                    <Typography>
+                      Hyperparameters Impact
+                    </Typography>
+                  </Box>
+                </Box>
+                }
               />
             </TreeItem2>
           </SimpleTreeView>
-        </Box>
-      </Box>
+        </AccordionDetails>
+      </Accordion>
     </Box>
   )
 }

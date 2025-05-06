@@ -14,6 +14,11 @@ import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task
 import ModelDetails from "./workflow-model-details"
 import InstanceView from "./workflow-instance-view"
 import HyperparameterImpact from "./workflow-hyperparameter-impact"
+import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
+import InsightsIcon from '@mui/icons-material/Insights';
+
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -112,7 +117,8 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
         <Header 
-          title={`${selectedItem.data.model} Details`} 
+          title={`${selectedItem.data.model} Details`}
+          icon={<ModelTrainingIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
         <Box sx={{ overflow: "auto", height: "100%" }}>
@@ -128,7 +134,8 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
         <Header 
-          title={`Instance View`} 
+          title={`Instance View`}
+          icon={<QueryStatsIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
           <InstanceView/>
@@ -142,6 +149,7 @@ const SelectedItemViewer = () => {
       <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
         <Header 
           title={`Feature Effects`}
+          icon={<InsightsIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
           <ModelAnalysisTask />
@@ -155,6 +163,7 @@ const SelectedItemViewer = () => {
       <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
         <Header 
           title={`Hyperparameter Impact`}
+          icon={<PermDataSettingIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
           <HyperparameterImpact />
