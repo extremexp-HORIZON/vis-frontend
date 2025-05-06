@@ -1,21 +1,13 @@
 import Box from "@mui/material/Box"
-import IconButton from "@mui/material/IconButton"
-import Paper from "@mui/material/Paper"
-import Tooltip from "@mui/material/Tooltip"
+
 import Typography from "@mui/material/Typography"
-import InfoIcon from "@mui/icons-material/Info"
 import FormControl from "@mui/material/FormControl"
 import Select from "@mui/material/Select"
 import MenuItem from "@mui/material/MenuItem"
 import type { Dispatch, SetStateAction } from "react"
 import { useEffect, useState } from "react"
-import grey from "@mui/material/colors/grey"
-import { VegaLite } from "react-vega"
 import _ from "lodash"
-import { Checkbox, CircularProgress, LinearProgress, Skeleton, useTheme } from "@mui/material"
-import type { IDataExplorationResponse } from "../../../../shared/models/dataexploration.model"
-import { green } from "@mui/material/colors"
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import { Checkbox, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
@@ -252,6 +244,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
           options={options}
           plotData={plotData}
         />}
+        onNewView={handleNewView}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
         maxHeight={500}

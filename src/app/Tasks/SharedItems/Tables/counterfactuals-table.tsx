@@ -13,7 +13,6 @@ import TableBody from "@mui/material/TableBody"
 import grey from "@mui/material/colors/grey"
 // import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
-import Modal from "@mui/material/Modal"
 import { useEffect } from "react"
 import { useAppDispatch } from "../../../../store/store"
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -21,6 +20,7 @@ import CircularProgress from "@mui/material/CircularProgress"
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
 import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { fetchExplainabilityPlotPayloadDefault } from "../../../../shared/models/tasks/explainability.model"
+import Modal from "@mui/material/Modal"
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -66,25 +66,45 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const { point, handleClose, counterfactuals, experimentId, workflowId } = props
   const dispatch = useAppDispatch()
 
-  useEffect(() => {
-    const query = point
-    delete query["_vgsid_"] 
-    delete query["Symbol(vega_id)"]
-    delete query["C0"]
-    dispatch(fetchModelAnalysisExplainabilityPlot({
-    ...fetchExplainabilityPlotPayloadDefault,
-    explanationType:"hyperparameterExplanation",
-    explanationMethod:"counterfactuals",
-    model:`${experimentId}_model`,
-    modelId: Number(workflowId),
-    feature1: "",
-    feature2: "",
-    query: JSON.stringify(query)
-    }))
-  }, [])
+  // useEffect(() => {
+  //   const query = point
+  //   delete query["_vgsid_"] 
+  //   delete query["Symbol(vega_id)"]
+  //   delete query["C0"]
+  //   dispatch(fetchModelAnalysisExplainabilityPlot({
+  //   ...fetchExplainabilityPlotPayloadDefault,
+  //   explanationType:"hyperparameterExplanation",
+  //   explanationMethod:"counterfactuals",
+  //   model:`${experimentId}_model`,
+  //   modelId: Number(workflowId),
+  //   feature1: "",
+  //   feature2: "",
+  //   query: JSON.stringify(query)
+  //   }))
+  // }, [point])
 
   return (
     <>
+          <Modal
+        open={point !== null}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+      <Paper
+        className="Category-Item"
+        elevation={2}
+        sx={{
+          borderRadius: 4,
+          display: "flex",
+          flexDirection: "column",
+          rowGap: 0,
+          minWidth: "300px",
+          overflow: "hidden",
+          ...style
+        }}
+      >
+
 
      
         <Box
@@ -188,6 +208,8 @@ const CounterfactualsTable = (props: ITableComponent) => {
             </Table>
           </TableContainer>}
         </Box>
+      </Paper>
+      </Modal>
     </>
   )
 }
