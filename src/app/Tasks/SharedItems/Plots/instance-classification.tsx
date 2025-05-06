@@ -7,7 +7,7 @@ import MenuItem from "@mui/material/MenuItem"
 import type { Dispatch, SetStateAction } from "react"
 import { useEffect, useState } from "react"
 import _ from "lodash"
-import { Checkbox, useTheme } from "@mui/material"
+import { Checkbox, CircularProgress, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
@@ -175,12 +175,17 @@ const InstanceClassification = (props: IInstanceClassification) => {
   }
 
   const info = (
-    <InfoMessage
-      message="Loading data..."
-      type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
-      fullHeight
-    />
+    <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    height="100%"
+  >
+    <CircularProgress />
+    <Typography fontSize={"0.8rem"} sx={{ ml: 1 }}>
+      {plotData?.loading ? "Loading..." : "No data available"}
+    </Typography>
+  </Box>
   )  
   const shouldShowInfoMessage = plotData?.loading || !plotData?.data
 
