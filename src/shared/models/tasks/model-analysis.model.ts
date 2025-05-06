@@ -9,7 +9,9 @@ import type {
 } from "../dataexploration.model"
 import type { FetchExplainabilityPlotPayload } from "./explainability.model"
 import { api, experimentApi } from "../../../app/api/api"
+import { api, experimentApi } from "../../../app/api/api"
 import { createAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
@@ -51,7 +53,7 @@ export interface IModelAnalysis {
     loading: boolean
     error: string | null
   }
-  modelInstances: { data: IDataExplorationResponse | null; loading: boolean; error: string | null }
+  modelInstances: { data: any | null; loading: boolean; error: string | null }
   modelConfusionMatrix: {
     data: {labels: any, matrix: any} | null
     loading: boolean
@@ -218,6 +220,29 @@ export const modelAnalysisReducers = (
       }
 
     })
+    .addCase(getLabelTestInstances.pending, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowTasks.modelAnalysis;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelInstances.loading = true;
+        compareCompletedTask.modelInstances.error = null;
+      }
+    })
+    .addCase(getLabelTestInstances.fulfilled, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowTasks.modelAnalysis;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelInstances.data = action.payload; // treat as any
+        compareCompletedTask.modelInstances.loading = false;
+        compareCompletedTask.modelInstances.error = null;
+      }
+    })
+    .addCase(getLabelTestInstances.rejected, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowTasks.modelAnalysis;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelInstances.loading = false;
+        compareCompletedTask.modelInstances.error = "Failed to fetch test instances";
+      }
+    })
+    
 }
 
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
@@ -244,6 +269,27 @@ export const fetchModelAnalysisData = createAsyncThunk(
       .then(response => response.data)
   }
 )
+
+
+export const getLabelTestInstances = createAsyncThunk(
+  'evaluation/getLabelTestInstances',
+  async ({ experimentId, runId, offset = 0, limit = 100000 }: { experimentId: string; runId: string; offset?: number; limit?: number }, { rejectWithValue }) => {
+    try {
+      const response = await experimentApi.get(
+        `${experimentId}/runs/${runId}/evaluation/test-instances`,
+        {
+          params: { offset, limit },
+        }
+      );
+      console.log('Response:', response.data); // Log the response data
+      return response.data;
+    } catch (error) {
+      // Customize the error handling as needed
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 
 export const fetchConfusionMatrix = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_confusion_matrix",
