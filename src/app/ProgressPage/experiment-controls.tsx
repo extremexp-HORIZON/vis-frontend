@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, CircularProgress } from "@mui/material"
+import { Box, IconButton, Typography, CircularProgress, Chip } from "@mui/material"
 import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
@@ -15,6 +15,7 @@ import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
 import PauseCircleRoundedIcon from '@mui/icons-material/PauseCircleRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import type { IRun } from "../../shared/models/experiment/run.model"
+import ScienceIcon from '@mui/icons-material/Science';
 
 const ExperimentControls = () => {
   const [ searchParams ] = useSearchParams()
@@ -174,9 +175,23 @@ const ExperimentControls = () => {
                 />
                 <Box sx={{display: "flex", flexDirection: "column"}}>
                   <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {/* <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       {`Workflow ${workflowId}`}
-                    </Typography>
+                    </Typography> */}
+                    <Chip
+                        // icon={<WorkIcon />}
+                        label={`Workflow: ${workflowId}`}
+                        color="primary"
+                        variant="outlined"
+                        sx={{ 
+                        border:'none',
+                        fontWeight: '600',
+                        '& .MuiChip-label': {
+                        fontSize: '1rem',
+                        p: 0,
+                        }
+                        }}
+                      />
                     {workflowRating !== undefined && <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography> }
                     {workflowRating !== undefined &&
                       <Rating

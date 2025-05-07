@@ -26,14 +26,18 @@ const ProgressPageBar = () => {
           flexWrap: "wrap",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5}}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1}}>
           <Chip
-            icon={<ScienceIcon />}
+            // icon={<ScienceIcon />}
             label={`Experiment: ${experimentId}`}
             color="primary"
             variant="outlined"
             sx={{ 
-              fontWeight: 'medium',
+              border:'none',
+              p: 0,
+              alignContent: 'left',
+              justifyContent: 'left',
+              fontWeight: '600',
               '& .MuiChip-label': {
                 fontSize: '1rem',
               }
@@ -43,9 +47,9 @@ const ProgressPageBar = () => {
             display: 'inline-flex', 
             alignItems: 'center', 
             backgroundColor: theme.palette.background.paper,
-            borderRadius: '16px',
-            px: 1,
-            border: `1px solid ${theme.palette.divider}`
+            // borderRadius: '16px',
+            // px: 1,
+            // border: `1px solid ${theme.palette.divider}`
           }}>
             <Typography
               variant="body2"
@@ -58,7 +62,7 @@ const ProgressPageBar = () => {
             <Typography
               variant="body2"
               fontWeight="bold"
-              color="primary.main"
+              color="secondary"
             >
               {`${progressBar.progress}%`}
             </Typography>
@@ -84,7 +88,7 @@ const ProgressPageBar = () => {
           </Box>
         )}
       </Box>
-      <Box sx={{ width: "100%",}}>
+      <Box sx={{ width: "100%", ml: 1}}>
         <LinearProgress
           variant="determinate"
           value={Math.round(progressBar.progress)}
