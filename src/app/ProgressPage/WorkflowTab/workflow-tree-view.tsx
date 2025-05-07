@@ -180,11 +180,11 @@ export default function WorkflowTreeView() {
           },
         }}      
       >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}
+              sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}>
         <Box
           sx={{
             pb: 1,
-            borderBottom: `1px solid ${theme.palette.divider}`,
             display: "flex",
             alignItems: "center",
             gap: 1,
@@ -193,8 +193,8 @@ export default function WorkflowTreeView() {
         >
           <AccountTreeIcon color="primary" />
           <Typography
-            variant="h6"
-            sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+            variant="body1"
+            sx={{ fontWeight: 600, color: theme.palette.text.primary }}
           >
             Workflow Details
           </Typography>
@@ -768,12 +768,12 @@ export default function WorkflowTreeView() {
           },
         }}      
         >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} 
+        sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}>
           {/* Simple Title */}
           <Box
             sx={{
               pb: 1,
-              borderBottom: `1px solid ${theme.palette.divider}`,
               bgcolor: "background.paper",
               display: "flex",
               alignItems: "center",
@@ -783,8 +783,8 @@ export default function WorkflowTreeView() {
           >
             <PsychologyAltRoundedIcon color="primary" />
             <Typography
-              variant="h6"
-              sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+              variant="body1"
+              sx={{ fontWeight: 800, color: theme.palette.text.primary }}
             >
               Model Insights
             </Typography>

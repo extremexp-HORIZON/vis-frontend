@@ -43,7 +43,7 @@ const SelectedItemViewer = () => {
       p: 2,
     }}>
       {icon}
-      <Typography variant="h6" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>
+      <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
         {title}
       </Typography>
     </Box>
