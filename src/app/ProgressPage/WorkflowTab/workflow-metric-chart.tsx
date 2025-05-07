@@ -339,7 +339,7 @@ export const MetricCards = () => {
             <>
               {metricData.min?.toFixed(2)}
               {metricData.value !== metricData.min && minWorkflow && (
-                <> — View Workflow <WorkflowLink workflowId={minWorkflow.id} /></>
+                <> — Workflow: <WorkflowLink workflowId={minWorkflow.id} /></>
               )}
             </>
           } 
@@ -350,7 +350,7 @@ export const MetricCards = () => {
             <>
               {metricData.max?.toFixed(2)}
               {metricData.value !== metricData.max && maxWorkflow && (
-                <> — View Workflow <WorkflowLink workflowId={maxWorkflow.id} /></>
+                <> — Workflow: <WorkflowLink workflowId={maxWorkflow.id} /></>
               )}
             </>
           } 
