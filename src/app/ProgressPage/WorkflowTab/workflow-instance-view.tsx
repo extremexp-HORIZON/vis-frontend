@@ -39,14 +39,9 @@ const InstanceView = () => {
 
   const [point, setPoint] = useState<any | null>(null)
   const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? []
-  const orderedColumns = [
-    "predicted",
-    "actual",
-    ...Object.keys(rows[0] || {}).filter(
-      key => key !== "predicted" && key !== "actual",
-    ),
-  ]
-  const columns = orderedColumns.map(key => ({
+
+  
+  const columns = Object.keys(rows[0] || {}).map(key => ({
     field: key,
     headerName: key,
     flex: 1,
