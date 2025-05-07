@@ -100,7 +100,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             target_column: "label",
           },
           metadata: {
-            workflowId: tab.workflowId,
+            workflowId: tab?.workflowId|| "" ,
             queryCase: "counterfactuals",
           },
         }),
@@ -225,6 +225,13 @@ const CounterfactualsTable = (props: ITableComponent) => {
       )
     }
   }, [point, activeTab])
+
+  if (
+    !counterfactuals?.data?.tableContents ||
+    Object.keys(counterfactuals.data.tableContents).length === 0
+  ) {
+    return null; // or a fallback like <p>No data available</p>
+  }
 
   return (
     <>
