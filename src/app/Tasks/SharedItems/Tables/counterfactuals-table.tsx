@@ -14,22 +14,18 @@ import grey from "@mui/material/colors/grey"
 // import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
 import { useEffect, useState } from "react"
-import type {
-  RootState} from "../../../../store/store";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../../store/store"
+import type { RootState } from "../../../../store/store"
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import ModelTrainingIcon from "@mui/icons-material/ModelTraining"
 import CircularProgress from "@mui/material/CircularProgress"
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
 import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
-import {
-  explainabilityQueryDefault,
-} from "../../../../shared/models/tasks/explainability.model"
+import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
 import Modal from "@mui/material/Modal"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 import { Tab, Tabs } from "@mui/material"
+import { DataGrid } from "@mui/x-data-grid"
+import ResponsiveCardTable from "../../../../shared/components/responsive-card-table"
 
 const style = {
   position: "absolute" as "absolute",
@@ -100,7 +96,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             target_column: "label",
           },
           metadata: {
-            workflowId: tab?.workflowId|| "" ,
+            workflowId: tab?.workflowId || "",
             queryCase: "counterfactuals",
           },
         }),
@@ -226,206 +222,206 @@ const CounterfactualsTable = (props: ITableComponent) => {
     }
   }, [point, activeTab])
 
-  if (
-    !counterfactuals?.data?.tableContents ||
-    Object.keys(counterfactuals.data.tableContents).length === 0
-  ) {
-    return null; // or a fallback like <p>No data available</p>
+  
+
+  const getNonConstantColumns = (tableContents: any) => {
+    if (!tableContents) return []
+
+    return Object.entries(tableContents).filter(([key, columnData]: any) => {
+      const values = columnData.values
+      if (!values || values.length === 0) return false
+      return new Set(values).size > 1 // Only keep if not all values are identical
+    })
   }
+
+  const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+    "& .MuiDataGrid-scrollbarFiller": {
+      backgroundColor: theme.palette.customGrey.main,
+    },
+    "& .MuiDataGrid-columnHeader": {
+      backgroundColor: theme.palette.customGrey.main,
+    },
+    '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
+      backgroundColor: theme.palette.customGrey.main,
+    },
+    "& .MuiDataGrid-columnHeaderTitle": {
+      whiteSpace: "nowrap",
+      overflow: "visible",
+    },
+    // Fix header to remain at top
+    "& .MuiDataGrid-main": {
+      // Critical for layout
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
+    },
+    "& .MuiDataGrid-columnHeaders": {
+      position: "sticky",
+      top: 0,
+      zIndex: 2,
+    },
+    // Ensure the cell container scrolls properly
+    "& .MuiDataGrid-virtualScroller": {
+      flex: 1,
+      overflow: "auto",
+    },
+    // Fix pagination to remain at bottom
+    "& .MuiDataGrid-footerContainer": {
+      minHeight: "56px",
+      borderTop: "1px solid rgba(224, 224, 224, 1)",
+      position: "sticky",
+      bottom: 0,
+      zIndex: 2,
+      backgroundColor: "#ffffff",
+    },
+    "& .MuiTablePagination-root": {
+      overflow: "visible",
+    },
+    // Add border radius to bottom corners
+    "&.MuiDataGrid-root": {
+      borderRadius: "0 0 12px 12px",
+      border: "none",
+      height: "100%", // Ensure full height
+    },
+  }))
+
+  const getFilteredTableContents = (
+    tableContents: Record<string, { index: number; values: string[] }>,
+  ) => {
+    if (!tableContents) return {}
+
+    const filteredEntries = Object.entries(tableContents).filter(
+      ([key, column]) => {
+        const uniqueValues = new Set(column.values)
+        return uniqueValues.size > 1 // Keep only if there is more than one unique value
+      },
+    )
+
+    return Object.fromEntries(filteredEntries)
+  }
+
+  const filteredTableContents = getFilteredTableContents(
+    counterfactuals?.data?.tableContents || {},
+  )
+
+  const columns = Object.entries(filteredTableContents).map(([key]) => ({
+    field: key,
+    headerName: key,
+    flex: 1,
+    minWidth: 100,
+    maxWidth: 300,
+    headerAlign: "center",
+    align: "center",
+  }))
+
+  const rowCount =
+    filteredTableContents[Object.keys(filteredTableContents)[0]]?.values
+      .length || 0
+
+  const rows = Array.from({ length: rowCount }, (_, rowIndex) => {
+    const row: Record<string, any> = { id: rowIndex }
+    for (const [key, column] of Object.entries(filteredTableContents)) {
+      row[key] = column.values[rowIndex]
+    }
+    return row
+  })
+  
 
   return (
     <>
-      <Modal
-        open={point !== null}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+    
+    
+      <ResponsiveCardTable
+        details={counterfactuals?.data?.plotDescr}
+        title={counterfactuals?.data?.plotName || "Counterfactuals"}
+        controlPanel={
+          <ControlPanel activeTab={activeTab} setActiveTab={setActiveTab} counterfactuals={counterfactuals} />
+        }
+        // onDownload={handleExportCsv}
+        // showDownloadButton={hasContent}
+        downloadLabel="Export as CSV"
+        downloadSecondaryText="Download table data"
+        additionalMenuItems={null}
+        noPadding={true}
       >
-        <Paper
-          className="Category-Item"
-          elevation={2}
-          sx={{
-            borderRadius: 4,
-            display: "flex",
-            flexDirection: "column",
-            rowGap: 0,
-            minWidth: "300px",
-            overflow: "hidden",
-            ...style,
-          }}
-        >
-          <Box
-            sx={{
-              // px: 1.5,
-              // py: 0.5,
-              display: "flex",
-              alignItems: "center",
-              borderBottom: `1px solid ${grey[400]}`,
-            }}
-          >
-            <Typography fontSize={"1rem"} fontWeight={600}>
-              {counterfactuals?.data?.plotName || "Plot name"}
-            </Typography>
-            <Box sx={{ flex: 1 }} />
-            <Tooltip
-              title={
-                counterfactuals?.data?.plotDescr || "This is a description"
-              }
-            >
-              <IconButton>
-                <InfoIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-          {props.children || (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                mb: 1, // optional: margin bottom for spacing below tabs
-              }}
-            >
-              <Tabs
-                value={activeTab}
-                onChange={(e, newValue) => setActiveTab(newValue)}
-              >
-                <Tab label="Feature" />
-                <Tab label="Hyperparameters" />
-              </Tabs>
-            </Box>
-          )}
-          <Box
-            sx={{
-              width: "99%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-              p: 1,
-            }}
-          >
-            {counterfactuals?.loading ? (
-              <Box
-                sx={{
-                  width: 650,
-                  height: 300,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <CircularProgress sx={{ fontSize: "2rem" }} />
-              </Box>
-            ) : (
-              <>
-                <TableContainer
-                  component={Box}
-                  sx={{
-                    width: "99%",
-                    overflowX: "auto",
-                    border: theme =>
-                      `1px solid ${theme.palette.customGrey.main}`,
-                  }}
-                >
-                  <Table
-                    stickyHeader
-                    sx={{ minWidth: 650 }}
-                    aria-label="simple table"
-                    size="small"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        {Object.keys(
-                          counterfactuals?.data?.tableContents || {},
-                        ).map((key, index) => {
-                          const orderedColumn = Object.entries(
-                            counterfactuals?.data?.tableContents || {},
-                          ).find(([key, value]) => value.index === index + 1)
-                          return (
-                            <TableCell
-                              key={`table-header-${key}-${index}`}
-                              sx={{ fontWeight: 600 }}
-                            >
-                              {orderedColumn?.[0]}
-                            </TableCell>
-                          )
-                        })}
-                        <FixedTableCell
-                          key="table-header-static"
-                          sx={{ fontWeight: 600 }}
-                          align="center"
-                        >
-                          Actions
-                        </FixedTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {counterfactuals?.data?.tableContents[
-                        Object.keys(counterfactuals.data?.tableContents)[0]
-                      ].values.map((value: any, index: number) => {
-                        return (
-                          <StyledTableRow key={`table-row-${index}`}>
-                            {Object.keys(
-                              counterfactuals.data?.tableContents || {},
-                            ).map((key, idx) => {
-                              const orderedColumn = Object.entries(
-                                counterfactuals.data?.tableContents || {},
-                              ).find(([key, value]) => value.index === idx + 1)
-                              return (
-                                <TableCell key={`table-cell-${key}-${index}`}>
-                                  {orderedColumn?.[1].values[index]}
-                                </TableCell>
-                              )
-                            })}
-                            <FixedTableCell
-                              key={`table-cell-static-${index}`}
-                              align="center"
-                              sx={{
-                                display: "flex",
-                                gap: 1,
-                                justifyContent: "center",
-                              }}
-                            >
-                              <Tooltip title="Explain">
-                                <IconButton
-                                  color="info"
-                                  onClick={() =>
-                                    console.log(
-                                      "Explain clicked for row:",
-                                      index,
-                                    )
-                                  }
-                                >
-                                  <PsychologyAltRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Suggest Config">
-                                <IconButton
-                                  color="primary"
-                                  onClick={() =>
-                                    console.log(
-                                      "Suggest Config clicked for row:",
-                                      index,
-                                    )
-                                  }
-                                >
-                                  <ModelTrainingIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </FixedTableCell>
-                          </StyledTableRow>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </>
-            )}
-          </Box>
-        </Paper>
-      </Modal>
+       {counterfactuals?.loading  ? (
+  // Loader when loading
+  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+    <CircularProgress />
+    <Typography variant="body2" align="center">
+      Loading data...
+    </Typography>
+  </Box>
+) : counterfactuals?.data?.plotType === "Error" ? (
+  // Display error message
+  <Box sx={{ p: 2, textAlign: "center" }}>
+    <Typography variant="h6" color="error">
+      {counterfactuals?.data.plotName || "Error"}
+    </Typography>
+    <Typography variant="body2">
+      {counterfactuals?.data?.plotDescr}
+    </Typography>
+  </Box>
+) : counterfactuals?.data?.tableContents ? (
+  // Display table
+  <StyledDataGrid
+    autoHeight
+    rows={rows}
+    columns={columns}
+    pageSize={5}
+    rowsPerPageOptions={[5, 10, 25]}
+    disableSelectionOnClick
+    sx={{
+      border: theme => `1px solid ${theme.palette.customGrey.main}`,
+      "& .MuiDataGrid-columnHeader": {
+        backgroundColor: theme => theme.palette.customGrey.light,
+        fontWeight: 600,
+      },
+      "& .MuiDataGrid-cell": {
+        wordBreak: "break-word",
+        whiteSpace: "normal",
+      },
+    }}
+  />
+) : (
+  // Default fallback if no content at all
+  <Typography variant="body2" align="center">
+    No data available.
+  </Typography>
+)}
+      </ResponsiveCardTable>
+     
     </>
   )
 }
 
 export default CounterfactualsTable
+
+const ControlPanel = ({
+  activeTab,
+  setActiveTab,
+  counterfactuals
+}: {
+  activeTab: number
+  setActiveTab: (value: number) => void
+  counterfactuals: any
+}) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "flex-end",
+        mb: 0, // optional: margin bottom for spacing below tabs
+      }}
+    >
+      <Tabs
+        value={activeTab}
+        onChange={(e, newValue) => setActiveTab(newValue)}
+      
+      >
+        <Tab label="Feature"  disabled={counterfactuals?.loading}/>
+        <Tab label="Hyperparameters" disabled={counterfactuals?.loading} />
+      </Tabs>
+    </Box>
+  )
+}
