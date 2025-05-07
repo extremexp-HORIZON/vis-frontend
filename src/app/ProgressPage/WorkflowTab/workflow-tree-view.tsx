@@ -828,8 +828,11 @@ export default function WorkflowTreeView() {
                       fontSize="small"
                       sx={{ mr: 1, color: theme.palette.primary.main }}
                     />
-                    <Typography>
-                      TrainedModel (Model.pkl)
+                    <Typography sx={{mr: 1}}>
+                      TrainedModel
+                    </Typography>
+                    <Typography sx={{color: theme.palette.primary.main}}>
+                      [Model.pkl]
                     </Typography>
                   </Box>
                 </Box>
