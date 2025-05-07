@@ -171,6 +171,17 @@ const InstanceView = () => {
     }
   }, [isTabInitialized])
 
+  const visibleRows = showMisclassifiedOnly
+    ? rows.filter((row: any) => row.actual !== row.predicted)
+    : rows
+
+  const rowHeight = 52 // Estimated row height
+  const maxTableHeight = 500 // Set a max height to avoid it growing indefinitely
+  const calculatedHeight = Math.min(
+    visibleRows.length * rowHeight + 210,
+    maxTableHeight,
+  ) // Add space for headers and footer
+
   return (
     <>
       <Box display="flex" justifyContent="flex-end" marginBottom={2}>
@@ -216,7 +227,7 @@ const InstanceView = () => {
           setPoint={setPoint}
         />
       ) : (
-        <Box sx={{ height: "90%" }}>
+        <Box sx={{ height: calculatedHeight }}>
           <ResponsiveCardTable
             details={"No details available"}
             title="Instance Classification Table"
@@ -259,7 +270,7 @@ const InstanceView = () => {
                       : rows
                     ).map((row: any, index: any) => ({ id: index, ...row }))}
                     columns={columns}
-                    onRowClick={(params) => {
+                    onRowClick={params => {
                       const rowData = rows[params.id] // Ensure you're using the original data
                       setPoint(rowData)
                     }}
@@ -299,15 +310,17 @@ const InstanceView = () => {
         </Box>
       )}
 
-      {point && workflow  && (
-        <CounterfactualsTable
-          key={`counterfactuals-table`}
-          point={point}
-          handleClose={() => setPoint(null)}
-          counterfactuals={workflow || null}
-          experimentId={"I2Cat_phising"}
-          workflowId={"1"}
-        />
+      {point && workflow && (
+        <Box sx={{ mt: 2 }}>
+          <CounterfactualsTable
+            key={`counterfactuals-table`}
+            point={point}
+            handleClose={() => setPoint(null)}
+            counterfactuals={workflow || null}
+            experimentId={"I2Cat_phising"}
+            workflowId={"1"}
+          />
+        </Box>
       )}
     </>
   )

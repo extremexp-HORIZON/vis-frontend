@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box"
-
 import Typography from "@mui/material/Typography"
 import FormControl from "@mui/material/FormControl"
 import Select from "@mui/material/Select"
@@ -9,8 +8,6 @@ import { useEffect, useState } from "react"
 import _ from "lodash"
 import { Checkbox, CircularProgress, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import AssessmentIcon from "@mui/icons-material/Assessment"
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -44,13 +41,18 @@ const ControlPanel = ({
       <Box sx={{ display: "flex", flexWrap: "wrap" }}>
         <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
           <Typography fontSize={"0.8rem"}>x-axis:</Typography>
-          <FormControl sx={{ m: 1, minWidth: 120, maxHeight: 120 }} size="small">
+          <FormControl
+            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
+            size="small"
+          >
             <Select
               value={xAxisOption}
               disabled={plotData?.loading || !plotData?.data}
               sx={{ fontSize: "0.8rem" }}
               onChange={handleAxisSelection("x")}
-              MenuProps={{ PaperProps: { style: { maxHeight: 250, maxWidth: 300 } } }}
+              MenuProps={{
+                PaperProps: { style: { maxHeight: 250, maxWidth: 300 } },
+              }}
             >
               {options
                 .filter(option => option !== yAxisOption)
@@ -65,13 +67,18 @@ const ControlPanel = ({
 
         <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
           <Typography fontSize={"0.8rem"}>y-axis:</Typography>
-          <FormControl sx={{ m: 1, minWidth: 120, maxHeight: 120 }} size="small">
+          <FormControl
+            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
+            size="small"
+          >
             <Select
               value={yAxisOption}
               sx={{ fontSize: "0.8rem" }}
               disabled={plotData?.loading || !plotData?.data}
               onChange={handleAxisSelection("y")}
-              MenuProps={{ PaperProps: { style: { maxHeight: 250, maxWidth: 300 } } }}
+              MenuProps={{
+                PaperProps: { style: { maxHeight: 250, maxWidth: 300 } },
+              }}
             >
               {options
                 .filter(option => option !== xAxisOption)
@@ -104,13 +111,12 @@ const ControlPanel = ({
   )
 }
 
-
 interface IInstanceClassification {
   plotData: {
     data: Array<{
-      [key: string]: any;
-      label: string;
-      prediction: string;
+      [key: string]: any
+      label: string
+      prediction: string
     }>
     loading: boolean
     error: string | null
@@ -135,7 +141,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
     }
     return newData
   }
-
 
   useEffect(() => {
     if (plotData && plotData.data) {
@@ -176,89 +181,90 @@ const InstanceClassification = (props: IInstanceClassification) => {
 
   const info = (
     <Box
-    display="flex"
-    justifyContent="center"
-    alignItems="center"
-    height="100%"
-  >
-    <CircularProgress />
-    <Typography fontSize={"0.8rem"} sx={{ ml: 1 }}>
-      {plotData?.loading ? "Loading..." : "No data available"}
-    </Typography>
-  </Box>
-  )  
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100%"
+    >
+      <CircularProgress />
+      <Typography fontSize={"0.8rem"} sx={{ ml: 1 }}>
+        {plotData?.loading ? "Loading..." : "No data available"}
+      </Typography>
+    </Box>
+  )
   const shouldShowInfoMessage = plotData?.loading || !plotData?.data
 
   return (
-<ResponsiveCardVegaLite
-       spec={{
-        width: "container",
-        height: "container",
-        autosize: { type: "fit", contains: "padding", resize: true },
-        data: {
-          values: getVegaData(plotData?.data ?? []),
-        },
-        params: [
-          {
-            name: "pts",
-            select: "point",
+    <Box>
+      <ResponsiveCardVegaLite
+        spec={{
+          width: "container",
+          height: "container",
+          autosize: { type: "fit", contains: "padding", resize: true },
+          data: {
+            values: getVegaData(plotData?.data ?? []),
           },
-          {
-            name: "panZoom",
-            select: "interval",
-            bind: "scales",
-          },
-        ],
-        mark: {
-          type: "point",
-          filled: true,
-          tooltip: true,
-          size: 100,
-          color: theme.palette.primary.main,
-        },
-        encoding: {
-          x: {
-            field: xAxisOption || "xAxis default",
-            type: "quantitative",
-          },
-          y: {
-            field: yAxisOption || "yAxis default",
-            type: "quantitative",
-          },
-          color: {
-            condition: {
-              param: "pts",
-              field: "actual",
-              type: "nominal",
-              scale: { scheme: "category10" },
-              legend: null,
+          params: [
+            {
+              name: "pts",
+              select: "point",
             },
-            value: "grey",
+            {
+              name: "panZoom",
+              select: "interval",
+              bind: "scales",
+            },
+          ],
+          mark: {
+            type: "point",
+            filled: true,
+            tooltip: true,
+            size: 100,
+            color: theme.palette.primary.main,
           },
-        },
-      }}
+          encoding: {
+            x: {
+              field: xAxisOption || "xAxis default",
+              type: "quantitative",
+            },
+            y: {
+              field: yAxisOption || "yAxis default",
+              type: "quantitative",
+            },
+            color: {
+              condition: {
+                param: "pts",
+                field: "actual",
+                type: "nominal",
+                scale: { scheme: "category10" },
+                legend: null,
+              },
+              value: "grey",
+            },
+          },
+        }}
         title={"Instance Classification Chart"}
         actions={false}
-        controlPanel={ <ControlPanel
-          xAxisOption={xAxisOption}
-          yAxisOption={yAxisOption}
-          setXAxisOption={setXAxisOption}
-          setYAxisOption={setYAxisOption}
-          handleCheckboxChange={handleCheckboxChange}
-          checkbox={checkbox}
-          options={options}
-          plotData={plotData}
-        />}
+        controlPanel={
+          <ControlPanel
+            xAxisOption={xAxisOption}
+            yAxisOption={yAxisOption}
+            setXAxisOption={setXAxisOption}
+            setYAxisOption={setYAxisOption}
+            handleCheckboxChange={handleCheckboxChange}
+            checkbox={checkbox}
+            options={options}
+            plotData={plotData}
+          />
+        }
         onNewView={handleNewView}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
         maxHeight={500}
-        
+        details={"No Details available"}
         aspectRatio={2}
       />
-        
-    
-    
+    </Box>
   )
 }
 
