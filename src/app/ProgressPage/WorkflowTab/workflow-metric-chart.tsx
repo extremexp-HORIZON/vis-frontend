@@ -314,7 +314,6 @@ export const MetricCards = () => {
         <DetailsCardItem label="Metric" value={metricData.title} />
         <DetailsCardItem label="Value" value={metricData.value?.toFixed(2)} />
         {metricData.task && <DetailsCardItem label="Logged in Task" value={metricData.task} />}
-        {metricData.step != null && <DetailsCardItem label="Step" value={metricData.step} />}
         <DetailsCardItem 
           label="Timestamp" 
           value={typeof metricData.timestamp === 'number' ? 

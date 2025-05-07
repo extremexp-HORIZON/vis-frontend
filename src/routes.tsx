@@ -53,26 +53,6 @@ const routes = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/:experimentId/comparative-analysis",
-    element: (
-      <ProtectedRoute>
-        <ProgressPage>
-          <CompareCompleted />
-        </ProgressPage>
-      </ProtectedRoute>
-    ),
-    errorElement: <ErrorPage />
-  },
-  {
-    path: "/:experimentId/explains",
-    element: (
-      <ProgressPage>
-        {/* <DummyExplains /> */}
-      </ProgressPage>
-    ),
-    errorElement: <ErrorPage />
-  },
-  {
     path: "*",
     element: <NotFound />,
     errorElement: <NotFound />

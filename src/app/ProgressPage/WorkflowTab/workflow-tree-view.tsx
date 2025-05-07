@@ -912,7 +912,7 @@ export default function WorkflowTreeView() {
                       sx={{ mr: 1, color: theme.palette.primary.main }}
                     />
                     <Typography>
-                      Feature Effects
+                      Feature Explainability
                     </Typography>
                   </Box>
                 </Box>
@@ -952,7 +952,7 @@ export default function WorkflowTreeView() {
                       sx={{ mr: 1, color: theme.palette.primary.main }}
                     />
                     <Typography>
-                      Hyperparameters Impact
+                      ML Hyperparameter Explanability
                     </Typography>
                   </Box>
                 </Box>

@@ -81,7 +81,8 @@ const WorkflowCharts: React.FC = () => {
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     // task name is the same across workflows
-    const metricTask = workflows.data.find(w => w.metrics.some(m => m.name === metricName))?.metrics?.find(m => m.name === metricName)?.task
+    const metricTaskId = workflows.data.find(w => w.metrics.some(m => m.name === metricName))?.metrics?.find(m => m.name === metricName)?.task
+    const metricTask = workflows.data?.find(w => w.tasks?.some(task => task.id === metricTaskId))?.tasks?.find(task => task.name === metricTaskId)?.name
     const metricSeries = groupedMetrics[metricName]
     const uniqueSteps = new Set(metricSeries.map(m => m.step))
     const workflowColorMap = workflowsTable.workflowColors
