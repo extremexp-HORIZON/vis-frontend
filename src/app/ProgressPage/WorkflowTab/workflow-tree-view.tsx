@@ -165,8 +165,6 @@ export default function WorkflowTreeView() {
     tab?.workflowMetrics.data,
   ])
 
-  console.log("Expanded IDs:", expandedTaskItemIds)
-
   if (!tab?.workflowConfiguration) return null
 
   return (
@@ -820,7 +818,6 @@ export default function WorkflowTreeView() {
                   </Box>
                 </Box>
               }
-              onClick={() => console.log("Model clicked")}
             >
               <TreeItem2
                 itemId="instance-view"

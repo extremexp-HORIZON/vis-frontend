@@ -23,12 +23,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     
     if (decoded.exp && decoded.exp < currentTime) {
       // Token is expired, remove it and redirect to login
-      sessionStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_token');
       return <Navigate to="/login" state={{ from: location.pathname }} replace />;
     }
   } catch (error) {
     // Invalid token format, remove it and redirect to login
-    sessionStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_token');
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   

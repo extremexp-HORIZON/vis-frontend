@@ -1,4 +1,4 @@
-const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
+const DEFAULT_TTL = 10 * 60 * 1000; // 5 minutes
 
 type CacheEntry<T> = {
   data: T;
