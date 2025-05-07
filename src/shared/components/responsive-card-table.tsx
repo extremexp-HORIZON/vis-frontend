@@ -27,6 +27,7 @@ import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import DownloadIcon from "@mui/icons-material/Download";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import CloseIcon from "@mui/icons-material/Close";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 interface ResponsiveCardTableProps {
   title: string;
@@ -42,6 +43,8 @@ interface ResponsiveCardTableProps {
   showFullScreenButton?: boolean;
   showDownloadButton?: boolean;
   noPadding?: boolean;
+  details?: string | null
+
 }
 
 export const SectionHeader = ({
@@ -103,6 +106,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   showFullScreenButton = true,
   showDownloadButton = true,
   noPadding = false,
+  details=null,
+  
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
@@ -259,6 +264,26 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                   {additionalMenuItems}
                 </Box>
               </Menu>
+              { details &&
+                              <Tooltip title={details}>
+                                <IconButton
+                                  aria-label="details"
+                                  sx={{
+                                    mr: 0.5,
+                                    "& svg": {
+                                      position: "relative",
+                                      zIndex: 1,
+                                    },
+                                    "&:hover": {
+                                      cursor: "default",
+                                    },
+                                  }}
+                                >
+                                  <InfoOutlinedIcon
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            }
               {showFullScreenButton && (
                 <Tooltip title="Fullscreen">
                   <IconButton 
@@ -429,7 +454,28 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                       </>
                     )}
                   </Menu>
+                  { details &&
+                <Tooltip title={details}>
+                  <IconButton
+                    aria-label="details"
+                    sx={{
+                      mr: 0.5,
+                      "& svg": {
+                        position: "relative",
+                        zIndex: 1,
+                      },
+                      "&:hover": {
+                        cursor: "default",
+                      },
+                    }}
+                  >
+                    <InfoOutlinedIcon
+                    />
+                  </IconButton>
+                </Tooltip>
+              }
                 </>
+                
               )}
               <IconButton
                 edge="end"
