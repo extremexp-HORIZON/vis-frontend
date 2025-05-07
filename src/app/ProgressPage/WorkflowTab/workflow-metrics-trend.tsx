@@ -180,7 +180,7 @@ const WorkflowTrends = () => {
             color="primary"
             onClick={() => setIsMosaic(false)}
           >
-            List
+            Stacked
           </Button>
         </ButtonGroup>
       </Grid>
