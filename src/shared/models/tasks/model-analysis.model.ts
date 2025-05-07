@@ -9,9 +9,7 @@ import type {
 } from "../dataexploration.model"
 import type { FetchExplainabilityPlotPayload } from "./explainability.model"
 import { api, experimentApi } from "../../../app/api/api"
-import { api, experimentApi } from "../../../app/api/api"
 import { createAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
@@ -59,6 +57,11 @@ export interface IModelAnalysis {
     loading: boolean
     error: string | null
   }
+  modelRocCurve: {
+    data: {fpr: number[]; tpr: number[]; thresholds?: number[]; auc?: number} | null
+    loading: boolean
+    error: string | null
+  }
   multipleTimeSeries: {
     data: IDataExplorationResponse | null
     loading: boolean
@@ -85,6 +88,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   influenceFunctions: { data: null, loading: false, error: null },
   modelInstances: { data: null, loading: false, error: null },
   modelConfusionMatrix: { data: null, loading: false, error: null },
+  modelRocCurve: {data: null, loading: false, error: null },
   multipleTimeSeries: { data: null, loading: false, error: null },
   multipleTimeSeriesMetadata: { data: null, loading: false, error: null },
   affected: { data: null, loading: false, error: null },
@@ -218,7 +222,6 @@ export const modelAnalysisReducers = (
         compareCompletedTask.modelConfusionMatrix.loading = false
         compareCompletedTask.modelConfusionMatrix.error = action.error.message || "Failed to fetch confusion matrix"
       }
-
     })
     .addCase(getLabelTestInstances.pending, (state, action) => {
       const compareCompletedTask = state.tab?.workflowTasks.modelAnalysis;
@@ -242,7 +245,50 @@ export const modelAnalysisReducers = (
         compareCompletedTask.modelInstances.error = "Failed to fetch test instances";
       }
     })
-    
+    .addCase(fetchRocCurve.pending, (state, action) => {
+      const compareCompletedTask =
+        state.tab?.workflowId === `${action.meta.arg.runId}`
+          ? state.tab.workflowTasks.modelAnalysis
+          : null;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelRocCurve.loading = true;
+        compareCompletedTask.modelRocCurve.error = null;
+      }
+    })
+    .addCase(fetchRocCurve.fulfilled, (state, action) => {
+      const compareCompletedTask =
+        state.tab?.workflowId === `${action.meta.arg.runId}`
+          ? state.tab.workflowTasks.modelAnalysis
+          : null;
+      if (compareCompletedTask) {
+
+        let rawData = typeof action.payload === "string"
+        ? JSON.parse(action.payload.replace(/\bInfinity\b/g, "1e9").replace(/\b-Infinity\b/g, "-1e9"))
+        : action.payload
+  
+      if (Array.isArray(rawData.thresholds)) {
+        rawData.thresholds = rawData.thresholds.map((t: number | string) =>
+          t === Infinity || t === "Infinity" ? 1e9 :
+          t === -Infinity || t === "-Infinity" ? -1e9 :
+          t
+        );
+      }  
+        compareCompletedTask.modelRocCurve.data = rawData;
+        compareCompletedTask.modelRocCurve.loading = false;
+        compareCompletedTask.modelRocCurve.error = null;
+      }
+    })
+    .addCase(fetchRocCurve.rejected, (state, action) => {
+      const compareCompletedTask =
+        state.tab?.workflowId === `${action.meta.arg.runId}`
+          ? state.tab.workflowTasks.modelAnalysis
+          : null;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelRocCurve.loading = false;
+        compareCompletedTask.modelRocCurve.error =
+          action.error.message || "Failed to fetch ROC curve";
+      }
+    })
 }
 
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
@@ -296,6 +342,15 @@ export const fetchConfusionMatrix = createAsyncThunk(
   async (payload: {experimentId: string, runId: string}) => {
     const { experimentId, runId } = payload;
     const requestUrl = `${experimentId}/runs/${runId}/evaluation/confusion-matrix`
+    return experimentApi.get<any>(requestUrl).then(response => response.data)
+  }
+)
+
+export const fetchRocCurve = createAsyncThunk(
+  "workflowTasks/model_analysis/fetch_roc_data",
+  async (payload: {experimentId: string, runId: string}) => {
+    const { experimentId, runId } = payload;
+    const requestUrl = `${experimentId}/runs/${runId}/evaluation/roc-curve`
     return experimentApi.get<any>(requestUrl).then(response => response.data)
   }
 )

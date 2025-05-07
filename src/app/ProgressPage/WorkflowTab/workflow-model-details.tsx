@@ -13,6 +13,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import { useState } from "react"
 import ConfusionMatrixPlot from "../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot"
+import RocCurvePlot from "../../Tasks/ModelAnalysisTask/plots/roc-curve-plot"
 
 const ModelDetails = () => {
   const info = (
@@ -38,22 +39,6 @@ const ModelDetails = () => {
           <DetailsCardItem label="Number of Parameters" value="1,024,000" />
           <DetailsCardItem label="Version" value="v1.2.3" />
         </DetailsCard>
-
-        <DetailsCard title="Training Metadata">
-          <DetailsCardItem label="Dataset" value="Customer Churn (v3.1)" />
-          <DetailsCardItem label="Epochs" value="50" />
-          <DetailsCardItem label="Batch Size" value="32" />
-          <DetailsCardItem label="Learning Rate" value="0.001" />
-          <DetailsCardItem label="Optimizer" value="Adam" />
-        </DetailsCard>
-
-        <DetailsCard title="Evaluation Metrics">
-          <DetailsCardItem label="Accuracy" value="92.5%" />
-          <DetailsCardItem label="Precision" value="91.3%" />
-          <DetailsCardItem label="Recall" value="89.7%" />
-          <DetailsCardItem label="F1 Score" value="90.5%" />
-          <DetailsCardItem label="ROC AUC" value="0.94" />
-        </DetailsCard>
       </Box>
 
       <Box paddingTop={5}>
@@ -65,14 +50,7 @@ const ModelDetails = () => {
           </Grid>
           <Grid item xs={isMosaic ? 6 : 12}>
             <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-              <ResponsiveCardVegaLite
-                spec={[undefined]}
-                aspectRatio={2}
-                maxHeight={400}
-                title="ROC curve"
-                infoMessage={info}
-                showInfoMessage={showInfoMessage}
-              />
+              <RocCurvePlot />
             </Box>
           </Grid>
         </Grid>
