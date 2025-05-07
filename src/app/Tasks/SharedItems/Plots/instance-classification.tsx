@@ -263,6 +263,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
         maxHeight={500}
         details={"No Details available"}
         aspectRatio={2}
+        isStatic={false}
       />
     </Box>
   )

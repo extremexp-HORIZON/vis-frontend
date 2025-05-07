@@ -115,9 +115,6 @@ const RocCurvePlot = () => {
       }
     }
   };
-  
-
-  console.log("AUC Value:", aucValue);
     
   const loading = (
     <Box display="flex" justifyContent="center" alignItems="center" height="100%">
