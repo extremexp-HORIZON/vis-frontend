@@ -340,26 +340,6 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   </MenuItem>
                 </Box>
               </Menu>
-              { details &&
-                <Tooltip title={details}>
-                  <IconButton
-                    aria-label="details"
-                    sx={{
-                      mr: 0.5,
-                      "& svg": {
-                        position: "relative",
-                        zIndex: 1,
-                      },
-                      "&:hover": {
-                        cursor: "default",
-                      },
-                    }}
-                  >
-                    <InfoOutlinedIcon
-                    />
-                  </IconButton>
-                </Tooltip>
-              }
               <Tooltip title="Fullscreen">
                 <IconButton 
                   aria-label="fullscreen" 
@@ -378,18 +358,27 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             </>
           }
           title={
-            <Typography
-              variant="overline"
-              sx={{
-                padding: "4px 8px",
-                textTransform: "uppercase",
-                fontWeight: 600,
-                letterSpacing: '0.5px',
-                color: '#2a3f5f'
-              }}
-            >
-              {title}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="overline"
+                sx={{
+                  padding: "4px 0px",
+                  textTransform: "uppercase",
+                  fontWeight: 600,
+                  letterSpacing: '0.5px',
+                  color: '#2a3f5f'
+                }}
+              >
+                {title}
+              </Typography>
+              {details && (
+                <Tooltip title={details}>
+                  <InfoOutlinedIcon
+                    sx={{ fontSize: 16, color: 'grey.600', cursor: 'default' }}
+                  />
+                </Tooltip>
+              )}
+            </Box>
           }
           // subheader="September 14, 2016"
           sx={{
@@ -481,13 +470,22 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           px: 3,
           py: 1.5,
         }}>
-          <Typography variant="h6" component="div" sx={{ 
-            fontWeight: 600,
-            color: '#2a3f5f',
-            letterSpacing: '0.3px',
-          }}>
-            {title}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h6" component="div" sx={{ 
+              fontWeight: 600,
+              color: '#2a3f5f',
+              letterSpacing: '0.3px',
+            }}>
+              {title}
+            </Typography>
+            {details && (
+                <Tooltip title={details}>
+                  <InfoOutlinedIcon
+                    sx={{ fontSize: 20, color: 'grey.600', cursor: 'default' }}
+                  />
+                </Tooltip>
+              )}
+          </Box>          
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {controlPanel && (
               <>
@@ -546,26 +544,6 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 </Menu>
               </>
             )}
-            { details &&
-              <Tooltip title={details}>
-                <IconButton
-                  aria-label="details"
-                  sx={{
-                    mr: 0.5,
-                    "& svg": {
-                      position: "relative",
-                      zIndex: 1,
-                    },
-                    "&:hover": {
-                      cursor: "default",
-                    },
-                  }}
-                >
-                  <InfoOutlinedIcon
-                  />
-                </IconButton>
-              </Tooltip>
-            }
             <IconButton
               edge="end"
               color="inherit"
