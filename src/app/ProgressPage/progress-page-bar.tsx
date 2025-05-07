@@ -26,7 +26,7 @@ const ProgressPageBar = () => {
           flexWrap: "wrap",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5}}>
           <Chip
             icon={<ScienceIcon />}
             label={`Experiment: ${experimentId}`}
