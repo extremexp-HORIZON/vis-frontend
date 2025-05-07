@@ -259,8 +259,13 @@ const InstanceView = () => {
                       : rows
                     ).map((row: any, index: any) => ({ id: index, ...row }))}
                     columns={columns}
+                    onRowClick={(params) => {
+                      const rowData = rows[params.id] // Ensure you're using the original data
+                      setPoint(rowData)
+                    }}
                     pagination
-                    disableRowSelectionOnClick
+                    // checkboxSelection
+                    // disableRowSelectionOnClick
                     sx={{
                       width: "100%",
                       border: "none",
@@ -294,7 +299,7 @@ const InstanceView = () => {
         </Box>
       )}
 
-      {point && workflow && (
+      {point && workflow  && (
         <CounterfactualsTable
           key={`counterfactuals-table`}
           point={point}
