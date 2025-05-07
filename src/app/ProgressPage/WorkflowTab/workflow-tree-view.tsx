@@ -171,7 +171,14 @@ export default function WorkflowTreeView() {
     <Box sx={{ overflow: "auto" }}>
       {/* Enhanced Title and Separator */}
       <Accordion
-        defaultExpanded disableGutters
+        defaultExpanded 
+        disableGutters
+        sx={{
+          boxShadow: 'none',
+          '&::before': {
+            display: 'none',
+          },
+        }}      
       >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Box
@@ -751,7 +758,16 @@ export default function WorkflowTreeView() {
       </AccordionDetails>
       </Accordion>
 
-      <Accordion defaultExpanded disableGutters>
+      <Accordion 
+        defaultExpanded
+        disableGutters
+        sx={{
+          boxShadow: 'none',
+          '&::before': {
+            display: 'none',
+          },
+        }}      
+        >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           {/* Simple Title */}
           <Box
