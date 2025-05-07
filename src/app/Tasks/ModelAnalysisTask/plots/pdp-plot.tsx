@@ -189,6 +189,7 @@ const PdpPlot = (props: PdpPlotProps) => {
           showInfoMessage={ shouldShowLoading || shouldShowError}
           infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
           isStatic={false}
+          details={plotModel?.data?.plotDescr || null}
         />
     )
 }

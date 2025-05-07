@@ -31,7 +31,7 @@ import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 import DownloadIcon from "@mui/icons-material/Download"
 import FullscreenIcon from "@mui/icons-material/Fullscreen"
 import CodeIcon from "@mui/icons-material/Code"
-
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 interface ResponsiveCardVegaLiteProps {
   spec: any // VegaLite specification
   minWidth?: number
@@ -44,6 +44,7 @@ interface ResponsiveCardVegaLiteProps {
   infoMessage?: React.ReactElement
   showInfoMessage?: boolean
   isStatic?: boolean // If true, means the chart will be inside a static panel
+  details?: string | null
 }
 const SectionHeader = ({
   icon,
@@ -102,6 +103,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   infoMessage,
   showInfoMessage,
   isStatic = true,
+  details = null,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth)
@@ -338,6 +340,26 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   </MenuItem>
                 </Box>
               </Menu>
+              { details &&
+                <Tooltip title={details}>
+                  <IconButton
+                    aria-label="details"
+                    sx={{
+                      mr: 0.5,
+                      "& svg": {
+                        position: "relative",
+                        zIndex: 1,
+                      },
+                      "&:hover": {
+                        cursor: "default",
+                      },
+                    }}
+                  >
+                    <InfoOutlinedIcon
+                    />
+                  </IconButton>
+                </Tooltip>
+              }
               <Tooltip title="Fullscreen">
                 <IconButton 
                   aria-label="fullscreen" 
@@ -524,6 +546,26 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 </Menu>
               </>
             )}
+            { details &&
+              <Tooltip title={details}>
+                <IconButton
+                  aria-label="details"
+                  sx={{
+                    mr: 0.5,
+                    "& svg": {
+                      position: "relative",
+                      zIndex: 1,
+                    },
+                    "&:hover": {
+                      cursor: "default",
+                    },
+                  }}
+                >
+                  <InfoOutlinedIcon
+                  />
+                </IconButton>
+              </Tooltip>
+            }
             <IconButton
               edge="end"
               color="inherit"
