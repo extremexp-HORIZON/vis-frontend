@@ -240,30 +240,29 @@ const InstanceClassification = (props: IInstanceClassification) => {
               type: "quantitative",
             },
             color: checkbox
-              ? {
-                  field: "isMisclassified",
-                  type: "nominal",
-                  scale: {
-                    domain: [false, true],
-                    range: ["#cccccc", "#ff0000"],
-                  },
-                  legend: {
-                    title: "Misclassified",
-                    labelExpr:
-                      "datum.label === 'true' ? 'Misclassified' : 'Correct'",
-                  },
-                }
-              : {
-                  condition: {
-                    param: "pts",
-                    field: "actual",
-                    type: "nominal",
-                    scale: { scheme: "category10" },
-                    legend: null,
-                  },
-                  value: "grey",
+            ? {
+                field: "isMisclassified",
+                type: "nominal",
+                scale: {
+                  domain: [false, true],
+                  range: ["#cccccc", "#ff0000"], // grey for correct, red for misclassified
                 },
-            opacity: checkbox
+                legend: {
+                  title: "Misclassified",
+                  labelExpr: "datum.label === 'true' ? 'Misclassified' : 'Correct'",
+                },
+              }
+            : {
+                field: "actual", // Use the actual class for coloring
+                type: "nominal",
+                scale: {
+                  range: ["#1f77b4", "#2ca02c"], // blue and green colors
+                },
+                legend: {
+                  title: "Actual Class",
+                },
+              },
+              opacity: checkbox
               ? {
                   field: "isMisclassified",
                   type: "nominal",
@@ -273,7 +272,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
                   },
                 }
               : {
-                  value: 0.8,
+                  value: 0.8, // consistent opacity for all points in normal view
                 },
           },
         }}
