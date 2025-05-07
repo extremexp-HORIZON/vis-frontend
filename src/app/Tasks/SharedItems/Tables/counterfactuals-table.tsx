@@ -347,7 +347,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       >
        {counterfactuals?.loading  ? (
   // Loader when loading
-  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+  <Box sx={{ display: "flex", justifyContent: "center", minHeight: "250px", flexDirection: "column", alignItems: "center", height: "100%" }}>
     <CircularProgress />
     <Typography variant="body2" align="center">
       Loading data...
