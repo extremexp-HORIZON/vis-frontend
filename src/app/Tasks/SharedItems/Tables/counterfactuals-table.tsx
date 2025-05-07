@@ -26,7 +26,8 @@ import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 import { Tab, Tabs } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid"
 import ResponsiveCardTable from "../../../../shared/components/responsive-card-table"
-
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -222,8 +223,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
     }
   }, [point, activeTab])
 
-  
-
   const getNonConstantColumns = (tableContents: any) => {
     if (!tableContents) return []
 
@@ -292,7 +291,8 @@ const CounterfactualsTable = (props: ITableComponent) => {
 
     const filteredEntries = Object.entries(tableContents).filter(
       ([key, column]) => {
-        if (key==="BinaryLabel"|| key==="Type"|| key==="Cost") return false // Skip the BinaryLabel column
+        if (key === "BinaryLabel" || key === "Type" || key === "Cost")
+          return false // Skip the BinaryLabel column
         const uniqueValues = new Set(column.values)
         return uniqueValues.size > 1 // Keep only if there is more than one unique value
       },
@@ -305,15 +305,51 @@ const CounterfactualsTable = (props: ITableComponent) => {
     counterfactuals?.data?.tableContents || {},
   )
 
-  const columns = Object.entries(filteredTableContents).map(([key]) => ({
-    field: key,
-    headerName: key,
-    flex: 1,
-    minWidth: 100,
-    maxWidth: 300,
-    headerAlign: "center",
-    align: "center",
-  }))
+ 
+  const columns = Object.entries(filteredTableContents).map(([key, column]) => {
+    const referenceValue = parseFloat(column.values[0])
+
+    return {
+      field: key,
+      headerName: key,
+      flex: 1,
+      minWidth: 100,
+      maxWidth: 300,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params: any) => {
+        const currentValue = parseFloat(params.value)
+        if (isNaN(referenceValue) || isNaN(currentValue)) {
+          return params.value
+        }
+
+        let icon = null
+
+        if (currentValue < referenceValue) {
+          icon = (
+            <ArrowDropDownIcon
+              fontSize="small"
+              sx={{ color: "red", ml: 0.5 }}
+            />
+          )
+        } else if (currentValue > referenceValue) {
+          icon = (
+            <ArrowDropUpIcon
+              fontSize="small"
+              sx={{ color: "green", ml: 0.5 }}
+            />
+          )
+        }
+
+        return (
+          <Box display="flex" alignItems="center" justifyContent="center">
+            <Typography variant="body2">{params.value}</Typography>
+            {icon}
+          </Box>
+        )
+      },
+    }
+  })
 
   const rowCount =
     filteredTableContents[Object.keys(filteredTableContents)[0]]?.values
@@ -326,17 +362,18 @@ const CounterfactualsTable = (props: ITableComponent) => {
     }
     return row
   })
-  
 
   return (
     <>
-    
-    
       <ResponsiveCardTable
         details={counterfactuals?.data?.plotDescr}
         title={counterfactuals?.data?.plotName || "Counterfactuals"}
         controlPanel={
-          <ControlPanel activeTab={activeTab} setActiveTab={setActiveTab} counterfactuals={counterfactuals} />
+          <ControlPanel
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            counterfactuals={counterfactuals}
+          />
         }
         // onDownload={handleExportCsv}
         // showDownloadButton={hasContent}
@@ -345,53 +382,61 @@ const CounterfactualsTable = (props: ITableComponent) => {
         additionalMenuItems={null}
         noPadding={true}
       >
-       {counterfactuals?.loading  ? (
-  // Loader when loading
-  <Box sx={{ display: "flex", justifyContent: "center", minHeight: "250px", flexDirection: "column", alignItems: "center", height: "100%" }}>
-    <CircularProgress />
-    <Typography variant="body2" align="center">
-      Loading data...
-    </Typography>
-  </Box>
-) : counterfactuals?.data?.plotType === "Error" ? (
-  // Display error message
-  <Box sx={{ p: 2, textAlign: "center" }}>
-    <Typography variant="h6" color="error">
-      {counterfactuals?.data.plotName || "Error"}
-    </Typography>
-    <Typography variant="body2">
-      {counterfactuals?.data?.plotDescr}
-    </Typography>
-  </Box>
-) : counterfactuals?.data?.tableContents ? (
-  // Display table
-  <StyledDataGrid
-    autoHeight
-    rows={rows}
-    columns={columns}
-    pageSize={5}
-    rowsPerPageOptions={[5, 10, 25]}
-    disableSelectionOnClick
-    sx={{
-      border: theme => `1px solid ${theme.palette.customGrey.main}`,
-      "& .MuiDataGrid-columnHeader": {
-        backgroundColor: theme => theme.palette.customGrey.light,
-        fontWeight: 600,
-      },
-      "& .MuiDataGrid-cell": {
-        wordBreak: "break-word",
-        whiteSpace: "normal",
-      },
-    }}
-  />
-) : (
-  // Default fallback if no content at all
-  <Typography variant="body2" align="center">
-    No data available.
-  </Typography>
-)}
+        {counterfactuals?.loading ? (
+          // Loader when loading
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              minHeight: "250px",
+              flexDirection: "column",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
+            <Typography variant="body2" align="center">
+              Loading data...
+            </Typography>
+          </Box>
+        ) : counterfactuals?.data?.plotType === "Error" ? (
+          // Display error message
+          <Box sx={{ p: 2, textAlign: "center" }}>
+            <Typography variant="h6" color="error">
+              {counterfactuals?.data.plotName || "Error"}
+            </Typography>
+            <Typography variant="body2">
+              {counterfactuals?.data?.plotDescr}
+            </Typography>
+          </Box>
+        ) : counterfactuals?.data?.tableContents ? (
+          // Display table
+          <StyledDataGrid
+            autoHeight
+            rows={rows}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5, 10, 25]}
+            disableSelectionOnClick
+            sx={{
+              border: theme => `1px solid ${theme.palette.customGrey.main}`,
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: theme => theme.palette.customGrey.light,
+                fontWeight: 600,
+              },
+              "& .MuiDataGrid-cell": {
+                wordBreak: "break-word",
+                whiteSpace: "normal",
+              },
+            }}
+          />
+        ) : (
+          // Default fallback if no content at all
+          <Typography variant="body2" align="center">
+            No data available.
+          </Typography>
+        )}
       </ResponsiveCardTable>
-     
     </>
   )
 }
@@ -401,7 +446,7 @@ export default CounterfactualsTable
 const ControlPanel = ({
   activeTab,
   setActiveTab,
-  counterfactuals
+  counterfactuals,
 }: {
   activeTab: number
   setActiveTab: (value: number) => void
@@ -418,9 +463,8 @@ const ControlPanel = ({
       <Tabs
         value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}
-      
       >
-        <Tab label="Feature"  disabled={counterfactuals?.loading}/>
+        <Tab label="Feature" disabled={counterfactuals?.loading} />
         <Tab label="Hyperparameters" disabled={counterfactuals?.loading} />
       </Tabs>
     </Box>
