@@ -292,6 +292,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
 
     const filteredEntries = Object.entries(tableContents).filter(
       ([key, column]) => {
+        if (key==="BinaryLabel"|| key==="Type"|| key==="Cost") return false // Skip the BinaryLabel column
         const uniqueValues = new Set(column.values)
         return uniqueValues.size > 1 // Keep only if there is more than one unique value
       },
