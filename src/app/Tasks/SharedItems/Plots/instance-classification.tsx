@@ -143,7 +143,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
   // }
   const getVegaData = (data: any) => {
     let newData = _.cloneDeep(data)
-    return newData.map(d => ({
+    return newData.map((d: { actual: any; predicted: any }) => ({
       ...d,
       isMisclassified: d.actual !== d.predicted,
     }))
@@ -225,7 +225,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
           mark: {
             type: "point",
             filled: true,
-            tooltip: true,
+            // tooltip: true,
             size: 100,
             color: theme.palette.primary.main,
           },
@@ -274,6 +274,12 @@ const InstanceClassification = (props: IInstanceClassification) => {
               : {
                   value: 0.8, // consistent opacity for all points in normal view
                 },
+                tooltip: [
+                  { field: "actual", type: "nominal", title: "Actual" },
+                  { field: "predicted", type: "nominal", title: "Predicted" },
+                  { field: xAxisOption || "xAxis default", type: "quantitative", title:xAxisOption  },
+                  { field: yAxisOption || "yAxis default", type: "quantitative", title: yAxisOption },
+                ]    
           },
         }}
         title={"Instance Classification Chart"}

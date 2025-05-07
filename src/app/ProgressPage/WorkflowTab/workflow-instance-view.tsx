@@ -13,6 +13,11 @@ import {
   styled,
   Checkbox,
   Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
 } from "@mui/material"
 import { setControls } from "../../../store/slices/workflowPageSlice"
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
@@ -40,7 +45,7 @@ const InstanceView = () => {
   const [point, setPoint] = useState<any | null>(null)
   const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? []
 
-  
+
   const columns = Object.keys(rows[0] || {}).map(key => ({
     field: key,
     headerName: key,
@@ -70,6 +75,7 @@ const InstanceView = () => {
     },
   }))
 
+  console.log("pont", point)
   const handleExportCsv = () => {
     if (!rows || rows.length === 0) return
 
@@ -306,7 +312,35 @@ const InstanceView = () => {
       )}
 
       {point && workflow && (
-        <Box sx={{ mt: 2 }}>
+       <Box sx={{ mt: 2 }}>
+
+      <Box sx={{ mb: 2 }}>
+       
+   
+       <ResponsiveCardTable title={"Selected Instance"} details={"No details available"}>
+         <Table size="small" sx={{ minWidth: "max-content" }}>
+           <TableHead>
+             <TableRow>
+               {Object.keys(point).map((key) => (
+                 <TableCell key={key} sx={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                   {key}
+                 </TableCell>
+               ))}
+             </TableRow>
+           </TableHead>
+           <TableBody>
+             <TableRow>
+               {Object.values(point).map((value, index) => (
+                 <TableCell key={index} sx={{ whiteSpace: "nowrap" }}>
+                   {String(value)}
+                 </TableCell>
+               ))}
+             </TableRow>
+           </TableBody>
+         </Table>
+         </ResponsiveCardTable>
+       </Box>
+       
           <CounterfactualsTable
             key={`counterfactuals-table`}
             point={point}

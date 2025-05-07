@@ -362,21 +362,58 @@ const CounterfactualsTable = (props: ITableComponent) => {
     }
     return row
   })
+  const handleExportCsv = () => {
+    return
+    // if (!rows || rows.length === 0) return
+
+    // const headers = selectedColumns.map(col => col.name)
+    // const csvContent = [
+    //   headers.join(","),
+    //   ...rows.map((row: any) =>
+    //     headers
+    //       .map(header => {
+    //         const value = row[header]
+    //         // Handle values with commas by wrapping in quotes
+    //         return typeof value === "string" && value.includes(",")
+    //           ? `"${value}"`
+    //           : value !== undefined && value !== null
+    //             ? value
+    //             : ""
+    //       })
+    //       .join(","),
+    //   ),
+    // ].join("\n")
+
+    // const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    // const url = URL.createObjectURL(blob)
+    // const link = document.createElement("a")
+    // link.setAttribute("href", url)
+    // link.setAttribute(
+    //   "download",
+    //   `data-table-export-${new Date().toISOString().split("T")[0]}.csv`,
+    // )
+    // document.body.appendChild(link)
+    // link.click()
+    // document.body.removeChild(link)
+  }
 
   return (
     <>
       <ResponsiveCardTable
         details={counterfactuals?.data?.plotDescr}
-        title={counterfactuals?.data?.plotName || "Counterfactuals"}
-        controlPanel={
+        title={
+          activeTab === 0
+            ? `feature ${counterfactuals?.data?.plotName}`
+            : `hyperparameters ${counterfactuals?.data?.plotName}`
+        }        controlPanel={
           <ControlPanel
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             counterfactuals={counterfactuals}
           />
         }
-        // onDownload={handleExportCsv}
-        // showDownloadButton={hasContent}
+        onDownload={handleExportCsv}
+        showDownloadButton={true}
         downloadLabel="Export as CSV"
         downloadSecondaryText="Download table data"
         additionalMenuItems={null}
