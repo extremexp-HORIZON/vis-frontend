@@ -134,12 +134,19 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const [yAxisOption, setYAxisOption] = useState<string>("")
   const [checkbox, setCheckbox] = useState<boolean>(false)
 
+  // const getVegaData = (data: any) => {
+  //   let newData: any[] = _.cloneDeep(data)
+  //   if (checkbox) {
+  //     newData = newData.filter(d => d.actual !== d.predicted)
+  //   }
+  //   return newData
+  // }
   const getVegaData = (data: any) => {
-    let newData: any[] = _.cloneDeep(data)
-    if (checkbox) {
-      newData = newData.filter(d => d.actual !== d.predicted)
-    }
-    return newData
+    let newData = _.cloneDeep(data)
+    return newData.map(d => ({
+      ...d,
+      isMisclassified: d.actual !== d.predicted,
+    }))
   }
 
   useEffect(() => {
@@ -222,6 +229,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
             size: 100,
             color: theme.palette.primary.main,
           },
+
           encoding: {
             x: {
               field: xAxisOption || "xAxis default",
@@ -231,16 +239,42 @@ const InstanceClassification = (props: IInstanceClassification) => {
               field: yAxisOption || "yAxis default",
               type: "quantitative",
             },
-            color: {
-              condition: {
-                param: "pts",
-                field: "actual",
-                type: "nominal",
-                scale: { scheme: "category10" },
-                legend: null,
-              },
-              value: "grey",
-            },
+            color: checkbox
+              ? {
+                  field: "isMisclassified",
+                  type: "nominal",
+                  scale: {
+                    domain: [false, true],
+                    range: ["#cccccc", "#ff0000"],
+                  },
+                  legend: {
+                    title: "Misclassified",
+                    labelExpr:
+                      "datum.label === 'true' ? 'Misclassified' : 'Correct'",
+                  },
+                }
+              : {
+                  condition: {
+                    param: "pts",
+                    field: "actual",
+                    type: "nominal",
+                    scale: { scheme: "category10" },
+                    legend: null,
+                  },
+                  value: "grey",
+                },
+            opacity: checkbox
+              ? {
+                  field: "isMisclassified",
+                  type: "nominal",
+                  scale: {
+                    domain: [false, true],
+                    range: [0.45, 1.0], // very faint for correct, full for misclassified
+                  },
+                }
+              : {
+                  value: 0.8,
+                },
           },
         }}
         title={"Instance Classification Chart"}
