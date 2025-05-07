@@ -6,8 +6,12 @@ import type { RootState} from "../../store/store";
 import { useAppSelector } from "../../store/store"
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
+import { useParams } from "react-router-dom";
+import Chip from '@mui/material/Chip';
+import ScienceIcon from '@mui/icons-material/Science';
 
 const ProgressPageBar = () => {
+  const { experimentId } = useParams()
   const { progressBar } = useAppSelector((state: RootState) => state.progressPage)
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.up('md'))
@@ -22,21 +26,45 @@ const ProgressPageBar = () => {
           flexWrap: "wrap",
         }}
       >
-        { matches ? (
-          <Box sx={{ minWidth: 35 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}>
+          <Chip
+            icon={<ScienceIcon />}
+            label={`Experiment: ${experimentId}`}
+            color="primary"
+            variant="outlined"
+            sx={{ 
+              fontWeight: 'medium',
+              '& .MuiChip-label': {
+                fontSize: '1rem',
+              }
+            }}
+          />
+          <Box sx={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: '16px',
+            px: 1,
+            border: `1px solid ${theme.palette.divider}`
+          }}>
             <Typography
-              variant="h6"
-              color="text.primary"
-            >{`Progress: ${Math.round(progressBar.progress)}%`}</Typography>
-          </Box>
-        ) : (
-          <Box sx={{ minWidth: 35 }}>
+              variant="body2"
+              fontWeight="medium"
+              color="text.secondary"
+              sx={{ mr: 0.5 }}
+            >
+              Progress:
+            </Typography>
             <Typography
-              variant="body1"
-              color="text.primary"
-            >{`Progress: ${Math.round(progressBar.progress)}%`}</Typography>
+              variant="body2"
+              fontWeight="bold"
+              color="primary.main"
+            >
+              {`${progressBar.progress}%`}
+            </Typography>
           </Box>
-        )}
+        </Box>
+        
         {matches && (
           <Box
             sx={{ minWidth: 35, display: "flex", columnGap: 1, flexWrap: "wrap" }}
@@ -56,13 +84,13 @@ const ProgressPageBar = () => {
           </Box>
         )}
       </Box>
-      <Box sx={{ width: "100%", mr: 1 }}>
+      <Box sx={{ width: "100%",}}>
         <LinearProgress
           variant="determinate"
           value={Math.round(progressBar.progress)}
           sx={{
             height: "1rem",
-            borderRadius: 4,
+            borderRadius: 10,
             backgroundColor: grey[300],
             "& .MuiLinearProgress-bar": {
               background:

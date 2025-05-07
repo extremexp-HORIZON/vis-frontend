@@ -44,7 +44,7 @@ const LeftMenu = () => {
       }}
     >
       <Box>
-        <Box
+        {/* <Box
           sx={{
             display: "flex",
             alignItems: "center",
@@ -58,7 +58,7 @@ const LeftMenu = () => {
         >
           <Box
             component="img"
-            src="/images\extremexp-logo-removebg-preview.png"
+            src="/images/extremexp-logo-removebg-preview.png"
             alt="ExtremeXP logo"
             sx={{
               width: "40px",
@@ -81,7 +81,59 @@ const LeftMenu = () => {
               </Tooltip>
             </Box>
           )}
-        </Box>
+        </Box> */}
+        {menuOptions.collapsed && (
+          <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+                padding: 1,
+                height: "64px", // Fixed height to match experiment controls
+                boxSizing: "border-box",
+                borderBottom: "1px solid #ddd",
+              }}
+            >
+            <Box
+              component="img"
+              src="/images/extremexp-logo-removebg-preview.png"
+              alt="ExtremeXP logo"
+              sx={{
+                width: "40px",
+                borderRadius: "8px",
+                objectFit: "cover",
+                userSelect: "none",
+              }}
+            />
+          </Box>
+          )}
+        {!menuOptions.collapsed && (
+          <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: 1,
+                padding: 1,
+                height: "64px", // Fixed height to match experiment controls
+                boxSizing: "border-box",
+                borderBottom: "1px solid #ddd",
+              }}
+            >
+            <Box
+              component="img"
+              src="/images/extremexp-logo-full.png"
+              alt="ExtremeXP logo"
+              sx={{
+                width: "80%",
+                borderRadius: "8px",
+                objectFit: "cover",
+                userSelect: "none",
+              }}
+            />
+          </Box>
+          )}
         <Box>
           <List sx={{p: 0}}>
             {navItems.map(({ icon, label, path }) => {
