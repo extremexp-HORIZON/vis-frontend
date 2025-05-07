@@ -253,13 +253,13 @@ const InstanceClassification = (props: IInstanceClassification) => {
                 },
               }
             : {
-                field: "actual", // Use the actual class for coloring
+                field: "predicted", // Use the actual class for coloring
                 type: "nominal",
                 scale: {
                   range: ["#1f77b4", "#2ca02c"], // blue and green colors
                 },
                 legend: {
-                  title: "Actual Class",
+                  title: "Predicted Class",
                 },
               },
               opacity: checkbox
