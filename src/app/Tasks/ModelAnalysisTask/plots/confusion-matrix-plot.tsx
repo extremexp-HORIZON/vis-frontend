@@ -43,8 +43,6 @@ const ConfusionMatrixPlot = () => {
 
     useEffect(() => {
         if (confusionMatrix?.data?.labels && confusionMatrix?.data?.matrix) {
-          console.log(confusionMatrix?.data?.labels)
-          console.log(confusionMatrix?.data?.matrix)
           const data = transformConfusionMatrix(
             confusionMatrix.data.labels,
             confusionMatrix.data.matrix

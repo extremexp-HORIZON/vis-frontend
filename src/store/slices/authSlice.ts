@@ -13,20 +13,20 @@ interface AuthState {
 }
 
 export const saveToken = (token: string): void => {
-  sessionStorage.setItem("auth_token", token)
+  localStorage.setItem("auth_token", token)
 }
 
 export const getToken = (): string | null => {
-  return sessionStorage.getItem("auth_token")
+  return localStorage.getItem("auth_token")
 }
 
 const removeToken = (): void => {
-  sessionStorage.removeItem("auth_token")
+  localStorage.removeItem("auth_token")
 }
 
 // Load initial state from localStorage if token exists
 const loadInitialState = (): AuthState => {
-  const token = sessionStorage.getItem("auth_token")
+  const token = localStorage.getItem("auth_token")
   if (token) {
     return {
       token: token,

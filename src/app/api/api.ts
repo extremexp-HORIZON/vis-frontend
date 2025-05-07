@@ -30,7 +30,7 @@ api.interceptors.response.use(
     // Handle 401 errors globally
     if (error.response && error.response.status === 401) {
       // Clear token and redirect to login
-      sessionStorage.removeItem("auth_token")
+      localStorage.removeItem("auth_token")
       // Consider using history.push or similar for navigation
     }
     return Promise.reject(error)
@@ -51,7 +51,7 @@ experimentApi.interceptors.response.use(
     // Handle 401 errors globally
     if (error.response && error.response.status === 401) {
       // Clear token and redirect to login
-      sessionStorage.removeItem("auth_token")
+      localStorage.removeItem("auth_token")
       // Consider using history.push or similar for navigation
     }
     return Promise.reject(error)

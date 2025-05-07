@@ -165,15 +165,20 @@ export default function WorkflowTreeView() {
     tab?.workflowMetrics.data,
   ])
 
-  console.log("Expanded IDs:", expandedTaskItemIds)
-
   if (!tab?.workflowConfiguration) return null
 
   return (
     <Box sx={{ overflow: "auto" }}>
       {/* Enhanced Title and Separator */}
       <Accordion
-        defaultExpanded disableGutters
+        defaultExpanded 
+        disableGutters
+        sx={{
+          boxShadow: 'none',
+          '&::before': {
+            display: 'none',
+          },
+        }}      
       >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Box
@@ -753,7 +758,16 @@ export default function WorkflowTreeView() {
       </AccordionDetails>
       </Accordion>
 
-      <Accordion defaultExpanded disableGutters>
+      <Accordion 
+        defaultExpanded
+        disableGutters
+        sx={{
+          boxShadow: 'none',
+          '&::before': {
+            display: 'none',
+          },
+        }}      
+        >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           {/* Simple Title */}
           <Box
@@ -820,7 +834,6 @@ export default function WorkflowTreeView() {
                   </Box>
                 </Box>
               }
-              onClick={() => console.log("Model clicked")}
             >
               <TreeItem2
                 itemId="instance-view"

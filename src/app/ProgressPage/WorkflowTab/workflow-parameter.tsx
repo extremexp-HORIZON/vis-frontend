@@ -38,7 +38,7 @@ const WorkflowParameter = () => {
   const compareKey = useMemo(() => `compare-${Date.now()}`, [])
   const handleClick = () => {
     const workflowIds = filteredWorkflows?.map(workflow => workflow.id)
-    setCache(compareKey, { workflowIds }, 1 * 60 * 1000)
+    setCache(compareKey, { workflowIds }, 5 * 60 * 1000)
   }
 
   const maxCount = Math.max(...paramValueCounts.map(d => d.count))
