@@ -184,7 +184,6 @@ export default function WorkflowTreeView() {
               sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}>
         <Box
           sx={{
-            pb: 1,
             display: "flex",
             alignItems: "center",
             gap: 1,
@@ -773,7 +772,6 @@ export default function WorkflowTreeView() {
           {/* Simple Title */}
           <Box
             sx={{
-              pb: 1,
               bgcolor: "background.paper",
               display: "flex",
               alignItems: "center",

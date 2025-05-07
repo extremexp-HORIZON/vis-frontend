@@ -218,7 +218,7 @@ const InstanceView = () => {
       ) : (
         <Box sx={{ height: "90%" }}>
           <ResponsiveCardTable
-          details={"No details available"}
+            details={"No details available"}
             title="Instance Classification Table"
             controlPanel={
               <ControlPanel

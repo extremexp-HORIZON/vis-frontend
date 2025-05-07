@@ -33,14 +33,12 @@ const SelectedItemViewer = () => {
   // Enhanced header component for consistency
   const Header = ({ title, icon }: { title: string; icon?: React.ReactNode }) => (
     <Box sx={{ 
-      pt: 0, 
-      px: 0, 
       borderBottom: `1px solid ${theme.palette.divider}`,
       bgcolor: 'background.paper',
       display: 'flex',
       alignItems: 'center',
       gap: 1,
-      p: 2,
+      p: 1.5,
     }}>
       {icon}
       <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
