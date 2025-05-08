@@ -221,7 +221,7 @@ export const MetricCards = () => {
           value={
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography variant="body1">
-                {metricData?.avgValue?.toFixed(2)} — Difference: {metricData?.avgDiff?.toFixed(2) ?? 0}%
+                {metricData?.avgValue?.toFixed(2)} — Difference: {Number.isFinite(metricData?.avgDiff) ? metricData.avgDiff.toFixed(2) : "0.00"}%
               </Typography>
               {renderDiffIcon()}
             </Box>
