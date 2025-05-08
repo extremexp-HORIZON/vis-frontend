@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem"
 import type { Dispatch, SetStateAction } from "react"
 import { useEffect, useState } from "react"
 import _ from "lodash"
-import { Checkbox, CircularProgress, useTheme } from "@mui/material"
+import {CircularProgress, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 
 interface ControlPanelProps {
@@ -14,8 +14,7 @@ interface ControlPanelProps {
   yAxisOption: string
   setXAxisOption: (val: string) => void
   setYAxisOption: (val: string) => void
-  handleCheckboxChange: (event: React.ChangeEvent) => void
-  checkbox: boolean
+  showMisclassifiedOnly: boolean
   options: string[]
   plotData: any
 }
@@ -25,8 +24,6 @@ const ControlPanel = ({
   yAxisOption,
   setXAxisOption,
   setYAxisOption,
-  handleCheckboxChange,
-  checkbox,
   options,
   plotData,
 }: ControlPanelProps) => {
@@ -100,12 +97,6 @@ const ControlPanel = ({
           px: 1.5,
         }}
       >
-        <Typography fontSize={"0.8rem"}>Misclassified Instances:</Typography>
-        <Checkbox
-          checked={checkbox}
-          onChange={handleCheckboxChange}
-          disabled={plotData?.loading || !plotData?.data}
-        />
       </Box>
     </>
   )
@@ -122,17 +113,17 @@ interface IInstanceClassification {
     error: string | null
   } | null
   point: any
+  showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<any>>
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
   const theme = useTheme()
-  const { plotData, setPoint, point } = props
+  const { plotData, setPoint, point, showMisclassifiedOnly } = props
   console.log("InstanceClassification plotData", plotData)
   const [options, setOptions] = useState<string[]>([])
   const [xAxisOption, setXAxisOption] = useState<string>("")
   const [yAxisOption, setYAxisOption] = useState<string>("")
-  const [checkbox, setCheckbox] = useState<boolean>(false)
 
   // const getVegaData = (data: any) => {
   //   let newData: any[] = _.cloneDeep(data)
@@ -171,11 +162,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
       }
     }
 
-  const handleCheckboxChange = (event: React.ChangeEvent) => {
-    setCheckbox((event.target as HTMLInputElement).checked)
-    setPoint(null)
-  }
-
   const handleNewView = (view: any) => {
     view.addEventListener("click", (event: any, item: any) => {
       if (item && item.datum) {
@@ -202,7 +188,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const shouldShowInfoMessage = plotData?.loading || !plotData?.data
 
   return (
-    <Box>
       <ResponsiveCardVegaLite
         spec={{
           width: "container",
@@ -239,7 +224,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
               field: yAxisOption || "yAxis default",
               type: "quantitative",
             },
-            color: checkbox
+            color: showMisclassifiedOnly
             ? {
                 field: "isMisclassified",
                 type: "nominal",
@@ -262,7 +247,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
                   title: "Predicted Class",
                 },
               },
-              opacity: checkbox
+              opacity: showMisclassifiedOnly
               ? {
                   field: "isMisclassified",
                   type: "nominal",
@@ -290,8 +275,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
             yAxisOption={yAxisOption}
             setXAxisOption={setXAxisOption}
             setYAxisOption={setYAxisOption}
-            handleCheckboxChange={handleCheckboxChange}
-            checkbox={checkbox}
+            showMisclassifiedOnly={showMisclassifiedOnly}
             options={options}
             plotData={plotData}
           />
@@ -299,11 +283,10 @@ const InstanceClassification = (props: IInstanceClassification) => {
         onNewView={handleNewView}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
-        maxHeight={500}
         aspectRatio={2}
-        isStatic={false}
+        maxHeight={480}
+        isStatic={true}
       />
-    </Box>
   )
 }
 

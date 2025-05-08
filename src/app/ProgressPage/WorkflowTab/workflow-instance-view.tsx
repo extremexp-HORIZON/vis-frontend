@@ -13,11 +13,7 @@ import {
   styled,
   Checkbox,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
+  Stack,
 } from "@mui/material"
 import { setControls } from "../../../store/slices/workflowPageSlice"
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
@@ -25,6 +21,7 @@ import TableChartIcon from "@mui/icons-material/TableChartSharp"
 import { DataGrid } from "@mui/x-data-grid"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import ResponsiveCardTable from "../../../shared/components/responsive-card-table"
+
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(
@@ -74,8 +71,7 @@ const InstanceView = () => {
         : (value?.toString?.() ?? "")
     },
   }))
-
-  console.log("pont", point)
+  
   const handleExportCsv = () => {
     if (!rows || rows.length === 0) return
 
@@ -159,6 +155,13 @@ const InstanceView = () => {
       border: "none",
       height: "100%", // Ensure full height
     },
+    // Add styling for selected row
+    "& .MuiDataGrid-row.Mui-selected": {
+      backgroundColor: `${theme.palette.primary.light}40`,
+      "&:hover": {
+        backgroundColor: `${theme.palette.primary.light}60`,
+      },
+    },
   }))
 
   useEffect(() => {
@@ -183,16 +186,32 @@ const InstanceView = () => {
     maxTableHeight,
   ) // Add space for headers and footer
 
+  // Common chart height to use for both chart types
+  const chartHeight = calculatedHeight
+
   return (
     <>
-      <Box display="flex" justifyContent="flex-end" marginBottom={2}>
+      <Box display="flex" justifyContent="space-between" marginBottom={2} alignItems="center">
+        {/* Misclassified instances checkbox moved to the top left */}
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography fontSize={"0.8rem"}>Show Misclassified Instances:</Typography>
+          <Checkbox
+            checked={showMisclassifiedOnly}
+            onChange={e => setShowMisclassifiedOnly(e.target.checked)}
+            disabled={
+              tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ||
+              !tab.workflowTasks.modelAnalysis?.modelInstances?.data
+            }
+          />
+        </Stack>
+
+        {/* Chart type controls remain on the right */}
         <ButtonGroup
           size="small"
           aria-label="Small button group"
           variant="outlined"
           sx={{
-            marginLeft: "auto",
-            height: 30, // Adjust this value to your desired height
+            height: 30,
             "& .MuiButton-root": {
               minHeight: 30,
               padding: "2px 2px",
@@ -222,28 +241,26 @@ const InstanceView = () => {
       </Box>
 
       {chartType === "scatter" ? (
-        <InstanceClassification
-          plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
-          point={point}
-          setPoint={setPoint}
-        />
+        <Box sx={{ height: chartHeight }}>
+          <InstanceClassification
+            plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
+            point={point}
+            setPoint={setPoint}
+            showMisclassifiedOnly={showMisclassifiedOnly}
+          />
+        </Box>
       ) : (
-        <Box sx={{ height: calculatedHeight }}>
+        <Box sx={{ height: chartHeight }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
-            controlPanel={
-              <ControlPanel
-                showMisclassifiedOnly={showMisclassifiedOnly}
-                setShowMisclassifiedOnly={setShowMisclassifiedOnly}
-                tab={tab}
-              />
-            }
+            controlPanel={null} // Remove the ControlPanel from here
             onDownload={handleExportCsv}
-            // showDownloadButton={hasContent}
+            showDownloadButton={hasContent}
             downloadLabel="Export as CSV"
             downloadSecondaryText="Download table data"
             additionalMenuItems={null}
             noPadding={true}
+            showControlsInHeader={true}
           >
             <Box
               sx={{
@@ -275,8 +292,10 @@ const InstanceView = () => {
                       setPoint(rowData)
                     }}
                     pagination
-                    // checkboxSelection
-                    // disableRowSelectionOnClick
+                    selectionModel={point ? [rows.indexOf(point)] : []}
+                    rowSelectionModel={point ? [rows.indexOf(point)] : []}
+                    checkboxSelection={false}
+                    disableRowSelectionOnClick={false}
                     sx={{
                       width: "100%",
                       border: "none",
@@ -292,6 +311,13 @@ const InstanceView = () => {
                       "& .MuiDataGrid-main": {
                         overflow: "hidden",
                       },
+                      // Style for selected row
+                      "& .MuiDataGrid-row.Mui-selected": {
+                        backgroundColor: "rgba(25, 118, 210, 0.15)",
+                        "&:hover": {
+                          backgroundColor: "rgba(25, 118, 210, 0.25)",
+                        },
+                      },
                     }}
                   />
                 </Box>
@@ -299,9 +325,6 @@ const InstanceView = () => {
                 <InfoMessage
                   message="Please select columns to display."
                   type="info"
-                  // icon={
-                  //   <AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />
-                  // }
                   fullHeight
                 />
               )}
@@ -309,80 +332,21 @@ const InstanceView = () => {
           </ResponsiveCardTable>
         </Box>
       )}
-
       {point && workflow && (
-       <Box sx={{ mt: 2 }}>
-
-      <Box sx={{ mb: 2 }}>
-       
-   
-       <ResponsiveCardTable title={"Selected Instance"} >
-         <Table size="small" sx={{ minWidth: "max-content" }}>
-           <TableHead>
-             <TableRow>
-               {Object.keys(point).map((key) => (
-                 <TableCell key={key} sx={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
-                   {key}
-                 </TableCell>
-               ))}
-             </TableRow>
-           </TableHead>
-           <TableBody>
-             <TableRow>
-               {Object.values(point).map((value, index) => (
-                 <TableCell key={index} sx={{ whiteSpace: "nowrap" }}>
-                   {String(value)}
-                 </TableCell>
-               ))}
-             </TableRow>
-           </TableBody>
-         </Table>
-         </ResponsiveCardTable>
-       </Box>
-       
+        <Box sx={{pt: 2}}>
           <CounterfactualsTable
-            key={`counterfactuals-table`}
-            point={point}
-            handleClose={() => setPoint(null)}
-            counterfactuals={workflow || null}
-            experimentId={"I2Cat_phising"}
-            workflowId={"1"}
-          />
+              key={`counterfactuals-table`}
+              point={point}
+              handleClose={() => {}} // We're handling close with our own button
+              counterfactuals={workflow || null}
+              onClose={() => setPoint(null)}
+              experimentId={experimentId || "I2Cat_phising"}
+              workflowId={tab?.workflowId || "1"}
+            />
         </Box>
       )}
     </>
   )
 }
 
-export default InstanceView
-
-const ControlPanel = ({
-  tab,
-  showMisclassifiedOnly,
-  setShowMisclassifiedOnly,
-}: {
-  tab: any
-  showMisclassifiedOnly: boolean
-  setShowMisclassifiedOnly: (value: boolean) => void
-}) => {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        px: 1.5,
-      }}
-    >
-      <Typography fontSize={"0.8rem"}>Misclassified Instances:</Typography>
-      <Checkbox
-        checked={showMisclassifiedOnly}
-        onChange={e => setShowMisclassifiedOnly(e.target.checked)}
-        disabled={
-          tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ||
-          !tab.workflowTasks.modelAnalysis?.modelInstances?.data
-        }
-      />
-    </Box>
-  )
-}
+export default InstanceView;

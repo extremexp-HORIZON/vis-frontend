@@ -1,42 +1,23 @@
 import Box from "@mui/material/Box"
-import IconButton from "@mui/material/IconButton"
-import Paper from "@mui/material/Paper"
-import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
-import InfoIcon from "@mui/icons-material/Info"
-import TableContainer from "@mui/material/TableContainer"
-import Table from "@mui/material/Table"
-import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import TableCell, { tableCellClasses } from "@mui/material/TableCell"
-import TableBody from "@mui/material/TableBody"
 import grey from "@mui/material/colors/grey"
 // import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
 import { useEffect, useState } from "react"
 import type { RootState } from "../../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import ModelTrainingIcon from "@mui/icons-material/ModelTraining"
 import CircularProgress from "@mui/material/CircularProgress"
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
 import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
-import Modal from "@mui/material/Modal"
-import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 import { Tab, Tabs } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid"
-import ResponsiveCardTable from "../../../../shared/components/responsive-card-table"
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "70%",
-  boxShadow: 24,
-  p: 1,
-}
+import ClosableCardTable from "../../../../shared/components/closable-card-table"
+
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -49,27 +30,11 @@ interface ITableComponent {
   } | null
   experimentId: string | undefined
   workflowId: string
+  onClose: any
 }
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}))
-
-const FixedTableCell = styled(TableCell)(({ theme }) => ({
-  position: "sticky",
-  right: 0,
-  backgroundColor: theme.palette.customGrey.light,
-  zIndex: 100,
-  borderLeft: `1px solid ${grey[300]}`,
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.customGrey.light,
-  },
-}))
-
 const CounterfactualsTable = (props: ITableComponent) => {
-  const { point, handleClose, counterfactuals, experimentId, workflowId } =
+  const { point, handleClose, counterfactuals, experimentId, workflowId, onClose } =
     props
   const dispatch = useAppDispatch()
   const [activeTab, setActiveTab] = useState(0) //activeTab,setA
@@ -362,44 +327,11 @@ const CounterfactualsTable = (props: ITableComponent) => {
     }
     return row
   })
-  const handleExportCsv = () => {
-    return
-    // if (!rows || rows.length === 0) return
 
-    // const headers = selectedColumns.map(col => col.name)
-    // const csvContent = [
-    //   headers.join(","),
-    //   ...rows.map((row: any) =>
-    //     headers
-    //       .map(header => {
-    //         const value = row[header]
-    //         // Handle values with commas by wrapping in quotes
-    //         return typeof value === "string" && value.includes(",")
-    //           ? `"${value}"`
-    //           : value !== undefined && value !== null
-    //             ? value
-    //             : ""
-    //       })
-    //       .join(","),
-    //   ),
-    // ].join("\n")
-
-    // const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    // const url = URL.createObjectURL(blob)
-    // const link = document.createElement("a")
-    // link.setAttribute("href", url)
-    // link.setAttribute(
-    //   "download",
-    //   `data-table-export-${new Date().toISOString().split("T")[0]}.csv`,
-    // )
-    // document.body.appendChild(link)
-    // link.click()
-    // document.body.removeChild(link)
-  }
 
   return (
     <>
-      <ResponsiveCardTable
+      <ClosableCardTable
         details={counterfactuals?.data?.plotDescr}
         title={
           activeTab === 0
@@ -412,11 +344,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             counterfactuals={counterfactuals}
           />
         }
-        onDownload={handleExportCsv}
-        showDownloadButton={true}
-        downloadLabel="Export as CSV"
-        downloadSecondaryText="Download table data"
-        additionalMenuItems={null}
+        onClose={onClose}
         noPadding={true}
       >
         {counterfactuals?.loading ? (
@@ -452,8 +380,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
             autoHeight
             rows={rows}
             columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5, 10, 25]}
             disableSelectionOnClick
             sx={{
               border: theme => `1px solid ${theme.palette.customGrey.main}`,
@@ -465,6 +391,10 @@ const CounterfactualsTable = (props: ITableComponent) => {
                 wordBreak: "break-word",
                 whiteSpace: "normal",
               },
+              // Hide footer completely since pagination is disabled
+              "& .MuiDataGrid-footerContainer": {
+                display: "none",
+              },
             }}
           />
         ) : (
@@ -473,7 +403,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             No data available.
           </Typography>
         )}
-      </ResponsiveCardTable>
+      </ClosableCardTable>
     </>
   )
 }
@@ -500,8 +430,14 @@ const ControlPanel = ({
       <Tabs
         value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}
+        sx={{ 
+          '& .MuiTab-root': { 
+            fontSize: '0.8rem',
+            minHeight: '8px',
+          }
+        }}
       >
-        <Tab label="Feature" disabled={counterfactuals?.loading} />
+        <Tab label="Features" disabled={counterfactuals?.loading} />
         <Tab label="Hyperparameters" disabled={counterfactuals?.loading} />
       </Tabs>
     </Box>

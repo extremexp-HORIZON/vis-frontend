@@ -1,5 +1,5 @@
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Box,
   Card,
@@ -44,6 +44,7 @@ interface ResponsiveCardTableProps {
   showDownloadButton?: boolean
   noPadding?: boolean
   details?: string | null
+  showControlsInHeader?: boolean
 }
 
 export const SectionHeader = ({
@@ -108,6 +109,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   showDownloadButton = true,
   noPadding = false,
   details = null,
+  showControlsInHeader = false,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
@@ -118,6 +120,12 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   const [fullscreenAnchorEl, setFullscreenAnchorEl] =
     useState<null | HTMLElement>(null)
   const fullscreenMenuOpen = Boolean(fullscreenAnchorEl)
+  // Add state to track if we have enough space in the header
+  const [hasSpaceInHeader, setHasSpaceInHeader] = useState(true)
+  // Add ref for the card header
+  const cardHeaderRef = useRef<HTMLDivElement>(null)
+  // Threshold for minimum width to show controls in header (in pixels)
+  const MIN_HEADER_WIDTH_FOR_CONTROLS = 500
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -164,6 +172,27 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
     setFullscreenAnchorEl(null)
   }
 
+  // Effect to handle the resize observation
+  useEffect(() => {
+    if (!showControlsInHeader || !cardHeaderRef.current) return;
+    
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        // Check if there's enough space in the header
+        const width = entry.contentRect.width;
+        setHasSpaceInHeader(width > MIN_HEADER_WIDTH_FOR_CONTROLS);
+      }
+    });
+    
+    resizeObserver.observe(cardHeaderRef.current);
+    
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [showControlsInHeader]);
+
+  const shouldShowControlsInHeader = showControlsInHeader && hasSpaceInHeader && controlPanel;
+
   return (
     <>
       <Card
@@ -180,107 +209,128 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
         }}
       >
         <CardHeader
+          ref={cardHeaderRef}
           action={
             <>
-              <IconButton
-                aria-label="settings"
-                onClick={handleMenuClick}
-                sx={{
-                  position: "relative",
-                  "& svg": {
-                    zIndex: 1,
-                    position: "relative",
-                  },
-                }}
-              >
-                <SettingsIcon />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={menuOpen}
-                onClose={handleMenuClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                PaperProps={{
-                  elevation: 3,
-                  sx: {
-                    width: 320,
-                    maxHeight: 500,
-                    overflowY: "hidden", // Change this to hidden
-                    overflowX: "hidden",
-                    padding: 0,
-                    borderRadius: "12px",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
-                    border: "1px solid rgba(0,0,0,0.04)",
-                    mt: 1,
-                    "& .MuiMenu-list": {
-                      padding: 0,
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "100%",
-                      maxHeight: 500,
-                    },
-                  },
-                }}
-                MenuListProps={{
-                  sx: {
-                    padding: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                  },
-                }}
-              >
-                <SectionHeader
-                  icon={<SettingsSuggestIcon fontSize="small" />}
-                  title="Options"
-                />
-                {controlPanel && (
-                  <>
+              {shouldShowControlsInHeader && (
+                <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                  {controlPanel}
+                  {showDownloadButton && onDownload && (
+                    <Tooltip title={downloadLabel}>
+                      <IconButton 
+                        aria-label="download" 
+                        onClick={onDownload}
+                        sx={{ ml: 1 }}
+                      >
+                        <DownloadIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+              )}
+              {(!shouldShowControlsInHeader || additionalMenuItems) && (
+                <>
+                  <IconButton
+                    aria-label="settings"
+                    onClick={handleMenuClick}
+                    sx={{
+                      position: "relative",
+                      "& svg": {
+                        zIndex: 1,
+                        position: "relative",
+                      },
+                    }}
+                  >
+                    <SettingsIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={menuOpen}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    PaperProps={{
+                      elevation: 3,
+                      sx: {
+                        width: 320,
+                        maxHeight: 500,
+                        overflowY: "hidden", // Change this to hidden
+                        overflowX: "hidden",
+                        padding: 0,
+                        borderRadius: "12px",
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
+                        border: "1px solid rgba(0,0,0,0.04)",
+                        mt: 1,
+                        "& .MuiMenu-list": {
+                          padding: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          height: "100%",
+                          maxHeight: 500,
+                        },
+                      },
+                    }}
+                    MenuListProps={{
+                      sx: {
+                        padding: 0,
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                      },
+                    }}
+                  >
+                    <SectionHeader
+                      icon={<SettingsSuggestIcon fontSize="small" />}
+                      title="Options"
+                    />
+                    {controlPanel && (!shouldShowControlsInHeader) && (
+                      <>
+                        <Box
+                          sx={{
+                            p: 2,
+                            overflowY: "auto",
+                            flexGrow: 1,
+                          }}
+                        >
+                          {controlPanel}
+                        </Box>
+                        <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                      </>
+                    )}
                     <Box
                       sx={{
-                        p: 2,
-                        overflowY: "auto",
-                        flexGrow: 1,
+                        py: controlPanel && !shouldShowControlsInHeader ? 0.5 : 1,
+                        borderTop: controlPanel && !shouldShowControlsInHeader
+                          ? "none"
+                          : "1px solid rgba(0,0,0,0.08)",
                       }}
                     >
-                      {controlPanel}
+                      {showDownloadButton && onDownload && (!shouldShowControlsInHeader) && (
+                        <MenuItem onClick={handleDownload} sx={{ py: 1.5 }}>
+                          <ListItemIcon>
+                            <DownloadIcon fontSize="small" color="primary" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={downloadLabel}
+                            secondary={downloadSecondaryText}
+                            primaryTypographyProps={{ fontWeight: 500 }}
+                            secondaryTypographyProps={{ fontSize: "0.75rem" }}
+                          />
+                        </MenuItem>
+                      )}
+
+                      {additionalMenuItems}
                     </Box>
-                    <Divider sx={{ mt: 1, opacity: 0.6 }} />
-                  </>
-                )}
-                <Box
-                  sx={{
-                    py: controlPanel ? 0.5 : 1,
-                    borderTop: controlPanel
-                      ? "none"
-                      : "1px solid rgba(0,0,0,0.08)",
-                  }}
-                >
-                  {showDownloadButton && onDownload && (
-                    <MenuItem onClick={handleDownload} sx={{ py: 1.5 }}>
-                      <ListItemIcon>
-                        <DownloadIcon fontSize="small" color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={downloadLabel}
-                        secondary={downloadSecondaryText}
-                        primaryTypographyProps={{ fontWeight: 500 }}
-                        secondaryTypographyProps={{ fontSize: "0.75rem" }}
-                      />
-                    </MenuItem>
-                  )}
-
-                  {additionalMenuItems}
-                </Box>
-              </Menu>
-
+                  </Menu>
+                </>
+              )}
+              
               {showFullScreenButton && (
                 <Tooltip title="Fullscreen">
                   <IconButton
@@ -327,7 +377,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
             background: "linear-gradient(to right, #f8f9fa, #edf2f7)",
             borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
             padding: "4px 16px",
-            height: "40px",
+            height: shouldShowControlsInHeader ? "auto" : "40px",
+            minHeight: "40px",
             borderTopLeftRadius: "12px",
             borderTopRightRadius: "12px",
           }}
