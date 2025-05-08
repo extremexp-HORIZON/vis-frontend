@@ -1,10 +1,7 @@
-import { useEffect } from "react"
-import { useParams } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import { useAppSelector } from "../../../../store/store"
 import {
   Box,
   CircularProgress,
-  Grid,
   Table,
   TableHead,
   TableRow,
@@ -15,27 +12,13 @@ import {
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import ResponsiveCardTable from "../../../../shared/components/responsive-card-table"
-import { fetchModelSummary } from "../../../../shared/models/tasks/model-analysis.model"
 
 const format = (value: string | number): string =>
   typeof value === "number" ? value.toFixed(3) : String(value)
 
-const ClassificationReportTable = () => {
-  const dispatch = useAppDispatch()
-  const { experimentId } = useParams()
-  const { tab, isTabInitialized } = useAppSelector((state) => state.workflowPage)
+const ClassificationReportTable = () => {  
+  const { tab } = useAppSelector((state) => state.workflowPage)
   const summary = tab?.workflowTasks?.modelAnalysis?.modelSummary
-
-  useEffect(() => {
-    if (tab && experimentId) {
-      dispatch(
-        fetchModelSummary({
-          experimentId,
-          runId: tab.workflowId,
-        })
-      )
-    }
-  }, [isTabInitialized])
 
   const classificationReport = summary?.data?.classificationReport ?? []
   const overallMetrics = summary?.data?.overallMetrics ?? {}
