@@ -77,6 +77,18 @@ export interface IModelAnalysis {
     loading: boolean
     error: string | null
   }
+  modelSummary: {
+    data: {
+      overallMetrics: Record<string, number>
+      classificationReport: Array<Record<string, string | number>>
+      numSamples: number
+      numFeatures: number
+      classLabels: string[]
+      dataSplitSizes: Record<string, number>
+    } | null
+    loading: boolean
+    error: string | null  
+  }
 }
 
 export const modelAnalysisDefault: IModelAnalysis = {
@@ -92,6 +104,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   multipleTimeSeries: { data: null, loading: false, error: null },
   multipleTimeSeriesMetadata: { data: null, loading: false, error: null },
   affected: { data: null, loading: false, error: null },
+  modelSummary: { data: null, loading: false, error: null }
 }
 
 export const setSelectedFeature = createAction<{plotType: keyof IModelAnalysis; feature: string}>("modelAnalysis/set_selected_feature");
@@ -289,6 +302,34 @@ export const modelAnalysisReducers = (
           action.error.message || "Failed to fetch ROC curve";
       }
     })
+    .addCase(fetchModelSummary.pending, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.runId}`
+        ? state.tab.workflowTasks.modelAnalysis
+        : null;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelSummary.loading = true;
+        compareCompletedTask.modelSummary.error = null;
+      }
+    })
+    .addCase(fetchModelSummary.fulfilled, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.runId}`
+        ? state.tab.workflowTasks.modelAnalysis
+        : null;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelSummary.data = action.payload;
+        compareCompletedTask.modelSummary.loading = false;
+        compareCompletedTask.modelSummary.error = null;
+      }
+    })
+    .addCase(fetchModelSummary.rejected, (state, action) => {
+      const compareCompletedTask = state.tab?.workflowId === `${action.meta.arg.runId}`
+        ? state.tab.workflowTasks.modelAnalysis
+        : null;
+      if (compareCompletedTask) {
+        compareCompletedTask.modelSummary.loading = false;
+        compareCompletedTask.modelSummary.error = action.error.message || "Failed to fetch classification summary";
+      }
+    })    
 }
 
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
@@ -352,5 +393,15 @@ export const fetchRocCurve = createAsyncThunk(
     const { experimentId, runId } = payload;
     const requestUrl = `${experimentId}/runs/${runId}/evaluation/roc-curve`
     return experimentApi.get<any>(requestUrl).then(response => response.data)
+  }
+)
+
+export const fetchModelSummary = createAsyncThunk(
+  "workflowTasks/model_analysis/fetch_classification_summary",
+  async (payload: { experimentId: string; runId: string }) => {
+    const { experimentId, runId } = payload;
+    const requestUrl = `${experimentId}/runs/${runId}/evaluation/summary`;
+    const response = await experimentApi.get(requestUrl);
+    return response.data;
   }
 )

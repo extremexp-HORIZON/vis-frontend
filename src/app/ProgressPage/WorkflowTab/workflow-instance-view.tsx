@@ -220,7 +220,7 @@ const InstanceView = () => {
             },
           }}
         >
-          {" "}
+          
           <Tooltip title="Table">
             <Button
               variant={chartType === "datatable" ? "contained" : "outlined"}

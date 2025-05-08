@@ -107,7 +107,7 @@ const HeatMapControlPanel = () => {
               <CategoryIcon fontSize="small" />
               Group By (Category)
             </Box>
-          </InputLabel>{" "}
+          </InputLabel>
           <Select
             label="Group By (Category) okkk    "
             multiple
@@ -258,7 +258,7 @@ const HeatMapControlPanel = () => {
   <strong>Selections Summary:</strong>
 
   <Box mt={1}>
-    <strong>Group By:</strong>{" "}
+    <strong>Group By:</strong>
     {(tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length > 0 ? (
       (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).map((item: string) => (
         <Chip key={item} label={item} size="small" sx={{ m: 0.5 }} />
@@ -269,7 +269,7 @@ const HeatMapControlPanel = () => {
   </Box>
 
   <Box mt={1}>
-    <strong>Measure:</strong>{" "}
+    <strong>Measure:</strong>
     {selectedColumn ? (
       <Chip label={selectedColumn} size="small" sx={{ m: 0.5 }} />
     ) : (
@@ -278,7 +278,7 @@ const HeatMapControlPanel = () => {
   </Box>
 
   <Box mt={1}>
-    <strong>Aggregations:</strong>{" "}
+    <strong>Aggregations:</strong>
     {selectedColumn &&
     (tab?.workflowTasks.dataExploration?.controlPanel.barAggregation?.[selectedColumn] || []).length > 0 ? (
       (tab?.workflowTasks.dataExploration?.controlPanel.barAggregation?.[selectedColumn] || []).map(
