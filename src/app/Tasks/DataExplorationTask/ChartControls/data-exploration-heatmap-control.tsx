@@ -19,7 +19,8 @@ const HeatMapControlPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
   const selectedColumn =
-  tab?.workflowTasks.dataExploration?.controlPanel.selectedMeasureColumnHeat || null
+    tab?.workflowTasks.dataExploration?.controlPanel
+      .selectedMeasureColumnHeat || null
 
   // Handler for updating aggregation rules for a column
   const handleAggregationChange = (
@@ -62,7 +63,7 @@ const HeatMapControlPanel = () => {
     const updated = (currentAgg[selectedColumn] || []).filter(
       (agg: string) => agg !== toDelete,
     )
-  
+
     dispatch(
       setControls({
         barAggregationHeat: {
@@ -72,7 +73,6 @@ const HeatMapControlPanel = () => {
       }),
     )
   }
-  
 
   // Custom theme
   const theme = createTheme({
@@ -112,14 +112,15 @@ const HeatMapControlPanel = () => {
             label="Group By (Category) okkk    "
             multiple
             value={
-              tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || []
+              tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat ||
+              []
             }
             onChange={e => {
-                const selected = e.target.value as string[]
-                if (selected.length <= 2) {
-                  dispatch(setControls({ barGroupByHeat: selected }))
-                }
-              }}
+              const selected = e.target.value as string[]
+              if (selected.length <= 2) {
+                dispatch(setControls({ barGroupByHeat: selected }))
+              }
+            }}
             renderValue={(selected: any) =>
               selected.length === 0 ? (
                 <em>Select categories to group by</em>
@@ -154,15 +155,18 @@ const HeatMapControlPanel = () => {
               .filter(col => col.type === "STRING")
               .map(col => (
                 <MenuItem
-                key={col.name}
-                value={col.name}
-                disabled={
-                  (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat?.length ?? 0) >= 2 &&
-                  !tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat?.includes(col.name)
-                }
-              >
-                {col.name}
-              </MenuItem>
+                  key={col.name}
+                  value={col.name}
+                  disabled={
+                    (tab?.workflowTasks.dataExploration?.controlPanel
+                      .barGroupByHeat?.length ?? 0) >= 2 &&
+                    !tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat?.includes(
+                      col.name,
+                    )
+                  }
+                >
+                  {col.name}
+                </MenuItem>
               ))}
           </Select>
         </FormControl>
@@ -176,34 +180,36 @@ const HeatMapControlPanel = () => {
             </Box>
           </InputLabel>
           <Select
-  label="Measure (Value Column)-----"
-  value={selectedColumn || ""}
-  onChange={e => {
-    const newColumn = e.target.value as string
-    const currentAgg = tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
+            label="Measure (Value Column)-----"
+            value={selectedColumn || ""}
+            onChange={e => {
+              const newColumn = e.target.value as string
+              const currentAgg =
+                tab?.workflowTasks.dataExploration?.controlPanel
+                  .barAggregationHeat || {}
 
-    // Clear previous aggregation and set new selected column
-    dispatch(
-      setControls({
-        selectedMeasureColumnHeat: newColumn,
-        barAggregationHeat: {
-          [newColumn]: [], // Reset aggregation for new column
-        },
-      }),
-    )
-  }}
-  MenuProps={{
-    PaperProps: { style: { maxHeight: 224, width: 250 } },
-  }}
->
-  {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-    .filter(col => col.type !== "LOCAL_DATE_TIME")
-    .map(col => (
-      <MenuItem key={col.name} value={col.name}>
-        {col.name}
-      </MenuItem>
-    ))}
-</Select>
+              // Clear previous aggregation and set new selected column
+              dispatch(
+                setControls({
+                  selectedMeasureColumnHeat: newColumn,
+                  barAggregationHeat: {
+                    [newColumn]: [], // Reset aggregation for new column
+                  },
+                }),
+              )
+            }}
+            MenuProps={{
+              PaperProps: { style: { maxHeight: 224, width: 250 } },
+            }}
+          >
+            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+              .filter(col => col.type !== "LOCAL_DATE_TIME")
+              .map(col => (
+                <MenuItem key={col.name} value={col.name}>
+                  {col.name}
+                </MenuItem>
+              ))}
+          </Select>
         </FormControl>
 
         {/* Aggregation Selection */}
@@ -216,82 +222,37 @@ const HeatMapControlPanel = () => {
               </Box>
             </InputLabel>
             <Select
-  label="Apply Aggregation---------"
-  value={
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat[selectedColumn]?.[0] || ""
-  }
-  onChange={event => {
-    const value = event.target.value as string
-    if (!selectedColumn) return
-    const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
+              label="Apply Aggregation---------"
+              value={
+                tab?.workflowTasks.dataExploration?.controlPanel
+                  .barAggregationHeat[selectedColumn]?.[0] || ""
+              }
+              onChange={event => {
+                const value = event.target.value as string
+                if (!selectedColumn) return
+                const currentAgg =
+                  tab?.workflowTasks.dataExploration?.controlPanel
+                    .barAggregationHeat || {}
 
-    dispatch(
-      setControls({
-        barAggregationHeat: {
-          ...currentAgg,
-          [selectedColumn]: [value], // wrap in array since your state expects an array
-        },
-      }),
-    )
-  }}
->
-  {aggregationOptions.map(rule => (
-    <MenuItem key={rule} value={rule}>
-      {rule.charAt(0).toUpperCase() + rule.slice(1)}
-    </MenuItem>
-  ))}
-</Select>
+                dispatch(
+                  setControls({
+                    barAggregationHeat: {
+                      ...currentAgg,
+                      [selectedColumn]: [value], // wrap in array since your state expects an array
+                    },
+                  }),
+                )
+              }}
+            >
+              {aggregationOptions.map(rule => (
+                <MenuItem key={rule} value={rule}>
+                  {rule.charAt(0).toUpperCase() + rule.slice(1)}
+                </MenuItem>
+              ))}
+            </Select>
           </FormControl>
         )}
       </Box>
-      {/* Selection Summary */}
-{/* <Box
-  sx={{
-    p: 2,
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    backgroundColor: "#f9f9f9",
-    mt: 2,
-  }}
->
-  <strong>Selections Summary:</strong>
-
-  <Box mt={1}>
-    <strong>Group By:</strong>
-    {(tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length > 0 ? (
-      (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).map((item: string) => (
-        <Chip key={item} label={item} size="small" sx={{ m: 0.5 }} />
-      ))
-    ) : (
-      <em>None</em>
-    )}
-  </Box>
-
-  <Box mt={1}>
-    <strong>Measure:</strong>
-    {selectedColumn ? (
-      <Chip label={selectedColumn} size="small" sx={{ m: 0.5 }} />
-    ) : (
-      <em>None</em>
-    )}
-  </Box>
-
-  <Box mt={1}>
-    <strong>Aggregations:</strong>
-    {selectedColumn &&
-    (tab?.workflowTasks.dataExploration?.controlPanel.barAggregation?.[selectedColumn] || []).length > 0 ? (
-      (tab?.workflowTasks.dataExploration?.controlPanel.barAggregation?.[selectedColumn] || []).map(
-        (agg: string) => (
-          <Chip key={agg} label={agg} size="small" sx={{ m: 0.5 }} />
-        ),
-      )
-    ) : (
-      <em>None</em>
-    )}
-  </Box>
-</Box> */}
-
     </ThemeProvider>
   )
 }
