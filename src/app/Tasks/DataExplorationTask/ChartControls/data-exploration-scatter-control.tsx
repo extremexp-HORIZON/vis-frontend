@@ -120,7 +120,7 @@ const tooltipTitle = isDisabled ? "Select columns and color" : ""
               labelId="x-axis-select-label"
               value={xAxis?.name || ""}
               onChange={handleXAxisChange}
-              label="X-Axis"
+              label="X-Axis-----"
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
@@ -147,7 +147,7 @@ const tooltipTitle = isDisabled ? "Select columns and color" : ""
               multiple
               value={yAxis.map(col => col.name)}
               onChange={handleYAxisChange}
-              input={<OutlinedInput label="Y-Axis" />}
+              input={<OutlinedInput label="Y-Axis-----" />}
               renderValue={selected => selected.join(", ")}
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
@@ -184,7 +184,7 @@ const tooltipTitle = isDisabled ? "Select columns and color" : ""
               labelId="color-by-select-label"
               value={colorBy?.name || ""}
               onChange={handleColorByChange}
-              label="Color By"
+              label="Color By-----"
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
