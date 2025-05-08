@@ -14,6 +14,7 @@ import {
   Checkbox,
   Typography,
   Stack,
+  CircularProgress,
 } from "@mui/material"
 import { setControls } from "../../../store/slices/workflowPageSlice"
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
@@ -270,7 +271,20 @@ const InstanceView = () => {
                 flexDirection: "column",
               }}
             >
-              {hasContent ? (
+               {tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ? (
+                  <Box
+                    sx={{
+                      flexGrow: 1,
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                ) : hasContent ? (
                 <Box
                   sx={{
                     flexGrow: 1,
