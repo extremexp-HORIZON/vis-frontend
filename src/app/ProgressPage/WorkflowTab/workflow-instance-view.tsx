@@ -230,7 +230,6 @@ const InstanceView = () => {
       ) : (
         <Box sx={{ height: calculatedHeight }}>
           <ResponsiveCardTable
-            details={"No details available"}
             title="Instance Classification Table"
             controlPanel={
               <ControlPanel
@@ -317,7 +316,7 @@ const InstanceView = () => {
       <Box sx={{ mb: 2 }}>
        
    
-       <ResponsiveCardTable title={"Selected Instance"} details={"No details available"}>
+       <ResponsiveCardTable title={"Selected Instance"} >
          <Table size="small" sx={{ minWidth: "max-content" }}>
            <TableHead>
              <TableRow>

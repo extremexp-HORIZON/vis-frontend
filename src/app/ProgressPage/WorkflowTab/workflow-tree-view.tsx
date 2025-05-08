@@ -180,8 +180,10 @@ export default function WorkflowTreeView() {
           },
         }}      
       >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}
-              sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}>
+      <AccordionSummary 
+        expandIcon={<ExpandMoreIcon />}
+        sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}
+      >
         <Box
           sx={{
             display: "flex",
@@ -767,8 +769,10 @@ export default function WorkflowTreeView() {
           },
         }}      
         >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} 
-        sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}>
+        <AccordionSummary 
+          expandIcon={<ExpandMoreIcon />} 
+          sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}
+        >
           {/* Simple Title */}
           <Box
             sx={{

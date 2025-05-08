@@ -2,13 +2,15 @@ import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-v
 import type { RootState} from "../../../store/store";
 import { useAppSelector } from "../../../store/store"
 import type { IMetric } from "../../../shared/models/experiment/metric.model"
-import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material"
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import green from "@mui/material/colors/green"
 import red from "@mui/material/colors/red"
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { DetailsCard, DetailsCardItem } from "../../../shared/components/details-card";
+import { useMemo } from "react";
+import { setCache } from "../../../shared/utils/localStorageCache";
 
 
 interface GroupMetrics {
@@ -18,123 +20,6 @@ interface GroupMetrics {
   step: number | undefined;
   timestamp: string;
   task: string | undefined;
-}
-
-interface MetricData {
-  title?: string;
-  value?: number;
-  average?: number;
-  min?: number;
-  max?: number;
-  avgDiff?: number;
-  step?: number | null;
-  timestamp?: number;
-  task?: string;
-}
-
-export const MetricBulletChart = () => {
-    const { tab } = useAppSelector(state => state.workflowPage)
-    const { workflows } = useAppSelector((state: RootState) => state.progressPage)
-    const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage)
-  
-    const metricData = {
-        title: tab?.dataTaskTable.selectedItem?.data?.name,
-        value: tab?.dataTaskTable.selectedItem?.data?.value,
-        average: tab?.dataTaskTable.selectedItem?.data?.avgValue,
-        min: tab?.dataTaskTable.selectedItem?.data?.minValue,
-        max: tab?.dataTaskTable.selectedItem?.data?.maxValue,
-    }
-
-    const queryParams = new URLSearchParams(location.search)
-    const workflowId = queryParams.get("workflowId") // Get the workflowId from the query
-    const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId)
-  
-    const workflowColorMap = workflowsTable.workflowColors
-    const workflowColorScale = filteredWorkflows.map(wf => ({
-      id: wf.id,
-      color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
-    }))  
-
-    const bulletChartSpec = {
-        data: { values: metricData },
-        encoding: {
-          y: {
-            field: "title",
-            type: "ordinal",
-            axis: {
-              title: null,
-              labelFontWeight: "bold",
-              labelFontSize: 12,
-              labelAngle: -90,
-            },
-          },
-        },
-        layer: [
-          // Background range (min to max)
-          {
-            mark: "bar",
-            encoding: {
-              x: { field: "min", type: "quantitative" },
-              x2: { field: "max" },
-              color: { value: "#eeeeee" },
-            },
-          },
-          // Average range
-          {
-            mark: "bar",
-            encoding: {
-              x: { field: "average", type: "quantitative" },
-              x2: { field: "max" },
-              color: { value: "#cccccc" },
-            },
-          },
-          // Actual value
-          {
-            mark: {
-              type: "bar",
-              color: workflowColorScale.map(w => w.color),
-              size: 20,
-            },
-            encoding: {
-              x: { field: "value", type: "quantitative" },
-              tooltip: [
-                { field: "title", type: "ordinal" },
-                { field: "value", type: "quantitative" },
-                { field: "average", type: "quantitative" },
-                { field: "min", type: "quantitative" },
-                { field: "max", type: "quantitative" },
-              ],
-            },
-          },
-          // Marker for average
-          {
-            mark: {
-              type: "tick",
-              color: "black",
-              size: 15,
-              thickness: 2,
-            },
-            encoding: {
-              x: { field: "average", type: "quantitative" },
-            },
-          },
-        ],
-        config: {
-          axis: {
-            grid: false,
-          },
-        },
-      }
-    
-      return (
-        <ResponsiveCardVegaLite
-          title="Performance Overview"
-          spec={bulletChartSpec}
-          aspectRatio={2}
-          maxHeight={400}
-          actions={false}
-        />
-      )
 }
 
 export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
@@ -249,58 +134,44 @@ export const WorkflowMetricChart = () => {
 }
 
 
-const WorkflowLink = ({ workflowId }: { workflowId: string }) => {
-  const location = useLocation();
-  return (
-  <Typography
-  variant="body2"
-  color="primary"
-  sx={{ cursor: "pointer", textDecoration: "underline" }}
-  component="a"
-  href={`${location.pathname}?workflowId=${workflowId}`}
-  target="_blank"
-  rel="noopener noreferrer"
-  >
-    {workflowId}
-  </Typography>
-
-  );
-};
-
 export const MetricCards = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const { workflows } = useAppSelector((state: RootState) => state.progressPage);
+  const { experimentId } = useParams();
 
-  const metricData: MetricData = {
-    title: tab?.dataTaskTable.selectedItem?.data?.name,
-    value: tab?.dataTaskTable.selectedItem?.data?.value,
-    average: tab?.dataTaskTable.selectedItem?.data?.avgValue,
-    min: tab?.dataTaskTable.selectedItem?.data?.minValue,
-    max: tab?.dataTaskTable.selectedItem?.data?.maxValue,
-    avgDiff: tab?.dataTaskTable.selectedItem?.data?.avgDiff,
-    step: tab?.dataTaskTable.selectedItem?.data?.step,
-    timestamp: tab?.dataTaskTable.selectedItem?.data?.timestamp,
-    task: tab?.dataTaskTable.selectedItem?.data?.task
-  };
+  const metricData = tab?.dataTaskTable.selectedItem?.data;
+  const currentWorkflowId = tab?.workflowId;
 
   const filteredWorkflows = workflows?.data?.flatMap(w =>
-    w.metrics?.filter(metric => metric.name === metricData.title)
+    w.metrics?.filter(metric => metric.name === metricData?.name)
       .map(metric => ({ parent: w, value: metric.value })) ?? []
-  );
+  ) ?? [];
 
-  const minEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((min, curr) =>
-    curr.value < min.value ? curr : min
-  ) : null;
+  const minValue = Math.min(...filteredWorkflows.map(w => w.value));
+  const maxValue = Math.max(...filteredWorkflows.map(w => w.value));
 
-  const maxEntry = filteredWorkflows?.length ? filteredWorkflows.reduce((max, curr) =>
-    curr.value > max.value ? curr : max
-  ) : null;
+  const minWorkflows = filteredWorkflows.filter(w => w.value === minValue).map(w => w.parent);
+  const maxWorkflows = filteredWorkflows.filter(w => w.value === maxValue).map(w => w.parent);
 
-  const minWorkflow = minEntry?.parent;
-  const maxWorkflow = maxEntry?.parent;
+  const compareIdMin = useMemo(() => `compare-min-${Date.now()}`, []);
+  const compareIdMax = useMemo(() => `compare-max-${Date.now() + 1}`, []);
+
+  const handleClickMin = () => {
+    if (minWorkflows.length > 1) {
+      const workflowIds = minWorkflows.map(w => w.id);
+      setCache(compareIdMin, { workflowIds }, 5 * 60 * 1000);
+    }
+  };
+
+  const handleClickMax = () => {
+    if (maxWorkflows.length > 1) {
+      const workflowIds = maxWorkflows.map(w => w.id);
+      setCache(compareIdMax, { workflowIds }, 5 * 60 * 1000);
+    }
+  };
 
   const renderDiffIcon = () => {
-    if (!metricData.avgDiff) return null;
+    if (!metricData?.avgDiff) return null;
     return metricData.avgDiff > 0 ? (
       <ArrowDropUpIcon sx={{ color: green[500], mb: 1 }} />
     ) : (
@@ -308,52 +179,105 @@ export const MetricCards = () => {
     );
   };
 
+  const isOnlyThisWorkflowMin =
+    minWorkflows.length === 1 && minWorkflows[0].id === currentWorkflowId;
+  
+  const isOnlyThisWorkflowMax =
+    maxWorkflows.length === 1 && maxWorkflows[0].id === currentWorkflowId;
+
+  const getMinHref = () =>
+    minWorkflows.length === 1
+      ? `/${experimentId}/workflow?workflowId=${minWorkflows[0].id}`
+      : `/${experimentId}/monitoring?tab=1&compareId=${compareIdMin}`;
+
+  const getMaxHref = () =>
+    maxWorkflows.length === 1
+      ? `/${experimentId}/workflow?workflowId=${maxWorkflows[0].id}`
+      : `/${experimentId}/monitoring?tab=1&compareId=${compareIdMax}`;
+
+  const getMinText = () =>
+    minWorkflows.length === 1 ? "View workflow" : `View ${minWorkflows.length} workflows`;
+
+  const getMaxText = () =>
+    maxWorkflows.length === 1 ? "View workflow" : `View ${maxWorkflows.length} workflows`;
+
   return (
     <Box sx={{ display: "flex", flexDirection: "row", gap: 2, width: "100%" }}>
       <DetailsCard title="Metric Details">
-        <DetailsCardItem label="Metric" value={metricData.title} />
-        <DetailsCardItem label="Value" value={metricData.value?.toFixed(2)} />
-        {metricData.task && <DetailsCardItem label="Logged in Task" value={metricData.task} />}
-        <DetailsCardItem 
-          label="Timestamp" 
-          value={typeof metricData.timestamp === 'number' ? 
-            new Date(metricData.timestamp).toLocaleString() : 
-            undefined
-          } 
+        <DetailsCardItem label="Metric" value={metricData?.name} />
+        <DetailsCardItem label="Value" value={metricData?.value?.toFixed(2)} />
+        {metricData?.task && <DetailsCardItem label="Logged in Task" value={metricData.task} />}
+        <DetailsCardItem
+          label="Timestamp"
+          value={typeof metricData?.timestamp === "number"
+            ? new Date(metricData.timestamp).toLocaleString()
+            : undefined}
         />
       </DetailsCard>
 
       <DetailsCard title="Comparison Across All Workflows">
-        <Box>
-          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            <Typography sx={{ mb: 1 }} variant="body1">
-              Average: {metricData.average?.toFixed(2)} — Difference: {metricData.avgDiff ? metricData.avgDiff.toFixed(2) : 0}%
-            </Typography>
-            {renderDiffIcon()}
-          </Box>
-          <Divider />
-        </Box>
-        <DetailsCardItem 
-          label="Minimum" 
+        <DetailsCardItem
+          label="Average"
           value={
-            <>
-              {metricData.min?.toFixed(2)}
-              {metricData.value !== metricData.min && minWorkflow && (
-                <> — Workflow: <WorkflowLink workflowId={minWorkflow.id} /></>
-              )}
-            </>
-          } 
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Typography variant="body1">
+                {metricData?.avgValue?.toFixed(2)} — Difference: {metricData?.avgDiff?.toFixed(2) ?? 0}%
+              </Typography>
+              {renderDiffIcon()}
+            </Box>
+          }
         />
-        <DetailsCardItem 
-          label="Maximum" 
+
+        <DetailsCardItem
+          label="Minimum"
           value={
-            <>
-              {metricData.max?.toFixed(2)}
-              {metricData.value !== metricData.max && maxWorkflow && (
-                <> — Workflow: <WorkflowLink workflowId={maxWorkflow.id} /></>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Typography variant="body1" sx={{ mr: 1 }}>
+                {minValue.toFixed(2)}
+              </Typography>
+              {!isOnlyThisWorkflowMin && (
+                <>
+                  {" — "}
+                  <Box
+                    component="a"
+                    href={getMinHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleClickMin}
+                    sx={{ color: "primary.main", textDecoration: "underline", ml: 1 }}
+                  >
+                    {getMinText()}
+                  </Box>
+                </>              
               )}
-            </>
-          } 
+            </Box>
+          }
+        />
+
+        <DetailsCardItem
+          label="Maximum"
+          value={
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Typography variant="body1" sx={{ mr: 1 }}>
+                {maxValue.toFixed(2)}
+              </Typography>
+              {!isOnlyThisWorkflowMax && (
+                <>
+                  {" — "}
+                  <Box
+                    component="a"
+                    href={getMaxHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleClickMax}
+                    sx={{ color: "primary.main", textDecoration: "underline", ml: 1 }}
+                  >
+                    {getMaxText()}
+                  </Box>
+                </>
+              )}
+            </Box>
+          }
         />
       </DetailsCard>
     </Box>

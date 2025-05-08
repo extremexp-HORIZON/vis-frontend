@@ -73,9 +73,12 @@ interface DetailsCardItemProps {
 
 export const DetailsCardItem = ({ label, value }: DetailsCardItemProps) => (
   <Box>
-    <Typography sx={{ mb: 1 }} variant="body1">
-      {label}: {value}
-    </Typography>
-    <Divider />
+    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+        {label}:
+      </Typography>
+      <Box sx={{ flexGrow: 1 }}>{value}</Box>
+    </Box>
+    <Divider sx={{ mt: 1 }} />
   </Box>
 );

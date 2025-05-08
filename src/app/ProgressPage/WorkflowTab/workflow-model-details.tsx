@@ -8,7 +8,6 @@ import {
   DetailsCard,
   DetailsCardItem,
 } from "../../../shared/components/details-card"
-import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import { useState } from "react"
