@@ -222,7 +222,7 @@ const ParallelCoordinateVega = ({
                 type: "sequence",
                 start: selectedLastColumnMin,
                 stop: selectedLastColumnMax,
-                step: 0.001,
+                step: (selectedLastColumnMax - selectedLastColumnMin) / 256,
               },
             ],
           },
