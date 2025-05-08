@@ -176,7 +176,7 @@ const HeatMapControlPanel = () => {
             </Box>
           </InputLabel>
           <Select
-  label="Measure (Value Column)"
+  label="Measure (Value Column)-----"
   value={selectedColumn || ""}
   onChange={e => {
     const newColumn = e.target.value as string
@@ -216,7 +216,7 @@ const HeatMapControlPanel = () => {
               </Box>
             </InputLabel>
             <Select
-  label="Apply Aggregation"
+  label="Apply Aggregation---------"
   value={
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat[selectedColumn]?.[0] || ""
   }

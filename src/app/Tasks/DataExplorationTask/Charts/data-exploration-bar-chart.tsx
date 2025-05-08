@@ -51,11 +51,6 @@ const BarChart = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
   ])
 
-  console.log(
-    "bar agg",
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,
-  )
-
   const columns = tab?.workflowTasks.dataExploration?.barChart.data?.columns
   const xAxisColumn = columns?.find(col => col.type === "STRING")?.name
   const categoricalColumns = columns?.filter(
