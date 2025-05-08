@@ -45,7 +45,7 @@ function FlowGraph(props: IFlowGraphProps) {
   const [edges, setEdges] = useState<Edge[]>([])
 
   const clickableNodeStyle = {
-    cursor: "pointer",
+    cursor: "default",
     border: `1px solid ${theme.palette.primary.main}`,
     backgroundColor: "white",
   }
@@ -58,7 +58,7 @@ function FlowGraph(props: IFlowGraphProps) {
   }
 
   const interactiveNodeStyle = {
-    cursor: "pointer",
+    cursor: "default",
     border: `1px solid orange`,
     backgroundColor: "white",
   }
@@ -170,7 +170,7 @@ function FlowGraph(props: IFlowGraphProps) {
             workflowSvg.start,
             workflowSvg.end,
           ),
-          cursor: "pointer"
+          cursor: "default"
       },
       }})
 
@@ -292,7 +292,7 @@ function FlowGraph(props: IFlowGraphProps) {
         panOnDrag={true}
         zoomOnScroll={true}
         defaultViewport={{ x:0, y:0, zoom: 1 }}
-        onNodeClick={onNodeClick}
+        // onNodeClick={onNodeClick}
         zoomOnPinch={false}
         proOptions={{ hideAttribution: true }}
         fitView={true}
