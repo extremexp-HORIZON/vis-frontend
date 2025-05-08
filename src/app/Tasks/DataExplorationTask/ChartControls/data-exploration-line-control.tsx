@@ -176,7 +176,7 @@ const LineChartControlPanel = () => {
            <Button
              color={viewMode === "stacked" ? "primary" : "inherit"}
              onClick={() => dispatch(setControls({ viewMode: "stacked" }))}
-             disabled={yAxis.length < 2}
+            //  disabled={yAxis.length < 2}
            >
              Stacked
            </Button>

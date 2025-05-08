@@ -62,7 +62,7 @@ export interface IDataExploration {
     error: string | null
   }
   controlPanel: {
-    chartType: "string"
+    chartType: string
     selectedColumns: VisualColumn[]
     filters: IFilter[]
     viewMode: "overlay" | "stacked"
