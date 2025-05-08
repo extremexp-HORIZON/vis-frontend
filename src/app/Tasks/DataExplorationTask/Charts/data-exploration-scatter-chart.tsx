@@ -177,7 +177,12 @@ const ScatterChart = () => {
             field: colorField,
             type: colorType,
             legend: { title: colorField },
+            scale: {
+              range: ["#ffffcc", "#a1dab4", "#41b6c4", "#225ea8"]
+            }
+            
           },
+          
         }),
         tooltip: [
           { field: xAxis.name, type: getColumnType(xAxis) },
