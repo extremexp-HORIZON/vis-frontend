@@ -82,6 +82,8 @@ const HeatMap = () => {
         })),
     )
 
+    const limitedData = transformedData?.slice(0, 20) // Limit to 500 rows
+
   const groupByFields =
     tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || []
 
@@ -93,7 +95,7 @@ const HeatMap = () => {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       description:
         "Heatmap showing aggregation values by two categorical variables.",
-      data: { values: transformedData },
+      data: { values: limitedData },
       mark: "rect",
       encoding: {
         x: {
@@ -126,7 +128,7 @@ const HeatMap = () => {
       description:
         "A grouped bar chart showing different numeric values by category.",
       autosize: { type: "fit", contains: "padding", resize: true },
-      data: { values: transformedData },
+      data: { values: limitedData },
       mark: "bar",
       params: [
         {

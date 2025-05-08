@@ -77,12 +77,14 @@ const BarChart = () => {
         })),
     )
 
+    const limitedData = transformedData?.slice(0, 20)
+
   const specification = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description:
       "A grouped bar chart showing different numeric values by category.",
     autosize: { type: "fit", contains: "padding", resize: true },
-    data: { values: transformedData },
+    data: { values: limitedData },
     mark: "bar",
     params: [
       {
