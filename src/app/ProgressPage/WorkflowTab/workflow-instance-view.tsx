@@ -254,7 +254,6 @@ const InstanceView = () => {
         <Box sx={{ height: chartHeight }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
-            controlPanel={null} // Remove the ControlPanel from here
             onDownload={handleExportCsv}
             showDownloadButton={hasContent}
             downloadLabel="Export as CSV"

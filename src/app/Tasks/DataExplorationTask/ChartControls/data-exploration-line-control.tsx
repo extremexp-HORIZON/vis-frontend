@@ -97,11 +97,11 @@ const LineChartControlPanel = () => {
         {/* X-Axis Selector */}
         <FormControl fullWidth>
         <InputLabel id="x-axis-select-label">
-  <Box display="flex" alignItems="center" gap={1}>
-  <ShowChartIcon fontSize="small" />
-  X-Axis
-  </Box>
-</InputLabel>
+        <Box display="flex" alignItems="center" gap={1}>
+        <ShowChartIcon fontSize="small" />
+        X-Axis
+        </Box>
+      </InputLabel>
           <Select
             labelId="x-axis-select-label"
             value={xAxis?.name || ""}
@@ -121,12 +121,12 @@ const LineChartControlPanel = () => {
 
         {/* Y-Axis Multi-Selector */}
         <FormControl fullWidth>
-<InputLabel id="y-axis-multi-select-label">
-  <Box display="flex" alignItems="center" gap={1}>
-    <ShowChartIcon fontSize="small" />
-    Y-Axis
-  </Box>
-</InputLabel>
+        <InputLabel id="y-axis-multi-select-label">
+          <Box display="flex" alignItems="center" gap={1}>
+            <ShowChartIcon fontSize="small" />
+            Y-Axis
+          </Box>
+        </InputLabel>
           <Select
             labelId="y-axis-multi-select-label"
             multiple

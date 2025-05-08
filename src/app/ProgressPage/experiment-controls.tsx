@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, CircularProgress, Chip } from "@mui/material"
+import { Box, IconButton, Typography, CircularProgress, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button, Fade, useTheme, useMediaQuery, Tooltip } from "@mui/material"
 import ProgressPageBar from "./progress-page-bar"
 import PauseIcon from "@mui/icons-material/Pause"
 import StopIcon from "@mui/icons-material/Stop"
@@ -16,6 +16,9 @@ import PauseCircleRoundedIcon from '@mui/icons-material/PauseCircleRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import type { IRun } from "../../shared/models/experiment/run.model"
 import ScienceIcon from '@mui/icons-material/Science';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import StaticDirectedGraph from "./WorkflowTab/worfklow-flow-chart"
+import CloseIcon from '@mui/icons-material/Close';
 
 const ExperimentControls = () => {
   const [ searchParams ] = useSearchParams()
@@ -33,6 +36,18 @@ const ExperimentControls = () => {
   const workflowRating= workflow?.metrics?.find(metric => metric.name === "rating")?.value
   const [isPolling, setPolling] = useState(false);
   const [localRating, setLocalRating] = useState<number | null>(null);
+  const { tab } = useAppSelector((state: RootState) => state.workflowPage)
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  
+  const handleOpenDiagram = () => {
+    setDialogOpen(true);
+  };
+  
+  const handleCloseDiagram = () => {
+    setDialogOpen(false);
+  };
 
   let workflowIcon;
 
@@ -173,26 +188,47 @@ const ExperimentControls = () => {
                   sx={{ fontSize: 24, cursor: "pointer", color: "grey" }}
                   onClick={() => navigate(`/${experimentId}/monitoring`)}
                 />
+                
                 <Box sx={{display: "flex", flexDirection: "column"}}>
-                  <Box sx={{display: "flex", flexDirection: "row", gap: 1}}>
-                  {/* <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {`Workflow ${workflowId}`}
-                    </Typography> */}
+                  <Box sx={{display: "flex", flexDirection: "row", gap: 1, alignItems: "center"}}>
                     <Chip
-                        // icon={<WorkIcon />}
-                        label={`Workflow: ${workflowId}`}
-                        color="primary"
-                        variant="outlined"
-                        sx={{ 
+                      label={`Workflow: ${workflowId}`}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ 
                         border:'none',
                         fontWeight: '600',
                         '& .MuiChip-label': {
-                        fontSize: '1rem',
-                        p: 0,
+                          fontSize: '1rem',
+                          p: 0,
                         }
-                        }}
-                      />
-                    {workflowRating !== undefined && <Typography variant="h5" sx={{ fontWeight: 600 }}>-</Typography> }
+                      }}
+                    />
+                    
+                    {/* Add workflow diagram button after workflow name */}
+                    {(tab?.workflowConfiguration?.tasks?.length ?? 0) > 0 && (
+                      <Tooltip title="View workflow diagram">
+                        <Button
+                          size="small"
+                          startIcon={<AccountTreeIcon />}
+                          onClick={handleOpenDiagram}
+                          color="primary"
+                          variant="outlined"
+                          sx={{ 
+                            ml: 1,
+                            textTransform: 'none',
+                            height: '28px',
+                            borderRadius: '14px',
+                            fontSize: '0.75rem',
+                            fontWeight: '500'
+                          }}
+                        >
+                          View Diagram
+                        </Button>
+                      </Tooltip>
+                    )}
+                    
+                    {workflowRating !== undefined && <Typography variant="h5" sx={{ fontWeight: 600, ml: 1 }}>-</Typography> }
                     {workflowRating !== undefined &&
                       <Rating
                         name="workflow-rating"
@@ -213,7 +249,7 @@ const ExperimentControls = () => {
                 </Box>
               </Box>
 
-              <Box sx={{ display: "flex", alignItems: "center", }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Box sx={{ position: "relative", display: "inline-flex" }}>
                   <CircularProgress
                     variant="determinate"
@@ -244,6 +280,96 @@ const ExperimentControls = () => {
                   <StopIcon fontSize="large" />
                 </IconButton>
               </Box>
+              
+              {/* Non-fullscreen Dialog for Workflow Diagram */}
+              <Dialog
+                fullScreen={fullScreen}
+                maxWidth="xl"
+                open={dialogOpen}
+                onClose={handleCloseDiagram}
+                TransitionComponent={Fade}
+                TransitionProps={{ timeout: 400 }}
+                PaperProps={{
+                  sx: {
+                    borderRadius: fullScreen ? 0 : "12px",
+                    width: fullScreen ? "100%" : "90vw",
+                    height: fullScreen ? "100%" : "90vh",
+                    maxWidth: "unset",
+                    bgcolor: "#ffffff",
+                    overflow: "hidden",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+                  }
+                }}
+              >
+                <DialogTitle
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    background: "linear-gradient(to right, #f8f9fa, #edf2f7)",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+                    px: 3,
+                    py: 1.5,
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{
+                      fontWeight: 600,
+                      color: "#2a3f5f",
+                      letterSpacing: "0.3px",
+                    }}
+                  >
+                    Workflow Diagram
+                  </Typography>
+                  <IconButton
+                    edge="end"
+                    color="inherit"
+                    onClick={handleCloseDiagram}
+                    aria-label="close"
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </DialogTitle>
+                <DialogContent
+                  dividers
+                  sx={{
+                    p: 4,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                    overflow: "auto",
+                  }}
+                >
+                  {tab?.workflowSvg?.data && (
+                    <StaticDirectedGraph
+                      workflowSvg={tab.workflowSvg.data}
+                      params={tab.workflowConfiguration.params}
+                      handleOpenTask={function (taskName: string): void {
+                        throw new Error("Function not implemented.")
+                      }}
+                    />
+                  )}
+                </DialogContent>
+                <DialogActions
+                  sx={{
+                    p: 2,
+                    borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+                    background: "#f8f9fa",
+                  }}
+                >
+                  <Button
+                    onClick={handleCloseDiagram}
+                    color="primary"
+                    variant="contained"
+                    size="small"
+                  >
+                    Close
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </>
           )}
         </Box>

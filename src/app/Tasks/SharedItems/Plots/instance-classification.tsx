@@ -6,8 +6,9 @@ import MenuItem from "@mui/material/MenuItem"
 import type { Dispatch, SetStateAction } from "react"
 import { useEffect, useState } from "react"
 import _ from "lodash"
-import {CircularProgress, useTheme } from "@mui/material"
+import { CircularProgress, InputLabel, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
+import ShowChartIcon from "@mui/icons-material/ShowChart"
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -35,20 +36,23 @@ const ControlPanel = ({
 
   return (
     <>
-      <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-        <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
-          <Typography fontSize={"0.8rem"}>x-axis:</Typography>
-          <FormControl
-            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
-            size="small"
-          >
+      <Box sx={{ display: "flex", flexDirection: "row", gap: 2, px: 1.5 }}>
+        {/* X-Axis Selector */}
+        <FormControl fullWidth>
+            <InputLabel id="x-axis-select-label">
+              <Box display="flex" alignItems="center" gap={1}>
+                <ShowChartIcon fontSize="small" />
+                X-Axis
+              </Box>
+            </InputLabel>
             <Select
-              value={xAxisOption}
+              labelId="x-axis-select-label"
+              label="X-Axis-----"
               disabled={plotData?.loading || !plotData?.data}
-              sx={{ fontSize: "0.8rem" }}
+              value={xAxisOption}
               onChange={handleAxisSelection("x")}
               MenuProps={{
-                PaperProps: { style: { maxHeight: 250, maxWidth: 300 } },
+                PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
             >
               {options
@@ -60,33 +64,32 @@ const ControlPanel = ({
                 ))}
             </Select>
           </FormControl>
-        </Box>
-
-        <Box sx={{ display: "flex", alignItems: "center", px: 1.5 }}>
-          <Typography fontSize={"0.8rem"}>y-axis:</Typography>
-          <FormControl
-            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
-            size="small"
-          >
+          <FormControl fullWidth>
+            <InputLabel id="y-axis-select-label">
+              <Box display="flex" alignItems="center" gap={1}>
+                <ShowChartIcon fontSize="small" />
+                Y-Axis
+              </Box>
+            </InputLabel>
             <Select
-              value={yAxisOption}
-              sx={{ fontSize: "0.8rem" }}
+              labelId="y-axis-select-label"
+              label="Y-Axis-----"
               disabled={plotData?.loading || !plotData?.data}
+              value={xAxisOption}
               onChange={handleAxisSelection("y")}
               MenuProps={{
-                PaperProps: { style: { maxHeight: 250, maxWidth: 300 } },
+                PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
             >
               {options
-                .filter(option => option !== xAxisOption)
+                .filter(option => option !== yAxisOption)
                 .map((feature, idx) => (
-                  <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
+                  <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
                     {feature}
                   </MenuItem>
                 ))}
             </Select>
           </FormControl>
-        </Box>
       </Box>
 
       <Box
@@ -188,105 +191,124 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const shouldShowInfoMessage = plotData?.loading || !plotData?.data
 
   return (
-      <ResponsiveCardVegaLite
-        spec={{
-          width: "container",
-          height: "container",
-          autosize: { type: "fit", contains: "padding", resize: true },
-          data: {
-            values: getVegaData(plotData?.data ?? []),
+    <ResponsiveCardVegaLite
+      spec={{
+        width: "container",
+        height: "container",
+        autosize: { type: "fit", contains: "padding", resize: true },
+        data: {
+          values: getVegaData(plotData?.data ?? []),
+        },
+        params: [
+          {
+            name: "pts",
+            select: { type: "point", toggle: false },
+            bind: "legend",
           },
-          params: [
-            {
-              name: "pts",
-              select: "point",
-            },
-            {
-              name: "panZoom",
-              select: "interval",
-              bind: "scales",
-            },
-          ],
-          mark: {
-            type: "point",
-            filled: true,
-            // tooltip: true,
-            size: 100,
-            color: theme.palette.primary.main,
+          {
+            name: "highlight",
+            select: { type: "point", on: "click", clear: "clickoff" }
           },
+          {
+            name: "panZoom",
+            select: "interval",
+            bind: "scales",
+          },
+        ],
+        mark: {
+          type: "point",
+          filled: true,
+          size: 100,
+        },
 
-          encoding: {
-            x: {
-              field: xAxisOption || "xAxis default",
-              type: "quantitative",
-            },
-            y: {
-              field: yAxisOption || "yAxis default",
-              type: "quantitative",
-            },
-            color: showMisclassifiedOnly
-            ? {
-                field: "isMisclassified",
-                type: "nominal",
-                scale: {
-                  domain: [false, true],
-                  range: ["#cccccc", "#ff0000"], // grey for correct, red for misclassified
-                },
-                legend: {
-                  title: "Misclassified",
-                  labelExpr: "datum.label === 'true' ? 'Misclassified' : 'Correct'",
-                },
-              }
-            : {
-                field: "predicted", // Use the actual class for coloring
-                type: "nominal",
-                scale: {
-                  range: ["#1f77b4", "#2ca02c"], // blue and green colors
-                },
-                legend: {
-                  title: "Predicted Class",
-                },
-              },
-              opacity: showMisclassifiedOnly
-              ? {
-                  field: "isMisclassified",
-                  type: "nominal",
-                  scale: {
-                    domain: [false, true],
-                    range: [0.45, 1.0], // very faint for correct, full for misclassified
-                  },
-                }
-              : {
-                  value: 0.8, // consistent opacity for all points in normal view
-                },
-                tooltip: [
-                  { field: "actual", type: "nominal", title: "Actual" },
-                  { field: "predicted", type: "nominal", title: "Predicted" },
-                  { field: xAxisOption || "xAxis default", type: "quantitative", title:xAxisOption  },
-                  { field: yAxisOption || "yAxis default", type: "quantitative", title: yAxisOption },
-                ]    
+        encoding: {
+          x: {
+            field: xAxisOption || "xAxis default",
+            type: "quantitative",
           },
-        }}
-        title={"Instance Classification Chart"}
-        actions={false}
-        controlPanel={
-          <ControlPanel
-            xAxisOption={xAxisOption}
-            yAxisOption={yAxisOption}
-            setXAxisOption={setXAxisOption}
-            setYAxisOption={setYAxisOption}
-            showMisclassifiedOnly={showMisclassifiedOnly}
-            options={options}
-            plotData={plotData}
-          />
-        }
-        onNewView={handleNewView}
-        infoMessage={info}
-        showInfoMessage={shouldShowInfoMessage}
-        aspectRatio={2}
-        maxHeight={480}
-        isStatic={true}
-      />
+          y: {
+            field: yAxisOption || "yAxis default",
+            type: "quantitative",
+          },
+          color: showMisclassifiedOnly
+            ? {
+              field: "isMisclassified",
+              type: "nominal",
+              scale: {
+                domain: [false, true],
+                range: ["#cccccc", "#ff0000"],
+              },
+              legend: {
+                title: "Misclassified",
+                labelExpr: "datum.label === 'true' ? 'Misclassified' : 'Correct'",
+              },
+            }
+            : {
+              field: "predicted", 
+              type: "nominal",
+              scale: {
+                range: ["#1f77b4", "#2ca02c"],
+              },
+              legend: {
+                title: "Predicted Class",
+              },
+            },
+          opacity: showMisclassifiedOnly
+            ? {
+              field: "isMisclassified",
+              type: "nominal",
+              scale: {
+                domain: [false, true],
+                range: [0.45, 1.0],
+              },
+            }
+            : {
+              value: 0.8,
+            },
+          stroke: {
+            condition: {
+              param: "highlight",
+              empty: false,
+              value: "black", 
+            },
+            value: "transparent"
+          },
+          strokeWidth: {
+            condition: {
+              param: "highlight", 
+              empty: false, 
+              value: 2 
+            },
+            value: 0
+          },
+          tooltip: [
+            { field: "actual", type: "nominal", title: "Actual" },
+            { field: "predicted", type: "nominal", title: "Predicted" },
+            { field: xAxisOption || "xAxis default", type: "quantitative", title: xAxisOption },
+            { field: yAxisOption || "yAxis default", type: "quantitative", title: yAxisOption },
+          ]
+        },
+      }}
+      title={"Instance Classification Chart"}
+      actions={false}
+      controlPanel={
+        <ControlPanel
+          xAxisOption={xAxisOption}
+          yAxisOption={yAxisOption}
+          setXAxisOption={setXAxisOption}
+          setYAxisOption={setYAxisOption}
+          showMisclassifiedOnly={showMisclassifiedOnly}
+          options={options}
+          plotData={plotData}
+        />
+      }
+      onNewView={handleNewView}
+      infoMessage={info}
+      showInfoMessage={shouldShowInfoMessage}
+      aspectRatio={2}
+      maxHeight={480}
+      isStatic={true}
+    />
   )
 }
 
