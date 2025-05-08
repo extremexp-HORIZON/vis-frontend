@@ -218,11 +218,11 @@ const HeatMapControlPanel = () => {
             <InputLabel>
               <Box display="flex" alignItems="center" gap={1}>
                 <FunctionsIcon fontSize="small" />
-                Apply Aggregation(s)
+                Apply Aggregation
               </Box>
             </InputLabel>
             <Select
-              label="Apply Aggregation---------"
+              label="Apply Aggregation-----"
               value={
                 tab?.workflowTasks.dataExploration?.controlPanel
                   .barAggregationHeat[selectedColumn]?.[0] || ""
