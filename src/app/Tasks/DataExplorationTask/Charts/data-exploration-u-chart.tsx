@@ -5,6 +5,7 @@ import ResponsiveCardVegaLite from "../../../../shared/components/responsive-car
 import { Box, useTheme, useMediaQuery, CircularProgress } from "@mui/material"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
 import { fetchUmap } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { a } from "vitest/dist/suite-dWqIFb_-.js"
 
 const Uchart = () => {
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab)
@@ -36,10 +37,10 @@ const Uchart = () => {
 
   // Prepare VegaLite spec
   const spec = {
-    mark: "point",
+    mark:{type:"point",tooltip:true} ,
     encoding: {
-      x: { field: "x", type: "quantitative" },
-      y: { field: "y", type: "quantitative" },
+      x: { field: "x", type: "quantitative",axis: { title:null } },
+      y: { field: "y", type: "quantitative",axis: { title:null } },
     },
     data: { name: "table" },
   }
