@@ -157,6 +157,7 @@ const LineChart = () => {
         showInfoMessage={shouldShowInfoMessage}
         maxHeight={500}
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
+        loading={tab?.workflowTasks.dataExploration?.lineChart?.loading}
       />
     </Box>
   )

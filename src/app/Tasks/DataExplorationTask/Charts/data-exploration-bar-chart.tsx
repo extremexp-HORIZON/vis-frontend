@@ -157,6 +157,7 @@ const BarChart = () => {
         controlPanel={<BarChartControlPanel/>}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
+        loading={tab?.workflowTasks.dataExploration?.barChart?.loading}
       />
     </Box>
   )

@@ -81,6 +81,7 @@ const Uchart = () => {
         controlPanel={<ScatterChartControlPanel />}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
+        loading={tab?.workflowTasks.dataExploration?.umap?.loading}
       />
     </Box>
   )

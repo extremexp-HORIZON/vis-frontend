@@ -197,6 +197,7 @@ const HeatMap = () => {
         controlPanel={<HeatMapControlPanel/>}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
+        loading={tab?.workflowTasks.dataExploration?.heatChart?.loading}
       />
     </Box>
   )
