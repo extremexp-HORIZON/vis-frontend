@@ -114,6 +114,7 @@ const LineChart = () => {
     }
   }
   
+  
   const getSingleLineSpec = ({
     data,
     xAxis,
@@ -135,16 +136,9 @@ const LineChart = () => {
         },
         y: {
           field: y.name,
-          type: "quantitative",
-          axis: {
-            title: y.name,
-            titleAngle: 270,
-            titleAlign: "center",
-            titleFontSize: 12,
-            titlePadding: 8,
-            labelAngle: 0,
-            labelColor: "#333",
-          },
+          ...getAxisEncoding(y.type, y.name),
+
+          
         },
       },
     }
