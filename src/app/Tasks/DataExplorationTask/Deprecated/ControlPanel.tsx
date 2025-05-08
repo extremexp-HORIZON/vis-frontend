@@ -571,7 +571,7 @@ const ControlPanel = (props: IControlPanel) => {
               }}
               color="primary"
             >
-              Options{" "}
+              Options
               <ExpandMoreIcon
                 sx={{
                   color: "primary",

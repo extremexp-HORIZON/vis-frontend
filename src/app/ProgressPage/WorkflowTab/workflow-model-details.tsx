@@ -1,8 +1,6 @@
 import {
   Box,
-  Grid,
-  Button,
-  ButtonGroup,
+  Grid
 } from "@mui/material"
 import {
   DetailsCard,
@@ -13,19 +11,9 @@ import InfoMessage from "../../../shared/components/InfoMessage"
 import { useState } from "react"
 import ConfusionMatrixPlot from "../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot"
 import RocCurvePlot from "../../Tasks/ModelAnalysisTask/plots/roc-curve-plot"
+import ClassificationReportTable from "../../Tasks/ModelAnalysisTask/plots/classification-report-table"
 
 const ModelDetails = () => {
-  const info = (
-    <InfoMessage
-      message="Soon..."
-      type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
-      fullHeight
-    />
-  )
-  const [isMosaic, setIsMosaic] = useState(true)
-
-  const showInfoMessage = true
 
   return (
     <>
@@ -42,13 +30,16 @@ const ModelDetails = () => {
 
       <Box paddingTop={5}>
         <Grid container spacing={2}>
-          <Grid item xs={isMosaic ? 6 : 12}>
-            <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
+          <Grid item xs={12}>
+            <ClassificationReportTable />
+          </Grid>
+          <Grid item xs={6}>
+            <Box sx={{ minHeight: { md: 305, xl: 400 } }}>
               <ConfusionMatrixPlot />
             </Box>
           </Grid>
-          <Grid item xs={isMosaic ? 6 : 12}>
-            <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
+          <Grid item xs={6}>
+            <Box sx={{ minHeight: { md: 305, xl: 400 } }}>
               <RocCurvePlot />
             </Box>
           </Grid>
