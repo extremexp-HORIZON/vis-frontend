@@ -11,6 +11,7 @@ import {
   ButtonGroup,
   Switch,
   Typography,
+  Tooltip,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
@@ -93,6 +94,9 @@ const ScatterChartControlPanel = () => {
       }
     }, [columns, yAxis, xAxis, colorBy])
 
+
+    const isDisabled = !tab?.workflowTasks.dataExploration?.scatterChart.data?.data.length
+const tooltipTitle = isDisabled ? "Select columns and color" : ""
   return (
     columns.length > 0 && (
       <Box>
@@ -235,7 +239,10 @@ const ScatterChartControlPanel = () => {
     >
       UMAP
     </Typography>
+    <Tooltip title={tooltipTitle} disableHoverListener={!isDisabled}>
+  <span>
     <Switch
+    disabled={isDisabled}
       checked={tab?.workflowTasks.dataExploration?.controlPanel.umap}
       onChange={() =>
         dispatch(
@@ -248,6 +255,8 @@ const ScatterChartControlPanel = () => {
       name="umap"
       inputProps={{ "aria-label": "UMAP toggle switch" }}
     />
+  </span>
+</Tooltip>
   </Box>
         </Box>
       </Box>
