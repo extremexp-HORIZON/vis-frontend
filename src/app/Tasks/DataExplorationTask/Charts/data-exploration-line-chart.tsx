@@ -1,4 +1,4 @@
-import { Box, useTheme, useMediaQuery } from "@mui/material"
+import { Box, useTheme, useMediaQuery, Grid } from "@mui/material"
 import { useEffect } from "react"
 import { cloneDeep } from "lodash"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
@@ -85,53 +85,71 @@ const LineChart = () => {
     data,
     xAxis,
     yAxis,
-    displayMode,
   }: {
     data: any[]
     xAxis: VisualColumn
     yAxis: VisualColumn[]
-    displayMode: "overlay" | "stack"
   }) => {
     const xField = xAxis.name
-
-    if (displayMode === "overlay") {
-      const longData: any[] = []
-      data.forEach(row => {
-        yAxis.forEach(y => {
-          longData.push({
-            [xField]: row[xField],
-            value: row[y.name],
-            variable: y.name,
-          })
+    const longData: any[] = []
+  
+    data.forEach(row => {
+      yAxis.forEach(y => {
+        longData.push({
+          [xField]: row[xField],
+          value: row[y.name],
+          variable: y.name,
         })
       })
-
-      return {
-        data: { values: longData },
-        mark:{type:"line",tooltip:true} ,
-        encoding: {
-          x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
-          y: { field: "value", type: "quantitative", title: "Value" },
-          color: { field: "variable", type: "nominal", title: "Metric" },
-
-        },
-      }
-    } else {
-      return {
-        vconcat: yAxis.map(y => ({
-          data: { values: cloneDeep(data) },
-
-          mark:{type:"line",tooltip:true} ,
-          encoding: {
-            x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
-            y: { field: y.name, ...getAxisEncoding(y.type, y.name), title: y.name },
-
-          },
-        })),
-      }
+    })
+  
+    return {
+      data: { values: longData },
+      mark: { type: "line", tooltip: true },
+      encoding: {
+        x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
+        y: { field: "value", type: "quantitative", title: "Value" },
+        color: { field: "variable", type: "nominal", title: "Metric" },
+      },
     }
   }
-
+  
+  const getSingleLineSpec = ({
+    data,
+    xAxis,
+    y,
+  }: {
+    data: any[]
+    xAxis: VisualColumn
+    y: VisualColumn
+  }) => {
+    return {
+      data: {
+        values: cloneDeep(data),
+      },
+      mark: { type: "line", tooltip: true },
+      encoding: {
+        x: {
+          field: xAxis.name,
+          ...getAxisEncoding(xAxis.type, xAxis.name),
+        },
+        y: {
+          field: y.name,
+          type: "quantitative",
+          axis: {
+            title: y.name,
+            titleAngle: 270,
+            titleAlign: "center",
+            titleFontSize: 12,
+            titlePadding: 8,
+            labelAngle: 0,
+            labelColor: "#333",
+          },
+        },
+      },
+    }
+  }
+  
   const info = (
     <InfoMessage
       message="Please select x-Axis and y-Axis to display the chart."
@@ -147,22 +165,52 @@ const LineChart = () => {
 
   return (
     <Box sx={{ height: "99%" }}>
-      <ResponsiveCardVegaLite
-        spec={getLineChartSpec({
-          data: chartData,
-          xAxis: xAxis as VisualColumn,
-          yAxis: yAxis as VisualColumn[],
-          displayMode: displayMode as "overlay" | "stack",
-        })}
-        title={"Line Chart"}
-        actions={false}
-        controlPanel={<LineChartControlPanel />}
-        infoMessage={info}
-        showInfoMessage={shouldShowInfoMessage}
-        maxHeight={500}
-        aspectRatio={isSmallScreen ? 2.8 : 1.8}
-        loading={tab?.workflowTasks.dataExploration?.lineChart?.loading}
-      />
+      {shouldShowInfoMessage ? (
+        <ResponsiveCardVegaLite
+          spec={{}}
+          title="Line Chart"
+          actions={false}
+          controlPanel={<LineChartControlPanel />}
+          infoMessage={info}
+          showInfoMessage={true}
+          maxHeight={isSmallScreen ? undefined : 500}
+          aspectRatio={isSmallScreen ? 2.8 : 1.8}
+        />
+      ) : displayMode === "overlay" ? (
+        <ResponsiveCardVegaLite
+          spec={getLineChartSpec({
+            data: chartData,
+            xAxis: xAxis as VisualColumn,
+            yAxis: yAxis as VisualColumn[],
+          })}
+          title="Line Chart"
+          actions={false}
+          controlPanel={<LineChartControlPanel />}
+          minHeight={isSmallScreen ? undefined : 500}
+          aspectRatio={isSmallScreen ? 2.8 : 1.8}
+          loading={tab?.workflowTasks.dataExploration?.lineChart?.loading}
+        />
+      ) : (
+        <Grid container spacing={2}>
+          {yAxis.map(y => (
+            <Grid item xs={12} >
+            <ResponsiveCardVegaLite
+              key={y.name}
+              spec={getSingleLineSpec({
+                data: chartData,
+                xAxis: xAxis as VisualColumn,
+                y,
+              })}
+              title={y.name}
+              actions={false}
+              controlPanel={<LineChartControlPanel />}
+              loading={tab?.workflowTasks.dataExploration?.lineChart?.loading}
+              isStatic={false}
+            />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   )
 }

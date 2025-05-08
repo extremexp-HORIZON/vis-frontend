@@ -101,28 +101,6 @@ const ModelDetails = () => {
             ))
           )}
         </DetailsCard>
-
-        {/* Overall Metrics */}
-        <DetailsCard title="Overall Metrics">
-          <LoadingOrEmpty
-            loading={isLoading}
-            condition={
-              hasError ||
-              !summary?.data?.overallMetrics ||
-              Object.keys(summary.data.overallMetrics).length === 0
-            }
-            message="No metrics available"
-          />
-          {!isLoading && !hasError && summary?.data?.overallMetrics && (
-            Object.entries(summary.data.overallMetrics).map(([metric, value]) => (
-              <DetailsCardItem
-                key={metric}
-                label={metric.charAt(0).toUpperCase() + metric.slice(1)}
-                value={value.toFixed(3)}
-              />
-            ))
-          )}
-        </DetailsCard>
       </Box>
 
       <Box paddingTop={2}>
