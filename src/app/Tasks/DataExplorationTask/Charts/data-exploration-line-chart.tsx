@@ -9,6 +9,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
+import { tooltip } from "leaflet"
 
 const getColumnType = (columnType: string, fieldName?: string) => {
   if (fieldName?.toLowerCase() === "timestamp") return "temporal"
@@ -107,21 +108,24 @@ const LineChart = () => {
 
       return {
         data: { values: longData },
-        mark: "line",
+        mark:{type:"line",tooltip:true} ,
         encoding: {
           x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
           y: { field: "value", type: "quantitative", title: "Value" },
           color: { field: "variable", type: "nominal", title: "Metric" },
+
         },
       }
     } else {
       return {
         vconcat: yAxis.map(y => ({
           data: { values: cloneDeep(data) },
-          mark: "line",
+
+          mark:{type:"line",tooltip:true} ,
           encoding: {
             x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
             y: { field: y.name, ...getAxisEncoding(y.type, y.name), title: y.name },
+
           },
         })),
       }

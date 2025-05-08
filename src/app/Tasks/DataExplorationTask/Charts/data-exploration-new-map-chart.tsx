@@ -74,7 +74,7 @@ const MapChart = () => {
     )
       return
 
-    leafletMapRef.current = L.map(mapRef.current).setView([38.015, 23.834], 6)
+    leafletMapRef.current = L.map(mapRef.current).setView([38.015, 23.834], 16)
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
       leafletMapRef.current,
     )
@@ -199,7 +199,7 @@ const MapChart = () => {
           (sum: number, r: { [x: string]: string }) => sum + parseFloat(r[lon]),
           0,
         ) / data.length
-      leafletMapRef.current.setView([avgLat, avgLon], 6)
+      leafletMapRef.current.setView([avgLat, avgLon], 16)
     }
   }, [data, lat, lon, colorMap, useHeatmap, filters])
   useEffect(() => {

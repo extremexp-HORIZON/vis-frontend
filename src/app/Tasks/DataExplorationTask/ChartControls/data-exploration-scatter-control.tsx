@@ -11,6 +11,7 @@ import {
   ButtonGroup,
   Switch,
   Typography,
+  Tooltip,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
@@ -93,6 +94,9 @@ const ScatterChartControlPanel = () => {
       }
     }, [columns, yAxis, xAxis, colorBy])
 
+
+    const isDisabled = !tab?.workflowTasks.dataExploration?.scatterChart.data?.data.length
+const tooltipTitle = isDisabled ? "Select columns and color" : ""
   return (
     columns.length > 0 && (
       <Box>
@@ -116,7 +120,7 @@ const ScatterChartControlPanel = () => {
               labelId="x-axis-select-label"
               value={xAxis?.name || ""}
               onChange={handleXAxisChange}
-              label="X-Axis"
+              label="X-Axis-----"
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
@@ -143,7 +147,7 @@ const ScatterChartControlPanel = () => {
               multiple
               value={yAxis.map(col => col.name)}
               onChange={handleYAxisChange}
-              input={<OutlinedInput label="Y-Axis" />}
+              input={<OutlinedInput label="Y-Axis-----" />}
               renderValue={selected => selected.join(", ")}
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
@@ -180,7 +184,7 @@ const ScatterChartControlPanel = () => {
               labelId="color-by-select-label"
               value={colorBy?.name || ""}
               onChange={handleColorByChange}
-              label="Color By"
+              label="Color By-----"
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
@@ -235,7 +239,10 @@ const ScatterChartControlPanel = () => {
     >
       UMAP
     </Typography>
+    <Tooltip title={tooltipTitle} disableHoverListener={!isDisabled}>
+  <span>
     <Switch
+    disabled={isDisabled}
       checked={tab?.workflowTasks.dataExploration?.controlPanel.umap}
       onChange={() =>
         dispatch(
@@ -248,6 +255,8 @@ const ScatterChartControlPanel = () => {
       name="umap"
       inputProps={{ "aria-label": "UMAP toggle switch" }}
     />
+  </span>
+</Tooltip>
   </Box>
         </Box>
       </Box>
