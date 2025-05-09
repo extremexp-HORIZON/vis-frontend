@@ -96,6 +96,8 @@ const AlePlot = (props: AlePlotProps) => {
         field:
           tab?.workflowTasks.modelAnalysis?.ale?.data?.yAxis.axisName ||
           "yAxis default",
+          title: "Average Predicted Effect",
+
         type:
           tab?.workflowTasks.modelAnalysis?.ale?.data?.xAxis.axisType ===
           "numerical"

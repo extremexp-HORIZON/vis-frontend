@@ -84,6 +84,7 @@ const PdpPlot = (props: PdpPlotProps) => {
         field:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisName ||
           "xAxis default",
+          
         type:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
           "numerical"
@@ -95,6 +96,8 @@ const PdpPlot = (props: PdpPlotProps) => {
         field:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.yAxis.axisName ||
           "yAxis default",
+          title: "Average Predicted Value",
+
         type:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
           "numerical"
