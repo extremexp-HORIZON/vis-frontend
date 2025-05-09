@@ -138,6 +138,7 @@ export type FetchExplainabilityPlotPayload = {
   metadata: {
     workflowId: string | number
     queryCase: any
+    experimentId: string
   }
 }
 
@@ -147,6 +148,7 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
     metadata: {
       workflowId: "",
       queryCase: "",
+      experimentId: ""
     },
   }  
 

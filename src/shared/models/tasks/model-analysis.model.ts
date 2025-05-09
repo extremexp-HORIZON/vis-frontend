@@ -335,7 +335,7 @@ export const modelAnalysisReducers = (
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   "workflowTasks/model_analysis/fetch_explainability_plot",
   async (payload: FetchExplainabilityPlotPayload) => {
-    const requestUrl = "explainability"
+    const requestUrl = `explainability/${payload.metadata.experimentId}/${payload.metadata.workflowId}`
     return api.post<any>(requestUrl, payload.query).then(response => response.data)
   },
 )

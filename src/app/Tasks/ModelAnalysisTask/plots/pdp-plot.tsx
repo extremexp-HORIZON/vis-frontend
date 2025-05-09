@@ -9,6 +9,7 @@ import ResponsiveCardVegaLite from "../../../../shared/components/responsive-car
 import { Box, CircularProgress, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+import { useParams } from "react-router-dom";
 
 
 interface PdpPlotProps {
@@ -27,9 +28,10 @@ const PdpPlot = (props: PdpPlotProps) => {
     const dispatch = useAppDispatch()
     const featureList = tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
     const plotModel = tab?.workflowTasks.modelAnalysis?.pdp
+    const {experimentId} = useParams()
 
     useEffect(() => {
-        if(tab) {
+        if(tab && experimentId) {
             dispatch(
                 fetchModelAnalysisExplainabilityPlot({
                   query: {
@@ -46,6 +48,7 @@ const PdpPlot = (props: PdpPlotProps) => {
                   metadata: {
                     workflowId: tab.workflowId,
                     queryCase: "pdp",
+                    experimentId: experimentId
                   },
                 }),
               )
