@@ -121,29 +121,7 @@ const HeatMapControlPanel = () => {
                 dispatch(setControls({ barGroupByHeat: selected }))
               }
             }}
-            renderValue={(selected: any) =>
-              selected.length === 0 ? (
-                <em>Select categories to group by</em>
-              ) : (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                  {selected.map((value: string) => (
-                    <Chip
-                      key={value}
-                      label={value}
-                      onDelete={() =>
-                        dispatch(
-                          setControls({
-                            barGroupByHeat: selected.filter(
-                              (v: string) => v !== value,
-                            ),
-                          }),
-                        )
-                      }
-                    />
-                  ))}
-                </Box>
-              )
-            }
+            renderValue={(selected: any) => selected.join(", ")}            
             MenuProps={{
               PaperProps: {
                 style: { maxHeight: 224, width: 250 },
