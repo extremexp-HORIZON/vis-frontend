@@ -10,6 +10,8 @@ import AssessmentIcon from "@mui/icons-material/Assessment"
 import ResponsiveCardTable from "../../../../shared/components/responsive-card-table"
 import ColumnSelectionPanel from "../ChartControls/data-exploration-table-control"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import PaginationComponent from "../ChartControls/data-exploration-pagination-control"
+import { setCurrentPage } from "../../../../store/slices/workflowPageSlice"
 
 const TableExpand: React.FC = () => {
   const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] })
@@ -89,6 +91,10 @@ const TableExpand: React.FC = () => {
     },
   }))
 
+
+  useEffect(() => {
+    dispatch(setCurrentPage(1))
+  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters]) 
   // Get column information from the state
   const selectedColumns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
@@ -102,8 +108,14 @@ const TableExpand: React.FC = () => {
       ) {
         return
       }
-
+  
+      setLoading(true)
+  
       try {
+        const currentPage = tab?.workflowTasks.dataExploration?.controlPanel?.currentPage || 1
+        const pageSize = tab?.workflowTasks.dataExploration?.controlPanel?.pageSize || 25
+        const offset = (currentPage - 1) * pageSize
+  
         await dispatch(
           fetchDataExplorationData({
             query: {
@@ -111,30 +123,33 @@ const TableExpand: React.FC = () => {
               columns: columns.map((col: any) => col.name),
               filters:
                 tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
-              limit: 1000,
-              // If you have `defaultDataExplorationQuery`, add it here
+              limit: pageSize,
+              offset,
             },
             metadata: {
               workflowId: tab?.workflowId || "",
               queryCase: "dataTable",
             },
           }),
-        ).unwrap() // <-- if you use createAsyncThunk
+        ).unwrap()
       } catch (error) {
         console.error("Failed to fetch data:", error)
       } finally {
         setLoading(false)
       }
     }
-
+  
     fetchData()
   }, [
     dispatch,
-    tab?.dataTaskTable.selectedItem?.data?.source,
-    columns.length,
-    tab?.workflowId,
+    tab?.workflowTasks.dataExploration?.controlPanel?.currentPage,
+    tab?.workflowTasks.dataExploration?.controlPanel?.pageSize,
     tab?.workflowTasks.dataExploration?.controlPanel?.filters,
-  ]) // Important deps!
+    columns,
+    tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.workflowId,
+  ])
+  
   // Export data to CSV
   const handleExportCsv = () => {
     if (!rows || rows.length === 0) return
@@ -204,6 +219,7 @@ const TableExpand: React.FC = () => {
                 height: "100%",
                 overflow: "hidden", // Important to contain the scrolling
                 display: "flex",
+                flexDirection: "column",
               }}
               ref={tableRef}
             >
@@ -222,12 +238,13 @@ const TableExpand: React.FC = () => {
                 }))}
                 filterModel={filterModel}
                 disableColumnMenu
+                hideFooter
                 disableColumnSelector
                 pagination
                 pageSizeOptions={[10, 25, 50, 100]}
                 initialState={{
                   pagination: {
-                    paginationModel: { pageSize: 25 },
+                    paginationModel: { pageSize: 100 },
                   },
                 }}
                 autoHeight={false}
@@ -248,7 +265,13 @@ const TableExpand: React.FC = () => {
                   },
                 }}
               />
+              <Box mt={5} mb={2} sx={{ display: "flex", justifyContent: "right" }}>
+              <PaginationComponent />
+
+              </Box>
+
             </Box>
+            
           ) : (
             <InfoMessage
               message="Please select columns to display."
@@ -261,6 +284,7 @@ const TableExpand: React.FC = () => {
           )}
         </Box>
       </ResponsiveCardTable>
+
     </Box>
   )
 }

@@ -68,6 +68,9 @@ export interface IDataExploration {
     viewMode: "overlay" | "stacked"
     selectedDataset: string
     currentPage: number
+    pageSize: number
+    queryItems: number
+    totalPages: number
     timestampField: string | null
 
     //Line
@@ -169,7 +172,6 @@ export const dataExplorationDefault: IDataExploration = {
     tripsMode: false,
     selectedColumnsMap: [],
     selectedDataset: "",
-    currentPage: 1,
     lat: "",
     lon: "",
     umap: false,
@@ -180,6 +182,10 @@ export const dataExplorationDefault: IDataExploration = {
     barGroupByHeat: [],
     barAggregationHeat: {},
     selectedMeasureColumnHeat: null,
+    currentPage: 1,
+    pageSize: 100,
+    queryItems: 0,
+    totalPages: 0,
 
     
   },
@@ -216,6 +222,14 @@ export const explainabilityExtraReducers = (
             : prepareDataExplorationResponse(action.payload)
         dataExplorationTask[queryCase].loading = false
         dataExplorationTask[queryCase].error = null
+        if (queryCase === "dataTable") {
+          const totalItems = action.payload.querySize || 0;
+          const pageSize = dataExplorationTask.controlPanel.pageSize;
+          dataExplorationTask.controlPanel.queryItems = totalItems;
+          dataExplorationTask.controlPanel.totalPages = Math.ceil(totalItems / pageSize);
+        }
+        
+
       }
     })
     .addCase(fetchDataExplorationData.pending, (state, action) => {

@@ -64,6 +64,15 @@ export const workflowPageSlice = createSlice({
         ...state.tab?.workflowTasks.dataExploration?.controlPanel,
          ...action.payload}
       },
+      setCurrentPage: (state, action) => {
+        if (!state.tab?.workflowTasks.dataExploration) return
+        state.tab.workflowTasks.dataExploration.controlPanel.currentPage = action.payload
+      },
+      setTotalSize : (state, action) => {
+        if (!state.tab?.workflowTasks.dataExploration) return
+        state.tab.workflowTasks.dataExploration.controlPanel.totalPages = action.payload
+        state.tab.workflowTasks.dataExploration.controlPanel.currentPage = 1
+      },
       setMetaData: (state, action) => {
         if (!state.tab?.workflowTasks.dataExploration) return
         state.tab.workflowTasks.dataExploration.metaData = {
@@ -294,7 +303,7 @@ export const fetchWorkflowMetrics = createAsyncThunk(
 
 
 //Reducer exports
-export const { initTab,resetWorkflowTab, setControls,setMetaData,setDataTable,setSelectedItem,setSelectedTask, setSelectedId } =
+export const { initTab,resetWorkflowTab, setControls,setMetaData,setDataTable,setSelectedItem,setSelectedTask, setSelectedId,setCurrentPage,setTotalSize } =
   workflowPageSlice.actions
 
 export default workflowPageSlice.reducer
