@@ -253,6 +253,14 @@ export const explainabilityExtraReducers = (
         dataExplorationTask.metaData.error = null
         dataExplorationTask.controlPanel.selectedColumns =
           action.payload.originalColumns?.slice(0, 5) ?? []
+
+        if (action.payload.originalColumns[0]) {
+          dataExplorationTask.controlPanel.xAxis = action.payload.originalColumns[0]
+        }
+
+        const defaultYAxis = action.payload.originalColumns.length > 1 ? 
+          [action.payload.originalColumns[1]] : [action.payload.originalColumns[0]].filter(Boolean)
+        dataExplorationTask.controlPanel.yAxis = defaultYAxis
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {
