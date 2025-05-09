@@ -142,9 +142,15 @@ export const MetricCards = () => {
   const metricData = tab?.dataTaskTable.selectedItem?.data;
   const currentWorkflowId = tab?.workflowId;
 
+  const roundTo5 = (v: number) => Number(v.toFixed(5));
+
   const filteredWorkflows = workflows?.data?.flatMap(w =>
     w.metrics?.filter(metric => metric.name === metricData?.name)
-      .map(metric => ({ parent: w, value: metric.value })) ?? []
+      .map(metric => ({
+        parent: w,
+        rawValue: metric.value,
+        value: roundTo5(metric.value),
+      })) ?? []
   ) ?? [];
 
   const minValue = Math.min(...filteredWorkflows.map(w => w.value));
@@ -181,7 +187,7 @@ export const MetricCards = () => {
 
   const isOnlyThisWorkflowMin =
     minWorkflows.length === 1 && minWorkflows[0].id === currentWorkflowId;
-  
+
   const isOnlyThisWorkflowMax =
     maxWorkflows.length === 1 && maxWorkflows[0].id === currentWorkflowId;
 
@@ -205,7 +211,7 @@ export const MetricCards = () => {
     <Box sx={{ display: "flex", flexDirection: "row", gap: 2, width: "100%" }}>
       <DetailsCard title="Metric Details">
         <DetailsCardItem label="Metric" value={metricData?.name} />
-        <DetailsCardItem label="Value" value={metricData?.value?.toFixed(2)} />
+        <DetailsCardItem label="Value" value={metricData?.value?.toFixed(5)} />
         {metricData?.task && <DetailsCardItem label="Logged in Task" value={metricData.task} />}
         <DetailsCardItem
           label="Timestamp"
@@ -221,7 +227,7 @@ export const MetricCards = () => {
           value={
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography variant="body1">
-                {metricData?.avgValue?.toFixed(2)} — Difference: {Number.isFinite(metricData?.avgDiff) ? metricData.avgDiff.toFixed(2) : "0.00"}%
+                {metricData?.avgValue?.toFixed(5)} — Difference: {Number.isFinite(metricData?.avgDiff) ? metricData.avgDiff.toFixed(2) : "0.00"}%
               </Typography>
               {renderDiffIcon()}
             </Box>
@@ -233,7 +239,7 @@ export const MetricCards = () => {
           value={
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography variant="body1" sx={{ mr: 1 }}>
-                {minValue.toFixed(2)}
+                {minValue.toFixed(5)}
               </Typography>
               {!isOnlyThisWorkflowMin && (
                 <>
@@ -248,7 +254,7 @@ export const MetricCards = () => {
                   >
                     {getMinText()}
                   </Box>
-                </>              
+                </>
               )}
             </Box>
           }
@@ -259,7 +265,7 @@ export const MetricCards = () => {
           value={
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography variant="body1" sx={{ mr: 1 }}>
-                {maxValue.toFixed(2)}
+                {maxValue.toFixed(5)}
               </Typography>
               {!isOnlyThisWorkflowMax && (
                 <>
