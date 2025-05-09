@@ -72,12 +72,12 @@ const HyperparameterImpact = () => {
           >
             <Grid item xs={isMosaic ? 6 : 12}>
               <Box sx={{ minHeight:{md: 305, xl: 500} }}>
-                <PdpPlot query={query} explanation_type="hyperparameterExplanation" />
+                <PdpPlot explanation_type="hyperparameterExplanation" />
               </Box>
             </Grid>
             <Grid item xs={isMosaic ? 6 : 12}>
               <Box sx={{ minHeight:{md: 305, xl: 500} }}>
-                <AlePlot query={query} explanation_type="hyperparameterExplanation" />
+                <AlePlot explanation_type="hyperparameterExplanation" />
               </Box>
             </Grid>
           </Grid>
