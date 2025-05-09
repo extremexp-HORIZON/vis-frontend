@@ -9,7 +9,6 @@ import AssessmentIcon from "@mui/icons-material/Assessment"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
-import { tooltip } from "leaflet"
 
 const getColumnType = (columnType: string, fieldName?: string) => {
   if (fieldName?.toLowerCase() === "timestamp") return "temporal"
@@ -180,7 +179,7 @@ const LineChart = () => {
           title="Line Chart"
           actions={false}
           controlPanel={<LineChartControlPanel />}
-          minHeight={isSmallScreen ? undefined : 500}
+          maxHeight={500}
           aspectRatio={isSmallScreen ? 2.8 : 1.8}
           loading={tab?.workflowTasks.dataExploration?.lineChart?.loading}
         />
