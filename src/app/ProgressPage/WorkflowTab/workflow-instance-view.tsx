@@ -345,19 +345,19 @@ const InstanceView = () => {
           </ResponsiveCardTable>
         </Box>
       )}
-      {point && workflow && (
-        <Box sx={{pt: 2}}>
-          <CounterfactualsTable
-              key={`counterfactuals-table`}
-              point={point}
-              handleClose={() => {}} // We're handling close with our own button
-              counterfactuals={workflow || null}
-              onClose={() => setPoint(null)}
-              experimentId={experimentId || "I2Cat_phising"}
-              workflowId={tab?.workflowId || "1"}
-            />
-        </Box>
-      )}
+     <Box sx={{ pt: 2, minHeight: '100px' }}>
+  {point && workflow ? (
+    <CounterfactualsTable
+      key={`counterfactuals-table`}
+      point={point}
+      handleClose={() => {}}
+      counterfactuals={workflow || null}
+      onClose={() => setPoint(null)}
+      experimentId={experimentId || "I2Cat_phising"}
+      workflowId={tab?.workflowId || "1"}
+    />
+  ) : null}
+</Box>
     </>
   )
 }
