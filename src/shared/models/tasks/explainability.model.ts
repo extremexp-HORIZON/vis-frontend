@@ -102,12 +102,6 @@ export type IHyperparameters = {
 export type ExplainabilityQuery = {
   explanation_type?: string
   explanation_method?: string
-  model?: string[]
-  data?: string
-  train_index?: number[]
-  test_index?: number[]
-  target_column?: string
-  hyper_configs?: IHyperparameters
   feature1?: string
   feature2?: string
   query?: string
@@ -119,12 +113,6 @@ export type ExplainabilityQuery = {
 export const explainabilityQueryDefault: ExplainabilityQuery = {
   explanation_type: "",
   explanation_method: "",
-  model: [],
-  data: "",
-  train_index: [],
-  test_index: [],
-  target_column: "",
-  hyper_configs: {},
   feature1: "",
   feature2: "",
   query: "",
