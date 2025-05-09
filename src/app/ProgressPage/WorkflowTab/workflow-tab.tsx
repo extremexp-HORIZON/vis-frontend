@@ -61,7 +61,7 @@ const WorkflowTab = () => {
             width: "25%",
             height: "100%",
           }}
-          minWidth="200px"
+          minWidth="0px"
           enable={{
             top: false,
             right: true,
@@ -72,7 +72,7 @@ const WorkflowTab = () => {
             bottomLeft: false,
             topLeft: false,
           }}
-          maxWidth="50%"
+          maxWidth="30%"
           maxHeight="100%"
           style={{ height: "100%", position: "relative"}}          
           handleStyles={{
