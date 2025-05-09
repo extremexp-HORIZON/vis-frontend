@@ -51,26 +51,12 @@ const ModelAnalysisTask = () => {
         >
           <Grid item xs={isMosaic ? 6 : 12}>
             <Box sx={{ minHeight:{md: 305, xl: 500} }}>
-              <PdpPlot 
-                model={workflowModels} 
-                data={workflowDataset} 
-                train_index={trainIndexMetric} 
-                test_index={testIndexMetric}
-                target_column={targetColumnMetric}
-                explanation_type="featureExplanation"
-              />
+              <PdpPlot explanation_type="featureExplanation" />
             </Box>
           </Grid>
           <Grid item xs={isMosaic ? 6 : 12}>
             <Box sx={{ minHeight:{md: 305, xl: 500} }}>
-              <AlePlot 
-                model={workflowModels} 
-                data={workflowDataset} 
-                train_index={trainIndexMetric} 
-                test_index={testIndexMetric}
-                target_column={targetColumnMetric}
-                explanation_type="featureExplanation"
-              />
+              <AlePlot explanation_type="featureExplanation"/>
             </Box>
           </Grid>
         </Grid>
