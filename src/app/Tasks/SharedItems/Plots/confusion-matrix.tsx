@@ -7,8 +7,8 @@ import InfoIcon from "@mui/icons-material/Info"
 import grey from "@mui/material/colors/grey"
 import { useEffect, useState } from "react"
 import type { IDataExplorationResponse } from "../../../../shared/models/dataexploration.model"
-import CircularProgress from "@mui/material/CircularProgress"
 import Skeleton from "@mui/material/Skeleton"
+import Loader from "../../../../shared/components/loader"
 
 interface ILineplot {
   confusionMatrix: {
@@ -80,16 +80,7 @@ const ConfusionMatrix = (props: ILineplot) => {
               <InfoIcon sx={{ padding: 1, zIndex: 100, color: grey[600] }} />
             </Tooltip>
             {(confusionMatrix && (confusionMatrix.loading || !confusionMatrix.data)) && (
-              <CircularProgress
-                size={28}
-                sx={{
-                  // color: green[500],
-                  position: "absolute",
-                  top: 6,
-                  left: 6,
-                  zIndex: 0,
-                }}
-              />
+             <Loader/>
             )}
           </Box>
         </Box>

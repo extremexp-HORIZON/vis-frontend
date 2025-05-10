@@ -11,7 +11,6 @@ import theme from "../../../../mui-theme"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import {
   Box,
-  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -20,6 +19,7 @@ import {
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import { useParams } from "react-router-dom"
+import Loader from "../../../../shared/components/loader"
 
 interface PdpPlotProps {
   explanation_type: string
@@ -159,14 +159,7 @@ const PdpPlot = (props: PdpPlotProps) => {
   )
 
   const loading = (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100%"
-    >
-      <CircularProgress />
-    </Box>
+   <Loader />
   )
 
   const error = (

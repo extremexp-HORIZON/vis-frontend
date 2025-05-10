@@ -3,10 +3,10 @@ import type { RootState} from "../../../../store/store";
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useState } from "react"
 import { fetchConfusionMatrix } from "../../../../shared/models/tasks/model-analysis.model"
-import { Box, CircularProgress } from "@mui/material"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
+import Loader from "../../../../shared/components/loader";
 
 const ConfusionMatrixPlot = () => {
     const dispatch = useAppDispatch()
@@ -106,14 +106,7 @@ const ConfusionMatrixPlot = () => {
       }
 
     const loading = (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100%" 
-        >
-          <CircularProgress />
-        </Box>
+<Loader/>
     )
 
     const error = (

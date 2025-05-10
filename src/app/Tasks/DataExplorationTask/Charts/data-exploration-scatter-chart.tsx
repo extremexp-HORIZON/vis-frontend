@@ -86,7 +86,9 @@ const getScatterChartOverlaySpec = ({
               labelLimit: 20,
               symbolLimit: 50
             },            scale: {
-              range: ["#ffffcc", "#a1dab4", "#41b6c4", "#225ea8"]
+              range: ["#d9f0a3", "#74c476", "#238b8d", "#084081"]
+
+
             }
           },
         }),

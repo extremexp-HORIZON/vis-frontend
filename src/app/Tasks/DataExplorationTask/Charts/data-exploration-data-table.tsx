@@ -4,14 +4,12 @@ import type { GridFilterModel } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
 import { Box, styled } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import AssessmentIcon from "@mui/icons-material/Assessment"
-
 import ResponsiveCardTable from "../../../../shared/components/responsive-card-table"
 import ColumnSelectionPanel from "../ChartControls/data-exploration-table-control"
 import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import PaginationComponent from "../ChartControls/data-exploration-pagination-control"
 import { setCurrentPage } from "../../../../store/slices/workflowPageSlice"
+import Loader from "../../../../shared/components/loader"
 
 const TableExpand: React.FC = () => {
   const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] })
@@ -91,10 +89,9 @@ const TableExpand: React.FC = () => {
     },
   }))
 
-
   useEffect(() => {
     dispatch(setCurrentPage(1))
-  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters]) 
+  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters])
   // Get column information from the state
   const selectedColumns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
@@ -108,14 +105,16 @@ const TableExpand: React.FC = () => {
       ) {
         return
       }
-  
+
       setLoading(true)
-  
+
       try {
-        const currentPage = tab?.workflowTasks.dataExploration?.controlPanel?.currentPage || 1
-        const pageSize = tab?.workflowTasks.dataExploration?.controlPanel?.pageSize || 25
+        const currentPage =
+          tab?.workflowTasks.dataExploration?.controlPanel?.currentPage || 1
+        const pageSize =
+          tab?.workflowTasks.dataExploration?.controlPanel?.pageSize || 25
         const offset = (currentPage - 1) * pageSize
-  
+
         await dispatch(
           fetchDataExplorationData({
             query: {
@@ -138,7 +137,7 @@ const TableExpand: React.FC = () => {
         setLoading(false)
       }
     }
-  
+
     fetchData()
   }, [
     dispatch,
@@ -149,7 +148,7 @@ const TableExpand: React.FC = () => {
     tab?.dataTaskTable.selectedItem?.data?.source,
     tab?.workflowId,
   ])
-  
+
   // Export data to CSV
   const handleExportCsv = () => {
     if (!rows || rows.length === 0) return
@@ -191,6 +190,10 @@ const TableExpand: React.FC = () => {
     Array.isArray(selectedColumns) &&
     selectedColumns.length > 0
 
+  if (tab?.workflowTasks.dataExploration?.dataTable?.loading) {
+   <Loader/>
+  }
+
   return (
     <Box sx={{ height: "99%" }}>
       <ResponsiveCardTable
@@ -223,6 +226,9 @@ const TableExpand: React.FC = () => {
               }}
               ref={tableRef}
             >
+              {!tab?.workflowTasks.dataExploration?.dataTable.loading?(
+
+              
               <StyledDataGrid
                 rows={rows || []}
                 columns={selectedColumns.map((col: any) => ({
@@ -265,26 +271,23 @@ const TableExpand: React.FC = () => {
                   },
                 }}
               />
-              <Box mt={5} mb={2} sx={{ display: "flex", justifyContent: "right" }}>
-              <PaginationComponent />
-
+              ):(
+               <Loader/>
+              )
+            }
+              <Box
+                mt={5}
+                mb={2}
+                sx={{ display: "flex", justifyContent: "right" }}
+              >
+                <PaginationComponent />
               </Box>
-
             </Box>
-            
           ) : (
-            <InfoMessage
-              message="Please select columns to display."
-              type="info"
-              icon={
-                <AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />
-              }
-              fullHeight
-            />
+            <Loader/>
           )}
         </Box>
       </ResponsiveCardTable>
-
     </Box>
   )
 }

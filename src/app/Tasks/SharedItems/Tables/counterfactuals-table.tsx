@@ -5,7 +5,6 @@ import { styled } from "@mui/material/styles"
 import { useEffect, useState } from "react"
 import type { RootState } from "../../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import CircularProgress from "@mui/material/CircularProgress"
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
 import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
@@ -14,6 +13,7 @@ import { DataGrid } from "@mui/x-data-grid"
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import ClosableCardTable from "../../../../shared/components/closable-card-table"
+import Loader from "../../../../shared/components/loader"
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -242,21 +242,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       >
         {counterfactuals?.loading ? (
           // Loader when loading
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              minHeight: "250px",
-              flexDirection: "column",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <CircularProgress />
-            <Typography variant="body2" align="center">
-              Loading data...
-            </Typography>
-          </Box>
+          <Loader/>
         ) : counterfactuals?.data?.plotType === "Error" ? (
           // Display error message
           <Box sx={{ p: 2, textAlign: "center" }}>

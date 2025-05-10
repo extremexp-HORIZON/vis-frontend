@@ -1,7 +1,6 @@
 import { useAppSelector } from "../../../../store/store"
 import {
   Box,
-  CircularProgress,
   Table,
   TableHead,
   TableRow,
@@ -12,6 +11,7 @@ import {
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import ResponsiveCardTable from "../../../../shared/components/responsive-card-table"
+import Loader from "../../../../shared/components/loader"
 
 const format = (value: string | number): string =>
   typeof value === "number" ? value.toFixed(3) : String(value)
@@ -104,9 +104,7 @@ const ClassificationReportTable = () => {
   const content = () => {
     if (loading)
       return (
-        <Box display="flex" justifyContent="center" alignItems="center" height="100%" minHeight={200}>
-          <CircularProgress />
-        </Box>
+       <Loader/>
       )
     if (error)
       return (

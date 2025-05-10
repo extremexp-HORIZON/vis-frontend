@@ -2,10 +2,10 @@ import { useEffect } from "react"
 import type { RootState } from "../../../../store/store"
 import { useAppSelector, useAppDispatch } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import { Box, useTheme, useMediaQuery, CircularProgress } from "@mui/material"
+import { Box, useTheme, useMediaQuery,  } from "@mui/material"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
 import { fetchUmap } from "../../../../shared/models/tasks/data-exploration-task.model"
-import { a } from "vitest/dist/suite-dWqIFb_-.js"
+import Loader from "../../../../shared/components/loader"
 
 const Uchart = () => {
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab)
@@ -54,19 +54,10 @@ const Uchart = () => {
   console.log("Full umap object:", tab?.workflowTasks.dataExploration?.umap)
   console.log("UMAP data:", tab?.workflowTasks.dataExploration?.umap?.data)
   const info = (
-    <Box
-    sx={{
-      height: "100%",
-      width: "100%",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <CircularProgress />
-  </Box>
+    <Loader/>
   )
 
+  
   const shouldShowInfoMessage =
     !tab?.workflowTasks.dataExploration?.controlPanel.selectedColumns ||!chartData.length
 

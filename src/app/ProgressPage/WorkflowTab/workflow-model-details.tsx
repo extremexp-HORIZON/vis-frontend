@@ -1,6 +1,5 @@
 import {
   Box,
-  CircularProgress,
   Grid,
   Typography
 } from "@mui/material"
@@ -16,13 +15,12 @@ import { useEffect } from "react"
 import { fetchModelSummary } from "../../../shared/models/tasks/model-analysis.model"
 import { useParams } from "react-router-dom"
 import { InfoOutlined } from "@mui/icons-material"
+import Loader from "../../../shared/components/loader"
 
 const LoadingOrEmpty = ({ loading, condition, message }: { loading: boolean; condition: boolean; message: string }) => {
   if (loading) {
     return (
-      <Box sx={{ minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CircularProgress />
-      </Box>
+      <Loader/>
     )
   }
 

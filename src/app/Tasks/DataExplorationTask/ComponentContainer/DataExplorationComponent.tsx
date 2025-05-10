@@ -9,7 +9,7 @@ import LeftPanel from "./data-exploration-left-panel"
 import LineChart from "../Charts/data-exploration-line-chart"
 import ScatterChart from "../Charts/data-exploration-scatter-chart"
 import  BarChart from "../Charts/data-exploration-bar-chart"
-import { Box, CircularProgress, Paper, useMediaQuery } from "@mui/material"
+import { Box, Paper, useMediaQuery } from "@mui/material"
 import TableExpand from "../Charts/data-exploration-data-table"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
 import InfoMessage from "../../../../shared/components/InfoMessage"
@@ -65,21 +65,6 @@ const DataExplorationComponent = () => {
       />
     )
 
-  if (tab?.workflowTasks.dataExploration?.metaData.loading)
-    return (
-      <Box
-        sx={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    )
-
   if (tab?.workflowTasks.dataExploration?.metaData.error)
     return (
       <InfoMessage
@@ -103,30 +88,7 @@ const DataExplorationComponent = () => {
       }}
     >
       <LeftPanel />
-      {tab?.workflowTasks.dataExploration?.chart.loading ? (
-        <Box
-          sx={{
-            height: "100%",
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      ) : tab?.workflowTasks.dataExploration?.chart.error ? (
-        <InfoMessage
-          message="Failed to fetch dataset."
-          type="info"
-          icon={
-            <ReportProblemRoundedIcon
-              sx={{ fontSize: 40, color: "info.main" }}
-            />
-          }
-          fullHeight
-        />
-      ) : (
+      
         <Paper
           elevation={1}
           sx={{ flex: 1, overflow: "auto", height: "100%", width: "100%" }}
@@ -138,7 +100,7 @@ const DataExplorationComponent = () => {
           {chartType === "heatmap" && <HeatMap/>}
           {chartType === "map" && (<MapCardWrapper/>)}
         </Paper>
-      )}
+      
     </Box>
   )
 }

@@ -14,7 +14,6 @@ import {
   Checkbox,
   Typography,
   Stack,
-  CircularProgress,
 } from "@mui/material"
 import { setControls } from "../../../store/slices/workflowPageSlice"
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
@@ -22,6 +21,7 @@ import TableChartIcon from "@mui/icons-material/TableChartSharp"
 import { DataGrid } from "@mui/x-data-grid"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import ResponsiveCardTable from "../../../shared/components/responsive-card-table"
+import Loader from "../../../shared/components/loader"
 
 
 const InstanceView = () => {
@@ -271,18 +271,7 @@ const InstanceView = () => {
               }}
             >
                {tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ? (
-                  <Box
-                    sx={{
-                      flexGrow: 1,
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <CircularProgress />
-                  </Box>
+                 <Loader/>
                 ) : hasContent ? (
                 <Box
                   sx={{

@@ -33,6 +33,7 @@ import DownloadIcon from "@mui/icons-material/Download"
 import FullscreenIcon from "@mui/icons-material/Fullscreen"
 import CodeIcon from "@mui/icons-material/Code"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import Loader from "./loader"
 interface ResponsiveCardVegaLiteProps {
   spec: any // VegaLite specification
   minWidth?: number
@@ -442,20 +443,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             {showInfoMessage ? (
               <Box sx={{ width: width, height: height }}>{infoMessage}</Box>
             ) : loading ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width,
-                  height,
-                }}
-              >
-                <CircularProgress />
-                <Typography variant="body2" sx={{ ml: 1, color: grey[600] }}>
-                  Loading...
-                </Typography>
-              </Box>
+              <Loader/>
             ) : (
               <VegaLite
                 spec={{
@@ -608,20 +596,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         >
           {!showInfoMessage ? (
             loading ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <CircularProgress />
-                <Typography variant="body2" sx={{ ml: 1, color: grey[600] }}>
-                  Loading...
-                </Typography>
-              </Box>
+              <Loader/>
             ) : (
               <VegaLite
                 spec={{
