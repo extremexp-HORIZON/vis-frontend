@@ -107,6 +107,7 @@ const MapControls = () => {
         >
           <InputLabel>Segment By</InputLabel>
           <Select
+          disabled={true}
             multiple
             value={segmentBy}
             onChange={handleSegmentByChange}
