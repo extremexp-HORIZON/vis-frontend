@@ -280,6 +280,36 @@ export const explainabilityExtraReducers = (
         dataExplorationTask.controlPanel.yAxis = defaultYAxis
         dataExplorationTask.controlPanel.yAxisScatter = defaultYAxis
 
+        const defaultGroupBy = action.payload.originalColumns.find(col => col.type === "STRING")
+        if (defaultGroupBy) {
+          dataExplorationTask.controlPanel.barGroupBy = [defaultGroupBy.name]
+        }
+        const defaultAggregation = action.payload.originalColumns.find(col => col.type === "INTEGER")
+if (defaultAggregation) {
+  dataExplorationTask.controlPanel.barAggregation = {
+    [defaultAggregation.name]: ["count"], // or "sum", "count", depending on your needs
+  }
+}
+
+const stringColumns = action.payload.originalColumns.filter(col => col.type === "STRING")
+const heatmapGroupBy = stringColumns.slice(0, 2).map(col => col.name)
+
+if (heatmapGroupBy.length === 2) {
+  dataExplorationTask.controlPanel.barGroupByHeat = heatmapGroupBy
+}
+
+// Get first DOUBLE column for aggregation
+const heatmapAggregationColumn = action.payload.originalColumns.find(col => col.type === "DOUBLE")
+if (heatmapAggregationColumn) {
+  dataExplorationTask.controlPanel.barAggregationHeat = {
+    [heatmapAggregationColumn.name]: ["count"],
+  }
+}
+
+
+
+
+
 
       }
     })
