@@ -270,11 +270,17 @@ export const explainabilityExtraReducers = (
 
         if (action.payload.originalColumns[0]) {
           dataExplorationTask.controlPanel.xAxis = action.payload.originalColumns[0]
+          dataExplorationTask.controlPanel.xAxisScatter = action.payload.originalColumns[0]
+          dataExplorationTask.controlPanel.colorBy=action.payload.originalColumns[0]
+
         }
 
         const defaultYAxis = action.payload.originalColumns.length > 1 ? 
           [action.payload.originalColumns[1]] : [action.payload.originalColumns[0]].filter(Boolean)
         dataExplorationTask.controlPanel.yAxis = defaultYAxis
+        dataExplorationTask.controlPanel.yAxisScatter = defaultYAxis
+
+
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {
