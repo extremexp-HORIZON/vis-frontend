@@ -26,6 +26,18 @@ const getColumnType = (columnType: string, fieldName?: string) => {
   }
 }
 
+const MAX_UNIQUE_VALUES = 50
+
+const getUniqueValueCount = (data: any[], field: string): number => {
+  const values = new Set()
+  data.forEach(row => values.add(row[field]))
+  return values.size
+}
+
+const isTooManyUniqueValues = (field: VisualColumn | undefined, data: any[]) =>
+  field?.type === "STRING" && getUniqueValueCount(data, field.name) > MAX_UNIQUE_VALUES
+
+
 const getScatterChartOverlaySpec = ({
   data,
   xAxis,
@@ -49,22 +61,31 @@ const getScatterChartOverlaySpec = ({
     layer: yAxis.map(y => ({
       mark: "point",
       encoding: {
+        
         x: {
           field: xAxis.name,
           type: getColumnType(xAxis.type, xAxis.name),
-          axis: { title: xAxis.name },
+          axis: {
+            title: xAxis.name,
+            labelLimit: 30,
+            labelOverlap: true
+          }
+          
         },
         y: {
           field: y.name,
           type: getColumnType(y.type, y.name),
           axis: { title: y.name },
         },
-        ...(colorField && {
+        ...(colorField && !isTooManyUniqueValues(colorBy, data) && {
           color: {
             field: colorField,
             type: colorType,
-            legend: { title: colorField },
-            scale: {
+            legend: {
+              title: colorField,
+              labelLimit: 20,
+              symbolLimit: 50
+            },            scale: {
               range: ["#ffffcc", "#a1dab4", "#41b6c4", "#225ea8"]
             }
           },
