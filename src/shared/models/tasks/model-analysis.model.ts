@@ -360,7 +360,7 @@ export const fetchModelAnalysisData = createAsyncThunk(
 
 export const getLabelTestInstances = createAsyncThunk(
   'evaluation/getLabelTestInstances',
-  async ({ experimentId, runId, offset = 0, limit = 100000 }: { experimentId: string; runId: string; offset?: number; limit?: number }, { rejectWithValue }) => {
+  async ({ experimentId, runId, offset = 0, limit = 1000 }: { experimentId: string; runId: string; offset?: number; limit?: number }, { rejectWithValue }) => {
     try {
       const response = await experimentApi.get(
         `${experimentId}/runs/${runId}/evaluation/test-instances`,

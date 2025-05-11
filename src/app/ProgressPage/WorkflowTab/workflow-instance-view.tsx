@@ -42,7 +42,7 @@ const InstanceView = () => {
 
   const [point, setPoint] = useState<any | null>(null)
   const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? []
-
+console.log(point)
 
   const columns = Object.keys(rows[0] || {}).map(key => ({
     field: key,
@@ -289,9 +289,9 @@ const InstanceView = () => {
                       : rows
                     ).map((row: any, index: any) => ({ id: index, ...row }))}
                     columns={columns}
-                    onRowClick={params => {
-                      const rowData = rows[params.id] // Ensure you're using the original data
-                      setPoint(rowData)
+                    onRowClick={(params) => {
+                      const { id, ...rowWithoutId } = params.row
+                      setPoint(rowWithoutId)
                     }}
                     pagination
                     selectionModel={point ? [rows.indexOf(point)] : []}
