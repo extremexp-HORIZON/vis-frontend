@@ -167,10 +167,9 @@ export const progressPageSlice = createSlice({
           const currentRating = currentWorkflow.metrics.find(m => m.name === "rating")?.value;
           const newRating = workflow.metrics.find(m => m.name === "rating")?.value;
       
-          const isRatingChanged = currentRating !== newRating;
-          const isNewRating = currentRating === undefined && newRating !== undefined;
+          const isRatingChanged = currentRating !== newRating && newRating !== undefined;
       
-          if (isRatingChanged || isNewRating) {
+          if (isRatingChanged) {
             state.workflows.data[index] = workflow;
           }
           // Skip update if no relevant change (prevents flicker)
@@ -248,15 +247,21 @@ export const fetchWorkflowWithRating = createAsyncThunk(
       let updatedList: IRun[];
     
       if (index !== -1) {
-        // Replace existing workflow
-        updatedList = [...cached];
-        updatedList[index] = updatedWorkflow;
+        const currentWorkflow = cached[index];
+        const currentRating = currentWorkflow.metrics.find(m => m.name === "rating")?.value;
+        const newRating = updatedWorkflow.metrics.find((m: IMetric) => m.name === "rating")?.value;
+        const isRatingChanged = currentRating !== newRating && newRating !== undefined;
+
+        if (isRatingChanged) {
+          updatedList = [...cached];
+          updatedList[index] = updatedWorkflow;
+          setCache(key, updatedList);
+        }
       } else {
         // Append new workflow
         updatedList = [...cached, updatedWorkflow];
+        setCache(key, updatedList);
       }
-    
-      setCache(key, updatedList);
     }
 
     return { experimentId, workflow: updatedWorkflow };

@@ -33,7 +33,7 @@ const WorkflowTab = () => {
     if (experimentId && workflowId && metricNames && isTabInitialized) {
       dispatch(fetchWorkflowMetrics({experimentId, workflowId, metricNames}))
     }
-  },[isTabInitialized])
+  },[workflows.data, isTabInitialized])
   
 
   useEffect(() => {

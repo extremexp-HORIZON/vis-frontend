@@ -236,7 +236,7 @@ const ExperimentControls = () => {
                         value={ localRating !== null ? localRating : workflowRating}                      
                         disabled={isPolling}
                         onChange={(_, value) => {
-                          if (value !== null && Number(workflowRating) !== value) handleUserEvaluation(value);
+                          if (value !== null) handleUserEvaluation(value);
                         }}
                       />
                     }
