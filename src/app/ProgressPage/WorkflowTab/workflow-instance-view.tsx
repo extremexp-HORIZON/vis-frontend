@@ -376,6 +376,9 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                           backgroundColor: "rgba(25, 118, 210, 0.25)",
                         },
                       },
+                      "& .MuiDataGrid-selectedRowCount": {
+                        visibility: "hidden",
+                      },
                     }}
                   />
                 </Box>
