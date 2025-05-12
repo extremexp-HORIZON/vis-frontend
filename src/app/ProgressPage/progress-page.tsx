@@ -45,15 +45,13 @@ const ProgressPage = (props: ProgressPageProps) => {
     }
   }, [])
 
-  // TODO: Enable this for live data
   useEffect(() => {
     const fetchWorkflows = () =>
       !experiment.loading &&
       experiment.data &&
-      dispatch(fetchExperimentWorkflows({experimentId: experimentId || ""}))
-    // fetchWorkflows()
-    // TODO: Remove this if statement when no longer needed
-    // intervalId.current = setInterval(fetchWorkflows, 5000)
+      dispatch(fetchExperimentWorkflows({experimentId: experimentId || "", forceRefresh: true}))
+    fetchWorkflows()
+    intervalId.current = setInterval(fetchWorkflows, 2 * 60 * 1000)
 
     return () => {
       if (intervalId.current) {
@@ -62,7 +60,6 @@ const ProgressPage = (props: ProgressPageProps) => {
     }
   }, [experiment])
 
-  // TODO: Enable this for live data
   useEffect(() => {
     if (workflows.data && workflows.data.length > 0) {
       workflows.data.every(workflow => workflow.status === "COMPLETED") &&
