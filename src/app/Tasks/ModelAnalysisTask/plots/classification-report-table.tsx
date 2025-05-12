@@ -115,7 +115,16 @@ const ClassificationReportTable = () => {
           fullHeight
         />
       )
-    if (!classificationReport.length) return null
+
+      if (!classificationReport.length && !loading && !error)
+        return (
+          <InfoMessage
+            message="No classification report available."
+            type="info"
+            icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+            fullHeight
+          />
+      )
 
     return (
       <Box sx={{overflowX: "auto" }}>
@@ -190,7 +199,7 @@ const ClassificationReportTable = () => {
       >
         <Box
           sx={{
-            height: "100%",
+            height: 250,
             width: "100%",
             display: "flex",
             flexDirection: "column",

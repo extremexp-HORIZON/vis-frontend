@@ -361,8 +361,7 @@ export default function WorkflowTreeView() {
                             sx={{ mr: 1, color: theme.palette.primary.main }}
                           />
                           <Typography variant="body2">
-                            {metric.name}:
-                            {Math.round(metric.value * 100) / 100}
+                            {metric.name}: {Math.round(metric.value * 100) / 100}
                           </Typography>
                         </Box>
                       </Box>
@@ -602,8 +601,7 @@ export default function WorkflowTreeView() {
                               sx={{ mr: 1, color: theme.palette.primary.main }}
                             />
                             <Typography variant="body2">
-                              {metric.name}:
-                              {Math.round(metric.value * 100) / 100}
+                              {metric.name}: {Math.round(metric.value * 100) / 100}
                             </Typography>
                           </Box>
                         </Box>

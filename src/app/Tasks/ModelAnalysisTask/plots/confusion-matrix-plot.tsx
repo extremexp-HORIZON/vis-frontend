@@ -127,6 +127,7 @@ const ConfusionMatrixPlot = () => {
           actions={false}
           title={"Confusion Matrix"}
           aspectRatio={2}
+          minHeight={250}
           maxHeight={400}
           showInfoMessage={ shouldShowLoading || shouldShowError}
           infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
