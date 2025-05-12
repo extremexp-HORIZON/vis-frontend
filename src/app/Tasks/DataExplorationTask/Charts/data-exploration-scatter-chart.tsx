@@ -215,7 +215,7 @@ const ScatterChart = () => {
   const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hasValidColorBy
 
   return (
-    <Box sx={{ height: "99%" }}>
+    <Box sx={{ height: "100%" }}>
       {umap ? (
         <Uchart />
       ) : shouldShowInfoMessage ? (
@@ -240,12 +240,13 @@ const ScatterChart = () => {
           title="Scatter Chart"
           actions={false}
           controlPanel={<ScatterChartControlPanel />}
-          blinkOnStart={true}
+          blinkOnStart={false}
           infoMessage={info}
           showInfoMessage={false}
           maxHeight={500}
           aspectRatio={isSmallScreen ? 2.8 : 1.8}
           loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading}
+          minHeight={300}
         />
       ) : (
         <Grid container spacing={2}>
@@ -258,7 +259,7 @@ const ScatterChart = () => {
                   y,
                   colorBy: colorBy as VisualColumn,
                 })}
-                title={y.name}
+                title="Scatter Chart"
                 actions={false}
                 controlPanel={<ScatterChartControlPanel />}
                 loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading}

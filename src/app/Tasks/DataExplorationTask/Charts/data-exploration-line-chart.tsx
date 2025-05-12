@@ -194,7 +194,7 @@ const LineChart = () => {
                 xAxis: xAxis as VisualColumn,
                 y,
               })}
-              title={y.name}
+              title="Scatter Chart"
               actions={false}
               controlPanel={<LineChartControlPanel />}
               loading={tab?.workflowTasks.dataExploration?.lineChart?.loading}
