@@ -262,15 +262,15 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
           aria-label="Small button group"
           variant="outlined"
           sx={{
-            height: 30,
-            "& .MuiButton-root": {
+            marginLeft: 'auto',
+            height: 30, // Adjust this value to your desired height
+            '& .MuiButton-root': {
               minHeight: 30,
-              padding: "2px 2px",
+              padding: '2px 2px',
               marginTop: 0.5,
-              width: 80,
             },
           }}
-        >
+        >  
           
           <Tooltip title="Table">
             <Button
@@ -399,3 +399,6 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
 }
 
 export default InstanceView;
+
+
+
