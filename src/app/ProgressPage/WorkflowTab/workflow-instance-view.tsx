@@ -341,6 +341,15 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                     ).map((row: any, index: any) => ({ id: index, ...row }))}
                     columns={columns}
                     pagination
+                    pageSizeOptions={[25, 50, 100]}
+                    initialState={{
+                      pagination: {
+                        paginationModel: {
+                          pageSize: showMisclassifiedOnly ? 25 : 100,
+                          page: 0,
+                        },
+                      },
+                    }}
                     selectionModel={point ? [rows.indexOf(point)] : []}
                     rowSelectionModel={point ? [rows.indexOf(point)] : []}
                     checkboxSelection={false}
