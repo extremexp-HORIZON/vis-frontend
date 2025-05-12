@@ -158,8 +158,8 @@ const ScatterChart = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
 
   const chartData = tab?.workflowTasks.dataExploration?.scatterChart?.data?.data || []
-  const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxisScatter
-  const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxisScatter
+  const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis
+  const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis
   const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy
   const displayMode = tab?.workflowTasks.dataExploration?.controlPanel?.viewMode || "overlay"
   const umap = tab?.workflowTasks.dataExploration?.controlPanel.umap
@@ -193,8 +193,8 @@ const ScatterChart = () => {
       })
     )
   }, [
-    tab?.workflowTasks.dataExploration?.controlPanel.xAxisScatter,
-    tab?.workflowTasks.dataExploration?.controlPanel.yAxisScatter,
+    tab?.workflowTasks.dataExploration?.controlPanel.xAxis,
+    tab?.workflowTasks.dataExploration?.controlPanel.yAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
     tab?.dataTaskTable.selectedItem?.data?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.colorBy,

@@ -26,8 +26,8 @@ const ScatterChartControlPanel = () => {
   const columns =
     tab?.workflowTasks.dataExploration?.metaData?.data?.originalColumns || []
 
-  const xAxis = controlPanel?.xAxisScatter
-  const yAxis = controlPanel?.yAxisScatter || []
+  const xAxis = controlPanel?.xAxis
+  const yAxis = controlPanel?.yAxis || []
   const colorBy = controlPanel?.colorBy
   const viewMode = useAppSelector(
     state =>
@@ -41,14 +41,14 @@ const ScatterChartControlPanel = () => {
       columns.find(col => col.name === yCol.name),
     )
     if (validYAxis.length !== yAxis.length) {
-      dispatch(setControls({ yAxisScatter: validYAxis }))
+      dispatch(setControls({ yAxis: validYAxis }))
     }
   }, [columns, yAxis])
 
   const handleXAxisChange = (event: { target: { value: string } }) => {
     const selected = columns.find(col => col.name === event.target.value)
     if (selected) {
-      dispatch(setControls({ xAxisScatter: selected }))
+      dispatch(setControls({ xAxis: selected }))
     }
   }
 
@@ -57,7 +57,7 @@ const ScatterChartControlPanel = () => {
     const selectedCols = selectedNames
       .map((name: string) => columns.find(col => col.name === name))
       .filter(Boolean)
-    dispatch(setControls({ yAxisScatter: selectedCols }))
+    dispatch(setControls({ yAxis: selectedCols }))
   }
   const handleColorByChange = (event: { target: { value: any } }) => {
     const selected = columns.find(col => col.name === event.target.value)

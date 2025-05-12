@@ -17,6 +17,8 @@ const ChartButtonGroup: React.FC= () => {
   const dispatch = useAppDispatch()
   const {tab}= useAppSelector(state => state.workflowPage)
   const chartType= tab?.workflowTasks.dataExploration?.controlPanel.chartType
+  const columns= tab?.workflowTasks?.dataExploration?.metaData?.data?.originalColumns
+  console.log("columns",columns)
 
   return (
 <ButtonGroup
