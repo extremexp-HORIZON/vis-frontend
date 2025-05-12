@@ -118,11 +118,12 @@ interface IInstanceClassification {
   point: any
   showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<any>>
+  hashRow: (row: any) => string
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
   const theme = useTheme()
-  const { plotData, setPoint, point, showMisclassifiedOnly } = props
+  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props
   console.log("InstanceClassification plotData", plotData)
   const [options, setOptions] = useState<string[]>([])
   const [xAxisOption, setXAxisOption] = useState<string>("")
@@ -135,12 +136,16 @@ const InstanceClassification = (props: IInstanceClassification) => {
   //   }
   //   return newData
   // }
-  const getVegaData = (data: any) => {
-    let newData = _.cloneDeep(data)
-    return newData.map((d: { actual: any; predicted: any }) => ({
-      ...d,
-      isMisclassified: d.actual !== d.predicted,
-    }))
+  const getVegaData = (data: any[]) => {
+    return data.map((originalRow: any) => {
+      const id = hashRow(originalRow)
+      const isMisclassified = originalRow.actual !== originalRow.predicted
+      return {
+        ...originalRow,
+        isMisclassified,
+        id,
+      }
+    })
   }
 
   useEffect(() => {
@@ -168,7 +173,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const handleNewView = (view: any) => {
     view.addEventListener("click", (event: any, item: any) => {
       if (item && item.datum) {
-        setPoint(item.datum)
+        const { id, ...dataWithoutId } = item.datum
+        setPoint({ id, data: dataWithoutId })
       } else {
         setPoint(null)
       }

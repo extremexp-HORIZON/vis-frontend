@@ -41,7 +41,7 @@ const InstanceView = () => {
   const hasContent = true
   const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(false)
 
-  const [point, setPoint] = useState<any | null>(null)
+  const [point, setPoint] = useState<{ id: number; data: any } | null>(null)
   const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? []
 console.log(point)
 
@@ -96,8 +96,8 @@ const actionColumn = {
       <Tooltip title="Explanations">
         <IconButton             
           onClick={() => {
-            const { id, ...rowWithoutId } = params.row
-            setPoint(rowWithoutId)
+            const { id, ...data } = params.row
+            setPoint({ id, data })
           }}
         >
           <PsychologyAltRoundedIcon fontSize="small" color="primary" />
@@ -240,6 +240,17 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
   // Common chart height to use for both chart types
   const chartHeight = calculatedHeight
 
+  const hashRow = (row: any): string => {
+  const stringified = JSON.stringify(row, Object.keys(row).sort())
+  let hash = 0
+  for (let i = 0; i < stringified.length; i++) {
+    const char = stringified.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash |= 0 // Convert to 32bit integer
+  }
+  return `row-${Math.abs(hash)}`
+}
+
   return (
     <>
       <Box display="flex" justifyContent="space-between" marginBottom={2} alignItems="center">
@@ -298,6 +309,7 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
             point={point}
             setPoint={setPoint}
             showMisclassifiedOnly={showMisclassifiedOnly}
+            hashRow={hashRow}
           />
         </Box>
       ) : (
@@ -338,7 +350,7 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                     rows={(showMisclassifiedOnly
                       ? rows.filter((row: any) => row.actual !== row.predicted)
                       : rows
-                    ).map((row: any, index: any) => ({ id: index, ...row }))}
+                    ).map((row: any) => ({ id: hashRow(row), ...row }))}
                     columns={columns}
                     pagination
                     pageSizeOptions={[25, 50, 100]}
@@ -350,8 +362,8 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                         },
                       },
                     }}
-                    selectionModel={point ? [rows.indexOf(point)] : []}
-                    rowSelectionModel={point ? [rows.indexOf(point)] : []}
+                    selectionModel={point ? [point.id] : []}
+                    rowSelectionModel={point ? [point.id] : []}
                     checkboxSelection={false}
                     disableRowSelectionOnClick={false}
                     sx={{
@@ -397,7 +409,7 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
         <Box sx={{ pt: 2, height: "30%", minHeight: 300 }}>
            <CounterfactualsTable
              key={`counterfactuals-table`}
-             point={point}
+             point={point.data}
              handleClose={() => {}}
              counterfactuals={workflow || null}
              onClose={() => setPoint(null)}
