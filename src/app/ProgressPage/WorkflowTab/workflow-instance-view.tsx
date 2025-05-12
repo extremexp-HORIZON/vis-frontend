@@ -14,6 +14,7 @@ import {
   Checkbox,
   Typography,
   Stack,
+  IconButton,
 } from "@mui/material"
 import { setControls } from "../../../store/slices/workflowPageSlice"
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
@@ -22,7 +23,7 @@ import { DataGrid } from "@mui/x-data-grid"
 import InfoMessage from "../../../shared/components/InfoMessage"
 import ResponsiveCardTable from "../../../shared/components/responsive-card-table"
 import Loader from "../../../shared/components/loader"
-
+import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(
@@ -44,7 +45,7 @@ const InstanceView = () => {
   const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? []
 console.log(point)
 
-  const columns = Object.keys(rows[0] || {}).map(key => ({
+  const baseColumns = Object.keys(rows[0] || {}).map(key => ({
     field: key,
     headerName: key,
     flex: 1,
@@ -72,6 +73,41 @@ console.log(point)
         : (value?.toString?.() ?? "")
     },
   }))
+
+  
+const actionColumn = {
+  field: "action",
+  headerName: "actions",
+  headerAlign: "center",
+  align: "center",
+  sortable: false,
+  filterable: false,
+  headerClassName: "datagrid-header-fixed",
+  minWidth: 100,
+  renderCell: (params: any) => (
+    <Box
+      onClick={(e) => e.stopPropagation()}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      width="100%"
+      height="100%"
+    >
+      <Tooltip title="Explanations">
+        <IconButton             
+          onClick={() => {
+            const { id, ...rowWithoutId } = params.row;
+            setPoint(rowWithoutId)
+          }}
+        >
+          <PsychologyAltRoundedIcon fontSize="small" color="primary" />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  ),
+};
+const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
+
   
   const handleExportCsv = () => {
     if (!rows || rows.length === 0) return
@@ -162,6 +198,20 @@ console.log(point)
       "&:hover": {
         backgroundColor: `${theme.palette.primary.light}60`,
       },
+    },
+    '& .MuiDataGrid-columnHeader[data-field="action"]': {
+      position: "sticky",
+      right: 0,
+      zIndex: 999,
+      backgroundColor: theme.palette.customGrey.main,
+      borderLeft: "1px solid #ddd",
+    },
+    '& .MuiDataGrid-cell[data-field="action"]': {
+      position: "sticky",
+      right: 0,
+      zIndex: 999,
+      backgroundColor: theme.palette.customGrey.light,
+      borderLeft: "1px solid #ddd",
     },
   }))
 
@@ -284,15 +334,12 @@ console.log(point)
                   ref={tableRef}
                 >
                   <StyledDataGrid
+                    disableVirtualization={showMisclassifiedOnly}
                     rows={(showMisclassifiedOnly
                       ? rows.filter((row: any) => row.actual !== row.predicted)
                       : rows
                     ).map((row: any, index: any) => ({ id: index, ...row }))}
                     columns={columns}
-                    onRowClick={(params) => {
-                      const { id, ...rowWithoutId } = params.row
-                      setPoint(rowWithoutId)
-                    }}
                     pagination
                     selectionModel={point ? [rows.indexOf(point)] : []}
                     rowSelectionModel={point ? [rows.indexOf(point)] : []}
