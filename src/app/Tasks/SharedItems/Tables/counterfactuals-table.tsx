@@ -204,7 +204,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
       headerName: key,
       flex: 1,
       minWidth: 100,
-      maxWidth: 300,
       headerAlign: "center",
       align: "center",
       renderCell: (params: any) => {
@@ -254,7 +253,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
   })
 
   return (
-    <Box sx={{height: 400}}>
+    <Box sx={{height: "100%"}}>
       <ClosableCardTable
         details={ tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotDescr}
         title={

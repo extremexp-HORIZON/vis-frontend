@@ -242,7 +242,7 @@ console.log(point)
       </Box>
 
       {chartType === "scatter" ? (
-        <Box sx={{ height: 500 }}>
+        <Box sx={{ height: "60%", minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
@@ -251,7 +251,7 @@ console.log(point)
           />
         </Box>
       ) : (
-        <Box sx={{ height: 500 }}>
+        <Box sx={{ height: "60%", minHeight: 400 }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
             onDownload={handleExportCsv}
@@ -334,19 +334,19 @@ console.log(point)
           </ResponsiveCardTable>
         </Box>
       )}
-     <Box sx={{ pt: 2 }}>
       {point && workflow ? (
-        <CounterfactualsTable
-          key={`counterfactuals-table`}
-          point={point}
-          handleClose={() => {}}
-          counterfactuals={workflow || null}
-          onClose={() => setPoint(null)}
-          experimentId={experimentId || "I2Cat_phising"}
-          workflowId={tab?.workflowId || "1"}
-        />
+        <Box sx={{ pt: 2, height: "30%", minHeight: 300 }}>
+           <CounterfactualsTable
+             key={`counterfactuals-table`}
+             point={point}
+             handleClose={() => {}}
+             counterfactuals={workflow || null}
+             onClose={() => setPoint(null)}
+             experimentId={experimentId || "I2Cat_phising"}
+             workflowId={tab?.workflowId || "1"}
+           />
+        </Box>
       ) : null}
-    </Box>
     </>
   )
 }
