@@ -75,7 +75,8 @@ const getScatterChartOverlaySpec = ({
         y: {
           field: y.name,
           type: getColumnType(y.type, y.name),
-          axis: { title: y.name },
+          // axis: { title: y.name },
+          title:"Value"
         },
         ...(colorField && !isTooManyUniqueValues(colorBy, data) && {
           color: {
@@ -130,6 +131,7 @@ const getSingleScatterSpec = ({
         field: y.name,
         type: getColumnType(y.type, y.name),
         axis: { title: y.name },
+        // title:"Value"
       },
       ...(colorField && {
         color: {
