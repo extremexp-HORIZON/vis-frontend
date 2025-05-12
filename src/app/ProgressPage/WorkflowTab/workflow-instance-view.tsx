@@ -96,7 +96,7 @@ const actionColumn = {
       <Tooltip title="Explanations">
         <IconButton             
           onClick={() => {
-            const { id, ...rowWithoutId } = params.row;
+            const { id, ...rowWithoutId } = params.row
             setPoint(rowWithoutId)
           }}
         >
