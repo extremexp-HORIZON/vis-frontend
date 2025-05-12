@@ -18,7 +18,8 @@ const ChartButtonGroup: React.FC= () => {
   const {tab}= useAppSelector(state => state.workflowPage)
   const chartType= tab?.workflowTasks.dataExploration?.controlPanel.chartType
   const columns= tab?.workflowTasks?.dataExploration?.metaData?.data?.originalColumns
-  console.log("columns",columns)
+  const stringColumnsCount = columns?.filter((col: any) => col?.type === 'String').length || 0;
+  const disableHeatmap = stringColumnsCount < 2;
 
   return (
 <ButtonGroup
@@ -62,6 +63,7 @@ const ChartButtonGroup: React.FC= () => {
       <Button
         variant={chartType === 'heatmap' ? 'contained' : 'outlined'}
         onClick={() => dispatch(setControls({ chartType: 'heatmap' }))}
+        disabled={disableHeatmap}
       >
         <GridOnIcon />
       </Button>
