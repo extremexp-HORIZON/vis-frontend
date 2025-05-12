@@ -167,7 +167,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
 
   const handleNewView = (view: any) => {
     view.addEventListener("click", (event: any, item: any) => {
-      if (item && item.datum) {
+      if (item && item.datum?.isMisclassified) {
         setPoint(item.datum)
       } else {
         setPoint(null)
@@ -207,7 +207,10 @@ const InstanceClassification = (props: IInstanceClassification) => {
           },
           {
             name: "highlight",
-            select: { type: "point", on: "click", clear: "clickoff" }
+            select: { type: "point", on: "click", clear: "clickoff",    fields: ["isMisclassified"],
+            },
+            value: { isMisclassified: true }
+
           },
           {
             name: "panZoom",
@@ -265,22 +268,34 @@ const InstanceClassification = (props: IInstanceClassification) => {
             : {
               value: 0.8,
             },
-          stroke: {
-            condition: {
-              param: "highlight",
-              empty: false,
-              value: "black", 
+            size: showMisclassifiedOnly?{
+              field: "isMisclassified",
+              type: "nominal",
+              scale: {
+                domain: [false, true],
+                range: [60, 200],
+                legend: false
+              },
+            }:
+            {
+              value: 100,
             },
-            value: "transparent"
-          },
-          strokeWidth: {
-            condition: {
-              param: "highlight", 
-              empty: false, 
-              value: 2 
-            },
-            value: 0
-          },
+          // stroke: {
+          //   condition: {
+          //     param: "highlight",
+          //     empty: false,
+          //     value: "black", 
+          //   },
+          //   value: "transparent"
+          // },
+          // strokeWidth: {
+          //   condition: {
+          //     param: "highlight", 
+          //     empty: false, 
+          //     value: 2 
+          //   },
+          //   value: 0
+          // },
           tooltip: [
             { field: "actual", type: "nominal", title: "Actual" },
             { field: "predicted", type: "nominal", title: "Predicted" },
