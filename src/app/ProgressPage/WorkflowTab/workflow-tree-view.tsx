@@ -1,5 +1,5 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Tooltip, Typography } from "@mui/material"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView"
 import { TreeItem2 } from "@mui/x-tree-view/TreeItem2"
@@ -35,6 +35,8 @@ export default function WorkflowTreeView() {
   const dispatch = useAppDispatch()
   const [searchParams] = useSearchParams()
   const task = searchParams.get("task")
+  const [workflowExpanded, setWorkflowExpanded] = useState(true);
+  const [modelExpanded, setModelExpanded] = useState(true);
 
   useEffect(() => {
     const dataAssets = !task
@@ -171,7 +173,7 @@ export default function WorkflowTreeView() {
     <Box sx={{ overflow: "auto" }}>
       {/* Enhanced Title and Separator */}
       <Accordion
-        defaultExpanded 
+        expanded={workflowExpanded} 
         disableGutters
         sx={{
           boxShadow: 'none',
@@ -180,27 +182,46 @@ export default function WorkflowTreeView() {
           },
         }}      
       >
-      <AccordionSummary 
-        expandIcon={<ExpandMoreIcon />}
-        sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            width: "100%",
-          }}
+        <AccordionSummary
+          onClick={(e) => e.stopPropagation()}
+          sx={{ borderBottom: "1px solid #ccc", pointerEvents: "none" }}
         >
-          <AccountTreeIcon color="primary" />
-          <Typography
-            variant="body1"
-            sx={{ fontWeight: 600, color: theme.palette.text.primary }}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1,
+              width: "100%",
+              pointerEvents: "auto",
+              cursor: "default",
+            }}
           >
-            Workflow Details
-          </Typography>
-        </Box>
-      </AccordionSummary>
+            <Box
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                cursor: "default",
+              }}
+            >
+              <AccountTreeIcon color="primary" />
+              <Typography fontWeight={600}>Workflow Details</Typography>
+            </Box>
+            
+            {/* Right-side icon */}
+            <Box
+              onClick={(e) => {
+                e.stopPropagation();
+                setWorkflowExpanded((prev) => !prev);
+              }}
+              sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            >
+              <ExpandMoreIcon />
+            </Box>
+          </Box>
+        </AccordionSummary>
 
       {/* TreeView with adjusted padding */}
       <AccordionDetails>
@@ -242,9 +263,23 @@ export default function WorkflowTreeView() {
                 aria-expanded={true}
                 key={id}
                 itemId={`task-${id}`}
+                slotProps={{
+                  content: {
+                    style: {
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                    },
+                    onClick: (e) => {
+                      e.stopPropagation();
+                    },
+                  },
+                }}
                 label={
                   <Box
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       dispatch(setSelectedId(`task-${id}`))
                       dispatch(
                         setSelectedTask({
@@ -373,13 +408,29 @@ export default function WorkflowTreeView() {
                 {datasetsForTask.some(ds => ds.role === "INPUT") && (
                   <TreeItem2
                     itemId={`task-${id}-inputs`}
+                    slotProps={{
+                      content: {
+                        style: {
+                          paddingTop: 0,
+                          paddingBottom: 0,
+                          paddingLeft: 0,
+                          paddingRight: 0,
+                        },
+                        onClick: (e) => {
+                          e.stopPropagation();
+                        },
+                      },
+                    }}
                     label={
                       <Box
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
                         sx={{
                           px: 1,
                           py: 0.5,
                           borderRadius: 1,
-                          cursor: "pointer",
+                          cursor: "default",
                           bgcolor: "transparent",
                         }}
                       >
@@ -444,13 +495,29 @@ export default function WorkflowTreeView() {
                 {datasetsForTask.some(ds => ds.role === "OUTPUT") && (
                   <TreeItem2
                     itemId={`task-${id}-outputs`}
+                    slotProps={{
+                      content: {
+                        style: {
+                          paddingTop: 0,
+                          paddingBottom: 0,
+                          paddingLeft: 0,
+                          paddingRight: 0,
+                        },
+                        onClick: (e) => {
+                          e.stopPropagation();
+                        },
+                      },
+                    }}
                     label={
                       <Box
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
                         sx={{
                           px: 1,
                           py: 0.5,
                           borderRadius: 1,
-                          cursor: "pointer",
+                          cursor: "default",
                           bgcolor: "transparent",
                         }}
                       >
@@ -612,13 +679,29 @@ export default function WorkflowTreeView() {
                   {fallbackDatasets.some(ds => ds.role === "INPUT") && (
                     <TreeItem2
                       itemId="task-null-inputs"
+                      slotProps={{
+                        content: {
+                          style: {
+                            paddingTop: 0,
+                            paddingBottom: 0,
+                            paddingLeft: 0,
+                            paddingRight: 0,
+                          },
+                          onClick: (e) => {
+                            e.stopPropagation();
+                          },
+                        },
+                      }}
                       label={
                         <Box
+                          onClick={(e) => {
+                            e.stopPropagation()
+                          }}
                           sx={{
                             px: 1,
                             py: 0.5,
                             borderRadius: 1,
-                            cursor: "pointer",
+                            cursor: "default",
                             bgcolor: "transparent",
                           }}
                         >
@@ -683,13 +766,29 @@ export default function WorkflowTreeView() {
                   {fallbackDatasets.some(ds => ds.role === "OUTPUT") && (
                     <TreeItem2
                       itemId="task-null-outputs"
+                      slotProps={{
+                        content: {
+                          style: {
+                            paddingTop: 0,
+                            paddingBottom: 0,
+                            paddingLeft: 0,
+                            paddingRight: 0,
+                          },
+                          onClick: (e) => {
+                            e.stopPropagation();
+                          },
+                        },
+                      }}
                       label={
                         <Box
+                          onClick={(e) => {
+                            e.stopPropagation()
+                          }}
                           sx={{
                             px: 1,
                             py: 0.5,
                             borderRadius: 1,
-                            cursor: "pointer",
+                            cursor: "default",
                             bgcolor: "transparent",
                           }}
                         >
@@ -758,7 +857,7 @@ export default function WorkflowTreeView() {
       </Accordion>
 
       <Accordion 
-        defaultExpanded
+        expanded={modelExpanded}
         disableGutters
         sx={{
           boxShadow: 'none',
@@ -767,27 +866,44 @@ export default function WorkflowTreeView() {
           },
         }}      
         >
-        <AccordionSummary 
-          expandIcon={<ExpandMoreIcon />} 
-          sx ={{borderBottom: `1px solid ${theme.palette.divider}`}}
+        <AccordionSummary
+          onClick={(e) => e.stopPropagation()}
+          sx={{ borderBottom: "1px solid #ccc", pointerEvents: "none" }}
         >
-          {/* Simple Title */}
           <Box
             sx={{
-              bgcolor: "background.paper",
               display: "flex",
               alignItems: "center",
+              justifyContent: "space-between",
               gap: 1,
-              width: "100%"
+              width: "100%",
+              pointerEvents: "auto",
+              cursor: "default",
             }}
           >
-            <PsychologyAltRoundedIcon color="primary" />
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: 800, color: theme.palette.text.primary }}
+            <Box
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                cursor: "default",
+              }}
             >
-              Model Insights
-            </Typography>
+              <PsychologyAltRoundedIcon color="primary" />
+              <Typography fontWeight={600}>Model Insights</Typography>
+            </Box>
+            
+            {/* Right-side icon */}
+            <Box
+              onClick={(e) => {
+                e.stopPropagation();
+                setModelExpanded((prev) => !prev);
+              }}
+              sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            >
+              <ExpandMoreIcon />
+            </Box>
           </Box>
         </AccordionSummary>
         <AccordionDetails>
@@ -796,6 +912,19 @@ export default function WorkflowTreeView() {
             <TreeItem2
               aria-expanded={true}
               itemId="model"
+              slotProps={{
+                content: {
+                  style: {
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                  },
+                  onClick: (e) => {
+                    e.stopPropagation();
+                  },
+                },
+              }}
               label={
                 <Box
                   sx={{
@@ -806,6 +935,7 @@ export default function WorkflowTreeView() {
                     bgcolor: "transparent",
                   }}
                   onClick={e => {
+                    e.stopPropagation()
                     dispatch(setSelectedId(`model`))
                     dispatch(
                       setSelectedItem({

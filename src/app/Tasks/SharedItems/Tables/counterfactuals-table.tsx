@@ -254,7 +254,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
   })
 
   return (
-    <>
+    <Box sx={{height: 400}}>
       <ClosableCardTable
         details={ tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotDescr}
         title={
@@ -288,7 +288,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
         ) :  tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents ? (
           // Display table
           <StyledDataGrid
-            autoHeight
             rows={rows}
             columns={columns}
             disableSelectionOnClick
@@ -315,7 +314,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
           </Typography>
         )}
       </ClosableCardTable>
-    </>
+    </Box>
   )
 }
 
