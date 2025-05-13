@@ -51,7 +51,7 @@ const ProgressPage = (props: ProgressPageProps) => {
       experiment.data &&
       dispatch(fetchExperimentWorkflows({experimentId: experimentId || "", forceRefresh: true}))
     fetchWorkflows()
-    intervalId.current = setInterval(fetchWorkflows, 2 * 60 * 1000)
+    intervalId.current = setInterval(fetchWorkflows, 1 * 60 * 1000)
 
     return () => {
       if (intervalId.current) {
