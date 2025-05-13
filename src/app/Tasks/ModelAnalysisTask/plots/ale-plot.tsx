@@ -30,8 +30,9 @@ const AlePlot = (props: AlePlotProps) => {
     (state: RootState) => state.workflowPage,
   )
   const dispatch = useAppDispatch()
-  const featureList =
-    tab?.workflowTasks.modelAnalysis?.ale.data?.featureList || null
+  const featureOrHyperparameterList = explanation_type === "hyperparameterExplanation"
+  ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
+  : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
   const plotModel = tab?.workflowTasks.modelAnalysis?.ale
   const { experimentId } = useParams()
 
@@ -127,26 +128,27 @@ const AlePlot = (props: AlePlotProps) => {
       dispatch(setSelectedFeature({ plotType: "ale", feature: e.target.value }))
     }
 
-  const controlPanel = featureList && featureList?.length > 0 && (
-    <FormControl fullWidth>
-      <InputLabel id="feature-select-label">Feature</InputLabel>
-      <Select
-        labelId="feature-select-label"
-        value={plotModel?.selectedFeature || ""}
-        label="Feature"
-        onChange={handleFeatureSelection(plotModel?.data || null)}
-        disabled={plotModel?.loading || !plotModel?.data}
-        MenuProps={{
-          PaperProps: {
-            style: {
-              maxHeight: 250,
-              maxWidth: 300,
+    const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
+      <FormControl fullWidth>
+        <InputLabel id="feature-select-label">
+          {explanation_type === "hyperparameterExplanation" ? "Hyperparameter" : "Feature"}
+        </InputLabel>
+        <Select
+          labelId="feature-select-label"
+          value={plotModel?.selectedFeature || ""}
+          label={explanation_type === "hyperparameterExplanation" ? "Hyperparameter" : "Feature"}
+          onChange={handleFeatureSelection(plotModel?.data || null)}
+          disabled={plotModel?.loading || !plotModel?.data}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 250,
+                maxWidth: 300,
+              },
             },
-          },
-        }}
-      >
-        {featureList &&
-          featureList.map(feature => (
+          }}
+        >
+          {featureOrHyperparameterList.map(feature => (
             <MenuItem
               key={`${plotModel?.data?.plotName}-${feature}`}
               value={feature}
@@ -154,9 +156,9 @@ const AlePlot = (props: AlePlotProps) => {
               {feature}
             </MenuItem>
           ))}
-      </Select>
-    </FormControl>
-  )
+        </Select>
+      </FormControl>
+    )
 
   const loading = (
     <Loader />
