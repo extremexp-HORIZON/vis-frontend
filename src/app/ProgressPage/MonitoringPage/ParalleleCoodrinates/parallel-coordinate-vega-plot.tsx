@@ -152,10 +152,10 @@ const ParallelCoordinateVega = ({
       domainMin: selectedLastColumnMin,
       domainMax: selectedLastColumnMax,
       range: [
-        scheme("category20")[0],
-        scheme("category20")[1],
-        scheme("category20")[5],
         scheme("category20")[2],
+        scheme("category20")[5],
+        scheme("category20")[1],
+        scheme("category20")[0],
       ],
     })
   }

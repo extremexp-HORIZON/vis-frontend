@@ -1,6 +1,6 @@
 import { Rating } from "@mui/material";
 import { useState } from "react";
-import { useAppDispatch } from "../../../../store/store";
+import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store";
 import {
   fetchUserEvaluation,
   fetchWorkflowWithRating,
@@ -21,52 +21,30 @@ const WorkflowRating = ({
 }: WorkflowRatingProps) => {
   const dispatch = useAppDispatch();
   const [isPolling, setPolling] = useState(false);
+  const [localRating, setLocalRating] = useState<number | null>(null);
 
-  const handleUserEvaluation = async (value: number | null) => {
-    if (!experimentId || !workflowId) return;
-    setPolling(true);
+const handleUserEvaluation = async (value: number | null) => {
+  if (!experimentId || !workflowId) return;
 
-    // Optimistically update Redux state
-    dispatch(updateWorkflowRatingLocally({ workflowId, rating: value }));
+  setPolling(true);
+  setLocalRating(value);
 
-    const updateResult = await dispatch(
-      fetchUserEvaluation({
-        experimentId,
-        runId: workflowId,
-        data: { rating: value },
-      })
-    );
+  await dispatch(
+    fetchUserEvaluation({
+      experimentId,
+      runId: workflowId,
+      data: { rating: value },
+    })
+  );
 
-    if (!fetchUserEvaluation.fulfilled.match(updateResult)) {
-      setPolling(false);
-      return;
-    }
-
-    // Retry until rating metric is updated in backend
-    for (let i = 0; i < 5; i++) {
-      const result = await dispatch(
-        fetchWorkflowWithRating({ experimentId, workflowId })
-      );
-
-      if (fetchWorkflowWithRating.fulfilled.match(result)) {
-        const updatedWorkflow: IRun = result.payload.workflow;
-        const ratingMetric = updatedWorkflow.metrics.find(
-          (m) => m.name === "rating"
-        );
-        const fetchedRating = ratingMetric?.value;
-        if (fetchedRating === value) break;
-      }
-
-      await new Promise((res) => setTimeout(res, 200));
-    }
-
-    setPolling(false);
-  };
+  setLocalRating(null);
+  setPolling(false);
+};
 
   return (
     <Rating
       sx={{ verticalAlign: "middle" }}
-      value={currentRating}
+      value={localRating !== null ? localRating : currentRating}
       size="small"
       disabled={isPolling}
       onChange={(_, value) => {if (value !== null) handleUserEvaluation(value)}}

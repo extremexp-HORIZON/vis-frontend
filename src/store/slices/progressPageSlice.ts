@@ -148,7 +148,46 @@ export const progressPageSlice = createSlice({
           action.error.message || "Error while fetching data"
       })
       .addCase(fetchUserEvaluation.fulfilled, (state, action) => {
-        state.workflowEvaluation.loading = false
+        state.workflowEvaluation.loading = false;
+        state.workflowEvaluation.error = null;
+      
+        if (action.payload?.status === "success") {
+          const { experimentId, runId, data } = action.meta.arg;
+          const workflowIndex = state.workflows.data.findIndex(w => w.id === runId);
+        
+          if (workflowIndex !== -1) {
+            const currentWorkflow = state.workflows.data[workflowIndex];
+            const metrics = currentWorkflow.metrics ?? [];
+            const ratingMetricIndex = metrics.findIndex(m => m.name === "rating");
+          
+            if (ratingMetricIndex !== -1) {
+              metrics[ratingMetricIndex].value = data.rating;
+            } else {
+              metrics.push({
+                name: "rating",
+                value: data.rating,
+              } as IMetric);
+            }
+          
+            const updatedWorkflow: IRun = {
+              ...currentWorkflow,
+              metrics: [...metrics],
+            };
+          
+            state.workflows.data[workflowIndex] = updatedWorkflow;
+          
+            const key = `workflows-${experimentId}`;
+            const cached = getCache<IRun[]>(key);
+            if (cached) {
+              const updatedList = [...cached];
+              const cachedIndex = updatedList.findIndex(w => w.id === runId);
+              if (cachedIndex !== -1) {
+                updatedList[cachedIndex] = updatedWorkflow;
+                setCache(key, updatedList);
+              }
+            }
+          }
+        }
       })
       .addCase(fetchUserEvaluation.pending, (state, action) => {
         state.workflowEvaluation.loading = true

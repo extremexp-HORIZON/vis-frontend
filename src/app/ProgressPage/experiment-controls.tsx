@@ -72,47 +72,23 @@ const ExperimentControls = () => {
       break;
   }
 
-  const handleUserEvaluation = async (value: number | null) => {
-    if (!experimentId || !workflowId) return;
-  
-    setPolling(true);
-    setLocalRating(value);
-    
-    const updateResult = await dispatch(
-      fetchUserEvaluation({
-        experimentId,
-        runId: workflowId,
-        data: { rating: value },
-      })
-    );
-  
-    if (!fetchUserEvaluation.fulfilled.match(updateResult)) {
-      setPolling(false);
-      return;
-    }
-  
-    // Poll until backend reflects rating
-    for (let i = 0; i < 5; i++) {
-      const result = await dispatch(
-        fetchWorkflowWithRating({ experimentId, workflowId })
-      );
-  
-      if (fetchWorkflowWithRating.fulfilled.match(result)) {
-        const updatedWorkflow: IRun = result.payload.workflow;
-        const ratingMetric = updatedWorkflow.metrics.find((m) => m.name === "rating");
-        const fetchedRating = ratingMetric?.value;
-  
-        if (fetchedRating === value) {
-          setLocalRating(null);
-          break;
-        }
-      }
-  
-      await new Promise((res) => setTimeout(res, 200));
-    }
-  
-    setPolling(false);
-  };
+const handleUserEvaluation = async (value: number | null) => {
+  if (!experimentId || !workflowId) return;
+
+  setPolling(true);
+
+  setLocalRating(value);
+
+  await dispatch(
+    fetchUserEvaluation({
+      experimentId,
+      runId: workflowId,
+      data: { rating: value },
+    })
+  );
+  setLocalRating(null);
+  setPolling(false);
+};
       
   
 
