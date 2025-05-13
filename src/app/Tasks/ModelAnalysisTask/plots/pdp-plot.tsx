@@ -31,10 +31,8 @@ const PdpPlot = (props: PdpPlotProps) => {
     (state: RootState) => state.workflowPage,
   )
   const dispatch = useAppDispatch()
-  const featureOrHyperparameterList = explanation_type === "hyperparameterExplanation"
-  ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
-  : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
-
+  const featureList =
+    tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
   const plotModel = tab?.workflowTasks.modelAnalysis?.pdp
   const { experimentId } = useParams()
 
@@ -129,27 +127,26 @@ const PdpPlot = (props: PdpPlotProps) => {
       dispatch(setSelectedFeature({ plotType: "pdp", feature: e.target.value }))
     }
 
-    const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
-      <FormControl fullWidth>
-        <InputLabel id="feature-select-label">
-          {explanation_type === "hyperparameterExplanation" ? "Hyperparameter" : "Feature"}
-        </InputLabel>
-        <Select
-          labelId="feature-select-label"
-          value={plotModel?.selectedFeature || ""}
-          label={explanation_type === "hyperparameterExplanation" ? "Hyperparameter" : "Feature"}
-          onChange={handleFeatureSelection(plotModel?.data || null)}
-          disabled={plotModel?.loading || !plotModel?.data}
-          MenuProps={{
-            PaperProps: {
-              style: {
-                maxHeight: 250,
-                maxWidth: 300,
-              },
+  const controlPanel = featureList && featureList?.length > 0 && (
+    <FormControl fullWidth>
+      <InputLabel id="feature-select-label">Feature</InputLabel>
+      <Select
+        labelId="feature-select-label"
+        value={plotModel?.selectedFeature || ""}
+        label="Feature"
+        onChange={handleFeatureSelection(plotModel?.data || null)}
+        disabled={plotModel?.loading || !plotModel?.data}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 250,
+              maxWidth: 300,
             },
-          }}
-        >
-          {featureOrHyperparameterList.map(feature => (
+          },
+        }}
+      >
+        {featureList &&
+          featureList.map(feature => (
             <MenuItem
               key={`${plotModel?.data?.plotName}-${feature}`}
               value={feature}
@@ -157,9 +154,9 @@ const PdpPlot = (props: PdpPlotProps) => {
               {feature}
             </MenuItem>
           ))}
-        </Select>
-      </FormControl>
-    )
+      </Select>
+    </FormControl>
+  )
 
   const loading = (
    <Loader />
