@@ -77,7 +77,7 @@ const PdpPlot = (props: PdpPlotProps) => {
     mark: {
       type: "line",
       tooltip: true,
-      point: { size: 100, color: theme.palette.primary.main },
+      point: { size: 20, color: theme.palette.primary.main },
     },
     encoding: {
       x: {
