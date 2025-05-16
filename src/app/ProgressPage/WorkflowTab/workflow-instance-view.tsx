@@ -24,6 +24,8 @@ import InfoMessage from "../../../shared/components/InfoMessage"
 import ResponsiveCardTable from "../../../shared/components/responsive-card-table"
 import Loader from "../../../shared/components/loader"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
+import LensBlurIcon from '@mui/icons-material/LensBlur';
+import InstanceClassificationUmap from "../../Tasks/SharedItems/Plots/umapi"
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(
@@ -43,7 +45,6 @@ const InstanceView = () => {
 
   const [point, setPoint] = useState<{ id: number; data: any } | null>(null)
   const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? []
-console.log(point)
 
   const baseColumns = Object.keys(rows[0] || {}).map(key => ({
     field: key,
@@ -299,10 +300,18 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
               <ScatterPlotIcon />
             </Button>
           </Tooltip>
+          <Tooltip title="Umap">
+            <Button
+              variant={chartType === "umap" ? "contained" : "outlined"}
+              onClick={() => dispatch(setControls({ chartType: "umap" }))}
+            >
+              <LensBlurIcon />
+            </Button>
+          </Tooltip>
         </ButtonGroup>
       </Box>
 
-      {chartType === "scatter" ? (
+      {chartType === "scatter" &&(
         <Box sx={{ height: "60%", minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
@@ -312,7 +321,9 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
             hashRow={hashRow}
           />
         </Box>
-      ) : (
+      )}
+
+      {chartType === "datatable" && (
         <Box sx={{ height: "60%", minHeight: 400 }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
@@ -405,6 +416,12 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
           </ResponsiveCardTable>
         </Box>
       )}
+      {chartType === "umap" && (
+        <Box sx={{ height: "60%", minHeight: 400 }}>
+          <InstanceClassificationUmap  point={point} showMisclassifiedOnly={showMisclassifiedOnly} setPoint={setPoint} hashRow={hashRow}/>
+        </Box>
+      )}
+      
       {point && workflow ? (
         <Box sx={{ pt: 2, height: "30%", minHeight: 300 }}>
            <CounterfactualsTable
