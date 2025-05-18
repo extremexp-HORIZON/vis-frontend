@@ -25,7 +25,7 @@ import ResponsiveCardTable from "../../../shared/components/responsive-card-tabl
 import Loader from "../../../shared/components/loader"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 import LensBlurIcon from '@mui/icons-material/LensBlur';
-import InstanceClassificationUmap from "../../Tasks/SharedItems/Plots/umapi"
+import InstanceClassificationUmap from "../../Tasks/SharedItems/Plots/instance-classification-umap"
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(

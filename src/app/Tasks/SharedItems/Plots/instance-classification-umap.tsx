@@ -1,7 +1,7 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import _ from "lodash"
-import { CircularProgress, useTheme } from "@mui/material"
+import { CircularProgress, useMediaQuery, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import Loader from "../../../../shared/components/loader"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
@@ -21,6 +21,9 @@ const InstanceClassificationUmap = (props: Umapi) => {
     const tab = useAppSelector((state: RootState) => state.workflowPage.tab)
     const raw = tab?.workflowTasks.modelAnalysis?.modelInstances.data
     const parsedData = typeof raw === "string" ? JSON.parse(raw) : raw
+      const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+    
+    
   const dispatch = useAppDispatch()
   
     useEffect(() => {
@@ -83,7 +86,7 @@ const combinedPlotData = umapResult.map((point: number[], index: number) => {
   const info = (
     <Loader/>
   )
-  const shouldShowInfoMessage = false
+  const shouldShowInfoMessage = tab?.workflowTasks.dataExploration?.umap.loading && !tab?.workflowTasks.dataExploration?.umap.data
     // console.log("InstanceClassification plotData", plotData)
     // console.log("getVegaData(plotData?.data ?? [])", getVegaData(plotData?.data ?? []))
   return (
@@ -184,9 +187,12 @@ const combinedPlotData = umapResult.map((point: number[], index: number) => {
       onNewView={handleNewView}
       infoMessage={info}
       showInfoMessage={shouldShowInfoMessage}
-      aspectRatio={2}
+          aspectRatio={isSmallScreen ? 2.8 : 1.8}
       maxHeight={480}
       isStatic={true}
+
+
+       
     />
   )
 }
