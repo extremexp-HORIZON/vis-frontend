@@ -68,20 +68,36 @@ const combinedPlotData = umapResult.map((point: number[], index: number) => {
     y: point[1],
     actual,
     predicted,
+    index,
   }
 })
+
+
   
 
-  const handleNewView = (view: any) => {
-    view.addEventListener("click", (event: any, item: any) => {
-      if (item && item.datum?.isMisclassified) {
-        const { id, ...dataWithoutId } = item.datum
-        setPoint({ id, data: dataWithoutId })
-      } else {
-        setPoint(null)
-      }
-    })
-  }
+const handleNewView = (view: any) => {
+  view.addEventListener("click", (event: any, item: any) => {
+    if (item && item.datum?.isMisclassified) {
+      const clickedIndex = item.datum.index;
+      const originalRow = parsedData[clickedIndex]; // This is the row you want
+
+      const id = hashRow(originalRow);
+      const { actual, predicted, ...rest } = originalRow;
+
+      setPoint({
+        id,
+        data: {
+          ...rest,
+          "label":actual,
+          predicted,
+          // index: clickedIndex,
+        },
+      });
+    } else {
+      setPoint(null);
+    }
+  });
+};
 
   const info = (
     <Loader/>
