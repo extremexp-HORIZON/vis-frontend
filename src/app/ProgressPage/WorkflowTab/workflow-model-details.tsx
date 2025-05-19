@@ -9,7 +9,7 @@ import {
 } from "../../../shared/components/details-card"
 import ConfusionMatrixPlot from "../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot"
 import RocCurvePlot from "../../Tasks/ModelAnalysisTask/plots/roc-curve-plot"
-import ClassificationReportTable from "../../Tasks/ModelAnalysisTask/plots/classification-report-table"
+import ClassificationReportTable from "../../Tasks/ModelAnalysisTask/tables/classification-report-table"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import { useEffect } from "react"
 import { fetchModelSummary } from "../../../store/slices/modelAnalysisSlice"

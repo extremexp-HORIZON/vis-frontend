@@ -158,10 +158,10 @@ const ClassificationReportTable = () => {
                 <TableCell key={key} align="right">
                   {idx === metricKeys.length - 1
                     ? format(overallMetrics.accuracy ?? "-")
-                    : ""}
+                    : null}
                 </TableCell>
               ))}
-              <TableCell align="right" /> {/* leave Support cell empty */}
+              <TableCell align="right">{null}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><b>Macro avg</b></TableCell>
