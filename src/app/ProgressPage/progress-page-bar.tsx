@@ -8,7 +8,6 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 import { useParams } from "react-router-dom";
 import Chip from '@mui/material/Chip';
-import ScienceIcon from '@mui/icons-material/Science';
 
 const ProgressPageBar = () => {
   const { experimentId } = useParams()

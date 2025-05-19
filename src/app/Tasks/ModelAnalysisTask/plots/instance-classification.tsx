@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem"
 import type { Dispatch, SetStateAction } from "react"
 import { useEffect, useState } from "react"
 import _ from "lodash"
-import { CircularProgress, FormControlLabel, InputLabel, Switch, useTheme } from "@mui/material"
+import { CircularProgress, InputLabel, Switch, useMediaQuery, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import ShowChartIcon from "@mui/icons-material/ShowChart"
 import InstanceClassificationUmap from "./instance-classification-umap"
@@ -141,7 +141,9 @@ interface IInstanceClassification {
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
-  const theme = useTheme()
+const theme = useTheme()
+
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))  
   const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props
   console.log("InstanceClassification plotData", plotData)
   const [options, setOptions] = useState<string[]>([])
@@ -182,15 +184,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
     }
   }, [options])
 
-  const handleAxisSelection =
-    (axis: string) => (e: { target: { value: string } }) => {
-      if (axis === "x") {
-        setXAxisOption(e.target.value)
-      } else {
-        setYAxisOption(e.target.value)
-      }
-    }
-
+  
   const handleNewView = (view: any) => {
     view.addEventListener("click", (event: any, item: any) => {
       if (item && item.datum?.isMisclassified) {
@@ -359,7 +353,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
       onNewView={handleNewView}
       infoMessage={info}
       showInfoMessage={shouldShowInfoMessage}
-      aspectRatio={2}
+      aspectRatio={isSmallScreen ? 2.8 : 1.8}
       maxHeight={480}
       isStatic={true}
     />

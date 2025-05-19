@@ -1,7 +1,6 @@
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
-import _ from "lodash"
-import { Box, CircularProgress, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Dispatch, SetStateAction, useEffect } from "react"
+import { Box, FormControl, InputLabel, MenuItem, Select, Switch, Typography, useMediaQuery, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import Loader from "../../../../shared/components/loader"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
@@ -126,7 +125,7 @@ interface Umapi {
 
 const InstanceClassificationUmap = (props: Umapi) => {
   const theme = useTheme()
-  const { setPoint, point, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props
+  const { setPoint, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props
     const tab = useAppSelector((state: RootState) => state.workflowPage.tab)
     const raw = tab?.workflowTasks.modelAnalysis?.modelInstances.data
     const parsedData = typeof raw === "string" ? JSON.parse(raw) : raw
@@ -134,6 +133,7 @@ const InstanceClassificationUmap = (props: Umapi) => {
     
     
   const dispatch = useAppDispatch()
+  
   
     useEffect(() => {
       if (raw) {
@@ -312,7 +312,7 @@ const handleNewView = (view: any) => {
       onNewView={handleNewView}
       infoMessage={info}
       showInfoMessage={shouldShowInfoMessage}
-          aspectRatio={2}
+        aspectRatio={isSmallScreen ? 2.8 : 1.8}
       maxHeight={480}
       isStatic={true}
       controlPanel={

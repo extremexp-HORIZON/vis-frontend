@@ -21,7 +21,6 @@ import MapCardWrapper from "../Charts/map-wrap"
 
 const DataExplorationComponent = () => {
   const dispatch = useAppDispatch()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
 
   const { tab } = useAppSelector(state => state.workflowPage)
   const selectedDataset = useAppSelector(

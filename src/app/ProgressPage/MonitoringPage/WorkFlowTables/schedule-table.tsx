@@ -356,9 +356,7 @@ export default function ScheduleTable() {
       )
     }
 
-    const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
-      dispatch(setScheduledTable({ selectedWorkflows: newSelection }))
-    }
+    
 
   const handleFilterChange = (
     index: number,

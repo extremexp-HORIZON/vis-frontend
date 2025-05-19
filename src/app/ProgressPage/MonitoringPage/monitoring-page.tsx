@@ -19,7 +19,6 @@ const MonitoringPage = () => {
     (state: RootState) => state.monitorPage,
   )
   const navigate = useNavigate()
-  const { experimentId } = useParams()
   const dispatch = useDispatch()
   const theme = useTheme()
   const queryParams = new URLSearchParams(location.search);

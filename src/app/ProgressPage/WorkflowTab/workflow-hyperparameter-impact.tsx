@@ -12,12 +12,6 @@ const HyperparameterImpact = () => {
     ) 
 
     const [isMosaic, setIsMosaic] = useState(true)
-    const query = {hyper_configs: workflows.data.reduce((acc: {}, workflow: IRun) => {
-    //   const savedModelDataset = workflow.tasks?.flatMap(task => [
-    //     ...(workflow.dataAssets?.filter(asset => 
-    //       asset.task === task.name
-    //     ) || []),
-    //   ]).find(dataset => dataset.name === "saved_model");
     const savedModelDataset = "metadata/proxy_data_models/I2Cat_workflow12.pkl"
       
       const workflowSavedModelParameters = workflow.params?.reduce((ac, param) => ({

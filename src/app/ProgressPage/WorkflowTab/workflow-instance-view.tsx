@@ -23,7 +23,6 @@ import InfoMessage from "../../../shared/components/InfoMessage"
 import ResponsiveCardTable from "../../../shared/components/responsive-card-table"
 import Loader from "../../../shared/components/loader"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
-import LensBlurIcon from '@mui/icons-material/LensBlur';
 import InstanceClassificationUmap from "../../Tasks/ModelAnalysisTask/plots/instance-classification-umap"
 import { getLabelTestInstances } from "../../../store/slices/modelAnalysisSlice"
 

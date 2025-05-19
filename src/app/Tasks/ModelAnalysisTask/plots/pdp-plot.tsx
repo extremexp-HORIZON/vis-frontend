@@ -6,7 +6,6 @@ import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import theme from "../../../../mui-theme"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import {
-  Box,
   FormControl,
   InputLabel,
   MenuItem,

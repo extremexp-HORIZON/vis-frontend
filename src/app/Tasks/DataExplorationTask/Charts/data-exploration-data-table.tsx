@@ -91,12 +91,11 @@ const TableExpand: React.FC = () => {
 
   useEffect(() => {
     dispatch(setCurrentPage(1))
-  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters])
+  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters, ])
   // Get column information from the state
   const selectedColumns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || []
   const dispatch = useAppDispatch()
-  const [loading, setLoading] = useState<boolean>(false)
   useEffect(() => {
     const fetchData = async () => {
       if (
@@ -106,7 +105,6 @@ const TableExpand: React.FC = () => {
         return
       }
 
-      setLoading(true)
 
       try {
         const currentPage =

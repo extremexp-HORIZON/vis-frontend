@@ -29,7 +29,6 @@ const ProgressPage = (props: ProgressPageProps) => {
   const intervalId = useRef<NodeJS.Timeout | null>(null)
   const { children } = props
   const location = useLocation()
-  const navigate = useNavigate()
 
   useEffect(() => {
     const pathParts = location.pathname.split("/").filter(Boolean)

@@ -14,8 +14,6 @@ import ErrorIcon from '@mui/icons-material/Error'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
 import PauseCircleRoundedIcon from '@mui/icons-material/PauseCircleRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
-import type { IRun } from "../../shared/models/experiment/run.model"
-import ScienceIcon from '@mui/icons-material/Science';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import StaticDirectedGraph from "./WorkflowTab/worfklow-flow-chart"
 import CloseIcon from '@mui/icons-material/Close';

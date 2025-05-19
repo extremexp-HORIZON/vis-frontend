@@ -22,23 +22,7 @@ const BarChartControlPanel = () => {
     null
 
   // Handler for updating aggregation rules for a column
-  const handleAggregationChange = (
-    event: React.ChangeEvent<{ value: unknown }>,
-  ) => {
-    const value = event.target.value as string[]
-    if (!selectedColumn) return
-    const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
-
-    dispatch(
-      setControls({
-        barAggregation: {
-          ...currentAgg,
-          [selectedColumn]: value,
-        },
-      }),
-    )
-  }
+  
 
   const getAggregationOptions = () => {
     if (!selectedColumn) return []
@@ -55,23 +39,7 @@ const BarChartControlPanel = () => {
 
   const aggregationOptions = getAggregationOptions()
 
-  const handleAggregationDelete = (toDelete: string) => {
-    if (!selectedColumn) return
-    const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {}
-    const updated = (currentAgg[selectedColumn] || []).filter(
-      (agg: string) => agg !== toDelete,
-    )
-
-    dispatch(
-      setControls({
-        barAggregation: {
-          ...currentAgg,
-          [selectedColumn]: updated,
-        },
-      }),
-    )
-  }
+  
 
   // Custom theme
   const theme = createTheme({
@@ -152,7 +120,7 @@ const BarChartControlPanel = () => {
             }}
           >
             {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type != "LOCAL_DATE_TIME")
+              .filter(col => col.type !== "LOCAL_DATE_TIME")
               .map(col => (
                 <MenuItem key={col.name} value={col.name}>
                   {col.name}

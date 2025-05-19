@@ -106,7 +106,6 @@ const LeftPanel = () => {
     operator: string,
     value: string,
   ) => {
-    const updatedFilters = [...formattedFilters]
     
     // Find the column type from originalColumns
     const columnInfo = originalColumns.find((col: any) => col.name === column);

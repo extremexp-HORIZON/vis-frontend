@@ -73,6 +73,8 @@ const LineChart = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.yAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
     tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.workflowId,
+    dispatch
   ])
 
   const chartData = tab?.workflowTasks.dataExploration?.lineChart?.data?.data || []

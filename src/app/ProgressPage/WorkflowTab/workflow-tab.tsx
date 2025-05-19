@@ -6,7 +6,6 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { Paper } from "@mui/material"
 import { fetchWorkflowMetrics, initTab, resetWorkflowTab } from "../../../store/slices/workflowPageSlice"
 import { Resizable } from "re-resizable"
-import StaticDirectedGraph from "./worfklow-flow-chart"
 import WorkflowTreeView from "./workflow-tree-view"
 import SelectedItemViewer from "./SelectedItemViewer"
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';

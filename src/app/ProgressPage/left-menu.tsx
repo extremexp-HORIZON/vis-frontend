@@ -6,7 +6,6 @@ import {
   ListItemText,
   Paper,
   IconButton,
-  Typography,
 } from "@mui/material"
 import { useParams, useNavigate } from "react-router-dom"
 import ListRoundedIcon from "@mui/icons-material/ListRounded"

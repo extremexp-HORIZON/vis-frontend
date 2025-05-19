@@ -32,8 +32,6 @@ interface ITableComponent {
 const CounterfactualsTable = (props: ITableComponent) => {
   const {
     point,
-    handleClose,
-    // counterfactuals,
     experimentId,
     workflowId,
     onClose,
@@ -114,16 +112,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
     }
   }, [point, activeTab])
 
-  const getNonConstantColumns = (tableContents: any) => {
-    if (!tableContents) return []
-
-    return Object.entries(tableContents).filter(([key, columnData]: any) => {
-      const values = columnData.values
-      if (!values || values.length === 0) return false
-      return new Set(values).size > 1 // Only keep if not all values are identical
-    })
-  }
-
+  
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     "& .MuiDataGrid-scrollbarFiller": {
       backgroundColor: theme.palette.customGrey.main,

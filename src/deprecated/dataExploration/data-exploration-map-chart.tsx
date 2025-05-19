@@ -8,8 +8,8 @@ import {
   createTheme,
 } from "@mui/material"
 
-import type { IDataExploration } from "../../../../shared/models/tasks/data-exploration-task.model"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
+import type { IDataExploration } from "../../shared/models/tasks/data-exploration-task.model"
+import { useAppDispatch, useAppSelector } from "../../store/store"
 
 const COLOR_PALETTE = [
   "#E6194B",

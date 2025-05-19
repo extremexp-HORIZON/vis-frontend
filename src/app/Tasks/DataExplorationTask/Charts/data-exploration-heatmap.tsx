@@ -51,13 +51,13 @@ const HeatMap = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat,
     tab?.dataTaskTable.selectedItem?.data?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
+    dispatch,
+    tab?.workflowId,
   ])
 
   const columns = tab?.workflowTasks.dataExploration?.heatChart.data?.columns
   const xAxisColumn = columns?.find(col => col.type === "STRING")?.name
-  const aggregation =
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat
-
+ 
   const categoricalColumns = columns?.filter(
     col => col.type === "STRING" && col.name !== xAxisColumn,
   )

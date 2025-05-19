@@ -91,13 +91,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
 
   const open = Boolean(anchorEl)
 
-  const handleRemoveFilter = (index: number) => {
-    if (filters.length > 1) {
-      onRemoveFilter(index);
-    } else {
-      onFilterChange(index, '', '', '');
-    }
-  }
+
 
   // Custom header component for popover sections
   const SectionHeader = ({
