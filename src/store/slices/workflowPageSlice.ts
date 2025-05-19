@@ -5,22 +5,18 @@ import {
   defaultWorkflowPageModel,
 } from "../../shared/models/workflow.tab.model"
 import {
-  explainabilityDefault,
-  explainabilityReducers,
-} from "../../shared/models/tasks/explainability.model"
-import {
   modelAnalysisDefault,
-  modelAnalysisReducers,
 } from "../../shared/models/tasks/model-analysis.model"
 import {
   dataExplorationDefault,
-  explainabilityExtraReducers,
 } from "../../shared/models/tasks/data-exploration-task.model"
 import { userInteractionDefault } from "../../shared/models/tasks/user-interaction.model"
 import type { IRun } from "../../shared/models/experiment/run.model"
 import type { IMetric } from "../../shared/models/experiment/metric.model"
-import { api, experimentApi } from "../../app/api/api"
-import axios from "axios";
+import { experimentApi } from "../../app/api/api"
+import { dataExplorationReducers } from "./dataExplorationSlice";
+import { modelAnalysisReducers } from "./modelAnalysisSlice";
+import { explainabilityReducers } from "./explainabilitySlice";
 
 export interface IWorkflowPage {
   tab: IWorkflowPageModel | null
@@ -38,7 +34,8 @@ export const workflowPageSlice = createSlice({
   initialState,
   reducers: {
     initTab: (state, action) => {
-      state.tab = setTab(action.payload)
+      const {tab, workflows} = action.payload
+      state.tab = initializeTab({ workflowId: tab, workflows})
       state.isTabInitialized = true
     },
     resetWorkflowTab: (state) => {
@@ -47,7 +44,7 @@ export const workflowPageSlice = createSlice({
     },
     setDataTable: (state, action) => {
       if(!state.tab) return
-      state.tab.dataTaskTable = state.tab.dataTaskTable = {
+      state.tab.dataTaskTable = {
         ...state.tab.dataTaskTable,
         ...action.payload,
       }    
@@ -57,12 +54,12 @@ export const workflowPageSlice = createSlice({
       state.tab.dataTaskTable.selectedItem = action.payload
       state.tab.dataTaskTable.selectedTask = null
     },
-    // ...additionalReducers
     setControls: (state, action) => {
       if (!state.tab?.workflowTasks.dataExploration) return
       state.tab.workflowTasks.dataExploration.controlPanel = {
         ...state.tab?.workflowTasks.dataExploration?.controlPanel,
-         ...action.payload}
+        ...action.payload
+      }
       },
       setCurrentPage: (state, action) => {
         if (!state.tab?.workflowTasks.dataExploration) return
@@ -77,7 +74,8 @@ export const workflowPageSlice = createSlice({
         if (!state.tab?.workflowTasks.dataExploration) return
         state.tab.workflowTasks.dataExploration.metaData = {
           ...state.tab?.workflowTasks.dataExploration?.metaData,
-           ...action.payload}
+          ...action.payload
+        }
       } ,
       setSelectedTask: (state, action) => {
         if (!state.tab) return
@@ -92,7 +90,7 @@ export const workflowPageSlice = createSlice({
   extraReducers: builder => {
     explainabilityReducers(builder),
       modelAnalysisReducers(builder),
-      explainabilityExtraReducers(builder),
+      dataExplorationReducers(builder),
       builder
         .addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
             const newMetrics = action.payload; // this is an array of { name, data }
@@ -119,6 +117,7 @@ export const workflowPageSlice = createSlice({
             });
         
           state.tab.workflowSeriesMetrics.loading = false;
+          state.tab.workflowSeriesMetrics.error = null;
         })
         .addCase(fetchWorkflowMetrics.pending, state => {
           if (!state.tab) return
@@ -151,39 +150,29 @@ const workflowMetricsInitializer = ({
 }) => {
   if (!metrics) return null
 
-  const finishedWorkflowsMetrics = workflows.data
-    .filter(workflow => workflow.status === "COMPLETED")
-    .reduce<
-      IMetric[]
-    >((acc, workflow) => workflow.metrics ? [...acc, ...workflow.metrics] : [...acc], [])
+  const completedMetrics = workflows.data
+    .filter(run => run.status === "COMPLETED" && run.metrics)
+    .flatMap(run => run.metrics!)
 
   return metrics.map(metric => {
-    const filteredMetricsAll = finishedWorkflowsMetrics.filter(
-      metricAll => metricAll.name === metric.name,
+    const matchingMetrics = completedMetrics.filter(
+      m => m.name === metric.name
     )
-    const metricsSum = filteredMetricsAll.reduce(
-      (acc, metric) => acc + metric.value,
-      0,
-    )
-    const maxValue = Math.max(...filteredMetricsAll.map(metric => metric.value))
-    const minValue = Math.min(...filteredMetricsAll.map(metric => metric.value))
-    return {
-      name: metric.name,
-      value: metric.value,
-      avgValue: (metricsSum / filteredMetricsAll.length),
-      avgDiff:
-        (metric.value * 100) /
-          (metricsSum / filteredMetricsAll.length) -
-        100,
-      maxValue: maxValue,
-      minValue: minValue,
-      task: metric.task,
-      step: metric.step,
-      timestamp: metric.timestamp
-    }
-  })
 
-}
+    const values = matchingMetrics.map(m => m.value);
+    const total = values.reduce((sum, val) => sum + val, 0);
+    const count = values.length;
+    const avg = count > 0 ? total / count : 0;
+
+    return {
+      ...metric,
+      avgValue: avg,
+      avgDiff: avg ? (metric.value * 100) / avg - 100 : 0,
+      maxValue: count > 0 ? Math.max(...values) : 0,
+      minValue: count > 0 ? Math.min(...values) : 0,
+    };
+  });
+};
 
 const initializeTab = ({
   workflowId,
@@ -195,29 +184,35 @@ const initializeTab = ({
     loading: boolean
     error: string | null
   }
-}) => {
-  const workflow = workflows.data.find(
-    workflow => workflow.id === workflowId,
-  )
-  const tab: IWorkflowPageModel = {
+}): IWorkflowPageModel => {
+  const workflow = workflows.data.find(w => w.id === workflowId);
+
+  const workflowName = workflow?.name ?? "";
+  const workflowSvg = workflow
+    ? {
+        tasks: workflow.tasks,
+        start: workflow.startTime,
+        end: workflow.endTime,
+      }
+    : null;
+
+  return {
     ...defaultWorkflowPageModel,
-    workflowName: workflow?.name || "",
-    workflowId: workflow?.id || "",
+    workflowId: workflow?.id ?? "",
+    workflowName,
     workflowSvg: {
-      data: workflow
-        ? { tasks: workflow.tasks, start: workflow.startTime, end: workflow.endTime }
-        : null,
+      data: workflowSvg,
       loading: false,
     },
     workflowConfiguration: {
-      tasks: workflow?.tasks || null,
-      dataAssets: workflow?.dataAssets || null,
-      params: workflow?.params || null,
+      tasks: workflow?.tasks ?? null,
+      dataAssets: workflow?.dataAssets ?? null,
+      params: workflow?.params ?? null,
       loading: false,
     },
     workflowMetrics: {
       data: workflowMetricsInitializer({
-        metrics: workflow?.metrics || null,
+        metrics: workflow?.metrics ?? null,
         workflows,
       }),
       loading: false,
@@ -228,53 +223,7 @@ const initializeTab = ({
       userInteraction: userInteractionDefault,
     },
   }
-  return tab
 }
-
-const initializeCompareCompleteTab = () => {
-  const tab: IWorkflowPageModel = {
-    ...defaultWorkflowPageModel,
-    workflowId: "compare-completed",
-    workflowTasks: {
-      explainabilityTask: explainabilityDefault,
-    },
-    workflowMetrics: {
-      data: null,
-      loading: false,
-    },
-  }
-  return tab
-}
-
-const setTab = ({
-  tab,
-  workflows,
-}: {
-  tab: string | null
-  workflows: {
-    data: IRun[]
-    loading: boolean
-    error: string | null
-  },
-}) => {
-  if(tab === "compare-completed") return initializeCompareCompleteTab()
-  else if (tab !== null) return initializeTab({ workflowId: tab, workflows})
-  else return null
-}
-
-export const fetchUserEvaluation = createAsyncThunk(
-  "workflowTasks/user_evaluation/fetch_data",
-  async (
-    payload: { experimentId: string; runId: string; data: any }
-  ) => {
-    const { experimentId, runId, data } = payload
-    const requestUrl = `/experiments/${experimentId}/runs/${runId}/user-evaluation`
-    return axios
-      .post<any>(requestUrl, data)
-      .then(response => response.data)
-  },
-)
-
 
 export const fetchWorkflowMetrics = createAsyncThunk(
   "progressPage/fetchWorkflowMetrics",

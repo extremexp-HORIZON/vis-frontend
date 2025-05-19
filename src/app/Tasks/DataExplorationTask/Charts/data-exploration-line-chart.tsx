@@ -6,7 +6,7 @@ import ResponsiveCardVegaLite from "../../../../shared/components/responsive-car
 import LineChartControlPanel from "../ChartControls/data-exploration-line-control"
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
 import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 

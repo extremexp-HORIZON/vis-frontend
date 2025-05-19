@@ -1,12 +1,9 @@
 import { Rating } from "@mui/material";
 import { useState } from "react";
-import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store";
+import { useAppDispatch } from "../../../../store/store";
 import {
   fetchUserEvaluation,
-  fetchWorkflowWithRating,
 } from "../../../../store/slices/progressPageSlice";
-import type { IRun } from "../../../../shared/models/experiment/run.model";
-import { updateWorkflowRatingLocally } from "../../../../store/slices/monitorPageSlice";
 
 interface WorkflowRatingProps {
   currentRating: number;

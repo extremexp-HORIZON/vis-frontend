@@ -40,7 +40,14 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
   const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1
 
   const chartSpec = {
-    mark: isSingleStep ? "point" : "line", // Always use a line chart
+    mark: isSingleStep ? "point" 
+    : {
+      type: "line",
+      tooltip: true,
+      point: {
+        size: 20
+      }
+    },
     encoding: {
       x: {
         field: metrics[0].step=== null?"timestamp":"step", // Use the 'step' field for the x-axis (time or step sequence)

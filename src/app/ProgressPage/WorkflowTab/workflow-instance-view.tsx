@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react"
 import InstanceClassification from "../../Tasks/SharedItems/Plots/instance-classification"
 import type { RootState } from "../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
-import { getLabelTestInstances } from "../../../shared/models/tasks/model-analysis.model"
 import CounterfactualsTable from "../../Tasks/SharedItems/Tables/counterfactuals-table"
 import { useParams } from "react-router-dom"
 import {
@@ -26,6 +25,7 @@ import Loader from "../../../shared/components/loader"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 import LensBlurIcon from '@mui/icons-material/LensBlur';
 import InstanceClassificationUmap from "../../Tasks/SharedItems/Plots/instance-classification-umap"
+import { getLabelTestInstances } from "../../../store/slices/modelAnalysisSlice"
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(

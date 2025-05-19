@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import InfoMessage from "../../../../shared/components/InfoMessage";
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded";
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite";
-import { fetchRocCurve } from "../../../../shared/models/tasks/model-analysis.model";
+import { fetchRocCurve } from "../../../../store/slices/modelAnalysisSlice";
 import Loader from "../../../../shared/components/loader";
 
 const RocCurvePlot = () => {

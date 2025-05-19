@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom"
 import type { RootState} from "../../../../store/store";
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useState } from "react"
-import { fetchConfusionMatrix } from "../../../../shared/models/tasks/model-analysis.model"
+import { fetchConfusionMatrix } from "../../../../store/slices/modelAnalysisSlice";
 import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"

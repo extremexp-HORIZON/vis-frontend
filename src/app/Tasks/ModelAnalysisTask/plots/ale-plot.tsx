@@ -1,10 +1,6 @@
 import { useEffect } from "react"
 import type { RootState } from "../../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import {
-  fetchModelAnalysisExplainabilityPlot,
-  setSelectedFeature,
-} from "../../../../shared/models/tasks/model-analysis.model"
 import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
 import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import theme from "../../../../mui-theme"
@@ -19,6 +15,7 @@ import InfoMessage from "../../../../shared/components/InfoMessage"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import { useParams } from "react-router-dom"
 import Loader from "../../../../shared/components/loader"
+import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature } from "../../../../store/slices/explainabilitySlice"
 
 interface AlePlotProps {
   explanation_type: string

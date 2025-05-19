@@ -1,8 +1,4 @@
-import type { ActionReducerMapBuilder} from "@reduxjs/toolkit";
-import { createAsyncThunk } from "@reduxjs/toolkit"
 import type { IPlotModel } from "../plotmodel.model"
-import type { IWorkflowPage } from "../../../store/slices/workflowPageSlice"
-import { api } from "../../../app/api/api"
 export interface IExplainability {
   "2dpdp": {
     data: IPlotModel | null
@@ -53,44 +49,6 @@ export const explainabilityDefault: IExplainability = {
   },
 }
 
-export const explainabilityReducers = (
-  builder: ActionReducerMapBuilder<IWorkflowPage>,
-) => {
-  builder
-    .addCase(fetchExplainabilityPlot.fulfilled, (state, action) => {
-      if (state.tab) {
-      const compareCompletedTask =  state.tab.workflowTasks.explainabilityTask
-      const plotType = action.meta.arg.metadata
-        .queryCase as keyof IExplainability
-      if (compareCompletedTask && plotType !== "hyperparametersNames") {
-        compareCompletedTask[plotType].data = action.payload
-        compareCompletedTask[plotType].loading = false
-        compareCompletedTask[plotType].error = null
-      }
-    }
-    })
-    .addCase(fetchExplainabilityPlot.pending, (state, action) => {
-      if (state.tab) {
-      const compareCompletedTask =  state.tab.workflowTasks.explainabilityTask
-      const plotType = action.meta.arg.metadata
-      .queryCase as keyof IExplainability
-      if (compareCompletedTask && plotType !== "hyperparametersNames") {
-        compareCompletedTask[plotType].loading = true
-      }
-    }
-    })
-    .addCase(fetchExplainabilityPlot.rejected, (state, action) => {
-      if (state.tab) {
-      const compareCompletedTask = state.tab.workflowTasks.explainabilityTask
-      const plotType = action.meta.arg.metadata
-      .queryCase as keyof IExplainability
-      if (compareCompletedTask && plotType !== "hyperparametersNames") {
-        compareCompletedTask[plotType].loading = false
-        compareCompletedTask[plotType].error = "failed to fetch data"
-      }
-    }
-    })
-}
 
 export type IHyperparameters = {
   [key: string]: {
@@ -124,7 +82,7 @@ export const explainabilityQueryDefault: ExplainabilityQuery = {
 export type FetchExplainabilityPlotPayload = {
   query: ExplainabilityQuery
   metadata: {
-    workflowId: string | number
+    workflowId: string
     queryCase: any
     experimentId: string
   }
@@ -138,14 +96,4 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
       queryCase: "",
       experimentId: ""
     },
-  }  
-
-export const fetchExplainabilityPlot = createAsyncThunk(
-  "workflowPage/explainability/fetch_explainability_plot",
-  async (payload: FetchExplainabilityPlotPayload) => {
-    const requestUrl = "explainability"
-    return api
-      .post<any>(requestUrl, payload.query)
-      .then(response => response.data)
-  },
-)
+  }

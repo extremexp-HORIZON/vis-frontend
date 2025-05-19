@@ -5,8 +5,7 @@ import { CircularProgress, useMediaQuery, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import Loader from "../../../../shared/components/loader"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
-import { fetchUmap } from "../../../../shared/models/tasks/data-exploration-task.model"
-
+import { fetchUmap } from "../../../../store/slices/dataExplorationSlice"
 interface Umapi {
   
   point: any

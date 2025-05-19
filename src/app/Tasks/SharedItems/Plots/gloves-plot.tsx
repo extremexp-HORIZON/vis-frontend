@@ -17,10 +17,6 @@ import {
   CircularProgress
 } from "@mui/material"
 import type { IWorkflowPageModel } from "../../../../shared/models/workflow.tab.model"
-import {
-  fetchAffected,
-  fetchModelAnalysisExplainabilityPlot,
-} from "../../../../shared/models/tasks/model-analysis.model"
 import WorkflowCard from "../../../../shared/components/workflow-card"
 import {
   explainabilityQueryDefault,
@@ -29,6 +25,8 @@ import {
 import GlovesScatter from "./gloves-scatter"
 import GlovesMetricSummary from "./gloves-metric-summary"
 import { useAppDispatch } from "../../../../store/store"
+import { fetchAffected } from "../../../../store/slices/modelAnalysisSlice";
+import { fetchModelAnalysisExplainabilityPlot } from "../../../../store/slices/explainabilitySlice";
 
 interface CGlanceExecutionProps {
   workflow: IWorkflowPageModel

@@ -1,110 +1,189 @@
-import { createSlice, createAsyncThunk, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
-import axios from "axios";
-import type { IDataExplorationRequest } from "../../shared/models/dataexploration.model";
+import type {
+  ActionReducerMapBuilder,
+} from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
+import type { IWorkflowPage } from "./workflowPageSlice";
+import type {
+  IDataExplorationMetaDataResponse,
+  IDataExplorationRequest,
+  IDataExplorationResponse,
+  IMetaDataRequest,
+  VisualColumn,
+} from "../../shared/models/dataexploration.model";
+import type { IDataExploration } from "../../shared/models/tasks/data-exploration-task.model";
+import { handleMultiTimeSeriesData, prepareDataExplorationResponse } from "../../shared/models/tasks/model-analysis.model";
+import { api } from "../../app/api/api";
 
-// Define the interface for the slice state
-interface IExploration {  
-    loading: boolean;
-    initLoading: boolean;
-    dataExploration: {data: any, [key: string]: any} | null;
-    error: string | null;
-    multipleTimeSeries: any[];
+// Only keys that contain { data, loading, error }
+type AsyncQueryKey = Exclude<keyof IDataExploration, "controlPanel">;
+
+function getAsyncState<T extends AsyncQueryKey>(task: IDataExploration, key: T) {
+  return task[key];
 }
 
-// Define the initial state of the slice
-const initialState: IExploration = {
-    loading: false,
-    initLoading: true,
-    dataExploration: null, 
-    error: null,
-    multipleTimeSeries: [],
+export const dataExplorationReducers = (
+  builder: ActionReducerMapBuilder<IWorkflowPage>,
+) => {
+  builder
+    .addCase(fetchDataExplorationData.fulfilled, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      const queryCase = action.meta.arg.metadata.queryCase as AsyncQueryKey;
+
+      if (task) {
+        const asyncState = getAsyncState(task, queryCase);
+        asyncState.data = queryCase === "multipleTimeSeries"
+          ? handleMultiTimeSeriesData(action.payload)
+          : prepareDataExplorationResponse(action.payload);
+        asyncState.loading = false;
+        asyncState.error = null;
+
+        if (queryCase === "dataTable") {
+          const totalItems = action.payload.querySize || 0;
+          const { pageSize } = task.controlPanel;
+          task.controlPanel.queryItems = totalItems;
+          task.controlPanel.totalPages = Math.ceil(totalItems / pageSize);
+        }
+      }
+    })
+    .addCase(fetchDataExplorationData.pending, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      const queryCase = action.meta.arg.metadata.queryCase as AsyncQueryKey;
+      if (task) getAsyncState(task, queryCase).loading = true;
+    })
+    .addCase(fetchDataExplorationData.rejected, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      const queryCase = action.meta.arg.metadata.queryCase as AsyncQueryKey;
+      if (task) {
+        const asyncState = getAsyncState(task, queryCase);
+        asyncState.loading = false;
+        asyncState.error = "Failed to fetch data";
+      }
+    })
+    .addCase(fetchMetaData.fulfilled, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      if (!task) return;
+
+      const { originalColumns } = action.payload;
+      task.metaData.data = action.payload;
+      task.metaData.loading = false;
+      task.metaData.error = null;
+
+      task.controlPanel.selectedColumns = originalColumns?.slice(0, 5) ?? [];
+
+      if (originalColumns[0]) {
+        task.controlPanel.xAxis = originalColumns[0];
+        task.controlPanel.xAxisScatter = originalColumns[0];
+        task.controlPanel.colorBy = originalColumns[0];
+      }
+
+      const defaultYAxis = originalColumns.length > 1
+        ? [originalColumns[1]]
+        : [originalColumns[0]].filter(Boolean);
+
+      task.controlPanel.yAxis = defaultYAxis;
+      task.controlPanel.yAxisScatter = defaultYAxis;
+
+      const stringCols = originalColumns.filter((col: VisualColumn) => col.type === "STRING");
+      const intCol = originalColumns.find((col: VisualColumn) => col.type === "INTEGER");
+      const doubleCol = originalColumns.find((col: VisualColumn) => col.type === "DOUBLE");
+
+      if (stringCols[0]) task.controlPanel.barGroupBy = [stringCols[0].name];
+
+      if (intCol) {
+        task.controlPanel.barAggregation = {
+          [intCol.name]: ["count"]
+        };
+      }
+
+      const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
+      if (heatmapGroupBy.length === 2) {
+        task.controlPanel.barGroupByHeat = heatmapGroupBy;
+      }
+
+      if (doubleCol) {
+        task.controlPanel.barAggregationHeat = {
+          [doubleCol.name]: ["count"]
+        };
+      }
+    })
+    .addCase(fetchMetaData.pending, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      if (task) task.metaData.loading = true;
+    })
+    .addCase(fetchMetaData.rejected, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      if (task) {
+        task.metaData.loading = false;
+        task.metaData.error = "Failed to fetch metadata";
+      }
+    })
+    .addCase(fetchUmap.fulfilled, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      if (task) {
+        task.umap.data = action.payload;
+        task.umap.loading = false;
+        task.umap.error = null;
+      }
+    })
+    .addCase(fetchUmap.pending, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      if (task) task.umap.loading = true;
+    })
+    .addCase(fetchUmap.rejected, (state, action) => {
+      const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
+        ? state.tab?.workflowTasks.dataExploration
+        : null;
+      if (task) {
+        task.umap.loading = false;
+        task.umap.error = "Failed to fetch umap";
+      }
+    });
 };
 
-// Define the API path
-const apiPath = 'api/';
-
-const api = axios.create({
-  baseURL: '/api', // Let Nginx handle the proxy
-  withCredentials: true, // If authentication is needed
-});
-
-
-const handleMultiTimeSeriesData = (payload : any) => {
-    const fileData = JSON.parse(payload.data);
-    const seriesData = payload.fileNames;
-    const flatFileData =  fileData.flatMap((file: any, id:number)=> {
-      return file.map((row: any) => {
-        return { 
-          ...row,
-          timestamp: new Date(row.timestamp), // Ensure timestamp is parsed as Date object
-          value: +row.f3, // Ensure value is a number
-          series: seriesData[id].replace('.csv', '') // Strip the .csv extension for series name
-        };
-      });
-    });
-    return flatFileData;
-  }
-  
-// Create an async thunk for fetching data exploration
-export const fetchDataExploration = createAsyncThunk(
-    'dataExploration/fetchData',
-    async (payload: IDataExplorationRequest) => {
-        const requestUrl = `visualization/data`;
-        return api.post<any>(requestUrl, payload).then((response) => response.data);
-    }
+export const fetchDataExplorationData = createAsyncThunk(
+  "workflowTasks/data_exploration/fetch_data",
+  async (payload: IDataExplorationRequest) => {
+    const requestUrl = "data/tabular";
+    return api
+      .post<IDataExplorationResponse>(requestUrl, payload.query)
+      .then(response => response.data);
+  },
 );
 
-export const fetchMultipleTimeseries = createAsyncThunk('dataExploration/fetch_multiple_timeseries',
-    async (payload: {dataQuery: IDataExplorationRequest} ) => {
-      const requestUrl = "visualization/data";
-      return api.post<any>(requestUrl, payload.dataQuery).then((response) => response.data);
-  });
-  
+export const fetchMetaData = createAsyncThunk(
+  "workflowTasks/data_exploration/fetch_metadata",
+  async (payload: IMetaDataRequest) => {
+    const requestUrl = "data/metadata";
+    return api
+      .post<IDataExplorationMetaDataResponse>(requestUrl, payload.query)
+      .then(response => response.data);
+  },
+);
 
-// Create the slice
-export const dataExplorationSlice = createSlice({
-    name: "dataExploration",
-    initialState,
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchDataExploration.fulfilled, (state, action) => {
-                state.dataExploration = action.payload;
-                state.loading = false;
-                ////Added this
-                state.initLoading = false;  // Update initLoading state
-                state.error = null;  // Clearing error on success
-            })
-            .addCase(fetchDataExploration.pending, (state) => {
-                state.loading = true;
-                state.error = null;  // Resetting the error on new request
-            })
-            .addCase(fetchMultipleTimeseries.fulfilled, (state, action) => {
-                state.loading = false;
-                state.multipleTimeSeries = handleMultiTimeSeriesData(action.payload);
-                state.initLoading = false;  // Update initLoading state
-              })
-              ////added this
-              .addCase(fetchMultipleTimeseries.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchDataExploration.rejected, (state, action) => {
-                state.initLoading = false;
-                ////Added This
-                state.loading = false;
-                state.error = action.error.message || "Failed to fetch data";
-            })
-            ////Added This
-            .addCase(fetchMultipleTimeseries.rejected, (state, action) => {
-              state.loading = false;
-              state.initLoading = false;
-              state.error = action.error.message || "Failed to fetch timeseries data";
-          });
-
-            
-    }
-});
-
-// Export the actions and reducer
-export const { } = dataExplorationSlice.actions
-export default dataExplorationSlice.reducer;
+export const fetchUmap = createAsyncThunk(
+  "workflowTasks/data_exploration/fetch_umap",
+  async (payload: { data: number[][]; metadata: any }) => {
+    const requestUrl = "data/umap";
+    return api
+      .post<any>(requestUrl, payload.data)
+      .then(response => response.data);
+  },
+);

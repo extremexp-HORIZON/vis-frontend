@@ -4,7 +4,7 @@ import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect } from "react"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 import HeatMapControlPanel from "../ChartControls/data-exploration-heatmap-control"
 

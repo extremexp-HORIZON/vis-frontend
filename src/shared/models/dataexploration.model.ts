@@ -15,7 +15,7 @@ export interface IDataExplorationQuery {
 export interface IDataExplorationRequest {
   query: IDataExplorationQuery
   metadata: {
-    workflowId: string | number
+    workflowId: string
     queryCase: any
   }
 }
@@ -27,14 +27,14 @@ export interface IMetaDataQuery{
 export interface IMetaDataRequest {
   query: IMetaDataQuery
   metadata: {
-    workflowId: string | number
+    workflowId: string
     queryCase: any
   }
 }
 
 
 export interface fetchAffectedRequest{
-    workflowId: string | number
+    workflowId: string
     queryCase: any
 }
 

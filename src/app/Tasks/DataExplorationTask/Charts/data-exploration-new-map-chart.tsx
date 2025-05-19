@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import "leaflet/dist/leaflet.css"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 import L from "leaflet"
 // @ts-ignore

@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 import {
   dataExplorationDefault,
-  fetchMetaData,
 } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { fetchMetaData } from "../../../../store/slices/dataExplorationSlice"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 import LeftPanel from "./data-exploration-left-panel"

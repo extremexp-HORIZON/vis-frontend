@@ -4,8 +4,8 @@ import { useAppSelector, useAppDispatch } from "../../../../store/store"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import { Box, useTheme, useMediaQuery,  } from "@mui/material"
 import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
-import { fetchUmap } from "../../../../shared/models/tasks/data-exploration-task.model"
 import Loader from "../../../../shared/components/loader"
+import { fetchUmap } from "../../../../store/slices/dataExplorationSlice"
 
 const Uchart = () => {
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab)

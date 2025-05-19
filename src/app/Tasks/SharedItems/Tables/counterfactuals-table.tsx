@@ -5,7 +5,6 @@ import { styled } from "@mui/material/styles"
 import { useEffect, useState } from "react"
 import type { RootState } from "../../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { fetchModelAnalysisExplainabilityPlot } from "../../../../shared/models/tasks/model-analysis.model"
 import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
 import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
 import { Tab, Tabs } from "@mui/material"
@@ -14,6 +13,7 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import ClosableCardTable from "../../../../shared/components/closable-card-table"
 import Loader from "../../../../shared/components/loader"
+import { fetchModelAnalysisExplainabilityPlot } from "../../../../store/slices/explainabilitySlice"
 
 interface ITableComponent {
   children?: React.ReactNode

@@ -5,8 +5,8 @@ import InfoMessage from "../../../../shared/components/InfoMessage"
 import AssessmentIcon from "@mui/icons-material/Assessment"
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect } from "react"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
+import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const BarChart = () => {

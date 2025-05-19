@@ -12,7 +12,7 @@ import RocCurvePlot from "../../Tasks/ModelAnalysisTask/plots/roc-curve-plot"
 import ClassificationReportTable from "../../Tasks/ModelAnalysisTask/plots/classification-report-table"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
 import { useEffect } from "react"
-import { fetchModelSummary } from "../../../shared/models/tasks/model-analysis.model"
+import { fetchModelSummary } from "../../../store/slices/modelAnalysisSlice"
 import { useParams } from "react-router-dom"
 import { InfoOutlined } from "@mui/icons-material"
 import Loader from "../../../shared/components/loader"
@@ -94,7 +94,7 @@ const ModelDetails = () => {
               <DetailsCardItem
                 key={split}
                 label={split.charAt(0).toUpperCase() + split.slice(1)}
-                value={size}
+                value={size as number}
               />
             ))
           )}

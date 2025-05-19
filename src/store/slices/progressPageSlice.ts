@@ -196,36 +196,6 @@ export const progressPageSlice = createSlice({
         state.workflowEvaluation.loading = false
         state.workflowEvaluation.error = action.error.message || "Error while fetching data"
       })
-      .addCase(fetchWorkflowWithRating.fulfilled, (state, action) => {
-        const { workflow }: {workflow: IRun} = action.payload;
-        const index = state.workflows.data.findIndex(w => w.id === workflow.id);
-      
-        if (index !== -1) {
-          const currentWorkflow = state.workflows.data[index];
-      
-          const currentRating = currentWorkflow.metrics.find(m => m.name === "rating")?.value;
-          const newRating = workflow.metrics.find(m => m.name === "rating")?.value;
-      
-          const isRatingChanged = currentRating !== newRating && newRating !== undefined;
-      
-          if (isRatingChanged) {
-            state.workflows.data[index] = workflow;
-          }
-          // Skip update if no relevant change (prevents flicker)
-        } else {
-          state.workflows.data.push(workflow);
-        }
-      
-        state.workflows.loading = false;
-        state.workflows.error = null;
-      })
-      .addCase(fetchWorkflowWithRating.pending, state => {
-        state.workflows.loading = true;
-      })
-      .addCase(fetchWorkflowWithRating.rejected, (state, action) => {
-        state.workflows.loading = false;
-        state.workflows.error = action.error.message || "Error while fetching single workflow";
-      })      
   },
 })
 
@@ -270,42 +240,6 @@ export const fetchExperimentWorkflows = createAsyncThunk(
 // })
 
 // Calls for Workflow Actions
-
-export const fetchWorkflowWithRating = createAsyncThunk(
-  "progressPage/fetch_workflow_with_rating",
-  async ({ experimentId, workflowId }: { experimentId: string; workflowId: string }) => {
-    const key = `workflows-${experimentId}`;
-    const requestUrl = `${experimentId}/runs/${workflowId}`;
-    const res = await experimentApi.get(requestUrl);
-    const updatedWorkflow = res.data
-
-    // Update the localStorage cache
-    const cached = getCache<IRun[]>(key);
-    if (cached) {
-      const index = cached.findIndex(w => w.id === workflowId);
-      let updatedList: IRun[];
-    
-      if (index !== -1) {
-        const currentWorkflow = cached[index];
-        const currentRating = currentWorkflow.metrics.find(m => m.name === "rating")?.value;
-        const newRating = updatedWorkflow.metrics.find((m: IMetric) => m.name === "rating")?.value;
-        const isRatingChanged = currentRating !== newRating && newRating !== undefined;
-
-        if (isRatingChanged) {
-          updatedList = [...cached];
-          updatedList[index] = updatedWorkflow;
-          setCache(key, updatedList);
-        }
-      } else {
-        // Append new workflow
-        updatedList = [...cached, updatedWorkflow];
-        setCache(key, updatedList);
-      }
-    }
-
-    return { experimentId, workflow: updatedWorkflow };
-  }
-);
 
 // TODO: Test this once the reordering changes are done
 export const workflowsReordering = createAsyncThunk(

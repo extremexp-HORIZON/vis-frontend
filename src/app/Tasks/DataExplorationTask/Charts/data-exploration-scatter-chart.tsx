@@ -9,7 +9,7 @@ import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-
 import Uchart from "./data-exploration-u-chart"
 import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
 
 const getColumnType = (columnType: string, fieldName?: string) => {
   if (fieldName?.toLowerCase() === "timestamp") return "temporal"

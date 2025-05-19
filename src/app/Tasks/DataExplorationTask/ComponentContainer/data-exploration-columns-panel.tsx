@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material"
 import { setControls } from "../../../../store/slices/workflowPageSlice"
-import { fetchDataExplorationData } from "../../../../shared/models/tasks/data-exploration-task.model"
+import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
 import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
 import { useEffect, useState } from "react"
 import TableRowsIcon from "@mui/icons-material/TableRows"
