@@ -23,8 +23,9 @@ const MapCardWrapper = () => {
 
   return (
     <ResponsiveCardTable
-      title={useHeatmap ? "Heatmap" : "Map"}
+      title={useHeatmap ? "Map (Heat View)" : "Map (Point View)"}
       controlPanel={<MapControls />}
+
     >
       {shouldShowInfoMessage ? info : <MapChart />}
     </ResponsiveCardTable>

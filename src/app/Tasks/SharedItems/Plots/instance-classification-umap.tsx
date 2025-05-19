@@ -1,22 +1,136 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import _ from "lodash"
-import { CircularProgress, useMediaQuery, useTheme } from "@mui/material"
+import { Box, CircularProgress, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, useMediaQuery, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import Loader from "../../../../shared/components/loader"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
 import { fetchUmap } from "../../../../store/slices/dataExplorationSlice"
+import ShowChartIcon from "@mui/icons-material/ShowChart"
+
+
+interface ControlPanelProps {
+  xAxisOption: string
+  yAxisOption: string
+  setXAxisOption: (val: string) => void
+  setYAxisOption: (val: string) => void
+  showMisclassifiedOnly: boolean
+  options: string[]
+  plotData: any
+  useUmap: boolean
+  setUseUmap: Dispatch<SetStateAction<boolean>>
+}
+
+const ControlPanel = ({
+  xAxisOption,
+  yAxisOption,
+  setXAxisOption,
+  setYAxisOption,
+  options,
+  plotData,
+  useUmap,
+  setUseUmap
+}: ControlPanelProps) => {
+  const handleAxisSelection =
+    (axis: "x" | "y") => (e: { target: { value: string } }) => {
+      if (axis === "x") setXAxisOption(e.target.value)
+      else setYAxisOption(e.target.value)
+    }
+
+  return (
+    <>
+      <Box sx={{ display: "flex", flexDirection: "row", gap: 2, px: 1.5 }}>
+        {/* X-Axis Selector */}
+        <FormControl fullWidth disabled>
+            <InputLabel id="x-axis-select-label">
+              <Box display="flex" alignItems="center" gap={1}>
+                <ShowChartIcon fontSize="small" />
+                X-Axis
+              </Box>
+            </InputLabel>
+            <Select
+              labelId="x-axis-select-label"
+              label="X-Axis-----"
+              disabled={plotData?.loading || !plotData?.data}
+              value={xAxisOption}
+              onChange={handleAxisSelection("x")}
+              MenuProps={{
+                PaperProps: { style: { maxHeight: 224, width: 250 } },
+              }}
+            >
+              {options
+                .filter(option => option !== yAxisOption)
+                .map((feature, idx) => (
+                  <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
+                    {feature}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth disabled>
+            <InputLabel id="y-axis-select-label">
+              <Box display="flex" alignItems="center" gap={1}>
+                <ShowChartIcon fontSize="small" />
+                Y-Axis
+              </Box>
+            </InputLabel>
+            <Select
+              labelId="y-axis-select-label"
+              label="Y-Axis-----"
+              disabled={plotData?.loading || !plotData?.data}
+              value={xAxisOption}
+              onChange={handleAxisSelection("y")}
+              MenuProps={{
+                PaperProps: { style: { maxHeight: 224, width: 250 } },
+              }}
+            >
+              {options
+                .filter(option => option !== yAxisOption)
+                .map((feature, idx) => (
+                  <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
+                    {feature}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+          <FormControlLabel
+  control={
+    <Switch
+      checked={useUmap}
+      onChange={(e) => setUseUmap(e.target.checked)}
+      color="primary"
+    />
+  }
+  label="Use UMAP View"
+/>
+
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          px: 1.5,
+        }}
+      >
+      </Box>
+    </>
+  )
+}
 interface Umapi {
   
   point: any
   showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<any>>
   hashRow: (row: any) => string
+  useUmap: boolean
+  setuseUmap: Dispatch<SetStateAction<boolean>>
 }
 
 const InstanceClassificationUmap = (props: Umapi) => {
   const theme = useTheme()
-  const { setPoint, point, showMisclassifiedOnly, hashRow } = props
+  const { setPoint, point, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props
     const tab = useAppSelector((state: RootState) => state.workflowPage.tab)
     const raw = tab?.workflowTasks.modelAnalysis?.modelInstances.data
     const parsedData = typeof raw === "string" ? JSON.parse(raw) : raw
@@ -202,9 +316,20 @@ const handleNewView = (view: any) => {
       onNewView={handleNewView}
       infoMessage={info}
       showInfoMessage={shouldShowInfoMessage}
-          aspectRatio={isSmallScreen ? 2.8 : 1.8}
+          aspectRatio={2}
       maxHeight={480}
       isStatic={true}
+      controlPanel={
+        <ControlPanel
+          xAxisOption={""}
+          yAxisOption={""}
+          setXAxisOption={() => {}}
+          setYAxisOption={() => {}}
+          showMisclassifiedOnly={showMisclassifiedOnly}
+          options={[]}
+          plotData={null} useUmap={useUmap} setUseUmap={setuseUmap}          
+        />
+      }
 
 
        

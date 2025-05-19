@@ -111,37 +111,7 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
 
   
   const handleExportCsv = () => {
-    if (!rows || rows.length === 0) return
-
-    const headers = selectedColumns.map(col => col.name)
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row: any) =>
-        headers
-          .map(header => {
-            const value = row[header]
-            // Handle values with commas by wrapping in quotes
-            return typeof value === "string" && value.includes(",")
-              ? `"${value}"`
-              : value !== undefined && value !== null
-                ? value
-                : ""
-          })
-          .join(","),
-      ),
-    ].join("\n")
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.setAttribute("href", url)
-    link.setAttribute(
-      "download",
-      `data-table-export-${new Date().toISOString().split("T")[0]}.csv`,
-    )
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    return
   }
 
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
@@ -263,7 +233,7 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
             onChange={e => setShowMisclassifiedOnly(e.target.checked)}
             disabled={
               tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ||
-              !tab.workflowTasks.modelAnalysis?.modelInstances?.data
+              !tab?.workflowTasks.modelAnalysis?.modelInstances?.data
             }
           />
         </Stack>
@@ -298,14 +268,6 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
               onClick={() => dispatch(setControls({ chartType: "scatter" }))}
             >
               <ScatterPlotIcon />
-            </Button>
-          </Tooltip>
-          <Tooltip title="Umap">
-            <Button
-              variant={chartType === "umap" ? "contained" : "outlined"}
-              onClick={() => dispatch(setControls({ chartType: "umap" }))}
-            >
-              <LensBlurIcon />
             </Button>
           </Tooltip>
         </ButtonGroup>

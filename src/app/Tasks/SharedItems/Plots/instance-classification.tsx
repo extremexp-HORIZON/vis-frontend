@@ -6,9 +6,10 @@ import MenuItem from "@mui/material/MenuItem"
 import type { Dispatch, SetStateAction } from "react"
 import { useEffect, useState } from "react"
 import _ from "lodash"
-import { CircularProgress, InputLabel, useTheme } from "@mui/material"
+import { CircularProgress, FormControlLabel, InputLabel, Switch, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import ShowChartIcon from "@mui/icons-material/ShowChart"
+import InstanceClassificationUmap from "./instance-classification-umap"
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -18,6 +19,8 @@ interface ControlPanelProps {
   showMisclassifiedOnly: boolean
   options: string[]
   plotData: any
+  useUmap: boolean
+  setUseUmap: Dispatch<SetStateAction<boolean>>
 }
 
 const ControlPanel = ({
@@ -27,6 +30,8 @@ const ControlPanel = ({
   setYAxisOption,
   options,
   plotData,
+  useUmap,
+  setUseUmap
 }: ControlPanelProps) => {
   const handleAxisSelection =
     (axis: "x" | "y") => (e: { target: { value: string } }) => {
@@ -90,6 +95,26 @@ const ControlPanel = ({
                 ))}
             </Select>
           </FormControl>
+          </Box>
+          
+          
+          <Box  sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            mt: 2,
+          }}>
+
+          <FormControlLabel
+  control={
+    <Switch
+      checked={useUmap}
+      onChange={(e) => setUseUmap(e.target.checked)}
+      color="primary"
+    />
+  }
+  label="Use UMAP View"
+/>
+
       </Box>
 
       <Box
@@ -128,6 +153,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const [options, setOptions] = useState<string[]>([])
   const [xAxisOption, setXAxisOption] = useState<string>("")
   const [yAxisOption, setYAxisOption] = useState<string>("")
+  const [useUmap, setUseUmap] = useState(false)
+
 
   // const getVegaData = (data: any) => {
   //   let newData: any[] = _.cloneDeep(data)
@@ -197,6 +224,15 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const shouldShowInfoMessage = plotData?.loading || !plotData?.data
 
   return (
+    useUmap ? (
+   <InstanceClassificationUmap
+          point={point}
+          showMisclassifiedOnly={showMisclassifiedOnly}
+          setPoint={setPoint}
+          hashRow={hashRow} useUmap={useUmap} setuseUmap={setUseUmap } />
+
+    
+) : (
     <ResponsiveCardVegaLite
       spec={{
         width: "container",
@@ -310,6 +346,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
           ]
         },
       }}
+
       title={"Instance Classification Chart"}
       actions={false}
       controlPanel={
@@ -320,7 +357,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
           setYAxisOption={setYAxisOption}
           showMisclassifiedOnly={showMisclassifiedOnly}
           options={options}
-          plotData={plotData}
+          plotData={plotData} useUmap={useUmap} setUseUmap={setUseUmap}          
         />
       }
       onNewView={handleNewView}
@@ -330,6 +367,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
       maxHeight={480}
       isStatic={true}
     />
+)
+
   )
 }
 
