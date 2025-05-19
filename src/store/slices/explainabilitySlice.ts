@@ -1,9 +1,9 @@
 import { createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import type { ActionReducerMapBuilder } from "@reduxjs/toolkit";
-import { FetchExplainabilityPlotPayload } from "../../shared/models/tasks/explainability.model";
+import type { FetchExplainabilityPlotPayload } from "../../shared/models/tasks/explainability.model";
 import { api } from "../../app/api/api";
-import { IWorkflowPage } from "./workflowPageSlice";
-import { IModelAnalysis } from "../../shared/models/tasks/model-analysis.model";
+import type { IWorkflowPage } from "./workflowPageSlice";
+import type { IModelAnalysis } from "../../shared/models/tasks/model-analysis.model";
 
 // Thunk
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(

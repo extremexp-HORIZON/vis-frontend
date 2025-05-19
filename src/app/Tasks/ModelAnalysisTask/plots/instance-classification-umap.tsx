@@ -1,9 +1,11 @@
 
-import { Dispatch, SetStateAction, useEffect } from "react"
+import type { Dispatch, SetStateAction} from "react";
+import { useEffect } from "react"
 import { Box, FormControl, InputLabel, MenuItem, Select, Switch, Typography, useMediaQuery, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import Loader from "../../../../shared/components/loader"
-import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
+import type { RootState} from "../../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { fetchUmap } from "../../../../store/slices/dataExplorationSlice"
 import ShowChartIcon from "@mui/icons-material/ShowChart"
 
