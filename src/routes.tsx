@@ -8,7 +8,6 @@ import ProgressPageLoading from "./app/ProgressPage/progress-page-loading";
 import LoginPage from "./app/LoginPage/login-page";
 import ProtectedRoute from "./protected-route";
 import TokenAuthHandler from "./token-auth-handler";
-import CompareCompleted from "./app/ProgressPage/CompareTab/CompareCompleted/compare-completed";
 
 const routes = createBrowserRouter([
   {

@@ -10,7 +10,6 @@ import DatasetIcon from "@mui/icons-material/Dataset"
 import Grid3x3Icon from "@mui/icons-material/Grid3x3"
 import BarChartIcon from "@mui/icons-material/BarChart"
 import theme from "../../../mui-theme"
-import ModelAnalysisTask from "../../Tasks/ModelAnalysisTask/model-analysis-task"
 import ModelDetails from "./workflow-model-details"
 import InstanceView from "./workflow-instance-view"
 import HyperparameterImpact from "./workflow-hyperparameter-impact"
@@ -18,6 +17,7 @@ import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
+import FeatureExplainability from "./workflow-feature-explainability"
 
 
 const SelectedItemViewer = () => {
@@ -146,11 +146,11 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
         <Header 
-          title={`Feature Effects`}
+          title={`Feature Explainability`}
           icon={<InsightsIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>
-          <ModelAnalysisTask />
+          <FeatureExplainability />
         </Box>
       </Box>
     )
@@ -160,7 +160,7 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{height: "100%", display: "flex", flexDirection: "column"}}>
         <Header 
-          title={`Hyperparameter Impact`}
+          title={`ML Hyperparameter Explainability`}
           icon={<PermDataSettingIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: "auto" }}>

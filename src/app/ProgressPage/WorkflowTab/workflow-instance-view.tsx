@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react"
-import InstanceClassification from "../../Tasks/SharedItems/Plots/instance-classification"
+import InstanceClassification from "../../Tasks/ModelAnalysisTask/plots/instance-classification"
 import type { RootState } from "../../../store/store"
 import { useAppDispatch, useAppSelector } from "../../../store/store"
-import CounterfactualsTable from "../../Tasks/SharedItems/Tables/counterfactuals-table"
+import CounterfactualsTable from "../../Tasks/ModelAnalysisTask/tables/counterfactuals-table"
 import { useParams } from "react-router-dom"
 import {
   ButtonGroup,
@@ -24,7 +24,7 @@ import ResponsiveCardTable from "../../../shared/components/responsive-card-tabl
 import Loader from "../../../shared/components/loader"
 import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
 import LensBlurIcon from '@mui/icons-material/LensBlur';
-import InstanceClassificationUmap from "../../Tasks/SharedItems/Plots/instance-classification-umap"
+import InstanceClassificationUmap from "../../Tasks/ModelAnalysisTask/plots/instance-classification-umap"
 import { getLabelTestInstances } from "../../../store/slices/modelAnalysisSlice"
 
 const InstanceView = () => {
