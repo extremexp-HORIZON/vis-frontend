@@ -1,7 +1,7 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import _ from "lodash"
-import { Box, CircularProgress, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, useMediaQuery, useTheme } from "@mui/material"
+import { Box, CircularProgress, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, Typography, useMediaQuery, useTheme } from "@mui/material"
 import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
 import Loader from "../../../../shared/components/loader"
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store"
@@ -93,28 +93,29 @@ const ControlPanel = ({
                 ))}
             </Select>
           </FormControl>
-          <FormControlLabel
-  control={
+          </Box>           <Box sx={{ display: "flex", alignItems: "center", gap: 0.2 }}>
+
+           <Typography 
+                variant="caption" 
+                sx={{ 
+                  fontWeight: 500,
+                 
+                }}
+              >
+                UMAP
+              </Typography>
+        
     <Switch
       checked={useUmap}
       onChange={(e) => setUseUmap(e.target.checked)}
       color="primary"
     />
-  }
-  label="Use UMAP View"
-/>
+  
 
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          px: 1.5,
-        }}
-      >
-      </Box>
+      
+  
     </>
   )
 }
