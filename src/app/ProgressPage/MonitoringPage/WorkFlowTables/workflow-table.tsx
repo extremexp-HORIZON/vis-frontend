@@ -466,7 +466,6 @@ export default function WorkflowTable() {
           ...(key === "rating" && {
             renderCell: params => {
               const currentRating = params.row.rating
-              console.log("rating:", currentRating)
               return (
                 <WorkflowRating
                 //here must be the workflow id that i selected somehow

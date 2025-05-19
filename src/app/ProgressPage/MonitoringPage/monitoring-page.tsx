@@ -1,5 +1,5 @@
 import { Box, Tab, Tabs, Paper } from "@mui/material"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useEffect, useRef } from "react"
 import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
 import WorkflowTable from "./WorkFlowTables/workflow-table"

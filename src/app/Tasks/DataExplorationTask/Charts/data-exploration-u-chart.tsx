@@ -51,8 +51,6 @@ const Uchart = () => {
       x: point[0],
       y: point[1],
     })) || [] // Fallback to empty array if any part is null/undefined
-  console.log("Full umap object:", tab?.workflowTasks.dataExploration?.umap)
-  console.log("UMAP data:", tab?.workflowTasks.dataExploration?.umap?.data)
   const info = (
     <Loader/>
   )

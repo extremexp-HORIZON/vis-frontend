@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-// import ThumbUpIcon from "@mui/icons-material/ThumbUp"
 import { styled } from "@mui/material/styles"
 import { useEffect, useState } from "react"
 import type { RootState } from "../../../../store/store"
@@ -71,10 +70,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
   }
   
   const query = convertToPythonStyleString(point);
-  console.log("query,", query)
-  
-  
-  console.log("point,", point)
+
   useEffect(() => {
     if (activeTab === 0 && isTabInitialized) {
       dispatch(

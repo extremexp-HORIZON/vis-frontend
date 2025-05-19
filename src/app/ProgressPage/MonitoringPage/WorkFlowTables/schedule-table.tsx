@@ -10,7 +10,7 @@ import type { RootState} from "../../../../store/store";
 import { useAppDispatch, useAppSelector } from "../../../../store/store"
 import { useEffect, useRef, useState } from "react"
 import { setScheduledTable } from "../../../../store/slices/monitorPageSlice"
-import type { GridRowSelectionModel, GridColumnNode } from "@mui/x-data-grid"
+import type { GridColumnNode } from "@mui/x-data-grid"
 import { DataGrid } from "@mui/x-data-grid"
 import theme from "../../../../mui-theme"
 import InfoMessage from "../../../../shared/components/InfoMessage"

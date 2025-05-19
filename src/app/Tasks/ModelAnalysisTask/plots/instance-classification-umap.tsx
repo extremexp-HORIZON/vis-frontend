@@ -212,8 +212,6 @@ const handleNewView = (view: any) => {
     <Loader/>
   )
   const shouldShowInfoMessage = tab?.workflowTasks.dataExploration?.umap.loading && !tab?.workflowTasks.dataExploration?.umap.data
-    // console.log("InstanceClassification plotData", plotData)
-    // console.log("getVegaData(plotData?.data ?? [])", getVegaData(plotData?.data ?? []))
   return (
     <ResponsiveCardVegaLite
       spec={{

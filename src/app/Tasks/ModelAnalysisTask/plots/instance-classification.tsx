@@ -145,7 +145,6 @@ const theme = useTheme()
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))  
   const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props
-  console.log("InstanceClassification plotData", plotData)
   const [options, setOptions] = useState<string[]>([])
   const [xAxisOption, setXAxisOption] = useState<string>("")
   const [yAxisOption, setYAxisOption] = useState<string>("")

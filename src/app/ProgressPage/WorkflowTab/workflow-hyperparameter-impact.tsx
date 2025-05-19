@@ -1,32 +1,10 @@
 import { useState } from "react";
-import type { IRun } from "../../../shared/models/experiment/run.model";
-import type { RootState} from "../../../store/store";
-import { useAppSelector } from "../../../store/store";
 import { Box, Button, ButtonGroup, Grid } from "@mui/material";
 import PdpPlot from "../../Tasks/ModelAnalysisTask/plots/pdp-plot";
 import AlePlot from "../../Tasks/ModelAnalysisTask/plots/ale-plot";
 
 const HyperparameterImpact = () => {
-    const { workflows } = useAppSelector(
-      (state: RootState) => state.progressPage,
-    ) 
-
     const [isMosaic, setIsMosaic] = useState(true)
-    const savedModelDataset = "metadata/proxy_data_models/I2Cat_workflow12.pkl"
-      
-      const workflowSavedModelParameters = workflow.params?.reduce((ac, param) => ({
-        ...ac,
-        [param.name]: {
-      values: param.value,
-        },
-      }), {})
-      //TODO: This should be an option for the user
-      const workflowSelectedMetric = workflow.metrics[0].value
-      return {
-        ...acc,
-        [savedModelDataset || ""]: {hyperparameter: workflowSavedModelParameters, metric_value: workflowSelectedMetric},
-      }
-    }, {})}
     
     return (
         <Box>

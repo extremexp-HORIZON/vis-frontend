@@ -81,7 +81,6 @@ const MapChart = () => {
 
     markerLayerRef.current = L.layerGroup().addTo(leafletMapRef.current)
   }, [lat, lon, colorByMap, data, filters])
-  console.log("data", data)
 
   useEffect(() => {
     if (!data.length || !colorByMap || colorByMap === "None") return
