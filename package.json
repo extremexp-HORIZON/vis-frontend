@@ -12,7 +12,13 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "lint:src/app": "eslint src/app",
+    "lint:src/shared": "eslint src/shared",
+    "lint:src/store": "eslint src/store"
+
+
+
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

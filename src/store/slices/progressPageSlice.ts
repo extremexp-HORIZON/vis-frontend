@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import type { IExperiment } from "../../shared/models/experiment/experiment.model"
 import type { IRun } from "../../shared/models/experiment/run.model"
 import type { IMetric } from "../../shared/models/experiment/metric.model"
-import { api, experimentApi } from "../../app/api/api"
+import { experimentApi } from "../../app/api/api"
 import axios from "axios"
 import { getCache, setCache } from "../../shared/utils/localStorageCache"
 
