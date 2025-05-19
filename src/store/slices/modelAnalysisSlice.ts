@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 import type { fetchAffectedRequest } from "../../shared/models/dataexploration.model";
-import { IWorkflowPage } from "./workflowPageSlice";
-import { IModelAnalysis } from "../../shared/models/tasks/model-analysis.model";
+import type { IWorkflowPage } from "./workflowPageSlice";
+import type { IModelAnalysis } from "../../shared/models/tasks/model-analysis.model";
 import { api, experimentApi } from "../../app/api/api";
 
 // Thunks

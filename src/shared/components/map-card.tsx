@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Card,
   CardContent,
@@ -122,7 +121,6 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
       
       // Adjust to fit exactly within the container with no overflow
       const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
-      const calculatedHeight = newWidth / aspectRatio
       const newHeight = Math.max(
         minHeight,
         Math.min(newWidth / aspectRatio, maxHeight),

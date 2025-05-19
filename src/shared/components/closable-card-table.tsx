@@ -8,7 +8,6 @@ import {
   Typography,
   Tooltip,
   Button,
-  useTheme,
 } from "@mui/material"
 import DownloadIcon from "@mui/icons-material/Download"
 import CloseIcon from "@mui/icons-material/Close"
@@ -46,7 +45,6 @@ const ClosableCardTable: React.FC<ClosableCardTableProps> = ({
   noPadding = false,
   details = null,
 }) => {
-  const theme = useTheme()
 
   const handleDownload = () => {
     if (onDownload) {

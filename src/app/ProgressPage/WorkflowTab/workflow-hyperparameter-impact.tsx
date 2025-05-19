@@ -5,7 +5,7 @@ import AlePlot from "../../Tasks/ModelAnalysisTask/plots/ale-plot";
 
 const HyperparameterImpact = () => {
     const [isMosaic, setIsMosaic] = useState(true)
-    
+   
     return (
         <Box>
             <Grid

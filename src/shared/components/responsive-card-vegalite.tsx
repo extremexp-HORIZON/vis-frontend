@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Card,
   CardContent,
@@ -20,14 +19,13 @@ import {
   DialogActions,
   useTheme,
   useMediaQuery,
-  CircularProgress,
 } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import type React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { VegaLite } from "react-vega"
 import SettingsIcon from "@mui/icons-material/Settings"
-import { grey, red } from "@mui/material/colors"
+import { grey } from "@mui/material/colors"
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
 import DownloadIcon from "@mui/icons-material/Download"
 import FullscreenIcon from "@mui/icons-material/Fullscreen"
@@ -147,7 +145,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       setWidth(newWidth)
       setHeight(newHeight)
     }
-  }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio])
+  }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio, isStatic])
 
   useEffect(() => {
     updateSize()
