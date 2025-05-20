@@ -1,4 +1,4 @@
-import type React from "react"
+import type React from 'react';
 import {
   Box,
   MenuItem,
@@ -8,28 +8,28 @@ import {
   FormControl,
   createTheme,
   ThemeProvider,
-} from "@mui/material"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { setControls } from "../../../../store/slices/workflowPageSlice"
-import CategoryIcon from "@mui/icons-material/Category"
-import BarChartIcon from "@mui/icons-material/BarChart"
-import FunctionsIcon from "@mui/icons-material/Functions"
+} from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { setControls } from '../../../../store/slices/workflowPageSlice';
+import CategoryIcon from '@mui/icons-material/Category';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import FunctionsIcon from '@mui/icons-material/Functions';
 
 const HeatMapControlPanel = () => {
-  const dispatch = useAppDispatch()
-  const { tab } = useAppSelector(state => state.workflowPage)
+  const dispatch = useAppDispatch();
+  const { tab } = useAppSelector(state => state.workflowPage);
   const selectedColumn =
     tab?.workflowTasks.dataExploration?.controlPanel
-      .selectedMeasureColumnHeat || null
+      .selectedMeasureColumnHeat || null;
 
   // Handler for updating aggregation rules for a column
   const handleAggregationChange = (
     event: React.ChangeEvent<{ value: unknown }>,
   ) => {
-    const value = event.target.value as string[]
-    if (!selectedColumn) return
+    const value = event.target.value as string[];
+    if (!selectedColumn) return;
     const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {};
 
     dispatch(
       setControls({
@@ -38,31 +38,31 @@ const HeatMapControlPanel = () => {
           [selectedColumn]: value,
         },
       }),
-    )
-  }
+    );
+  };
 
   const getAggregationOptions = () => {
-    if (!selectedColumn) return []
+    if (!selectedColumn) return [];
     const column =
       tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(
         col => col.name === selectedColumn,
-      )
-    return column?.type === "DOUBLE" ||
-      column?.type === "FLOAT" ||
-      column?.type === "INTEGER"
-      ? ["Avg", "Min", "Max", "Count"]
-      : ["Count"]
-  }
+      );
+    return column?.type === 'DOUBLE' ||
+      column?.type === 'FLOAT' ||
+      column?.type === 'INTEGER'
+      ? ['Avg', 'Min', 'Max', 'Count']
+      : ['Count'];
+  };
 
-  const aggregationOptions = getAggregationOptions()
+  const aggregationOptions = getAggregationOptions();
 
   const handleAggregationDelete = (toDelete: string) => {
-    if (!selectedColumn) return
+    if (!selectedColumn) return;
     const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {}
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {};
     const updated = (currentAgg[selectedColumn] || []).filter(
       (agg: string) => agg !== toDelete,
-    )
+    );
 
     dispatch(
       setControls({
@@ -71,33 +71,33 @@ const HeatMapControlPanel = () => {
           [selectedColumn]: updated,
         },
       }),
-    )
-  }
+    );
+  };
 
   // Custom theme
   const theme = createTheme({
     palette: {
-      primary: { main: "#1976d2" },
-      secondary: { main: "#dc004e" },
+      primary: { main: '#1976d2' },
+      secondary: { main: '#dc004e' },
     },
     typography: {
-      fontFamily: "Arial",
+      fontFamily: 'Arial',
       h6: { fontWeight: 600 },
     },
     components: {
       MuiButton: {
-        styleOverrides: { root: { borderRadius: "20px" } },
+        styleOverrides: { root: { borderRadius: '20px' } },
       },
     },
-  })
+  });
 
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          display: "flex",
-          gap: "1rem",
-          flexDirection: "column",
+          display: 'flex',
+          gap: '1rem',
+          flexDirection: 'column',
         }}
       >
         {/* Group By Selection */}
@@ -116,12 +116,12 @@ const HeatMapControlPanel = () => {
               []
             }
             onChange={e => {
-              const selected = e.target.value as string[]
+              const selected = e.target.value as string[];
               if (selected.length <= 2) {
-                dispatch(setControls({ barGroupByHeat: selected }))
+                dispatch(setControls({ barGroupByHeat: selected }));
               }
             }}
-            renderValue={(selected: any) => selected.join(", ")}            
+            renderValue={(selected: any) => selected.join(', ')}            
             MenuProps={{
               PaperProps: {
                 style: { maxHeight: 224, width: 250 },
@@ -130,7 +130,7 @@ const HeatMapControlPanel = () => {
           >
             {/* <MenuItem value="Not Group">Not Group</MenuItem> */}
             {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type === "STRING")
+              .filter(col => col.type === 'STRING')
               .map(col => (
                 <MenuItem
                   key={col.name}
@@ -159,12 +159,12 @@ const HeatMapControlPanel = () => {
           </InputLabel>
           <Select
             label="Measure (Value Column)-----"
-            value={selectedColumn || ""}
+            value={selectedColumn || ''}
             onChange={e => {
-              const newColumn = e.target.value as string
+              const newColumn = e.target.value as string;
               const currentAgg =
                 tab?.workflowTasks.dataExploration?.controlPanel
-                  .barAggregationHeat || {}
+                  .barAggregationHeat || {};
 
               // Clear previous aggregation and set new selected column
               dispatch(
@@ -174,14 +174,14 @@ const HeatMapControlPanel = () => {
                     [newColumn]: [], // Reset aggregation for new column
                   },
                 }),
-              )
+              );
             }}
             MenuProps={{
               PaperProps: { style: { maxHeight: 224, width: 250 } },
             }}
           >
             {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type !== "LOCAL_DATE_TIME")
+              .filter(col => col.type !== 'LOCAL_DATE_TIME')
               .map(col => (
                 <MenuItem key={col.name} value={col.name}>
                   {col.name}
@@ -203,14 +203,14 @@ const HeatMapControlPanel = () => {
               label="Apply Aggregation-----"
               value={
                 tab?.workflowTasks.dataExploration?.controlPanel
-                  .barAggregationHeat[selectedColumn]?.[0] || ""
+                  .barAggregationHeat[selectedColumn]?.[0] || ''
               }
               onChange={event => {
-                const value = event.target.value as string
-                if (!selectedColumn) return
+                const value = event.target.value as string;
+                if (!selectedColumn) return;
                 const currentAgg =
                   tab?.workflowTasks.dataExploration?.controlPanel
-                    .barAggregationHeat || {}
+                    .barAggregationHeat || {};
 
                 dispatch(
                   setControls({
@@ -219,7 +219,7 @@ const HeatMapControlPanel = () => {
                       [selectedColumn]: [value], // wrap in array since your state expects an array
                     },
                   }),
-                )
+                );
               }}
             >
               {aggregationOptions.map(rule => (
@@ -232,7 +232,7 @@ const HeatMapControlPanel = () => {
         )}
       </Box>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default HeatMapControlPanel
+export default HeatMapControlPanel;

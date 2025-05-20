@@ -10,7 +10,7 @@ export interface CredentialsResponse {
   refresh_expires_in: number
   token_type: string
   id_token: string
-  "not-before-policy": number
+  'not-before-policy': number
   session_state: string
   scope: string
 }
@@ -27,7 +27,7 @@ export interface UserInfoResponse {
   name: string
   preferred_username: string
   given_name: string
-  locale: "en"
+  locale: 'en'
   family_name: string
   email: string
 }

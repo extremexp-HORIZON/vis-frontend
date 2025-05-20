@@ -2,58 +2,58 @@ import {
   Box,
   Grid,
   Typography
-} from "@mui/material"
+} from '@mui/material';
 import {
   DetailsCard,
   DetailsCardItem,
-} from "../../../shared/components/details-card"
-import ConfusionMatrixPlot from "../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot"
-import RocCurvePlot from "../../Tasks/ModelAnalysisTask/plots/roc-curve-plot"
-import ClassificationReportTable from "../../Tasks/ModelAnalysisTask/tables/classification-report-table"
-import { useAppDispatch, useAppSelector } from "../../../store/store"
-import { useEffect } from "react"
-import { fetchModelSummary } from "../../../store/slices/modelAnalysisSlice"
-import { useParams } from "react-router-dom"
-import { InfoOutlined } from "@mui/icons-material"
-import Loader from "../../../shared/components/loader"
+} from '../../../shared/components/details-card';
+import ConfusionMatrixPlot from '../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot';
+import RocCurvePlot from '../../Tasks/ModelAnalysisTask/plots/roc-curve-plot';
+import ClassificationReportTable from '../../Tasks/ModelAnalysisTask/tables/classification-report-table';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { useEffect } from 'react';
+import { fetchModelSummary } from '../../../store/slices/modelAnalysisSlice';
+import { useParams } from 'react-router-dom';
+import { InfoOutlined } from '@mui/icons-material';
+import Loader from '../../../shared/components/loader';
 
 const LoadingOrEmpty = ({ loading, condition, message }: { loading: boolean; condition: boolean; message: string }) => {
   if (loading) {
     return (
       <Loader/>
-    )
+    );
   }
 
   if (condition) {
     return (
-      <Box sx={{ minHeight: 120, display: "flex", gap: 1, alignItems: "center", justifyContent: "center" }}>
+      <Box sx={{ minHeight: 120, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
         <InfoOutlined fontSize="small" color="disabled" />
         <Typography variant="body1">{message}</Typography>
       </Box>
-    )
+    );
   }
 
-  return null
-}
+  return null;
+};
 
 const ModelDetails = () => {
-  const { tab, isTabInitialized } = useAppSelector((state) => state.workflowPage)
-  const summary = tab?.workflowTasks?.modelAnalysis?.modelSummary
-  const dispatch = useAppDispatch()
-  const { experimentId } = useParams()
+  const { tab, isTabInitialized } = useAppSelector((state) => state.workflowPage);
+  const summary = tab?.workflowTasks?.modelAnalysis?.modelSummary;
+  const dispatch = useAppDispatch();
+  const { experimentId } = useParams();
 
   useEffect(() => {
     if (tab && experimentId) {
-      dispatch(fetchModelSummary({ experimentId, runId: tab.workflowId }))
+      dispatch(fetchModelSummary({ experimentId, runId: tab.workflowId }));
     }
-  }, [isTabInitialized])
+  }, [isTabInitialized]);
 
-  const isLoading = !!summary?.loading
-  const hasError = !!summary?.error
+  const isLoading = !!summary?.loading;
+  const hasError = !!summary?.error;
 
   return (
     <>
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 3, width: "100%" }}>
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3, width: '100%' }}>
         {/* Model Overview */}
         <DetailsCard title="Model Overview">
           <LoadingOrEmpty
@@ -72,7 +72,7 @@ const ModelDetails = () => {
               <DetailsCardItem label="Features" value={summary.data.numFeatures} />
               <DetailsCardItem
                 label="Classes"
-                value={summary.data.classLabels?.join(", ") || "-"}
+                value={summary.data.classLabels?.join(', ') || '-'}
               />
             </>
           )}
@@ -119,7 +119,7 @@ const ModelDetails = () => {
         </Grid>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default ModelDetails
+export default ModelDetails;

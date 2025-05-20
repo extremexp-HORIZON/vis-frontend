@@ -1,11 +1,11 @@
-import type { IDataAsset } from "./experiment/data-asset.model";
-import type { IMetric } from "./experiment/metric.model";
-import type { IParam } from "./experiment/param.model";
-import type { ITask } from "./experiment/task.model";
-import type { IDataExploration } from "./tasks/data-exploration-task.model";
-import type { IExplainability } from "./tasks/explainability.model";
-import type { IModelAnalysis } from "./tasks/model-analysis.model";
-import type { IUserInteraction } from "./tasks/user-interaction.model";
+import type { IDataAsset } from './experiment/data-asset.model';
+import type { IMetric } from './experiment/metric.model';
+import type { IParam } from './experiment/param.model';
+import type { ITask } from './experiment/task.model';
+import type { IDataExploration } from './tasks/data-exploration-task.model';
+import type { IExplainability } from './tasks/explainability.model';
+import type { IModelAnalysis } from './tasks/model-analysis.model';
+import type { IUserInteraction } from './tasks/user-interaction.model';
 
 export interface IWorkflowPageModel {
     workflowId: string;
@@ -46,8 +46,8 @@ export interface IWorkflowPageModel {
 }
 
 export const defaultWorkflowPageModel: IWorkflowPageModel = {
-    workflowId: "0",
-    workflowName: "",
+    workflowId: '0',
+    workflowName: '',
     workflowConfiguration: {
         tasks: null,
         dataAssets: null,
@@ -81,4 +81,4 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
         selectedTask: null, 
         selectedId: null
     }
-}
+};

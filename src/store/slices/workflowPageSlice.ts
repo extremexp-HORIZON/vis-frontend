@@ -1,22 +1,22 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type {
-  IWorkflowPageModel} from "../../shared/models/workflow.tab.model";
+  IWorkflowPageModel} from '../../shared/models/workflow.tab.model';
 import {
   defaultWorkflowPageModel,
-} from "../../shared/models/workflow.tab.model"
+} from '../../shared/models/workflow.tab.model';
 import {
   modelAnalysisDefault,
-} from "../../shared/models/tasks/model-analysis.model"
+} from '../../shared/models/tasks/model-analysis.model';
 import {
   dataExplorationDefault,
-} from "../../shared/models/tasks/data-exploration-task.model"
-import { userInteractionDefault } from "../../shared/models/tasks/user-interaction.model"
-import type { IRun } from "../../shared/models/experiment/run.model"
-import type { IMetric } from "../../shared/models/experiment/metric.model"
-import { experimentApi } from "../../app/api/api"
-import { dataExplorationReducers } from "./dataExplorationSlice";
-import { modelAnalysisReducers } from "./modelAnalysisSlice";
-import { explainabilityReducers } from "./explainabilitySlice";
+} from '../../shared/models/tasks/data-exploration-task.model';
+import { userInteractionDefault } from '../../shared/models/tasks/user-interaction.model';
+import type { IRun } from '../../shared/models/experiment/run.model';
+import type { IMetric } from '../../shared/models/experiment/metric.model';
+import { experimentApi } from '../../app/api/api';
+import { dataExplorationReducers } from './dataExplorationSlice';
+import { modelAnalysisReducers } from './modelAnalysisSlice';
+import { explainabilityReducers } from './explainabilitySlice';
 
 export interface IWorkflowPage {
   tab: IWorkflowPageModel | null
@@ -26,65 +26,65 @@ export interface IWorkflowPage {
 const initialState: IWorkflowPage = {
   tab: null,
   isTabInitialized: false
-}
+};
 
 // explainabilitySlice
 export const workflowPageSlice = createSlice({
-  name: "workflowPage",
+  name: 'workflowPage',
   initialState,
   reducers: {
     initTab: (state, action) => {
-      const {tab, workflows} = action.payload
-      state.tab = initializeTab({ workflowId: tab, workflows})
-      state.isTabInitialized = true
+      const {tab, workflows} = action.payload;
+      state.tab = initializeTab({ workflowId: tab, workflows});
+      state.isTabInitialized = true;
     },
     resetWorkflowTab: (state) => {
-      state.tab = null
-      state.isTabInitialized = false
+      state.tab = null;
+      state.isTabInitialized = false;
     },
     setDataTable: (state, action) => {
-      if(!state.tab) return
+      if(!state.tab) return;
       state.tab.dataTaskTable = {
         ...state.tab.dataTaskTable,
         ...action.payload,
-      }    
+      };    
     },
     setSelectedItem: (state, action) => {
-      if (!state.tab) return
-      state.tab.dataTaskTable.selectedItem = action.payload
-      state.tab.dataTaskTable.selectedTask = null
+      if (!state.tab) return;
+      state.tab.dataTaskTable.selectedItem = action.payload;
+      state.tab.dataTaskTable.selectedTask = null;
     },
     setControls: (state, action) => {
-      if (!state.tab?.workflowTasks.dataExploration) return
+      if (!state.tab?.workflowTasks.dataExploration) return;
       state.tab.workflowTasks.dataExploration.controlPanel = {
         ...state.tab?.workflowTasks.dataExploration?.controlPanel,
         ...action.payload
-      }
+      };
       },
       setCurrentPage: (state, action) => {
-        if (!state.tab?.workflowTasks.dataExploration) return
-        state.tab.workflowTasks.dataExploration.controlPanel.currentPage = action.payload
+        if (!state.tab?.workflowTasks.dataExploration) return;
+        state.tab.workflowTasks.dataExploration.controlPanel.currentPage = action.payload;
       },
       setTotalSize : (state, action) => {
-        if (!state.tab?.workflowTasks.dataExploration) return
-        state.tab.workflowTasks.dataExploration.controlPanel.totalPages = action.payload
-        state.tab.workflowTasks.dataExploration.controlPanel.currentPage = 1
+        if (!state.tab?.workflowTasks.dataExploration) return;
+        state.tab.workflowTasks.dataExploration.controlPanel.totalPages = action.payload;
+        state.tab.workflowTasks.dataExploration.controlPanel.currentPage = 1;
       },
       setMetaData: (state, action) => {
-        if (!state.tab?.workflowTasks.dataExploration) return
+        if (!state.tab?.workflowTasks.dataExploration) return;
         state.tab.workflowTasks.dataExploration.metaData = {
           ...state.tab?.workflowTasks.dataExploration?.metaData,
           ...action.payload
-        }
+        };
       } ,
       setSelectedTask: (state, action) => {
-        if (!state.tab) return
-        state.tab.dataTaskTable.selectedTask = action.payload
-        state.tab.dataTaskTable.selectedItem = null
+        if (!state.tab) return;
+        state.tab.dataTaskTable.selectedTask = action.payload;
+        state.tab.dataTaskTable.selectedItem = null;
       },
       setSelectedId: (state, action) => {
-        if (!state.tab) return
-        state.tab.dataTaskTable.selectedId = action.payload
+        if (!state.tab) return;
+        state.tab.dataTaskTable.selectedId = action.payload;
       }
   },
   extraReducers: builder => {
@@ -96,14 +96,13 @@ export const workflowPageSlice = createSlice({
             const newMetrics = action.payload; // this is an array of { name, data }
             if (!state.tab) return;
             
-            const tab = state.tab
+            const tab = state.tab;
 
             newMetrics.forEach(({ name, data }) => {
               const newItem = {
                 name,
                 seriesMetric: data,
               };
-
 
               const existingIndex = tab.workflowSeriesMetrics.data.findIndex(
                 (item) => item.name === name
@@ -120,20 +119,20 @@ export const workflowPageSlice = createSlice({
           state.tab.workflowSeriesMetrics.error = null;
         })
         .addCase(fetchWorkflowMetrics.pending, state => {
-          if (!state.tab) return
+          if (!state.tab) return;
 
-          state.tab.workflowSeriesMetrics.loading = true
+          state.tab.workflowSeriesMetrics.loading = true;
         })
         .addCase(fetchWorkflowMetrics.rejected, (state, action) => {
-          if (!state.tab) return
+          if (!state.tab) return;
 
-          state.tab.workflowSeriesMetrics.loading = false
+          state.tab.workflowSeriesMetrics.loading = false;
           state.tab.workflowSeriesMetrics.error =
-            action.error.message || "Error while fetching data"
-        })
+            action.error.message || 'Error while fetching data';
+        });
 
   },
-})
+});
 
 //Managing tabs logic
 
@@ -148,16 +147,16 @@ const workflowMetricsInitializer = ({
     error: string | null
   }
 }) => {
-  if (!metrics) return null
+  if (!metrics) return null;
 
   const completedMetrics = workflows.data
-    .filter(run => run.status === "COMPLETED" && run.metrics)
-    .flatMap(run => run.metrics!)
+    .filter(run => run.status === 'COMPLETED' && run.metrics)
+    .flatMap(run => run.metrics!);
 
   return metrics.map(metric => {
     const matchingMetrics = completedMetrics.filter(
       m => m.name === metric.name
-    )
+    );
 
     const values = matchingMetrics.map(m => m.value);
     const total = values.reduce((sum, val) => sum + val, 0);
@@ -187,7 +186,7 @@ const initializeTab = ({
 }): IWorkflowPageModel => {
   const workflow = workflows.data.find(w => w.id === workflowId);
 
-  const workflowName = workflow?.name ?? "";
+  const workflowName = workflow?.name ?? '';
   const workflowSvg = workflow
     ? {
         tasks: workflow.tasks,
@@ -198,7 +197,7 @@ const initializeTab = ({
 
   return {
     ...defaultWorkflowPageModel,
-    workflowId: workflow?.id ?? "",
+    workflowId: workflow?.id ?? '',
     workflowName,
     workflowSvg: {
       data: workflowSvg,
@@ -222,11 +221,11 @@ const initializeTab = ({
       dataExploration: dataExplorationDefault,
       userInteraction: userInteractionDefault,
     },
-  }
-}
+  };
+};
 
 export const fetchWorkflowMetrics = createAsyncThunk(
-  "progressPage/fetchWorkflowMetrics",
+  'progressPage/fetchWorkflowMetrics',
   async ({ experimentId, workflowId, metricNames }: { experimentId: string; workflowId: string; metricNames: string[] }) => {
       
     const results = await Promise.allSettled(
@@ -240,20 +239,18 @@ export const fetchWorkflowMetrics = createAsyncThunk(
     );
     
     const successful = results.filter(
-      (res): res is PromiseFulfilledResult<{ name: string; data: any }> => res.status === "fulfilled"
+      (res): res is PromiseFulfilledResult<{ name: string; data: any }> => res.status === 'fulfilled'
     );
     
     if (successful.length === 0) {
-      throw new Error("Failed to fetch all metrics");
+      throw new Error('Failed to fetch all metrics');
     }
     
     return successful.map(res => res.value);
-})
-
+});
 
 //Reducer exports
 export const { initTab,resetWorkflowTab, setControls,setMetaData,setDataTable,setSelectedItem,setSelectedTask, setSelectedId,setCurrentPage,setTotalSize } =
-  workflowPageSlice.actions
+  workflowPageSlice.actions;
 
-export default workflowPageSlice.reducer
-
+export default workflowPageSlice.reducer;

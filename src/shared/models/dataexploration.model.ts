@@ -9,7 +9,7 @@ export interface IDataExplorationQuery {
     // Optional, a map of columns to an array of aggregation functions
     [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
   }
-  type?: "csv" | "zenoh"
+  type?: 'csv' | 'zenoh'
 }
 
 export interface IDataExplorationRequest {
@@ -22,7 +22,7 @@ export interface IDataExplorationRequest {
 
 export interface IMetaDataQuery{
   datasetId: string
-  type?: "csv" | "zenoh"
+  type?: 'csv' | 'zenoh'
 }
 export interface IMetaDataRequest {
   query: IMetaDataQuery
@@ -31,7 +31,6 @@ export interface IMetaDataRequest {
     queryCase: any
   }
 }
-
 
 export interface fetchAffectedRequest{
     workflowId: string
@@ -68,14 +67,13 @@ export interface IFilter {
   value?: number | string | any; 
 }
 
-
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
-  datasetId: "",
+  datasetId: '',
   limit: 0,
   columns: [],
   filters: [],
   offset: 0,
   groupBy: [],
   aggregation: {},
-  type: "csv",
-}
+  type: 'csv',
+};

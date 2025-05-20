@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect } from 'react';
 import {
   Box,
   FormControl,
@@ -9,79 +9,77 @@ import {
   Checkbox,
   Button,
   ButtonGroup,
-} from "@mui/material"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { setControls } from "../../../../store/slices/workflowPageSlice"
+} from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { setControls } from '../../../../store/slices/workflowPageSlice';
 
-import ShowChartIcon from "@mui/icons-material/ShowChart"
-
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 
 const LineChartControlPanel = () => {
-  const dispatch = useAppDispatch()
-  const tab = useAppSelector(state => state.workflowPage.tab)
-  const controlPanel = tab?.workflowTasks.dataExploration?.controlPanel
+  const dispatch = useAppDispatch();
+  const tab = useAppSelector(state => state.workflowPage.tab);
+  const controlPanel = tab?.workflowTasks.dataExploration?.controlPanel;
   const columns =
-    tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
+    tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || [];
 
-  const xAxis = controlPanel?.xAxis
-  const yAxis = controlPanel?.yAxis || []
+  const xAxis = controlPanel?.xAxis;
+  const yAxis = controlPanel?.yAxis || [];
   const viewMode = useAppSelector(
     state =>
       state.workflowPage.tab?.workflowTasks.dataExploration?.controlPanel
         ?.viewMode,
-  )
+  );
 
   // Auto-clean yAxis if columns no longer exist
   useEffect(() => {
     const validYAxis = yAxis.filter(yCol =>
       columns.find(col => col.name === yCol.name),
-    )
+    );
     if (validYAxis.length !== yAxis.length) {
-      dispatch(setControls({ yAxis: validYAxis }))
+      dispatch(setControls({ yAxis: validYAxis }));
     }
-  }, [columns, yAxis])
+  }, [columns, yAxis]);
 
   const handleXAxisChange = (event: { target: { value: string } }) => {
-    const selected = columns.find(col => col.name === event.target.value)
+    const selected = columns.find(col => col.name === event.target.value);
     if (selected) {
-      dispatch(setControls({ xAxis: selected }))
+      dispatch(setControls({ xAxis: selected }));
     }
-  }
+  };
 
   const handleYAxisChange = (event: { target: { value: any } }) => {
-    const selectedNames = event.target.value
+    const selectedNames = event.target.value;
     const selectedCols = selectedNames
       .map((name: string) => columns.find(col => col.name === name))
-      .filter(Boolean)
-    dispatch(setControls({ yAxis: selectedCols }))
-  }
+      .filter(Boolean);
+    dispatch(setControls({ yAxis: selectedCols }));
+  };
 
   useEffect(() => {
     const validYAxis = yAxis.filter(yCol =>
       columns.find(col => col.name === yCol.name),
-    )
+    );
     if (validYAxis.length !== yAxis.length) {
-      dispatch(setControls({ yAxis: validYAxis }))
+      dispatch(setControls({ yAxis: validYAxis }));
     }
   
     // Ensure selectedColumns includes xAxis and yAxis
-    const currentSelected = controlPanel?.selectedColumns || []
-    const requiredCols = [xAxis, ...validYAxis]
+    const currentSelected = controlPanel?.selectedColumns || [];
+    const requiredCols = [xAxis, ...validYAxis];
   
     const missingCols = requiredCols.filter(
       reqCol => !currentSelected.find(sel => sel.name === reqCol?.name)
-    )
+    );
   
     if (missingCols.length > 0) {
       const updatedSelected = [
         ...currentSelected,
         ...missingCols.filter(Boolean), // Avoid null/undefined
-      ]
-      const cleanedSelected = updatedSelected.filter(col => col?.name && col.type)
-      dispatch(setControls({ selectedColumns: cleanedSelected }))
+      ];
+      const cleanedSelected = updatedSelected.filter(col => col?.name && col.type);
+      dispatch(setControls({ selectedColumns: cleanedSelected }));
     }
-  }, [columns, yAxis, xAxis])
-  
+  }, [columns, yAxis, xAxis]);
 
   return (
     columns.length > 0 && (
@@ -89,9 +87,9 @@ const LineChartControlPanel = () => {
 
       <Box
         sx={{
-          display: "flex",
-          gap: "1rem",
-          flexDirection: "row",
+          display: 'flex',
+          gap: '1rem',
+          flexDirection: 'row',
         }}
       >
         {/* X-Axis Selector */}
@@ -104,7 +102,7 @@ const LineChartControlPanel = () => {
       </InputLabel>
           <Select
             labelId="x-axis-select-label"
-            value={xAxis?.name || ""}
+            value={xAxis?.name || ''}
             onChange={handleXAxisChange}
             label="X-Axis-----"
             MenuProps={{
@@ -133,7 +131,7 @@ const LineChartControlPanel = () => {
             value={yAxis.map(col => col.name)}
             onChange={handleYAxisChange}
             input={<OutlinedInput label="Y-Axis-----" />}
-            renderValue={selected => selected.join(", ")}
+            renderValue={selected => selected.join(', ')}
             MenuProps={{
               PaperProps: { style: { maxHeight: 224, width: 250 } },
             }}
@@ -148,34 +146,33 @@ const LineChartControlPanel = () => {
             ))}
           </Select>
         </FormControl>
-
      
       </Box>
          <Box
          sx={{
           mt: 2,
-           display: "flex",
-          gap: "1rem",
-          flexDirection: "row",
-          width: "100%"
+           display: 'flex',
+          gap: '1rem',
+          flexDirection: 'row',
+          width: '100%'
          }}
        >
 
          <ButtonGroup
            variant="contained"
            aria-label="view mode"
-           sx={{ height: "36px" }}
+           sx={{ height: '36px' }}
            fullWidth
          >
            <Button
-             color={viewMode === "overlay" ? "primary" : "inherit"}
-             onClick={() => dispatch(setControls({ viewMode: "overlay" }))}
+             color={viewMode === 'overlay' ? 'primary' : 'inherit'}
+             onClick={() => dispatch(setControls({ viewMode: 'overlay' }))}
            >
              Overlay
            </Button>
            <Button
-             color={viewMode === "stacked" ? "primary" : "inherit"}
-             onClick={() => dispatch(setControls({ viewMode: "stacked" }))}
+             color={viewMode === 'stacked' ? 'primary' : 'inherit'}
+             onClick={() => dispatch(setControls({ viewMode: 'stacked' }))}
             //  disabled={yAxis.length < 2}
            >
              Stacked
@@ -184,9 +181,8 @@ const LineChartControlPanel = () => {
        </Box>
        </Box>
 
-
     )
-  )
-}
+  );
+};
 
-export default LineChartControlPanel
+export default LineChartControlPanel;

@@ -8,40 +8,40 @@ import {
   Typography,
   Button,
   Divider,
-} from "@mui/material"
-import SearchIcon from "@mui/icons-material/Search"
-import CancelIcon from '@mui/icons-material/Cancel'
-import CloseIcon from "@mui/icons-material/Close"
-import type { GridColDef } from "@mui/x-data-grid"
-import { useState, useRef, useEffect } from "react"
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CloseIcon from '@mui/icons-material/Close';
+import type { GridColDef } from '@mui/x-data-grid';
+import { useState, useRef, useEffect } from 'react';
 
 type CustomGridColDef = GridColDef & {
   field: string
   minWidth?: number
   flex?: number
-  align?: "left" | "right" | "center"
-  headerAlign?: "left" | "right" | "center"
+  align?: 'left' | 'right' | 'center'
+  headerAlign?: 'left' | 'right' | 'center'
   originalType?: string
 }
 
 const stringOperators = [
-  { id: "contains", label: "contains" },
-  { id: "startsWith", label: "starts with" },
-  { id: "endsWith", label: "ends with" },
-  { id: "=", label: "=" },
+  { id: 'contains', label: 'contains' },
+  { id: 'startsWith', label: 'starts with' },
+  { id: 'endsWith', label: 'ends with' },
+  { id: '=', label: '=' },
 ];
 
 const numberOperators = [
-  { id: "=", label: "=" },
-  { id: ">", label: ">" },
-  { id: "<", label: "<" },
-  { id: ">=", label: ">=" },
-  { id: "<=", label: "<=" },
-]
+  { id: '=', label: '=' },
+  { id: '>', label: '>' },
+  { id: '<', label: '<' },
+  { id: '>=', label: '>=' },
+  { id: '<=', label: '<=' },
+];
 
 const booleanOperators = [
-  { id: "=", label: "=" },
-]
+  { id: '=', label: '=' },
+];
 
 interface FilterBarProps {
   columns: CustomGridColDef[]
@@ -72,10 +72,10 @@ export default function FilterBar({
   onRemoveFilter,
   setFilterOpen,
 }: FilterBarProps) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [currentStep, setCurrentStep] = useState<FilterStep>(FilterStep.IDLE);
-  const [tempColumn, setTempColumn] = useState<string>("");
-  const [tempOperator, setTempOperator] = useState<string>("");
+  const [tempColumn, setTempColumn] = useState<string>('');
+  const [tempOperator, setTempOperator] = useState<string>('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [showAvailableColumns, setShowAvailableColumns] = useState<boolean>(true);
@@ -89,7 +89,7 @@ export default function FilterBar({
   const [availableOperators, setAvailableOperators] = useState<typeof stringOperators | typeof numberOperators>(stringOperators);
 
   const validColumns = columns.filter(col => 
-    col.field !== "rating" && col.field !== "status" && col.field !== "action"
+    col.field !== 'rating' && col.field !== 'status' && col.field !== 'action'
   ).map(col => ({
     value: col.field,
     label: col.headerName as string
@@ -207,7 +207,7 @@ export default function FilterBar({
     setCurrentStep(FilterStep.OPERATOR);
     setShowAvailableColumns(false);
     setShowAvailableOperators(true);
-    setInputValue("");
+    setInputValue('');
     
     // Set available operators based on column type
     const selectedColumn = columns.find(col => col.field === columnValue);
@@ -230,7 +230,7 @@ export default function FilterBar({
     setCurrentStep(FilterStep.VALUE);
     setShowAvailableColumns(false);
     setShowAvailableOperators(false);
-    setInputValue("");
+    setInputValue('');
   };
 
   const addFilter = (value: string) => {
@@ -243,9 +243,9 @@ export default function FilterBar({
 
   const resetFilterProcess = () => {
     setCurrentStep(FilterStep.IDLE);
-    setTempColumn("");
-    setTempOperator("");
-    setInputValue("");
+    setTempColumn('');
+    setTempOperator('');
+    setInputValue('');
     setShowAvailableColumns(true);
     setShowAvailableOperators(false);
   };
@@ -258,15 +258,15 @@ export default function FilterBar({
     switch (currentStep) {
       case FilterStep.OPERATOR:
         setCurrentStep(FilterStep.COLUMN);
-        setTempColumn("");
-        setInputValue("");
+        setTempColumn('');
+        setInputValue('');
         setShowAvailableColumns(true);
         setShowAvailableOperators(false);
         break;
       case FilterStep.VALUE:
         setCurrentStep(FilterStep.OPERATOR);
-        setTempOperator("");
-        setInputValue("");
+        setTempOperator('');
+        setInputValue('');
         setShowAvailableColumns(false);
         setShowAvailableOperators(true);
         break;
@@ -278,13 +278,13 @@ export default function FilterBar({
   const getPlaceholder = () => {
     switch (currentStep) {
       case FilterStep.COLUMN:
-        return "Select or type a column...";
+        return 'Select or type a column...';
       case FilterStep.OPERATOR:
         return `${tempColumn} (select operator)`;
       case FilterStep.VALUE:
         return `${tempColumn} ${tempOperator} (enter value)`;
       default:
-        return "Build a filter query...";
+        return 'Build a filter query...';
     }
   };
 
@@ -482,9 +482,9 @@ export default function FilterBar({
       {/* Help text only when not showing available options */}
       {currentStep !== FilterStep.IDLE && !showAvailableColumns && !showAvailableOperators && (
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-          {currentStep === FilterStep.COLUMN && "Select a column or type to filter columns (use arrow keys to navigate)"}
-          {currentStep === FilterStep.OPERATOR && "Select an operator (contains, =, >, <, etc.) - use arrow keys to navigate"}
-          {currentStep === FilterStep.VALUE && "Enter a value and press Enter to add the filter"}
+          {currentStep === FilterStep.COLUMN && 'Select a column or type to filter columns (use arrow keys to navigate)'}
+          {currentStep === FilterStep.OPERATOR && 'Select an operator (contains, =, >, <, etc.) - use arrow keys to navigate'}
+          {currentStep === FilterStep.VALUE && 'Enter a value and press Enter to add the filter'}
         </Typography>
       )}
       

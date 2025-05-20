@@ -6,64 +6,61 @@ import {
   FormControl,
   createTheme,
   ThemeProvider,
-} from "@mui/material"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { setControls } from "../../../../store/slices/workflowPageSlice"
-import CategoryIcon from "@mui/icons-material/Category"
-import BarChartIcon from "@mui/icons-material/BarChart"
-import FunctionsIcon from "@mui/icons-material/Functions"
+} from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { setControls } from '../../../../store/slices/workflowPageSlice';
+import CategoryIcon from '@mui/icons-material/Category';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import FunctionsIcon from '@mui/icons-material/Functions';
 
 const BarChartControlPanel = () => {
-  const dispatch = useAppDispatch()
-  const { tab } = useAppSelector(state => state.workflowPage)
+  const dispatch = useAppDispatch();
+  const { tab } = useAppSelector(state => state.workflowPage);
   const selectedColumn =
     tab?.workflowTasks.dataExploration?.controlPanel.selectedMeasureColumn ||
-    null
+    null;
 
   // Handler for updating aggregation rules for a column
-  
 
   const getAggregationOptions = () => {
-    if (!selectedColumn) return []
+    if (!selectedColumn) return [];
     const column =
       tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(
         col => col.name === selectedColumn,
-      )
-    return column?.type === "DOUBLE" ||
-      column?.type === "FLOAT" ||
-      column?.type === "INTEGER"
-      ? ["Avg", "Min", "Max", "Count"]
-      : ["Count"]
-  }
+      );
+    return column?.type === 'DOUBLE' ||
+      column?.type === 'FLOAT' ||
+      column?.type === 'INTEGER'
+      ? ['Avg', 'Min', 'Max', 'Count']
+      : ['Count'];
+  };
 
-  const aggregationOptions = getAggregationOptions()
-
-  
+  const aggregationOptions = getAggregationOptions();
 
   // Custom theme
   const theme = createTheme({
     palette: {
-      primary: { main: "#1976d2" },
-      secondary: { main: "#dc004e" },
+      primary: { main: '#1976d2' },
+      secondary: { main: '#dc004e' },
     },
     typography: {
-      fontFamily: "Arial",
+      fontFamily: 'Arial',
       h6: { fontWeight: 600 },
     },
     components: {
       MuiButton: {
-        styleOverrides: { root: { borderRadius: "20px" } },
+        styleOverrides: { root: { borderRadius: '20px' } },
       },
     },
-  })
+  });
 
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          display: "flex",
-          gap: "1rem",
-          flexDirection: "column",
+          display: 'flex',
+          gap: '1rem',
+          flexDirection: 'column',
         }}
       >
         {/* Group By Selection */}
@@ -78,7 +75,7 @@ const BarChartControlPanel = () => {
             label="Group By (Category) okkk    "
             value={
               tab?.workflowTasks.dataExploration?.controlPanel
-                .barGroupBy?.[0] || ""
+                .barGroupBy?.[0] || ''
             }
             onChange={e =>
               dispatch(setControls({ barGroupBy: [e.target.value] }))
@@ -91,7 +88,7 @@ const BarChartControlPanel = () => {
           >
             {/* <MenuItem value="Not Group">Not Group</MenuItem> */}
             {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type === "STRING")
+              .filter(col => col.type === 'STRING')
               .map(col => (
                 <MenuItem key={col.name} value={col.name}>
                   {col.name}
@@ -110,7 +107,7 @@ const BarChartControlPanel = () => {
           </InputLabel>
           <Select
             label="Measure (Value Column)ooo"
-            value={selectedColumn || ""}
+            value={selectedColumn || ''}
             onChange={e =>
               dispatch(setControls({ selectedMeasureColumn: e.target.value }))
             }
@@ -119,7 +116,7 @@ const BarChartControlPanel = () => {
             }}
           >
             {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type !== "LOCAL_DATE_TIME")
+              .filter(col => col.type !== 'LOCAL_DATE_TIME')
               .map(col => (
                 <MenuItem key={col.name} value={col.name}>
                   {col.name}
@@ -146,11 +143,11 @@ const BarChartControlPanel = () => {
               ] || []
             }
             onChange={event => {
-              const value = event.target.value as string[]
-              if (!selectedColumn) return
+              const value = event.target.value as string[];
+              if (!selectedColumn) return;
               const currentAgg =
                 tab?.workflowTasks.dataExploration?.controlPanel
-                  .barAggregation || {}
+                  .barAggregation || {};
 
               dispatch(
                 setControls({
@@ -159,9 +156,9 @@ const BarChartControlPanel = () => {
                     [selectedColumn]: value,
                   },
                 }),
-              )
+              );
             }}
-            renderValue={(selected: any) => selected.join(", ")}
+            renderValue={(selected: any) => selected.join(', ')}
           >
             {aggregationOptions.map(rule => (
               <MenuItem key={rule} value={rule}>
@@ -172,7 +169,7 @@ const BarChartControlPanel = () => {
         </FormControl>
       </Box>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default BarChartControlPanel
+export default BarChartControlPanel;

@@ -1,31 +1,31 @@
-import Box from "@mui/material/Box"
-import LinearProgress from "@mui/material/LinearProgress"
-import Typography from "@mui/material/Typography"
-import grey from "@mui/material/colors/grey"
-import type { RootState} from "../../store/store";
-import { useAppSelector } from "../../store/store"
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { useTheme } from '@mui/material/styles'
-import { useParams } from "react-router-dom";
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+import Typography from '@mui/material/Typography';
+import grey from '@mui/material/colors/grey';
+import type { RootState} from '../../store/store';
+import { useAppSelector } from '../../store/store';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import { useParams } from 'react-router-dom';
 import Chip from '@mui/material/Chip';
 
 const ProgressPageBar = () => {
-  const { experimentId } = useParams()
-  const { progressBar } = useAppSelector((state: RootState) => state.progressPage)
-  const theme = useTheme()
-  const matches = useMediaQuery(theme.breakpoints.up('md'))
+  const { experimentId } = useParams();
+  const { progressBar } = useAppSelector((state: RootState) => state.progressPage);
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('md'));
 
   return (
     <Box>
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1}}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1}}>
           <Chip
             // icon={<ScienceIcon />}
             label={`Experiment: ${experimentId}`}
@@ -70,7 +70,7 @@ const ProgressPageBar = () => {
         
         {matches && (
           <Box
-            sx={{ minWidth: 35, display: "flex", columnGap: 1, flexWrap: "wrap" }}
+            sx={{ minWidth: 35, display: 'flex', columnGap: 1, flexWrap: 'wrap' }}
           >
             <Typography
               variant="body1"
@@ -87,15 +87,15 @@ const ProgressPageBar = () => {
           </Box>
         )}
       </Box>
-      <Box sx={{ width: "100%", ml: 1}}>
+      <Box sx={{ width: '100%', ml: 1}}>
         <LinearProgress
           variant="determinate"
           value={Math.round(progressBar.progress)}
           sx={{
-            height: "1rem",
+            height: '1rem',
             borderRadius: 10,
             backgroundColor: grey[300],
-            "& .MuiLinearProgress-bar": {
+            '& .MuiLinearProgress-bar': {
               background:
                 theme => theme.palette.customGradient.main,
             },
@@ -103,7 +103,7 @@ const ProgressPageBar = () => {
         />
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default ProgressPageBar
+export default ProgressPageBar;

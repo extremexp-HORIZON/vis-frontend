@@ -1,15 +1,15 @@
-import { Paper, Box, Typography, Tooltip, IconButton } from "@mui/material"
-import InfoIcon from "@mui/icons-material/Info"
-import { grey } from "@mui/material/colors"
+import { Paper, Box, Typography, Tooltip, IconButton } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import { grey } from '@mui/material/colors';
 
 const WorkflowCard: React.FC<{
   title: string
   description?: string
   children: React.ReactNode
 }> = ({
-  title = "Title",
+  title = 'Title',
   children = <></>,
-  description = "Description not available.",
+  description = 'Description not available.',
 }) => {
   return (
     <Paper
@@ -17,24 +17,24 @@ const WorkflowCard: React.FC<{
       elevation={2}
       sx={{
         borderRadius: 4,
-        width: "inherit",
-        display: "flex",
-        flexDirection: "column",
+        width: 'inherit',
+        display: 'flex',
+        flexDirection: 'column',
         rowGap: 0,
-        minWidth: "300px",
-        height: "100%",
+        minWidth: '300px',
+        height: '100%',
       }}
     >
       <Box
         sx={{
           px: 1.5,
           py: 0.5,
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           borderBottom: `1px solid ${grey[400]}`,
         }}
       >
-        <Typography fontSize={"1rem"} fontWeight={600}>
+        <Typography fontSize={'1rem'} fontWeight={600}>
           {title}
         </Typography>
         <Box sx={{ flex: 1 }} />
@@ -46,7 +46,7 @@ const WorkflowCard: React.FC<{
       </Box>
       {children}
     </Paper>
-  )
-}
+  );
+};
 
-export default WorkflowCard
+export default WorkflowCard;

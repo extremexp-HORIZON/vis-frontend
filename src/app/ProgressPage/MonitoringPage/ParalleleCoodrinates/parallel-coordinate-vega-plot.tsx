@@ -1,10 +1,10 @@
-import type { ViewListener } from "react-vega";
-import { Vega } from "react-vega"
-import { scheme } from "vega"
-import vegaTooltip from "vega-tooltip"
-import type { Axis, Item, Scale } from "vega-typings/types"
-import type { View } from "vega"
-import { useEffect, useState, useRef } from "react"
+import type { ViewListener } from 'react-vega';
+import { Vega } from 'react-vega';
+import { scheme } from 'vega';
+import vegaTooltip from 'vega-tooltip';
+import type { Axis, Item, Scale } from 'vega-typings/types';
+import type { View } from 'vega';
+import { useEffect, useState, useRef } from 'react';
 
 interface ParallelCoordinateVegaProps {
   parallelData: any[]
@@ -20,13 +20,13 @@ function setValuesIfSelectedAndDefault(
 ) {
   return [
     {
-      test: "anySelected && parent.selected === false",
+      test: 'anySelected && parent.selected === false',
       value: filteredOutValue,
     },
     {
       value: defaultValue,
     },
-  ]
+  ];
 }
 
 const ParallelCoordinateVega = ({
@@ -36,103 +36,102 @@ const ParallelCoordinateVega = ({
   selectedWorkflows,
   processedData
 }: ParallelCoordinateVegaProps) => {
-  const [chartHeight, setChartHeight] = useState(window.innerHeight * 0.27)
+  const [chartHeight, setChartHeight] = useState(window.innerHeight * 0.27);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [chartWidth, setChartWidth] = useState(0)
+  const [chartWidth, setChartWidth] = useState(0);
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const container = containerRef.current;
+    if (!container) return;
   
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
-        const { width } = entry.contentRect
-        setChartWidth(width)
-        setChartHeight(Math.max(window.innerHeight * 0.27,100))
+        const { width } = entry.contentRect;
+        setChartWidth(width);
+        setChartHeight(Math.max(window.innerHeight * 0.27,100));
       }
-    })
+    });
   
-    resizeObserver.observe(container)
+    resizeObserver.observe(container);
   
-    return () => resizeObserver.disconnect()
-  }, [])  
+    return () => resizeObserver.disconnect();
+  }, []);  
 
   const handleNewView: ViewListener = (view: View) => {
-    if (!view) return
+    if (!view) return;
 
     const tooltipHandler = vegaTooltip(view, {
       formatTooltip: datum => {
-        const table = document.createElement("table")
+        const table = document.createElement('table');
         Object.entries(datum).forEach(([key, value]) => {
-          const row = table.insertRow()
-          const keyCell = row.insertCell()
-          const valueCell = row.insertCell()
-          keyCell.innerHTML = key
-          valueCell.innerHTML = ` <strong>${value}</strong>`
-        })
-        return table.outerHTML
+          const row = table.insertRow();
+          const keyCell = row.insertCell();
+          const valueCell = row.insertCell();
+          keyCell.innerHTML = key;
+          valueCell.innerHTML = ` <strong>${value}</strong>`;
+        });
+        return table.outerHTML;
       },
-    })
+    });
 
     // Manually trigger tooltip on line mark hover (otherwise only triggered on intersections)
-    var isTooltipVisible = false
-    view.addEventListener("mousemove", (event: any) => {
-      const hover = view.signal("hover")
+    var isTooltipVisible = false;
+    view.addEventListener('mousemove', (event: any) => {
+      const hover = view.signal('hover');
 
       if (hover) {
-        tooltipHandler.call(view, event, {} as Item, hover)
-        isTooltipVisible = true
+        tooltipHandler.call(view, event, {} as Item, hover);
+        isTooltipVisible = true;
       } else if (isTooltipVisible) {
-        hideTooltip()
+        hideTooltip();
       }
-    })
-    window.addEventListener("scroll", () => {
+    });
+    window.addEventListener('scroll', () => {
       if (isTooltipVisible) {
-        hideTooltip()
+        hideTooltip();
       }
-    })
+    });
 
     function hideTooltip() {
       // To hide tooltip, simulate an empty/null value
-      tooltipHandler.call(view, new MouseEvent("mousemove"), {} as Item, null)
-      isTooltipVisible = false
+      tooltipHandler.call(view, new MouseEvent('mousemove'), {} as Item, null);
+      isTooltipVisible = false;
     }
-  }
+  };
 
-  const columnNames = [...foldArray.current, progressParallel.selected]
+  const columnNames = [...foldArray.current, progressParallel.selected];
 
   // generate scales:
   const numericValues = processedData
   .map(d => d[progressParallel.selected])
-  .filter(v => typeof v === "number" && !isNaN(v))
+  .filter(v => typeof v === 'number' && !isNaN(v));
 
-  let selectedLastColumnMin = Math.min(...numericValues)
-  let selectedLastColumnMax = Math.max(...numericValues)
+  let selectedLastColumnMin = Math.min(...numericValues);
+  let selectedLastColumnMax = Math.max(...numericValues);
 
   // fallback to avoid breaking Vega when data is empty
-  const isValidDomain = numericValues.length > 0
+  const isValidDomain = numericValues.length > 0;
 
   if (isValidDomain && selectedLastColumnMin === selectedLastColumnMax) {
-    const padding = selectedLastColumnMin === 0 ? 1 : Math.abs(selectedLastColumnMin * 0.5)
-    selectedLastColumnMin -= padding
-    selectedLastColumnMax += padding
+    const padding = selectedLastColumnMin === 0 ? 1 : Math.abs(selectedLastColumnMin * 0.5);
+    selectedLastColumnMin -= padding;
+    selectedLastColumnMax += padding;
   }
-  
 
     const generatedScales: Scale[] = [
     {
-      name: "ord",
-      type: "point",
-      range: "width",
+      name: 'ord',
+      type: 'point',
+      range: 'width',
       round: true,
-      domain: { data: "columnNames", field: "data" },
+      domain: { data: 'columnNames', field: 'data' },
     },
     {
       name: progressParallel.selected,
-      type: "linear",
-      range: "height",
+      type: 'linear',
+      range: 'height',
       domain: {
-        data: "mydata",
+        data: 'mydata',
         field: progressParallel.selected,
       },
       ...(isValidDomain && {
@@ -140,86 +139,86 @@ const ParallelCoordinateVega = ({
         domainMax: selectedLastColumnMax,
       }),
     },
-  ]
+  ];
   if (isValidDomain) {
     generatedScales.push({
-      name: "selectedLastColumnColorScale",
-      type: "linear",
+      name: 'selectedLastColumnColorScale',
+      type: 'linear',
       domain: {
-        data: "mydata",
+        data: 'mydata',
         field: progressParallel.selected,
       },
       domainMin: selectedLastColumnMin,
       domainMax: selectedLastColumnMax,
       range: [
-        scheme("category20")[2],
-        scheme("category20")[5],
-        scheme("category20")[1],
-        scheme("category20")[0],
+        scheme('category20')[2],
+        scheme('category20')[5],
+        scheme('category20')[1],
+        scheme('category20')[0],
       ],
-    })
+    });
   }
   
   for (const columnName of foldArray.current) {
     generatedScales.push({
       name: columnName,
-      type: "point",
-      range: "height",
-      domain: { data: "mydata", field: columnName },
+      type: 'point',
+      range: 'height',
+      domain: { data: 'mydata', field: columnName },
       padding: 0.3,
-    })
+    });
   }
 
-  const generatedAxes: Axis[] = []
+  const generatedAxes: Axis[] = [];
   for (const columnName of columnNames) {
     generatedAxes.push({
-      orient: "left",
+      orient: 'left',
       scale: columnName,
       // only show the last column, other columns are shown as draggable objects
-      title: columnName === progressParallel.selected ? columnName : "",
-      offset: { scale: "ord", value: columnName, mult: -1 },
-    })
+      title: columnName === progressParallel.selected ? columnName : '',
+      offset: { scale: 'ord', value: columnName, mult: -1 },
+    });
   }
   const numericFilteredData = processedData.filter((row: any) => {
-    const key = progressParallel.selected
-    const val = Number(row[key])
-    return !isNaN(val)
-  }) 
+    const key = progressParallel.selected;
+    const val = Number(row[key]);
+    return !isNaN(val);
+  }); 
 
   return (
-    <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
     <Vega
       actions={false}
       onNewView={handleNewView}
-      style={{ width: "100%" }}
+      style={{ width: '100%' }}
       spec={{
         height: chartHeight,
         width: chartWidth,
         padding: { top: 15, left: 2, right: 2, bottom: 2 },
-        autosize: { type: "fit", contains: "padding" }, // Ensure the chart adjusts to container size
+        autosize: { type: 'fit', contains: 'padding' }, // Ensure the chart adjusts to container size
         config: {
           axisY: {
             titleY: -12,
             titleX: 10,
             titleAngle: 0,
-            titleFontWeight: "lighter",
+            titleFontWeight: 'lighter',
             zindex: 3,
           },
         },
         data: [
           {
-            name: "mydata",
+            name: 'mydata',
             values: numericFilteredData,
           },
           {
-            name: "columnNames",
+            name: 'columnNames',
             values: columnNames,
           },
           {
-            name: "gradientData",
+            name: 'gradientData',
             transform: [
               {
-                type: "sequence",
+                type: 'sequence',
                 start: selectedLastColumnMin,
                 stop: selectedLastColumnMax,
                 step: (selectedLastColumnMax - selectedLastColumnMin) / 256,
@@ -229,19 +228,19 @@ const ParallelCoordinateVega = ({
         ],
         signals: [
           {
-            name: "anySelected",
+            name: 'anySelected',
             value: selectedWorkflows.length > 0,
           },
           {
-            name: "hover",
+            name: 'hover',
             value: null,
             on: [
               {
-                events: "@oneDataLine:mouseover",
+                events: '@oneDataLine:mouseover',
                 update:
-                  "!anySelected || group().datum.selected ? group().datum : null",
+                  '!anySelected || group().datum.selected ? group().datum : null',
               },
-              { events: "@oneDataLine:mouseout", update: "null" },
+              { events: '@oneDataLine:mouseout', update: 'null' },
             ],
           },
           // {
@@ -255,28 +254,28 @@ const ParallelCoordinateVega = ({
         axes: generatedAxes,
         marks: [
           {
-            name: "dataLines",
-            type: "group",
-            role: "frame",
+            name: 'dataLines',
+            type: 'group',
+            role: 'frame',
             interactive: true,
-            from: { data: "mydata" },
+            from: { data: 'mydata' },
             marks: [
               {
-                name: "oneDataLine",
-                type: "line",
-                from: { data: "columnNames" },
+                name: 'oneDataLine',
+                type: 'line',
+                from: { data: 'columnNames' },
                 encode: {
                   enter: {
-                    x: { scale: "ord", field: "data" },
+                    x: { scale: 'ord', field: 'data' },
                     y: {
-                      scale: { datum: "data" },
-                      field: { parent: { datum: "data" } },
+                      scale: { datum: 'data' },
+                      field: { parent: { datum: 'data' } },
                     },
                     stroke: {
-                      scale: "selectedLastColumnColorScale",
+                      scale: 'selectedLastColumnColorScale',
                       field: { parent: progressParallel.selected },
                     },
-                    interpolate: { value: "natural" },
+                    interpolate: { value: 'natural' },
                   },
                   update: {
                     strokeWidth: { value: 2 },
@@ -284,18 +283,18 @@ const ParallelCoordinateVega = ({
                     strokeOpacity: setValuesIfSelectedAndDefault(0.1, 0.9),
                     stroke: [
                       {
-                        test: "anySelected && parent.selected === false", // if any line is selected and this line is not selected then grey it out
-                        value: "grey",
+                        test: 'anySelected && parent.selected === false', // if any line is selected and this line is not selected then grey it out
+                        value: 'grey',
                       },
                       {
-                        scale: "selectedLastColumnColorScale",
+                        scale: 'selectedLastColumnColorScale',
                         field: { parent: progressParallel.selected },
                       },
                     ],
                   },
                   hover: {
                     strokeWidth: setValuesIfSelectedAndDefault(2, 5),
-                    cursor: { value: "pointer" },
+                    cursor: { value: 'pointer' },
                     strokeOpacity: setValuesIfSelectedAndDefault(0.1, 1),
                     zindex: setValuesIfSelectedAndDefault(1, 2),
                   },
@@ -304,22 +303,22 @@ const ParallelCoordinateVega = ({
             ],
           },
           {
-            name: "colourRect",
-            type: "rect",
-            from: { data: "gradientData" },
+            name: 'colourRect',
+            type: 'rect',
+            from: { data: 'gradientData' },
             encode: {
               enter: {
-                x: { signal: "width" },
+                x: { signal: 'width' },
                 y: {
                   scale: progressParallel.selected,
-                  field: "data",
+                  field: 'data',
                   offset: -3,
                 },
                 width: { value: 30 },
                 height: { value: 3 },
                 fill: {
-                  scale: "selectedLastColumnColorScale",
-                  field: "data",
+                  scale: 'selectedLastColumnColorScale',
+                  field: 'data',
                 },
               },
             },
@@ -328,6 +327,6 @@ const ParallelCoordinateVega = ({
       }}
     />
     </div>
-  )
-}
-export default ParallelCoordinateVega
+  );
+};
+export default ParallelCoordinateVega;

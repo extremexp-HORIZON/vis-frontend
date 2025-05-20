@@ -19,16 +19,16 @@ import {
   DialogActions,
   useTheme,
   useMediaQuery,
-} from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
-import type React from "react";
-import { useCallback, useEffect, useRef, useState } from "react"
-import SettingsIcon from "@mui/icons-material/Settings"
-import { grey } from "@mui/material/colors"
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
-import DownloadIcon from "@mui/icons-material/Download"
-import FullscreenIcon from "@mui/icons-material/Fullscreen"
-import CodeIcon from "@mui/icons-material/Code"
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { grey } from '@mui/material/colors';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import DownloadIcon from '@mui/icons-material/Download';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import CodeIcon from '@mui/icons-material/Code';
 
 interface ResponsiveMapCardProps {
   mapRef?: React.RefObject<HTMLDivElement>
@@ -52,8 +52,8 @@ const SectionHeader = ({
 }) => (
   <Box
     sx={{
-      display: "flex",
-      alignItems: "center",
+      display: 'flex',
+      alignItems: 'center',
       borderBottom: `1px solid ${grey[200]}`,
       px: 2,
       py: 1.5,
@@ -76,8 +76,8 @@ const SectionHeader = ({
     <Typography
       variant="subtitle1"
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         fontWeight: 600,
         color: '#1e3a5f',
         letterSpacing: '0.3px',
@@ -86,7 +86,7 @@ const SectionHeader = ({
       {title}
     </Typography>
   </Box>
-)
+);
 
 const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
   mapRef,
@@ -102,11 +102,11 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
   showInfoMessage,
   ...otherProps
 }) => {
-  const [width, setWidth] = useState(minWidth)
-  const [height, setHeight] = useState(minHeight)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const menuOpen = Boolean(anchorEl)
+  const [width, setWidth] = useState(minWidth);
+  const [height, setHeight] = useState(minHeight);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -117,44 +117,44 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
     if (containerRef.current) {
-      const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9
+      const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9;
       
       // Adjust to fit exactly within the container with no overflow
-      const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
+      const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth));
       const newHeight = Math.max(
         minHeight,
         Math.min(newWidth / aspectRatio, maxHeight),
-      )
+      );
       
-      setWidth(newWidth)
-      setHeight(newHeight)
+      setWidth(newWidth);
+      setHeight(newHeight);
     }
-  }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio])
+  }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio]);
 
   useEffect(() => {
-    updateSize()
+    updateSize();
 
     const observer = new ResizeObserver(() => {
-      updateSize()
-    })
+      updateSize();
+    });
 
     if (containerRef.current) {
-      observer.observe(containerRef.current)
+      observer.observe(containerRef.current);
     }
 
     return () => {
-      observer.disconnect()
-    }
-  }, [updateSize])
+      observer.disconnect();
+    };
+  }, [updateSize]);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
+    setAnchorEl(event.currentTarget);
 
-  }
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   // New function to handle chart download
   const handleDownloadChart = () => {
@@ -239,12 +239,12 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
     <>
       <Card sx={{ 
         maxWidth: maxWidth, 
-        mx: "auto", 
+        mx: 'auto', 
         mb: 1, 
         boxShadow: '0 4px 20px rgba(0,0,0,0.09)', 
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         borderRadius: '12px',
         border: '1px solid rgba(0, 0, 0, 0.06)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -253,10 +253,10 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
           action={
             <>
               <IconButton aria-label="settings" onClick={handleMenuClick} sx={{
-                position: "relative",
-                "& svg": {
+                position: 'relative',
+                '& svg': {
                   zIndex: 1,
-                  position: "relative",
+                  position: 'relative',
                 },
               }}
               >
@@ -268,26 +268,26 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                 open={menuOpen}
                 onClose={handleMenuClose}
                 anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
+                  vertical: 'bottom',
+                  horizontal: 'right',
                 }}
                 transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
                 PaperProps={{
                   elevation: 3,
                   sx: {
                     width: 320,
                     maxHeight: 500,
-                    overflowY: "hidden",
-                    overflowX: "hidden",
+                    overflowY: 'hidden',
+                    overflowX: 'hidden',
                     padding: 0,
                     borderRadius: '12px',
                     boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
                     border: '1px solid rgba(0,0,0,0.04)',
                     mt: 1, // Add small margin to top
-                    "& .MuiMenu-list": {
+                    '& .MuiMenu-list': {
                       padding: 0, // Remove default padding
                     },
                   },
@@ -341,8 +341,8 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                   onClick={handleFullScreen}
                   sx={{
                     mr: 0.5,
-                    "& svg": {
-                      position: "relative",
+                    '& svg': {
+                      position: 'relative',
                       zIndex: 1,
                     },
                   }}
@@ -356,8 +356,8 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
             <Typography
               variant="overline"
               sx={{
-                padding: "4px 8px",
-                textTransform: "uppercase",
+                padding: '4px 8px',
+                textTransform: 'uppercase',
                 fontWeight: 600,
                 letterSpacing: '0.5px',
                 color: '#2a3f5f'
@@ -370,36 +370,36 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
           sx={{
             background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
             borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-            padding: "4px 16px",
-            height: "40px",
+            padding: '4px 16px',
+            height: '40px',
             borderTopLeftRadius: '12px',
             borderTopRightRadius: '12px',
             flexShrink: 0, // Prevent header from shrinking
           }}
         />
         <CardContent sx={{ 
-          backgroundColor: "#ffffff", 
+          backgroundColor: '#ffffff', 
           py: 2,
           px: 3,
           '&:last-child': { 
             paddingBottom: 3 
           },
           borderRadius: '0 0 12px 12px',
-          display: "flex",
+          display: 'flex',
           flexGrow: 1, // Allow content to grow
-          overflow: "auto", // Only make the content scrollable
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          overflow: 'auto', // Only make the content scrollable
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}>
           <Box 
             ref={containerRef} 
             sx={{ 
-              width: "100%", 
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
+              width: '100%', 
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
             {
@@ -408,7 +408,7 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                 {infoMessage}
                 </Box>
               ) : (
-                 <Box ref={mapRef} style={{ height: "100%", width: "100%" }} />
+                 <Box ref={mapRef} style={{ height: '100%', width: '100%' }} />
               )
             }
           </Box>
@@ -459,8 +459,8 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                   onClick={handleFullscreenMenuClick}
                   sx={{
                     mr: 1,
-                    "& svg": {
-                      position: "relative",
+                    '& svg': {
+                      position: 'relative',
                       zIndex: 1,
                     },
                   }}
@@ -472,26 +472,26 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                   open={fullscreenMenuOpen}
                   onClose={handleFullscreenMenuClose}
                   anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
+                    vertical: 'bottom',
+                    horizontal: 'right',
                   }}
                   transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
+                    vertical: 'top',
+                    horizontal: 'right',
                   }}
                   PaperProps={{
                     elevation: 3,
                     sx: {
                       width: 320,
                       maxHeight: 500,
-                      overflowY: "hidden",
-                      overflowX: "hidden",
+                      overflowY: 'hidden',
+                      overflowX: 'hidden',
                       padding: 0,
                       borderRadius: '12px',
                       boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
                       border: '1px solid rgba(0,0,0,0.04)',
                       mt: 1,
-                      "& .MuiMenu-list": {
+                      '& .MuiMenu-list': {
                         padding: 0,
                       },
                     },
@@ -562,7 +562,7 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
         </DialogActions>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-export default ResponsiveMapCard
+export default ResponsiveMapCard;

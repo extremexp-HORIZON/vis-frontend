@@ -1,11 +1,11 @@
-import type {IPlotModel } from "./plotmodel.model";
+import type {IPlotModel } from './plotmodel.model';
 
 export interface IInitialization {
   featureExplanation: {
     featureNames: string[];
     plots: {
       pdp: IPlotModel | null;
-      "2dpdp": IPlotModel | null;
+      '2dpdp': IPlotModel | null;
       ale: IPlotModel | null;
     };
     tables: {
@@ -19,7 +19,7 @@ export interface IInitialization {
     hyperparameterNames: string[];
     plots: {
       pdp: IPlotModel | null;
-      "2dpdp": IPlotModel | null;
+      '2dpdp': IPlotModel | null;
       ale: IPlotModel | null;
     };
     tables: {

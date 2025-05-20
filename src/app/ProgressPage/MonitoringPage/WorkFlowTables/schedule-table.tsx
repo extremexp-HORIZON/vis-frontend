@@ -1,89 +1,89 @@
-import Paper from "@mui/material/Paper"
-import Box from "@mui/material/Box"
-import ArrowUp from "@mui/icons-material/KeyboardArrowUp"
-import ArrowDown from "@mui/icons-material/KeyboardArrowDown"
-import { Close } from "@mui/icons-material"
-import ToolBarWorkflow from "./toolbar-workflow-table"
-import FilterBar from "../../../../shared/components/filter-bar"
-import { Popover, styled } from "@mui/material"
-import type { RootState} from "../../../../store/store";
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { useEffect, useRef, useState } from "react"
-import { setScheduledTable } from "../../../../store/slices/monitorPageSlice"
-import type { GridColumnNode } from "@mui/x-data-grid"
-import { DataGrid } from "@mui/x-data-grid"
-import theme from "../../../../mui-theme"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import ScheduleIcon from "@mui/icons-material/Schedule"
-import type { CustomGridColDef } from "../../../../shared/types/table-types"
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import ArrowUp from '@mui/icons-material/KeyboardArrowUp';
+import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import { Close } from '@mui/icons-material';
+import ToolBarWorkflow from './toolbar-workflow-table';
+import FilterBar from '../../../../shared/components/filter-bar';
+import { Popover, styled } from '@mui/material';
+import type { RootState} from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { useEffect, useRef, useState } from 'react';
+import { setScheduledTable } from '../../../../store/slices/monitorPageSlice';
+import type { GridColumnNode } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
+import theme from '../../../../mui-theme';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import type { CustomGridColDef } from '../../../../shared/types/table-types';
 export interface Data {
   [key: string]: string | number | boolean
 }
 
-let idCounter = 1
+let idCounter = 1;
 
 const WorkflowActions = (props: {
   id: number,
 }) => {
-  const { id } = props
+  const { id } = props;
   const dispatch = useAppDispatch();
   const { scheduledTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
-  )
+  );
 
   const handleIndexChange = (indexChange: number, id: number) => {
-    const rowIndex = scheduledTable.rows.findIndex(row => row.id === id)
-    const newIndex = rowIndex + indexChange
+    const rowIndex = scheduledTable.rows.findIndex(row => row.id === id);
+    const newIndex = rowIndex + indexChange;
     if (newIndex < 0 || newIndex >= scheduledTable.rows.length) {
-      return
+      return;
     } else {
-      const updatedRows = [...scheduledTable.rows]
-      const [movedRow] = updatedRows.splice(rowIndex, 1)
-      updatedRows.splice(newIndex, 0, movedRow)
+      const updatedRows = [...scheduledTable.rows];
+      const [movedRow] = updatedRows.splice(rowIndex, 1);
+      updatedRows.splice(newIndex, 0, movedRow);
 
       const newRows = updatedRows.map((row, index) => ({
         ...row,
         id: index + 1,
-      }))
+      }));
       dispatch(
         setScheduledTable({ rows: newRows, visibleRows: newRows }),
-      )
+      );
     }
-  }
+  };
 
   const removeRow =
   (list: Number) => {
     let filteredWorkflows = scheduledTable.rows.filter(
         row => !(row.id === id),
-      )
+      );
     dispatch(
       setScheduledTable({
         rows: filteredWorkflows,
         visibleRows: filteredWorkflows,
         selectedWorkflows: [],
       }),
-    )
-  }
+    );
+  };
 
   const isStartRow = (id: number): boolean => {
     if (id === 1) {
-      return true
+      return true;
     }
-    return false
-  }
+    return false;
+  };
   const isEndRow = (id: number): boolean => {
     if (id === scheduledTable.rows.length) {
-      return true
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   return (
-    <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+    <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
       <ArrowUp
         onClick={() => handleIndexChange(-1, id)}
         sx={{
-          cursor: "pointer",
+          cursor: 'pointer',
           color: theme =>
             isStartRow(id)
               ? theme.palette.text.disabled
@@ -93,7 +93,7 @@ const WorkflowActions = (props: {
       <ArrowDown
         onClick={() => handleIndexChange(1, id)}
         sx={{
-          cursor: "pointer",
+          cursor: 'pointer',
           color: theme =>
             isEndRow(id)
               ? theme.palette.text.disabled
@@ -103,62 +103,62 @@ const WorkflowActions = (props: {
       <Close
         onClick={() => removeRow(id)} // TODO: Create function deleting the workflow (delete from scheduled? Or from whole database?)
         sx={{
-          cursor: "pointer",
+          cursor: 'pointer',
           color: theme => theme.palette.primary.main,
         }}
       />
     </span>
-  )
-}
+  );
+};
 
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-  "& .MuiDataGrid-scrollbarFiller": {
+  '& .MuiDataGrid-scrollbarFiller': {
     backgroundColor: theme.palette.customGrey.main,
   },
-  "& .MuiDataGrid-columnHeader": {
+  '& .MuiDataGrid-columnHeader': {
     backgroundColor: theme.palette.customGrey.main,
   },
   '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
     backgroundColor: theme.palette.customGrey.main,
   },
-  "& .MuiDataGrid-columnHeaderTitle": {
-    whiteSpace: "nowrap",
-    overflow: "visible",
+  '& .MuiDataGrid-columnHeaderTitle': {
+    whiteSpace: 'nowrap',
+    overflow: 'visible',
   },
-  "& .datagrid-header-fixed": {
+  '& .datagrid-header-fixed': {
     // Action column
-    position: "sticky",
+    position: 'sticky',
     right: 0,
     zIndex: 100,
     backgroundColor: theme.palette.customGrey.main,
-    borderLeft: "1px solid #ddd",
+    borderLeft: '1px solid #ddd',
   },
   '& .MuiDataGrid-cell[data-field="action"]': {
-    position: "sticky",
+    position: 'sticky',
     right: 0,
     backgroundColor: theme.palette.customGrey.light,
     zIndex: 90,
-    borderLeft: "1px solid #ddd",
+    borderLeft: '1px solid #ddd',
   },
   // Add pagination styling
-  "& .MuiDataGrid-footerContainer": {
-    minHeight: "56px",
-    borderTop: "1px solid rgba(224, 224, 224, 1)",
+  '& .MuiDataGrid-footerContainer': {
+    minHeight: '56px',
+    borderTop: '1px solid rgba(224, 224, 224, 1)',
   },
-  "& .MuiTablePagination-root": {
-    overflow: "visible",
+  '& .MuiTablePagination-root': {
+    overflow: 'visible',
   },
   '& .MuiDataGrid-columnHeader[data-field="__action_group__"]': {
     position: 'sticky',
     right: 0,
     zIndex: 1000,
     backgroundColor: theme.palette.customGrey.main,
-    borderLeft: "1px solid #ddd",
+    borderLeft: '1px solid #ddd',
     display: 'flex',
     justifyContent: 'center', // Center the header content
     alignItems: 'center', // Vertically center
   },
-}))
+}));
 
 // Create a custom NoRowsOverlay component using InfoMessage
 const CustomNoRowsOverlay = () => {
@@ -166,103 +166,103 @@ const CustomNoRowsOverlay = () => {
     <InfoMessage 
       message="No scheduled workflows available."
       type="info"
-      icon={<ScheduleIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      icon={<ScheduleIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
-  )
-}
+  );
+};
 
 export default function ScheduleTable() {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
-  )
+  );
   const { scheduledTable } = useAppSelector(
     (state: RootState) => state.monitorPage
-  )
-  const dispatch = useAppDispatch()
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-  const [isFilterOpen, setFilterOpen] = useState(false)
-  const paramLength = useRef(0)
+  );
+  const dispatch = useAppDispatch();
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [isFilterOpen, setFilterOpen] = useState(false);
+  const paramLength = useRef(0);
 
   useEffect(() => {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
-        workflows.data.filter(workflow => workflow.status === "SCHEDULED")
+        workflows.data.filter(workflow => workflow.status === 'SCHEDULED')
         .reduce((acc: any[], workflow) => {
-          const params = workflow.params
-          let paramNames = []
+          const params = workflow.params;
+          let paramNames = [];
           if (params) {
-            paramNames = params.map(param => param.name)
-            return [...acc, ...paramNames]
+            paramNames = params.map(param => param.name);
+            return [...acc, ...paramNames];
           } else {
-            return [...acc]
+            return [...acc];
           }
         }, []),
-      )
+      );
       const uniqueTasks = new Set(
-        workflows.data.filter(workflow => workflow.status === "SCHEDULED")
+        workflows.data.filter(workflow => workflow.status === 'SCHEDULED')
         .reduce((acc: any[], workflow) => {
-          const tasks = workflow?.tasks
-          let taskNames = []
+          const tasks = workflow?.tasks;
+          let taskNames = [];
           if(tasks) {
-            taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name)
-            return [...acc, ...taskNames]
+            taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
+            return [...acc, ...taskNames];
           } else {
-            return [...acc]
+            return [...acc];
           }
         }, [])
-      )
+      );
 
       const rows = workflows.data
-        .filter(workflow => workflow.status === "SCHEDULED")
+        .filter(workflow => workflow.status === 'SCHEDULED')
         .map(workflow => {
-          const params = workflow.params
-          const tasks = workflow?.tasks
+          const params = workflow.params;
+          const tasks = workflow?.tasks;
           return {
             id: idCounter++,
             workflowId: workflow.name,
             // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
-                tasks?.find(task => task.name === variant)?.variant || ""
-              return acc
+                tasks?.find(task => task.name === variant)?.variant || '';
+              return acc;
             }, {}),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
-                params?.find(param => param.name === variant)?.value || ""
-              return acc
+                params?.find(param => param.name === variant)?.value || '';
+              return acc;
             }, {}),
             status: workflow.status.toLowerCase(),
             // ...Object.keys(workflow.constraints)
             //   .map(key => ({ [key]: workflow.constraints[key] }))
             //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
-            action: "",
-          }
+            action: '',
+          };
         })
-        .sort((a, b) => a.id - b.id)
-      const workflow = workflows.data[0]
-      const params = workflow.params
-      const tasks = workflow?.tasks
+        .sort((a, b) => a.id - b.id);
+      const workflow = workflows.data[0];
+      const params = workflow.params;
+      const tasks = workflow?.tasks;
       const infoRow = {
         id: idCounter++,
         workflowId: workflow.id,
         // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
         ...Array.from(uniqueTasks).reduce((acc, variant) => {
           acc[variant] =
-            tasks?.find(task => task.name === variant)?.variant || ""
-          return acc
+            tasks?.find(task => task.name === variant)?.variant || '';
+          return acc;
         }, {}),
         ...Array.from(uniqueParameters).reduce((acc, variant) => {
           acc[variant] =
-            `${params?.find(param => param.name === variant)?.value}` || ""
-          return acc
+            `${params?.find(param => param.name === variant)?.value}` || '';
+          return acc;
         }, {}),
         status: workflow.status,
         // ...Object.keys(workflow.constraints)
         //   .map(key => ({ [key]: workflow.constraints[key] }))
         //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
-        action: "",
-      }
+        action: '',
+      };
       // .filter(workflow => workflow.status === "scheduled")
       // .map(workflow => {
       //   const params = workflow.tasks.find(
@@ -287,30 +287,30 @@ export default function ScheduleTable() {
       const columns: CustomGridColDef[] =
         infoRow
           ? Object.keys(infoRow)
-              .filter(key => key !== "id")
+              .filter(key => key !== 'id')
               .map(key => ({
                 field: key,
-                headerName:  key === "action" ? "" : key.replace("_", " "),
+                headerName:  key === 'action' ? '' : key.replace('_', ' '),
                 headerClassName:
-                key === "action" ? "datagrid-header-fixed" : "datagrid-header",
-                minWidth: key === "action" ? 120 : key === "status" ? key.length * 10 + 40 : key.length * 10,
+                key === 'action' ? 'datagrid-header-fixed' : 'datagrid-header',
+                minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,
                 flex: 1,
-                align: "center",
-                headerAlign: "center",
+                align: 'center',
+                headerAlign: 'center',
                 sortable: false,    
-                type: (rows.length > 0 && typeof rows[0][key] === "number") ? "number" : "string",
-                ...(key === "action" && {
+                type: (rows.length > 0 && typeof rows[0][key] === 'number') ? 'number' : 'string',
+                ...(key === 'action' && {
                   renderCell: (params) => {
                     return (
                       <WorkflowActions
                         id={params.row.id}
                       />
-                    )
+                    );
                   }
                 })
               }))
-          : []
-      paramLength.current = uniqueParameters.size
+          : [];
+      paramLength.current = uniqueParameters.size;
         const visibilityModel = columns.reduce((acc, col) => {
           acc[col.field] = true;
           return acc;
@@ -326,26 +326,26 @@ export default function ScheduleTable() {
           uniqueParameters: Array.from(uniqueParameters),
           uniqueTasks: Array.from(uniqueTasks)
         }),
-      )
+      );
     }
-  }, [workflows.data])
+  }, [workflows.data]);
 
   const filterClicked = (event: React.MouseEvent<HTMLElement>) => {
-    setFilterOpen(!isFilterOpen)
-    !isFilterOpen ? setAnchorEl(event.currentTarget as HTMLButtonElement) : setAnchorEl(null)
-  }
+    setFilterOpen(!isFilterOpen);
+    !isFilterOpen ? setAnchorEl(event.currentTarget as HTMLButtonElement) : setAnchorEl(null);
+  };
 
   const removeSelected =
     (list: Number[] | string) => (e: React.SyntheticEvent) => {
-      let filteredWorkflows
-      if (typeof list !== "string") {
+      let filteredWorkflows;
+      if (typeof list !== 'string') {
         filteredWorkflows = scheduledTable.rows.filter(
           row => !list.includes(row.id),
-        )
+        );
       } else {
         filteredWorkflows = scheduledTable.rows.filter(
           row => !scheduledTable.selectedWorkflows.includes(row.id),
-        )
+        );
       }
       dispatch(
         setScheduledTable({
@@ -353,10 +353,8 @@ export default function ScheduleTable() {
           visibleRows: filteredWorkflows,
           selectedWorkflows: [],
         }),
-      )
-    }
-
-    
+      );
+    };
 
   const handleFilterChange = (
     index: number,
@@ -364,82 +362,82 @@ export default function ScheduleTable() {
     operator: string,
     value: string,
   ) => {
-    const newFilters = [...scheduledTable.filters]
-    newFilters[index] = { column, operator, value }
-    dispatch(setScheduledTable({ filters: newFilters }))
-  }
+    const newFilters = [...scheduledTable.filters];
+    newFilters[index] = { column, operator, value };
+    dispatch(setScheduledTable({ filters: newFilters }));
+  };
 
   const handleAddFilter = () => {
     dispatch(
       setScheduledTable({
         filters: [
           ...scheduledTable.filters,
-          { column: "", operator: "", value: "" },
+          { column: '', operator: '', value: '' },
         ],
       }),
-    )
-  }
+    );
+  };
 
   const handleRemoveFilter = (index: number) => {
     const newFilters = scheduledTable.filters.filter(
       (_, i) => i !== index,
-    )
-    dispatch(setScheduledTable({ filters: newFilters }))
-  }
+    );
+    dispatch(setScheduledTable({ filters: newFilters }));
+  };
 
   useEffect(() => {
-      let counter = 0
-      let newRows = scheduledTable.rows
+      let counter = 0;
+      let newRows = scheduledTable.rows;
       if(scheduledTable.filters.length > 0) {
       for (let i = 0; i < scheduledTable.filters.length; i++) {
-        if (scheduledTable.filters[i].value !== "") {
-          counter++
+        if (scheduledTable.filters[i].value !== '') {
+          counter++;
         }
       }
       // dispatch(setScheduledTable({ filtersCounter: counter }))
        newRows = scheduledTable.rows.filter(row => {
         return scheduledTable.filters.every(filter => {
-          if (filter.value === "") return true
+          if (filter.value === '') return true;
           const cellValue = row[filter.column as keyof Data]
             ?.toString()
-            .toLowerCase()
-          const filterValue = filter.value.toLowerCase()
-          if (!cellValue) return false
+            .toLowerCase();
+          const filterValue = filter.value.toLowerCase();
+          if (!cellValue) return false;
 
           switch (filter.operator) {
-            case "contains":
-              return cellValue.includes(filterValue)
-            case "=":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue
-            case "startsWith":
-              return cellValue.startsWith(filterValue)
-            case "endsWith":
-              return cellValue.endsWith(filterValue)
-            case ">":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true
-            case "<":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true
-            case ">=":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true
-            case "<=":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true    
+            case 'contains':
+              return cellValue.includes(filterValue);
+            case '=':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue;
+            case 'startsWith':
+              return cellValue.startsWith(filterValue);
+            case 'endsWith':
+              return cellValue.endsWith(filterValue);
+            case '>':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true;
+            case '<':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true;
+            case '>=':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true;
+            case '<=':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true;    
             default:
-              return true
+              return true;
           }
-        })
-      })
+        });
+      });
     }
     dispatch(
         setScheduledTable({
           filtersCounter: counter,
           filteredRows: newRows,
         }),
-      )
-  }, [scheduledTable.filters])
+      );
+  }, [scheduledTable.filters]);
 
   return (
-    <Box sx={{height: "100%"}} >
-      <Paper sx={{ height: "100%", width: "100%", mb: 2 }} elevation={2}>
+    <Box sx={{height: '100%'}} >
+      <Paper sx={{ height: '100%', width: '100%', mb: 2 }} elevation={2}>
         <Box >
           <ToolBarWorkflow
             key="scheduled-toolbar"
@@ -447,7 +445,7 @@ export default function ScheduleTable() {
             filterClickedFunction={filterClicked}
             actionButtonName="Cancel selected workflows"
             numSelected={scheduledTable.selectedWorkflows.length}
-            tableName={"Scheduled Workflows"}
+            tableName={'Scheduled Workflows'}
             handleClickedFunction={removeSelected}
             onRemoveFilter={handleRemoveFilter}
             filters={scheduledTable.filters}
@@ -456,13 +454,13 @@ export default function ScheduleTable() {
           />
         </Box>
         <Popover
-          id={"Filters"}
+          id={'Filters'}
           open={isFilterOpen}
           anchorEl={anchorEl}
           onClose={() => setFilterOpen(false)}
           anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
+            vertical: 'bottom',
+            horizontal: 'left',
           }}
         >
           <Box sx={{ p: 2 }}>
@@ -477,7 +475,7 @@ export default function ScheduleTable() {
           </Box>
         </Popover>
 
-        <div style={{ height: 'calc(100% - 64px)', width: "100%" }}>
+        <div style={{ height: 'calc(100% - 64px)', width: '100%' }}>
           <StyledDataGrid
             disableVirtualization
             density="compact"
@@ -493,39 +491,39 @@ export default function ScheduleTable() {
             }}
             checkboxSelection
             sx={{
-              "& .MuiDataGrid-selectedRowCount": {
-                visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header
+              '& .MuiDataGrid-selectedRowCount': {
+                visibility: 'hidden', // Remove the selection count text on the bottom because we implement it in the header
               },
-              "& .theme-parameters-group": {
-                textAlign: "center",
-                justifyContent: "center",
-                position: "relative",
-                display: "grid",
-                width: "100%",
-                "&::after": {
+              '& .theme-parameters-group': {
+                textAlign: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                display: 'grid',
+                width: '100%',
+                '&::after': {
                   content: '""',
-                  display: "block",
-                  width: "100%",
-                  height: "2px",
+                  display: 'block',
+                  width: '100%',
+                  height: '2px',
                   backgroundColor: theme.palette.primary.main,
-                  position: "absolute",
+                  position: 'absolute',
                   bottom: 0,
                   left: 0,
                 },
               },
-              "& .theme-parameters-group-2": {
-                textAlign: "center",
-                justifyContent: "center",
-                position: "relative",
-                display: "grid",
-                width: "100%",
-                "&::after": {
+              '& .theme-parameters-group-2': {
+                textAlign: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                display: 'grid',
+                width: '100%',
+                '&::after': {
                   content: '""',
-                  display: "block",
-                  width: "100%",
-                  height: "2px",
+                  display: 'block',
+                  width: '100%',
+                  height: '2px',
                   backgroundColor: theme.palette.secondary.dark,
-                  position: "absolute",
+                  position: 'absolute',
                   bottom: 0,
                   left: 0,
                 },
@@ -539,8 +537,8 @@ export default function ScheduleTable() {
             }}
             columnGroupingModel={[
               {
-                groupId: "Parameters",
-                headerClassName: "theme-parameters-group",
+                groupId: 'Parameters',
+                headerClassName: 'theme-parameters-group',
                 children: scheduledTable.uniqueParameters.length > 0
                   ? (scheduledTable.uniqueParameters.map(
                       (param): GridColumnNode => ({
@@ -550,8 +548,8 @@ export default function ScheduleTable() {
                   : [],
               },
               {
-                groupId: "Task Variants",
-                headerClassName: "theme-parameters-group-2",
+                groupId: 'Task Variants',
+                headerClassName: 'theme-parameters-group-2',
                 children: scheduledTable.uniqueTasks.length > 0 ? (
                   scheduledTable.uniqueTasks.map(
                     (task): GridColumnNode => ({
@@ -561,12 +559,12 @@ export default function ScheduleTable() {
                 ) : []
               },
               {
-                groupId: "Actions",
-                headerClassName: "datagrid-header-fixed",
-                headerAlign: "center",
+                groupId: 'Actions',
+                headerClassName: 'datagrid-header-fixed',
+                headerAlign: 'center',
                 children: [
                   {
-                    field: "action",
+                    field: 'action',
                   } as GridColumnNode
                 ]
               }
@@ -575,5 +573,5 @@ export default function ScheduleTable() {
         </div>
       </Paper>
     </Box>
-  )
+  );
 }

@@ -1,33 +1,33 @@
-import { Box, useTheme, useMediaQuery } from "@mui/material"
-import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import BarChartControlPanel from "../ChartControls/data-exploration-bar-control"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import AssessmentIcon from "@mui/icons-material/Assessment"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { useEffect } from "react"
-import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
-import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
+import { Box, useTheme, useMediaQuery } from '@mui/material';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import BarChartControlPanel from '../ChartControls/data-exploration-bar-control';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { useEffect } from 'react';
+import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
+import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const BarChart = () => {
-  const dispatch = useAppDispatch()
-  const { tab } = useAppSelector(state => state.workflowPage)
-  const theme = useTheme()
+  const dispatch = useAppDispatch();
+  const { tab } = useAppSelector(state => state.workflowPage);
+  const theme = useTheme();
 
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   useEffect(() => {
-    const groupBy = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy
+    const groupBy = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy;
     const aggregation =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || ""
-    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregation;
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
+    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
 
     if (
       !datasetId ||
       !groupBy?.length ||
       !Object.keys(aggregation || {}).length
     ) {
-      return // Don't dispatch if missing dataset, groupBy, or aggregation
+      return; // Don't dispatch if missing dataset, groupBy, or aggregation
     }
     dispatch(
       fetchDataExplorationData({
@@ -39,26 +39,26 @@ const BarChart = () => {
           filters,
         },
         metadata: {
-          workflowId: tab?.workflowId || "",
-          queryCase: "barChart",
+          workflowId: tab?.workflowId || '',
+          queryCase: 'barChart',
         },
       }),
-    )
+    );
   }, [
     tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy,
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,
     tab?.dataTaskTable.selectedItem?.data?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
-  ])
+  ]);
 
-  const columns = tab?.workflowTasks.dataExploration?.barChart.data?.columns
-  const xAxisColumn = columns?.find(col => col.type === "STRING")?.name
+  const columns = tab?.workflowTasks.dataExploration?.barChart.data?.columns;
+  const xAxisColumn = columns?.find(col => col.type === 'STRING')?.name;
   const categoricalColumns = columns?.filter(
-    col => col.type === "STRING" && col.name !== xAxisColumn,
-  )
+    col => col.type === 'STRING' && col.name !== xAxisColumn,
+  );
   const yAxisColumns = columns
-    ?.filter(col => col.type === "DOUBLE")
-    .map(col => col.name)
+    ?.filter(col => col.type === 'DOUBLE')
+    .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
   const transformedData =
@@ -75,92 +75,92 @@ const BarChart = () => {
             ]),
           ), // Include all categorical values
         })),
-    )
+    );
 
-    const limitedData = transformedData?.slice(0, 20)
+    const limitedData = transformedData?.slice(0, 20);
 
   const specification = {
-    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     description:
-      "A grouped bar chart showing different numeric values by category.",
-    autosize: { type: "fit", contains: "padding", resize: true },
+      'A grouped bar chart showing different numeric values by category.',
+    autosize: { type: 'fit', contains: 'padding', resize: true },
     data: { values: limitedData },
-    mark: "bar",
+    mark: 'bar',
     params: [
       {
-        name: "industry",
-        select: { type: "point", fields: ["type"] },
-        bind: "legend",
+        name: 'industry',
+        select: { type: 'point', fields: ['type'] },
+        bind: 'legend',
       },
     ],
     encoding: {
       y: {
         field: xAxisColumn,
-        type: "nominal",
+        type: 'nominal',
         axis: {
           labelAngle: 0,
           labelLimit: 100,
-          labelOverlap: "parity",
+          labelOverlap: 'parity',
           tickCount: Math.floor(500 / 20), // Show only ticks that fit within height 800
         },
         sort: null,
       },
       x: {
-        field: "value",
-        type: "quantitative",
-        title: "Value",
+        field: 'value',
+        type: 'quantitative',
+        title: 'Value',
       },
       color: {
-        field: "type",
-        type: "nominal",
-        title: "Metric",
+        field: 'type',
+        type: 'nominal',
+        title: 'Metric',
         // legend:
         //   null
       },
       xOffset: {
-        field: "type",
-        type: "nominal",
+        field: 'type',
+        type: 'nominal',
       },
       tooltip: [
-        { field: xAxisColumn, type: "nominal", title: xAxisColumn },
+        { field: xAxisColumn, type: 'nominal', title: xAxisColumn },
         ...(categoricalColumns || []).map(col => ({
           field: col.name,
-          type: "nominal",
+          type: 'nominal',
           title: col.name,
         })),
-        { field: "value", type: "quantitative", title: "Value" },
-        { field: "type", type: "nominal", title: "Metric" },
+        { field: 'value', type: 'quantitative', title: 'Value' },
+        { field: 'type', type: 'nominal', title: 'Metric' },
       ],
       opacity: {
-        condition: { param: "industry", value: 1 },
+        condition: { param: 'industry', value: 1 },
         value: 0.01,
       },
     },
-  }
+  };
 
   const info = (
     <InfoMessage
       message="Please select both Group By and Aggregation to display the chart."
       type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
-  )
+  );
   const hasValidAggregation = Object.values(
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {},
-  ).some((val: any) => Array.isArray(val) && val.length > 0)
+  ).some((val: any) => Array.isArray(val) && val.length > 0);
 
   const hasGroupBy =
     (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length >
-    0
+    0;
 
-  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation
+  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation;
   return (
-    <Box sx={{ height: "99%" }}>
+    <Box sx={{ height: '99%' }}>
       <ResponsiveCardVegaLite
         spec={specification}
         actions={false}
-        title={"Bar Chart"}
+        title={'Bar Chart'}
         maxHeight={500}
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
         controlPanel={<BarChartControlPanel />}
@@ -169,7 +169,7 @@ const BarChart = () => {
         loading={tab?.workflowTasks.dataExploration?.barChart?.loading}
       />
     </Box>
-  )
-}
+  );
+};
 
-export default BarChart
+export default BarChart;

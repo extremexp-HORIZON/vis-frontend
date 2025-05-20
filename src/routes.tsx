@@ -1,22 +1,22 @@
-import { createBrowserRouter } from "react-router-dom"
-import ProgressPage from "./app/ProgressPage/progress-page";
-import ErrorPage from "./error-page";
-import NotFound from "./not-found";
-import MonitoringPage from "./app/ProgressPage/MonitoringPage/monitoring-page";
-import WorkflowTab from "./app/ProgressPage/WorkflowTab/workflow-tab";
-import ProgressPageLoading from "./app/ProgressPage/progress-page-loading";
-import LoginPage from "./app/LoginPage/login-page";
-import ProtectedRoute from "./protected-route";
-import TokenAuthHandler from "./token-auth-handler";
+import { createBrowserRouter } from 'react-router-dom';
+import ProgressPage from './app/ProgressPage/progress-page';
+import ErrorPage from './error-page';
+import NotFound from './not-found';
+import MonitoringPage from './app/ProgressPage/MonitoringPage/monitoring-page';
+import WorkflowTab from './app/ProgressPage/WorkflowTab/workflow-tab';
+import ProgressPageLoading from './app/ProgressPage/progress-page-loading';
+import LoginPage from './app/LoginPage/login-page';
+import ProtectedRoute from './protected-route';
+import TokenAuthHandler from './token-auth-handler';
 
 const routes = createBrowserRouter([
   {
-    path: "/login",
+    path: '/login',
     element: <LoginPage />,
     errorElement: <ErrorPage />
   },
   {
-    path: "/:experimentId",
+    path: '/:experimentId',
     element: (
       // <ProtectedRoute>
         <ProgressPageLoading />
@@ -25,12 +25,12 @@ const routes = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/external/:token/:experimentId?",
+    path: '/external/:token/:experimentId?',
     element: <TokenAuthHandler />,
     errorElement: <ErrorPage />
   },
   {
-    path: "/:experimentId/monitoring",
+    path: '/:experimentId/monitoring',
     element: (
       // <ProtectedRoute>
         <ProgressPage>
@@ -41,7 +41,7 @@ const routes = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/:experimentId/workflow",
+    path: '/:experimentId/workflow',
     element: (
       // <ProtectedRoute>
         <ProgressPage>
@@ -52,7 +52,7 @@ const routes = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "*",
+    path: '*',
     element: <NotFound />,
     errorElement: <NotFound />
   }

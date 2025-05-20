@@ -1,8 +1,8 @@
-import type { Axis, Features } from "./initialization.model";
+import type { Axis, Features } from './initialization.model';
 
 export interface IPlotModel {
-    explainabilityType: "featureExplanation" | "hyperparameterExplanation";
-    explanationMethod: "ale" | "pdp" | "2dpdp" | "counterfactuals" | "influenceFunctions";
+    explainabilityType: 'featureExplanation' | 'hyperparameterExplanation';
+    explanationMethod: 'ale' | 'pdp' | '2dpdp' | 'counterfactuals' | 'influenceFunctions';
     explainabilityModel: string;
     plotName: string;
     plotDescr: string;
@@ -50,6 +50,3 @@ export interface IPlotModel {
       actions: Record<string, unknown>;
     };
   }
-
-
-  

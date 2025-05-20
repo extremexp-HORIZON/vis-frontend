@@ -1,19 +1,19 @@
-import { useParams } from "react-router-dom";
-import type { RootState } from "../../../../store/store";
-import { useAppDispatch, useAppSelector } from "../../../../store/store";
-import { useEffect, useState } from "react";
-import InfoMessage from "../../../../shared/components/InfoMessage";
-import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded";
-import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite";
-import { fetchRocCurve } from "../../../../store/slices/modelAnalysisSlice";
-import Loader from "../../../../shared/components/loader";
+import { useParams } from 'react-router-dom';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { useEffect, useState } from 'react';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import { fetchRocCurve } from '../../../../store/slices/modelAnalysisSlice';
+import Loader from '../../../../shared/components/loader';
 
 const RocCurvePlot = () => {
   const dispatch = useAppDispatch();
   const { experimentId } = useParams();
   const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage);
   const rocState = tab?.workflowTasks.modelAnalysis?.modelRocCurve;
-  const aucValue = rocState?.data?.auc?.toFixed(3) || "";
+  const aucValue = rocState?.data?.auc?.toFixed(3) || '';
 
   const [rocData, setRocData] = useState<
     { fpr: number; tpr: number; threshold: number }[]
@@ -21,7 +21,7 @@ const RocCurvePlot = () => {
 
   useEffect(() => {
     if (tab) {
-      dispatch(fetchRocCurve({ experimentId: experimentId || "", runId: tab.workflowId || "" }));
+      dispatch(fetchRocCurve({ experimentId: experimentId || '', runId: tab.workflowId || '' }));
     }
   }, [isTabInitialized]);
 
@@ -38,40 +38,40 @@ const RocCurvePlot = () => {
   }, [rocState?.data]);
 
   const rocSpec = {
-    description: "ROC Curve with Dynamic AUC Label",
+    description: 'ROC Curve with Dynamic AUC Label',
     data: { values: rocData },
     layer: [
       // ROC Curve Line
       {
-        mark: { type: "line", point: true },
+        mark: { type: 'line', point: true },
         encoding: {
           x: {
-            field: "fpr",
-            type: "quantitative",
-            title: "False Positive Rate (FPR)",
+            field: 'fpr',
+            type: 'quantitative',
+            title: 'False Positive Rate (FPR)',
             scale: { domain: [0, 1] }
           },
           y: {
-            field: "tpr",
-            type: "quantitative",
-            title: "True Positive Rate (TPR)",
+            field: 'tpr',
+            type: 'quantitative',
+            title: 'True Positive Rate (TPR)',
             scale: { domain: [0, 1] }
           },
           tooltip: [
-            { field: "fpr", type: "quantitative", title: "FPR" },
-            { field: "tpr", type: "quantitative", title: "TPR" },
-            { field: "threshold", type: "quantitative", title: "Threshold" }
+            { field: 'fpr', type: 'quantitative', title: 'FPR' },
+            { field: 'tpr', type: 'quantitative', title: 'TPR' },
+            { field: 'threshold', type: 'quantitative', title: 'Threshold' }
           ]
         }
       },
   
       // Diagonal Reference Line
       {
-        mark: { type: "line", strokeDash: [4, 4], color: "#888" },
+        mark: { type: 'line', strokeDash: [4, 4], color: '#888' },
         data: { values: [{ fpr: 0, tpr: 0 }, { fpr: 1, tpr: 1 }] },
         encoding: {
-          x: { field: "fpr", type: "quantitative" },
-          y: { field: "tpr", type: "quantitative" }
+          x: { field: 'fpr', type: 'quantitative' },
+          y: { field: 'tpr', type: 'quantitative' }
         }
       },
   
@@ -82,34 +82,34 @@ const RocCurvePlot = () => {
           transform: [
             {
               aggregate: [
-                { op: "max", field: "fpr", as: "maxFpr" },
-                { op: "min", field: "tpr", as: "minTpr" }
+                { op: 'max', field: 'fpr', as: 'maxFpr' },
+                { op: 'min', field: 'tpr', as: 'minTpr' }
               ]
             }
           ],
           mark: {
-            type: "text",
-            align: "right",
-            baseline: "bottom",
+            type: 'text',
+            align: 'right',
+            baseline: 'bottom',
             fontSize: 14,
-            fontWeight: "bold",
-            fill: "#2c3e50",
+            fontWeight: 'bold',
+            fill: '#2c3e50',
             dx: -10,
             dy: -10
           },
           encoding: {
-            x: { field: "maxFpr", type: "quantitative" },
-            y: { field: "minTpr", type: "quantitative" },
+            x: { field: 'maxFpr', type: 'quantitative' },
+            y: { field: 'minTpr', type: 'quantitative' },
             text: { value: `AUC: ${aucValue}` }
           }
         }
       ] : [])
     ],
     config: {
-      view: { stroke: "transparent" },
+      view: { stroke: 'transparent' },
       axis: {
-        labelFont: "Arial",
-        titleFont: "Arial",
+        labelFont: 'Arial',
+        titleFont: 'Arial',
         labelFontSize: 12,
         titleFontSize: 14
       }
@@ -124,7 +124,7 @@ const RocCurvePlot = () => {
     <InfoMessage
       message="Error fetching ROC curve."
       type="info"
-      icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
   );

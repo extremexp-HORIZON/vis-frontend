@@ -14,4 +14,3 @@ export interface IMetricDefinition {
     /** Optional: Whether a higher value is considered better. */
     greaterIsBetter?: boolean;
   }
-  

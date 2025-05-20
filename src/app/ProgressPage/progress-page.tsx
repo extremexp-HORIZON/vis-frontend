@@ -1,20 +1,20 @@
-import Box from "@mui/material/Box"
-import type { ReactNode } from "react"
-import { useEffect, useRef } from "react"
-import type { RootState } from "../../store/store"
-import { useAppDispatch, useAppSelector } from "../../store/store"
+import Box from '@mui/material/Box';
+import type { ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
+import type { RootState } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   useLocation,
   useNavigate,
   useParams,
-} from "react-router-dom"
+} from 'react-router-dom';
 import {
   fetchExperimentWorkflows,
   setMenuOptions,
-} from "../../store/slices/progressPageSlice"
-import ProgressPageLoading from "./progress-page-loading"
-import LeftMenu from "./left-menu"
-import ExperimentControls from "./experiment-controls"
+} from '../../store/slices/progressPageSlice';
+import ProgressPageLoading from './progress-page-loading';
+import LeftMenu from './left-menu';
+import ExperimentControls from './experiment-controls';
 
 interface ProgressPageProps {
   children?: ReactNode
@@ -23,48 +23,48 @@ interface ProgressPageProps {
 const ProgressPage = (props: ProgressPageProps) => {
   const { experiment, workflows, initialization, menuOptions } = useAppSelector(
     (state: RootState) => state.progressPage,
-  )
-  const { experimentId } = useParams()
-  const dispatch = useAppDispatch()
-  const intervalId = useRef<NodeJS.Timeout | null>(null)
-  const { children } = props
-  const location = useLocation()
+  );
+  const { experimentId } = useParams();
+  const dispatch = useAppDispatch();
+  const intervalId = useRef<NodeJS.Timeout | null>(null);
+  const { children } = props;
+  const location = useLocation();
 
   useEffect(() => {
-    const pathParts = location.pathname.split("/").filter(Boolean)
+    const pathParts = location.pathname.split('/').filter(Boolean);
 
-    if (location.pathname.includes("workflow"))
-      dispatch(setMenuOptions({ ...menuOptions, selected: "monitoring" }))
-    else dispatch(setMenuOptions({ ...menuOptions, selected: pathParts[1] }))
-  }, [location, history])
+    if (location.pathname.includes('workflow'))
+      dispatch(setMenuOptions({ ...menuOptions, selected: 'monitoring' }));
+    else dispatch(setMenuOptions({ ...menuOptions, selected: pathParts[1] }));
+  }, [location, history]);
 
   useEffect(() => {
     if (experimentId && experimentId !== experiment.data?.id) {
       // dispatch(fetchExperiment(experimentId))
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const fetchWorkflows = () =>
       !experiment.loading &&
       experiment.data &&
-      dispatch(fetchExperimentWorkflows({experimentId: experimentId || "", forceRefresh: true}))
-    intervalId.current = setInterval(fetchWorkflows, 1 * 60 * 1000)
+      dispatch(fetchExperimentWorkflows({experimentId: experimentId || '', forceRefresh: true}));
+    intervalId.current = setInterval(fetchWorkflows, 1 * 60 * 1000);
 
     return () => {
       if (intervalId.current) {
-        clearInterval(intervalId.current)
+        clearInterval(intervalId.current);
       }
-    }
-  }, [experiment])
+    };
+  }, [experiment]);
 
   useEffect(() => {
     if (workflows.data && workflows.data.length > 0) {
-      workflows.data.every(workflow => workflow.status === "COMPLETED") &&
+      workflows.data.every(workflow => workflow.status === 'COMPLETED') &&
         intervalId.current &&
-        clearInterval(intervalId.current)
+        clearInterval(intervalId.current);
     }
-  }, [workflows])
+  }, [workflows]);
 
   return (
     <>
@@ -73,17 +73,17 @@ const ProgressPage = (props: ProgressPageProps) => {
       ) : (
         <Box
           sx={{
-            height: "100vh",
-            width: "100vw",
-            display: "flex",
+            height: '100vh',
+            width: '100vw',
+            display: 'flex',
           }}
         >
           {/* Left Menu - Full Height */}
           <Box
             sx={{
-              width: !menuOptions.collapsed ? "calc(15% + 16px)" : "56px",
-              height: "100%",
-              transition: "width 0.3s ease",
+              width: !menuOptions.collapsed ? 'calc(15% + 16px)' : '56px',
+              height: '100%',
+              transition: 'width 0.3s ease',
               flexShrink: 0,
             }}
           >
@@ -93,29 +93,29 @@ const ProgressPage = (props: ProgressPageProps) => {
           {/* Right Content Area */}
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
               width: !menuOptions.collapsed
-                ? "calc(85% - 16px)"
-                : "calc(100% - 56px)",
-              transition: "width 0.3s ease",
+                ? 'calc(85% - 16px)'
+                : 'calc(100% - 56px)',
+              transition: 'width 0.3s ease',
             }}
           >
             {/* Experiment Controls */}
-            <Box sx={{ width: "100%" }}>
+            <Box sx={{ width: '100%' }}>
               <ExperimentControls />
             </Box>
 
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
                 rowGap: 2,
                 flexGrow: 1,
-                overflow: "hidden", // Prevent overflow
-                width: "100%",
-                boxSizing: "border-box",
+                overflow: 'hidden', // Prevent overflow
+                width: '100%',
+                boxSizing: 'border-box',
               }}
             >
               {children}
@@ -124,7 +124,7 @@ const ProgressPage = (props: ProgressPageProps) => {
         </Box>
       )}
     </>
-  )
-}
+  );
+};
 
-export default ProgressPage
+export default ProgressPage;

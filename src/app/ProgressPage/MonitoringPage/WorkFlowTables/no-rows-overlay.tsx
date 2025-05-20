@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from '@mui/material';
 import PlaylistRemoveRoundedIcon from '@mui/icons-material/PlaylistRemoveRounded';
 
 interface INoRowsOverlayProps {
@@ -6,7 +6,7 @@ interface INoRowsOverlayProps {
 }
 
  const NoRowsOverlay = (props: INoRowsOverlayProps) => {
-    const {title} = props
+    const {title} = props;
     return (
         <Box
             height="100%"
@@ -19,12 +19,11 @@ interface INoRowsOverlayProps {
         <Typography variant="body2">{title}</Typography>
       </Box>
     
-    )
-}
+    );
+};
 
 const NoRowsOverlayWrapper = (props: any) => {
     return <NoRowsOverlay title={props?.title} />;
   };
-  
 
-export default NoRowsOverlayWrapper
+export default NoRowsOverlayWrapper;

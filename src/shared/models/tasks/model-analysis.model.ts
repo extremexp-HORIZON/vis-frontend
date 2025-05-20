@@ -1,12 +1,12 @@
-import type { IPlotModel } from "../plotmodel.model"
+import type { IPlotModel } from '../plotmodel.model';
 import type {
   IDataExplorationResponse
-} from "../dataexploration.model"
+} from '../dataexploration.model';
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
   data: JSON.parse(payload.data),
-})
+});
 
 export const handleMultiTimeSeriesData = (payload : any) => {
   const fileData = JSON.parse(payload.data);
@@ -22,7 +22,7 @@ export const handleMultiTimeSeriesData = (payload : any) => {
     });
   });
   return {...payload, data: flatFileData};
-}
+};
 
 export interface IModelAnalysis {
   featureNames: string[]
@@ -97,4 +97,4 @@ export const modelAnalysisDefault: IModelAnalysis = {
   multipleTimeSeriesMetadata: { data: null, loading: false, error: null },
   affected: { data: null, loading: false, error: null },
   modelSummary: { data: null, loading: false, error: null }
-}
+};

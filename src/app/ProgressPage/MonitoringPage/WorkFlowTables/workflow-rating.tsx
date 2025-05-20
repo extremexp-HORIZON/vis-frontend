@@ -1,9 +1,9 @@
-import { Rating } from "@mui/material";
-import { useState } from "react";
-import { useAppDispatch } from "../../../../store/store";
+import { Rating } from '@mui/material';
+import { useState } from 'react';
+import { useAppDispatch } from '../../../../store/store';
 import {
   fetchUserEvaluation,
-} from "../../../../store/slices/progressPageSlice";
+} from '../../../../store/slices/progressPageSlice';
 
 interface WorkflowRatingProps {
   currentRating: number;
@@ -40,11 +40,11 @@ const handleUserEvaluation = async (value: number | null) => {
 
   return (
     <Rating
-      sx={{ verticalAlign: "middle" }}
+      sx={{ verticalAlign: 'middle' }}
       value={localRating !== null ? localRating : currentRating}
       size="small"
       disabled={isPolling}
-      onChange={(_, value) => {if (value !== null) handleUserEvaluation(value)}}
+      onChange={(_, value) => {if (value !== null) handleUserEvaluation(value);}}
     />
   );
 };

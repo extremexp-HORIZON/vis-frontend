@@ -1,5 +1,5 @@
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import type React from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Card,
@@ -21,13 +21,13 @@ import {
   Fade,
   useTheme,
   useMediaQuery,
-} from "@mui/material"
-import SettingsIcon from "@mui/icons-material/Settings"
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
-import DownloadIcon from "@mui/icons-material/Download"
-import FullscreenIcon from "@mui/icons-material/Fullscreen"
-import CloseIcon from "@mui/icons-material/Close"
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+} from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import DownloadIcon from '@mui/icons-material/Download';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import CloseIcon from '@mui/icons-material/Close';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 interface ResponsiveCardTableProps {
   title: string
@@ -56,24 +56,24 @@ export const SectionHeader = ({
 }) => (
   <Box
     sx={{
-      display: "flex",
-      alignItems: "center",
-      borderBottom: `1px solid rgba(0, 0, 0, 0.08)`,
+      display: 'flex',
+      alignItems: 'center',
+      borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
       px: 2,
       py: 1.5,
-      background: "linear-gradient(to right, #f1f5f9, #f8fafc)",
-      borderTopLeftRadius: "10px",
-      borderTopRightRadius: "10px",
+      background: 'linear-gradient(to right, #f1f5f9, #f8fafc)',
+      borderTopLeftRadius: '10px',
+      borderTopRightRadius: '10px',
       margin: 0,
-      width: "100%",
+      width: '100%',
     }}
   >
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#3566b5",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#3566b5',
         mr: 1.5,
       }}
     >
@@ -82,17 +82,17 @@ export const SectionHeader = ({
     <Typography
       variant="subtitle1"
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         fontWeight: 600,
-        color: "#1e3a5f",
-        letterSpacing: "0.3px",
+        color: '#1e3a5f',
+        letterSpacing: '0.3px',
       }}
     >
       {title}
     </Typography>
   </Box>
-)
+);
 
 const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   title,
@@ -103,74 +103,74 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   maxWidth = 2000,
   maxHeight = 300,
   additionalMenuItems,
-  downloadLabel = "Download as PNG",
-  downloadSecondaryText = "Save chart as image",
+  downloadLabel = 'Download as PNG',
+  downloadSecondaryText = 'Save chart as image',
   showFullScreenButton = true,
   showDownloadButton = true,
   noPadding = false,
   details = null,
   showControlsInHeader = false,
 }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [fullscreenOpen, setFullscreenOpen] = useState(false)
-  const menuOpen = Boolean(anchorEl)
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"))
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const menuOpen = Boolean(anchorEl);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   // Add state for fullscreen settings menu
   const [fullscreenAnchorEl, setFullscreenAnchorEl] =
-    useState<null | HTMLElement>(null)
-  const fullscreenMenuOpen = Boolean(fullscreenAnchorEl)
+    useState<null | HTMLElement>(null);
+  const fullscreenMenuOpen = Boolean(fullscreenAnchorEl);
   // Add state to track if we have enough space in the header
-  const [hasSpaceInHeader, setHasSpaceInHeader] = useState(true)
+  const [hasSpaceInHeader, setHasSpaceInHeader] = useState(true);
   // Add ref for the card header
-  const cardHeaderRef = useRef<HTMLDivElement>(null)
+  const cardHeaderRef = useRef<HTMLDivElement>(null);
   // Threshold for minimum width to show controls in header (in pixels)
-  const MIN_HEADER_WIDTH_FOR_CONTROLS = 500
+  const MIN_HEADER_WIDTH_FOR_CONTROLS = 500;
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const handleDownload = () => {
     if (onDownload) {
-      onDownload()
+      onDownload();
     }
-    handleMenuClose()
-  }
+    handleMenuClose();
+  };
 
   const handleFullScreen = () => {
-    setFullscreenOpen(true)
-    handleMenuClose()
+    setFullscreenOpen(true);
+    handleMenuClose();
     if (onFullScreen) {
-      onFullScreen(true)
+      onFullScreen(true);
     }
-  }
+  };
 
   const handleCloseFullscreen = () => {
-    setFullscreenOpen(false)
+    setFullscreenOpen(false);
     if (onFullScreen) {
-      onFullScreen(false)
+      onFullScreen(false);
     }
-  }
+  };
 
   // Notify parent of fullscreen changes
   useEffect(() => {
     if (onFullScreen) {
-      onFullScreen(fullscreenOpen)
+      onFullScreen(fullscreenOpen);
     }
-  }, [fullscreenOpen, onFullScreen])
+  }, [fullscreenOpen, onFullScreen]);
 
   const handleFullscreenMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setFullscreenAnchorEl(event.currentTarget)
-  }
+    setFullscreenAnchorEl(event.currentTarget);
+  };
 
   const handleFullscreenMenuClose = () => {
-    setFullscreenAnchorEl(null)
-  }
+    setFullscreenAnchorEl(null);
+  };
 
   // Effect to handle the resize observation
   useEffect(() => {
@@ -198,14 +198,14 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
       <Card
         sx={{
           maxWidth: maxWidth,
-          mx: "auto",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.09)",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: "12px",
-          border: "1px solid rgba(0, 0, 0, 0.06)",
-          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          mx: 'auto',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.09)',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: '12px',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         }}
       >
         <CardHeader
@@ -234,10 +234,10 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     aria-label="settings"
                     onClick={handleMenuClick}
                     sx={{
-                      position: "relative",
-                      "& svg": {
+                      position: 'relative',
+                      '& svg': {
                         zIndex: 1,
-                        position: "relative",
+                        position: 'relative',
                       },
                     }}
                   >
@@ -248,30 +248,30 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     open={menuOpen}
                     onClose={handleMenuClose}
                     anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "right",
+                      vertical: 'bottom',
+                      horizontal: 'right',
                     }}
                     transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
+                      vertical: 'top',
+                      horizontal: 'right',
                     }}
                     PaperProps={{
                       elevation: 3,
                       sx: {
                         width: 320,
                         maxHeight: 500,
-                        overflowY: "hidden", // Change this to hidden
-                        overflowX: "hidden",
+                        overflowY: 'hidden', // Change this to hidden
+                        overflowX: 'hidden',
                         padding: 0,
-                        borderRadius: "12px",
-                        boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
-                        border: "1px solid rgba(0,0,0,0.04)",
+                        borderRadius: '12px',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                        border: '1px solid rgba(0,0,0,0.04)',
                         mt: 1,
-                        "& .MuiMenu-list": {
+                        '& .MuiMenu-list': {
                           padding: 0,
-                          display: "flex",
-                          flexDirection: "column",
-                          height: "100%",
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: '100%',
                           maxHeight: 500,
                         },
                       },
@@ -279,9 +279,9 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     MenuListProps={{
                       sx: {
                         padding: 0,
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "100%",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
                       },
                     }}
                   >
@@ -294,7 +294,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                         <Box
                           sx={{
                             p: 2,
-                            overflowY: "auto",
+                            overflowY: 'auto',
                             flexGrow: 1,
                           }}
                         >
@@ -307,8 +307,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                       sx={{
                         py: controlPanel && !shouldShowControlsInHeader ? 0.5 : 1,
                         borderTop: controlPanel && !shouldShowControlsInHeader
-                          ? "none"
-                          : "1px solid rgba(0,0,0,0.08)",
+                          ? 'none'
+                          : '1px solid rgba(0,0,0,0.08)',
                       }}
                     >
                       {showDownloadButton && onDownload && (!shouldShowControlsInHeader) && (
@@ -320,7 +320,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                             primary={downloadLabel}
                             secondary={downloadSecondaryText}
                             primaryTypographyProps={{ fontWeight: 500 }}
-                            secondaryTypographyProps={{ fontSize: "0.75rem" }}
+                            secondaryTypographyProps={{ fontSize: '0.75rem' }}
                           />
                         </MenuItem>
                       )}
@@ -338,8 +338,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     onClick={handleFullScreen}
                     sx={{
                       mr: 0.5,
-                      "& svg": {
-                        position: "relative",
+                      '& svg': {
+                        position: 'relative',
                         zIndex: 1,
                       },
                     }}
@@ -351,15 +351,15 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
             </>
           }
           title={
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="overline"
                 sx={{
-                  padding: "4px 0px",
-                  textTransform: "uppercase",
+                  padding: '4px 0px',
+                  textTransform: 'uppercase',
                   fontWeight: 600,
-                  letterSpacing: "0.5px",
-                  color: "#2a3f5f",
+                  letterSpacing: '0.5px',
+                  color: '#2a3f5f',
                 }}
               >
                 {title}
@@ -367,35 +367,35 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
               {details && (
                 <Tooltip title={details}>
                   <InfoOutlinedIcon
-                    sx={{ fontSize: 16, color: "grey.600", cursor: "default" }}
+                    sx={{ fontSize: 16, color: 'grey.600', cursor: 'default' }}
                   />
                 </Tooltip>
               )}
             </Box>
           }
           sx={{
-            background: "linear-gradient(to right, #f8f9fa, #edf2f7)",
-            borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-            padding: "4px 16px",
-            height: shouldShowControlsInHeader ? "auto" : "40px",
-            minHeight: "40px",
-            borderTopLeftRadius: "12px",
-            borderTopRightRadius: "12px",
+            background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+            padding: '4px 16px',
+            height: shouldShowControlsInHeader ? 'auto' : '40px',
+            minHeight: '40px',
+            borderTopLeftRadius: '12px',
+            borderTopRightRadius: '12px',
           }}
         />
         <CardContent
           sx={{
-            backgroundColor: "#ffffff",
+            backgroundColor: '#ffffff',
             p: noPadding ? 0 : 2,
-            "&:last-child": {
+            '&:last-child': {
               paddingBottom: noPadding ? 0 : 3,
             },
-            borderRadius: "0 0 12px 12px",
+            borderRadius: '0 0 12px 12px',
             flexGrow: 1, // Allow content to grow and fill space
-            display: "flex", // Enable flexbox
-            flexDirection: "column", // Stack children vertically
-            overflow: noPadding ? "hidden" : "auto", // Control overflow based on padding
-            height: "100%", // Ensure CardContent takes full height
+            display: 'flex', // Enable flexbox
+            flexDirection: 'column', // Stack children vertically
+            overflow: noPadding ? 'hidden' : 'auto', // Control overflow based on padding
+            height: '100%', // Ensure CardContent takes full height
           }}
         >
           {children}
@@ -412,35 +412,35 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
           TransitionProps={{ timeout: 400 }}
           PaperProps={{
             sx: {
-              borderRadius: fullScreen ? 0 : "12px",
-              width: fullScreen ? "100%" : "90vw",
-              height: fullScreen ? "100%" : "90vh",
-              maxWidth: "unset",
-              bgcolor: "#ffffff",
-              overflow: "hidden",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+              borderRadius: fullScreen ? 0 : '12px',
+              width: fullScreen ? '100%' : '90vw',
+              height: fullScreen ? '100%' : '90vh',
+              maxWidth: 'unset',
+              bgcolor: '#ffffff',
+              overflow: 'hidden',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
             },
           }}
         >
           <DialogTitle
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              background: "linear-gradient(to right, #f8f9fa, #edf2f7)",
-              borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
+              borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
               px: 3,
               py: 1.5,
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="h6"
                 component="div"
                 sx={{
                   fontWeight: 600,
-                  color: "#2a3f5f",
-                  letterSpacing: "0.3px",
+                  color: '#2a3f5f',
+                  letterSpacing: '0.3px',
                 }}
               >
                 {title}
@@ -448,12 +448,12 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
               {details && (
                 <Tooltip title={details}>
                   <InfoOutlinedIcon
-                    sx={{ fontSize: 20, color: "grey.600", cursor: "default" }}
+                    sx={{ fontSize: 20, color: 'grey.600', cursor: 'default' }}
                   />
                 </Tooltip>
               )}
             </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {controlPanel && (
                 <>
                   <IconButton
@@ -461,8 +461,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     onClick={handleFullscreenMenuClick}
                     sx={{
                       mr: 1,
-                      "& svg": {
-                        position: "relative",
+                      '& svg': {
+                        position: 'relative',
                         zIndex: 1,
                       },
                     }}
@@ -474,30 +474,30 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     open={fullscreenMenuOpen}
                     onClose={handleFullscreenMenuClose}
                     anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "right",
+                      vertical: 'bottom',
+                      horizontal: 'right',
                     }}
                     transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
+                      vertical: 'top',
+                      horizontal: 'right',
                     }}
                     PaperProps={{
                       elevation: 3,
                       sx: {
                         width: 320,
                         maxHeight: 500,
-                        overflowY: "hidden",
-                        overflowX: "hidden",
+                        overflowY: 'hidden',
+                        overflowX: 'hidden',
                         padding: 0,
-                        borderRadius: "12px",
-                        boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
-                        border: "1px solid rgba(0,0,0,0.04)",
+                        borderRadius: '12px',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                        border: '1px solid rgba(0,0,0,0.04)',
                         mt: 1,
-                        "& .MuiMenu-list": {
+                        '& .MuiMenu-list': {
                           padding: 0,
-                          display: "flex",
-                          flexDirection: "column",
-                          height: "100%",
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: '100%',
                           maxHeight: 500,
                         },
                       },
@@ -505,9 +505,9 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     MenuListProps={{
                       sx: {
                         padding: 0,
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "100%",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
                       },
                     }}
                   >
@@ -518,7 +518,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                     <Box
                       sx={{
                         p: 2,
-                        overflowY: "auto",
+                        overflowY: 'auto',
                         flexGrow: 1,
                       }}
                     >
@@ -537,12 +537,12 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                         aria-label="details"
                         sx={{
                           mr: 0.5,
-                          "& svg": {
-                            position: "relative",
+                          '& svg': {
+                            position: 'relative',
                             zIndex: 1,
                           },
-                          "&:hover": {
-                            cursor: "default",
+                          '&:hover': {
+                            cursor: 'default',
                           },
                         }}
                       >
@@ -566,11 +566,11 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
             dividers
             sx={{
               p: noPadding ? 0 : 4,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-              overflow: "hidden",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              overflow: 'hidden',
             }}
           >
             {children}
@@ -578,8 +578,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
           <DialogActions
             sx={{
               p: 2,
-              borderTop: "1px solid rgba(0, 0, 0, 0.08)",
-              background: "#f8f9fa",
+              borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+              background: '#f8f9fa',
             }}
           >
             {onDownload && showDownloadButton && (
@@ -605,7 +605,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
         </Dialog>
       )}
     </>
-  )
-}
+  );
+};
 
-export default ResponsiveCardTable
+export default ResponsiveCardTable;

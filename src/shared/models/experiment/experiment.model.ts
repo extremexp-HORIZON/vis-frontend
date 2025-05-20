@@ -1,4 +1,4 @@
-import type { IMetricDefinition } from "./metric-definition.model";
+import type { IMetricDefinition } from './metric-definition.model';
 
 export interface IExperiment {
     /** Unique identifier for the experiment. */
@@ -19,4 +19,3 @@ export interface IExperiment {
     /** Additional metadata as key-value pairs. */
     tags: Record<string, string>;
   }
-  

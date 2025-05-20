@@ -1,6 +1,6 @@
-import { Navigate, useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import { getToken } from "./store/slices/authSlice";
+import { Navigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import { getToken } from './store/slices/authSlice';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit"
-import type { CustomGridColDef } from "../../shared/types/table-types"
+import { createSlice } from '@reduxjs/toolkit';
+import type { CustomGridColDef } from '../../shared/types/table-types';
 
 interface IMonitoringPageSlice {
     parallel: {
@@ -8,7 +8,7 @@ interface IMonitoringPageSlice {
         selected: string
       }
       workflowsTable: {
-        order: "asc" | "desc"
+        order: 'asc' | 'desc'
         orderBy: string
         page: number
         rowsPerPage: number
@@ -32,7 +32,7 @@ interface IMonitoringPageSlice {
         initialized: boolean
       }
       scheduledTable: {
-        order: "asc" | "desc"
+        order: 'asc' | 'desc'
         orderBy: string
         page: number
         rowsPerPage: number
@@ -53,22 +53,22 @@ interface IMonitoringPageSlice {
 
 const generateUniqueColor = (existingColors: Set<string>) => {
   const colors = [
-    "#1F77B4", 
-  "#FF7F0E", 
-  "#2CA02C", 
-  "#D62728", 
-  "#9467BD", // Purple
-  "#8C564B", // Brown
-  "#E377C2", // Pink
-  "#17BECF", // Cyan
-  "#AEC7E8", // Light Blue
-  "#FFBB78", // Light Orange
-  "#98DF8A", // Light Green
-  "#FF9896", // Light Red
-  "#C5B0D5", // Light Purple
-  "#C49C94", // Light Brown
-  "#F7B6D2", // Light Pink
-  "#9EDAE5", // Light Cyan
+    '#1F77B4', 
+  '#FF7F0E', 
+  '#2CA02C', 
+  '#D62728', 
+  '#9467BD', // Purple
+  '#8C564B', // Brown
+  '#E377C2', // Pink
+  '#17BECF', // Cyan
+  '#AEC7E8', // Light Blue
+  '#FFBB78', // Light Orange
+  '#98DF8A', // Light Green
+  '#FF9896', // Light Red
+  '#C5B0D5', // Light Purple
+  '#C49C94', // Light Brown
+  '#F7B6D2', // Light Pink
+  '#9EDAE5', // Light Cyan
   ];
 
   const availableColors = colors.filter(color => !existingColors.has(color));
@@ -80,10 +80,10 @@ const generateUniqueColor = (existingColors: Set<string>) => {
   return newColor;
 };
 const initialState: IMonitoringPageSlice = {
-    parallel: { data: [], options: [], selected: "" },
+    parallel: { data: [], options: [], selected: '' },
     workflowsTable: {
-      order: "asc",
-      orderBy: "id",
+      order: 'asc',
+      orderBy: 'id',
       page: 0,
       rowsPerPage: 50,
       selectedWorkflows: [],
@@ -106,8 +106,8 @@ const initialState: IMonitoringPageSlice = {
       initialized: false
     },
     scheduledTable: {
-      order: "asc",
-      orderBy: "id",
+      order: 'asc',
+      orderBy: 'id',
       page: 0,
       rowsPerPage: 50,
       selectedWorkflows: [],
@@ -121,16 +121,16 @@ const initialState: IMonitoringPageSlice = {
       uniqueParameters: [],
       uniqueTasks: []
     },
-    visibleTable: "workflows",
+    visibleTable: 'workflows',
     selectedTab: 0
-}
+};
 
 export const monitoringPageSlice = createSlice({
-  name: "monitoringPage",
+  name: 'monitoringPage',
   initialState,
   reducers: {
     setParallel: (state, action) => {
-      state.parallel = { ...state.parallel, ...action.payload }
+      state.parallel = { ...state.parallel, ...action.payload };
     },
     setWorkflowsTable: (state, action) => {
       const { rows = [], ...rest } = action.payload;
@@ -162,13 +162,13 @@ export const monitoringPageSlice = createSlice({
       state.scheduledTable = {
         ...state.scheduledTable,
         ...action.payload,
-      }
+      };
     },
     setVisibleTable: (state, action) => {
-      state.visibleTable = action.payload
+      state.visibleTable = action.payload;
     },
     setSelectedTab: (state, action) => {
-      state.selectedTab = action.payload
+      state.selectedTab = action.payload;
     },
     toggleWorkflowSelection: (state, action) => {
       const workflowId = action.payload;
@@ -206,7 +206,7 @@ export const monitoringPageSlice = createSlice({
       });
     },    
     setGroupBy: (state, action) => {
-      state.workflowsTable.groupBy = action.payload
+      state.workflowsTable.groupBy = action.payload;
     },
     setHoveredWorkflow: (state, action) => {
       state.workflowsTable.hoveredWorkflowId = action.payload;
@@ -226,7 +226,7 @@ export const monitoringPageSlice = createSlice({
       state.workflowsTable.visibleRows = updateRowRating(state.workflowsTable.visibleRows);
     },    
   }
-})
+});
 
 export const {setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection,bulkToggleWorkflowSelection, setGroupBy, 
   setHoveredWorkflow, updateWorkflowRatingLocally

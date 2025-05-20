@@ -1,6 +1,6 @@
-import type { IPlotModel } from "../plotmodel.model"
+import type { IPlotModel } from '../plotmodel.model';
 export interface IExplainability {
-  "2dpdp": {
+  '2dpdp': {
     data: IPlotModel | null
     loading: boolean
     error: string | null
@@ -27,7 +27,7 @@ export interface IExplainability {
 export const explainabilityDefault: IExplainability = {
   //TODO: these hyperparameters names should be populated from the response
   hyperparametersNames: [],
-  "2dpdp": {
+  '2dpdp': {
     data: null,
     loading: false,
     error: null,
@@ -47,8 +47,7 @@ export const explainabilityDefault: IExplainability = {
     loading: false,
     error: null,
   },
-}
-
+};
 
 export type IHyperparameters = {
   [key: string]: {
@@ -69,15 +68,15 @@ export type ExplainabilityQuery = {
 }
 
 export const explainabilityQueryDefault: ExplainabilityQuery = {
-  explanation_type: "",
-  explanation_method: "",
-  feature1: "",
-  feature2: "",
-  query: "",
+  explanation_type: '',
+  explanation_method: '',
+  feature1: '',
+  feature2: '',
+  query: '',
   gcf_size: 0,
-  cf_generator: "",
-  cluster_action_choice_algo: "",
-}
+  cf_generator: '',
+  cluster_action_choice_algo: '',
+};
 
 export type FetchExplainabilityPlotPayload = {
   query: ExplainabilityQuery
@@ -92,8 +91,8 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
   {
     query: explainabilityQueryDefault,
     metadata: {
-      workflowId: "",
-      queryCase: "",
-      experimentId: ""
+      workflowId: '',
+      queryCase: '',
+      experimentId: ''
     },
-  }
+  };

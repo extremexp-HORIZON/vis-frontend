@@ -1,38 +1,38 @@
-import { useEffect } from "react"
-import type { RootState } from "../../../../store/store"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
-import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
-import theme from "../../../../mui-theme"
-import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
+import { useEffect } from 'react';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
+import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
+import theme from '../../../../mui-theme';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import {
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-} from "@mui/material"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
-import { useParams } from "react-router-dom"
-import Loader from "../../../../shared/components/loader"
-import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature } from "../../../../store/slices/explainabilitySlice"
+} from '@mui/material';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import { useParams } from 'react-router-dom';
+import Loader from '../../../../shared/components/loader';
+import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature } from '../../../../store/slices/explainabilitySlice';
 
 interface PdpPlotProps {
   explanation_type: string
 }
 
 const PdpPlot = (props: PdpPlotProps) => {
-  const { explanation_type } = props
+  const { explanation_type } = props;
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,
-  )
-  const dispatch = useAppDispatch()
- const featureOrHyperparameterList = explanation_type === "hyperparameterExplanation"
+  );
+  const dispatch = useAppDispatch();
+ const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
   ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
-  : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null
+  : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
 
-  const plotModel = tab?.workflowTasks.modelAnalysis?.pdp
-  const { experimentId } = useParams()
+  const plotModel = tab?.workflowTasks.modelAnalysis?.pdp;
+  const { experimentId } = useParams();
 
   useEffect(() => {
     if (tab && experimentId) {
@@ -41,39 +41,39 @@ const PdpPlot = (props: PdpPlotProps) => {
           query: {
             ...explainabilityQueryDefault,
             explanation_type: explanation_type,
-            explanation_method: "pdp",
+            explanation_method: 'pdp',
           },
           metadata: {
             workflowId: tab.workflowId,
-            queryCase: "pdp",
+            queryCase: 'pdp',
             experimentId: experimentId,
           },
         }),
-      )
+      );
     }
-  }, [isTabInitialized])
+  }, [isTabInitialized]);
 
   const getVegaliteData = (plmodel: IPlotModel | null) => {
-    if (!plmodel) return []
-    const data: { [x: string]: string }[] = []
+    if (!plmodel) return [];
+    const data: { [x: string]: string }[] = [];
     plmodel.xAxis.axisValues.forEach((val, idx) => {
       data.push({
         [plmodel.xAxis.axisName]: val,
         [plmodel.yAxis.axisName]: plmodel.yAxis.axisValues[idx],
-      })
-    })
-    return data
-  }
+      });
+    });
+    return data;
+  };
   const spec = {
-    width: "container",
-    autosize: { type: "fit", contains: "padding", resize: true },
+    width: 'container',
+    autosize: { type: 'fit', contains: 'padding', resize: true },
     data: {
       values: getVegaliteData(
         tab?.workflowTasks.modelAnalysis?.pdp?.data || null,
       ),
     },
     mark: {
-      type: "line",
+      type: 'line',
       tooltip: true,
       point: { size: 20, color: theme.palette.primary.main },
     },
@@ -81,59 +81,59 @@ const PdpPlot = (props: PdpPlotProps) => {
       x: {
         field:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisName ||
-          "xAxis default",
+          'xAxis default',
           
         type:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
-          "numerical"
-            ? "quantitative"
-            : "ordinal",
+          'numerical'
+            ? 'quantitative'
+            : 'ordinal',
         // aggregate: "mean"
       },
       y: {
         field:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.yAxis.axisName ||
-          "yAxis default",
-          title: "Average Predicted Value",
+          'yAxis default',
+          title: 'Average Predicted Value',
 
         type:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
-          "numerical"
-            ? "quantitative"
-            : "ordinal",
+          'numerical'
+            ? 'quantitative'
+            : 'ordinal',
       },
     },
-  }
+  };
   const handleFeatureSelection =
     (plmodel: IPlotModel | null) => (e: { target: { value: string } }) => {
       dispatch(
         fetchModelAnalysisExplainabilityPlot({
           query: {
             ...explainabilityQueryDefault,
-            explanation_type: plmodel?.explainabilityType || "",
-            explanation_method: plmodel?.explanationMethod || "",
-            feature1: e.target.value || "",
-            feature2: plmodel?.features.feature2 || "",
+            explanation_type: plmodel?.explainabilityType || '',
+            explanation_method: plmodel?.explanationMethod || '',
+            feature1: e.target.value || '',
+            feature2: plmodel?.features.feature2 || '',
           },
           metadata: {
-            workflowId: tab?.workflowId || "",
+            workflowId: tab?.workflowId || '',
             queryCase: plmodel?.explanationMethod,
-            experimentId: experimentId || "",
+            experimentId: experimentId || '',
           },
         }),
-      )
-      dispatch(setSelectedFeature({ plotType: "pdp", feature: e.target.value }))
-    }
+      );
+      dispatch(setSelectedFeature({ plotType: 'pdp', feature: e.target.value }));
+    };
 
  const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
   <FormControl fullWidth>
     <InputLabel id="feature-select-label">
-      {explanation_type === "hyperparameterExplanation" ? "Hyperparameter" : "Feature"}
+      {explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
     </InputLabel>
     <Select
       labelId="feature-select-label"
-      value={plotModel?.selectedFeature || ""}
-      label={explanation_type === "hyperparameterExplanation" ? "Hyperparameter" : "Feature"}
+      value={plotModel?.selectedFeature || ''}
+      label={explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
       onChange={handleFeatureSelection(plotModel?.data || null)}
       disabled={plotModel?.loading || !plotModel?.data}
       MenuProps={{
@@ -155,30 +155,30 @@ const PdpPlot = (props: PdpPlotProps) => {
       ))}
     </Select>
   </FormControl>
-)
+);
   const loading = (
    <Loader />
-  )
+  );
 
   const error = (
     <InfoMessage
       message="Error fetching pdp plot."
       type="info"
       icon={
-        <ReportProblemRoundedIcon sx={{ fontSize: 40, color: "info.main" }} />
+        <ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />
       }
       fullHeight
     />
-  )
+  );
 
-  const shouldShowLoading = !!plotModel?.loading
-  const shouldShowError = !!plotModel?.error
+  const shouldShowLoading = !!plotModel?.loading;
+  const shouldShowError = !!plotModel?.error;
 
   return (
     <ResponsiveCardVegaLite
       spec={spec}
       actions={false}
-      title={plotModel?.data?.plotName || "pdp plot"}
+      title={plotModel?.data?.plotName || 'pdp plot'}
       aspectRatio={2}
       maxHeight={400}
       controlPanel={controlPanel}
@@ -189,7 +189,7 @@ const PdpPlot = (props: PdpPlotProps) => {
       isStatic={false}
       details={plotModel?.data?.plotDescr || null}
     />
-  )
-}
+  );
+};
 
-export default PdpPlot
+export default PdpPlot;

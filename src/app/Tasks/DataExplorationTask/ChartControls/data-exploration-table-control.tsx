@@ -1,8 +1,8 @@
-import type React from "react";
-import { Box, Typography, List, ListItem, ListItemButton, ListItemIcon, Checkbox, ListItemText } from "@mui/material";
-import TableRowsIcon from "@mui/icons-material/TableRows";
-import { useAppSelector, useAppDispatch } from "../../../../store/store";
-import { setControls } from "../../../../store/slices/workflowPageSlice";
+import type React from 'react';
+import { Box, Typography, List, ListItem, ListItemButton, ListItemIcon, Checkbox, ListItemText } from '@mui/material';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import { useAppSelector, useAppDispatch } from '../../../../store/store';
+import { setControls } from '../../../../store/slices/workflowPageSlice';
 
 // Column selection panel component
 const ColumnSelectionPanel: React.FC = () => {

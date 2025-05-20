@@ -1,17 +1,16 @@
-import ResponsiveCardVegaLite from "../../../shared/components/responsive-card-vegalite"
-import type { RootState} from "../../../store/store";
-import { useAppSelector } from "../../../store/store"
-import type { IMetric } from "../../../shared/models/experiment/metric.model"
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material"
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
-import green from "@mui/material/colors/green"
-import red from "@mui/material/colors/red"
-import { useParams } from "react-router-dom";
-import { DetailsCard, DetailsCardItem } from "../../../shared/components/details-card";
-import { useMemo } from "react";
-import { setCache } from "../../../shared/utils/localStorageCache";
-
+import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
+import type { RootState} from '../../../store/store';
+import { useAppSelector } from '../../../store/store';
+import type { IMetric } from '../../../shared/models/experiment/metric.model';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import green from '@mui/material/colors/green';
+import red from '@mui/material/colors/red';
+import { useParams } from 'react-router-dom';
+import { DetailsCard, DetailsCardItem } from '../../../shared/components/details-card';
+import { useMemo } from 'react';
+import { setCache } from '../../../shared/utils/localStorageCache';
 
 interface GroupMetrics {
   value: number;
@@ -23,26 +22,26 @@ interface GroupMetrics {
 }
 
 export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
-  const { workflows } = useAppSelector((state: RootState) => state.progressPage)
-  const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage)
-  const theme = useTheme()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  const { workflows } = useAppSelector((state: RootState) => state.progressPage);
+  const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   
-  const queryParams = new URLSearchParams(location.search)
-  const workflowId = queryParams.get("workflowId") // Get the workflowId from the query
-  const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId)
+  const queryParams = new URLSearchParams(location.search);
+  const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query
+  const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId);
 
-  const workflowColorMap = workflowsTable.workflowColors
+  const workflowColorMap = workflowsTable.workflowColors;
   const workflowColorScale = filteredWorkflows.map(wf => ({
     id: wf.id,
-    color: workflowColorMap[wf.id] || "#000000", // Default to black if not found
-  }))
-  const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1
+    color: workflowColorMap[wf.id] || '#000000', // Default to black if not found
+  }));
+  const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1;
 
   const chartSpec = {
-    mark: isSingleStep ? "point" 
+    mark: isSingleStep ? 'point' 
     : {
-      type: "line",
+      type: 'line',
       tooltip: true,
       point: {
         size: 20
@@ -50,13 +49,13 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
     },
     encoding: {
       x: {
-        field: metrics[0].step=== null?"timestamp":"step", // Use the 'step' field for the x-axis (time or step sequence)
-        type: "ordinal",
-        axis: { labels: false, title: metrics[0].step=== null?"Timestamp":"Step" }, // Hide x-axis labels
+        field: metrics[0].step=== null?'timestamp':'step', // Use the 'step' field for the x-axis (time or step sequence)
+        type: 'ordinal',
+        axis: { labels: false, title: metrics[0].step=== null?'Timestamp':'Step' }, // Hide x-axis labels
       },
       y: {
-        field: "value", // Use the 'value' field for the y-axis (metric values like CPU Load)
-        type: "quantitative",
+        field: 'value', // Use the 'value' field for the y-axis (metric values like CPU Load)
+        type: 'quantitative',
         axis: { title: metrics[0].metricName }, // Title the y-axis based on the metric name
         scale: {
           domain: [
@@ -69,8 +68,8 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
         },
       },
       color: {
-        field: "id",
-        type: "nominal",
+        field: 'id',
+        type: 'nominal',
         scale: {
           domain: workflowColorScale.map(w => w.id), // Workflow IDs
           range: workflowColorScale.map(w => w.color), // Corresponding Colors
@@ -78,15 +77,15 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
         legend:null,
       },
       tooltip: [
-        { field: metrics[0].step=== null?"timestamp":"step", type: "nominal" },
-        { field: "value", type: "quantitative" },
+        { field: metrics[0].step=== null?'timestamp':'step', type: 'nominal' },
+        { field: 'value', type: 'quantitative' },
       ],
     },
     data: { values: metrics },
-  }
+  };
 
   return (
-    <Box sx={{height: "99%"}}>
+    <Box sx={{height: '99%'}}>
       <ResponsiveCardVegaLite
         spec={chartSpec}
         actions={false}
@@ -95,13 +94,13 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
         maxHeight={500}
       />
     </Box>
-  )
-}
+  );
+};
 
 export const WorkflowMetricChart = () => {
-    const { tab } = useAppSelector(state => state.workflowPage)
-    const queryParams = new URLSearchParams(location.search)
-    const workflowId = queryParams.get("workflowId") // Get the workflowId from the query
+    const { tab } = useAppSelector(state => state.workflowPage);
+    const queryParams = new URLSearchParams(location.search);
+    const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query
 
     const groupedMetrics: Record<string, GroupMetrics[]> | undefined = tab?.workflowSeriesMetrics.data.reduce(
         (acc: Record<string, GroupMetrics[]>, entry) => {
@@ -121,25 +120,24 @@ export const WorkflowMetricChart = () => {
         {}
       );
 
-      const metrics = groupedMetrics?.[tab?.dataTaskTable.selectedItem?.data?.name] || []
+      const metrics = groupedMetrics?.[tab?.dataTaskTable.selectedItem?.data?.name] || [];
   return (
     (metrics?.length ?? 0) > 1 ?
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
+          display: 'flex',
+          flexDirection: 'column',
           rowGap: 1,
-          height: "100%",
-          overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
+          height: '100%',
+          overflow: 'auto', //enables scrolling when table minHeight is applied in the overview page
         }}
       >
        <MetricLineChart metrics={metrics} /> 
       </Box>
     :
     <MetricCards />
-  )
-}
-
+  );
+};
 
 export const MetricCards = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -209,20 +207,20 @@ export const MetricCards = () => {
       : `/${experimentId}/monitoring?tab=1&compareId=${compareIdMax}`;
 
   const getMinText = () =>
-    minWorkflows.length === 1 ? "View workflow" : `View ${minWorkflows.length} workflows`;
+    minWorkflows.length === 1 ? 'View workflow' : `View ${minWorkflows.length} workflows`;
 
   const getMaxText = () =>
-    maxWorkflows.length === 1 ? "View workflow" : `View ${maxWorkflows.length} workflows`;
+    maxWorkflows.length === 1 ? 'View workflow' : `View ${maxWorkflows.length} workflows`;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "row", gap: 2, width: "100%" }}>
+    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, width: '100%' }}>
       <DetailsCard title="Metric Details">
         <DetailsCardItem label="Metric" value={metricData?.name} />
         <DetailsCardItem label="Value" value={metricData?.value?.toFixed(5)} />
         {metricData?.task && <DetailsCardItem label="Logged in Task" value={metricData.task} />}
         <DetailsCardItem
           label="Timestamp"
-          value={typeof metricData?.timestamp === "number"
+          value={typeof metricData?.timestamp === 'number'
             ? new Date(metricData.timestamp).toLocaleString()
             : undefined}
         />
@@ -232,9 +230,9 @@ export const MetricCards = () => {
         <DetailsCardItem
           label="Average"
           value={
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="body1">
-                {metricData?.avgValue?.toFixed(5)} — Difference: {Number.isFinite(metricData?.avgDiff) ? metricData.avgDiff.toFixed(2) : "0.00"}%
+                {metricData?.avgValue?.toFixed(5)} — Difference: {Number.isFinite(metricData?.avgDiff) ? metricData.avgDiff.toFixed(2) : '0.00'}%
               </Typography>
               {renderDiffIcon()}
             </Box>
@@ -244,20 +242,20 @@ export const MetricCards = () => {
         <DetailsCardItem
           label="Minimum"
           value={
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="body1" sx={{ mr: 1 }}>
                 {minValue.toFixed(5)}
               </Typography>
               {!isOnlyThisWorkflowMin && (
                 <>
-                  {" — "}
+                  {' — '}
                   <Box
                     component="a"
                     href={getMinHref()}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleClickMin}
-                    sx={{ color: "primary.main", textDecoration: "underline", ml: 1 }}
+                    sx={{ color: 'primary.main', textDecoration: 'underline', ml: 1 }}
                   >
                     {getMinText()}
                   </Box>
@@ -270,20 +268,20 @@ export const MetricCards = () => {
         <DetailsCardItem
           label="Maximum"
           value={
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="body1" sx={{ mr: 1 }}>
                 {maxValue.toFixed(5)}
               </Typography>
               {!isOnlyThisWorkflowMax && (
                 <>
-                  {" — "}
+                  {' — '}
                   <Box
                     component="a"
                     href={getMaxHref()}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleClickMax}
-                    sx={{ color: "primary.main", textDecoration: "underline", ml: 1 }}
+                    sx={{ color: 'primary.main', textDecoration: 'underline', ml: 1 }}
                   >
                     {getMaxText()}
                   </Box>

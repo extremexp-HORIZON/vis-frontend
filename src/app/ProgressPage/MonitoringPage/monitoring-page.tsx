@@ -1,43 +1,43 @@
-import { Box, Tab, Tabs, Paper } from "@mui/material"
-import { useNavigate } from "react-router-dom"
-import { useEffect, useRef } from "react"
-import ParallelCoordinatePlot from "./ParalleleCoodrinates/parallel-coordinate-plot"
-import WorkflowTable from "./WorkFlowTables/workflow-table"
-import ScheduleTable from "./WorkFlowTables/schedule-table"
-import type { RootState} from "../../../store/store";
-import { useAppSelector } from "../../../store/store"
-import WorkflowCharts from "../DynamicMetricCharts"
-import { Resizable } from "re-resizable"
-import { bulkToggleWorkflowSelection, setSelectedTab, setVisibleTable } from "../../../store/slices/monitorPageSlice"
-import { useDispatch } from "react-redux"
+import { Box, Tab, Tabs, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import ParallelCoordinatePlot from './ParalleleCoodrinates/parallel-coordinate-plot';
+import WorkflowTable from './WorkFlowTables/workflow-table';
+import ScheduleTable from './WorkFlowTables/schedule-table';
+import type { RootState} from '../../../store/store';
+import { useAppSelector } from '../../../store/store';
+import WorkflowCharts from '../DynamicMetricCharts';
+import { Resizable } from 're-resizable';
+import { bulkToggleWorkflowSelection, setSelectedTab, setVisibleTable } from '../../../store/slices/monitorPageSlice';
+import { useDispatch } from 'react-redux';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
-import { getCache } from "../../../shared/utils/localStorageCache"
+import { getCache } from '../../../shared/utils/localStorageCache';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
-  )
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const theme = useTheme()
+  );
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const theme = useTheme();
   const queryParams = new URLSearchParams(location.search);
-  const compareId = queryParams.get("compareId");
-  const tabParam = queryParams.get("tab");
-  const compareWorkflowsRef = useRef<string[] | null>(null)
+  const compareId = queryParams.get('compareId');
+  const tabParam = queryParams.get('tab');
+  const compareWorkflowsRef = useRef<string[] | null>(null);
 
   useEffect(() => {
     if (compareId) {
       const parsed = getCache<{ workflowIds: string[] }>(compareId);
       if (parsed?.workflowIds) {
-        compareWorkflowsRef.current = parsed.workflowIds
+        compareWorkflowsRef.current = parsed.workflowIds;
       }
     }
 
     if (tabParam) {
-      dispatch(setSelectedTab(Number(tabParam)))
+      dispatch(setSelectedTab(Number(tabParam)));
     }
-  }, [compareId, tabParam])
+  }, [compareId, tabParam]);
 
   // Apply toggleWorkflowSelection only after workflowsTable is loaded
   useEffect(() => {
@@ -47,9 +47,9 @@ const MonitoringPage = () => {
       compareWorkflowsRef.current.length > 0
     ) {
       dispatch(bulkToggleWorkflowSelection(compareWorkflowsRef.current));
-      compareWorkflowsRef.current = null // avoid rerunning
+      compareWorkflowsRef.current = null; // avoid rerunning
     }
-  }, [workflowsTable.initialized])
+  }, [workflowsTable.initialized]);
 
   return (
     <>
@@ -58,8 +58,8 @@ const MonitoringPage = () => {
         sx={{
           borderColor: theme => theme.palette.customGrey.main,
           borderBottomWidth: 2,
-          borderBottomStyle: "solid",
-          width: "100%",
+          borderBottomStyle: 'solid',
+          width: '100%',
           px: 2,
         }}
       >
@@ -68,14 +68,14 @@ const MonitoringPage = () => {
           onChange={(event, newValue) => {
             const searchParams = new URLSearchParams(location.search);
             searchParams.delete('compareId');
-            searchParams.set('tab', newValue)
+            searchParams.set('tab', newValue);
             navigate({
               pathname: location.pathname,
               search: searchParams.toString(),
             }, { replace: true });
           
             if (newValue === 1) {
-              dispatch(setVisibleTable("workflows"));
+              dispatch(setVisibleTable('workflows'));
             }
           }}
           
@@ -87,24 +87,24 @@ const MonitoringPage = () => {
       </Box>
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
+          display: 'flex',
+          flexDirection: 'column',
           rowGap: 1,
-          height: "100%",
-          overflow: "auto", //enables scrolling when table minHeight is applied in the overview page
+          height: '100%',
+          overflow: 'auto', //enables scrolling when table minHeight is applied in the overview page
           px: 2
         }}
       >
         {selectedTab === 0 && (
-          <Box sx={{height: "98%"}}>
-            <Box sx={{ height: "60%", minHeight: "350px", paddingBottom: 1 }}>
-              {visibleTable === "workflows" ? (
+          <Box sx={{height: '98%'}}>
+            <Box sx={{ height: '60%', minHeight: '350px', paddingBottom: 1 }}>
+              {visibleTable === 'workflows' ? (
                 <WorkflowTable />
               ) : (
                 <ScheduleTable />
               )}
             </Box>
-            <Box sx={{ height: "40%", minHeight: "250px" }}>
+            <Box sx={{ height: '40%', minHeight: '250px' }}>
               <ParallelCoordinatePlot />
             </Box>
           </Box>
@@ -112,15 +112,15 @@ const MonitoringPage = () => {
         {selectedTab === 1 && (
           <Box
             sx={{
-              height: "99%",
-              display: "flex",
+              height: '99%',
+              display: 'flex',
               gap: 1,
             }}
           >
             <Resizable
               defaultSize={{
-                width: "30%",
-                height: "100%",
+                width: '30%',
+                height: '100%',
               }}
               minWidth="200px"
               enable={{
@@ -135,14 +135,14 @@ const MonitoringPage = () => {
               }}
               maxWidth="80%"
               maxHeight="100%"
-              style={{ height: "100%", position: "relative"}}          
+              style={{ height: '100%', position: 'relative'}}          
               handleStyles={{
                 right: {
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "16px",  // Fixed width for handle area
-                  right: "-16px",  // Position handle to overlap both components
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '16px',  // Fixed width for handle area
+                  right: '-16px',  // Position handle to overlap both components
                   zIndex: 10,
                 }
               }}
@@ -150,12 +150,12 @@ const MonitoringPage = () => {
                 right: (
                 <Box
                   sx={{
-                    height: "100%",
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center", 
-                    cursor: "ew-resize",
+                    height: '100%',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center', 
+                    cursor: 'ew-resize',
                   }}        
                 >
                   <MoreVertRoundedIcon style={{ color: theme.palette.action.active }} />
@@ -165,14 +165,14 @@ const MonitoringPage = () => {
             >
               <WorkflowTable />
             </Resizable>
-            <Paper elevation={2} sx={{ flex: 1, overflow: "auto", height: "100%", ml: "8px"}}>
+            <Paper elevation={2} sx={{ flex: 1, overflow: 'auto', height: '100%', ml: '8px'}}>
                 <WorkflowCharts />
             </Paper>
           </Box>
         )}
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default MonitoringPage
+export default MonitoringPage;

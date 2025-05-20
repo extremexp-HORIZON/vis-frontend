@@ -1,34 +1,34 @@
-import { Box, useTheme, useMediaQuery } from "@mui/material"
-import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import AssessmentIcon from "@mui/icons-material/Assessment"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { useEffect } from "react"
-import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
-import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
-import HeatMapControlPanel from "../ChartControls/data-exploration-heatmap-control"
+import { Box, useTheme, useMediaQuery } from '@mui/material';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { useEffect } from 'react';
+import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
+import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
+import HeatMapControlPanel from '../ChartControls/data-exploration-heatmap-control';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
 const HeatMap = () => {
-  const dispatch = useAppDispatch()
-  const { tab } = useAppSelector(state => state.workflowPage)
-  const theme = useTheme()
+  const dispatch = useAppDispatch();
+  const { tab } = useAppSelector(state => state.workflowPage);
+  const theme = useTheme();
 
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   useEffect(() => {
     const groupBy =
-      tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat
+      tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat;
     const aggregation =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || ""
-    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
+      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat;
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
+    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
 
     if (
       !datasetId ||
       !groupBy?.length ||
       !Object.keys(aggregation || {}).length
     ) {
-      return // Don't dispatch if missing dataset, groupBy, or aggregation
+      return; // Don't dispatch if missing dataset, groupBy, or aggregation
     }
 
     dispatch(
@@ -41,11 +41,11 @@ const HeatMap = () => {
           filters,
         },
         metadata: {
-          workflowId: tab?.workflowId || "",
-          queryCase: "heatChart",
+          workflowId: tab?.workflowId || '',
+          queryCase: 'heatChart',
         },
       }),
-    )
+    );
   }, [
     tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat,
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat,
@@ -53,17 +53,17 @@ const HeatMap = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
     dispatch,
     tab?.workflowId,
-  ])
+  ]);
 
-  const columns = tab?.workflowTasks.dataExploration?.heatChart.data?.columns
-  const xAxisColumn = columns?.find(col => col.type === "STRING")?.name
+  const columns = tab?.workflowTasks.dataExploration?.heatChart.data?.columns;
+  const xAxisColumn = columns?.find(col => col.type === 'STRING')?.name;
  
   const categoricalColumns = columns?.filter(
-    col => col.type === "STRING" && col.name !== xAxisColumn,
-  )
+    col => col.type === 'STRING' && col.name !== xAxisColumn,
+  );
   const yAxisColumns = columns
-    ?.filter(col => col.type === "DOUBLE")
-    .map(col => col.name)
+    ?.filter(col => col.type === 'DOUBLE')
+    .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
   const transformedData =
@@ -80,130 +80,130 @@ const HeatMap = () => {
             ]),
           ), // Include all categorical values
         })),
-    )
+    );
 
-    const limitedData = transformedData?.slice(0, 20) // Limit to 500 rows
+    const limitedData = transformedData?.slice(0, 20); // Limit to 500 rows
 
   const groupByFields =
-    tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || []
+    tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [];
 
-  let specification
+  let specification;
 
   if (groupByFields.length === 2) {
     // Render heatmap
     specification = {
-      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
       description:
-        "Heatmap showing aggregation values by two categorical variables.",
+        'Heatmap showing aggregation values by two categorical variables.',
       data: { values: limitedData },
-      mark: "rect",
+      mark: 'rect',
       encoding: {
         x: {
           field: groupByFields[0],
-          type: "nominal",
+          type: 'nominal',
           axis: { title: groupByFields[0] },
         },
         y: {
           field: groupByFields[1],
-          type: "nominal",
+          type: 'nominal',
           axis: { title: groupByFields[1] },
         },
         color: {
-          field: "value",
-          type: "quantitative",
-          title: "Value",
+          field: 'value',
+          type: 'quantitative',
+          title: 'Value',
         },
         tooltip: [
-          { field: groupByFields[0], type: "nominal" },
-          { field: groupByFields[1], type: "nominal" },
-          { field: "value", type: "quantitative" },
-          { field: "type", type: "nominal" },
+          { field: groupByFields[0], type: 'nominal' },
+          { field: groupByFields[1], type: 'nominal' },
+          { field: 'value', type: 'quantitative' },
+          { field: 'type', type: 'nominal' },
         ],
       },
-    }
+    };
   } else {
     // Fallback to your current bar chart spec
     specification = {
-      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
       description:
-        "A grouped bar chart showing different numeric values by category.",
-      autosize: { type: "fit", contains: "padding", resize: true },
+        'A grouped bar chart showing different numeric values by category.',
+      autosize: { type: 'fit', contains: 'padding', resize: true },
       data: { values: limitedData },
-      mark: "bar",
+      mark: 'bar',
       params: [
         {
-          name: "industry",
-          select: { type: "point", fields: ["type"] },
-          bind: "legend",
+          name: 'industry',
+          select: { type: 'point', fields: ['type'] },
+          bind: 'legend',
         },
       ],
       encoding: {
         y: {
           field: xAxisColumn,
-          type: "nominal",
+          type: 'nominal',
           axis: {
             labelAngle: 0,
             labelLimit: 100,
-            labelOverlap: "parity",
+            labelOverlap: 'parity',
             tickCount: Math.floor(500 / 20),
           },
           sort: null,
         },
         x: {
-          field: "value",
-          type: "quantitative",
-          title: "Value",
+          field: 'value',
+          type: 'quantitative',
+          title: 'Value',
         },
         color: {
-          field: "type",
-          type: "nominal",
-          title: "Metric",
+          field: 'type',
+          type: 'nominal',
+          title: 'Metric',
         },
         xOffset: {
-          field: "type",
-          type: "nominal",
+          field: 'type',
+          type: 'nominal',
         },
         tooltip: [
-          { field: xAxisColumn, type: "nominal", title: xAxisColumn },
+          { field: xAxisColumn, type: 'nominal', title: xAxisColumn },
           ...(categoricalColumns || []).map(col => ({
             field: col.name,
-            type: "nominal",
+            type: 'nominal',
             title: col.name,
           })),
-          { field: "value", type: "quantitative", title: "Value" },
-          { field: "type", type: "nominal", title: "Metric" },
+          { field: 'value', type: 'quantitative', title: 'Value' },
+          { field: 'type', type: 'nominal', title: 'Metric' },
         ],
         opacity: {
-          condition: { param: "industry", value: 1 },
+          condition: { param: 'industry', value: 1 },
           value: 0.01,
         },
       },
-    }
+    };
   }
 
   const info = (
     <InfoMessage
       message="Please select both Group By and Aggregation to display the chart."
       type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
-  )
+  );
   const hasValidAggregation = Object.values(
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {},
-  ).some((val: any) => Array.isArray(val) && val.length > 0)
+  ).some((val: any) => Array.isArray(val) && val.length > 0);
 
   const hasGroupBy =
     (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [])
-      .length > 0
+      .length > 0;
 
-  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation
+  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation;
   return (
-    <Box sx={{ height: "99%" }}>
+    <Box sx={{ height: '99%' }}>
       <ResponsiveCardVegaLite
         spec={specification}
         actions={false}
-        title={"Heatmap"}
+        title={'Heatmap'}
         maxHeight={500}
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
         controlPanel={<HeatMapControlPanel />}
@@ -212,7 +212,7 @@ const HeatMap = () => {
         loading={tab?.workflowTasks.dataExploration?.heatChart?.loading}
       />
     </Box>
-  )
-}
+  );
+};
 
-export default HeatMap
+export default HeatMap;

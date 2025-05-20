@@ -1,30 +1,30 @@
-import ChartButtonGroup from "../ChartControls/data-exploration-chart-button-group"
-import { Box, IconButton, Popover, Stack, Tooltip, Badge, Typography } from "@mui/material"
-import FilterBar from "../../../../shared/components/filter-bar"
-import { useState } from "react"
-import FilterListIcon from "@mui/icons-material/FilterList"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import { setControls } from "../../../../store/slices/workflowPageSlice"
-import type { IFilter } from "../../../../shared/models/dataexploration.model"
+import ChartButtonGroup from '../ChartControls/data-exploration-chart-button-group';
+import { Box, IconButton, Popover, Stack, Tooltip, Badge, Typography } from '@mui/material';
+import FilterBar from '../../../../shared/components/filter-bar';
+import { useState } from 'react';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { setControls } from '../../../../store/slices/workflowPageSlice';
+import type { IFilter } from '../../../../shared/models/dataexploration.model';
 
 const LeftPanel = () => {
   
-  const dispatch = useAppDispatch()
-  const { tab } = useAppSelector(state => state.workflowPage)
-  const [isFilterOpen, setFilterOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const dispatch = useAppDispatch();
+  const { tab } = useAppSelector(state => state.workflowPage);
+  const [isFilterOpen, setFilterOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   // Get columns from the Redux store
-  const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || []
+  const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || [];
   // Format columns for FilterBar
   const formattedColumns = originalColumns.map((col: any) => ({
     field: col.name,
     headerName: col.name,
     originalType: col.type,
-  }))
+  }));
 
   // Get filters from Redux store
-  const activeFilters = tab?.workflowTasks.dataExploration?.controlPanel?.filters || []
+  const activeFilters = tab?.workflowTasks.dataExploration?.controlPanel?.filters || [];
   
   // Format filters for FilterBar
   const formattedFilters = activeFilters.map((filter: IFilter) => {
@@ -35,28 +35,28 @@ const LeftPanel = () => {
           column: filter.column,
           operator: '>=',
           value: filter.value.toString(),
-        }
+        };
       }
       else if(filter.operator === 'lte'){
         return {
           column: filter.column,
           operator: '<=',
           value: filter.value.toString(),
-        }
+        };
       }
       else if(filter.operator === 'gt'){
         return {
           column: filter.column,
           operator: '>',
           value: filter.value.toString(),
-        }
+        };
       }
       else if(filter.operator === 'lt'){
         return {
           column: filter.column,
           operator: '<',
           value: filter.value.toString(),
-        }
+        };
       }
     } else if (filter.type === 'string') {
       if (filter.operator === 'contains') {
@@ -64,41 +64,41 @@ const LeftPanel = () => {
           column: filter.column,
           operator: 'contains',
           value: filter.value.toString(),
-        }
+        };
       }
       else if(filter.operator === 'startsWith') {
         return {
           column: filter.column,
           operator: 'startsWith',
           value: filter.value.toString(),
-        }
+        };
       }
       else if(filter.operator === 'endsWith') {
         return {
           column: filter.column,
           operator: 'endsWith',
           value: filter.value.toString(),
-        }
+        };
       }
     } else {
       return {
         column: filter.column,
         operator: '=',
         value: filter.value.toString(),
-      }
+      };
     }
     // Default return if no conditions match
     return {
       column: filter.column,
       operator: '=',
       value: filter.value.toString(),
-    }
-  }).filter((filter): filter is { column: string; operator: string; value: string } => filter !== undefined)
+    };
+  }).filter((filter): filter is { column: string; operator: string; value: string } => filter !== undefined);
 
   const handleOpenFilter = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-    setFilterOpen(true)
-  }
+    setAnchorEl(event.currentTarget);
+    setFilterOpen(true);
+  };
 
   const handleFilterChange = (
     index: number,
@@ -130,21 +130,21 @@ const LeftPanel = () => {
           type: 'inequality',
           operator: 'gte',
           value: parsedValue,
-        }
+        };
       } else if (operator === '>') {
         storeFilter = {
           column,
           type: 'inequality',
           operator: 'gt',
           value: parsedValue,
-        }
+        };
       } else if (operator === '<=') {
         storeFilter = {
           column,
           type: 'inequality',
           operator: 'lte',
           value: parsedValue,
-        }
+        };
       }
       else if (operator === '<') {
         storeFilter = {
@@ -152,7 +152,7 @@ const LeftPanel = () => {
           type: 'inequality',
           operator: 'lt',
           value: parsedValue,
-        }
+        };
       }
       else {
         // Handle equals type filters
@@ -160,53 +160,53 @@ const LeftPanel = () => {
           column,
           type: 'equals',
           value,
-        }
+        };
       }
     }
     else {
-      if(operator === "contains") {
+      if(operator === 'contains') {
         storeFilter = {
           column,
           type: 'string',
           operator: 'contains',
           value,
-        }
+        };
       }
-      else if(operator === "startsWith") {
+      else if(operator === 'startsWith') {
         storeFilter = {
           column,
           type: 'string',
           operator: 'startsWith',
           value,
-        }
+        };
       }
-      else if(operator === "endsWith") {
+      else if(operator === 'endsWith') {
         storeFilter = {
           column,
           type: 'string',
           operator: 'endsWith',
           value,
-        }
+        };
       }
     }
-    const allFilters = [...activeFilters]
+    const allFilters = [...activeFilters];
     if (index < allFilters.length) {
-      allFilters[index] = storeFilter
+      allFilters[index] = storeFilter;
     } else {
-      allFilters.push(storeFilter)
+      allFilters.push(storeFilter);
     }
-    dispatch(setControls({ filters: allFilters }))
-  }
+    dispatch(setControls({ filters: allFilters }));
+  };
 
   const handleAddFilter = () => {
     // Adding is handled by handleFilterChange
     // This is called before each filter is added
-  }
+  };
 
   const handleRemoveFilter = (index: number) => {
-    const updatedFilters = activeFilters.filter((_, idx) => idx !== index)
-    dispatch(setControls({ filters: updatedFilters }))
-  }
+    const updatedFilters = activeFilters.filter((_, idx) => idx !== index);
+    dispatch(setControls({ filters: updatedFilters }));
+  };
 
   return (
     <Box sx={{ 
@@ -235,20 +235,20 @@ const LeftPanel = () => {
               anchorEl={anchorEl}
               onClose={() => setFilterOpen(false)}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
               transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
+                vertical: 'top',
+                horizontal: 'left',
               }}
               PaperProps={{
                 sx: {
-                  width: "550px",
+                  width: '550px',
                   p: 2,
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
-                  border: "1px solid rgba(0,0,0,0.04)",
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
                 }
               }}
             >
@@ -277,7 +277,7 @@ const LeftPanel = () => {
           <ChartButtonGroup />
         </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default LeftPanel
+export default LeftPanel;

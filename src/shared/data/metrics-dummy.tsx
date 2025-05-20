@@ -95,4 +95,4 @@ export const dummyData = [
       Accuracy: 0.648,
       Runtime: 8.38,
     },
-  ]
+  ];

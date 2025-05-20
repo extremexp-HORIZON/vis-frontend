@@ -3,7 +3,7 @@ import type {
   IDataExplorationResponse,
   IFilter,
   VisualColumn,
-} from "../dataexploration.model"
+} from '../dataexploration.model';
 export interface IDataExploration {
   multipleTimeSeries: {
     data: IDataExplorationResponse | null
@@ -50,7 +50,7 @@ export interface IDataExploration {
     chartType: string
     selectedColumns: VisualColumn[]
     filters: IFilter[]
-    viewMode: "overlay" | "stacked"
+    viewMode: 'overlay' | 'stacked'
     selectedDataset: string
     currentPage: number
     pageSize: number
@@ -142,23 +142,23 @@ export const dataExplorationDefault: IDataExploration = {
     error: null,
   },
   controlPanel: {
-    chartType: "datatable",
+    chartType: 'datatable',
     selectedColumns: [],
     filters: [],
-    xAxis: { name: "", type: "" },
-    xAxisScatter: { name: "", type: "" },
+    xAxis: { name: '', type: '' },
+    xAxisScatter: { name: '', type: '' },
     yAxis: [],
     yAxisScatter: [],
     barGroupBy: [],
     barAggregation: {},
-    viewMode: "overlay",
-    colorBy: { name: "", type: "" },
-    colorByMap: "None",
+    viewMode: 'overlay',
+    colorBy: { name: '', type: '' },
+    colorByMap: 'None',
     tripsMode: false,
     selectedColumnsMap: [],
-    selectedDataset: "",
-    lat: "",
-    lon: "",
+    selectedDataset: '',
+    lat: '',
+    lon: '',
     umap: false,
     segmentBy: [],
     timestampField: null,
@@ -171,7 +171,6 @@ export const dataExplorationDefault: IDataExploration = {
     pageSize: 100,
     queryItems: 0,
     totalPages: 0,
-
     
   },
   
@@ -185,4 +184,4 @@ export const dataExplorationDefault: IDataExploration = {
     loading: false,
     error: null,
   },
-}
+};

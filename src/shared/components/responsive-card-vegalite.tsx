@@ -19,19 +19,19 @@ import {
   DialogActions,
   useTheme,
   useMediaQuery,
-} from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
-import type React from "react"
-import { useCallback, useEffect, useRef, useState } from "react"
-import { VegaLite } from "react-vega"
-import SettingsIcon from "@mui/icons-material/Settings"
-import { grey } from "@mui/material/colors"
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest"
-import DownloadIcon from "@mui/icons-material/Download"
-import FullscreenIcon from "@mui/icons-material/Fullscreen"
-import CodeIcon from "@mui/icons-material/Code"
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import Loader from "./loader"
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { VegaLite } from 'react-vega';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { grey } from '@mui/material/colors';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import DownloadIcon from '@mui/icons-material/Download';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import CodeIcon from '@mui/icons-material/Code';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import Loader from './loader';
 interface ResponsiveCardVegaLiteProps {
   spec: any // VegaLite specification
   minWidth?: number
@@ -56,24 +56,24 @@ const SectionHeader = ({
 }) => (
   <Box
     sx={{
-      display: "flex",
-      alignItems: "center",
+      display: 'flex',
+      alignItems: 'center',
       borderBottom: `1px solid ${grey[200]}`,
       px: 2,
       py: 1.5,
-      background: "linear-gradient(to right, #f1f5f9, #f8fafc)",
-      borderTopLeftRadius: "10px",
-      borderTopRightRadius: "10px",
+      background: 'linear-gradient(to right, #f1f5f9, #f8fafc)',
+      borderTopLeftRadius: '10px',
+      borderTopRightRadius: '10px',
       margin: 0, // Ensure no margin
-      width: "100%", // Full width
+      width: '100%', // Full width
     }}
   >
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#3566b5",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#3566b5',
         mr: 1.5,
       }}
     >
@@ -82,17 +82,17 @@ const SectionHeader = ({
     <Typography
       variant="subtitle1"
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         fontWeight: 600,
-        color: "#1e3a5f",
-        letterSpacing: "0.3px",
+        color: '#1e3a5f',
+        letterSpacing: '0.3px',
       }}
     >
       {title}
     </Typography>
   </Box>
-)
+);
 
 const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   spec,
@@ -111,163 +111,163 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
   ...otherProps
 }) => {
-  const [width, setWidth] = useState(minWidth)
-  const [height, setHeight] = useState(minHeight)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const menuOpen = Boolean(anchorEl)
-  const [fullscreenOpen, setFullscreenOpen] = useState(false)
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"))
+  const [width, setWidth] = useState(minWidth);
+  const [height, setHeight] = useState(minHeight);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   // Add a new state for fullscreen menu
   const [fullscreenAnchorEl, setFullscreenAnchorEl] =
-    useState<null | HTMLElement>(null)
-  const fullscreenMenuOpen = Boolean(fullscreenAnchorEl)
+    useState<null | HTMLElement>(null);
+  const fullscreenMenuOpen = Boolean(fullscreenAnchorEl);
 
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
     if (containerRef.current) {
       const containerWidth =
-        containerRef.current.offsetWidth || window.innerWidth * 0.9
+        containerRef.current.offsetWidth || window.innerWidth * 0.9;
       const containerHeight = isStatic
         ? containerRef.current.offsetHeight || window.innerHeight * 0.5
-        : 0
+        : 0;
       // Adjust to fit exactly within the container with no overflow
-      const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth))
+      const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth));
 
       const newHeight = isStatic
         ? Math.max(
             minHeight,
             Math.min(newWidth / aspectRatio, maxHeight, containerHeight),
           )
-        : Math.max(minHeight, Math.min(newWidth / aspectRatio, maxHeight))
+        : Math.max(minHeight, Math.min(newWidth / aspectRatio, maxHeight));
 
-      setWidth(newWidth)
-      setHeight(newHeight)
+      setWidth(newWidth);
+      setHeight(newHeight);
     }
-  }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio, isStatic])
+  }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio, isStatic]);
 
   useEffect(() => {
-    updateSize()
+    updateSize();
 
     const observer = new ResizeObserver(() => {
-      updateSize()
-    })
+      updateSize();
+    });
 
     if (containerRef.current) {
-      observer.observe(containerRef.current)
+      observer.observe(containerRef.current);
     }
 
     return () => {
-      observer.disconnect()
-    }
-  }, [updateSize])
+      observer.disconnect();
+    };
+  }, [updateSize]);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   // New function to handle chart download
   const handleDownloadChart = () => {
     if (containerRef.current) {
       // Find the canvas element inside the container
-      const canvas = containerRef.current.querySelector("canvas")
+      const canvas = containerRef.current.querySelector('canvas');
       if (canvas) {
         // Create a temporary link element
-        const link = document.createElement("a")
-        link.download = `${title || "chart"}_${new Date().toISOString().split("T")[0]}.png`
-        link.href = canvas.toDataURL("image/png")
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        const link = document.createElement('a');
+        link.download = `${title || 'chart'}_${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     }
-    handleMenuClose()
-  }
+    handleMenuClose();
+  };
 
   // Enhanced function to handle full-screen mode
   const handleFullScreen = () => {
-    setFullscreenOpen(true)
-    handleMenuClose()
-  }
+    setFullscreenOpen(true);
+    handleMenuClose();
+  };
 
   const handleCloseFullscreen = () => {
-    setFullscreenOpen(false)
-  }
+    setFullscreenOpen(false);
+  };
 
   // When fullscreen dialog opens, resize the chart to fit
   useEffect(() => {
     if (fullscreenOpen) {
       // Short delay to ensure the dialog is rendered before measuring
-      const timer = setTimeout(() => updateSize(), 100)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => updateSize(), 100);
+      return () => clearTimeout(timer);
     }
-  }, [fullscreenOpen, updateSize])
+  }, [fullscreenOpen, updateSize]);
 
   // Replaced view data function with JSON download function
   const handleDownloadData = () => {
     if (spec?.data) {
       // Extract data from spec
-      let dataToExport
+      let dataToExport;
 
       if (spec.data.values) {
-        dataToExport = spec.data.values
+        dataToExport = spec.data.values;
       } else if (
         spec.data.name &&
         otherProps.data &&
         otherProps.data[spec.data.name]
       ) {
-        dataToExport = otherProps.data[spec.data.name]
+        dataToExport = otherProps.data[spec.data.name];
       } else {
-        dataToExport = spec.data
+        dataToExport = spec.data;
       }
 
       // Convert data to JSON string
-      const jsonData = JSON.stringify(dataToExport, null, 2)
+      const jsonData = JSON.stringify(dataToExport, null, 2);
 
       // Create blob and download link
-      const blob = new Blob([jsonData], { type: "application/json" })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
 
-      link.href = url
-      link.download = `${title || "chart-data"}_${new Date().toISOString().split("T")[0]}.json`
-      document.body.appendChild(link)
-      link.click()
+      link.href = url;
+      link.download = `${title || 'chart-data'}_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
 
       // Clean up
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
-    handleMenuClose()
-  }
+    handleMenuClose();
+  };
 
   const handleFullscreenMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setFullscreenAnchorEl(event.currentTarget)
-  }
+    setFullscreenAnchorEl(event.currentTarget);
+  };
 
   const handleFullscreenMenuClose = () => {
-    setFullscreenAnchorEl(null)
-  }
+    setFullscreenAnchorEl(null);
+  };
 
   return (
     <>
       <Card
         sx={{
           maxWidth: maxWidth,
-          mx: "auto",
+          mx: 'auto',
           mb: 1,
-          boxShadow: "0 4px 20px rgba(0,0,0,0.09)",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: "12px",
-          border: "1px solid rgba(0, 0, 0, 0.06)",
-          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          boxShadow: '0 4px 20px rgba(0,0,0,0.09)',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: '12px',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         }}
       >
         <CardHeader
@@ -277,10 +277,10 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 aria-label="settings"
                 onClick={handleMenuClick}
                 sx={{
-                  position: "relative",
-                  "& svg": {
+                  position: 'relative',
+                  '& svg': {
                     zIndex: 1,
-                    position: "relative",
+                    position: 'relative',
                   },
                 }}
               >
@@ -292,26 +292,26 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 open={menuOpen}
                 onClose={handleMenuClose}
                 anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
+                  vertical: 'bottom',
+                  horizontal: 'right',
                 }}
                 transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
                 PaperProps={{
                   elevation: 3,
                   sx: {
                     width: 320,
                     maxHeight: 500,
-                    overflowY: "hidden",
-                    overflowX: "hidden",
+                    overflowY: 'hidden',
+                    overflowX: 'hidden',
                     padding: 0,
-                    borderRadius: "12px",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
-                    border: "1px solid rgba(0,0,0,0.04)",
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                    border: '1px solid rgba(0,0,0,0.04)',
                     mt: 1, // Add small margin to top
-                    "& .MuiMenu-list": {
+                    '& .MuiMenu-list': {
                       padding: 0, // Remove default padding
                     },
                   },
@@ -343,7 +343,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                       primary="Download as PNG"
                       secondary="Save chart as image"
                       primaryTypographyProps={{ fontWeight: 500 }}
-                      secondaryTypographyProps={{ fontSize: "0.75rem" }}
+                      secondaryTypographyProps={{ fontSize: '0.75rem' }}
                     />
                   </MenuItem>
 
@@ -355,7 +355,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                       primary="Download Data as JSON"
                       secondary="Export chart's underlying data"
                       primaryTypographyProps={{ fontWeight: 500 }}
-                      secondaryTypographyProps={{ fontSize: "0.75rem" }}
+                      secondaryTypographyProps={{ fontSize: '0.75rem' }}
                     />
                   </MenuItem>
                 </Box>
@@ -366,8 +366,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   onClick={handleFullScreen}
                   sx={{
                     mr: 0.5,
-                    "& svg": {
-                      position: "relative",
+                    '& svg': {
+                      position: 'relative',
                       zIndex: 1,
                     },
                   }}
@@ -378,15 +378,15 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             </>
           }
           title={
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="overline"
                 sx={{
-                  padding: "4px 0px",
-                  textTransform: "uppercase",
+                  padding: '4px 0px',
+                  textTransform: 'uppercase',
                   fontWeight: 600,
-                  letterSpacing: "0.5px",
-                  color: "#2a3f5f",
+                  letterSpacing: '0.5px',
+                  color: '#2a3f5f',
                 }}
               >
                 {title}
@@ -394,7 +394,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
               {details && (
                 <Tooltip title={details}>
                   <InfoOutlinedIcon
-                    sx={{ fontSize: 16, color: "grey.600", cursor: "default" }}
+                    sx={{ fontSize: 16, color: 'grey.600', cursor: 'default' }}
                   />
                 </Tooltip>
               )}
@@ -402,40 +402,40 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           }
           // subheader="September 14, 2016"
           sx={{
-            background: "linear-gradient(to right, #f8f9fa, #edf2f7)",
-            borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-            padding: "4px 16px",
-            height: "40px",
-            borderTopLeftRadius: "12px",
-            borderTopRightRadius: "12px",
+            background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+            padding: '4px 16px',
+            height: '40px',
+            borderTopLeftRadius: '12px',
+            borderTopRightRadius: '12px',
             flexShrink: 0, // Prevent header from shrinking
           }}
         />
         <CardContent
           sx={{
-            backgroundColor: "#ffffff",
+            backgroundColor: '#ffffff',
             py: 2,
             px: 3,
-            "&:last-child": {
+            '&:last-child': {
               paddingBottom: 3,
             },
-            borderRadius: "0 0 12px 12px",
-            display: "flex",
+            borderRadius: '0 0 12px 12px',
+            display: 'flex',
             flexGrow: 1, // Allow content to grow
-            overflow: "auto", // Only make the content scrollable
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            overflow: 'auto', // Only make the content scrollable
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <Box
             ref={containerRef}
             sx={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             {showInfoMessage ? (
@@ -447,8 +447,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 spec={{
                   ...spec,
                   autosize: {
-                    type: "fit",
-                    contains: "padding",
+                    type: 'fit',
+                    contains: 'padding',
                     resize: true,
                   },
                   width: width,
@@ -471,35 +471,35 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         TransitionProps={{ timeout: 400 }}
         PaperProps={{
           sx: {
-            borderRadius: fullScreen ? 0 : "12px",
-            width: fullScreen ? "100%" : "90vw",
-            height: fullScreen ? "100%" : "90vh",
-            maxWidth: "unset",
-            bgcolor: "#ffffff",
-            overflow: "hidden",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+            borderRadius: fullScreen ? 0 : '12px',
+            width: fullScreen ? '100%' : '90vw',
+            height: fullScreen ? '100%' : '90vh',
+            maxWidth: 'unset',
+            bgcolor: '#ffffff',
+            overflow: 'hidden',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
           },
         }}
       >
         <DialogTitle
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            background: "linear-gradient(to right, #f8f9fa, #edf2f7)",
-            borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
             px: 3,
             py: 1.5,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography
               variant="h6"
               component="div"
               sx={{
                 fontWeight: 600,
-                color: "#2a3f5f",
-                letterSpacing: "0.3px",
+                color: '#2a3f5f',
+                letterSpacing: '0.3px',
               }}
             >
               {title}
@@ -507,12 +507,12 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             {details && (
               <Tooltip title={details}>
                 <InfoOutlinedIcon
-                  sx={{ fontSize: 20, color: "grey.600", cursor: "default" }}
+                  sx={{ fontSize: 20, color: 'grey.600', cursor: 'default' }}
                 />
               </Tooltip>
             )}
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {controlPanel && (
               <>
                 <IconButton
@@ -520,8 +520,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   onClick={handleFullscreenMenuClick}
                   sx={{
                     mr: 1,
-                    "& svg": {
-                      position: "relative",
+                    '& svg': {
+                      position: 'relative',
                       zIndex: 1,
                     },
                   }}
@@ -533,26 +533,26 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   open={fullscreenMenuOpen}
                   onClose={handleFullscreenMenuClose}
                   anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
+                    vertical: 'bottom',
+                    horizontal: 'right',
                   }}
                   transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
+                    vertical: 'top',
+                    horizontal: 'right',
                   }}
                   PaperProps={{
                     elevation: 3,
                     sx: {
                       width: 320,
                       maxHeight: 500,
-                      overflowY: "hidden",
-                      overflowX: "hidden",
+                      overflowY: 'hidden',
+                      overflowX: 'hidden',
                       padding: 0,
-                      borderRadius: "12px",
-                      boxShadow: "0 10px 30px rgba(0,0,0,0.16)",
-                      border: "1px solid rgba(0,0,0,0.04)",
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                      border: '1px solid rgba(0,0,0,0.04)',
                       mt: 1,
-                      "& .MuiMenu-list": {
+                      '& .MuiMenu-list': {
                         padding: 0,
                       },
                     },
@@ -585,11 +585,11 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           dividers
           sx={{
             p: 4,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            overflow: "hidden",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            overflow: 'hidden',
           }}
         >
           {!showInfoMessage ? (
@@ -599,7 +599,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
               <VegaLite
                 spec={{
                   ...spec,
-                  autosize: { type: "fit", contains: "padding" },
+                  autosize: { type: 'fit', contains: 'padding' },
                   width: fullScreen
                     ? window.innerWidth * 0.9
                     : window.innerWidth * 0.8,
@@ -613,11 +613,11 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           ) : (
             <Box
               sx={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               {infoMessage}
@@ -628,8 +628,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           sx={{
             px: 3,
             py: 2,
-            borderTop: "1px solid rgba(0, 0, 0, 0.08)",
-            background: "#f8f9fa",
+            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+            background: '#f8f9fa',
           }}
         >
           <Button
@@ -652,7 +652,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         </DialogActions>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-export default ResponsiveCardVegaLite
+export default ResponsiveCardVegaLite;

@@ -1,10 +1,10 @@
-import type * as React from "react"
-import Tooltip from "@mui/material/Tooltip"
-import Toolbar from "@mui/material/Toolbar"
-import Typography from "@mui/material/Typography"
-import IconButton from "@mui/material/IconButton"
-import FilterListIcon from "@mui/icons-material/FilterList"
-import { alpha } from "@mui/material/styles"
+import type * as React from 'react';
+import Tooltip from '@mui/material/Tooltip';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { alpha } from '@mui/material/styles';
 import {
   Button,
   Stack,
@@ -16,27 +16,27 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-} from "@mui/material"
+} from '@mui/material';
 import type {
-  RootState} from "../../../../store/store";
+  RootState} from '../../../../store/store';
 import {
   useAppDispatch,
   useAppSelector,
-} from "../../../../store/store"
+} from '../../../../store/store';
 import {
   setScheduledTable,
   setVisibleTable,
   setWorkflowsTable,
   setGroupBy,
-} from "../../../../store/slices/monitorPageSlice"
-import { useState } from "react"
-import PivotTableChartRoundedIcon from "@mui/icons-material/PivotTableChartRounded"
-import ViewColumnIcon from "@mui/icons-material/ViewColumn"
-import CheckBoxIcon from "@mui/icons-material/CheckBox"
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
-import TableRowsIcon from "@mui/icons-material/TableRows"
-import CategoryIcon from "@mui/icons-material/Category"
-import ClearAllIcon from "@mui/icons-material/ClearAll"
+} from '../../../../store/slices/monitorPageSlice';
+import { useState } from 'react';
+import PivotTableChartRoundedIcon from '@mui/icons-material/PivotTableChartRounded';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import CategoryIcon from '@mui/icons-material/Category';
+import ClearAllIcon from '@mui/icons-material/ClearAll';
 
 interface ToolBarWorkflowProps {
   filterNumbers: number
@@ -72,26 +72,24 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     filters,
     onFilterChange,
     showFilterButton = false
-  } = props
+  } = props;
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
-    useAppSelector((state: RootState) => state.monitorPage)
-  const dispatch = useAppDispatch()
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [anchorElGroup, setAnchorElGroup] = useState<null | HTMLElement>(null)
+    useAppSelector((state: RootState) => state.monitorPage);
+  const dispatch = useAppDispatch();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorElGroup, setAnchorElGroup] = useState<null | HTMLElement>(null);
 
   const handleGroupClick = (e: React.MouseEvent<HTMLElement>) =>
-    setAnchorElGroup(e.currentTarget)
-  const handleGroupClose = () => setAnchorElGroup(null)
+    setAnchorElGroup(e.currentTarget);
+  const handleGroupClose = () => setAnchorElGroup(null);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
-  const handleClose = () => setAnchorEl(null)
+  const handleClose = () => setAnchorEl(null);
 
-  const open = Boolean(anchorEl)
-
-
+  const open = Boolean(anchorEl);
 
   // Custom header component for popover sections
   const SectionHeader = ({
@@ -103,9 +101,9 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
   }) => (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        borderBottom: `1px solid rgba(0, 0, 0, 0.08)`,
+        display: 'flex',
+        alignItems: 'center',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
         px: 2,
         py: 1.5,
         background: 'linear-gradient(to right, #f1f5f9, #f8fafc)',
@@ -127,8 +125,8 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
       <Typography
         variant="subtitle1"
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           fontWeight: 600,
           color: '#1e3a5f',
           letterSpacing: '0.3px',
@@ -137,7 +135,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
         {title}
       </Typography>
     </Box>
-  )
+  );
 
   return (
     <Toolbar
@@ -156,7 +154,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     >
       {numSelected > 0 && selectedTab !== 1 ? (
         <Typography
-          sx={{ flex: "1 1 60%" }}
+          sx={{ flex: '1 1 60%' }}
           color="inherit"
           variant="subtitle1"
           component="div"
@@ -165,37 +163,37 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
         </Typography>
       ) : (
         selectedTab !== 1 && (
-          <Tooltip title="" sx={{ width: "15%" }}>
+          <Tooltip title="" sx={{ width: '15%' }}>
             <Stack spacing={1} direction="row">
               <Button
                 size="small"
                 variant={
-                  visibleTable === "workflows" ? "contained" : "outlined"
+                  visibleTable === 'workflows' ? 'contained' : 'outlined'
                 }
                 sx={{
                   padding: 1,
                   margin: 2,
-                  fontSize: "11px",
-                  fontWeight: "bold",
+                  fontSize: '11px',
+                  fontWeight: 'bold',
                   borderRadius: 4,
                 }}
-                onClick={() => dispatch(setVisibleTable("workflows"))}
+                onClick={() => dispatch(setVisibleTable('workflows'))}
               >
                 Completed
               </Button>
               <Button
                 size="small"
                 variant={
-                  visibleTable === "scheduled" ? "contained" : "outlined"
+                  visibleTable === 'scheduled' ? 'contained' : 'outlined'
                 }
                 sx={{
                   padding: 1,
                   margin: 2,
-                  fontSize: "11px",
-                  fontWeight: "bold",
+                  fontSize: '11px',
+                  fontWeight: 'bold',
                   borderRadius: 4,
                 }}
-                onClick={() => dispatch(setVisibleTable("scheduled"))}
+                onClick={() => dispatch(setVisibleTable('scheduled'))}
               >
                 Scheduled
               </Button>
@@ -209,9 +207,9 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             sx={{ padding: 1, margin: 2 }}
             size="small"
             variant="contained"
-            disabled={numSelected < 2 && tableName === "Workflow Execution"}
-            style={{ fontSize: "11px" }}
-            onClick={handleClickedFunction("compare-completed")}
+            disabled={numSelected < 2 && tableName === 'Workflow Execution'}
+            style={{ fontSize: '11px' }}
+            onClick={handleClickedFunction('compare-completed')}
           >
             {actionButtonName}
           </Button>
@@ -219,14 +217,14 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
       ) : (
         <Box
           sx={{
-            width: selectedTab !== 1 ? "85%" : "100%",
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "row",
+            width: selectedTab !== 1 ? '85%' : '100%',
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'row',
             pl: 1,
           }}
         >
-          <Box sx={{ gap: 0.2, marginLeft: "auto" }}>
+          <Box sx={{ gap: 0.2, marginLeft: 'auto' }}>
             {showFilterButton && (
               <Tooltip title="Filter list">
                 <IconButton onClick={filterClickedFunction}>
@@ -243,7 +241,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               </IconButton>
             </Tooltip>
 
-            {visibleTable === "workflows" && (
+            {visibleTable === 'workflows' && (
               <Tooltip title="Group by">
                 <IconButton onClick={handleGroupClick}>
                   <Badge color="primary" badgeContent={workflowsTable.groupBy.length} invisible={workflowsTable.groupBy.length === 0}>
@@ -257,19 +255,19 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               open={open}
               anchorEl={anchorEl}
               onClose={handleClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               PaperProps={{
                 elevation: 3,
                 sx: {
                   width: 300,
                   maxHeight: 500,
-                  overflow: "hidden",
+                  overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
                   boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
                   border: '1px solid rgba(0,0,0,0.04)',
                   mt: 1,
-                  "& .MuiList-root": {
+                  '& .MuiList-root': {
                     padding: 0,
                   }
                 },
@@ -278,7 +276,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               <SectionHeader icon={<TableRowsIcon fontSize="small" />} title="Visible Columns" />
               
               <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
-                {visibleTable === "workflows"
+                {visibleTable === 'workflows'
                   ? workflowsTable.visibleColumns.slice(0, -1).map(column => (
                       <ListItem 
                         key={column.field}
@@ -297,7 +295,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                                     ],
                                 },
                               }),
-                            )
+                            );
                           }}
                           dense
                         >
@@ -333,7 +331,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                                     ],
                                 },
                               }),
-                            )
+                            );
                           }}
                           dense
                         >
@@ -357,19 +355,19 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               open={Boolean(anchorElGroup)}
               anchorEl={anchorElGroup}
               onClose={handleGroupClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               PaperProps={{
                 elevation: 3,
                 sx: {
                   width: 300,
                   maxHeight: 500,
-                  overflow: "hidden",
+                  overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
                   boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
                   border: '1px solid rgba(0,0,0,0.04)',
                   mt: 1,
-                  "& .MuiList-root": {
+                  '& .MuiList-root': {
                     padding: 0,
                   }
                 },
@@ -392,7 +390,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                               ? workflowsTable.groupBy.filter(p => p !== option)
                               : [...workflowsTable.groupBy, option],
                           ),
-                        )
+                        );
                       }}
                       dense
                     >
@@ -436,5 +434,5 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
         </Box>
       )}
     </Toolbar>
-  )
+  );
 }

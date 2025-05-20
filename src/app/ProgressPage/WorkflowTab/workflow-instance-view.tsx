@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react"
-import InstanceClassification from "../../Tasks/ModelAnalysisTask/plots/instance-classification"
-import type { RootState } from "../../../store/store"
-import { useAppDispatch, useAppSelector } from "../../../store/store"
-import CounterfactualsTable from "../../Tasks/ModelAnalysisTask/tables/counterfactuals-table"
-import { useParams } from "react-router-dom"
+import { useEffect, useRef, useState } from 'react';
+import InstanceClassification from '../../Tasks/ModelAnalysisTask/plots/instance-classification';
+import type { RootState } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
+import CounterfactualsTable from '../../Tasks/ModelAnalysisTask/tables/counterfactuals-table';
+import { useParams } from 'react-router-dom';
 import {
   ButtonGroup,
   Button,
@@ -14,36 +14,36 @@ import {
   Typography,
   Stack,
   IconButton,
-} from "@mui/material"
-import { setControls } from "../../../store/slices/workflowPageSlice"
-import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
-import TableChartIcon from "@mui/icons-material/TableChartSharp"
-import { DataGrid } from "@mui/x-data-grid"
-import InfoMessage from "../../../shared/components/InfoMessage"
-import ResponsiveCardTable from "../../../shared/components/responsive-card-table"
-import Loader from "../../../shared/components/loader"
-import PsychologyAltRoundedIcon from "@mui/icons-material/PsychologyAltRounded"
-import InstanceClassificationUmap from "../../Tasks/ModelAnalysisTask/plots/instance-classification-umap"
-import { getLabelTestInstances } from "../../../store/slices/modelAnalysisSlice"
+} from '@mui/material';
+import { setControls } from '../../../store/slices/workflowPageSlice';
+import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
+import TableChartIcon from '@mui/icons-material/TableChartSharp';
+import { DataGrid } from '@mui/x-data-grid';
+import InfoMessage from '../../../shared/components/InfoMessage';
+import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
+import Loader from '../../../shared/components/loader';
+import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded';
+import InstanceClassificationUmap from '../../Tasks/ModelAnalysisTask/plots/instance-classification-umap';
+import { getLabelTestInstances } from '../../../store/slices/modelAnalysisSlice';
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,
-  )
+  );
   const chartType = useAppSelector(
     (state: RootState) =>
       state.workflowPage.tab?.workflowTasks.dataExploration?.controlPanel
         .chartType,
-  )
-  const dispatch = useAppDispatch()
-  const experimentId = useParams().experimentId
-  const workflow = tab?.workflowTasks.modelAnalysis?.counterfactuals
-  const tableRef = useRef<HTMLDivElement>(null)
-  const hasContent = true
-  const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(false)
+  );
+  const dispatch = useAppDispatch();
+  const experimentId = useParams().experimentId;
+  const workflow = tab?.workflowTasks.modelAnalysis?.counterfactuals;
+  const tableRef = useRef<HTMLDivElement>(null);
+  const hasContent = true;
+  const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(false);
 
-  const [point, setPoint] = useState<{ id: number; data: any } | null>(null)
-  const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? []
+  const [point, setPoint] = useState<{ id: number; data: any } | null>(null);
+  const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
 
   const baseColumns = Object.keys(rows[0] || {}).map(key => ({
     field: key,
@@ -51,38 +51,37 @@ const InstanceView = () => {
     flex: 1,
     minWidth: 150,
     maxWidth: 300,
-    headerAlign: "center",
-    align: "center",
+    headerAlign: 'center',
+    align: 'center',
 
     renderCell: (params: any) => {
-      const value = params.value
-      if (key === "predicted") {
+      const value = params.value;
+      if (key === 'predicted') {
         return (
           <span
             style={{
-              color: value === "1" ? "green" : "red",
-              fontWeight: "bold",
+              color: value === '1' ? 'green' : 'red',
+              fontWeight: 'bold',
             }}
           >
             {value}
           </span>
-        )
+        );
       }
-      return typeof value === "number"
+      return typeof value === 'number'
         ? value.toFixed(3)
-        : (value?.toString?.() ?? "")
+        : (value?.toString?.() ?? '');
     },
-  }))
-
+  }));
   
 const actionColumn = {
-  field: "action",
-  headerName: "actions",
-  headerAlign: "center",
-  align: "center",
+  field: 'action',
+  headerName: 'actions',
+  headerAlign: 'center',
+  align: 'center',
   sortable: false,
   filterable: false,
-  headerClassName: "datagrid-header-fixed",
+  headerClassName: 'datagrid-header-fixed',
   minWidth: 100,
   renderCell: (params: any) => (
     <Box
@@ -96,8 +95,8 @@ const actionColumn = {
       <Tooltip title="Explanations">
         <IconButton             
           onClick={() => {
-            const { id, ...data } = params.row
-            setPoint({ id, data })
+            const { id, ...data } = params.row;
+            setPoint({ id, data });
           }}
         >
           <PsychologyAltRoundedIcon fontSize="small" color="primary" />
@@ -107,126 +106,125 @@ const actionColumn = {
   ),
 };
 const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
-
   
   const handleExportCsv = () => {
-    return
-  }
+    return;
+  };
 
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-    "& .MuiDataGrid-scrollbarFiller": {
+    '& .MuiDataGrid-scrollbarFiller': {
       backgroundColor: theme.palette.customGrey.main,
     },
-    "& .MuiDataGrid-columnHeader": {
+    '& .MuiDataGrid-columnHeader': {
       backgroundColor: theme.palette.customGrey.main,
     },
     '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
       backgroundColor: theme.palette.customGrey.main,
     },
-    "& .MuiDataGrid-columnHeaderTitle": {
-      whiteSpace: "nowrap",
-      overflow: "visible",
+    '& .MuiDataGrid-columnHeaderTitle': {
+      whiteSpace: 'nowrap',
+      overflow: 'visible',
     },
     // Fix header to remain at top
-    "& .MuiDataGrid-main": {
+    '& .MuiDataGrid-main': {
       // Critical for layout
-      display: "flex",
-      flexDirection: "column",
-      height: "100%",
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
     },
-    "& .MuiDataGrid-columnHeaders": {
-      position: "sticky",
+    '& .MuiDataGrid-columnHeaders': {
+      position: 'sticky',
       top: 0,
       zIndex: 2,
     },
     // Ensure the cell container scrolls properly
-    "& .MuiDataGrid-virtualScroller": {
+    '& .MuiDataGrid-virtualScroller': {
       flex: 1,
-      overflow: "auto",
+      overflow: 'auto',
     },
     // Fix pagination to remain at bottom
-    "& .MuiDataGrid-footerContainer": {
-      minHeight: "56px",
-      borderTop: "1px solid rgba(224, 224, 224, 1)",
-      position: "sticky",
+    '& .MuiDataGrid-footerContainer': {
+      minHeight: '56px',
+      borderTop: '1px solid rgba(224, 224, 224, 1)',
+      position: 'sticky',
       bottom: 0,
       zIndex: 2,
-      backgroundColor: "#ffffff",
+      backgroundColor: '#ffffff',
     },
-    "& .MuiTablePagination-root": {
-      overflow: "visible",
+    '& .MuiTablePagination-root': {
+      overflow: 'visible',
     },
     // Add border radius to bottom corners
-    "&.MuiDataGrid-root": {
-      borderRadius: "0 0 12px 12px",
-      border: "none",
-      height: "100%", // Ensure full height
+    '&.MuiDataGrid-root': {
+      borderRadius: '0 0 12px 12px',
+      border: 'none',
+      height: '100%', // Ensure full height
     },
     // Add styling for selected row
-    "& .MuiDataGrid-row.Mui-selected": {
+    '& .MuiDataGrid-row.Mui-selected': {
       backgroundColor: `${theme.palette.primary.light}40`,
-      "&:hover": {
+      '&:hover': {
         backgroundColor: `${theme.palette.primary.light}60`,
       },
     },
     '& .MuiDataGrid-columnHeader[data-field="action"]': {
-      position: "sticky",
+      position: 'sticky',
       right: 0,
       zIndex: 999,
       backgroundColor: theme.palette.customGrey.main,
-      borderLeft: "1px solid #ddd",
+      borderLeft: '1px solid #ddd',
     },
     '& .MuiDataGrid-cell[data-field="action"]': {
-      position: "sticky",
+      position: 'sticky',
       right: 0,
       zIndex: 999,
       backgroundColor: theme.palette.customGrey.light,
-      borderLeft: "1px solid #ddd",
+      borderLeft: '1px solid #ddd',
     },
-  }))
+  }));
 
   useEffect(() => {
     if (tab) {
       dispatch(
         getLabelTestInstances({
-          experimentId: experimentId || "",
+          experimentId: experimentId || '',
           runId: tab?.workflowId,
         }),
-      )
+      );
     }
-  }, [isTabInitialized])
+  }, [isTabInitialized]);
 
   const visibleRows = showMisclassifiedOnly
     ? rows.filter((row: any) => row.actual !== row.predicted)
-    : rows
+    : rows;
 
-  const rowHeight = 52 // Estimated row height
-  const maxTableHeight = 500 // Set a max height to avoid it growing indefinitely
+  const rowHeight = 52; // Estimated row height
+  const maxTableHeight = 500; // Set a max height to avoid it growing indefinitely
   const calculatedHeight = Math.min(
     visibleRows.length * rowHeight + 210,
     maxTableHeight,
-  ) // Add space for headers and footer
+  ); // Add space for headers and footer
 
   // Common chart height to use for both chart types
-  const chartHeight = calculatedHeight
+  const chartHeight = calculatedHeight;
 
   const hashRow = (row: any): string => {
-  const stringified = JSON.stringify(row, Object.keys(row).sort())
-  let hash = 0
+  const stringified = JSON.stringify(row, Object.keys(row).sort());
+  let hash = 0;
   for (let i = 0; i < stringified.length; i++) {
-    const char = stringified.charCodeAt(i)
-    hash = (hash << 5) - hash + char
-    hash |= 0 // Convert to 32bit integer
+    const char = stringified.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32bit integer
   }
-  return `row-${Math.abs(hash)}`
-}
+  return `row-${Math.abs(hash)}`;
+};
 
   return (
     <>
       <Box display="flex" justifyContent="space-between" marginBottom={2} alignItems="center">
         {/* Misclassified instances checkbox moved to the top left */}
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography fontSize={"0.8rem"}>Show Misclassified Instances:</Typography>
+          <Typography fontSize={'0.8rem'}>Show Misclassified Instances:</Typography>
           <Checkbox
             checked={showMisclassifiedOnly}
             onChange={e => setShowMisclassifiedOnly(e.target.checked)}
@@ -255,16 +253,16 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
           
           <Tooltip title="Table">
             <Button
-              variant={chartType === "datatable" ? "contained" : "outlined"}
-              onClick={() => dispatch(setControls({ chartType: "datatable" }))}
+              variant={chartType === 'datatable' ? 'contained' : 'outlined'}
+              onClick={() => dispatch(setControls({ chartType: 'datatable' }))}
             >
               <TableChartIcon />
             </Button>
           </Tooltip>
           <Tooltip title="Scatter">
             <Button
-              variant={chartType === "scatter" ? "contained" : "outlined"}
-              onClick={() => dispatch(setControls({ chartType: "scatter" }))}
+              variant={chartType === 'scatter' ? 'contained' : 'outlined'}
+              onClick={() => dispatch(setControls({ chartType: 'scatter' }))}
             >
               <ScatterPlotIcon />
             </Button>
@@ -272,8 +270,8 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
         </ButtonGroup>
       </Box>
 
-      {chartType === "scatter" &&(
-        <Box sx={{ height: "60%", minHeight: 400 }}>
+      {chartType === 'scatter' &&(
+        <Box sx={{ height: '60%', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
@@ -284,8 +282,8 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
         </Box>
       )}
 
-      {chartType === "datatable" && (
-        <Box sx={{ height: "60%", minHeight: 400 }}>
+      {chartType === 'datatable' && (
+        <Box sx={{ height: '60%', minHeight: 400 }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
             onDownload={handleExportCsv}
@@ -298,10 +296,10 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
           >
             <Box
               sx={{
-                height: "100%",
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
+                height: '100%',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
                {tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ? (
@@ -310,10 +308,10 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                 <Box
                   sx={{
                     flexGrow: 1,
-                    width: "100%",
-                    height: "100%",
-                    overflow: "hidden", // Important to contain the scrolling
-                    display: "flex",
+                    width: '100%',
+                    height: '100%',
+                    overflow: 'hidden', // Important to contain the scrolling
+                    display: 'flex',
                   }}
                   ref={tableRef}
                 >
@@ -339,29 +337,29 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                     checkboxSelection={false}
                     disableRowSelectionOnClick={false}
                     sx={{
-                      width: "100%",
-                      border: "none",
-                      "& .MuiDataGrid-cell": {
-                        whiteSpace: "normal", // Allow text to wrap
-                        wordWrap: "break-word",
+                      width: '100%',
+                      border: 'none',
+                      '& .MuiDataGrid-cell': {
+                        whiteSpace: 'normal', // Allow text to wrap
+                        wordWrap: 'break-word',
                       },
-                      "& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell": {
+                      '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
                         // Add border to make cells more distinct
-                        borderRight: "1px solid rgba(224, 224, 224, 0.4)",
+                        borderRight: '1px solid rgba(224, 224, 224, 0.4)',
                       },
                       // Make the grid look better when fewer columns
-                      "& .MuiDataGrid-main": {
-                        overflow: "hidden",
+                      '& .MuiDataGrid-main': {
+                        overflow: 'hidden',
                       },
                       // Style for selected row
-                      "& .MuiDataGrid-row.Mui-selected": {
-                        backgroundColor: "rgba(25, 118, 210, 0.15)",
-                        "&:hover": {
-                          backgroundColor: "rgba(25, 118, 210, 0.25)",
+                      '& .MuiDataGrid-row.Mui-selected': {
+                        backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(25, 118, 210, 0.25)',
                         },
                       },
-                      "& .MuiDataGrid-selectedRowCount": {
-                        visibility: "hidden",
+                      '& .MuiDataGrid-selectedRowCount': {
+                        visibility: 'hidden',
                       },
                     }}
                   />
@@ -377,30 +375,27 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
           </ResponsiveCardTable>
         </Box>
       )}
-      {chartType === "umap" && (
-        <Box sx={{ height: "60%", minHeight: 400 }}>
+      {chartType === 'umap' && (
+        <Box sx={{ height: '60%', minHeight: 400 }}>
           <InstanceClassificationUmap  point={point} showMisclassifiedOnly={showMisclassifiedOnly} setPoint={setPoint} hashRow={hashRow}/>
         </Box>
       )}
       
       {point && workflow ? (
-        <Box sx={{ pt: 2, height: "30%", minHeight: 300 }}>
+        <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
            <CounterfactualsTable
-             key={`counterfactuals-table`}
+             key={'counterfactuals-table'}
              point={point.data}
              handleClose={() => {}}
              counterfactuals={workflow || null}
              onClose={() => setPoint(null)}
-             experimentId={experimentId || "I2Cat_phising"}
-             workflowId={tab?.workflowId || "1"}
+             experimentId={experimentId || 'I2Cat_phising'}
+             workflowId={tab?.workflowId || '1'}
            />
         </Box>
       ) : null}
     </>
-  )
-}
+  );
+};
 
 export default InstanceView;
-
-
-

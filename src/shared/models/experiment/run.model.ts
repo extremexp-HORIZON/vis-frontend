@@ -1,7 +1,7 @@
-import type { IParam } from "./param.model";
-import type { IMetric } from "./metric.model";
-import type { IDataAsset } from "./data-asset.model";
-import type { ITask } from "./task.model";
+import type { IParam } from './param.model';
+import type { IMetric } from './metric.model';
+import type { IDataAsset } from './data-asset.model';
+import type { ITask } from './task.model';
 
 export type RunStatus = 'RUNNING' | 'SCHEDULED' | 'COMPLETED' | 'FAILED' | 'PAUSED' | 'STOPPED' | 'KILLED';
 

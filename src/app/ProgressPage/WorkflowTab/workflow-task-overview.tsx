@@ -1,23 +1,23 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from '@mui/material';
 import { CheckCircle as CheckCircleIcon, WarningAmberRounded as WarningAmberRoundedIcon, InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
-import type { RootState } from "../../../store/store";
-import { useAppSelector } from "../../../store/store";
+import type { RootState } from '../../../store/store';
+import { useAppSelector } from '../../../store/store';
 import { DetailsCard, DetailsCardItem } from '../../../shared/components/details-card';
 
 const StatusIndicator = ({ completed }: {completed: boolean}) => (
   <Box
     sx={{
-      display: "flex",
-      flexDirection: "row",
+      display: 'flex',
+      flexDirection: 'row',
       gap: 1,
-      alignItems: "center",
-      backgroundColor: completed ? "#e6f4ea" : "#fdecea",
-      padding: "6px 8px",
+      alignItems: 'center',
+      backgroundColor: completed ? '#e6f4ea' : '#fdecea',
+      padding: '6px 8px',
       borderRadius: 1,
     }}
   >
     <Typography variant="body1">
-      Status: {completed ? "completed" : "not completed"}
+      Status: {completed ? 'completed' : 'not completed'}
     </Typography>
     {completed ? (
       <CheckCircleIcon fontSize="small" color="success" />
@@ -28,7 +28,7 @@ const StatusIndicator = ({ completed }: {completed: boolean}) => (
 );
 
 const EmptyState = () => (
-  <Box sx={{ display: "flex", gap: 1, alignItems: "center", justifyContent: "center", height: "100%" }}>
+  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
     <InfoOutlinedIcon fontSize="small" color="disabled" />
     <Typography variant="body1">
       No parameters defined for this task
@@ -46,7 +46,7 @@ const formatDuration = (seconds: number): string => {
   if (m) parts.push(`${m}m`);
   if (s || parts.length === 0) parts.push(`${s}s`);
 
-  return parts.join(" ");
+  return parts.join(' ');
 };
 
 const WorkflowTaskOverview = () => {
@@ -64,7 +64,7 @@ const WorkflowTaskOverview = () => {
   if (!task) return null;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "row", gap: 2, width: "100%" }}>
+    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, width: '100%' }}>
       <DetailsCard title="Task Metadata">
         <StatusIndicator completed={!!task.endTime} />
         {task.startTime && (

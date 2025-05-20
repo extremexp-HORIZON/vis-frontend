@@ -1,42 +1,41 @@
-import { Box, useTheme, useMediaQuery, Grid } from "@mui/material"
-import { useEffect } from "react"
-import { cloneDeep } from "lodash" // Import lodash for deep cloning
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import InfoMessage from "../../../../shared/components/InfoMessage"
-import AssessmentIcon from "@mui/icons-material/Assessment"
-import ScatterChartControlPanel from "../ChartControls/data-exploration-scatter-control"
-import Uchart from "./data-exploration-u-chart"
-import type { VisualColumn } from "../../../../shared/models/dataexploration.model";
-import { defaultDataExplorationQuery } from "../../../../shared/models/dataexploration.model"
-import { fetchDataExplorationData } from "../../../../store/slices/dataExplorationSlice"
+import { Box, useTheme, useMediaQuery, Grid } from '@mui/material';
+import { useEffect } from 'react';
+import { cloneDeep } from 'lodash'; // Import lodash for deep cloning
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import ScatterChartControlPanel from '../ChartControls/data-exploration-scatter-control';
+import Uchart from './data-exploration-u-chart';
+import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
+import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
+import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 
 const getColumnType = (columnType: string, fieldName?: string) => {
-  if (fieldName?.toLowerCase() === "timestamp") return "temporal"
+  if (fieldName?.toLowerCase() === 'timestamp') return 'temporal';
   switch (columnType) {
-    case "DOUBLE":
-    case "FLOAT":
-    case "INTEGER":
-      return "quantitative"
-    case "LOCAL_DATE_TIME":
-      return "temporal"
-    case "STRING":
+    case 'DOUBLE':
+    case 'FLOAT':
+    case 'INTEGER':
+      return 'quantitative';
+    case 'LOCAL_DATE_TIME':
+      return 'temporal';
+    case 'STRING':
     default:
-      return "ordinal"
+      return 'ordinal';
   }
-}
+};
 
-const MAX_UNIQUE_VALUES = 50
+const MAX_UNIQUE_VALUES = 50;
 
 const getUniqueValueCount = (data: any[], field: string): number => {
-  const values = new Set()
-  data.forEach(row => values.add(row[field]))
-  return values.size
-}
+  const values = new Set();
+  data.forEach(row => values.add(row[field]));
+  return values.size;
+};
 
 const isTooManyUniqueValues = (field: VisualColumn | undefined, data: any[]) =>
-  field?.type === "STRING" && getUniqueValueCount(data, field.name) > MAX_UNIQUE_VALUES
-
+  field?.type === 'STRING' && getUniqueValueCount(data, field.name) > MAX_UNIQUE_VALUES;
 
 const getScatterChartOverlaySpec = ({
   data,
@@ -49,17 +48,17 @@ const getScatterChartOverlaySpec = ({
   yAxis: VisualColumn[]
   colorBy?: VisualColumn
 }) => {
-  const colorField = colorBy?.name
-  const colorType = colorBy ? getColumnType(colorBy.type, colorBy.name) : undefined
+  const colorField = colorBy?.name;
+  const colorType = colorBy ? getColumnType(colorBy.type, colorBy.name) : undefined;
 
   return {
-    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { values: cloneDeep(data) },
     selection: {
-      brush: { type: "interval", encodings: ["x", "y"] },
+      brush: { type: 'interval', encodings: ['x', 'y'] },
     },
     layer: yAxis.map(y => ({
-      mark: "point",
+      mark: 'point',
       encoding: {
         
         x: {
@@ -76,7 +75,7 @@ const getScatterChartOverlaySpec = ({
           field: y.name,
           type: getColumnType(y.type, y.name),
           // axis: { title: y.name },
-          title:"Value"
+          title:'Value'
         },
         ...(colorField && !isTooManyUniqueValues(colorBy, data) && {
           color: {
@@ -87,8 +86,7 @@ const getScatterChartOverlaySpec = ({
               labelLimit: 20,
               symbolLimit: 50
             },            scale: {
-              range: ["#d9f0a3", "#74c476", "#238b8d", "#084081"]
-
+              range: ['#d9f0a3', '#74c476', '#238b8d', '#084081']
 
             }
           },
@@ -100,8 +98,8 @@ const getScatterChartOverlaySpec = ({
         ],
       },
     })),
-  }
-}
+  };
+};
 
 const getSingleScatterSpec = ({
   data,
@@ -114,13 +112,13 @@ const getSingleScatterSpec = ({
   y: VisualColumn
   colorBy?: VisualColumn
 }) => {
-  const colorField = colorBy?.name
-  const colorType = colorBy ? getColumnType(colorBy.type, colorBy.name) : undefined
+  const colorField = colorBy?.name;
+  const colorType = colorBy ? getColumnType(colorBy.type, colorBy.name) : undefined;
 
   return {
-    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { values: cloneDeep(data) },
-    mark: "point",
+    mark: 'point',
     encoding: {
       x: {
         field: xAxis.name,
@@ -139,7 +137,7 @@ const getSingleScatterSpec = ({
           type: colorType,
           legend: { title: colorField },
           scale: {
-              range: ["#ffffcc", "#a1dab4", "#41b6c4", "#225ea8"]
+              range: ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8']
             }
         },
       }),
@@ -149,26 +147,25 @@ const getSingleScatterSpec = ({
         ...(colorField ? [{ field: colorField, type: colorType }] : []),
       ],
     },
-  }
-}
-
+  };
+};
 
 const ScatterChart = () => {
-  const { tab } = useAppSelector(state => state.workflowPage)
-  const dispatch = useAppDispatch()
-  const theme = useTheme()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))
+  const { tab } = useAppSelector(state => state.workflowPage);
+  const dispatch = useAppDispatch();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
 
-  const chartData = tab?.workflowTasks.dataExploration?.scatterChart?.data?.data || []
-  const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis
-  const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis
-  const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy
-  const displayMode = tab?.workflowTasks.dataExploration?.controlPanel?.viewMode || "overlay"
-  const umap = tab?.workflowTasks.dataExploration?.controlPanel.umap
+  const chartData = tab?.workflowTasks.dataExploration?.scatterChart?.data?.data || [];
+  const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis;
+  const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis;
+  const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy;
+  const displayMode = tab?.workflowTasks.dataExploration?.controlPanel?.viewMode || 'overlay';
+  const umap = tab?.workflowTasks.dataExploration?.controlPanel.umap;
 
   useEffect(() => {
-    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || ""
+    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
 
     const cols = Array.from(
       new Set([
@@ -176,9 +173,9 @@ const ScatterChart = () => {
         xAxis?.name,
         ...(yAxis?.length ? yAxis.map((axis: any) => axis.name) : []),
       ])
-    ).filter(Boolean)
+    ).filter(Boolean);
 
-    if (!datasetId || !xAxis || !yAxis?.length) return
+    if (!datasetId || !xAxis || !yAxis?.length) return;
 
     dispatch(
       fetchDataExplorationData({
@@ -189,35 +186,35 @@ const ScatterChart = () => {
           filters,
         },
         metadata: {
-          workflowId: tab?.workflowId || "",
-          queryCase: "scatterChart",
+          workflowId: tab?.workflowId || '',
+          queryCase: 'scatterChart',
         },
       })
-    )
+    );
   }, [
     tab?.workflowTasks.dataExploration?.controlPanel.xAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.yAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
     tab?.dataTaskTable.selectedItem?.data?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.colorBy,
-  ])
+  ]);
 
   const info = (
     <InfoMessage
       message="Please select x-Axis, y-Axis and color fields to display the chart."
       type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: "info.main" }} />}
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
-  )
+  );
 
-  const hasValidXAxis = xAxis && xAxis.name
-  const hasValidYAxis = Array.isArray(yAxis) && yAxis.length > 0
-  const hasValidColorBy = colorBy && colorBy.name
-  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hasValidColorBy
+  const hasValidXAxis = xAxis && xAxis.name;
+  const hasValidYAxis = Array.isArray(yAxis) && yAxis.length > 0;
+  const hasValidColorBy = colorBy && colorBy.name;
+  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hasValidColorBy;
 
   return (
-    <Box sx={{ height: "99%" }}>
+    <Box sx={{ height: '99%' }}>
       {umap ? (
         <Uchart />
       ) : shouldShowInfoMessage ? (
@@ -231,7 +228,7 @@ const ScatterChart = () => {
           maxHeight={isSmallScreen ? undefined : 500}
           aspectRatio={isSmallScreen ? 2.8 : 1.8}
         />
-      ) : displayMode === "overlay" ? (
+      ) : displayMode === 'overlay' ? (
         <ResponsiveCardVegaLite
           spec={getScatterChartOverlaySpec({
             data: chartData,
@@ -272,7 +269,7 @@ const ScatterChart = () => {
         </Grid>
       )}
     </Box>
-  )
-}
+  );
+};
 
-export default ScatterChart
+export default ScatterChart;

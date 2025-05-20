@@ -4,20 +4,17 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import MapIcon from '@mui/icons-material/Map';
-import TableChartIcon from "@mui/icons-material/TableChartSharp"
+import TableChartIcon from '@mui/icons-material/TableChartSharp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 
-
-
-
 const ChartButtonGroup: React.FC= () => {
 
-  const dispatch = useAppDispatch()
-  const {tab}= useAppSelector(state => state.workflowPage)
-  const chartType= tab?.workflowTasks.dataExploration?.controlPanel.chartType
-  const columns= tab?.workflowTasks?.dataExploration?.metaData?.data?.originalColumns
+  const dispatch = useAppDispatch();
+  const {tab}= useAppSelector(state => state.workflowPage);
+  const chartType= tab?.workflowTasks.dataExploration?.controlPanel.chartType;
+  const columns= tab?.workflowTasks?.dataExploration?.metaData?.data?.originalColumns;
   const stringColumnsCount = columns?.filter((col: any) => col?.type === 'String').length || 0;
   const disableHeatmap = stringColumnsCount < 2;
 

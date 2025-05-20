@@ -1,15 +1,15 @@
-import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
-import FormControl from "@mui/material/FormControl"
-import Select from "@mui/material/Select"
-import MenuItem from "@mui/material/MenuItem"
-import type { Dispatch, SetStateAction } from "react"
-import { useEffect, useState } from "react"
-import _ from "lodash"
-import { CircularProgress, InputLabel, Switch, useMediaQuery, useTheme } from "@mui/material"
-import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite"
-import ShowChartIcon from "@mui/icons-material/ShowChart"
-import InstanceClassificationUmap from "./instance-classification-umap"
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
+import _ from 'lodash';
+import { CircularProgress, InputLabel, Switch, useMediaQuery, useTheme } from '@mui/material';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import InstanceClassificationUmap from './instance-classification-umap';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -34,14 +34,14 @@ const ControlPanel = ({
   setUseUmap
 }: ControlPanelProps) => {
   const handleAxisSelection =
-    (axis: "x" | "y") => (e: { target: { value: string } }) => {
-      if (axis === "x") setXAxisOption(e.target.value)
-      else setYAxisOption(e.target.value)
-    }
+    (axis: 'x' | 'y') => (e: { target: { value: string } }) => {
+      if (axis === 'x') setXAxisOption(e.target.value);
+      else setYAxisOption(e.target.value);
+    };
 
   return (
     <>
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 2, px: 1.5 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, px: 1.5 }}>
         {/* X-Axis Selector */}
         <FormControl fullWidth>
             <InputLabel id="x-axis-select-label">
@@ -55,7 +55,7 @@ const ControlPanel = ({
               label="X-Axis-----"
               disabled={plotData?.loading || !plotData?.data}
               value={xAxisOption}
-              onChange={handleAxisSelection("x")}
+              onChange={handleAxisSelection('x')}
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
@@ -81,7 +81,7 @@ const ControlPanel = ({
               label="Y-Axis-----"
               disabled={plotData?.loading || !plotData?.data}
               value={xAxisOption}
-              onChange={handleAxisSelection("y")}
+              onChange={handleAxisSelection('y')}
               MenuProps={{
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
@@ -97,8 +97,7 @@ const ControlPanel = ({
           </FormControl>
           </Box>
           
-          
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.2 }}>
 
            <Typography 
                 variant="caption" 
@@ -115,14 +114,12 @@ const ControlPanel = ({
       onChange={(e) => setUseUmap(e.target.checked)}
       color="primary"
     />
-  
 
       </Box>
-
      
     </>
-  )
-}
+  );
+};
 
 interface IInstanceClassification {
   plotData: {
@@ -141,15 +138,14 @@ interface IInstanceClassification {
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
-const theme = useTheme()
+const theme = useTheme();
 
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xl"))  
-  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props
-  const [options, setOptions] = useState<string[]>([])
-  const [xAxisOption, setXAxisOption] = useState<string>("")
-  const [yAxisOption, setYAxisOption] = useState<string>("")
-  const [useUmap, setUseUmap] = useState(false)
-
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));  
+  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
+  const [options, setOptions] = useState<string[]>([]);
+  const [xAxisOption, setXAxisOption] = useState<string>('');
+  const [yAxisOption, setYAxisOption] = useState<string>('');
+  const [useUmap, setUseUmap] = useState(false);
 
   // const getVegaData = (data: any) => {
   //   let newData: any[] = _.cloneDeep(data)
@@ -160,40 +156,39 @@ const theme = useTheme()
   // }
   const getVegaData = (data: any[]) => {
     return data.map((originalRow: any) => {
-      const id = hashRow(originalRow)
-      const isMisclassified = originalRow.actual !== originalRow.predicted
+      const id = hashRow(originalRow);
+      const isMisclassified = originalRow.actual !== originalRow.predicted;
       return {
         ...originalRow,
         isMisclassified,
         id,
-      }
-    })
-  }
+      };
+    });
+  };
 
   useEffect(() => {
     if (plotData && plotData.data) {
-      setOptions(Object.keys(plotData.data[0]))
+      setOptions(Object.keys(plotData.data[0]));
     }
-  }, [plotData])
+  }, [plotData]);
 
   useEffect(() => {
     if (options.length > 0) {
-      setXAxisOption(options[0])
-      setYAxisOption(options[1])
+      setXAxisOption(options[0]);
+      setYAxisOption(options[1]);
     }
-  }, [options])
-
+  }, [options]);
   
   const handleNewView = (view: any) => {
-    view.addEventListener("click", (event: any, item: any) => {
+    view.addEventListener('click', (event: any, item: any) => {
       if (item && item.datum?.isMisclassified) {
-        const { id, ...dataWithoutId } = item.datum
-        setPoint({ id, data: dataWithoutId })
+        const { id, ...dataWithoutId } = item.datum;
+        setPoint({ id, data: dataWithoutId });
       } else {
-        setPoint(null)
+        setPoint(null);
       }
-    })
-  }
+    });
+  };
 
   const info = (
     <Box
@@ -203,12 +198,12 @@ const theme = useTheme()
       height="100%"
     >
       <CircularProgress />
-      <Typography fontSize={"0.8rem"} sx={{ ml: 1 }}>
-        {plotData?.loading ? "Loading..." : "No data available"}
+      <Typography fontSize={'0.8rem'} sx={{ ml: 1 }}>
+        {plotData?.loading ? 'Loading...' : 'No data available'}
       </Typography>
     </Box>
-  )
-  const shouldShowInfoMessage = plotData?.loading || !plotData?.data
+  );
+  const shouldShowInfoMessage = plotData?.loading || !plotData?.data;
 
   return (
     useUmap ? (
@@ -217,78 +212,77 @@ const theme = useTheme()
           showMisclassifiedOnly={showMisclassifiedOnly}
           setPoint={setPoint}
           hashRow={hashRow} useUmap={useUmap} setuseUmap={setUseUmap } />
-
     
 ) : (
     <ResponsiveCardVegaLite
       spec={{
-        width: "container",
-        height: "container",
-        autosize: { type: "fit", contains: "padding", resize: true },
+        width: 'container',
+        height: 'container',
+        autosize: { type: 'fit', contains: 'padding', resize: true },
         data: {
           values: getVegaData(plotData?.data ?? []),
         },
         params: [
           {
-            name: "pts",
-            select: { type: "point", toggle: false },
-            bind: "legend",
+            name: 'pts',
+            select: { type: 'point', toggle: false },
+            bind: 'legend',
           },
           {
-            name: "highlight",
-            select: { type: "point", on: "click", clear: "clickoff",    fields: ["isMisclassified"],
+            name: 'highlight',
+            select: { type: 'point', on: 'click', clear: 'clickoff',    fields: ['isMisclassified'],
             },
             value: { isMisclassified: true }
 
           },
           {
-            name: "panZoom",
-            select: "interval",
-            bind: "scales",
+            name: 'panZoom',
+            select: 'interval',
+            bind: 'scales',
           },
         ],
         mark: {
-          type: "point",
+          type: 'point',
           filled: true,
           size: 100,
         },
 
         encoding: {
           x: {
-            field: xAxisOption || "xAxis default",
-            type: "quantitative",
+            field: xAxisOption || 'xAxis default',
+            type: 'quantitative',
           },
           y: {
-            field: yAxisOption || "yAxis default",
-            type: "quantitative",
+            field: yAxisOption || 'yAxis default',
+            type: 'quantitative',
           },
           color: showMisclassifiedOnly
             ? {
-              field: "isMisclassified",
-              type: "nominal",
+              field: 'isMisclassified',
+              type: 'nominal',
               scale: {
                 domain: [false, true],
-                range: ["#cccccc", "#ff0000"],
+                range: ['#cccccc', '#ff0000'],
               },
               legend: {
-                title: "Misclassified",
-                labelExpr: "datum.label === 'true' ? 'Misclassified' : 'Correct'",
+                title: 'Misclassified',
+                labelExpr: 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\'',
               },
             }
             : {
-              field: "predicted", 
-              type: "nominal",
+              field: 'predicted', 
+              type: 'nominal',
               scale: {
-                range: ["#1f77b4", "#2ca02c"],
+                range: ['#1f77b4', '#2ca02c'],
               },
               legend: {
-                title: "Predicted Class",
+                title: 'Predicted Class',
               },
             },
           opacity: showMisclassifiedOnly
             ? {
-              field: "isMisclassified",
-              type: "nominal",
+              field: 'isMisclassified',
+              type: 'nominal',
               scale: {
                 domain: [false, true],
                 range: [0.45, 1.0],
@@ -298,8 +292,8 @@ const theme = useTheme()
               value: 0.8,
             },
             size: showMisclassifiedOnly?{
-              field: "isMisclassified",
-              type: "nominal",
+              field: 'isMisclassified',
+              type: 'nominal',
               scale: {
                 domain: [false, true],
                 range: [60, 200],
@@ -326,15 +320,15 @@ const theme = useTheme()
           //   value: 0
           // },
           tooltip: [
-            { field: "actual", type: "nominal", title: "Actual" },
-            { field: "predicted", type: "nominal", title: "Predicted" },
-            { field: xAxisOption || "xAxis default", type: "quantitative", title: xAxisOption },
-            { field: yAxisOption || "yAxis default", type: "quantitative", title: yAxisOption },
+            { field: 'actual', type: 'nominal', title: 'Actual' },
+            { field: 'predicted', type: 'nominal', title: 'Predicted' },
+            { field: xAxisOption || 'xAxis default', type: 'quantitative', title: xAxisOption },
+            { field: yAxisOption || 'yAxis default', type: 'quantitative', title: yAxisOption },
           ]
         },
       }}
 
-      title={"Instance Classification Chart"}
+      title={'Instance Classification Chart'}
       actions={false}
       controlPanel={
         <ControlPanel
@@ -358,7 +352,7 @@ const theme = useTheme()
     />
 )
 
-  )
-}
+  );
+};
 
-export default InstanceClassification
+export default InstanceClassification;

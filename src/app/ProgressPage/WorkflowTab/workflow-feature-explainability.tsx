@@ -1,10 +1,10 @@
-import { Box, Button, ButtonGroup, Grid } from "@mui/material"
-import PdpPlot from "../../Tasks/ModelAnalysisTask/plots/pdp-plot"
-import AlePlot from "../../Tasks/ModelAnalysisTask/plots/ale-plot"
-import { useState } from "react"
+import { Box, Button, ButtonGroup, Grid } from '@mui/material';
+import PdpPlot from '../../Tasks/ModelAnalysisTask/plots/pdp-plot';
+import AlePlot from '../../Tasks/ModelAnalysisTask/plots/ale-plot';
+import { useState } from 'react';
 
 const FeatureExplainability = () => {
-    const [isMosaic, setIsMosaic] = useState(true)
+    const [isMosaic, setIsMosaic] = useState(true);
 
     return (
       <Box>
@@ -18,18 +18,18 @@ const FeatureExplainability = () => {
               variant="contained"
               aria-label="view mode"
               sx={{
-                height: "25px", // Ensure consistent height for the button group
+                height: '25px', // Ensure consistent height for the button group
               }}
             >
               <Button
-                variant={isMosaic ? "contained" : "outlined"}
+                variant={isMosaic ? 'contained' : 'outlined'}
                 color="primary"
                 onClick={() => setIsMosaic(true)}
               >
                 Mosaic
               </Button>
               <Button
-                variant={!isMosaic ? "contained" : "outlined"}
+                variant={!isMosaic ? 'contained' : 'outlined'}
                 color="primary"
                 onClick={() => setIsMosaic(false)}
               >
@@ -54,7 +54,7 @@ const FeatureExplainability = () => {
           </Grid>
         </Grid>
       </Box>
-    )
-}
+    );
+};
 
-export default FeatureExplainability
+export default FeatureExplainability;

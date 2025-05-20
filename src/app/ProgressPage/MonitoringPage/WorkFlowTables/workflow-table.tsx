@@ -1,27 +1,27 @@
 import type {
   GridColumnNode,
   GridRowSelectionModel,
-} from "@mui/x-data-grid"
-import { DataGrid } from "@mui/x-data-grid"
-import ToolbarWorkflow from "./toolbar-workflow-table"
-import Paper from "@mui/material/Paper"
-import Box from "@mui/material/Box"
-import PauseIcon from "@mui/icons-material/Pause"
-import StopIcon from "@mui/icons-material/Stop"
-import LaunchIcon from "@mui/icons-material/Launch"
-import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable } from "../../../../store/slices/monitorPageSlice"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import type { RootState } from "../../../../store/store"
-import { useEffect, useRef, useState } from "react"
-import { Badge,  IconButton, Popover, styled, } from "@mui/material"
-import FilterBar from "../../../../shared/components/filter-bar"
-import NoRowsOverlayWrapper from "./no-rows-overlay"
-import ProgressBar from "./prgress-bar"
-import theme from "../../../../mui-theme"
-import { debounce } from "lodash";
-import type { CustomGridColDef } from "../../../../shared/types/table-types"
-import { Link, useParams } from "react-router-dom"
-import WorkflowRating from "./workflow-rating"
+} from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
+import ToolbarWorkflow from './toolbar-workflow-table';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
+import LaunchIcon from '@mui/icons-material/Launch';
+import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable } from '../../../../store/slices/monitorPageSlice';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useEffect, useRef, useState } from 'react';
+import { Badge,  IconButton, Popover, styled, } from '@mui/material';
+import FilterBar from '../../../../shared/components/filter-bar';
+import NoRowsOverlayWrapper from './no-rows-overlay';
+import ProgressBar from './prgress-bar';
+import theme from '../../../../mui-theme';
+import { debounce } from 'lodash';
+import type { CustomGridColDef } from '../../../../shared/types/table-types';
+import { Link, useParams } from 'react-router-dom';
+import WorkflowRating from './workflow-rating';
 
 export interface Data {
   [key: string]: any
@@ -34,124 +34,124 @@ const WorkflowActions = (props: {
   workflowId: string,
   experimentId: string | undefined,
 }) => {
-  const { currentStatus, workflowId, experimentId } = props
+  const { currentStatus, workflowId, experimentId } = props;
 
   return (
-    <span onClick={event => event.stopPropagation()} style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-      <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== "pending_input"}>
+    <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== 'pending_input'}>
       <Link
         to={`/${experimentId}/workflow?workflowId=${workflowId}`}
       >
         <IconButton>
           <LaunchIcon
             style={{
-              cursor: "pointer",
+              cursor: 'pointer',
               color: theme.palette.primary.main,
             }}
           />
         </IconButton>
       </Link>
         </Badge>
-      {currentStatus !== "COMPLETED" && currentStatus !== "FAILED" && (
+      {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && (
         <>
-          <IconButton onClick={() => console.log("Pause clicked")} >
+          <IconButton onClick={() => console.log('Pause clicked')} >
             <PauseIcon
-              style={{ cursor: "pointer", color: theme.palette.primary.main }}
+              style={{ cursor: 'pointer', color: theme.palette.primary.main }}
             />
           </IconButton>
-          <IconButton onClick={() => console.log("Stop clicked")}>
+          <IconButton onClick={() => console.log('Stop clicked')}>
             <StopIcon
-              style={{ cursor: "pointer", color: theme.palette.primary.main }}
+              style={{ cursor: 'pointer', color: theme.palette.primary.main }}
             />
           </IconButton>
         </>
       )}
     </span>
-  )
-}
+  );
+};
 
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-  "& .MuiDataGrid-scrollbarFiller": {
+  '& .MuiDataGrid-scrollbarFiller': {
     backgroundColor: theme.palette.customGrey.main,
   },
-  "& .MuiDataGrid-columnHeader": {
+  '& .MuiDataGrid-columnHeader': {
     backgroundColor: theme.palette.customGrey.main,
   },
   '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
     backgroundColor: theme.palette.customGrey.main,
   },
-  "& .MuiDataGrid-columnHeaderTitle": {
-    whiteSpace: "nowrap",
-    overflow: "visible",
+  '& .MuiDataGrid-columnHeaderTitle': {
+    whiteSpace: 'nowrap',
+    overflow: 'visible',
   },
-  "& .datagrid-header-fixed": {
+  '& .datagrid-header-fixed': {
     // Action column
-    position: "sticky",
+    position: 'sticky',
     right: 0,
     zIndex: 9999,
     backgroundColor: theme.palette.customGrey.main,
-    borderLeft: "1px solid #ddd",
+    borderLeft: '1px solid #ddd',
   },
   '& .MuiDataGrid-cell[data-field="action"]': {
-    position: "sticky",
+    position: 'sticky',
     right: 0,
     backgroundColor: theme.palette.customGrey.light,
     zIndex: 9999,
-    borderLeft: "1px solid #ddd",
+    borderLeft: '1px solid #ddd',
   },
   // Add pagination styling
-  "& .MuiDataGrid-footerContainer": {
-    minHeight: "56px",
-    borderTop: "1px solid rgba(224, 224, 224, 1)",
+  '& .MuiDataGrid-footerContainer': {
+    minHeight: '56px',
+    borderTop: '1px solid rgba(224, 224, 224, 1)',
   },
   
-  "& .MuiTablePagination-root": {
-    overflow: "visible",
+  '& .MuiTablePagination-root': {
+    overflow: 'visible',
   },
   '& .MuiDataGrid-columnHeader[data-field="__action_group__"]': {
     position: 'sticky',
     right: 0,
     zIndex: 1000,
     backgroundColor: theme.palette.customGrey.main,
-    borderLeft: "1px solid #ddd",
+    borderLeft: '1px solid #ddd',
     display: 'flex',
     justifyContent: 'center', // Center the header content
     alignItems: 'center', // Vertically center
   },
-}))
+}));
 
 export default function WorkflowTable() {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
-  )
+  );
   const { workflowsTable, selectedTab } = useAppSelector(
     (state: RootState) => state.monitorPage
-  )
-  const [isFilterOpen, setFilterOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const lastHoveredIdRef = useRef<string | null>(null)
-  const { experimentId } = useParams()
+  );
+  const [isFilterOpen, setFilterOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const lastHoveredIdRef = useRef<string | null>(null);
+  const { experimentId } = useParams();
 
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
     newSelection.forEach(workflowId => {
       dispatch(toggleWorkflowSelection(workflowId));
 
   });
-  dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }))
-  }
+  dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }));
+  };
 
   const handleLaunchCompletedTab =
     (workflowId: any) => (e: React.SyntheticEvent) => {
-      dispatch(setSelectedTab(1))
-    }
+      dispatch(setSelectedTab(1));
+    };
 
   const filterClicked = (event: React.MouseEvent<HTMLElement>) => {
-    setFilterOpen(!isFilterOpen)
-    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null)
-  }
+    setFilterOpen(!isFilterOpen);
+    !isFilterOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
+  };
 
   const handleFilterChange = (
     index: number,
@@ -159,147 +159,147 @@ export default function WorkflowTable() {
     operator: string,
     value: string,
   ) => {
-    const newFilters = [...workflowsTable.filters]
-    newFilters[index] = { column, operator, value }
-    dispatch(setWorkflowsTable({ filters: newFilters }))
-  }
+    const newFilters = [...workflowsTable.filters];
+    newFilters[index] = { column, operator, value };
+    dispatch(setWorkflowsTable({ filters: newFilters }));
+  };
 
   const handleAddFilter = () => {
     const newFilters = [
       ...workflowsTable.filters,
-      { column: "", operator: "", value: "" },
-    ]
-    dispatch(setWorkflowsTable({ filters: newFilters }))
-  }
+      { column: '', operator: '', value: '' },
+    ];
+    dispatch(setWorkflowsTable({ filters: newFilters }));
+  };
 
   const handleRemoveFilter = (index: number) => {
     const newFilters = workflowsTable.filters.filter(
       (_, i) => i !== index,
-    )
-    dispatch(setWorkflowsTable({ filters: newFilters }))
-  }
+    );
+    dispatch(setWorkflowsTable({ filters: newFilters }));
+  };
 
   const handleRemoveAllFilters = () => {
-    dispatch(setWorkflowsTable({ filters: [] }))
-  }
+    dispatch(setWorkflowsTable({ filters: [] }));
+  };
 
   const debouncedDispatch = useRef(
     debounce((workflowId: string | null) => {
-      dispatch(setHoveredWorkflow(workflowId))
+      dispatch(setHoveredWorkflow(workflowId));
     }, 20)
-  ).current
+  ).current;
 
-  const workflowId = workflowsTable.selectedWorkflows[0] || null
+  const workflowId = workflowsTable.selectedWorkflows[0] || null;
 
   const handleHover = (workflowId: string | null) => {
     if (workflowId !== lastHoveredIdRef.current) {
-      lastHoveredIdRef.current = workflowId
-      debouncedDispatch(workflowId)
+      lastHoveredIdRef.current = workflowId;
+      debouncedDispatch(workflowId);
     }
-  }
+  };
 
   const handleAggregation = (
     rows: any[],
     groupKeys: string[],
     metricKeys: string[]  
   ): any[] => {
-    const grouped = new Map<string, any[]>()
+    const grouped = new Map<string, any[]>();
 
     rows.forEach(row => {
-      const key = groupKeys.map(k => row[k]).join('|')
-      if (!grouped.has(key)) grouped.set(key, [])
-      grouped.get(key)?.push(row)
-    })
+      const key = groupKeys.map(k => row[k]).join('|');
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key)?.push(row);
+    });
 
-    let idCounter = 0
-    const aggregatedRows: any[] = []
+    let idCounter = 0;
+    const aggregatedRows: any[] = [];
 
     for (const [key, group] of grouped.entries()) {
-      const values = group[0]
+      const values = group[0];
       const summary: any = {
         id: (idCounter++).toString(),
         isGroupSummary: true,
         workflowId: group.length > 1 ? `${group.length} workflows` : `${group.length} workflow`,
-      }
+      };
   
       groupKeys.forEach(param => {
-        summary[param] = values[param]
-      })  
+        summary[param] = values[param];
+      });  
 
       metricKeys.forEach(metric => {
-        const validValues = group.map(row => row[metric]).filter((v: any) => typeof v === 'number')
+        const validValues = group.map(row => row[metric]).filter((v: any) => typeof v === 'number');
         if (validValues.length > 0) {
-          const avg = validValues.reduce((sum, val) => sum + val, 0) / validValues.length
-          summary[metric] = Number(avg.toFixed(3))
+          const avg = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
+          summary[metric] = Number(avg.toFixed(3));
         } else {
-          summary[metric] = "n/a"
+          summary[metric] = 'n/a';
         }
-      })
-      aggregatedRows.push(summary)
+      });
+      aggregatedRows.push(summary);
     }
   
-    return aggregatedRows
-  }
+    return aggregatedRows;
+  };
 
   useEffect(() => {
     if(workflowsTable.initialized) {
-      let counter = 0
+      let counter = 0;
       for (let i = 0; i < workflowsTable.filters.length; i++) {
-        if (workflowsTable.filters[i].value !== "") {
-          counter++
+        if (workflowsTable.filters[i].value !== '') {
+          counter++;
         }
       }
 
-      let filteredRows = workflowsTable.rows
+      let filteredRows = workflowsTable.rows;
 
       // Apply search term filter if it exists
       if (searchTerm) {
-        const lowerSearchTerm = searchTerm.toLowerCase()
+        const lowerSearchTerm = searchTerm.toLowerCase();
         filteredRows = filteredRows.filter(row => {
           // Check if any field contains the search term
           return Object.entries(row).some(([key, value]) => {
-            if (key === 'id' || key === 'action' || !value) return false
-            return String(value).toLowerCase().includes(lowerSearchTerm)
-          })
-        })
+            if (key === 'id' || key === 'action' || !value) return false;
+            return String(value).toLowerCase().includes(lowerSearchTerm);
+          });
+        });
       }
 
       // Apply column filters
       filteredRows = filteredRows.filter(row => {
         return workflowsTable.filters.every(filter => {
-          if (filter.value === "") return true
+          if (filter.value === '') return true;
           const cellValue = row[filter.column as keyof Data]
             ?.toString()
-            .toLowerCase()
-          const filterValue = filter.value.toLowerCase()
-          if (!cellValue) return false
+            .toLowerCase();
+          const filterValue = filter.value.toLowerCase();
+          if (!cellValue) return false;
 
           switch (filter.operator) {
-            case "contains":
-              return cellValue.includes(filterValue)
-            case "=":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue
-            case "startsWith":
-              return cellValue.startsWith(filterValue)
-            case "endsWith":
-              return cellValue.endsWith(filterValue)
-            case ">":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true
-            case "<":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true
-            case ">=":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true
-            case "<=":
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true
+            case 'contains':
+              return cellValue.includes(filterValue);
+            case '=':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue;
+            case 'startsWith':
+              return cellValue.startsWith(filterValue);
+            case 'endsWith':
+              return cellValue.endsWith(filterValue);
+            case '>':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true;
+            case '<':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true;
+            case '>=':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true;
+            case '<=':
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true;
             default:
-              return true
+              return true;
           }
-        })
-      })
+        });
+      });
 
-      dispatch(setWorkflowsTable({ filteredRows, filtersCounter: counter }))
+      dispatch(setWorkflowsTable({ filteredRows, filtersCounter: counter }));
     }
-  }, [workflowsTable.filters, workflowsTable.rows, searchTerm,workflowsTable.rows])
+  }, [workflowsTable.filters, workflowsTable.rows, searchTerm,workflowsTable.rows]);
 
   useEffect(() => {
     if(workflowsTable.initialized) {
@@ -308,142 +308,141 @@ export default function WorkflowTable() {
           workflowsTable.filteredRows,
           workflowsTable.groupBy,
           workflowsTable.uniqueMetrics
-        )
+        );
 
         const allowedFields = new Set([
-          "workflowId",
+          'workflowId',
           ...workflowsTable.groupBy,
           ...workflowsTable.uniqueMetrics,
-        ])
+        ]);
       
         const reducedColumns = workflowsTable.columns.filter(col =>
           allowedFields.has(col.field)
-        )
+        );
 
         dispatch(setWorkflowsTable({
           visibleRows: aggregatedRows,
           aggregatedRows: aggregatedRows,
           visibleColumns: reducedColumns
-        }))
+        }));
       } else {
         dispatch(setWorkflowsTable({
           visibleRows: workflowsTable.filteredRows,
           aggregatedRows: [],
           visibleColumns: workflowsTable.columns,
-        }))
+        }));
       }
     }
-  }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics])
+  }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics]);
 
   useEffect(() => {
     if (workflows.data.length > 0) {
       //find unique parameters of each workflow -> model traning task
       const uniqueParameters = new Set(
-        workflows.data.filter(workflow => workflow.status !== "SCHEDULED")
+        workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
         .reduce((acc: any[], workflow) => {
-          const params = workflow.params
-          let paramNames = []
+          const params = workflow.params;
+          let paramNames = [];
           if (params) {
-            paramNames = params.map(param => param.name)
-            return [...acc, ...paramNames]
+            paramNames = params.map(param => param.name);
+            return [...acc, ...paramNames];
           } else {
-            return [...acc]
+            return [...acc];
           }
         }, []),
-      )
+      );
       const uniqueMetrics = new Set(
-        workflows.data.filter(workflow => workflow.status !== "SCHEDULED")
+        workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
         .reduce((acc: any[], workflow) => {
-          const metrics = workflow.metrics
-          let metricNames = []
+          const metrics = workflow.metrics;
+          let metricNames = [];
           if(metrics) {
-            metricNames = metrics.map(metric => metric.name)
-            return [...acc, ...metricNames]
+            metricNames = metrics.map(metric => metric.name);
+            return [...acc, ...metricNames];
           } else {
-            return [...acc]
+            return [...acc];
           }
         }, [])
-      )
+      );
       const uniqueTasks = new Set(
-        workflows.data.filter(workflow => workflow.status !== "SCHEDULED")
+        workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
         .reduce((acc: any[], workflow) => {
-          const tasks = workflow?.tasks
-          let taskNames = []
+          const tasks = workflow?.tasks;
+          let taskNames = [];
           if(tasks) {
-            taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name)
-            return [...acc, ...taskNames]
+            taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
+            return [...acc, ...taskNames];
           } else {
-            return [...acc]
+            return [...acc];
           }
         }, [])
-      )
+      );
 
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
-        .filter(workflow => workflow.status !== "SCHEDULED")
+        .filter(workflow => workflow.status !== 'SCHEDULED')
         .map(workflow => {
-          const params = workflow.params
-          const metrics = workflow?.metrics
-          const tasks = workflow?.tasks
+          const params = workflow.params;
+          const metrics = workflow?.metrics;
+          const tasks = workflow?.tasks;
           return {
             id: workflow.id,
             workflowId: workflow.id,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
-                tasks?.find(task => task.name === variant)?.variant || ""
-              return acc
+                tasks?.find(task => task.name === variant)?.variant || '';
+              return acc;
             }, {}),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
-                params?.find(param => param.name === variant)?.value || ""
-              return acc
+                params?.find(param => param.name === variant)?.value || '';
+              return acc;
             }, {}),
             ...Array.from(uniqueMetrics).reduce((acc, variant) => {
               if (metrics && metrics.length > 0) {
-                const matchingMetrics = metrics.filter(metric => metric.name === variant)
+                const matchingMetrics = metrics.filter(metric => metric.name === variant);
             
                 // Pick the one with highest step or fallback to latest timestamp
                 const latestMetric = matchingMetrics.reduce((latest, current) => {
                   if (current.step != null && latest.step != null) {
-                    return current.step > latest.step ? current : latest
+                    return current.step > latest.step ? current : latest;
                   } else {
-                    return current.timestamp > latest.timestamp ? current : latest
+                    return current.timestamp > latest.timestamp ? current : latest;
                   }
-                }, matchingMetrics[0])
+                }, matchingMetrics[0]);
             
-                acc[variant] = latestMetric?.value != null ? latestMetric.value : "n/a"
+                acc[variant] = latestMetric?.value != null ? latestMetric.value : 'n/a';
               } else {
-                acc[variant] = "n/a"
+                acc[variant] = 'n/a';
               }
-              return acc
+              return acc;
             }, {}),
             status: workflow.status,
             // rating: 2,
-            action: "",
-          }
-        })
+            action: '',
+          };
+        });
 
       // Check if there are no rows completed then set the table to scheduled
         if (rows.length=== 0) {
-          dispatch(setVisibleTable("scheduled"))
-          return 
+          dispatch(setVisibleTable('scheduled'));
+          return; 
         }
 
-
       const columns: CustomGridColDef[] = Object.keys(rows[0])
-        .filter(key => key !== "id")
+        .filter(key => key !== 'id')
         .map(key => ({
           field: key,
-          headerName:  key === "action" ? "" : key.replace("_", " "),
+          headerName:  key === 'action' ? '' : key.replace('_', ' '),
           headerClassName:
-            key === "action" ? "datagrid-header-fixed" : "datagrid-header",
-          minWidth: key === "action" ? 120 : key === "status" ? key.length * 10 + 40 : key.length * 10,
+            key === 'action' ? 'datagrid-header-fixed' : 'datagrid-header',
+          minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,
           flex: 1,
-          align: "center",
-          headerAlign: "center",
-          sortable: key !== "action",
-          type: rows.length > 0 && typeof rows[0][key] === "number" ? "number" : "string",
-          ...(key === "status" && {
+          align: 'center',
+          headerAlign: 'center',
+          sortable: key !== 'action',
+          type: rows.length > 0 && typeof rows[0][key] === 'number' ? 'number' : 'string',
+          ...(key === 'status' && {
             renderCell: params => (
               <ProgressBar
                 workflowStatus={params.value}
@@ -451,29 +450,29 @@ export default function WorkflowTable() {
               />
             ),
           }),
-          ...(key === "action" && {
+          ...(key === 'action' && {
             renderCell: params => {
-              const currentStatus = params.row.status
+              const currentStatus = params.row.status;
               return (
                 <WorkflowActions
                   currentStatus={currentStatus}
                   workflowId={params.row.workflowId}
                   experimentId={experimentId}
                 />
-              )
+              );
             },
           }),
-          ...(key === "rating" && {
+          ...(key === 'rating' && {
             renderCell: params => {
-              const currentRating = params.row.rating
+              const currentRating = params.row.rating;
               return (
                 <WorkflowRating
                 //here must be the workflow id that i selected somehow
-                currentRating={currentRating} experimentId={experimentId || ""} workflowId={params.row.id} />
-              )
+                currentRating={currentRating} experimentId={experimentId || ''} workflowId={params.row.id} />
+              );
             },
           }),
-        }))
+        }));
 
         const visibilityModel = columns.reduce((acc, col) => {
           acc[col.field] = true;
@@ -493,13 +492,13 @@ export default function WorkflowTable() {
           uniqueTasks: Array.from(uniqueTasks),
           initialized: true
         }),
-      )
+      );
     }
-  }, [workflows.data])
+  }, [workflows.data]);
 
   return (
-    <Box sx={{height: "100%" }}>
-      <Paper elevation={2} sx={{height: "100%", width: "100%", mb: 2}}>
+    <Box sx={{height: '100%' }}>
+      <Paper elevation={2} sx={{height: '100%', width: '100%', mb: 2}}>
         <Box >
           <ToolbarWorkflow
             key="workflows-toolbar"
@@ -517,21 +516,21 @@ export default function WorkflowTable() {
           />
         </Box>
         <Popover
-          id={"Filters"}
+          id={'Filters'}
           open={isFilterOpen}
           anchorEl={anchorEl}
           onClose={() => setFilterOpen(false)}
           anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
+            vertical: 'top',
+            horizontal: 'right',
           }}
           transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
+            vertical: 'top',
+            horizontal: 'right',
           }}
           PaperProps={{
             sx: {
-              width: "550px",
+              width: '550px',
               p: 2,
               borderRadius: 1,
               boxShadow: 3
@@ -548,7 +547,7 @@ export default function WorkflowTable() {
           />
         </Popover>
 
-        <div style={{ height: 'calc(100% - 63px)', width: "100%" }}>
+        <div style={{ height: 'calc(100% - 63px)', width: '100%' }}>
           <StyledDataGrid
             disableVirtualization
             density="compact"
@@ -562,12 +561,12 @@ export default function WorkflowTable() {
             slots={{noRowsOverlay: NoRowsOverlayWrapper}}
             slotProps={
               {
-                noRowsOverlay: {title: "No workflows available"},
+                noRowsOverlay: {title: 'No workflows available'},
                 row: {
                   onMouseEnter: (event) => {
                     if(selectedTab === 1) {
                       const rowId = event.currentTarget.getAttribute('data-id');
-                      const id = rowId ? workflowsTable.selectedWorkflows.includes(rowId) ? rowId : "notSelected" : null
+                      const id = rowId ? workflowsTable.selectedWorkflows.includes(rowId) ? rowId : 'notSelected' : null;
                       handleHover(id);
                     }
                   },
@@ -583,39 +582,39 @@ export default function WorkflowTable() {
             onRowSelectionModelChange={handleSelectionChange}
             rowSelectionModel={workflowsTable.selectedWorkflows}
             sx={{
-              "& .MuiDataGrid-selectedRowCount": {
-                visibility: "hidden", // Remove the selection count text on the bottom because we implement it in the header
+              '& .MuiDataGrid-selectedRowCount': {
+                visibility: 'hidden', // Remove the selection count text on the bottom because we implement it in the header
               },
-              "& .theme-parameters-group": {
-                textAlign: "center",
-                justifyContent: "center",
-                position: "relative",
-                display: "grid",
-                width: "100%",
-                "&::after": {
+              '& .theme-parameters-group': {
+                textAlign: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                display: 'grid',
+                width: '100%',
+                '&::after': {
                   content: '""',
-                  display: "block",
-                  width: "100%",
-                  height: "2px",
+                  display: 'block',
+                  width: '100%',
+                  height: '2px',
                   backgroundColor: theme.palette.primary.main,
-                  position: "absolute",
+                  position: 'absolute',
                   bottom: 0,
                   left: 0,
                 },
               },
-              "& .theme-parameters-group-2": {
-                textAlign: "center",
-                justifyContent: "center",
-                position: "relative",
-                display: "grid",
-                width: "100%",
-                "&::after": {
+              '& .theme-parameters-group-2': {
+                textAlign: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                display: 'grid',
+                width: '100%',
+                '&::after': {
                   content: '""',
-                  display: "block",
-                  width: "100%",
-                  height: "2px",
+                  display: 'block',
+                  width: '100%',
+                  height: '2px',
                   backgroundColor: theme.palette.secondary.dark,
-                  position: "absolute",
+                  position: 'absolute',
                   bottom: 0,
                   left: 0,
                 },
@@ -629,8 +628,8 @@ export default function WorkflowTable() {
             }}
             columnGroupingModel={[
               {
-                groupId: "Parameters",
-                headerClassName: "theme-parameters-group",
+                groupId: 'Parameters',
+                headerClassName: 'theme-parameters-group',
                 children: workflowsTable.uniqueParameters.length > 0
                   ? (workflowsTable.uniqueParameters.map(
                       (param): GridColumnNode => ({
@@ -640,8 +639,8 @@ export default function WorkflowTable() {
                   : [],
               },
               {
-                groupId: "Metrics",
-                headerClassName: "theme-parameters-group-2",
+                groupId: 'Metrics',
+                headerClassName: 'theme-parameters-group-2',
                 children: workflowsTable.uniqueMetrics.length > 0 ? (
                   workflowsTable.uniqueMetrics.map(
                     (metric): GridColumnNode => ({
@@ -651,8 +650,8 @@ export default function WorkflowTable() {
                 ) : []
               },
               {
-                groupId: "Task Variants",
-                headerClassName: "theme-parameters-group-2",
+                groupId: 'Task Variants',
+                headerClassName: 'theme-parameters-group-2',
                 children: workflowsTable.uniqueTasks.length > 0 ? (
                   workflowsTable.uniqueTasks.map(
                     (task): GridColumnNode => ({
@@ -662,12 +661,12 @@ export default function WorkflowTable() {
                 ) : []
               },
               {
-                groupId: "Actions",
-                headerClassName: "datagrid-header-fixed",
-                headerAlign: "center",
+                groupId: 'Actions',
+                headerClassName: 'datagrid-header-fixed',
+                headerAlign: 'center',
                 children: [
                   {
-                    field: "action",
+                    field: 'action',
                   } as GridColumnNode
                 ]
               }
@@ -676,5 +675,5 @@ export default function WorkflowTable() {
         </div>
       </Paper>
     </Box>
-  )
+  );
 }

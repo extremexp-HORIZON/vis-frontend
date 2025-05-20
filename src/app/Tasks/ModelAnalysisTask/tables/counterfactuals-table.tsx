@@ -1,18 +1,18 @@
-import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
-import { styled } from "@mui/material/styles"
-import { useEffect, useState } from "react"
-import type { RootState } from "../../../../store/store"
-import { useAppDispatch, useAppSelector } from "../../../../store/store"
-import type { IPlotModel } from "../../../../shared/models/plotmodel.model"
-import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model"
-import { Tab, Tabs } from "@mui/material"
-import { DataGrid } from "@mui/x-data-grid"
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
-import ClosableCardTable from "../../../../shared/components/closable-card-table"
-import Loader from "../../../../shared/components/loader"
-import { fetchModelAnalysisExplainabilityPlot } from "../../../../store/slices/explainabilitySlice"
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
+import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
+import { Tab, Tabs } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ClosableCardTable from '../../../../shared/components/closable-card-table';
+import Loader from '../../../../shared/components/loader';
+import { fetchModelAnalysisExplainabilityPlot } from '../../../../store/slices/explainabilitySlice';
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -34,12 +34,12 @@ const CounterfactualsTable = (props: ITableComponent) => {
     experimentId,
     workflowId,
     onClose,
-  } = props
-  const dispatch = useAppDispatch()
-  const [activeTab, setActiveTab] = useState(0) //activeTab,setA
+  } = props;
+  const dispatch = useAppDispatch();
+  const [activeTab, setActiveTab] = useState(0); //activeTab,setA
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,
-  )
+  );
 
   function convertToPythonStyleString(obj) {
     const excludedKeys = ['isMisclassified', '_vgsid_'];
@@ -77,142 +77,141 @@ const CounterfactualsTable = (props: ITableComponent) => {
         fetchModelAnalysisExplainabilityPlot({
           query: {
             ...explainabilityQueryDefault,
-            explanation_type: "featureExplanation",
-            explanation_method: "counterfactuals",
+            explanation_type: 'featureExplanation',
+            explanation_method: 'counterfactuals',
 
             query:query
           },
           metadata: {
-            workflowId: tab?.workflowId || "",
-            queryCase: "counterfactuals",
-            experimentId: experimentId || "",
+            workflowId: tab?.workflowId || '',
+            queryCase: 'counterfactuals',
+            experimentId: experimentId || '',
           },
         }),
-      )
+      );
     }
     if (activeTab === 1 && isTabInitialized) {
       dispatch(
         fetchModelAnalysisExplainabilityPlot({
           query: {
-            explanation_type: "hyperparameterExplanation",
-            explanation_method: "counterfactuals",
+            explanation_type: 'hyperparameterExplanation',
+            explanation_method: 'counterfactuals',
             query:query
           },
           metadata: {
             workflowId: tab?.workflowId || workflowId,
-            queryCase: "counterfactuals",
-            experimentId: experimentId || "",
+            queryCase: 'counterfactuals',
+            experimentId: experimentId || '',
           },
         }),
-      )
+      );
     }
-  }, [point, activeTab])
-
+  }, [point, activeTab]);
   
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-    "& .MuiDataGrid-scrollbarFiller": {
+    '& .MuiDataGrid-scrollbarFiller': {
       backgroundColor: theme.palette.customGrey.main,
     },
-    "& .MuiDataGrid-columnHeader": {
+    '& .MuiDataGrid-columnHeader': {
       backgroundColor: theme.palette.customGrey.main,
     },
     '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
       backgroundColor: theme.palette.customGrey.main,
     },
-    "& .MuiDataGrid-columnHeaderTitle": {
-      whiteSpace: "nowrap",
-      overflow: "visible",
+    '& .MuiDataGrid-columnHeaderTitle': {
+      whiteSpace: 'nowrap',
+      overflow: 'visible',
     },
     // Fix header to remain at top
-    "& .MuiDataGrid-main": {
+    '& .MuiDataGrid-main': {
       // Critical for layout
-      display: "flex",
-      flexDirection: "column",
-      height: "100%",
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
     },
-    "& .MuiDataGrid-columnHeaders": {
-      position: "sticky",
+    '& .MuiDataGrid-columnHeaders': {
+      position: 'sticky',
       top: 0,
       zIndex: 2,
     },
     // Ensure the cell container scrolls properly
-    "& .MuiDataGrid-virtualScroller": {
+    '& .MuiDataGrid-virtualScroller': {
       flex: 1,
-      overflow: "auto",
+      overflow: 'auto',
     },
     // Fix pagination to remain at bottom
-    "& .MuiDataGrid-footerContainer": {
-      minHeight: "56px",
-      borderTop: "1px solid rgba(224, 224, 224, 1)",
-      position: "sticky",
+    '& .MuiDataGrid-footerContainer': {
+      minHeight: '56px',
+      borderTop: '1px solid rgba(224, 224, 224, 1)',
+      position: 'sticky',
       bottom: 0,
       zIndex: 2,
-      backgroundColor: "#ffffff",
+      backgroundColor: '#ffffff',
     },
-    "& .MuiTablePagination-root": {
-      overflow: "visible",
+    '& .MuiTablePagination-root': {
+      overflow: 'visible',
     },
     // Add border radius to bottom corners
-    "&.MuiDataGrid-root": {
-      borderRadius: "0 0 12px 12px",
-      border: "none",
-      height: "100%", // Ensure full height
+    '&.MuiDataGrid-root': {
+      borderRadius: '0 0 12px 12px',
+      border: 'none',
+      height: '100%', // Ensure full height
     },
-  }))
+  }));
 
   const getFilteredTableContents = (
     tableContents: Record<string, { index: number; values: string[] }>,
   ) => {
-    if (!tableContents) return {}
+    if (!tableContents) return {};
 
     const filteredEntries = Object.entries(tableContents).filter(
       ([key, column]) => {
-        if (key === "BinaryLabel" || key === "Type" || key === "Cost")
-          return false // Skip the BinaryLabel column
-        const uniqueValues = new Set(column.values)
-        return uniqueValues.size > 1 // Keep only if there is more than one unique value
+        if (key === 'BinaryLabel' || key === 'Type' || key === 'Cost')
+          return false; // Skip the BinaryLabel column
+        const uniqueValues = new Set(column.values);
+        return uniqueValues.size > 1; // Keep only if there is more than one unique value
       },
-    )
+    );
 
-    return Object.fromEntries(filteredEntries)
-  }
+    return Object.fromEntries(filteredEntries);
+  };
 
   const filteredTableContents = getFilteredTableContents(
     tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents || {},
-  )
+  );
 
   const columns = Object.entries(filteredTableContents).map(([key, column]) => {
-    const referenceValue = parseFloat(column.values[0])
+    const referenceValue = parseFloat(column.values[0]);
 
     return {
       field: key,
       headerName: key,
       flex: 1,
       minWidth: 100,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: 'center',
+      align: 'center',
       renderCell: (params: any) => {
-        const currentValue = parseFloat(params.value)
+        const currentValue = parseFloat(params.value);
         if (isNaN(referenceValue) || isNaN(currentValue)) {
-          return params.value
+          return params.value;
         }
 
-        let icon = null
+        let icon = null;
 
         if (currentValue < referenceValue) {
           icon = (
             <ArrowDropDownIcon
               fontSize="small"
-              sx={{ color: "red", ml: 0.5 }}
+              sx={{ color: 'red', ml: 0.5 }}
             />
-          )
+          );
         } else if (currentValue > referenceValue) {
           icon = (
             <ArrowDropUpIcon
               fontSize="small"
-              sx={{ color: "green", ml: 0.5 }}
+              sx={{ color: 'green', ml: 0.5 }}
             />
-          )
+          );
         }
 
         return (
@@ -220,31 +219,31 @@ const CounterfactualsTable = (props: ITableComponent) => {
             <Typography variant="body2">{params.value}</Typography>
             {icon}
           </Box>
-        )
+        );
       },
-    }
-  })
+    };
+  });
 
   const rowCount =
     filteredTableContents[Object.keys(filteredTableContents)[0]]?.values
-      .length || 0
+      .length || 0;
 
   const rows = Array.from({ length: rowCount }, (_, rowIndex) => {
-    const row: Record<string, any> = { id: rowIndex }
+    const row: Record<string, any> = { id: rowIndex };
     for (const [key, column] of Object.entries(filteredTableContents)) {
-      row[key] = column.values[rowIndex]
+      row[key] = column.values[rowIndex];
     }
-    return row
-  })
+    return row;
+  });
 
   return (
-    <Box sx={{height: "100%"}}>
+    <Box sx={{height: '100%'}}>
       <ClosableCardTable
         details={ tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotDescr}
         title={
           activeTab === 0
-            ? `feature Counterfactual Explanations`
-            : `hyperparameters Counterfactual Explanations`
+            ? 'feature Counterfactual Explanations'
+            : 'hyperparameters Counterfactual Explanations'
         }
         controlPanel={
           <ControlPanel
@@ -259,11 +258,11 @@ const CounterfactualsTable = (props: ITableComponent) => {
         { tab?.workflowTasks.modelAnalysis?.counterfactuals?.loading ? (
           // Loader when loading
           <Loader/>
-        ) :  tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotType === "Error" ? (
+        ) :  tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotType === 'Error' ? (
           // Display error message
-          <Box sx={{ p: 2, textAlign: "center" }}>
+          <Box sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h6" color="error">
-              { tab?.workflowTasks.modelAnalysis?.counterfactuals?.data.plotName || "Error"}
+              { tab?.workflowTasks.modelAnalysis?.counterfactuals?.data.plotName || 'Error'}
             </Typography>
             <Typography variant="body2">
               { tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotDescr}
@@ -277,17 +276,17 @@ const CounterfactualsTable = (props: ITableComponent) => {
             disableSelectionOnClick
             sx={{
               border: theme => `1px solid ${theme.palette.customGrey.main}`,
-              "& .MuiDataGrid-columnHeader": {
+              '& .MuiDataGrid-columnHeader': {
                 backgroundColor: theme => theme.palette.customGrey.light,
                 fontWeight: 600,
               },
-              "& .MuiDataGrid-cell": {
-                wordBreak: "break-word",
-                whiteSpace: "normal",
+              '& .MuiDataGrid-cell': {
+                wordBreak: 'break-word',
+                whiteSpace: 'normal',
               },
               // Hide footer completely since pagination is disabled
-              "& .MuiDataGrid-footerContainer": {
-                display: "none",
+              '& .MuiDataGrid-footerContainer': {
+                display: 'none',
               },
             }}
           />
@@ -299,10 +298,10 @@ const CounterfactualsTable = (props: ITableComponent) => {
         )}
       </ClosableCardTable>
     </Box>
-  )
-}
+  );
+};
 
-export default CounterfactualsTable
+export default CounterfactualsTable;
 
 const ControlPanel = ({
   activeTab,
@@ -316,8 +315,8 @@ const ControlPanel = ({
   return (
     <Box
       sx={{
-        display: "flex",
-        justifyContent: "flex-end",
+        display: 'flex',
+        justifyContent: 'flex-end',
         mb: 0, // optional: margin bottom for spacing below tabs
       }}
     >
@@ -325,9 +324,9 @@ const ControlPanel = ({
         value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}
         sx={{
-          "& .MuiTab-root": {
-            fontSize: "0.8rem",
-            minHeight: "8px",
+          '& .MuiTab-root': {
+            fontSize: '0.8rem',
+            minHeight: '8px',
           },
         }}
       >
@@ -335,5 +334,5 @@ const ControlPanel = ({
         <Tab label="Hyperparameters" disabled={counterfactuals?.loading} />
       </Tabs>
     </Box>
-  )
-}
+  );
+};
