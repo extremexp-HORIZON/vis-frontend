@@ -16,8 +16,7 @@ interface BaseMetric {
   id: string
   name: string
   value: number
-  step: number
-  [key: string]: string | number
+  [key: string]: string | number | boolean | null | undefined
 }
 
 const WorkflowCharts: React.FC = () => {
@@ -63,7 +62,6 @@ const WorkflowCharts: React.FC = () => {
               value,
               id: workflow.id,
               name: metricName,
-              step: workflow.step ?? 0
             };
             
             workflowsTable.groupBy.forEach(groupKey => {

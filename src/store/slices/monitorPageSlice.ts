@@ -1,6 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { CustomGridColDef } from '../../shared/types/table-types';
 
+export interface WorkflowTableRow {
+  id: string;
+  workflowId: string;
+  status?: string;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+export interface ScheduleTableRow {
+  id: number;
+  workflowId: string;
+  status?: string;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+
 interface IMonitoringPageSlice {
     parallel: {
         data: { [key: string]: any }[]
@@ -17,14 +32,14 @@ interface IMonitoringPageSlice {
         hoveredWorkflowId: string | number | null; // Add this field
 
         filters: { column: string; operator: string; value: string }[]
-        rows: { [key: string]: any }[]
-        filteredRows: { [key: string]: any }[]
+        rows: WorkflowTableRow[]
+        filteredRows: WorkflowTableRow[]
         filtersCounter: number
-        visibleRows: { [key: string]: any }[]
+        visibleRows: WorkflowTableRow[]
         columns: CustomGridColDef[]
-        visibleColumns: { [key: string]: any }[]
+        visibleColumns: CustomGridColDef[]
         columnsVisibilityModel: { [field: string]: boolean }
-        aggregatedRows: { [key: string]: any }[]
+        aggregatedRows: WorkflowTableRow[]
         groupBy: string[]
         uniqueMetrics: string[]
         uniqueParameters: string[]
@@ -36,12 +51,12 @@ interface IMonitoringPageSlice {
         orderBy: string
         page: number
         rowsPerPage: number
-        selectedWorkflows: string[]
+        selectedWorkflows: number[]
         filters: { column: string; operator: string; value: string }[]
-        rows: { [key: string]: any }[]
-        filteredRows: { [key: string]: any }[]
+        rows: ScheduleTableRow[]
+        filteredRows: ScheduleTableRow[]
         filtersCounter: number
-        visibleRows: { [key: string]: any }[]
+        visibleRows: ScheduleTableRow[]
         columns: CustomGridColDef[]
         columnsVisibilityModel: { [field: string]: boolean },
         uniqueParameters: string[]
@@ -214,7 +229,7 @@ export const monitoringPageSlice = createSlice({
     updateWorkflowRatingLocally: (state, action) => {
       const { workflowId, rating } = action.payload;
     
-      const updateRowRating = (rows: any[]) =>
+      const updateRowRating = (rows: WorkflowTableRow[]) =>
         rows.map((row) =>
           row.workflowId === workflowId
             ? { ...row, rating }

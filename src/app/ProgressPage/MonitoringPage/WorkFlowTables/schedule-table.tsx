@@ -188,9 +188,9 @@ export default function ScheduleTable() {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
         workflows.data.filter(workflow => workflow.status === 'SCHEDULED')
-        .reduce((acc: any[], workflow) => {
+        .reduce((acc: string[], workflow) => {
           const params = workflow.params;
-          let paramNames = [];
+          let paramNames: string[] = [];
           if (params) {
             paramNames = params.map(param => param.name);
             return [...acc, ...paramNames];
@@ -201,9 +201,9 @@ export default function ScheduleTable() {
       );
       const uniqueTasks = new Set(
         workflows.data.filter(workflow => workflow.status === 'SCHEDULED')
-        .reduce((acc: any[], workflow) => {
+        .reduce((acc: string[], workflow) => {
           const tasks = workflow?.tasks;
-          let taskNames = [];
+          let taskNames: string[] = [];
           if(tasks) {
             taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
             return [...acc, ...taskNames];
@@ -221,21 +221,17 @@ export default function ScheduleTable() {
           return {
             id: idCounter++,
             workflowId: workflow.name,
-            // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
                 tasks?.find(task => task.name === variant)?.variant || '';
               return acc;
-            }, {}),
+            }, {} as Record<string, string>),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 params?.find(param => param.name === variant)?.value || '';
               return acc;
-            }, {}),
+            }, {} as Record<string, string>),
             status: workflow.status.toLowerCase(),
-            // ...Object.keys(workflow.constraints)
-            //   .map(key => ({ [key]: workflow.constraints[key] }))
-            //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
             action: '',
           };
         })
@@ -246,44 +242,19 @@ export default function ScheduleTable() {
       const infoRow = {
         id: idCounter++,
         workflowId: workflow.id,
-        // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
         ...Array.from(uniqueTasks).reduce((acc, variant) => {
           acc[variant] =
             tasks?.find(task => task.name === variant)?.variant || '';
           return acc;
-        }, {}),
+        }, {} as Record<string, string>),
         ...Array.from(uniqueParameters).reduce((acc, variant) => {
           acc[variant] =
             `${params?.find(param => param.name === variant)?.value}` || '';
           return acc;
-        }, {}),
+        }, {} as Record<string, string>),
         status: workflow.status,
-        // ...Object.keys(workflow.constraints)
-        //   .map(key => ({ [key]: workflow.constraints[key] }))
-        //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
         action: '',
       };
-      // .filter(workflow => workflow.status === "scheduled")
-      // .map(workflow => {
-      //   const params = workflow.tasks.find(
-      //     task => task.id === "TrainModel",
-      //   )?.parameters
-      //   return {
-      //     id: idCounter++,
-      //     workflowId: workflow.name,
-      //     // "Train Model": workflow.variabilityPoints["Model Training"].Variant,
-      //     ...Array.from(uniqueParameters).reduce((acc, variant) => {
-      //       acc[variant] =
-      //         `${params?.find(param => param.name === variant)?.value}` || ""
-      //       return acc
-      //     }, {}),
-      //     status: workflow.status,
-      //     // ...Object.keys(workflow.constraints)
-      //     //   .map(key => ({ [key]: workflow.constraints[key] }))
-      //     //   .reduce((acc, constraint) => ({ ...acc, ...constraint }), {}),
-      //     action: "",
-      //   }
-      // })
       const columns: CustomGridColDef[] =
         infoRow
           ? Object.keys(infoRow)
@@ -298,7 +269,7 @@ export default function ScheduleTable() {
                 align: 'center',
                 headerAlign: 'center',
                 sortable: false,    
-                type: (rows.length > 0 && typeof rows[0][key] === 'number') ? 'number' : 'string',
+                type: (rows.length > 0 && typeof (rows[0] as Record<string, string | number | boolean | undefined>)[key] === 'number') ? 'number' : 'string',
                 ...(key === 'action' && {
                   renderCell: (params) => {
                     return (
@@ -447,9 +418,6 @@ export default function ScheduleTable() {
             numSelected={scheduledTable.selectedWorkflows.length}
             tableName={'Scheduled Workflows'}
             handleClickedFunction={removeSelected}
-            onRemoveFilter={handleRemoveFilter}
-            filters={scheduledTable.filters}
-            onFilterChange={handleFilterChange}
             showFilterButton={true}
           />
         </Box>

@@ -47,15 +47,7 @@ interface ToolBarWorkflowProps {
     workflowId: number[] | string,
   ) => (e: React.SyntheticEvent) => void
   filterClickedFunction: (event: React.MouseEvent<HTMLElement>) => void
-  onRemoveFilter: (index: number) => void
   groupByOptions?: string[]
-  filters: { column: string; operator: string; value: string }[]
-  onFilterChange: (
-    index: number,
-    column: string,
-    operator: string,
-    value: string,
-  ) => void
   showFilterButton?: boolean;
 }
 
@@ -67,10 +59,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     actionButtonName,
     handleClickedFunction,
     filterClickedFunction,
-    onRemoveFilter,
     groupByOptions,
-    filters,
-    onFilterChange,
     showFilterButton = false
   } = props;
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
