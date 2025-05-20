@@ -56,6 +56,14 @@ const MapControls = () => {
             value={lat}
             onChange={e => handleChange('lat', e.target.value)}
             input={<OutlinedInput label="Latitude" />}
+             MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 250,
+                    maxWidth: 300,
+                  },
+                },
+              }}
           >
             {doubleColumns.map(col => (
               <MenuItem key={col.name} value={col.name}>
@@ -72,6 +80,14 @@ const MapControls = () => {
             value={lon}
             onChange={e => handleChange('lon', e.target.value)}
             input={<OutlinedInput label="Longitude" />}
+             MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 250,
+                    maxWidth: 300,
+                  },
+                },
+              }}
           >
             {doubleColumns.map(col => (
               <MenuItem key={col.name} value={col.name}>
@@ -90,8 +106,15 @@ const MapControls = () => {
             value={segmentBy.length > 0 ? 'None' : colorByMap}
             onChange={e => handleChange('colorByMap', e.target.value)}
             input={<OutlinedInput label="Color By" />}
+             MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 250,
+                    maxWidth: 300,
+                  },
+                },
+              }}
           >
-            <MenuItem value="None">None</MenuItem>
             {selectedColumns.map(col => (
               <MenuItem key={col.name} value={col.name}>
                 {col.name}
