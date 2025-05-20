@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Grid, Typography, LinearProgress } from '@mui/material';
 import { checkAuthentication } from './store/slices/authSlice';
+import { logger } from './shared/utils/logger';
 
 const TokenAuthHandler = () => {
   const { token, experimentId } = useParams();
@@ -46,7 +47,7 @@ const TokenAuthHandler = () => {
           }, 2000);
         }
       } catch (err) {
-        console.error('Authentication error:', err);
+        logger.error('Authentication error:', err);
         setError('Authentication failed');
 
         // Redirect to login after a brief delay

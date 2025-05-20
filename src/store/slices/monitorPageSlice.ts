@@ -15,7 +15,6 @@ export interface ScheduleTableRow {
   [key: string]: string | number | boolean | null | undefined;
 }
 
-
 interface IMonitoringPageSlice {
     parallel: {
         data: { [key: string]: any }[]

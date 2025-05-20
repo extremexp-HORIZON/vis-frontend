@@ -42,17 +42,6 @@ const WorkflowTab = () => {
  
   return (
     <Box sx={{height: '100%', display: 'flex', flexDirection: 'column', gap: 1}}>
-      {/* {(tab?.workflowConfiguration?.tasks?.length ?? 0) > 0 &&
-        <Box sx={{px: 2,mt:1}}>
-          <StaticDirectedGraph
-            workflowSvg={tab?.workflowSvg.data || null}
-            params={tab?.workflowConfiguration.params}
-            handleOpenTask={function (taskName: string): void {
-              throw new Error("Function not implemented.")
-            }}
-          />
-        </Box>
-      } */}
       <Box sx={{p: 2, height: '100%', display: 'flex', direction: 'row', gap: 1, overflow: 'hidden'}}>
         <Resizable
           defaultSize={{

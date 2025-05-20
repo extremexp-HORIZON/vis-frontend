@@ -5,22 +5,23 @@ import ParallelCoordinatePlot from './ParalleleCoodrinates/parallel-coordinate-p
 import WorkflowTable from './WorkFlowTables/workflow-table';
 import ScheduleTable from './WorkFlowTables/schedule-table';
 import type { RootState} from '../../../store/store';
-import { useAppSelector } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import WorkflowCharts from '../DynamicMetricCharts';
 import { Resizable } from 're-resizable';
 import { bulkToggleWorkflowSelection, setSelectedTab, setVisibleTable } from '../../../store/slices/monitorPageSlice';
-import { useDispatch } from 'react-redux';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
 import { getCache } from '../../../shared/utils/localStorageCache';
+import { useLocation } from 'react-router-dom';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const theme = useTheme();
+  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const compareId = queryParams.get('compareId');
   const tabParam = queryParams.get('tab');

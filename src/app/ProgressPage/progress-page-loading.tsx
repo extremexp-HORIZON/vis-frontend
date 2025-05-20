@@ -11,6 +11,7 @@ import {
 } from '../../store/slices/progressPageSlice';
 import '../../index.css';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const ProgressPageLoading = () => {
   const { workflows, experiment } = useAppSelector(
@@ -21,6 +22,7 @@ const ProgressPageLoading = () => {
   const [searchParams] = useSearchParams();
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   
   // Get experimentId from either path params or query params
   const experimentId = params.experimentId || searchParams.get('experimentId');

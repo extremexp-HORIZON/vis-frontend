@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 import { DetailsCard, DetailsCardItem } from '../../../shared/components/details-card';
 import { useMemo } from 'react';
 import { setCache } from '../../../shared/utils/localStorageCache';
+import { useLocation } from 'react-router-dom';
 
 interface GroupMetrics {
   value: number;
@@ -26,7 +27,7 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
   const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
-  
+  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query
   const filteredWorkflows = workflows.data.filter(workflow => workflow.id === workflowId);
@@ -99,6 +100,7 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
 
 export const WorkflowMetricChart = () => {
     const { tab } = useAppSelector(state => state.workflowPage);
+    const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query
 

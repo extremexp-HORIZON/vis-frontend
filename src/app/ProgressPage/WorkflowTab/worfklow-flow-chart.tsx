@@ -32,11 +32,10 @@ const startEndNodeStyle = {
 interface IFlowGraphProps {
   workflowSvg: { tasks: ITask[] | undefined; start: number | undefined; end: number | undefined } | null
   params: IParam[] | undefined | null
-  handleOpenTask: (taskName: string) => void
 }
 
 function FlowGraph(props: IFlowGraphProps) {
-  const { workflowSvg, params, handleOpenTask } = props;
+  const { workflowSvg, params } = props;
   const flowWrapper = useRef(null);
   const { fitView } = useReactFlow();
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -243,37 +242,6 @@ function FlowGraph(props: IFlowGraphProps) {
     }
   }, [workflowSvg, fitView]);
 
-  const onNodeClick = (_: any, node: Node) => {
-    if (
-      node.id === 'start' ||
-      node.id === 'end'
-    )
-      return;
-    else {
-      handleOpenTask(node.id);
-    }
-    // setNodes(state =>
-    //   state.map(n =>
-    //     n.data.type === node.data.type
-    //       ? {
-    //           ...n,
-    //           style: getTaskStyleOnClick(node),
-    //         }
-    //       : n.id === "start" || n.id === "end"
-    //         ? n
-    //         : {
-    //             ...n,
-    //             style: getInitialNodeStyle(
-    //               String(n.data.type) || "",
-    //               workflowSvg?.tasks || [],
-    //               workflowSvg?.start,
-    //               workflowSvg?.end,
-    //             ),
-    //           },
-    //   ),
-    // )
-  };
-
   return (
     <div
       style={{
@@ -309,13 +277,12 @@ function FlowGraph(props: IFlowGraphProps) {
 }
 
 function StaticDirectedGraph(props: IFlowGraphProps) {
-  const { workflowSvg, params, handleOpenTask } = props;
+  const { workflowSvg, params } = props;
   return (
     <ReactFlowProvider>
       <FlowGraph
         workflowSvg={workflowSvg}
         params={params}
-        handleOpenTask={handleOpenTask}
       />
     </ReactFlowProvider>
   );

@@ -17,6 +17,7 @@ import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import StaticDirectedGraph from './WorkflowTab/worfklow-flow-chart';
 import CloseIcon from '@mui/icons-material/Close';
+import { logger } from '../../shared/utils/logger';
 
 const ExperimentControls = () => {
   const [ searchParams ] = useSearchParams();
@@ -146,10 +147,10 @@ const handleUserEvaluation = async (value: number | null) => {
               </Box>
               { progressBar.progress !== 100 && (
                 <Box className={'progress-page-actions'} >
-                  <IconButton onClick={() => console.log('Paused')} color="primary">
+                  <IconButton onClick={() => logger.log('Paused')} color="primary">
                     <PauseIcon fontSize="large" />
                   </IconButton>
-                  <IconButton onClick={() => console.log('Stopped')} color="primary">
+                  <IconButton onClick={() => logger.log('Stopped')} color="primary">
                     <StopIcon fontSize="large" />
                   </IconButton>
                 </Box>
@@ -249,10 +250,10 @@ const handleUserEvaluation = async (value: number | null) => {
                 </Box>
                 {progressBar.progress !== 100 && (
                   <>
-                    <IconButton onClick={() => console.log('Paused')} color="primary">
+                    <IconButton onClick={() => logger.log('Paused')} color="primary">
                       <PauseIcon fontSize="large" />
                     </IconButton>
-                    <IconButton onClick={() => console.log('Stopped')} color="primary">
+                    <IconButton onClick={() => logger.log('Stopped')} color="primary">
                       <StopIcon fontSize="large" />
                     </IconButton>
                   </>
@@ -325,9 +326,6 @@ const handleUserEvaluation = async (value: number | null) => {
                     <StaticDirectedGraph
                       workflowSvg={tab.workflowSvg.data}
                       params={tab.workflowConfiguration.params}
-                      handleOpenTask={function (taskName: string): void {
-                        throw new Error('Function not implemented.');
-                      }}
                     />
                   )}
                 </DialogContent>

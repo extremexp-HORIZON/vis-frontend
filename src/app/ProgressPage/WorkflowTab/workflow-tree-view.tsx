@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
@@ -584,7 +584,7 @@ export default function WorkflowTreeView() {
           {/* Fallback for null-task entries if no unique tasks. Supporting mlflow */}
           {uniqueTasks.length === 0 &&
             (() => {
-              const nullTask = (val: any) => val.task == null;
+              const nullTask = (val: { task?: string | null }) => val.task == null;
 
               const fallbackParams =
                 tab?.workflowConfiguration.params?.filter(nullTask) || [];

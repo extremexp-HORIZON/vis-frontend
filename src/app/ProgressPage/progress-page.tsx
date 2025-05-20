@@ -5,7 +5,6 @@ import type { RootState } from '../../store/store';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
   useLocation,
-  useNavigate,
   useParams,
 } from 'react-router-dom';
 import {
@@ -36,7 +35,7 @@ const ProgressPage = (props: ProgressPageProps) => {
     if (location.pathname.includes('workflow'))
       dispatch(setMenuOptions({ ...menuOptions, selected: 'monitoring' }));
     else dispatch(setMenuOptions({ ...menuOptions, selected: pathParts[1] }));
-  }, [location, history]);
+  }, [location]);
 
   useEffect(() => {
     if (experimentId && experimentId !== experiment.data?.id) {
