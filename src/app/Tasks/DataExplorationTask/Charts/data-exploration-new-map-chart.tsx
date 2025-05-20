@@ -190,11 +190,11 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
 
   legend.onAdd = function () {
     const div = L.DomUtil.create('div', 'leaflet-legend');
-    div.style.background = 'white';
+    div.style.background = 'lightgray';
     div.style.padding = '8px';
     div.style.borderRadius = '4px';
     div.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)';
-    div.innerHTML = `<strong>${colorByMap}</strong><br/>`;
+    div.innerHTML = `<div style="text-align: center;"><strong>${colorByMap}</strong></div><br/>`;
 
     if (isNumeric) {
       const values = data.map((r: any) => parseFloat(r[colorByMap || '']));
