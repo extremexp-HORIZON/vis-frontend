@@ -92,7 +92,7 @@ const MapControls = () => {
             input={<OutlinedInput label="Color By" />}
           >
             <MenuItem value="None">None</MenuItem>
-            {stringColumns.map(col => (
+            {selectedColumns.map(col => (
               <MenuItem key={col.name} value={col.name}>
                 {col.name}
               </MenuItem>
