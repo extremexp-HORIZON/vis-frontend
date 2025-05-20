@@ -1,4 +1,5 @@
 import type { TypedUseSelectorHook} from 'react-redux';
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { workflowPageSlice } from './slices/workflowPageSlice';

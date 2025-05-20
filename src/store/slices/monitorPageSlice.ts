@@ -17,7 +17,7 @@ export interface ScheduleTableRow {
 
 interface IMonitoringPageSlice {
     parallel: {
-        data: { [key: string]: any }[]
+        data: Record<string, string | number | boolean | null | undefined>[]
         options: string[]
         selected: string
       }
@@ -154,7 +154,7 @@ export const monitoringPageSlice = createSlice({
         const existingColors = new Set(Object.values(state.workflowsTable.workflowColors));
         const newWorkflowColors = { ...state.workflowsTable.workflowColors };
     
-        rows.forEach((row: { id: any }) => {
+        rows.forEach((row: WorkflowTableRow) => {
           const workflowId = row.id; // Adjust if your workflow ID field has a different name
           if (!newWorkflowColors[workflowId]) {
             newWorkflowColors[workflowId] = generateUniqueColor(existingColors);

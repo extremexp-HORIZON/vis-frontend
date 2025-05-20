@@ -6,24 +6,10 @@ import { experimentApi } from '../../app/api/api';
 import axios from 'axios';
 import { getCache, setCache } from '../../shared/utils/localStorageCache';
 
-const workflowMetricsPreparation = (workflow: any, workflowId: string) => {
-  if (!workflow.metrics) {
-    return { ...workflow, workflowId };
-  }
-  const ok = {
-    ...workflow,
-    workflowId,
-    metrics: workflow.metrics.map((item: any) => {
-      const metricId = Object.keys(item)[0];
-      const metricData = item[metricId];
-      return {
-        ...metricData,
-        metricId,
-      };
-    })
-  };
-  return ok;
-};
+interface IUserEvaluationResponse {
+  status: string;
+  message: string;
+}
 
 interface IProgressPage {
   initialization: boolean
@@ -160,6 +146,7 @@ export const progressPageSlice = createSlice({
       
         if (action.payload?.status === 'success') {
           const { experimentId, runId, data } = action.meta.arg;
+          if (data.rating === null) return;
           const workflowIndex = state.workflows.data.findIndex(w => w.id === runId);
         
           if (workflowIndex !== -1) {
@@ -252,7 +239,7 @@ export const fetchExperimentWorkflows = createAsyncThunk(
 export const workflowsReordering = createAsyncThunk(
   'progressPage/workflows_reordering',
   async (payload: { workflowId1: string; workflowId2: string, experimentId: string }) => {
-    const { workflowId1, workflowId2, experimentId } = payload;
+    const { workflowId1, workflowId2 } = payload;
     const requestUrl = '';
     const requestPayload = {
       precedence: {
@@ -261,7 +248,7 @@ export const workflowsReordering = createAsyncThunk(
     };
     return experimentApi
       .post<IRun[]>(requestUrl, requestPayload)
-      .then(response => response.data.map(workflow => workflowMetricsPreparation(workflow, workflow.id || '')));    
+      .then(response => response.data);
   }
 );
 
@@ -277,27 +264,15 @@ export const stateController = createAsyncThunk(
   },
 );
 
-// TODO: Test this once the table changes are done
-// export const workflowRating = (payload: {metric: IMetric, newValue: number}) => {
-//     const {metric, newValue} = payload
-//     const requestUrl = `/metrics/metricId`
-//     const requestPayload: Partial<IMetric> = {
-//       ...metric,
-//       value: newValue,
-//     }
-//     delete requestPayload.name
-//     return axios.post<IRun[]>(requestUrl, requestPayload)
-//   }
-
 export const fetchUserEvaluation = createAsyncThunk(
   'workflowTasks/user_evaluation/fetch_data',
   async (
-    payload: { experimentId: string; runId: string; data: any }
+    payload: { experimentId: string; runId: string; data: {rating: number | null} }
   ) => {
     const { experimentId, runId, data } = payload;
     const requestUrl = `${experimentId}/runs/${runId}/user-evaluation`;
     return experimentApi
-      .post<any>(requestUrl, data)
+      .post<IUserEvaluationResponse>(requestUrl, data)
       .then(response => response.data);
       
   },

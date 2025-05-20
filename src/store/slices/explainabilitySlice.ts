@@ -4,13 +4,20 @@ import type { FetchExplainabilityPlotPayload } from '../../shared/models/tasks/e
 import { api } from '../../app/api/api';
 import type { IWorkflowPage } from './workflowPageSlice';
 import type { IModelAnalysis } from '../../shared/models/tasks/model-analysis.model';
+import type { IPlotModel } from '../../shared/models/plotmodel.model';
+
+interface LoadableSection<T = unknown> {
+  data?: T;
+  loading: boolean;
+  error: string | null;
+}
 
 // Thunk
 export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   'explainability/fetch_plot',
   async (payload: FetchExplainabilityPlotPayload) => {
     const requestUrl = `explainability/${payload.metadata.experimentId}/${payload.metadata.workflowId}`;
-    const response = await api.post<any>(requestUrl, payload.query);
+    const response = await api.post<IPlotModel>(requestUrl, payload.query);
     return response.data;
   }
 );
@@ -25,13 +32,13 @@ export const setSelectedFeature = createAction<{
 const getTask = (state: IWorkflowPage, workflowId: string) =>
   state.tab?.workflowId === workflowId ? state.tab.workflowTasks.modelAnalysis : null;
 
-const assignResult = (section: any, data: any) => {
+const assignResult = <T>(section: LoadableSection<T>, data: T) => {
   section.data = data;
   section.loading = false;
   section.error = null;
 };
 
-const assignError = (section: any, message: string) => {
+const assignError = (section: LoadableSection, message: string) => {
   section.loading = false;
   section.error = message;
 };

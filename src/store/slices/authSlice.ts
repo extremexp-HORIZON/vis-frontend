@@ -4,11 +4,12 @@ import type {
   LoginCredentials,
 } from '../../shared/models/auth.model';
 import { authApi } from '../../app/api/api';
+import type { AxiosError } from 'axios';
 
 interface AuthState {
   token: string | null
   isLoading: boolean
-  error: any | null
+  error: unknown | null
 }
 
 export const saveToken = (token: string): void => {
@@ -49,7 +50,7 @@ export const checkAuthentication = async (externalToken: string) => {
   saveToken(externalToken);
   try {
     // Decode the token to check its validity and expiration
-    const response = await authApi.get('/extreme_auth/api/v1/person/userinfo', {
+    await authApi.get('/extreme_auth/api/v1/person/userinfo', {
       headers: {
         Authorization: `Bearer ${externalToken}`,
       },
@@ -109,8 +110,9 @@ export const loginUser = createAsyncThunk(
       }
 
       return response.data.access_token;
-    } catch (error: any) {
-      if (error.response && error.response.data) {
+    } catch (err) {
+      const error = err as AxiosError<{ error_description?: string }>;
+      if (error.response?.data?.error_description) {
         return rejectWithValue(
           error.response.data.error_description || 'Login failed',
         );

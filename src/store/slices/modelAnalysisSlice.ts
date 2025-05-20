@@ -4,6 +4,13 @@ import type { fetchAffectedRequest } from '../../shared/models/dataexploration.m
 import type { IWorkflowPage } from './workflowPageSlice';
 import type { IModelAnalysis } from '../../shared/models/tasks/model-analysis.model';
 import { api, experimentApi } from '../../app/api/api';
+import type { AxiosError } from 'axios';
+
+interface LoadableSection<T = unknown> {
+  data?: T;
+  loading: boolean;
+  error: string | null;
+}
 
 // Thunks
 export const fetchAffected = createAsyncThunk(
@@ -22,11 +29,14 @@ export const getLabelTestInstances = createAsyncThunk(
         params: { offset, limit },
       });
       return response.data;
-    } catch (error) {
-      if (typeof error === 'object' && error !== null && 'response' in error) {
-        return rejectWithValue((error as any).response?.data || (error as any).message);
+    } catch (err) {
+      const error = err as AxiosError;
+
+      if (error.response) {
+        return rejectWithValue(error.response.data);
       }
-      return rejectWithValue('Unknown error occurred');
+
+      return rejectWithValue(error.message || 'Unknown error occurred');
     }
   }
 );
@@ -59,13 +69,13 @@ export const fetchModelSummary = createAsyncThunk(
 const getTask = (state: IWorkflowPage, workflowId: string) =>
   state.tab?.workflowId === workflowId ? state.tab.workflowTasks.modelAnalysis : null;
 
-const assignResult = (section: any, data: any) => {
+const assignResult = <T>(section: LoadableSection<T>, data: T) => {
   section.data = data;
   section.loading = false;
   section.error = null;
 };
 
-const assignError = (section: any, message: string) => {
+const assignError = (section: LoadableSection, message: string) => {
   section.loading = false;
   section.error = message;
 };
@@ -142,14 +152,12 @@ export const modelAnalysisReducers = (builder: ActionReducerMapBuilder<IWorkflow
             )
           : action.payload;
 
-        if (Array.isArray(rawData.thresholds)) {
-          rawData.thresholds = rawData.thresholds.map((t: any) =>
-            t === Infinity || t === 'Infinity'
-              ? 1e9
-              : t === -Infinity || t === '-Infinity'
-              ? -1e9
-              : t
-          );
+          if (Array.isArray(rawData.thresholds)) {
+            rawData.thresholds = (rawData.thresholds as Array<string | number>).map((t): number => {
+              if (t === Infinity || t === 'Infinity') return 1e9;
+              if (t === -Infinity || t === '-Infinity') return -1e9;
+              return Number(t);
+          });
         }
 
         assignResult(task.modelRocCurve, rawData);

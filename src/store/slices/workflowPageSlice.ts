@@ -18,6 +18,11 @@ import { dataExplorationReducers } from './dataExplorationSlice';
 import { modelAnalysisReducers } from './modelAnalysisSlice';
 import { explainabilityReducers } from './explainabilitySlice';
 
+type MetricFetchResult = {
+  name: string;
+  data: IMetric[];
+};
+
 export interface IWorkflowPage {
   tab: IWorkflowPageModel | null
   isTabInitialized: boolean;
@@ -88,9 +93,9 @@ export const workflowPageSlice = createSlice({
       }
   },
   extraReducers: builder => {
-    explainabilityReducers(builder),
-      modelAnalysisReducers(builder),
-      dataExplorationReducers(builder),
+    explainabilityReducers(builder);
+      modelAnalysisReducers(builder);
+      dataExplorationReducers(builder);
       builder
         .addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
             const newMetrics = action.payload; // this is an array of { name, data }
@@ -233,13 +238,13 @@ export const fetchWorkflowMetrics = createAsyncThunk(
         const requestUrl = `${experimentId}/runs/${workflowId}/metrics-all/${name}`;
         return experimentApi.get(requestUrl).then((response) => ({
           name,
-          data: response.data,
+          data: response.data as IMetric[],
         }));
       })
     );
     
     const successful = results.filter(
-      (res): res is PromiseFulfilledResult<{ name: string; data: any }> => res.status === 'fulfilled'
+      (res): res is PromiseFulfilledResult<MetricFetchResult> => res.status === 'fulfilled'
     );
     
     if (successful.length === 0) {

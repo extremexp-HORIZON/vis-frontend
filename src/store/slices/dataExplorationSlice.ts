@@ -180,10 +180,10 @@ export const fetchMetaData = createAsyncThunk(
 
 export const fetchUmap = createAsyncThunk(
   'workflowTasks/data_exploration/fetch_umap',
-  async (payload: { data: number[][]; metadata: any }) => {
+  async (payload: { data: number[][]; metadata: {workflowId: string; query: string;} }) => {
     const requestUrl = 'data/umap';
     return api
-      .post<any>(requestUrl, payload.data)
+      .post<number[][]>(requestUrl, payload.data)
       .then(response => response.data);
   },
 );
