@@ -1,4 +1,5 @@
 import { DndContext, closestCenter } from '@dnd-kit/core';
+import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import { SortableContext, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Paper, styled } from '@mui/material';
@@ -19,7 +20,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const SortableItem = ({ id }: { id: string }) => {
+const SortableItem = ({ id }: { id: UniqueIdentifier }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -39,11 +40,12 @@ const DraggableColumns = ({
   foldArray,
   onOrderChange,
 }: {
-  foldArray: React.MutableRefObject<string[]>
-  onOrderChange?: (newOrder: string[]) => void
+  foldArray: React.MutableRefObject<UniqueIdentifier[]>
+  onOrderChange?: (newOrder: UniqueIdentifier[]) => void
 }) => {
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    if (!over) return;
     if (active.id !== over?.id) {
       const oldIndex = foldArray.current.indexOf(active.id);
       const newIndex = foldArray.current.indexOf(over.id);

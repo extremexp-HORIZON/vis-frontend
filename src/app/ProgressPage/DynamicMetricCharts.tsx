@@ -12,11 +12,12 @@ import ResponsiveCardVegaLite from '../../shared/components/responsive-card-vega
 import InfoMessage from '../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
-interface IMetric {
+interface BaseMetric {
+  id: string
   name: string
   value: number
-  timestamp: number
   step: number
+  [key: string]: string | number
 }
 
 const WorkflowCharts: React.FC = () => {
@@ -47,9 +48,9 @@ const WorkflowCharts: React.FC = () => {
     { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
   ];
   
-  const groupedMetrics: Record<string, IMetric[]> = workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating')
+  const groupedMetrics: Record<string, BaseMetric[]> = workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating')
   .reduce(
-    (acc: any, metricName: string) => {
+    (acc: Record<string, BaseMetric[]>, metricName: string) => {
       acc[metricName] = [];
 
       filteredWorkflows.forEach(workflow => {
@@ -58,10 +59,10 @@ const WorkflowCharts: React.FC = () => {
   
           // Skip non-numeric or NaN values
           if (typeof value === 'number' && !isNaN(value)) {
-            const metricPoint: any = {
+            const metricPoint: BaseMetric = {
               value,
               id: workflow.id,
-              metricName,
+              name: metricName,
               step: workflow.step ?? 0
             };
             
@@ -76,7 +77,7 @@ const WorkflowCharts: React.FC = () => {
   
       return acc;
     },
-    {} as Record<string, IMetric[]>
+    {} as Record<string, BaseMetric[]>
   );
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
@@ -117,7 +118,7 @@ const WorkflowCharts: React.FC = () => {
           scale: {
             domain: [
               0,
-              Math.max(...metricSeries.map((d: any) => d.value)) * 1.05,
+              Math.max(...metricSeries.map((d: BaseMetric) => d.value)) * 1.05,
             ],
           },
         },

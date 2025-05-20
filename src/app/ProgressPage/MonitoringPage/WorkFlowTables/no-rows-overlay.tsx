@@ -22,7 +22,11 @@ interface INoRowsOverlayProps {
     );
 };
 
-const NoRowsOverlayWrapper = (props: any) => {
+interface INoRowsOverlayProps {
+  title: string;
+}
+
+const NoRowsOverlayWrapper = (props: INoRowsOverlayProps) => {
     return <NoRowsOverlay title={props?.title} />;
   };
 

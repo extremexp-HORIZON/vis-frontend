@@ -3,15 +3,16 @@ import { Vega } from 'react-vega';
 import { scheme } from 'vega';
 import vegaTooltip from 'vega-tooltip';
 import type { Axis, Item, Scale } from 'vega-typings/types';
-import type { View } from 'vega';
+import type { ScenegraphEvent, View } from 'vega';
 import { useEffect, useState, useRef } from 'react';
+import type { ParallelDataItem } from '../../../../shared/types/parallel.types';
 
 interface ParallelCoordinateVegaProps {
-  parallelData: any[]
+  parallelData: ParallelDataItem[]
   progressParallel: { selected: string }
   foldArray: React.MutableRefObject<string[]>
   selectedWorkflows: string[]
-  processedData: any[]
+  processedData: (ParallelDataItem & { selected: boolean })[]
 }
 
 function setValuesIfSelectedAndDefault(
@@ -61,7 +62,7 @@ const ParallelCoordinateVega = ({
     if (!view) return;
 
     const tooltipHandler = vegaTooltip(view, {
-      formatTooltip: datum => {
+      formatTooltip: (datum: Record<string, string | number | boolean>) => {
         const table = document.createElement('table');
         Object.entries(datum).forEach(([key, value]) => {
           const row = table.insertRow();
@@ -76,11 +77,12 @@ const ParallelCoordinateVega = ({
 
     // Manually trigger tooltip on line mark hover (otherwise only triggered on intersections)
     var isTooltipVisible = false;
-    view.addEventListener('mousemove', (event: any) => {
+    view.addEventListener('mousemove', (event: ScenegraphEvent) => {
       const hover = view.signal('hover');
 
       if (hover) {
-        tooltipHandler.call(view, event, {} as Item, hover);
+        const domEvent = (event as unknown as { event: MouseEvent }).event;
+        tooltipHandler.call(view, domEvent, {} as Item, hover);
         isTooltipVisible = true;
       } else if (isTooltipVisible) {
         hideTooltip();
@@ -104,7 +106,7 @@ const ParallelCoordinateVega = ({
   // generate scales:
   const numericValues = processedData
   .map(d => d[progressParallel.selected])
-  .filter(v => typeof v === 'number' && !isNaN(v));
+  .filter((v): v is number => typeof v === 'number' && !isNaN(v));
 
   let selectedLastColumnMin = Math.min(...numericValues);
   let selectedLastColumnMax = Math.max(...numericValues);
@@ -179,7 +181,7 @@ const ParallelCoordinateVega = ({
       offset: { scale: 'ord', value: columnName, mult: -1 },
     });
   }
-  const numericFilteredData = processedData.filter((row: any) => {
+  const numericFilteredData = processedData.filter((row: ParallelDataItem & { selected: boolean }) => {
     const key = progressParallel.selected;
     const val = Number(row[key]);
     return !isNaN(val);

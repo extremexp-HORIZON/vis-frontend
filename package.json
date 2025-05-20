@@ -17,7 +17,8 @@
     "lint:src/app": "eslint src/app",
     "lint:src/shared": "eslint src/shared",
     "lint:src/store": "eslint src/store",
-    "lint:src/app:fix": "eslint --fix src/app"
+    "lint:src/app:fix": "eslint --fix src/app",
+    "lint:log": "eslint . --quiet --format stylish > eslint-errors.log"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
