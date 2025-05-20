@@ -101,7 +101,14 @@ export const progressPageSlice = createSlice({
         state.experiment.error = null;
       })
       .addCase(fetchExperimentWorkflows.fulfilled, (state, action) => {
-        state.workflows.data = action.payload;
+        const incoming = action.payload;
+        const existing = state.workflows.data;
+
+        const isDifferent = JSON.stringify(existing) !== JSON.stringify(incoming);
+        if (isDifferent) {
+          state.workflows.data = incoming;
+        }
+
         state.workflows.loading = false;
         state.workflows.error = null;
       })

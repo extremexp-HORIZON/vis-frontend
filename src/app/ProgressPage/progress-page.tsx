@@ -44,19 +44,35 @@ const ProgressPage = (props: ProgressPageProps) => {
     }
   }, []);
 
+  // useEffect(() => {
+  //   const fetchWorkflows = () =>
+  //     !experiment.loading &&
+  //     experiment.data &&
+  //     dispatch(fetchExperimentWorkflows({experimentId: experimentId || '', forceRefresh: true}));
+  //   intervalId.current = setInterval(fetchWorkflows, 1 * 60 * 1000);
+
+  //   return () => {
+  //     if (intervalId.current) {
+  //       clearInterval(intervalId.current);
+  //     }
+  //   };
+  // }, [experiment]);
+
   useEffect(() => {
-    const fetchWorkflows = () =>
-      !experiment.loading &&
-      experiment.data &&
-      dispatch(fetchExperimentWorkflows({experimentId: experimentId || '', forceRefresh: true}));
-    intervalId.current = setInterval(fetchWorkflows, 1 * 60 * 1000);
+  if (!experiment.data?.id) return;
+
+  const fetchWorkflows = () =>
+    dispatch(fetchExperimentWorkflows({ experimentId: experiment?.data?.id || '', forceRefresh: true }));
+
+  intervalId.current = setInterval(fetchWorkflows, 60 * 1000); // 1 minute
 
     return () => {
       if (intervalId.current) {
         clearInterval(intervalId.current);
       }
     };
-  }, [experiment]);
+
+}, [experiment.data?.id]);
 
   useEffect(() => {
     if (workflows.data && workflows.data.length > 0) {
