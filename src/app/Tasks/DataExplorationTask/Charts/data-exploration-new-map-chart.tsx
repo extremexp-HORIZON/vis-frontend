@@ -104,7 +104,7 @@ const getColorForValue = (value: number, min: number, max: number): string => {
 
     categories.forEach((category, index) => {
       // Get a color from the COLOR_PALETTE or generate your own strategy here
-      newColorMap.set(category, COLOR_PALETTE[index % COLOR_PALETTE.length]);
+      newColorMap.set(category as string, COLOR_PALETTE[index % COLOR_PALETTE.length]);
     });
 
     setColorMap(newColorMap);
@@ -153,11 +153,11 @@ const getColorForValue = (value: number, min: number, max: number): string => {
         const lonVal = parseFloat(row[lon]);
         const category = row[colorByMap || ''];
         if (!isNaN(latVal) && !isNaN(lonVal) && category) {
-const colorValue = row[colorByMap];
+const colorValue = row[colorByMap || ''];
 let color = '#000000';
 
-if (isNumericField(data.map((r: any) => r[colorByMap]))) {
-  const values = data.map((r: any) => parseFloat(r[colorByMap]));
+if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
+  const values = data.map((r: any) => parseFloat(r[colorByMap || '']));
   const min = Math.min(...values);
   const max = Math.max(...values);
   const numericVal = parseFloat(colorValue);
@@ -172,7 +172,10 @@ if (isNumericField(data.map((r: any) => r[colorByMap]))) {
               iconAnchor: [6, 6],
             }),
           })
-            .bindTooltip(category, { permanent: false, direction: 'top' })
+.bindTooltip(
+  `Lat: ${latVal.toFixed(5)}, Lon: ${lonVal.toFixed(5)}<br/>${colorByMap}: ${category}`,
+  { permanent: false, direction: 'top' }
+)
             .addTo(markerLayerRef.current!);
         }
       });
@@ -183,7 +186,7 @@ if (isNumericField(data.map((r: any) => r[colorByMap]))) {
     if (existingLegend) existingLegend.remove();
     if (!useHeatmap && data.length > 0) {
   const legend = L.control({ position: 'topright' });
-  const isNumeric = isNumericField(data.map((r: any) => r[colorByMap]));
+  const isNumeric = isNumericField(data.map((r: any) => r[colorByMap || '']));
 
   legend.onAdd = function () {
     const div = L.DomUtil.create('div', 'leaflet-legend');
@@ -194,7 +197,7 @@ if (isNumericField(data.map((r: any) => r[colorByMap]))) {
     div.innerHTML = `<strong>${colorByMap}</strong><br/>`;
 
     if (isNumeric) {
-      const values = data.map((r: any) => parseFloat(r[colorByMap]));
+      const values = data.map((r: any) => parseFloat(r[colorByMap || '']));
       const min = Math.min(...values);
       const max = Math.max(...values);
 
