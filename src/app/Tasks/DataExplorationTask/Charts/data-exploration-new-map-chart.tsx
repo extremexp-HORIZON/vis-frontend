@@ -26,7 +26,7 @@ const MapChart = () => {
 
 const getColorForValue = (value: number, min: number, max: number): string => {
   const percent = (value - min) / (max - min);
-  const hue = (1 - percent) * 240; // 240 = blue, 0 = red
+  const hue = (1 - percent) * 72; // 240 = blue, 0 = red
   return `hsl(${hue}, 100%, 50%)`;
 };
 
@@ -203,7 +203,7 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
 
       div.innerHTML += `
       <div style="width: 200px;">
-        <div style="background: linear-gradient(to right, hsl(240, 100%, 50%), hsl(0, 100%, 50%)); height: 12px; width: 100%; margin-bottom: 4px;"></div>
+        <div style="background: linear-gradient(to right, hsl(72, 100.00%, 50.00%), hsl(0, 100.00%, 50.00%)); height: 12px; width: 100%; margin-bottom: 4px;"></div>
         <div style="display: flex; justify-content: space-between; font-size: 12px;">
           <span>${min.toFixed(2)}</span>
           <span>${max.toFixed(2)}</span>
