@@ -193,11 +193,11 @@ export const fetchExperiment = createAsyncThunk(
 );
 
 export const fetchExperimentWorkflows = createAsyncThunk(
-    "progressPage/fetch_experiment_workflows",
+    'progressPage/fetch_experiment_workflows',
     async (experimentId: string) => {
-        const requestUrl = `${experimentId}/runs`
-        return experimentApi.get(requestUrl).then(response => response.data)
-})
+        const requestUrl = `${experimentId}/runs`;
+        return experimentApi.get(requestUrl).then(response => response.data);
+});
 
 // Calls for Workflow Actions
 
