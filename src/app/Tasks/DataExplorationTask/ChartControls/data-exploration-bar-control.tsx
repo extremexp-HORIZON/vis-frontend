@@ -138,7 +138,7 @@ const BarChartControlPanel = () => {
             label="Apply Aggregation(s)oook"
             multiple
             value={
-              tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[
+              selectedColumn && tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[
                 selectedColumn
               ] || []
             }

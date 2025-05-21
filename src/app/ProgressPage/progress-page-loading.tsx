@@ -35,7 +35,7 @@ const ProgressPageLoading = () => {
 
   useEffect(() => {
     if (!experiment.loading && experiment.data) {
-            dispatch(fetchExperimentWorkflows({experimentId: experimentId || ''}));
+            dispatch(fetchExperimentWorkflows(experimentId ?? ''));
     }
   }, [experiment]);
 

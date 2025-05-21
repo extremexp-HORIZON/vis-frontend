@@ -64,7 +64,7 @@ export interface IDataExploration {
     //Bar
     barGroupBy: string[]
     barAggregation: Record<string,string[]>
-    selectedMeasureColumn: null
+    selectedMeasureColumn: string | null
 
     //Scatter
     xAxisScatter: VisualColumn
@@ -74,7 +74,7 @@ export interface IDataExploration {
     //Heatmap
     barGroupByHeat: string[]
     barAggregationHeat: Record<string,string[]>
-    selectedMeasureColumnHeat: null
+    selectedMeasureColumnHeat: string | null
 
     //Map
     colorByMap: string

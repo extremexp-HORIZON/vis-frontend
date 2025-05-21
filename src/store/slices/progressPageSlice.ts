@@ -4,7 +4,6 @@ import type { IRun } from '../../shared/models/experiment/run.model';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
 import { experimentApi } from '../../app/api/api';
 import axios from 'axios';
-import { getCache, setCache } from '../../shared/utils/localStorageCache';
 
 interface IUserEvaluationResponse {
   status: string;
@@ -168,18 +167,7 @@ export const progressPageSlice = createSlice({
               metrics: [...metrics],
             };
           
-            state.workflows.data[workflowIndex] = updatedWorkflow;
-          
-            const key = `workflows-${experimentId}`;
-            const cached = getCache<IRun[]>(key);
-            if (cached) {
-              const updatedList = [...cached];
-              const cachedIndex = updatedList.findIndex(w => w.id === runId);
-              if (cachedIndex !== -1) {
-                updatedList[cachedIndex] = updatedWorkflow;
-                setCache(key, updatedList);
-              }
-            }
+            state.workflows.data[workflowIndex] = updatedWorkflow;          
           }
         }
       })
@@ -198,40 +186,18 @@ export const progressPageSlice = createSlice({
 export const fetchExperiment = createAsyncThunk(
   'progressPage/fetch_experiment',
   async (experimentId: string) => {
-    const key = `experiment-${experimentId}`;
-    const cached = getCache<IExperiment>(key);
-    if (cached) return cached;
-
     const requestUrl = `${experimentId}`;
     const res = await experimentApi.get(requestUrl);
-    setCache(key, res.data);
     return res.data;
   }
 );
 
-//remove workflows cache when live data is on or live data fetches are more sparce
 export const fetchExperimentWorkflows = createAsyncThunk(
-  'progressPage/fetch_experiment_workflows',
-  async ({ experimentId, forceRefresh = false }: { experimentId: string; forceRefresh?: boolean }) => {
-    const key = `workflows-${experimentId}`;
-    if (!forceRefresh) {
-      const cached = getCache<IRun[]>(key);
-      if (cached) return cached;
-    }
-
-    const requestUrl = `${experimentId}/runs`;
-    const res = await experimentApi.get(requestUrl);
-    setCache(key, res.data);
-    return res.data;
-  }
-);
-
-// export const fetchExperimentWorkflows = createAsyncThunk(
-//     "progressPage/fetch_experiment_workflows",
-//     async (experimentId: string) => {
-//         const requestUrl = `${experimentId}/runs`
-//         return experimentApi.get(requestUrl).then(response => response.data)
-// })
+    "progressPage/fetch_experiment_workflows",
+    async (experimentId: string) => {
+        const requestUrl = `${experimentId}/runs`
+        return experimentApi.get(requestUrl).then(response => response.data)
+})
 
 // Calls for Workflow Actions
 

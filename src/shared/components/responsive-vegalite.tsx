@@ -10,7 +10,7 @@ interface ResponsiveVegaLiteProps {
   maxWidth?: number
   maxHeight?: number
   aspectRatio?: number // Aspect ratio (width / height)
-  [key: string]: any // Capture all other props
+  [key: string]: unknown // Capture all other props
 }
 
 const ResponsiveVegaLite: React.FC<ResponsiveVegaLiteProps> = ({

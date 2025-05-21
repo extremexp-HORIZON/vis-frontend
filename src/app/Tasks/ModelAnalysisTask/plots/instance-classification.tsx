@@ -5,7 +5,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
-import _ from 'lodash';
+// import _ from 'lodash';
 import { CircularProgress, InputLabel, Switch, useMediaQuery, useTheme } from '@mui/material';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
