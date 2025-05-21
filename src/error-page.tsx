@@ -4,7 +4,7 @@ interface RouteError {
   status?: number;
   statusText?: string;
   message?: string;
-  [key: string]: any; // for any extra unknown props
+  [key: string]: unknown;
 }
 
 export default function ErrorPage() {

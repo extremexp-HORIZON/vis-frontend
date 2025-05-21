@@ -9,13 +9,12 @@ import LeftPanel from './data-exploration-left-panel';
 import LineChart from '../Charts/data-exploration-line-chart';
 import ScatterChart from '../Charts/data-exploration-scatter-chart';
 import  BarChart from '../Charts/data-exploration-bar-chart';
-import { Box, Paper, useMediaQuery } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import TableExpand from '../Charts/data-exploration-data-table';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
-import theme from '../../../../mui-theme';
 import HeatMap from '../Charts/data-exploration-heatmap';
 import MapCardWrapper from '../Charts/map-wrap';
 
@@ -25,7 +24,7 @@ const DataExplorationComponent = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const selectedDataset = useAppSelector(
     state =>
-      state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.source || '',
+      state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset?.source || '',
   );
   const workflowId = useAppSelector(
     state => state.workflowPage?.tab?.workflowId || '',

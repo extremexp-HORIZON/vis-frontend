@@ -3,21 +3,45 @@ import type {
   IDataExplorationResponse
 } from '../dataexploration.model';
 
+interface RawRow {
+  timestamp: string;
+  f3: string;
+  [key: string]: unknown;
+}
+
+interface ParsedRow extends Omit<RawRow, 'timestamp' | 'f3'> {
+  timestamp: Date;
+  value: number;
+  // series: string;
+}
+
+export interface ParsedDataExplorationResponse extends IDataExplorationResponse {
+  parsedData: ParsedRow[];
+}
+
+export interface ConfusionMatrixResult {
+  labels: string[];
+  matrix: number[][];
+}
+
+export type TestInstance = Record<string, string | number | boolean | null>;
+
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
-  data: JSON.parse(payload.data),
+  data: JSON.parse(payload.data as string),
 });
 
-export const handleMultiTimeSeriesData = (payload : any) => {
-  const fileData = JSON.parse(payload.data);
-  const seriesData = payload.fileNames;
-  const flatFileData =  fileData.flatMap((file: any, id:number)=> {
-    return file.map((row: any) => {
+//TODO: fix this whit correct typings to support multiple timeseries
+export const handleMultiTimeSeriesData = (payload : IDataExplorationResponse) => {
+  const fileData: RawRow[][] = JSON.parse(payload.data as string);
+  // const seriesData = payload.fileNames;
+  const flatFileData: ParsedRow[] =  fileData.flatMap((file, id)=> {
+    return file.map( row => {
       return { 
         ...row,
         timestamp: new Date(row.timestamp), // Ensure timestamp is parsed as Date object
         value: +row.f3, // Ensure value is a number
-        series: seriesData[id].replace('.csv', '') // Strip the .csv extension for series name
+        // series: seriesData[id].replace('.csv', '') // Strip the .csv extension for series name
       };
     });
   });
@@ -43,9 +67,9 @@ export interface IModelAnalysis {
     loading: boolean
     error: string | null
   }
-  modelInstances: { data: any | null; loading: boolean; error: string | null }
+  modelInstances: { data: TestInstance[] | null; loading: boolean; error: string | null }
   modelConfusionMatrix: {
-    data: {labels: any, matrix: any} | null
+    data: ConfusionMatrixResult | null
     loading: boolean
     error: string | null
   }
@@ -65,7 +89,7 @@ export interface IModelAnalysis {
     error: string | null
   }
   affected: {
-    data: any | null
+    data: unknown | null
     loading: boolean
     error: string | null
   }

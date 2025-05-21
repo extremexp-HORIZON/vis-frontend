@@ -48,7 +48,7 @@ const LineChart = () => {
     const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis;
     const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis;
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
     const cols = Array.from(new Set([xAxis?.name, ...(yAxis?.length ? yAxis.map((axis: any) => axis.name) : [])]));
     if (!datasetId || !xAxis || !yAxis?.length) return;
@@ -72,7 +72,7 @@ const LineChart = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.xAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.yAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
-    tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     tab?.workflowId,
     dispatch
   ]);
@@ -172,7 +172,7 @@ const LineChart = () => {
       ) : displayMode === 'overlay' ? (
         <ResponsiveCardVegaLite
           spec={getLineChartSpec({
-            data: chartData,
+            data: Array.isArray(chartData) ? chartData : [],
             xAxis: xAxis as VisualColumn,
             yAxis: yAxis as VisualColumn[],
           })}
@@ -190,7 +190,7 @@ const LineChart = () => {
             <ResponsiveCardVegaLite
               key={y.name}
               spec={getSingleLineSpec({
-                data: chartData,
+                data: Array.isArray(chartData) ? chartData : [],
                 xAxis: xAxis as VisualColumn,
                 y,
               })}

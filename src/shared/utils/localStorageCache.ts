@@ -32,7 +32,6 @@ export function getCache<T>(key: string): T | null {
       return null;
     }
   } catch (e) {
-    console.warn(`Invalid localStorage entry for key "${key}":`, e);
     localStorage.removeItem(key); // Clean up corrupted
     return null;
   }

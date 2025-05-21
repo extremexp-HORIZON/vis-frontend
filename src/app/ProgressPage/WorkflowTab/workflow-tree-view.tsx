@@ -1,5 +1,5 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
@@ -10,7 +10,6 @@ import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRound
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
-  setDataTable,
   setSelectedId,
   setSelectedTask,
 } from '../../../store/slices/workflowPageSlice';
@@ -34,56 +33,8 @@ export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage);
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
-  const task = searchParams.get('task');
   const [workflowExpanded, setWorkflowExpanded] = useState(true);
   const [modelExpanded, setModelExpanded] = useState(true);
-
-  useEffect(() => {
-    const dataAssets = !task
-      ? tab?.workflowConfiguration.dataAssets
-      : tab?.workflowConfiguration.dataAssets?.filter(a => a.task === task);
-
-    if (dataAssets && dataAssets.length > 0) {
-      const rows = dataAssets.map((asset, index) => ({
-        id: index + 1,
-        dataset: asset.name,
-        source: asset.source,
-        task: asset.task,
-        role: asset.role,
-        format: asset.format,
-      }));
-      dispatch(setDataTable({ dataRows: rows }));
-    }
-  }, [tab?.workflowConfiguration.dataAssets, task]);
-
-  useEffect(() => {
-    const params = tab?.workflowConfiguration.params;
-    if (params && params.length > 0) {
-      const rows = params.map((param, index) => ({
-        id: index + 1,
-        dataset: param.name,
-        source: param.value,
-        task: param.task,
-        role: 'PARAMETER',
-        format: null,
-      }));
-      dispatch(setDataTable({ parameters: rows }));
-    }
-  }, [tab?.workflowConfiguration.params]);
-  useEffect(() => {
-    const metrics = tab?.workflowMetrics.data;
-    if (metrics && metrics.length > 0) {
-      const rows = metrics.map((metric, index) => ({
-        id: index + 1,
-        dataset: metric.name,
-        source: metric.value,
-        task: metric.task,
-        role: 'METRIC',
-        format: null,
-      }));
-      dispatch(setDataTable({ metrics: rows }));
-    }
-  }, [tab?.workflowMetrics.data]);
 
   function getDatasetIcon(format: string | null | undefined) {
     if (!format || format.trim() === '') return;
@@ -283,9 +234,7 @@ export default function WorkflowTreeView() {
                       dispatch(setSelectedId(`task-${id}`));
                       dispatch(
                         setSelectedTask({
-                          type: 'group',
                           role: 'TASK',
-                          data: datasetsForTask,
                           task: name,
                           taskId: id,
                           variant: taskVariants[name],
@@ -342,7 +291,7 @@ export default function WorkflowTreeView() {
                           dispatch(
                             setSelectedItem({
                               type: 'param',
-                              data: { ...param, variant: taskVariants[name] },
+                              data: { param: param, variant: taskVariants[name] },
                             }),
                           );
                         }}
@@ -379,7 +328,7 @@ export default function WorkflowTreeView() {
                         onClick={() => {
                           dispatch(setSelectedId(`metric-${id}-${index}`));
                           dispatch(
-                            setSelectedItem({ type: 'metric', data: metric }),
+                            setSelectedItem({ type: 'metric', data: {metric: metric} }),
                           );
                         }}
                         sx={{
@@ -466,7 +415,7 @@ export default function WorkflowTreeView() {
                                   dispatch(
                                     setSelectedItem({
                                       type: 'DATASET',
-                                      data: ds,
+                                      data: {dataset: ds},
                                     }),
                                   );
                                 }
@@ -553,7 +502,7 @@ export default function WorkflowTreeView() {
                                   dispatch(
                                     setSelectedItem({
                                       type: 'DATASET',
-                                      data: ds,
+                                      data: {dataset: ds},
                                     }),
                                   );
                                 }
@@ -616,7 +565,7 @@ export default function WorkflowTreeView() {
                             dispatch(
                               setSelectedItem({
                                 type: 'param',
-                                data: param,
+                                data: {param: param},
                               }),
                             );
                           }}
@@ -651,7 +600,7 @@ export default function WorkflowTreeView() {
                           onClick={() => {
                             dispatch(setSelectedId(`null-metric-${index}`));
                             dispatch(
-                              setSelectedItem({ type: 'metric', data: metric }),
+                              setSelectedItem({ type: 'metric', data: {metric: metric} }),
                             );
                           }}
                           sx={{
@@ -738,7 +687,7 @@ export default function WorkflowTreeView() {
                                     dispatch(
                                       setSelectedItem({
                                         type: 'DATASET',
-                                        data: ds,
+                                        data: {dataset: ds},
                                       }),
                                     );
                                   }
@@ -825,7 +774,7 @@ export default function WorkflowTreeView() {
                                     dispatch(
                                       setSelectedItem({
                                         type: 'DATASET',
-                                        data: ds,
+                                        data: {dataset: ds},
                                       }),
                                     );
                                   }

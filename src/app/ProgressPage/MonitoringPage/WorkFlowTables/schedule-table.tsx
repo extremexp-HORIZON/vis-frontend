@@ -438,7 +438,6 @@ export default function ScheduleTable() {
               onFilterChange={handleFilterChange}
               onAddFilter={handleAddFilter}
               onRemoveFilter={handleRemoveFilter}
-              setFilterOpen={setFilterOpen}
             />
           </Box>
         </Popover>

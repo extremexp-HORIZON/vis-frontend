@@ -22,21 +22,22 @@ const TableExpand: React.FC = () => {
     )?.name;
   const columns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || [];
-  const rows = tab?.workflowTasks.dataExploration?.dataTable?.data?.data?.map(
-    (row: any, index: number) => {
-      if (dateTimeColumn !== undefined) {
-        return {
-          id: row[dateTimeColumn] ?? index,
-          ...row,
-        };
-      } else {
-        return {
-          id: index,
-          ...row,
-        };
-      }
-    },
-  );
+  const rows = Array.isArray(tab?.workflowTasks.dataExploration?.dataTable?.data?.data) ?
+    tab?.workflowTasks.dataExploration?.dataTable?.data?.data?.map(
+      (row: any, index: number) => {
+        if (dateTimeColumn !== undefined) {
+          return {
+            id: row[dateTimeColumn] ?? index,
+            ...row,
+          };
+        } else {
+          return {
+            id: index,
+            ...row,
+          };
+        }
+      },
+    ): [];
 
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-scrollbarFiller': {
@@ -99,7 +100,7 @@ const TableExpand: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (
-        !tab?.dataTaskTable.selectedItem?.data?.source ||
+        !tab?.dataTaskTable.selectedItem?.data?.dataset?.source ||
         columns.length === 0
       ) {
         return;
@@ -115,7 +116,7 @@ const TableExpand: React.FC = () => {
         await dispatch(
           fetchDataExplorationData({
             query: {
-              datasetId: tab?.dataTaskTable.selectedItem?.data?.source || '',
+              datasetId: tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '',
               columns: columns.map((col: any) => col.name),
               filters:
                 tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
@@ -142,7 +143,7 @@ const TableExpand: React.FC = () => {
     tab?.workflowTasks.dataExploration?.controlPanel?.pageSize,
     tab?.workflowTasks.dataExploration?.controlPanel?.filters,
     columns,
-    tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     tab?.workflowId,
   ]);
 

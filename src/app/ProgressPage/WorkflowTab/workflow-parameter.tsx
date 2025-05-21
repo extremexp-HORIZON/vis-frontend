@@ -16,13 +16,13 @@ const WorkflowParameter = () => {
     ?.filter(w => w.status !== 'SCHEDULED')
     .filter(w =>
       w.params.find(
-        param => param.name === selectedParam.name && param.value === selectedParam.value
+        param => param.name === selectedParam?.param?.name && param.value === selectedParam?.param?.value
       )
     );
 
   const allParams = workflows?.data
     ?.filter(w => w.status !== 'SCHEDULED')
-    ?.flatMap(w => w.params?.filter(p => p.name === selectedParam.name) ?? []) ?? [];
+    ?.flatMap(w => w.params?.filter(p => p.name === selectedParam?.param?.name) ?? []) ?? [];
 
   const paramValueCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -46,15 +46,15 @@ const WorkflowParameter = () => {
   return (
     <DetailsCard title="Parameter Details">
       <DetailsCardItem
-        label={selectedParam.name}
-        value={selectedParam.value}
+        label={selectedParam?.param?.name ? selectedParam.param.name : ''}
+        value={selectedParam?.param?.value}
       />
       <DetailsCardItem
         label="Used in task"
         value={
           <>
-            {selectedParam.task}
-            { selectedParam.variant && <Chip size="small" color="primary" label={selectedParam?.variant} sx={{ ml: 1 }} />}
+            {selectedParam?.param?.task}
+            { selectedParam?.variant && <Chip size="small" color="primary" label={selectedParam?.variant} sx={{ ml: 1 }} />}
           </>
         }
       />
@@ -78,7 +78,7 @@ const WorkflowParameter = () => {
                   borderRadius: 5,
                   backgroundColor: '#f0f0f0',
                   '& .MuiLinearProgress-bar': {
-                    backgroundColor: value === String(selectedParam.value) ? 'primary' : '#bdbdbd',
+                    backgroundColor: value === String(selectedParam?.param?.value) ? 'primary' : '#bdbdbd',
                   },
                 }}
               />

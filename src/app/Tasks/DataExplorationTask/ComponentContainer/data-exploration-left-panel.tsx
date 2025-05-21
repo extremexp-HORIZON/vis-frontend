@@ -122,6 +122,8 @@ const LeftPanel = () => {
         parsedValue = parseInt(value, 10);
       } else if (columnType === 'double' || columnType === 'float') {
         parsedValue = parseFloat(value);
+      } else {
+        parsedValue = value;
       }
       
       if (operator === '>=') {
@@ -159,7 +161,7 @@ const LeftPanel = () => {
         storeFilter = {
           column,
           type: 'equals',
-          value,
+          value: parsedValue,
         };
       }
     }
@@ -267,7 +269,6 @@ const LeftPanel = () => {
                 onFilterChange={handleFilterChange}
                 onAddFilter={handleAddFilter}
                 onRemoveFilter={handleRemoveFilter}
-                setFilterOpen={setFilterOpen}
               />
           </Popover>
         </Stack>

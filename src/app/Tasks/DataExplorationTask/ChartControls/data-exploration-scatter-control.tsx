@@ -94,7 +94,7 @@ const ScatterChartControlPanel = () => {
       }
     }, [columns, yAxis, xAxis, colorBy]);
 
-    const isDisabled = !tab?.workflowTasks.dataExploration?.scatterChart.data?.data.length;
+    const isDisabled = Array.isArray(tab?.workflowTasks.dataExploration?.scatterChart.data?.data) && !tab?.workflowTasks.dataExploration?.scatterChart.data?.data.length;
 const tooltipTitle = isDisabled ? 'Select columns and color' : '';
   return (
     columns.length > 0 && (

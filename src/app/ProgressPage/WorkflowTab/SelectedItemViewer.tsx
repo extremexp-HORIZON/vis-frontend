@@ -25,7 +25,6 @@ const SelectedItemViewer = () => {
       state.workflowPage.tab?.dataTaskTable ?? {
         selectedItem: null,
         selectedTask: null,
-        selectedDataset: null,
       },
   );
 
@@ -64,7 +63,7 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Header 
-          title={`${selectedItem.data.name} Details`} 
+          title={`${selectedItem?.data?.dataset?.name} Details`} 
           icon={<DatasetIcon color="primary" />} 
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -80,7 +79,7 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
         <Header 
-          title={`${selectedItem.data.name} Details`} 
+          title={`${selectedItem.data?.param?.name} Details`} 
           icon={<Grid3x3Icon color="primary" />} 
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -98,7 +97,7 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
         <Header 
-          title={`${selectedItem.data.name} Details`} 
+          title={`${selectedItem.data?.metric?.name} Details`}
           icon={<BarChartIcon color="primary" />} 
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

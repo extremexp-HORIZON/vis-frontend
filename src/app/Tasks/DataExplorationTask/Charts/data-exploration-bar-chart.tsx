@@ -19,7 +19,7 @@ const BarChart = () => {
     const groupBy = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy;
     const aggregation =
       tab?.workflowTasks.dataExploration?.controlPanel.barAggregation;
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
 
     if (
@@ -47,7 +47,7 @@ const BarChart = () => {
   }, [
     tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy,
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregation,
-    tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
   ]);
 
@@ -62,7 +62,8 @@ const BarChart = () => {
 
   // Transform the data into a suitable format for grouped bar chart
   const transformedData =
-    tab?.workflowTasks.dataExploration?.barChart.data?.data.flatMap(
+    Array.isArray(tab?.workflowTasks.dataExploration?.barChart.data?.data) ? 
+      tab?.workflowTasks.dataExploration?.barChart.data?.data.flatMap(
       (item: { [x: string]: any }) =>
         yAxisColumns?.map(col => ({
           [xAxisColumn as string]: item[xAxisColumn as string],
@@ -75,7 +76,7 @@ const BarChart = () => {
             ]),
           ), // Include all categorical values
         })),
-    );
+      ) : [];
 
     const limitedData = transformedData?.slice(0, 20);
 

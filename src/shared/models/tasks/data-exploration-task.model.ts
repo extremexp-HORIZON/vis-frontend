@@ -63,8 +63,8 @@ export interface IDataExploration {
     yAxis: VisualColumn[]
     //Bar
     barGroupBy: string[]
-    barAggregation: any
-    selectedMeasureColumn: null,
+    barAggregation: Record<string,string[]>
+    selectedMeasureColumn: null
 
     //Scatter
     xAxisScatter: VisualColumn
@@ -73,8 +73,8 @@ export interface IDataExploration {
     umap: boolean
     //Heatmap
     barGroupByHeat: string[]
-    barAggregationHeat: any
-    selectedMeasureColumnHeat: null,
+    barAggregationHeat: Record<string,string[]>
+    selectedMeasureColumnHeat: null
 
     //Map
     colorByMap: string
@@ -92,7 +92,7 @@ export interface IDataExploration {
     error: string | null
   }
   umap: {
-    data: any | null
+    data: number[][] | null
     loading: boolean
     error: string | null
   }

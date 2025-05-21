@@ -122,7 +122,8 @@ export const WorkflowMetricChart = () => {
         {}
       );
 
-      const metrics = groupedMetrics?.[tab?.dataTaskTable.selectedItem?.data?.name] || [];
+      const metrics = tab?.dataTaskTable.selectedItem?.data?.metric?.name ? 
+      groupedMetrics?.[tab?.dataTaskTable.selectedItem?.data?.metric?.name] || [] : [];
   return (
     (metrics?.length ?? 0) > 1 ?
       <Box
@@ -152,7 +153,7 @@ export const MetricCards = () => {
   const roundTo5 = (v: number) => Number(v.toFixed(5));
 
   const filteredWorkflows = workflows?.data?.flatMap(w =>
-    w.metrics?.filter(metric => metric.name === metricData?.name)
+    w.metrics?.filter(metric => metric.name === metricData?.metric?.name)
       .map(metric => ({
         parent: w,
         rawValue: metric.value,
@@ -184,8 +185,8 @@ export const MetricCards = () => {
   };
 
   const renderDiffIcon = () => {
-    if (!metricData?.avgDiff) return null;
-    return metricData.avgDiff > 0 ? (
+    if (!metricData?.metric?.avgDiff) return null;
+    return metricData.metric.avgDiff > 0 ? (
       <ArrowDropUpIcon sx={{ color: green[500], mb: 1 }} />
     ) : (
       <ArrowDropDownIcon sx={{ color: red[500], mb: 1 }} />
@@ -217,13 +218,13 @@ export const MetricCards = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, width: '100%' }}>
       <DetailsCard title="Metric Details">
-        <DetailsCardItem label="Metric" value={metricData?.name} />
-        <DetailsCardItem label="Value" value={metricData?.value?.toFixed(5)} />
-        {metricData?.task && <DetailsCardItem label="Logged in Task" value={metricData.task} />}
+        <DetailsCardItem label="Metric" value={metricData?.metric?.name} />
+        <DetailsCardItem label="Value" value={metricData?.metric?.value?.toFixed(5)} />
+        {metricData?.metric?.task && <DetailsCardItem label="Logged in Task" value={metricData.metric?.task} />}
         <DetailsCardItem
           label="Timestamp"
-          value={typeof metricData?.timestamp === 'number'
-            ? new Date(metricData.timestamp).toLocaleString()
+          value={typeof metricData?.metric?.timestamp === 'number'
+            ? new Date(metricData.metric?.timestamp).toLocaleString()
             : undefined}
         />
       </DetailsCard>
@@ -234,7 +235,7 @@ export const MetricCards = () => {
           value={
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="body1">
-                {metricData?.avgValue?.toFixed(5)} — Difference: {Number.isFinite(metricData?.avgDiff) ? metricData.avgDiff.toFixed(2) : '0.00'}%
+                {metricData?.metric?.avgValue?.toFixed(5)} — Difference: {Number.isFinite(metricData?.metric?.avgDiff) ? metricData?.metric?.avgDiff.toFixed(2) : '0.00'}%
               </Typography>
               {renderDiffIcon()}
             </Box>

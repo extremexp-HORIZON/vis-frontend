@@ -535,7 +535,6 @@ export default function WorkflowTable() {
             onFilterChange={handleFilterChange}
             onAddFilter={handleAddFilter}
             onRemoveFilter={handleRemoveFilter}
-            setFilterOpen={setFilterOpen}
           />
         </Popover>
 

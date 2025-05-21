@@ -40,7 +40,7 @@ const HeatMapControlPanel = () => {
       }),
     );
   };
-
+  console.log(tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat);
   const getAggregationOptions = () => {
     if (!selectedColumn) return [];
     const column =

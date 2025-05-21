@@ -67,7 +67,7 @@ const ColumnsPanel = () => {
       fetchDataExplorationData({
         query: {
           ...defaultDataExplorationQuery,
-          datasetId: tab?.dataTaskTable.selectedItem?.data?.source || "",
+          datasetId: tab?.dataTaskTable.selectedItem?.data?.dataset?.source || "",
           columns: columns.map(col => col.name),
           filters:
             tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],

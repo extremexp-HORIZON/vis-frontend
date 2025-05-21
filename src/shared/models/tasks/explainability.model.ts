@@ -82,7 +82,7 @@ export type FetchExplainabilityPlotPayload = {
   query: ExplainabilityQuery
   metadata: {
     workflowId: string
-    queryCase: any
+    queryCase: string | undefined
     experimentId: string
   }
 }

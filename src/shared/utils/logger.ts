@@ -1,13 +1,23 @@
-const isDev = import.meta.env?.MODE === 'development' || process.env.NODE_ENV === 'development';
+const isDev =
+  import.meta.env?.MODE === 'development' || process.env.NODE_ENV === 'development';
+
+type LogArgs = unknown[]; // Avoids `any` while allowing flexible input
 
 export const logger = {
-  log: (...args: any[]) => {
-    if (isDev) console.log(...args);
+  log: (...args: LogArgs): void => {
+    if (isDev) {
+      // eslint-disable-next-line no-console
+      console.log(...args);
+    }
   },
-  warn: (...args: any[]) => {
-    if (isDev) console.warn(...args);
+  warn: (...args: LogArgs): void => {
+    if (isDev) {
+      // eslint-disable-next-line no-console
+      console.warn(...args);
+    }
   },
-  error: (...args: any[]) => {
+  error: (...args: LogArgs): void => {
+    // eslint-disable-next-line no-console
     console.error(...args);
   },
 };

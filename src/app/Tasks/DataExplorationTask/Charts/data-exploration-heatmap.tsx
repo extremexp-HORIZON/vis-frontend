@@ -20,7 +20,7 @@ const HeatMap = () => {
       tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat;
     const aggregation =
       tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat;
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
 
     if (
@@ -49,7 +49,7 @@ const HeatMap = () => {
   }, [
     tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat,
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat,
-    tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
     dispatch,
     tab?.workflowId,
@@ -67,20 +67,21 @@ const HeatMap = () => {
 
   // Transform the data into a suitable format for grouped bar chart
   const transformedData =
-    tab?.workflowTasks.dataExploration?.heatChart.data?.data.flatMap(
-      (item: { [x: string]: any }) =>
-        yAxisColumns?.map(col => ({
-          [xAxisColumn as string]: item[xAxisColumn as string],
-          type: col, // Each numeric column becomes a type/category
-          value: item[col], // The value for each column
-          ...Object.fromEntries(
-            (categoricalColumns || []).map(catCol => [
-              catCol.name,
-              item[catCol.name],
-            ]),
-          ), // Include all categorical values
-        })),
-    );
+    Array.isArray(tab?.workflowTasks.dataExploration?.heatChart.data?.data) ?
+      tab?.workflowTasks.dataExploration?.heatChart.data?.data.flatMap(
+        (item: { [x: string]: any }) =>
+          yAxisColumns?.map(col => ({
+            [xAxisColumn as string]: item[xAxisColumn as string],
+            type: col, // Each numeric column becomes a type/category
+            value: item[col], // The value for each column
+            ...Object.fromEntries(
+              (categoricalColumns || []).map(catCol => [
+                catCol.name,
+                item[catCol.name],
+              ]),
+            ), // Include all categorical values
+          })),
+        ) : [];
 
     const limitedData = transformedData?.slice(0, 20); // Limit to 500 rows
 

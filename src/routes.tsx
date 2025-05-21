@@ -6,7 +6,7 @@ import MonitoringPage from './app/ProgressPage/MonitoringPage/monitoring-page';
 import WorkflowTab from './app/ProgressPage/WorkflowTab/workflow-tab';
 import ProgressPageLoading from './app/ProgressPage/progress-page-loading';
 import LoginPage from './app/LoginPage/login-page';
-import ProtectedRoute from './protected-route';
+// import ProtectedRoute from './protected-route';
 import TokenAuthHandler from './token-auth-handler';
 
 const routes = createBrowserRouter([

@@ -2,7 +2,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { ActionReducerMapBuilder } from '@reduxjs/toolkit';
 import type { fetchAffectedRequest } from '../../shared/models/dataexploration.model';
 import type { IWorkflowPage } from './workflowPageSlice';
-import type { IModelAnalysis } from '../../shared/models/tasks/model-analysis.model';
 import { api, experimentApi } from '../../app/api/api';
 import type { AxiosError } from 'axios';
 
@@ -85,24 +84,15 @@ export const modelAnalysisReducers = (builder: ActionReducerMapBuilder<IWorkflow
   builder
     .addCase(fetchAffected.pending, (state, action) => {
       const task = getTask(state, action.meta.arg.workflowId);
-      const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
-      if (task && plotType !== 'featureNames') {
-        task[plotType].loading = true;
-      }
+      if (task) task.affected.loading = true;
     })
     .addCase(fetchAffected.fulfilled, (state, action) => {
       const task = getTask(state, action.meta.arg.workflowId);
-      const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
-      if (task && plotType !== 'featureNames') {
-        assignResult(task[plotType], action.payload);
-      }
+      if (task) assignResult(task.affected, action.payload);
     })
     .addCase(fetchAffected.rejected, (state, action) => {
       const task = getTask(state, action.meta.arg.workflowId);
-      const plotType = action.meta.arg.queryCase as keyof IModelAnalysis;
-      if (task && plotType !== 'featureNames') {
-        assignError(task[plotType], 'Failed to fetch data');
-      }
+      if (task) assignError(task.affected, 'Failed to fetch data');
     })
 
     .addCase(fetchConfusionMatrix.pending, (state, action) => {

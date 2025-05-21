@@ -30,7 +30,6 @@ const getColorForValue = (value: number, min: number, max: number): string => {
   return `hsl(${hue}, 100%, 50%)`;
 };
 
-
   const { tab } = useAppSelector(state => state.workflowPage);
   const dispatch = useAppDispatch();
 
@@ -47,7 +46,7 @@ const getColorForValue = (value: number, min: number, max: number): string => {
   // Fetch data
   useEffect(() => {
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
     if (!datasetId || !lat || !lon || !colorByMap || colorByMap === 'None')
       return;
 
@@ -69,7 +68,7 @@ const getColorForValue = (value: number, min: number, max: number): string => {
   }, [
     lat,
     lon,
-    tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     colorByMap,
     filters,
   ]);
@@ -95,7 +94,7 @@ const getColorForValue = (value: number, min: number, max: number): string => {
   }, [lat, lon, colorByMap, data, filters]);
 
   useEffect(() => {
-    if (!data.length || !colorByMap || colorByMap === 'None') return;
+    if (!Array.isArray(data) || !data.length || !colorByMap || colorByMap === 'None') return;
 
     const categories = Array.from(
       new Set(data.map((row: any) => row[colorByMap])),
@@ -128,7 +127,7 @@ const getColorForValue = (value: number, min: number, max: number): string => {
       heatLayerRef.current = null;
     }
 
-    if (useHeatmap) {
+    if (useHeatmap && Array.isArray(data)) {
       const heatData = data
         .map((row: any) => {
           const latVal = parseFloat(row[lat]);
@@ -146,7 +145,7 @@ const getColorForValue = (value: number, min: number, max: number): string => {
         maxZoom: 17,
       });
       heatLayerRef.current.addTo(leafletMapRef.current!);
-    } else {
+    } else if (Array.isArray(data)) {
       // Marker rendering as before
       data.forEach((row: any) => {
         const latVal = parseFloat(row[lat]);
@@ -184,7 +183,7 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
     // Remove existing legend if it exists
     const existingLegend = document.querySelector('.leaflet-legend');
     if (existingLegend) existingLegend.remove();
-    if (!useHeatmap && data.length > 0) {
+    if (!useHeatmap && Array.isArray(data) && data.length > 0) {
   const legend = L.control({ position: 'topright' });
   const isNumeric = isNumericField(data.map((r: any) => r[colorByMap || '']));
 
@@ -228,7 +227,7 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
   legend.addTo(leafletMapRef.current!);
 }
     // Optionally pan to average center
-    if (data.length) {
+    if (Array.isArray(data) && data.length) {
       const avgLat =
         data.reduce(
           (sum: number, r: { [x: string]: string }) => sum + parseFloat(r[lat]),

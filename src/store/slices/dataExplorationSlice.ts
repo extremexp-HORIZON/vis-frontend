@@ -17,7 +17,7 @@ import { handleMultiTimeSeriesData, prepareDataExplorationResponse } from '../..
 import { api } from '../../app/api/api';
 
 // Only keys that contain { data, loading, error }
-type AsyncQueryKey = Exclude<keyof IDataExploration, 'controlPanel'>;
+type AsyncQueryKey = Exclude<keyof IDataExploration, 'controlPanel' | 'umap'>;
 
 function getAsyncState<T extends AsyncQueryKey>(task: IDataExploration, key: T) {
   return task[key];

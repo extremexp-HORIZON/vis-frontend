@@ -28,7 +28,7 @@ const Uchart = () => {
           data: umapPayload.slice(0, 2000), // Limit to first 1000 rows
           metadata: {
             workflowId: tab?.workflowId,
-            queryCase: 'umap',
+            query: 'umap',
           },
         }),
       );

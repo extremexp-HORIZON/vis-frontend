@@ -165,7 +165,7 @@ const ScatterChart = () => {
 
   useEffect(() => {
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.source || '';
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
     const cols = Array.from(
       new Set([
@@ -195,7 +195,7 @@ const ScatterChart = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.xAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.yAxis,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
-    tab?.dataTaskTable.selectedItem?.data?.source,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.colorBy,
   ]);
 
@@ -231,7 +231,7 @@ const ScatterChart = () => {
       ) : displayMode === 'overlay' ? (
         <ResponsiveCardVegaLite
           spec={getScatterChartOverlaySpec({
-            data: chartData,
+            data: Array.isArray(chartData) ? chartData : [],
             xAxis: xAxis as VisualColumn,
             yAxis: yAxis as VisualColumn[],
             colorBy: colorBy as VisualColumn,
@@ -253,7 +253,7 @@ const ScatterChart = () => {
             <Grid item xs={12} key={y.name}>
               <ResponsiveCardVegaLite
                 spec={getSingleScatterSpec({
-                  data: chartData,
+                  data: Array.isArray(chartData) ? chartData : [],
                   xAxis: xAxis as VisualColumn,
                   y,
                   colorBy: colorBy as VisualColumn,

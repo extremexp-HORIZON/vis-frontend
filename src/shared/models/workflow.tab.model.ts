@@ -7,6 +7,27 @@ import type { IExplainability } from './tasks/explainability.model';
 import type { IModelAnalysis } from './tasks/model-analysis.model';
 import type { IUserInteraction } from './tasks/user-interaction.model';
 
+type SelectedItem = {
+  type: string;
+  data: {
+    param?: IParam;
+    dataset?: IDataAsset;
+    metric?: {
+        name: string;
+        value: number;
+        avgDiff: number;
+        avgValue: number;
+        maxValue: number;
+        minValue: number;
+        task?: string;
+        step?: number;
+        timestamp: number;
+    }
+    variant?: string;
+    model?: string;
+  }
+} | null;
+
 export interface IWorkflowPageModel {
     workflowId: string;
     workflowName: string;
@@ -36,11 +57,8 @@ export interface IWorkflowPageModel {
         userInteraction?: IUserInteraction | null;
     }
     dataTaskTable: {
-        dataRows: { [key: string]: any }[]
-        parameters: { [key: string]: any }[]
-        metrics: { [key: string]: any }[]
-        selectedItem: { [key: string]: any } | null
-        selectedTask:  { [key: string]: any } | null
+        selectedItem: SelectedItem
+        selectedTask:  {role: string; task: string; taskId: string; variant: string; } | null
         selectedId: string | null
     }
 }
@@ -74,9 +92,6 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
         userInteraction: null
     },
     dataTaskTable: {
-        dataRows: [],
-        parameters: [],
-        metrics: [],
         selectedItem: null, 
         selectedTask: null, 
         selectedId: null

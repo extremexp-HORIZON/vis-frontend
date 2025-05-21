@@ -54,15 +54,18 @@ interface FilterBarProps {
   ) => void
   onAddFilter: () => void
   onRemoveFilter: (index: number) => void
-  setFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-enum FilterStep {
-  IDLE = 'idle',
-  COLUMN = 'column',
-  OPERATOR = 'operator',
-  VALUE = 'value'
-}
+export type FilterStep = 'idle' | 'column' | 'operator' | 'value';
+
+export const FilterStep = {
+  IDLE: 'idle',
+  COLUMN: 'column',
+  OPERATOR: 'operator',
+  VALUE: 'value',
+} as const;
+
+type Suggestion = { id?: string; value?: string; label: string };
 
 export default function FilterBar({
   columns,
@@ -70,13 +73,12 @@ export default function FilterBar({
   onFilterChange,
   onAddFilter,
   onRemoveFilter,
-  setFilterOpen,
 }: FilterBarProps) {
   const [inputValue, setInputValue] = useState('');
   const [currentStep, setCurrentStep] = useState<FilterStep>(FilterStep.IDLE);
   const [tempColumn, setTempColumn] = useState<string>('');
   const [tempOperator, setTempOperator] = useState<string>('');
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [showAvailableColumns, setShowAvailableColumns] = useState<boolean>(true);
   const [showAvailableOperators, setShowAvailableOperators] = useState<boolean>(false);
@@ -84,7 +86,7 @@ export default function FilterBar({
   const [showAllColumns, setShowAllColumns] = useState<boolean>(false);
   const selectedItemRef = useRef<HTMLDivElement | null>(null);
   const suggestionsContainerRef = useRef<HTMLDivElement | null>(null);
-  const prevSuggestions = useRef<any[]>([]);
+  const prevSuggestions = useRef<Suggestion[]>([]);
   const prevStep = useRef<FilterStep>(FilterStep.IDLE);
   const [availableOperators, setAvailableOperators] = useState<typeof stringOperators | typeof numberOperators>(stringOperators);
 
@@ -143,9 +145,9 @@ export default function FilterBar({
           suggestions.length > 0) {
         const selectedItem = suggestions[selectedSuggestionIndex];
         if (currentStep === FilterStep.COLUMN) {
-          selectColumn(selectedItem.value);
+          selectedItem.value && selectColumn(selectedItem.value);
         } else {
-          selectOperator(selectedItem.id);
+          selectedItem.id && selectOperator(selectedItem.id);
         }
       } else if (currentStep === FilterStep.VALUE && inputValue) {
         addFilter(inputValue);
@@ -212,7 +214,6 @@ export default function FilterBar({
     // Set available operators based on column type
     const selectedColumn = columns.find(col => col.field === columnValue);
     const columnType = selectedColumn?.originalType;
-    console.log(columnType);
     if (columnType === 'INTEGER' || columnType === 'DOUBLE') {
       setAvailableOperators(numberOperators);
     } else if (columnType === 'BOOLEAN') {
@@ -455,9 +456,9 @@ export default function FilterBar({
                   }}
                   onClick={() => {
                     if (currentStep === FilterStep.COLUMN) {
-                      selectColumn(item.value);
+                      item.value && selectColumn(item.value);
                     } else if (currentStep === FilterStep.OPERATOR) {
-                      selectOperator(item.id);
+                      item.id && selectOperator(item.id);
                     }
                   }}
                 >

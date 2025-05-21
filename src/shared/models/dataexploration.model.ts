@@ -16,7 +16,7 @@ export interface IDataExplorationRequest {
   query: IDataExplorationQuery
   metadata: {
     workflowId: string
-    queryCase: any
+    queryCase: string
   }
 }
 
@@ -28,13 +28,13 @@ export interface IMetaDataRequest {
   query: IMetaDataQuery
   metadata: {
     workflowId: string
-    queryCase: any
+    queryCase: string
   }
 }
 
 export interface fetchAffectedRequest{
     workflowId: string
-    queryCase: any
+    queryCase: string
 }
 
 export interface VisualColumn {
@@ -44,7 +44,7 @@ export interface VisualColumn {
 
 // Model for TabularResults
 export interface IDataExplorationResponse {
-  data: any
+  data: unknown
   totalItems: number
   querySize: number
   columns: VisualColumn[]
@@ -55,7 +55,7 @@ export interface IDataExplorationMetaDataResponse {
   fileNames: string[]
   originalColumns: VisualColumn[]
   totalItems: number
-  uniqueColumnValues: any
+  uniqueColumnValues: Record<string, unknown[]>
   hasLatLonColumns:boolean
   timeColumn?: string[]
 }
@@ -64,7 +64,7 @@ export interface IFilter {
   column: string;
   type: string;
   operator: string;
-  value?: number | string | any; 
+  value: number | string;
 }
 
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
