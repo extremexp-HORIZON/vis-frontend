@@ -45,6 +45,11 @@ const InstanceView = () => {
   const [point, setPoint] = useState<{ id: number; data: any } | null>(null);
   const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
 
+  useEffect(() => {
+    if(chartType !== 'datatable' && chartType !== 'scatter')
+      dispatch(setControls({ chartType: 'datatable' }))
+  },[])
+
   const baseColumns = Object.keys(rows[0] || {}).map(key => ({
     field: key,
     headerName: key,
