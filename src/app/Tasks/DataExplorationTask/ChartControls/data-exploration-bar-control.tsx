@@ -158,7 +158,7 @@ const BarChartControlPanel = () => {
                 }),
               );
             }}
-            renderValue={(selected: any) => selected.join(', ')}
+            renderValue={(selected: string[]) => selected.join(', ')}
           >
             {aggregationOptions.map(rule => (
               <MenuItem key={rule} value={rule}>

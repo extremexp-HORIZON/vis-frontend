@@ -1,6 +1,5 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
 import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
@@ -32,7 +31,6 @@ import InsightsIcon from '@mui/icons-material/Insights';
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage);
   const dispatch = useAppDispatch();
-  const [searchParams] = useSearchParams();
   const [workflowExpanded, setWorkflowExpanded] = useState(true);
   const [modelExpanded, setModelExpanded] = useState(true);
 

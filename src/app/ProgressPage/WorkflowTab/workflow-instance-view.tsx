@@ -198,16 +198,6 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
     ? rows.filter((row: any) => row.actual !== row.predicted)
     : rows;
 
-  const rowHeight = 52; // Estimated row height
-  const maxTableHeight = 500; // Set a max height to avoid it growing indefinitely
-  const calculatedHeight = Math.min(
-    visibleRows.length * rowHeight + 210,
-    maxTableHeight,
-  ); // Add space for headers and footer
-
-  // Common chart height to use for both chart types
-  const chartHeight = calculatedHeight;
-
   const hashRow = (row: any): string => {
   const stringified = JSON.stringify(row, Object.keys(row).sort());
   let hash = 0;

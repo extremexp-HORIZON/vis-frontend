@@ -144,7 +144,7 @@ export const progressPageSlice = createSlice({
         state.workflowEvaluation.error = null;
       
         if (action.payload?.status === 'success') {
-          const { experimentId, runId, data } = action.meta.arg;
+          const { runId, data } = action.meta.arg;
           if (data.rating === null) return;
           const workflowIndex = state.workflows.data.findIndex(w => w.id === runId);
         

@@ -66,22 +66,24 @@ const HeatMap = () => {
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
-  const transformedData =
-    Array.isArray(tab?.workflowTasks.dataExploration?.heatChart.data?.data) ?
-      tab?.workflowTasks.dataExploration?.heatChart.data?.data.flatMap(
-        (item: { [x: string]: any }) =>
-          yAxisColumns?.map(col => ({
+const transformedData =
+  Array.isArray(tab?.workflowTasks.dataExploration?.heatChart.data?.data) &&
+  Array.isArray(yAxisColumns)
+    ? tab.workflowTasks.dataExploration.heatChart.data.data.flatMap(
+        (item: { [x: string]: unknown }) =>
+          yAxisColumns.map(col => ({
             [xAxisColumn as string]: item[xAxisColumn as string],
-            type: col, // Each numeric column becomes a type/category
-            value: item[col], // The value for each column
+            type: col,
+            value: item[col],
             ...Object.fromEntries(
               (categoricalColumns || []).map(catCol => [
                 catCol.name,
                 item[catCol.name],
-              ]),
-            ), // Include all categorical values
-          })),
-        ) : [];
+              ])
+            ),
+          }))
+      )
+    : [];
 
     const limitedData = transformedData?.slice(0, 20); // Limit to 500 rows
 
@@ -182,7 +184,16 @@ const HeatMap = () => {
     };
   }
 
-  const info = (
+  const hasData = limitedData.length > 0;
+
+  const info = !hasData ? (
+    <InfoMessage
+      message="No data available for the selected configuration."
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
+  ) : (
     <InfoMessage
       message="Please select both Group By and Aggregation to display the chart."
       type="info"
@@ -190,15 +201,16 @@ const HeatMap = () => {
       fullHeight
     />
   );
+
   const hasValidAggregation = Object.values(
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {},
-  ).some((val: any) => Array.isArray(val) && val.length > 0);
+  ).some((val) => Array.isArray(val) && val.length > 0);
 
   const hasGroupBy =
     (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [])
       .length > 0;
 
-  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation;
+  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData;
   return (
     <Box sx={{ height: '99%' }}>
       <ResponsiveCardVegaLite
@@ -210,7 +222,7 @@ const HeatMap = () => {
         controlPanel={<HeatMapControlPanel />}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
-        loading={tab?.workflowTasks.dataExploration?.heatChart?.loading}
+        loading={tab?.workflowTasks.dataExploration?.heatChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
       />
     </Box>
   );

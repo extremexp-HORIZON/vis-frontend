@@ -11,6 +11,8 @@ import type { VisualColumn } from '../../../../shared/models/dataexploration.mod
 import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 
+type ScatterChartDataRow = Record<string, number | string | Date | null>;
+
 const getColumnType = (columnType: string, fieldName?: string) => {
   if (fieldName?.toLowerCase() === 'timestamp') return 'temporal';
   switch (columnType) {
@@ -28,13 +30,13 @@ const getColumnType = (columnType: string, fieldName?: string) => {
 
 const MAX_UNIQUE_VALUES = 50;
 
-const getUniqueValueCount = (data: any[], field: string): number => {
+const getUniqueValueCount = (data: ScatterChartDataRow[], field: string): number => {
   const values = new Set();
   data.forEach(row => values.add(row[field]));
   return values.size;
 };
 
-const isTooManyUniqueValues = (field: VisualColumn | undefined, data: any[]) =>
+const isTooManyUniqueValues = (field: VisualColumn | undefined, data: ScatterChartDataRow[]) =>
   field?.type === 'STRING' && getUniqueValueCount(data, field.name) > MAX_UNIQUE_VALUES;
 
 const getScatterChartOverlaySpec = ({
@@ -43,7 +45,7 @@ const getScatterChartOverlaySpec = ({
   yAxis,
   colorBy,
 }: {
-  data: any[]
+  data: ScatterChartDataRow[]
   xAxis: VisualColumn
   yAxis: VisualColumn[]
   colorBy?: VisualColumn
@@ -107,7 +109,7 @@ const getSingleScatterSpec = ({
   y,
   colorBy,
 }: {
-  data: any[]
+  data: ScatterChartDataRow[]
   xAxis: VisualColumn
   y: VisualColumn
   colorBy?: VisualColumn
@@ -156,7 +158,7 @@ const ScatterChart = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
 
-  const chartData = tab?.workflowTasks.dataExploration?.scatterChart?.data?.data || [];
+  const chartData = (tab?.workflowTasks.dataExploration?.lineChart?.data?.data as ScatterChartDataRow[]) ?? [];
   const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis;
   const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis;
   const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy;
@@ -167,13 +169,15 @@ const ScatterChart = () => {
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
-    const cols = Array.from(
-      new Set([
-        colorBy?.name,
-        xAxis?.name,
-        ...(yAxis?.length ? yAxis.map((axis: any) => axis.name) : []),
-      ])
-    ).filter(Boolean);
+const cols = Array.from(
+  new Set(
+    [
+      colorBy?.name,
+      xAxis?.name,
+      ...(yAxis?.map((axis: VisualColumn) => axis.name) || [])
+    ].filter((name): name is string => typeof name === 'string' && name.trim() !== '')
+  )
+);
 
     if (!datasetId || !xAxis || !yAxis?.length) return;
 
@@ -199,19 +203,29 @@ const ScatterChart = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.colorBy,
   ]);
 
+  const hasData = Array.isArray(chartData) && chartData.length > 0;
+
+  const hasValidXAxis = xAxis && xAxis.name;
+  const hasValidYAxis = Array.isArray(yAxis) && yAxis.length > 0;
+  const hasValidColorBy = colorBy && colorBy.name;
+
+  let infoMessageText = '';
+  if (!hasValidXAxis || !hasValidYAxis || !hasValidColorBy) {
+    infoMessageText = 'Please select x-Axis, y-Axis and color fields to display the chart.';
+  } else if (!hasData) {
+    infoMessageText = 'No data available for the selected configuration.';
+  }
+
   const info = (
     <InfoMessage
-      message="Please select x-Axis, y-Axis and color fields to display the chart."
+      message={infoMessageText}
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
   );
 
-  const hasValidXAxis = xAxis && xAxis.name;
-  const hasValidYAxis = Array.isArray(yAxis) && yAxis.length > 0;
-  const hasValidColorBy = colorBy && colorBy.name;
-  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hasValidColorBy;
+  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hasValidColorBy || !hasData;
 
   return (
     <Box sx={{ height: '99%' }}>
@@ -244,7 +258,7 @@ const ScatterChart = () => {
           showInfoMessage={false}
           maxHeight={500}
           aspectRatio={isSmallScreen ? 2.8 : 1.8}
-          loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading}
+          loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
           minHeight={300}
         />
       ) : (
@@ -261,7 +275,7 @@ const ScatterChart = () => {
                 title={y.name}  
                 actions={false}
                 controlPanel={<ScatterChartControlPanel />}
-                loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading}
+                loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
                 isStatic={false}
               />
             </Grid>

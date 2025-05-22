@@ -8,6 +8,7 @@ import TableChartIcon from '@mui/icons-material/TableChartSharp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
 
 const ChartButtonGroup: React.FC= () => {
 
@@ -15,7 +16,7 @@ const ChartButtonGroup: React.FC= () => {
   const {tab}= useAppSelector(state => state.workflowPage);
   const chartType= tab?.workflowTasks.dataExploration?.controlPanel.chartType;
   const columns= tab?.workflowTasks?.dataExploration?.metaData?.data?.originalColumns;
-  const stringColumnsCount = columns?.filter((col: any) => col?.type === 'String').length || 0;
+  const stringColumnsCount = columns?.filter((col: VisualColumn) => col?.type === 'String').length || 0;
   const disableHeatmap = stringColumnsCount < 2;
 
   return (

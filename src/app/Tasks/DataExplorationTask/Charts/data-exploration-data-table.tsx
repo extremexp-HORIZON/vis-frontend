@@ -1,6 +1,5 @@
 import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
-import type { GridFilterModel } from '@mui/x-data-grid';
+import { useRef, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, styled } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
@@ -10,9 +9,13 @@ import { fetchDataExplorationData } from '../../../../store/slices/dataExplorati
 import PaginationComponent from '../ChartControls/data-exploration-pagination-control';
 import { setCurrentPage } from '../../../../store/slices/workflowPageSlice';
 import Loader from '../../../../shared/components/loader';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import { logger } from '../../../../shared/utils/logger';
+import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
+import type { GridColDef, GridValidRowModel } from '@mui/x-data-grid';
 
 const TableExpand: React.FC = () => {
-  const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
   const tableRef = useRef<HTMLDivElement>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -23,8 +26,10 @@ const TableExpand: React.FC = () => {
   const columns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || [];
   const rows = Array.isArray(tab?.workflowTasks.dataExploration?.dataTable?.data?.data) ?
-    tab?.workflowTasks.dataExploration?.dataTable?.data?.data?.map(
-      (row: any, index: number) => {
+    tab?.workflowTasks.dataExploration?.dataTable?.data?.data
+    ?.filter((row): row is Record<string, unknown> => typeof row === 'object' && row !== null)
+    .map(
+      (row, index) => {
         if (dateTimeColumn !== undefined) {
           return {
             id: row[dateTimeColumn] ?? index,
@@ -117,7 +122,7 @@ const TableExpand: React.FC = () => {
           fetchDataExplorationData({
             query: {
               datasetId: tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '',
-              columns: columns.map((col: any) => col.name),
+              columns: columns.map((col: VisualColumn) => col.name),
               filters:
                 tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
               limit: pageSize,
@@ -130,9 +135,7 @@ const TableExpand: React.FC = () => {
           }),
         ).unwrap();
       } catch (error) {
-        console.error('Failed to fetch data:', error);
-      } finally {
-        setLoading(false);
+        logger.log('Failed to fetch data:', error);
       }
     };
 
@@ -154,7 +157,7 @@ const TableExpand: React.FC = () => {
     const headers = selectedColumns.map(col => col.name);
     const csvContent = [
       headers.join(','),
-      ...rows.map((row: any) =>
+      ...rows.map((row: Record<string, unknown>) =>
         headers
           .map(header => {
             const value = row[header];
@@ -187,10 +190,17 @@ const TableExpand: React.FC = () => {
     rows.length > 0 &&
     Array.isArray(selectedColumns) &&
     selectedColumns.length > 0;
-
-  if (tab?.workflowTasks.dataExploration?.dataTable?.loading) {
-   <Loader/>;
-  }
+  
+    const gridColumns: GridColDef<GridValidRowModel>[] = selectedColumns.map((col) => ({
+      field: col.name,
+      headerName: col.name,
+      width: 155,
+      headerAlign: 'center',
+      align: 'center',
+      type: col.type as GridColDef['type'],
+      flex: 1,
+      minWidth: 120,
+    }));
 
   return (
     <Box sx={{ height: '99%' }}>
@@ -224,22 +234,12 @@ const TableExpand: React.FC = () => {
               }}
               ref={tableRef}
             >
-              {!tab?.workflowTasks.dataExploration?.dataTable.loading?(
-              
+              { !tab?.workflowTasks.dataExploration?.dataTable.loading 
+              && !tab?.workflowTasks.dataExploration?.metaData?.loading
+              ? (
               <StyledDataGrid
                 rows={rows || []}
-                columns={selectedColumns.map((col: any) => ({
-                  field: typeof col === 'string' ? col : col.name,
-                  headerName: typeof col === 'string' ? col : col.name,
-                  width: 155,
-                  headerAlign: 'center',
-                  align: 'center',
-                  type:
-                    typeof col === 'string' ? 'string' : col.type || 'string',
-                  flex: 1, // Add flex to make columns expand to fill space
-                  minWidth: 120, // Ensure minimum width for readability
-                }))}
-                filterModel={filterModel}
+                columns={gridColumns}
                 disableColumnMenu
                 hideFooter
                 disableColumnSelector
@@ -281,7 +281,18 @@ const TableExpand: React.FC = () => {
               </Box>
             </Box>
           ) : (
-            <Loader/>
+            !tab?.workflowTasks.dataExploration?.dataTable.loading &&
+            !tab?.workflowTasks.dataExploration?.metaData?.loading
+            ? (
+            <InfoMessage
+              message="No data available for the selected configuration."
+              type="info"
+              icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+              fullHeight
+            />
+            ) : (
+              <Loader />
+            )
           )}
         </Box>
       </ResponsiveCardTable>
