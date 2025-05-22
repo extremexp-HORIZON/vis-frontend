@@ -17,7 +17,7 @@ const LeftPanel = () => {
   // Get columns from the Redux store
   const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || [];
   // Format columns for FilterBar
-  const formattedColumns = originalColumns.map((col: any) => ({
+  const formattedColumns = originalColumns.map((col) => ({
     field: col.name,
     headerName: col.name,
     originalType: col.type,
@@ -108,11 +108,11 @@ const LeftPanel = () => {
   ) => {
     
     // Find the column type from originalColumns
-    const columnInfo = originalColumns.find((col: any) => col.name === column);
+    const columnInfo = originalColumns.find((col) => col.name === column);
     const columnType = columnInfo?.type?.toLowerCase();
     
     // Convert to the format used in the store
-    let storeFilter: any;
+    let storeFilter: IFilter | undefined;
     if (['>', '<', '>=', '<=', '='].includes(operator)) {
       // Handle numeric type filters
       let parsedValue: number | string = value;
@@ -161,6 +161,7 @@ const LeftPanel = () => {
         storeFilter = {
           column,
           type: 'equals',
+          operator: '=',
           value: parsedValue,
         };
       }
@@ -191,6 +192,7 @@ const LeftPanel = () => {
         };
       }
     }
+    if(!storeFilter) return;
     const allFilters = [...activeFilters];
     if (index < allFilters.length) {
       allFilters[index] = storeFilter;

@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import type{ SelectChangeEvent } from '@mui/material';
 
 const LineChartControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -47,8 +48,8 @@ const LineChartControlPanel = () => {
     }
   };
 
-  const handleYAxisChange = (event: { target: { value: any } }) => {
-    const selectedNames = event.target.value;
+  const handleYAxisChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedNames = event.target.value as string[];
     const selectedCols = selectedNames
       .map((name: string) => columns.find(col => col.name === name))
       .filter(Boolean);

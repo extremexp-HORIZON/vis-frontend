@@ -8,6 +8,8 @@ import type { RootState} from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchUmap } from '../../../../store/slices/dataExplorationSlice';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
+import type { Item, ScenegraphEvent, View } from 'vega';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -16,7 +18,11 @@ interface ControlPanelProps {
   setYAxisOption: (val: string) => void
   showMisclassifiedOnly: boolean
   options: string[]
-  plotData: any
+  plotData: {
+      data: TestInstance[] | null
+      loading: boolean
+      error: string | null
+    } | null
   useUmap: boolean
   setUseUmap: Dispatch<SetStateAction<boolean>>
 }
@@ -115,11 +121,10 @@ const ControlPanel = ({
   );
 };
 interface Umapi {
-  
-  point: any
+  point: { id: string; data: TestInstance } | null
   showMisclassifiedOnly: boolean
-  setPoint: Dispatch<SetStateAction<any>>
-  hashRow: (row: any) => string
+  setPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
+  hashRow: (row: TestInstance) => string
   useUmap: boolean
   setuseUmap: Dispatch<SetStateAction<boolean>>
 }
@@ -152,8 +157,8 @@ const InstanceClassificationUmap = (props: Umapi) => {
         );
       }
     }, [raw, dispatch]);
-  const getVegaData = (data: any[]) => {
-    return data.map((originalRow: any) => {
+  const getVegaData = (data: TestInstance[]) => {
+    return data.map((originalRow: TestInstance) => {
       const id = hashRow(originalRow);
       const isMisclassified = originalRow.actual !== originalRow.predicted;
       return {
@@ -178,8 +183,8 @@ const combinedPlotData = umapResult.map((point: number[], index: number) => {
   };
 });
 
-const handleNewView = (view: any) => {
-  view.addEventListener('click', (event: any, item: any) => {
+const handleNewView = (view: View) => {
+  view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
     if (item && item.datum?.isMisclassified) {
       const clickedIndex = item.datum.index;
       const originalRow = parsedData[clickedIndex]; // This is the row you want

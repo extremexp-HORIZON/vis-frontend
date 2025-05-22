@@ -23,8 +23,10 @@ import InfoMessage from '../../../shared/components/InfoMessage';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import Loader from '../../../shared/components/loader';
 import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded';
-import InstanceClassificationUmap from '../../Tasks/ModelAnalysisTask/plots/instance-classification-umap';
 import { getLabelTestInstances } from '../../../store/slices/modelAnalysisSlice';
+import type { GridColDef } from '@mui/x-data-grid';
+import type { TestInstance } from '../../../shared/models/tasks/model-analysis.model';
+import type { GridRenderCellParams } from '@mui/x-data-grid';
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(
@@ -42,24 +44,25 @@ const InstanceView = () => {
   const hasContent = true;
   const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(false);
 
-  const [point, setPoint] = useState<{ id: number; data: any } | null>(null);
-  const rows = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
+  const [point, setPoint] = useState<{ id: string; data: TestInstance } | null>(null);
+  const rows: TestInstance[] = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
 
   useEffect(() => {
     if(chartType !== 'datatable' && chartType !== 'scatter')
-      dispatch(setControls({ chartType: 'datatable' }))
-  },[])
+      dispatch(setControls({ chartType: 'datatable' }));
+  },[]);
 
-  const baseColumns = Object.keys(rows[0] || {}).map(key => ({
+  const baseColumns: GridColDef[] = Object.keys(rows[0] || {}).map(key => ({
     field: key,
     headerName: key,
+    type: typeof rows[0]?.[key] === 'number' ? 'number' : 'string',
     flex: 1,
     minWidth: 150,
     maxWidth: 300,
     headerAlign: 'center',
     align: 'center',
 
-    renderCell: (params: any) => {
+    renderCell: (params: GridRenderCellParams) => {
       const value = params.value;
       if (key === 'predicted') {
         return (
@@ -79,7 +82,7 @@ const InstanceView = () => {
     },
   }));
   
-const actionColumn = {
+const actionColumn: GridColDef = {
   field: 'action',
   headerName: 'actions',
   headerAlign: 'center',
@@ -88,7 +91,7 @@ const actionColumn = {
   filterable: false,
   headerClassName: 'datagrid-header-fixed',
   minWidth: 100,
-  renderCell: (params: any) => (
+  renderCell: (params: GridRenderCellParams) => (
     <Box
       onClick={(e) => e.stopPropagation()}
       display="flex"
@@ -110,7 +113,7 @@ const actionColumn = {
     </Box>
   ),
 };
-const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
+const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
   
   const handleExportCsv = () => {
     return;
@@ -199,11 +202,7 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
     }
   }, [isTabInitialized]);
 
-  const visibleRows = showMisclassifiedOnly
-    ? rows.filter((row: any) => row.actual !== row.predicted)
-    : rows;
-
-  const hashRow = (row: any): string => {
+  const hashRow = (row: TestInstance): string => {
   const stringified = JSON.stringify(row, Object.keys(row).sort());
   let hash = 0;
   for (let i = 0; i < stringified.length; i++) {
@@ -313,9 +312,9 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                   <StyledDataGrid
                     disableVirtualization={showMisclassifiedOnly}
                     rows={(showMisclassifiedOnly
-                      ? rows.filter((row: any) => row.actual !== row.predicted)
+                      ? rows.filter((row) => row.actual !== row.predicted)
                       : rows
-                    ).map((row: any) => ({ id: hashRow(row), ...row }))}
+                    ).map((row) => ({ id: hashRow(row), ...row }))}
                     columns={columns}
                     pagination
                     pageSizeOptions={[25, 50, 100]}
@@ -327,7 +326,6 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
                         },
                       },
                     }}
-                    selectionModel={point ? [point.id] : []}
                     rowSelectionModel={point ? [point.id] : []}
                     checkboxSelection={false}
                     disableRowSelectionOnClick={false}
@@ -369,19 +367,12 @@ const columns = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseCol
             </Box>
           </ResponsiveCardTable>
         </Box>
-      )}
-      {chartType === 'umap' && (
-        <Box sx={{ height: '60%', minHeight: 400 }}>
-          <InstanceClassificationUmap  point={point} showMisclassifiedOnly={showMisclassifiedOnly} setPoint={setPoint} hashRow={hashRow}/>
-        </Box>
-      )}
-      
+      )}      
       {point && workflow ? (
         <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
            <CounterfactualsTable
              key={'counterfactuals-table'}
              point={point.data}
-             handleClose={() => {}}
              counterfactuals={workflow || null}
              onClose={() => setPoint(null)}
              experimentId={experimentId || 'I2Cat_phising'}

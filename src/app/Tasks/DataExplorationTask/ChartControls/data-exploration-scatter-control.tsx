@@ -18,6 +18,7 @@ import { setControls } from '../../../../store/slices/workflowPageSlice';
 import PaletteIcon from '@mui/icons-material/Palette';
 
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import type{ SelectChangeEvent } from '@mui/material';
 
 const ScatterChartControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -52,15 +53,15 @@ const ScatterChartControlPanel = () => {
     }
   };
 
-  const handleYAxisChange = (event: { target: { value: any } }) => {
-    const selectedNames = event.target.value;
+  const handleYAxisChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedNames = event.target.value as string[];
     const selectedCols = selectedNames
       .map((name: string) => columns.find(col => col.name === name))
       .filter(Boolean);
     dispatch(setControls({ yAxis: selectedCols }));
   };
-  const handleColorByChange = (event: { target: { value: any } }) => {
-    const selected = columns.find(col => col.name === event.target.value);
+  const handleColorByChange = (event: SelectChangeEvent<string>) => {
+    const selected = columns.find(col => col.name === event.target.value as string);
     if (selected) {
       dispatch(setControls({ colorBy: selected }));
     }

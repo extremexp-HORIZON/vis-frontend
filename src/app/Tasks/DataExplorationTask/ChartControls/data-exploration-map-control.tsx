@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import type{ SelectChangeEvent } from '@mui/material';
 
 const MapControls = () => {
   const dispatch = useAppDispatch();
@@ -33,13 +34,13 @@ const MapControls = () => {
     tab?.workflowTasks?.dataExploration?.controlPanel.timestampField || '';
   const useHeatmap =
     tab?.workflowTasks?.dataExploration?.controlPanel.heatmap || false;
-  const handleChange = (key: string, value: any) => {
+  const handleChange = (key: string, value: string | string[] | boolean) => {
     dispatch(setControls({ [key]: value }));
   };
 
-  const handleSegmentByChange = (e: any) => {
+  const handleSegmentByChange = (e: SelectChangeEvent<string[]>) => {
     const value = e.target.value;
-    handleChange('segmentBy', value);
+    handleChange('segmentBy', value as string);
 
     if (value.length > 0 && colorByMap !== 'None') {
       handleChange('colorByMap', 'None');

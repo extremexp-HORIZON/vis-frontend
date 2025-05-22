@@ -13,11 +13,12 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClosableCardTable from '../../../../shared/components/closable-card-table';
 import Loader from '../../../../shared/components/loader';
 import { fetchModelAnalysisExplainabilityPlot } from '../../../../store/slices/explainabilitySlice';
+import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
+import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 interface ITableComponent {
   children?: React.ReactNode
-  point: any
-  handleClose: any
+  point: TestInstance
   counterfactuals: {
     data: IPlotModel | null
     loading: boolean
@@ -25,7 +26,7 @@ interface ITableComponent {
   } | null
   experimentId: string | undefined
   workflowId: string
-  onClose: any
+  onClose: () => void
 }
 
 const CounterfactualsTable = (props: ITableComponent) => {
@@ -41,7 +42,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
     (state: RootState) => state.workflowPage,
   );
 
-  function convertToPythonStyleString(obj) {
+  function convertToPythonStyleString(obj: TestInstance) {
     const excludedKeys = ['isMisclassified', '_vgsid_'];
   
     return (
@@ -52,12 +53,12 @@ const CounterfactualsTable = (props: ITableComponent) => {
           // Rename keys
           if (key === 'actual') {
             key = 'label';
-            value = parseFloat(value);
+            value = parseFloat(String(value));
           } else if (key === 'predicted') {
             key = 'prediction';
-            value = parseFloat(value);
-          } else if (!isNaN(value)) {
-            value = parseFloat(value); // convert number to float
+            value = parseFloat(String(value));
+          } else if (!isNaN(Number(value))) {
+            value = parseFloat(String(value)); // convert number to float
           } else {
             value = `'${value}'`; // wrap string in single quotes
           }
@@ -180,7 +181,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
     tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents || {},
   );
 
-  const columns = Object.entries(filteredTableContents).map(([key, column]) => {
+  const columns: GridColDef[] = Object.entries(filteredTableContents).map(([key, column]) => {
     const referenceValue = parseFloat(column.values[0]);
 
     return {
@@ -190,7 +191,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       minWidth: 100,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params: any) => {
+      renderCell: (params: GridRenderCellParams) => {
         const currentValue = parseFloat(params.value);
         if (isNaN(referenceValue) || isNaN(currentValue)) {
           return params.value;
@@ -229,7 +230,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       .length || 0;
 
   const rows = Array.from({ length: rowCount }, (_, rowIndex) => {
-    const row: Record<string, any> = { id: rowIndex };
+    const row: Record<string, number | string> = { id: rowIndex };
     for (const [key, column] of Object.entries(filteredTableContents)) {
       row[key] = column.values[rowIndex];
     }
@@ -273,7 +274,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
           <StyledDataGrid
             rows={rows}
             columns={columns}
-            disableSelectionOnClick
+            disableRowSelectionOnClick
             sx={{
               border: theme => `1px solid ${theme.palette.customGrey.main}`,
               '& .MuiDataGrid-columnHeader': {
@@ -310,7 +311,11 @@ const ControlPanel = ({
 }: {
   activeTab: number
   setActiveTab: (value: number) => void
-  counterfactuals: any
+  counterfactuals: {
+    data: IPlotModel | null
+    loading: boolean
+    error: string | null
+  } | null | undefined
 }) => {
   return (
     <Box

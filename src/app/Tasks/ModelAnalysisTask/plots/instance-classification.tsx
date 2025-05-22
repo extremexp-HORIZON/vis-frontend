@@ -10,6 +10,8 @@ import { CircularProgress, InputLabel, Switch, useMediaQuery, useTheme } from '@
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import InstanceClassificationUmap from './instance-classification-umap';
+import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
+import type { View, Item, ScenegraphEvent } from 'vega';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -18,7 +20,11 @@ interface ControlPanelProps {
   setYAxisOption: (val: string) => void
   showMisclassifiedOnly: boolean
   options: string[]
-  plotData: any
+  plotData: {
+    data: TestInstance[] | null
+    loading: boolean
+    error: string | null
+  } | null
   useUmap: boolean
   setUseUmap: Dispatch<SetStateAction<boolean>>
 }
@@ -123,18 +129,14 @@ const ControlPanel = ({
 
 interface IInstanceClassification {
   plotData: {
-    data: Array<{
-      [key: string]: any
-      label: string
-      prediction: string
-    }>
+    data: TestInstance[] | null
     loading: boolean
     error: string | null
   } | null
-  point: any
+  point: { id: string; data: TestInstance } | null
   showMisclassifiedOnly: boolean
-  setPoint: Dispatch<SetStateAction<any>>
-  hashRow: (row: any) => string
+  setPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
+  hashRow: (row: TestInstance) => string
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
@@ -154,8 +156,8 @@ const theme = useTheme();
   //   }
   //   return newData
   // }
-  const getVegaData = (data: any[]) => {
-    return data.map((originalRow: any) => {
+  const getVegaData = (data: TestInstance[]) => {
+    return data.map((originalRow: TestInstance) => {
       const id = hashRow(originalRow);
       const isMisclassified = originalRow.actual !== originalRow.predicted;
       return {
@@ -179,16 +181,23 @@ const theme = useTheme();
     }
   }, [options]);
   
-  const handleNewView = (view: any) => {
-    view.addEventListener('click', (event: any, item: any) => {
-      if (item && item.datum?.isMisclassified) {
-        const { id, ...dataWithoutId } = item.datum;
-        setPoint({ id, data: dataWithoutId });
-      } else {
-        setPoint(null);
-      }
-    });
-  };
+const handleNewView = (view: View) => {
+  view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
+    const datum = item?.datum as (Partial<TestInstance> & { id: string; isMisclassified?: boolean }) | undefined;
+
+    if (datum?.isMisclassified) {
+      const { id, ...dataWithoutId } = datum;
+
+      const cleanedData = Object.fromEntries(
+        Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
+      ) as TestInstance;
+
+      setPoint({ id, data: cleanedData });
+    } else {
+      setPoint(null);
+    }
+  });
+};
 
   const info = (
     <Box
@@ -207,13 +216,15 @@ const theme = useTheme();
 
   return (
     useUmap ? (
-   <InstanceClassificationUmap
-          point={point}
-          showMisclassifiedOnly={showMisclassifiedOnly}
-          setPoint={setPoint}
-          hashRow={hashRow} useUmap={useUmap} setuseUmap={setUseUmap } />
-    
-) : (
+      <InstanceClassificationUmap
+        point={point}
+        showMisclassifiedOnly={showMisclassifiedOnly}
+        setPoint={setPoint}
+        hashRow={hashRow} 
+        useUmap={useUmap} 
+        setuseUmap={setUseUmap } 
+      />
+    ) : (
     <ResponsiveCardVegaLite
       spec={{
         width: 'container',

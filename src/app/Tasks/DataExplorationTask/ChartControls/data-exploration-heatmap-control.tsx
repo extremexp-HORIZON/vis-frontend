@@ -1,8 +1,6 @@
-import type React from 'react';
 import {
   Box,
   MenuItem,
-  Chip,
   Select,
   InputLabel,
   FormControl,
@@ -22,25 +20,6 @@ const HeatMapControlPanel = () => {
     tab?.workflowTasks.dataExploration?.controlPanel
       .selectedMeasureColumnHeat || null;
 
-  // Handler for updating aggregation rules for a column
-  const handleAggregationChange = (
-    event: React.ChangeEvent<{ value: unknown }>,
-  ) => {
-    const value = event.target.value as string[];
-    if (!selectedColumn) return;
-    const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {};
-
-    dispatch(
-      setControls({
-        barAggregationHeat: {
-          ...currentAgg,
-          [selectedColumn]: value,
-        },
-      }),
-    );
-  };
-  console.log(tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat);
   const getAggregationOptions = () => {
     if (!selectedColumn) return [];
     const column =
@@ -55,24 +34,6 @@ const HeatMapControlPanel = () => {
   };
 
   const aggregationOptions = getAggregationOptions();
-
-  const handleAggregationDelete = (toDelete: string) => {
-    if (!selectedColumn) return;
-    const currentAgg =
-      tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {};
-    const updated = (currentAgg[selectedColumn] || []).filter(
-      (agg: string) => agg !== toDelete,
-    );
-
-    dispatch(
-      setControls({
-        barAggregationHeat: {
-          ...currentAgg,
-          [selectedColumn]: updated,
-        },
-      }),
-    );
-  };
 
   // Custom theme
   const theme = createTheme({
@@ -121,7 +82,7 @@ const HeatMapControlPanel = () => {
                 dispatch(setControls({ barGroupByHeat: selected }));
               }
             }}
-            renderValue={(selected: any) => selected.join(', ')}            
+            renderValue={(selected) => selected.join(', ')}            
             MenuProps={{
               PaperProps: {
                 style: { maxHeight: 224, width: 250 },
@@ -162,10 +123,6 @@ const HeatMapControlPanel = () => {
             value={selectedColumn || ''}
             onChange={e => {
               const newColumn = e.target.value as string;
-              const currentAgg =
-                tab?.workflowTasks.dataExploration?.controlPanel
-                  .barAggregationHeat || {};
-
               // Clear previous aggregation and set new selected column
               dispatch(
                 setControls({
