@@ -176,7 +176,7 @@ const transformedData =
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
         controlPanel={<BarChartControlPanel />}
         infoMessage={info}
-        showInfoMessage={shouldShowInfoMessage}
+        showInfoMessage={shouldShowInfoMessage && !(tab?.workflowTasks.dataExploration?.barChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading)}
         loading={tab?.workflowTasks.dataExploration?.barChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
       />
     </Box>

@@ -231,7 +231,9 @@ const cols = Array.from(
     <Box sx={{ height: '99%' }}>
       {umap ? (
         <Uchart />
-      ) : shouldShowInfoMessage ? (
+      ) : shouldShowInfoMessage && 
+      !(tab?.workflowTasks.dataExploration?.scatterChart?.loading 
+        || tab?.workflowTasks.dataExploration?.metaData?.loading) ? (
         <ResponsiveCardVegaLite
           spec={{}}
           title="Scatter Chart"
@@ -263,7 +265,7 @@ const cols = Array.from(
         />
       ) : (
         <Grid container spacing={2}>
-          {yAxis.map(y => (
+          {yAxis?.map(y => (
             <Grid item xs={12} key={y.name}>
               <ResponsiveCardVegaLite
                 spec={getSingleScatterSpec({

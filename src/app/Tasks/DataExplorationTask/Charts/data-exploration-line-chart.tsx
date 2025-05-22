@@ -177,7 +177,9 @@ const LineChart = () => {
 
   return (
     <Box sx={{ height: '99%' }}>
-      {shouldShowInfoMessage ? (
+      {shouldShowInfoMessage && !(
+        tab?.workflowTasks.dataExploration?.lineChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading
+      ) ? (
         <ResponsiveCardVegaLite
           spec={{}}
           title="Line Chart"
@@ -204,7 +206,7 @@ const LineChart = () => {
         />
       ) : (
         <Grid container spacing={2}>
-          {yAxis.map(y => (
+          {yAxis?.map(y => (
             <Grid key={`grid-${y.name}`} item xs={12} >
               <ResponsiveCardVegaLite
                 key={y.name}

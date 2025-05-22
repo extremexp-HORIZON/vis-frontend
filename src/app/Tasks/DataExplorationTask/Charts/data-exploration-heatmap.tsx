@@ -221,7 +221,7 @@ const transformedData =
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
         controlPanel={<HeatMapControlPanel />}
         infoMessage={info}
-        showInfoMessage={shouldShowInfoMessage}
+        showInfoMessage={shouldShowInfoMessage && !(tab?.workflowTasks.dataExploration?.heatChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading)}
         loading={tab?.workflowTasks.dataExploration?.heatChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
       />
     </Box>
