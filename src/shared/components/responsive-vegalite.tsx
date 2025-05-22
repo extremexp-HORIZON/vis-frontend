@@ -2,9 +2,10 @@ import { Box } from '@mui/material';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { VegaLite } from 'react-vega';
+import type { VisualizationSpec } from 'vega-embed';
 
 interface ResponsiveVegaLiteProps {
-  spec: any // VegaLite specification
+  spec: VisualizationSpec // VegaLite specification
   minWidth?: number
   minHeight?: number
   maxWidth?: number

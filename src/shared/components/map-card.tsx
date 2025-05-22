@@ -38,10 +38,11 @@ interface ResponsiveMapCardProps {
   maxWidth?: number
   maxHeight?: number
   aspectRatio?: number // Aspect ratio (width / height)
-  [key: string]: any // Capture all other props
+  [key: string]: unknown // Capture all other props
   controlPanel?: React.ReactNode
   infoMessage?: React.ReactElement
   showInfoMessage?: boolean
+  title?: string
 }
 const SectionHeader = ({
   icon,

@@ -32,20 +32,22 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import CodeIcon from '@mui/icons-material/Code';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Loader from './loader';
+
 interface ResponsiveCardVegaLiteProps {
-  spec: any // VegaLite specification
+  spec: Record<string, unknown>; // VegaLite specification
   minWidth?: number
   minHeight?: number
   maxWidth?: number
   maxHeight?: number
   aspectRatio?: number // Aspect ratio (width / height)
-  [key: string]: any // Capture all other props
+  [key: string]: unknown // Capture all other props
   controlPanel?: React.ReactNode
   infoMessage?: React.ReactElement
   showInfoMessage?: boolean
   isStatic?: boolean // If true, means the chart will be inside a static panel
   details?: string | null
-  loading?: boolean // ✅ Add this
+  loading?: boolean
+  title?: string
 }
 const SectionHeader = ({
   icon,
@@ -214,18 +216,35 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       // Extract data from spec
       let dataToExport;
 
-      if (spec.data.values) {
-        dataToExport = spec.data.values;
-      } else if (
-        spec.data.name &&
-        otherProps.data &&
-        otherProps.data[spec.data.name]
+      if (
+        typeof spec.data === 'object' &&
+        spec.data !== null &&
+        'values' in spec.data &&
+        Array.isArray((spec.data as { values: unknown }).values)
       ) {
-        dataToExport = otherProps.data[spec.data.name];
-      } else {
+        dataToExport = (spec.data as { values: unknown }).values;
+      }
+      else if (
+        typeof spec.data === 'object' &&
+        spec.data !== null &&
+        'name' in spec.data &&
+        typeof (spec.data as { name: unknown }).name === 'string' &&
+        otherProps.data &&
+        typeof otherProps.data === 'object' &&
+        otherProps.data !== null
+      ) {
+        const name = (spec.data as { name: string }).name;
+        const dataMap = otherProps.data as Record<string, unknown>;
+      
+        if (name in dataMap) {
+          dataToExport = dataMap[name];
+        } else {
+          dataToExport = spec.data;
+        }
+      }
+      else {
         dataToExport = spec.data;
       }
-
       // Convert data to JSON string
       const jsonData = JSON.stringify(dataToExport, null, 2);
 

@@ -5,7 +5,7 @@ const NotFound = () => {
     <div id="error-page">
       <div style={{ display: 'flex', alignItems: 'center', columnGap: 4, userSelect: 'none' }}>
         <h1 style={{fontSize: 130, margin: 0}}>4</h1>
-        <img src="/images/extremexp-logo.png" height={130} />
+        <img src="/images/extremexp-logo.png" height={130} alt='Extremexp logo'/>
         {/* <h1 style={{fontSize: 130, margin: 0}}>0</h1> */}
         <h1 style={{fontSize: 130, margin: 0}}>4</h1>
       </div>

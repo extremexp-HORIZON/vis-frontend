@@ -76,6 +76,7 @@ const TokenAuthHandler = () => {
           src="/images/extremexp-logo.png"
           height={130}
           style={{ objectFit: 'contain' }}
+          alt='Extremexp logo'
         />
         <Typography variant="h4">Authenticating...</Typography>
 

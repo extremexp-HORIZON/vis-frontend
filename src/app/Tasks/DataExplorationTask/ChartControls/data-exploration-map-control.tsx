@@ -30,8 +30,8 @@ const MapControls = () => {
     tab?.workflowTasks?.dataExploration?.controlPanel.colorByMap || 'None';
   const segmentBy =
     tab?.workflowTasks?.dataExploration?.controlPanel.segmentBy || [];
-  const timestampField =
-    tab?.workflowTasks?.dataExploration?.controlPanel.timestampField || '';
+  // const timestampField =
+  //   tab?.workflowTasks?.dataExploration?.controlPanel.timestampField || '';
   const useHeatmap =
     tab?.workflowTasks?.dataExploration?.controlPanel.heatmap || false;
   const handleChange = (key: string, value: string | string[] | boolean) => {
