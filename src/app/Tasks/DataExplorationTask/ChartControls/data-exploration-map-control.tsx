@@ -42,9 +42,9 @@ const MapControls = () => {
     const value = e.target.value;
     handleChange('segmentBy', value as string);
 
-    if (value.length > 0 && colorByMap !== 'None') {
-      handleChange('colorByMap', 'None');
-    }
+    // if (value.length > 0 && colorByMap !== 'None') {
+    //   handleChange('colorByMap', 'None');
+    // }
   };
 
   return (
@@ -101,10 +101,10 @@ const MapControls = () => {
 
       <Box display="flex" gap={2}>
         {/* Color By Selector */}
-        <FormControl disabled={segmentBy.length > 0} fullWidth>
+        <FormControl  fullWidth>
           <InputLabel>Color By</InputLabel>
           <Select
-            value={segmentBy.length > 0 ? 'None' : colorByMap}
+            value={colorByMap}
             onChange={e => handleChange('colorByMap', e.target.value)}
             input={<OutlinedInput label="Color By" />}
              MenuProps={{
@@ -127,11 +127,11 @@ const MapControls = () => {
         {/* Segment By Selector */}
         <FormControl
           fullWidth
-          disabled={timestampField === null || timestampField === ''}
+          // disabled={timestampField === null || timestampField === ''}
         >
           <InputLabel>Segment By</InputLabel>
           <Select
-          disabled={true}
+          // disabled={true}
             multiple
             value={segmentBy}
             onChange={handleSegmentByChange}
