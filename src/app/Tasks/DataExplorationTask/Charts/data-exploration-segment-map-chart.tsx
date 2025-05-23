@@ -27,7 +27,8 @@ const SegmentMapChart = () => {
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;
   const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon;
   const segmentBy = tab?.workflowTasks.dataExploration?.controlPanel.segmentBy || [];
-  const data = tab?.workflowTasks.dataExploration?.mapChart.data?.data || [];
+  const rawData = tab?.workflowTasks.dataExploration?.mapChart.data?.data;
+  const data: Record<string, string | number>[] = Array.isArray(rawData) ? rawData : [];
   const timestampField = 'timestamp';
   const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map());
@@ -77,7 +78,9 @@ const SegmentMapChart = () => {
   // Set color map
   useEffect(() => {
     if (!segmentBy || !data.length) return;
-    const categories = Array.from(new Set(data.map(row => row[segmentBy])));
+    const categories = Array.from(
+      new Set(data.map(row => segmentBy.map(field => row[field]).join('|')))
+    );
     const newMap = new Map<string, string>();
 
     categories.forEach((cat, i) =>
@@ -103,9 +106,9 @@ const SegmentMapChart = () => {
     const groups: Record<string, { lat: number; lon: number; timestamp?: number }[]> = {};
 
     for (const row of data) {
-      const groupKey = row[segmentBy];
-      const latVal = parseFloat(row[lat]);
-      const lonVal = parseFloat(row[lon]);
+      const groupKey = segmentBy.map(field => row[field]).join('|');
+      const latVal = parseFloat(String(row[lat]));
+      const lonVal = parseFloat(String(row[lon]));
 
       if (!isNaN(latVal) && !isNaN(lonVal)) {
         const point = {
@@ -136,7 +139,7 @@ const SegmentMapChart = () => {
       });
       const polyline = L.polyline(path, { color, weight: 3 }).addTo(layerGroupRef.current!);
 
-      polyline.bindTooltip(`${segmentBy}: ${key}`, {
+      polyline.bindTooltip(`${segmentBy.join(', ')}: ${key}`, {
         permanent: false,
         direction: 'top',
       });

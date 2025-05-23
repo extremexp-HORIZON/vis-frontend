@@ -85,6 +85,7 @@ const ProgressPageLoading = () => {
             src="/images/extremexp-logo.png"
             height={130}
             style={{ objectFit: 'contain' }}
+            alt="extremexp logo"
           />
           <Typography variant="h4">Initializing Progress Page</Typography>
           {!experiment.data && experiment.loading && (

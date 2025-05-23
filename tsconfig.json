@@ -17,5 +17,7 @@
     "types": ["vitest/globals"],
     "allowImportingTsExtensions": true,
   },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "vite.config.d.ts", "src/deprecated"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

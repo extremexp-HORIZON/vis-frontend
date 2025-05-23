@@ -75,7 +75,12 @@ const LoginPage = () => {
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: 0, textAlign: 'center' }}>
           <h3 style={{ marginBottom: 2 }}>Login to Your Account</h3>
           <p style={{ fontSize: '14px', margin: 0, marginBottom: '2rem', color: theme.palette.error.main, height: '17px' }}>
-            {error ? error : ' '}
+            {typeof error === 'string'
+              ? error
+              : error instanceof Error
+                ? error.message
+                : ' '
+            }
           </p>
         </div>
       </div>
