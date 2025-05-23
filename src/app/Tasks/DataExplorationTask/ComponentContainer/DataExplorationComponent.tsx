@@ -17,6 +17,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import HeatMap from '../Charts/data-exploration-heatmap';
 import MapCardWrapper from '../Charts/map-wrap';
+import ImageCard from '../Charts/data-exploration-image';
 
 const DataExplorationComponent = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ const DataExplorationComponent = () => {
       state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel
         ?.chartType || '',
   );
+  const isImage = selectedDataset?.match(/\.(jpe?g|png|gif|webp|bmp|tiff?|svg)$/i);
 
   useEffect(() => {
     if (selectedDataset && workflowId) {
@@ -73,6 +75,11 @@ const DataExplorationComponent = () => {
         }
         fullHeight
       />
+    );
+
+  if(isImage)
+    return (
+      <ImageCard />
     );
 
   return (
