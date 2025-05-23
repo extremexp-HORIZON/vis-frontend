@@ -13,6 +13,7 @@ export function setCache<T>(key: string, data: T, ttl: number = DEFAULT_TTL): vo
     data,
     expires: Date.now() + ttl,
   };
+
   localStorage.setItem(key, JSON.stringify(payload));
 }
 
@@ -21,18 +22,22 @@ export function setCache<T>(key: string, data: T, ttl: number = DEFAULT_TTL): vo
  */
 export function getCache<T>(key: string): T | null {
   const raw = localStorage.getItem(key);
+
   if (!raw) return null;
 
   try {
     const parsed: CacheEntry<T> = JSON.parse(raw);
+
     if (Date.now() < parsed.expires) {
       return parsed.data;
     } else {
       localStorage.removeItem(key); // Clean up expired
+
       return null;
     }
   } catch (e) {
     localStorage.removeItem(key); // Clean up corrupted
+
     return null;
   }
 }
@@ -50,9 +55,11 @@ export function clearExpiredLocalStorage(prefixes: string[] = []) {
     if (prefixes.length === 0 || prefixes.some(prefix => key.startsWith(prefix))) {
       try {
         const raw = localStorage.getItem(key);
+
         if (!raw) return;
 
         const parsed = JSON.parse(raw);
+
         if (parsed.expires && Date.now() > parsed.expires) {
           localStorage.removeItem(key);
         }

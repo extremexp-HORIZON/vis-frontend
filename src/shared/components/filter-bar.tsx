@@ -90,7 +90,7 @@ export default function FilterBar({
   const prevStep = useRef<FilterStep>(FilterStep.IDLE);
   const [availableOperators, setAvailableOperators] = useState<typeof stringOperators | typeof numberOperators>(stringOperators);
 
-  const validColumns = columns.filter(col => 
+  const validColumns = columns.filter(col =>
     col.field !== 'rating' && col.field !== 'status' && col.field !== 'action'
   ).map(col => ({
     value: col.field,
@@ -107,16 +107,18 @@ export default function FilterBar({
   // Update suggestions based on the current step and input value
   useEffect(() => {
     if (currentStep === FilterStep.COLUMN) {
-      const filtered = validColumns.filter(col => 
+      const filtered = validColumns.filter(col =>
         col.label.toLowerCase().includes(inputValue.toLowerCase())
       );
+
       setSuggestions(filtered);
       setShowAvailableColumns(inputValue.length === 0);
       setShowAvailableOperators(false);
     } else if (currentStep === FilterStep.OPERATOR) {
-      const filtered = availableOperators.filter(op => 
+      const filtered = availableOperators.filter(op =>
         op.label.toLowerCase().includes(inputValue.toLowerCase())
       );
+
       setSuggestions(filtered);
       setShowAvailableColumns(false);
       setShowAvailableOperators(inputValue.length === 0);
@@ -129,7 +131,7 @@ export default function FilterBar({
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
-    
+
     // If we're in IDLE state and user starts typing, move to COLUMN step
     if (currentStep === FilterStep.IDLE && event.target.value) {
       setCurrentStep(FilterStep.COLUMN);
@@ -140,10 +142,11 @@ export default function FilterBar({
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === 'Tab') {
       event.preventDefault();
-      
-      if ((currentStep === FilterStep.COLUMN || currentStep === FilterStep.OPERATOR) && 
+
+      if ((currentStep === FilterStep.COLUMN || currentStep === FilterStep.OPERATOR) &&
           suggestions.length > 0) {
         const selectedItem = suggestions[selectedSuggestionIndex];
+
         if (currentStep === FilterStep.COLUMN) {
           selectedItem.value && selectColumn(selectedItem.value);
         } else {
@@ -159,7 +162,7 @@ export default function FilterBar({
       handleBackStep();
     } else if (event.key === 'ArrowDown' && suggestions.length > 0) {
       event.preventDefault();
-      setSelectedSuggestionIndex(prev => 
+      setSelectedSuggestionIndex(prev =>
         prev < suggestions.length - 1 ? prev + 1 : prev
       );
     } else if (event.key === 'ArrowUp' && suggestions.length > 0) {
@@ -172,14 +175,14 @@ export default function FilterBar({
   useEffect(() => {
     // Only reset the selection index when the suggestions array changes size
     // or when transitioning between column and operator selection
-    const isNewSuggestionSet = 
+    const isNewSuggestionSet =
       prevSuggestions.current?.length !== suggestions.length ||
       prevStep.current !== currentStep;
-      
+
     if (isNewSuggestionSet) {
       setSelectedSuggestionIndex(0);
     }
-    
+
     prevSuggestions.current = [...suggestions];
     prevStep.current = currentStep;
   }, [suggestions, currentStep]);
@@ -189,10 +192,10 @@ export default function FilterBar({
     if (selectedItemRef.current && suggestionsContainerRef.current) {
       const container = suggestionsContainerRef.current;
       const item = selectedItemRef.current;
-      
+
       const containerRect = container.getBoundingClientRect();
       const itemRect = item.getBoundingClientRect();
-      
+
       // Check if the item is outside the visible area
       if (itemRect.bottom > containerRect.bottom) {
         // Item is below visible area
@@ -210,10 +213,11 @@ export default function FilterBar({
     setShowAvailableColumns(false);
     setShowAvailableOperators(true);
     setInputValue('');
-    
+
     // Set available operators based on column type
     const selectedColumn = columns.find(col => col.field === columnValue);
     const columnType = selectedColumn?.originalType;
+
     if (columnType === 'INTEGER' || columnType === 'DOUBLE') {
       setAvailableOperators(numberOperators);
     } else if (columnType === 'BOOLEAN') {
@@ -353,10 +357,10 @@ export default function FilterBar({
   // Function to render available columns as chips
   const renderAvailableColumns = () => {
     if (!showAvailableColumns) return null;
-    
+
     const columnsToShow = showAllColumns ? validColumns : validColumns.slice(0, 5);
     const hasMore = validColumns.length > 5;
-    
+
     return (
       <Box sx={{ mt: 2 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -374,8 +378,8 @@ export default function FilterBar({
             />
           ))}
           {hasMore && !showAllColumns && (
-            <Button 
-              size="small" 
+            <Button
+              size="small"
               onClick={() => setShowAllColumns(true)}
               sx={{ fontSize: '0.75rem', ml: 1 }}
             >
@@ -383,8 +387,8 @@ export default function FilterBar({
             </Button>
           )}
           {showAllColumns && (
-            <Button 
-              size="small" 
+            <Button
+              size="small"
               onClick={() => setShowAllColumns(false)}
               sx={{ fontSize: '0.75rem', ml: 1 }}
             >
@@ -399,7 +403,7 @@ export default function FilterBar({
   // Function to render available operators as chips
   const renderAvailableOperators = () => {
     if (!showAvailableOperators) return null;
-    
+
     return (
       <Box sx={{ mt: 2 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -426,7 +430,7 @@ export default function FilterBar({
       {/* Search input */}
       <Box sx={{ position: 'relative' }}>
         {renderInputWithPills()}
-        
+
         {/* Suggestions dropdown */}
         {suggestions.length > 0 && currentStep !== FilterStep.VALUE && !showAvailableColumns && !showAvailableOperators && (
           <Paper
@@ -440,16 +444,16 @@ export default function FilterBar({
               overflow: 'hidden' // Changed from 'auto' to 'hidden'
             }}
           >
-            <Box 
+            <Box
               ref={suggestionsContainerRef}
               sx={{ maxHeight: 300, overflow: 'auto' }}
             >
               {suggestions.map((item, index) => (
-                <Box 
+                <Box
                   key={index}
                   ref={index === selectedSuggestionIndex ? selectedItemRef : null}
-                  sx={{ 
-                    p: 1.5, 
+                  sx={{
+                    p: 1.5,
                     cursor: 'pointer',
                     backgroundColor: index === selectedSuggestionIndex ? 'action.selected' : 'inherit',
                     '&:hover': { backgroundColor: 'action.hover' }
@@ -479,7 +483,7 @@ export default function FilterBar({
       {renderAvailableOperators()}
 
       {/* Remove the filter preview since we now show pills in the input */}
-      
+
       {/* Help text only when not showing available options */}
       {currentStep !== FilterStep.IDLE && !showAvailableColumns && !showAvailableOperators && (
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
@@ -488,7 +492,7 @@ export default function FilterBar({
           {currentStep === FilterStep.VALUE && 'Enter a value and press Enter to add the filter'}
         </Typography>
       )}
-      
+
       <Divider sx={{ my: 2 }} />
 
       {/* Active filters */}
@@ -496,7 +500,7 @@ export default function FilterBar({
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           Active Filters
         </Typography>
-        
+
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
           {filters.filter(f => f.column && f.operator && f.value).map((filter, index) => (
             <Chip
@@ -507,14 +511,14 @@ export default function FilterBar({
               deleteIcon={<CancelIcon />}
             />
           ))}
-          
+
           {filters.filter(f => f.column && f.operator && f.value).length === 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
               No active filters
             </Typography>
           )}
         </Box>
-      </Box>      
+      </Box>
     </Box>
   );
 }

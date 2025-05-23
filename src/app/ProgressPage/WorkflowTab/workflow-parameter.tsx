@@ -26,10 +26,13 @@ const WorkflowParameter = () => {
 
   const paramValueCounts = useMemo(() => {
     const counts: Record<string, number> = {};
+
     for (const param of allParams) {
       const key = String(param.value);
+
       counts[key] = (counts[key] || 0) + 1;
     }
+
     return Object.entries(counts)
       .map(([value, count]) => ({ value, count }))
       .sort((a, b) => parseFloat(a.value) - parseFloat(b.value));
@@ -38,6 +41,7 @@ const WorkflowParameter = () => {
   const compareKey = useMemo(() => `compare-${Date.now()}`, []);
   const handleClick = () => {
     const workflowIds = filteredWorkflows?.map(workflow => workflow.id);
+
     setCache(compareKey, { workflowIds }, 5 * 60 * 1000);
   };
 
@@ -83,7 +87,7 @@ const WorkflowParameter = () => {
                 }}
               />
             </Box>
-            <Box sx={{width: 100, textAlign: 'right'}}>
+            <Box sx={{ width: 100, textAlign: 'right' }}>
               <Typography variant="caption">{count} workflow{count > 1 && 's'} </Typography>
             </Box>
           </Box>
@@ -100,7 +104,7 @@ const WorkflowParameter = () => {
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleClick}
-          >
+        >
           View workflows using this value
         </Typography>
       </Box>

@@ -15,6 +15,7 @@ const HeatMap = () => {
   const theme = useTheme();
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
+
   useEffect(() => {
     const groupBy =
       tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat;
@@ -57,7 +58,7 @@ const HeatMap = () => {
 
   const columns = tab?.workflowTasks.dataExploration?.heatChart.data?.columns;
   const xAxisColumn = columns?.find(col => col.type === 'STRING')?.name;
- 
+
   const categoricalColumns = columns?.filter(
     col => col.type === 'STRING' && col.name !== xAxisColumn,
   );
@@ -66,26 +67,26 @@ const HeatMap = () => {
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
-const transformedData =
+  const transformedData =
   Array.isArray(tab?.workflowTasks.dataExploration?.heatChart.data?.data) &&
   Array.isArray(yAxisColumns)
     ? tab.workflowTasks.dataExploration.heatChart.data.data.flatMap(
-        (item: { [x: string]: unknown }) =>
-          yAxisColumns.map(col => ({
-            [xAxisColumn as string]: item[xAxisColumn as string],
-            type: col,
-            value: item[col],
-            ...Object.fromEntries(
-              (categoricalColumns || []).map(catCol => [
-                catCol.name,
-                item[catCol.name],
-              ])
-            ),
-          }))
-      )
+      (item: { [x: string]: unknown }) =>
+        yAxisColumns.map(col => ({
+          [xAxisColumn as string]: item[xAxisColumn as string],
+          type: col,
+          value: item[col],
+          ...Object.fromEntries(
+            (categoricalColumns || []).map(catCol => [
+              catCol.name,
+              item[catCol.name],
+            ])
+          ),
+        }))
+    )
     : [];
 
-    const limitedData = transformedData?.slice(0, 20); // Limit to 500 rows
+  const limitedData = transformedData?.slice(0, 20); // Limit to 500 rows
 
   const groupByFields =
     tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [];
@@ -211,6 +212,7 @@ const transformedData =
       .length > 0;
 
   const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData;
+
   return (
     <Box sx={{ height: '99%' }}>
       <ResponsiveCardVegaLite

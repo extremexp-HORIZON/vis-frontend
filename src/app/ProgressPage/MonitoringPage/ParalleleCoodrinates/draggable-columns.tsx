@@ -45,11 +45,13 @@ const DraggableColumns = ({
 }) => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
     if (!over) return;
     if (active.id !== over?.id) {
       const oldIndex = foldArray.current.indexOf(active.id);
       const newIndex = foldArray.current.indexOf(over.id);
       const newArray = arrayMove(foldArray.current, oldIndex, newIndex);
+
       foldArray.current = newArray;
       onOrderChange?.(newArray);
     }

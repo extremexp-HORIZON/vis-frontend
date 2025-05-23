@@ -42,6 +42,7 @@ const formatDuration = (seconds: number): string => {
   const s = Math.floor(seconds % 60);
 
   const parts = [];
+
   if (h) parts.push(`${h}h`);
   if (m) parts.push(`${m}m`);
   if (s || parts.length === 0) parts.push(`${s}s`);
@@ -57,7 +58,7 @@ const WorkflowTaskOverview = () => {
         selectedTask: null,
       },
   );
-  
+
   const task = tab?.workflowConfiguration.tasks?.find(task => task.name === selectedTask?.task);
   const parameters = tab?.workflowConfiguration.params?.filter(param => param.task === selectedTask?.taskId);
 
@@ -68,21 +69,21 @@ const WorkflowTaskOverview = () => {
       <DetailsCard title="Task Metadata">
         <StatusIndicator completed={!!task.endTime} />
         {task.startTime && (
-          <DetailsCardItem 
-            label="Start time" 
-            value={new Date(task.startTime).toLocaleString()} 
+          <DetailsCardItem
+            label="Start time"
+            value={new Date(task.startTime).toLocaleString()}
           />
         )}
         {task.endTime && (
-          <DetailsCardItem 
-            label="End time" 
-            value={new Date(task.endTime).toLocaleString()} 
+          <DetailsCardItem
+            label="End time"
+            value={new Date(task.endTime).toLocaleString()}
           />
         )}
         {task.endTime && task.startTime && (
-          <DetailsCardItem 
-            label="Duration" 
-            value={formatDuration((task.endTime - task.startTime) / 1000)} 
+          <DetailsCardItem
+            label="Duration"
+            value={formatDuration((task.endTime - task.startTime) / 1000)}
           />
         )}
       </DetailsCard>
@@ -90,10 +91,10 @@ const WorkflowTaskOverview = () => {
       <DetailsCard title="Task Parameters">
         {parameters?.length ? (
           parameters.map(param => (
-            <DetailsCardItem 
+            <DetailsCardItem
               key={`param-${param.name}`}
-              label={param.name} 
-              value={param.value} 
+              label={param.name}
+              value={param.value}
             />
           ))
         ) : (

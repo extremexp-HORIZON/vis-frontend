@@ -8,9 +8,9 @@ interface DetailsCardProps {
 }
 
 export const DetailsCard = ({
-  title, 
-  children, 
-  minWidth = '20%' 
+  title,
+  children,
+  minWidth = '20%'
 }: DetailsCardProps) => (
   <Card sx={{
     minWidth,

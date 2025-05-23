@@ -50,7 +50,7 @@ const InstanceView = () => {
   useEffect(() => {
     if(chartType !== 'datatable' && chartType !== 'scatter')
       dispatch(setControls({ chartType: 'datatable' }));
-  },[]);
+  }, []);
 
   const baseColumns: GridColDef[] = Object.keys(rows[0] || {}).map(key => ({
     field: key,
@@ -64,6 +64,7 @@ const InstanceView = () => {
 
     renderCell: (params: GridRenderCellParams) => {
       const value = params.value;
+
       if (key === 'predicted') {
         return (
           <span
@@ -76,45 +77,47 @@ const InstanceView = () => {
           </span>
         );
       }
+
       return typeof value === 'number'
         ? value.toFixed(3)
         : (value?.toString?.() ?? '');
     },
   }));
-  
-const actionColumn: GridColDef = {
-  field: 'action',
-  headerName: 'actions',
-  headerAlign: 'center',
-  align: 'center',
-  sortable: false,
-  filterable: false,
-  headerClassName: 'datagrid-header-fixed',
-  minWidth: 100,
-  renderCell: (params: GridRenderCellParams) => (
-    <Box
-      onClick={(e) => e.stopPropagation()}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="100%"
-      height="100%"
-    >
-      <Tooltip title="Explanations">
-        <IconButton             
-          onClick={() => {
-            const { id, ...data } = params.row;
-            setPoint({ id, data });
-          }}
-        >
-          <PsychologyAltRoundedIcon fontSize="small" color="primary" />
-        </IconButton>
-      </Tooltip>
-    </Box>
-  ),
-};
-const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
-  
+
+  const actionColumn: GridColDef = {
+    field: 'action',
+    headerName: 'actions',
+    headerAlign: 'center',
+    align: 'center',
+    sortable: false,
+    filterable: false,
+    headerClassName: 'datagrid-header-fixed',
+    minWidth: 100,
+    renderCell: (params: GridRenderCellParams) => (
+      <Box
+        onClick={(e) => e.stopPropagation()}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        height="100%"
+      >
+        <Tooltip title="Explanations">
+          <IconButton
+            onClick={() => {
+              const { id, ...data } = params.row;
+
+              setPoint({ id, data });
+            }}
+          >
+            <PsychologyAltRoundedIcon fontSize="small" color="primary" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+  };
+  const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
+
   const handleExportCsv = () => {
     return;
   };
@@ -203,15 +206,18 @@ const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionCol
   }, [isTabInitialized]);
 
   const hashRow = (row: TestInstance): string => {
-  const stringified = JSON.stringify(row, Object.keys(row).sort());
-  let hash = 0;
-  for (let i = 0; i < stringified.length; i++) {
-    const char = stringified.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return `row-${Math.abs(hash)}`;
-};
+    const stringified = JSON.stringify(row, Object.keys(row).sort());
+    let hash = 0;
+
+    for (let i = 0; i < stringified.length; i++) {
+      const char = stringified.charCodeAt(i);
+
+      hash = (hash << 5) - hash + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+
+    return `row-${Math.abs(hash)}`;
+  };
 
   return (
     <>
@@ -243,8 +249,8 @@ const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionCol
               marginTop: 0.5,
             },
           }}
-        >  
-          
+        >
+
           <Tooltip title="Table">
             <Button
               variant={chartType === 'datatable' ? 'contained' : 'outlined'}
@@ -264,7 +270,7 @@ const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionCol
         </ButtonGroup>
       </Box>
 
-      {chartType === 'scatter' &&(
+      {chartType === 'scatter' && (
         <Box sx={{ height: '60%', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
@@ -296,9 +302,9 @@ const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionCol
                 flexDirection: 'column',
               }}
             >
-               {tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ? (
-                 <Loader/>
-                ) : hasContent ? (
+              {tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ? (
+                <Loader/>
+              ) : hasContent ? (
                 <Box
                   sx={{
                     flexGrow: 1,
@@ -367,17 +373,17 @@ const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionCol
             </Box>
           </ResponsiveCardTable>
         </Box>
-      )}      
+      )}
       {point && workflow ? (
         <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
-           <CounterfactualsTable
-             key={'counterfactuals-table'}
-             point={point.data}
-             counterfactuals={workflow || null}
-             onClose={() => setPoint(null)}
-             experimentId={experimentId || 'I2Cat_phising'}
-             workflowId={tab?.workflowId || '1'}
-           />
+          <CounterfactualsTable
+            key={'counterfactuals-table'}
+            point={point.data}
+            counterfactuals={workflow || null}
+            onClose={() => setPoint(null)}
+            experimentId={experimentId || 'I2Cat_phising'}
+            workflowId={tab?.workflowId || '1'}
+          />
         </Box>
       ) : null}
     </>

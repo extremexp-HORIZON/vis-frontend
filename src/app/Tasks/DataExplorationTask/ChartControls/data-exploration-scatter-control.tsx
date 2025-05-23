@@ -41,6 +41,7 @@ const ScatterChartControlPanel = () => {
     const validYAxis = yAxis.filter(yCol =>
       columns.find(col => col.name === yCol.name),
     );
+
     if (validYAxis.length !== yAxis.length) {
       dispatch(setControls({ yAxis: validYAxis }));
     }
@@ -48,6 +49,7 @@ const ScatterChartControlPanel = () => {
 
   const handleXAxisChange = (event: { target: { value: string } }) => {
     const selected = columns.find(col => col.name === event.target.value);
+
     if (selected) {
       dispatch(setControls({ xAxis: selected }));
     }
@@ -58,45 +60,51 @@ const ScatterChartControlPanel = () => {
     const selectedCols = selectedNames
       .map((name: string) => columns.find(col => col.name === name))
       .filter(Boolean);
+
     dispatch(setControls({ yAxis: selectedCols }));
   };
   const handleColorByChange = (event: SelectChangeEvent<string>) => {
     const selected = columns.find(col => col.name === event.target.value as string);
+
     if (selected) {
       dispatch(setControls({ colorBy: selected }));
     }
   };
 
   useEffect(() => {
-      const validYAxis = yAxis.filter(yCol =>
-        columns.find(col => col.name === yCol.name),
-      );
-      if (validYAxis.length !== yAxis.length) {
-        dispatch(setControls({ yAxis: validYAxis }));
-      }
-    
-      // Ensure selectedColumns includes xAxis and yAxis
-      const currentSelected = controlPanel?.selectedColumns || [];
-      const requiredCols = [xAxis, ...validYAxis];
-      if (colorBy) {
-        requiredCols.push(colorBy);
-      }    
-      const missingCols = requiredCols.filter(
-        reqCol => !currentSelected.find(sel => sel.name === reqCol?.name)
-      );
-    
-      if (missingCols.length > 0) {
-        const updatedSelected = [
-          ...currentSelected,
-          ...missingCols.filter(Boolean), // Avoid null/undefined
-        ];
-        const cleanedSelected = updatedSelected.filter(col => col?.name && col.type);
-        dispatch(setControls({ selectedColumns: cleanedSelected }));
-      }
-    }, [columns, yAxis, xAxis, colorBy]);
+    const validYAxis = yAxis.filter(yCol =>
+      columns.find(col => col.name === yCol.name),
+    );
 
-    const isDisabled = Array.isArray(tab?.workflowTasks.dataExploration?.scatterChart.data?.data) && !tab?.workflowTasks.dataExploration?.scatterChart.data?.data.length;
-const tooltipTitle = isDisabled ? 'Select columns and color' : '';
+    if (validYAxis.length !== yAxis.length) {
+      dispatch(setControls({ yAxis: validYAxis }));
+    }
+
+    // Ensure selectedColumns includes xAxis and yAxis
+    const currentSelected = controlPanel?.selectedColumns || [];
+    const requiredCols = [xAxis, ...validYAxis];
+
+    if (colorBy) {
+      requiredCols.push(colorBy);
+    }
+    const missingCols = requiredCols.filter(
+      reqCol => !currentSelected.find(sel => sel.name === reqCol?.name)
+    );
+
+    if (missingCols.length > 0) {
+      const updatedSelected = [
+        ...currentSelected,
+        ...missingCols.filter(Boolean), // Avoid null/undefined
+      ];
+      const cleanedSelected = updatedSelected.filter(col => col?.name && col.type);
+
+      dispatch(setControls({ selectedColumns: cleanedSelected }));
+    }
+  }, [columns, yAxis, xAxis, colorBy]);
+
+  const isDisabled = Array.isArray(tab?.workflowTasks.dataExploration?.scatterChart.data?.data) && !tab?.workflowTasks.dataExploration?.scatterChart.data?.data.length;
+  const tooltipTitle = isDisabled ? 'Select columns and color' : '';
+
   return (
     columns.length > 0 && (
       <Box>
@@ -228,36 +236,36 @@ const tooltipTitle = isDisabled ? 'Select columns and color' : '';
             </Button>
           </ButtonGroup>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.2 }}>
-    <Typography 
-      variant="caption" 
-      sx={{ 
-        fontWeight: 500,
-        color: tab?.workflowTasks.dataExploration?.controlPanel.umap 
-          ? 'primary.main' 
-          : 'text.secondary'
-      }}
-    >
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 500,
+                color: tab?.workflowTasks.dataExploration?.controlPanel.umap
+                  ? 'primary.main'
+                  : 'text.secondary'
+              }}
+            >
       UMAP
-    </Typography>
-    <Tooltip title={tooltipTitle} disableHoverListener={!isDisabled}>
-  <span>
-    <Switch
-    disabled={isDisabled}
-      checked={tab?.workflowTasks.dataExploration?.controlPanel.umap}
-      onChange={() =>
-        dispatch(
-          setControls({
-            umap: !tab?.workflowTasks.dataExploration?.controlPanel.umap,
-          }),
-        )
-      }
-      color="primary"
-      name="umap"
-      inputProps={{ 'aria-label': 'UMAP toggle switch' }}
-    />
-  </span>
-</Tooltip>
-  </Box>
+            </Typography>
+            <Tooltip title={tooltipTitle} disableHoverListener={!isDisabled}>
+              <span>
+                <Switch
+                  disabled={isDisabled}
+                  checked={tab?.workflowTasks.dataExploration?.controlPanel.umap}
+                  onChange={() =>
+                    dispatch(
+                      setControls({
+                        umap: !tab?.workflowTasks.dataExploration?.controlPanel.umap,
+                      }),
+                    )
+                  }
+                  color="primary"
+                  name="umap"
+                  inputProps={{ 'aria-label': 'UMAP toggle switch' }}
+                />
+              </span>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
     )

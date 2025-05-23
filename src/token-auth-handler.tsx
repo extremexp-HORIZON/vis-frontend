@@ -13,6 +13,7 @@ const TokenAuthHandler = () => {
   useEffect(() => {
     if (!token) {
       setError('Missing authentication token');
+
       return;
     }
 

@@ -37,14 +37,14 @@ const CounterfactualsTable = (props: ITableComponent) => {
     onClose,
   } = props;
   const dispatch = useAppDispatch();
-  const [activeTab, setActiveTab] = useState(0); //activeTab,setA
+  const [activeTab, setActiveTab] = useState(0); // activeTab,setA
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,
   );
 
   function convertToPythonStyleString(obj: TestInstance) {
     const excludedKeys = ['isMisclassified', '_vgsid_'];
-  
+
     return (
       '{' +
       Object.entries(obj)
@@ -62,14 +62,14 @@ const CounterfactualsTable = (props: ITableComponent) => {
           } else {
             value = `'${value}'`; // wrap string in single quotes
           }
-  
+
           return `'${key}': ${value}`;
         })
         .join(', ') +
       '}'
     );
   }
-  
+
   const query = convertToPythonStyleString(point);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             explanation_type: 'featureExplanation',
             explanation_method: 'counterfactuals',
 
-            query:query
+            query: query
           },
           metadata: {
             workflowId: tab?.workflowId || '',
@@ -97,7 +97,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
           query: {
             explanation_type: 'hyperparameterExplanation',
             explanation_method: 'counterfactuals',
-            query:query
+            query: query
           },
           metadata: {
             workflowId: tab?.workflowId || workflowId,
@@ -108,7 +108,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       );
     }
   }, [point, activeTab]);
-  
+
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-scrollbarFiller': {
       backgroundColor: theme.palette.customGrey.main,
@@ -170,6 +170,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
         if (key === 'BinaryLabel' || key === 'Type' || key === 'Cost')
           return false; // Skip the BinaryLabel column
         const uniqueValues = new Set(column.values);
+
         return uniqueValues.size > 1; // Keep only if there is more than one unique value
       },
     );
@@ -193,6 +194,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
         const currentValue = parseFloat(params.value);
+
         if (isNaN(referenceValue) || isNaN(currentValue)) {
           return params.value;
         }
@@ -231,14 +233,16 @@ const CounterfactualsTable = (props: ITableComponent) => {
 
   const rows = Array.from({ length: rowCount }, (_, rowIndex) => {
     const row: Record<string, number | string> = { id: rowIndex };
+
     for (const [key, column] of Object.entries(filteredTableContents)) {
       row[key] = column.values[rowIndex];
     }
+
     return row;
   });
 
   return (
-    <Box sx={{height: '100%'}}>
+    <Box sx={{ height: '100%' }}>
       <ClosableCardTable
         details={ tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotDescr}
         title={

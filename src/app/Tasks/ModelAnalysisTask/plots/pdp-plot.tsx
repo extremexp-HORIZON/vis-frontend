@@ -27,9 +27,9 @@ const PdpPlot = (props: PdpPlotProps) => {
     (state: RootState) => state.workflowPage,
   );
   const dispatch = useAppDispatch();
- const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
-  ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
-  : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
+  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
+    ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
+    : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
 
   const plotModel = tab?.workflowTasks.modelAnalysis?.pdp;
   const { experimentId } = useParams();
@@ -56,12 +56,14 @@ const PdpPlot = (props: PdpPlotProps) => {
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return [];
     const data: { [x: string]: string }[] = [];
+
     plmodel.xAxis.axisValues.forEach((val, idx) => {
       data.push({
         [plmodel.xAxis.axisName]: val,
         [plmodel.yAxis.axisName]: plmodel.yAxis.axisValues[idx],
       });
     });
+
     return data;
   };
   const spec = {
@@ -82,7 +84,7 @@ const PdpPlot = (props: PdpPlotProps) => {
         field:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisName ||
           'xAxis default',
-          
+
         type:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
           'numerical'
@@ -94,7 +96,7 @@ const PdpPlot = (props: PdpPlotProps) => {
         field:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.yAxis.axisName ||
           'yAxis default',
-          title: 'Average Predicted Value',
+        title: 'Average Predicted Value',
 
         type:
           tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
@@ -125,39 +127,39 @@ const PdpPlot = (props: PdpPlotProps) => {
       dispatch(setSelectedFeature({ plotType: 'pdp', feature: e.target.value }));
     };
 
- const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
-  <FormControl fullWidth>
-    <InputLabel id="feature-select-label">
-      {explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-    </InputLabel>
-    <Select
-      labelId="feature-select-label"
-      value={plotModel?.selectedFeature || ''}
-      label={explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-      onChange={handleFeatureSelection(plotModel?.data || null)}
-      disabled={plotModel?.loading || !plotModel?.data}
-      MenuProps={{
-        PaperProps: {
-          style: {
-            maxHeight: 250,
-            maxWidth: 300,
+  const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
+    <FormControl fullWidth>
+      <InputLabel id="feature-select-label">
+        {explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
+      </InputLabel>
+      <Select
+        labelId="feature-select-label"
+        value={plotModel?.selectedFeature || ''}
+        label={explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
+        onChange={handleFeatureSelection(plotModel?.data || null)}
+        disabled={plotModel?.loading || !plotModel?.data}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 250,
+              maxWidth: 300,
+            },
           },
-        },
-      }}
-    >
-      {featureOrHyperparameterList && featureOrHyperparameterList.map(feature => (
-        <MenuItem
-          key={`${plotModel?.data?.plotName}-${feature}`}
-          value={feature}
-        >
-          {feature}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-);
+        }}
+      >
+        {featureOrHyperparameterList && featureOrHyperparameterList.map(feature => (
+          <MenuItem
+            key={`${plotModel?.data?.plotName}-${feature}`}
+            value={feature}
+          >
+            {feature}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
   const loading = (
-   <Loader />
+    <Loader />
   );
 
   const error = (

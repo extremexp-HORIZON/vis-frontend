@@ -1,5 +1,5 @@
 import Grid from '@mui/material/Grid';
-import type { RootState} from '../../store/store';
+import type { RootState } from '../../store/store';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -23,19 +23,19 @@ const ProgressPageLoading = () => {
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get experimentId from either path params or query params
   const experimentId = params.experimentId || searchParams.get('experimentId');
 
   useEffect(() => {
-      if (experimentId && experimentId !== experiment.data?.id) {
-        dispatch(fetchExperiment(experimentId));
+    if (experimentId && experimentId !== experiment.data?.id) {
+      dispatch(fetchExperiment(experimentId));
     }
   }, []);
 
   useEffect(() => {
     if (!experiment.loading && experiment.data) {
-            dispatch(fetchExperimentWorkflows(experimentId ?? ''));
+      dispatch(fetchExperimentWorkflows(experimentId ?? ''));
     }
   }, [experiment]);
 
@@ -55,7 +55,7 @@ const ProgressPageLoading = () => {
       setTimeout(() => {
         dispatch(setIntialization(true));
         const pathParts = location.pathname.split('/').filter(Boolean);
-    
+
         if (pathParts.length === 1) {
           navigate(`/${experimentId}/monitoring`, { replace: true });
         }
@@ -93,8 +93,8 @@ const ProgressPageLoading = () => {
           {workflows.data.length === 0 &&
             workflows.loading &&
             experiment.data && (
-              <Typography variant="h6">Fetching Workflows...</Typography>
-            )}
+            <Typography variant="h6">Fetching Workflows...</Typography>
+          )}
           {((workflows.error && !workflows.loading) ||
             (experiment.error && !workflows.loading)) && (
             <Typography variant="h6" color="error">

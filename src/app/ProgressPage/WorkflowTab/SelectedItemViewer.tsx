@@ -1,4 +1,4 @@
-import {Typography, Box } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import { useAppSelector } from '../../../store/store';
 import DataExplorationComponent from '../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent';
 import { WorkflowMetricChart } from './workflow-metric-chart';
@@ -30,7 +30,7 @@ const SelectedItemViewer = () => {
 
   // Enhanced header component for consistency
   const Header = ({ title, icon }: { title: string; icon?: React.ReactNode }) => (
-    <Box sx={{ 
+    <Box sx={{
       borderBottom: `1px solid ${theme.palette.divider}`,
       bgcolor: 'background.paper',
       display: 'flex',
@@ -47,10 +47,10 @@ const SelectedItemViewer = () => {
 
   if (selectedTask?.role === 'TASK') {
     return (
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <Header 
-          title={`${selectedTask?.variant || selectedTask?.task} Overview`} 
-          icon={<AssessmentIcon color="primary" />} 
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
+          title={`${selectedTask?.variant || selectedTask?.task} Overview`}
+          icon={<AssessmentIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
           <WorkflowTaskOverview />
@@ -59,12 +59,12 @@ const SelectedItemViewer = () => {
     );
   }
 
-  if (selectedItem?.type === 'DATASET' ) {
+  if (selectedItem?.type === 'DATASET') {
     return (
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Header 
-          title={`${selectedItem?.data?.dataset?.name} Details`} 
-          icon={<DatasetIcon color="primary" />} 
+        <Header
+          title={`${selectedItem?.data?.dataset?.name} Details`}
+          icon={<DatasetIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ overflow: 'auto', height: '100%' }}>
@@ -74,13 +74,13 @@ const SelectedItemViewer = () => {
       </Box>
     );
   }
-  
+
   if (selectedItem?.type === 'param') {
     return (
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <Header 
-          title={`${selectedItem.data?.param?.name} Details`} 
-          icon={<Grid3x3Icon color="primary" />} 
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
+          title={`${selectedItem.data?.param?.name} Details`}
+          icon={<Grid3x3Icon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ overflow: 'auto', height: '100%' }}>
@@ -92,13 +92,13 @@ const SelectedItemViewer = () => {
       </Box>
     );
   }
-  
+
   if (selectedItem?.type === 'metric') {
     return (
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <Header 
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
           title={`${selectedItem.data?.metric?.name} Details`}
-          icon={<BarChartIcon color="primary" />} 
+          icon={<BarChartIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ overflow: 'auto', height: '100%' }}>
@@ -111,15 +111,15 @@ const SelectedItemViewer = () => {
 
   if (selectedItem?.type === 'model') {
     return (
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <Header 
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
           title={`${selectedItem.data.model} Overview`}
           icon={<ModelTrainingIcon color="primary" />}
         />
-        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: 'auto' }}>
-        <Box sx={{ overflow: 'auto', height: '100%' }}>
-          <ModelDetails/>
-        </Box>
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
+          <Box sx={{ overflow: 'auto', height: '100%' }}>
+            <ModelDetails/>
+          </Box>
 
         </Box>
       </Box>
@@ -128,12 +128,12 @@ const SelectedItemViewer = () => {
 
   if (selectedItem?.type === 'instance-view') {
     return (
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <Header 
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
           title={'Instance View'}
           icon={<QueryStatsIcon color="primary" />}
         />
-        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: 'auto' }}>
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
           <InstanceView/>
         </Box>
       </Box>
@@ -142,12 +142,12 @@ const SelectedItemViewer = () => {
 
   if (selectedItem?.type === 'feature-effects') {
     return (
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <Header 
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
           title={'Feature Explainability'}
           icon={<InsightsIcon color="primary" />}
         />
-        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: 'auto' }}>
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
           <FeatureExplainability />
         </Box>
       </Box>
@@ -156,12 +156,12 @@ const SelectedItemViewer = () => {
 
   if (selectedItem?.type === 'hyperparameters') {
     return (
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <Header 
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
           title={'ML Hyperparameter Explainability'}
           icon={<PermDataSettingIcon color="primary" />}
         />
-        <Box sx={{ px: 3, py: 2, flexGrow: 1,overflow: 'auto' }}>
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
           <HyperparameterImpact />
         </Box>
       </Box>
@@ -169,7 +169,7 @@ const SelectedItemViewer = () => {
   }
 
   return (
-    <InfoMessage 
+    <InfoMessage
       message="No selection yet. Click a task or item to view its details."
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}

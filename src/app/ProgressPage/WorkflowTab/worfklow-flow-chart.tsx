@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type {
   Node,
-  Edge} from '@xyflow/react';
+  Edge } from '@xyflow/react';
 import {
   ReactFlow,
   Controls,
@@ -63,7 +63,7 @@ function FlowGraph(props: IFlowGraphProps) {
   };
 
   const getNodeSelectState = (task: ITask) => {
-      return false;
+    return false;
   };
 
   const getInitialNodeStyle = (
@@ -87,6 +87,7 @@ function FlowGraph(props: IFlowGraphProps) {
       const interactiveTask = tasks?.find(
         t => t.type === 'interactive',
       );
+
       if (interactiveTask && !interactiveTask.endTime) {
         switch (taskType) {
           case 'interactive':
@@ -113,6 +114,7 @@ function FlowGraph(props: IFlowGraphProps) {
     // Resize functionality
     const observer = new ResizeObserver(entries => {
       const { width, height } = entries[0].contentRect;
+
       setContainerSize({ width, height });
     });
 
@@ -138,39 +140,41 @@ function FlowGraph(props: IFlowGraphProps) {
 
   useEffect(() => {
     if (workflowSvg && Array.isArray(workflowSvg.tasks) && workflowSvg.tasks.length > 0) {
-      //Nodes and Edges initialization
+      // Nodes and Edges initialization
       const taskNodes = workflowSvg?.tasks?.map((task, index) => {
         const matchingParams = params?.filter(param => param.task === task.id) || [];
-        const paramNames = matchingParams.map(p => p.name).join(', ');      
+        const paramNames = matchingParams.map(p => p.name).join(', ');
+
         return {
-        id: task.name,
-        position: { x: (index + 1) * 200, y: 100 },
-        data: {
-          label:  matchingParams.length > 0 ? (
-            <Tooltip title={`Parameters: ${paramNames}`} arrow>
-              <div>{task.variant ? task.variant : task.name}</div>
-            </Tooltip>
-          ) : (
-            <div>{task.name}</div>
-          ),
-          type: task.type,
-          variant: task.variant,
-          start: task?.startTime,
-          end: task?.endTime,
-        },
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
-        selectable: getNodeSelectState(task),
-        style: {
-          ...getInitialNodeStyle(
-            task.type || '',
-            workflowSvg.tasks,
-            workflowSvg.start,
-            workflowSvg.end,
-          ),
-          cursor: 'default'
-      },
-      };});
+          id: task.name,
+          position: { x: (index + 1) * 200, y: 100 },
+          data: {
+            label: matchingParams.length > 0 ? (
+              <Tooltip title={`Parameters: ${paramNames}`} arrow>
+                <div>{task.variant ? task.variant : task.name}</div>
+              </Tooltip>
+            ) : (
+              <div>{task.name}</div>
+            ),
+            type: task.type,
+            variant: task.variant,
+            start: task?.startTime,
+            end: task?.endTime,
+          },
+          sourcePosition: Position.Right,
+          targetPosition: Position.Left,
+          selectable: getNodeSelectState(task),
+          style: {
+            ...getInitialNodeStyle(
+              task.type || '',
+              workflowSvg.tasks,
+              workflowSvg.start,
+              workflowSvg.end,
+            ),
+            cursor: 'default'
+          },
+        };
+      });
 
       const startNode = {
         id: 'start',
@@ -197,21 +201,21 @@ function FlowGraph(props: IFlowGraphProps) {
       const taskEdges =
         tasks && tasks.length > 1
           ? tasks.flatMap((task, idx) =>
-              idx <= tasks.length - 2
-                ? [
-                    {
-                      id: `${task.name}-${tasks[idx + 1].name}`,
-                      source: task.name,
-                      target: tasks[idx + 1].name,
-                      animated: true,
-                      selectable: false,
-                      reconnectable: false,
-                    },
-                  ]
-                : [],
-            )
+            idx <= tasks.length - 2
+              ? [
+                {
+                  id: `${task.name}-${tasks[idx + 1].name}`,
+                  source: task.name,
+                  target: tasks[idx + 1].name,
+                  animated: true,
+                  selectable: false,
+                  reconnectable: false,
+                },
+              ]
+              : [],
+          )
           : [];
-      
+
       // After setting nodes and edges, add a timeout to allow rendering before fitting view
       setNodes([startNode, ...taskNodes, endNode]);
       setEdges([
@@ -229,7 +233,7 @@ function FlowGraph(props: IFlowGraphProps) {
           animated: true,
         },
       ]);
-      
+
       // Add a small delay to ensure nodes are rendered before attempting to fit view
       setTimeout(() => {
         fitView({
@@ -257,12 +261,12 @@ function FlowGraph(props: IFlowGraphProps) {
         edges={edges}
         panOnDrag={true}
         zoomOnScroll={true}
-        defaultViewport={{ x:0, y:0, zoom: 1 }}
+        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         // onNodeClick={onNodeClick}
         zoomOnPinch={false}
         proOptions={{ hideAttribution: true }}
         fitView={true}
-        fitViewOptions={{ 
+        fitViewOptions={{
           padding: 0.2,
           includeHiddenNodes: true,
           minZoom: 0.5,
@@ -278,6 +282,7 @@ function FlowGraph(props: IFlowGraphProps) {
 
 function StaticDirectedGraph(props: IFlowGraphProps) {
   const { workflowSvg, params } = props;
+
   return (
     <ReactFlowProvider>
       <FlowGraph

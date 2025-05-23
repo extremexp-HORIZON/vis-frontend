@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { RootState } from '../../../../store/store';
 import { useAppSelector, useAppDispatch } from '../../../../store/store';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
-import { Box, useTheme, useMediaQuery,  } from '@mui/material';
+import { Box, useTheme, useMediaQuery  } from '@mui/material';
 import ScatterChartControlPanel from '../ChartControls/data-exploration-scatter-control';
 import Loader from '../../../../shared/components/loader';
 import { fetchUmap } from '../../../../store/slices/dataExplorationSlice';
@@ -17,7 +17,7 @@ const Uchart = () => {
   const parsedData = typeof raw === 'string' ? JSON.parse(raw) : raw;
 
   useEffect(() => {
-    if (tab?.workflowTasks.dataExploration?.scatterChart.data?.data ) {
+    if (tab?.workflowTasks.dataExploration?.scatterChart.data?.data) {
       // Ensure payload is proper 2D array of numbers
       const umapPayload = parsedData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) =>
         Object.values(row).map(val => parseFloat(val as string)),
@@ -37,10 +37,10 @@ const Uchart = () => {
 
   // Prepare VegaLite spec
   const spec = {
-    mark:{type:'point',tooltip:true} ,
+    mark: { type: 'point', tooltip: true },
     encoding: {
-      x: { field: 'x', type: 'quantitative',axis: { title:null } },
-      y: { field: 'y', type: 'quantitative',axis: { title:null } },
+      x: { field: 'x', type: 'quantitative', axis: { title: null } },
+      y: { field: 'y', type: 'quantitative', axis: { title: null } },
     },
     data: { name: 'table' },
   };
@@ -54,9 +54,9 @@ const Uchart = () => {
   const info = (
     <Loader/>
   );
-  
+
   const shouldShowInfoMessage =
-    !tab?.workflowTasks.dataExploration?.controlPanel.selectedColumns ||!chartData.length;
+    !tab?.workflowTasks.dataExploration?.controlPanel.selectedColumns || !chartData.length;
 
   return (
     <Box sx={{ height: '100%' }}>

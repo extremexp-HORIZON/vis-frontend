@@ -16,17 +16,17 @@ const PaginationComponent = () => {
   };
 
   return (
-      <Pagination
-        count={totalPages}
-        page={currentPage}
-        onChange={handleChange}
-        color="primary"
-        shape="circular"
-        siblingCount={1}
-        boundaryCount={1}
-        showFirstButton
-        showLastButton
-      />
+    <Pagination
+      count={totalPages}
+      page={currentPage}
+      onChange={handleChange}
+      color="primary"
+      shape="circular"
+      siblingCount={1}
+      boundaryCount={1}
+      showFirstButton
+      showLastButton
+    />
   );
 };
 

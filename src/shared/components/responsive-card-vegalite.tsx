@@ -139,9 +139,9 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
       const newHeight = isStatic
         ? Math.max(
-            minHeight,
-            Math.min(newWidth / aspectRatio, maxHeight, containerHeight),
-          )
+          minHeight,
+          Math.min(newWidth / aspectRatio, maxHeight, containerHeight),
+        )
         : Math.max(minHeight, Math.min(newWidth / aspectRatio, maxHeight));
 
       setWidth(newWidth);
@@ -178,10 +178,13 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     if (containerRef.current) {
       // Find the canvas element inside the container
       const canvas = containerRef.current.querySelector('canvas');
+
       if (canvas) {
         // Create a temporary link element
         const link = document.createElement('a');
-        link.download = `${title || 'chart'}_${new Date().toISOString().split('T')[0]}.png`;
+
+        link.download = `${title || 'chart'}_${new Date().toISOString()
+          .split('T')[0]}.png`;
         link.href = canvas.toDataURL('image/png');
         document.body.appendChild(link);
         link.click();
@@ -206,6 +209,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     if (fullscreenOpen) {
       // Short delay to ensure the dialog is rendered before measuring
       const timer = setTimeout(() => updateSize(), 100);
+
       return () => clearTimeout(timer);
     }
   }, [fullscreenOpen, updateSize]);
@@ -223,8 +227,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         Array.isArray((spec.data as { values: unknown }).values)
       ) {
         dataToExport = (spec.data as { values: unknown }).values;
-      }
-      else if (
+      } else if (
         typeof spec.data === 'object' &&
         spec.data !== null &&
         'name' in spec.data &&
@@ -235,14 +238,13 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       ) {
         const name = (spec.data as { name: string }).name;
         const dataMap = otherProps.data as Record<string, unknown>;
-      
+
         if (name in dataMap) {
           dataToExport = dataMap[name];
         } else {
           dataToExport = spec.data;
         }
-      }
-      else {
+      } else {
         dataToExport = spec.data;
       }
       // Convert data to JSON string
@@ -254,7 +256,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       const link = document.createElement('a');
 
       link.href = url;
-      link.download = `${title || 'chart-data'}_${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `${title || 'chart-data'}_${new Date().toISOString()
+        .split('T')[0]}.json`;
       document.body.appendChild(link);
       link.click();
 

@@ -22,7 +22,7 @@ const LoginPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Redirect to previous location from state, or default to home
   const from = location.state?.from || '/';
 
@@ -31,6 +31,7 @@ const LoginPage = () => {
     field: string,
   ) => {
     const { value } = event.target;
+
     setLoginInfo(prevState => ({
       ...prevState,
       [field]: value,
@@ -72,13 +73,13 @@ const LoginPage = () => {
       >
         <img src="/images/extremexp-logo.png" height={130} alt="ExtremeXP Logo" />
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: 0, textAlign: 'center' }}>
-          <h3 style={{marginBottom: 2}}>Login to Your Account</h3>
-          <p style={{fontSize: '14px', margin: 0, marginBottom: '2rem', color: theme.palette.error.main, height: '17px'}}>
+          <h3 style={{ marginBottom: 2 }}>Login to Your Account</h3>
+          <p style={{ fontSize: '14px', margin: 0, marginBottom: '2rem', color: theme.palette.error.main, height: '17px' }}>
             {error ? error : ' '}
           </p>
         </div>
       </div>
-      
+
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', rowGap: 20 }}>
         <TextField
           id="username"

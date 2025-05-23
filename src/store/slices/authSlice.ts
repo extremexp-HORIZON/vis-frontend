@@ -27,6 +27,7 @@ const removeToken = (): void => {
 // Load initial state from localStorage if token exists
 const loadInitialState = (): AuthState => {
   const token = localStorage.getItem('auth_token');
+
   if (token) {
     return {
       token: token,
@@ -34,6 +35,7 @@ const loadInitialState = (): AuthState => {
       error: null,
     };
   }
+
   return {
     token: null,
     isLoading: false,
@@ -55,9 +57,11 @@ export const checkAuthentication = async (externalToken: string) => {
         Authorization: `Bearer ${externalToken}`,
       },
     });
+
     return true;
   } catch (error) {
     removeToken();
+
     return false;
   }
 };
@@ -112,11 +116,13 @@ export const loginUser = createAsyncThunk(
       return response.data.access_token;
     } catch (err) {
       const error = err as AxiosError<{ error_description?: string }>;
+
       if (error.response?.data?.error_description) {
         return rejectWithValue(
           error.response.data.error_description || 'Login failed',
         );
       }
+
       return rejectWithValue('Login failed');
     }
   },
@@ -124,6 +130,7 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk('auth/logout', async () => {
   removeToken();
+
   return null;
 });
 

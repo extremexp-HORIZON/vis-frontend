@@ -28,6 +28,7 @@ const BarChartControlPanel = () => {
       tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(
         col => col.name === selectedColumn,
       );
+
     return column?.type === 'DOUBLE' ||
       column?.type === 'FLOAT' ||
       column?.type === 'INTEGER'
@@ -144,6 +145,7 @@ const BarChartControlPanel = () => {
             }
             onChange={event => {
               const value = event.target.value as string[];
+
               if (!selectedColumn) return;
               const currentAgg =
                 tab?.workflowTasks.dataExploration?.controlPanel

@@ -58,12 +58,12 @@ const ProgressPage = (props: ProgressPageProps) => {
   // }, [experiment]);
 
   useEffect(() => {
-  if (!experiment.data?.id) return;
+    if (!experiment.data?.id) return;
 
-  const fetchWorkflows = () =>
-    dispatch(fetchExperimentWorkflows(experiment?.data?.id ?? ''));
+    const fetchWorkflows = () =>
+      dispatch(fetchExperimentWorkflows(experiment?.data?.id ?? ''));
 
-  intervalId.current = setInterval(fetchWorkflows, 60 * 1000); // 1 minute
+    intervalId.current = setInterval(fetchWorkflows, 60 * 1000); // 1 minute
 
     return () => {
       if (intervalId.current) {
@@ -71,7 +71,7 @@ const ProgressPage = (props: ProgressPageProps) => {
       }
     };
 
-}, [experiment.data?.id]);
+  }, [experiment.data?.id]);
 
   useEffect(() => {
     if (workflows.data && workflows.data.length > 0) {

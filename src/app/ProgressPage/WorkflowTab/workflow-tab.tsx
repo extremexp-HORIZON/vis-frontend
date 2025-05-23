@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import { useEffect, useRef } from 'react';
-import type { RootState} from '../../../store/store';
+import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Paper } from '@mui/material';
@@ -11,7 +11,7 @@ import SelectedItemViewer from './SelectedItemViewer';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
 import { isEqual } from 'lodash';
-import { IRun } from '../../../shared/models/experiment/run.model';
+import type { IRun } from '../../../shared/models/experiment/run.model';
 
 const WorkflowTab = () => {
   const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage);
@@ -24,43 +24,45 @@ const WorkflowTab = () => {
   const theme = useTheme();
   const prevWorkflowRef = useRef<IRun | null>(null);
 
-useEffect(() => {
-  const currentWorkflow = workflows.data.find((w) => w.id === workflowId);
-  if (!currentWorkflow) {
-    navigate(`/${experimentId}/monitoring`);
-    return;
-  }
+  useEffect(() => {
+    const currentWorkflow = workflows.data.find((w) => w.id === workflowId);
 
-  const workflowWithoutRatingMetric = {
-    ...currentWorkflow,
-    metrics: (currentWorkflow.metrics || []).filter(
-      (metric) => metric.name !== "rating"
-    ),
-  };
+    if (!currentWorkflow) {
+      navigate(`/${experimentId}/monitoring`);
 
-  if (!isEqual(prevWorkflowRef.current, workflowWithoutRatingMetric)) {
-    prevWorkflowRef.current = workflowWithoutRatingMetric;
-    dispatch(initTab({ tab: workflowId, workflows }));
-  }
-}, [workflows.data]);
+      return;
+    }
 
+    const workflowWithoutRatingMetric = {
+      ...currentWorkflow,
+      metrics: (currentWorkflow.metrics || []).filter(
+        (metric) => metric.name !== 'rating'
+      ),
+    };
+
+    if (!isEqual(prevWorkflowRef.current, workflowWithoutRatingMetric)) {
+      prevWorkflowRef.current = workflowWithoutRatingMetric;
+      dispatch(initTab({ tab: workflowId, workflows }));
+    }
+  }, [workflows.data]);
 
   useEffect(() => {
     const metricNames = tab?.workflowMetrics.data?.map((m) => m.name);
+
     if (experimentId && workflowId && metricNames && isTabInitialized) {
-      dispatch(fetchWorkflowMetrics({experimentId, workflowId, metricNames}));
+      dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
     }
-  },[workflows.data, isTabInitialized]);
+  }, [workflows.data, isTabInitialized]);
 
   useEffect(() => {
     return () => {
       dispatch(resetWorkflowTab());
     };
   }, []);
- 
+
   return (
-    <Box sx={{height: '100%', display: 'flex', flexDirection: 'column', gap: 1}}>
-      <Box sx={{p: 2, height: '100%', display: 'flex', direction: 'row', gap: 1, overflow: 'hidden'}}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <Box sx={{ p: 2, height: '100%', display: 'flex', direction: 'row', gap: 1, overflow: 'hidden' }}>
         <Resizable
           defaultSize={{
             width: '25%',
@@ -79,7 +81,7 @@ useEffect(() => {
           }}
           maxWidth="30%"
           maxHeight="100%"
-          style={{ height: '100%', position: 'relative'}}          
+          style={{ height: '100%', position: 'relative' }}
           handleStyles={{
             right: {
               display: 'flex',
@@ -98,9 +100,9 @@ useEffect(() => {
                   width: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center', 
+                  justifyContent: 'center',
                   cursor: 'ew-resize',
-                }}        
+                }}
               >
                 <MoreVertRoundedIcon style={{ color: theme.palette.action.active }} />
               </Box>

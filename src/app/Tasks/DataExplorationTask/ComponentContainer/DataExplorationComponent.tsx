@@ -82,23 +82,23 @@ const DataExplorationComponent = () => {
         flexDirection: 'column',
         rowGap: 1,
         height: '100%',
-        overflow: 'auto', //enables scrolling when table minHeight is applied in the overview page
+        overflow: 'auto', // enables scrolling when table minHeight is applied in the overview page
       }}
     >
       <LeftPanel />
-      
-        <Paper
-          elevation={1}
-          sx={{ flex: 1, overflow: 'auto', height: '100%', width: '100%' }}
-        >
-          {chartType === 'datatable' && <TableExpand />}
-          {chartType === 'line' && <LineChart />}
-          {chartType === 'scatter' && <ScatterChart />}
-          {chartType === 'bar' && <BarChart />}
-          {chartType === 'heatmap' && <HeatMap/>}
-          {chartType === 'map' && (<MapCardWrapper/>)}
-        </Paper>
-      
+
+      <Paper
+        elevation={1}
+        sx={{ flex: 1, overflow: 'auto', height: '100%', width: '100%' }}
+      >
+        {chartType === 'datatable' && <TableExpand />}
+        {chartType === 'line' && <LineChart />}
+        {chartType === 'scatter' && <ScatterChart />}
+        {chartType === 'bar' && <BarChart />}
+        {chartType === 'heatmap' && <HeatMap/>}
+        {chartType === 'map' && (<MapCardWrapper/>)}
+      </Paper>
+
     </Box>
   );
 };

@@ -20,23 +20,23 @@ const WorkflowRating = ({
   const [isPolling, setPolling] = useState(false);
   const [localRating, setLocalRating] = useState<number | null>(null);
 
-const handleUserEvaluation = async (value: number | null) => {
-  if (!experimentId || !workflowId) return;
+  const handleUserEvaluation = async (value: number | null) => {
+    if (!experimentId || !workflowId) return;
 
-  setPolling(true);
-  setLocalRating(value);
+    setPolling(true);
+    setLocalRating(value);
 
-  await dispatch(
-    fetchUserEvaluation({
-      experimentId,
-      runId: workflowId,
-      data: { rating: value },
-    })
-  );
+    await dispatch(
+      fetchUserEvaluation({
+        experimentId,
+        runId: workflowId,
+        data: { rating: value },
+      })
+    );
 
-  setLocalRating(null);
-  setPolling(false);
-};
+    setLocalRating(null);
+    setPolling(false);
+  };
 
   return (
     <Rating
@@ -44,7 +44,7 @@ const handleUserEvaluation = async (value: number | null) => {
       value={localRating !== null ? localRating : currentRating}
       size="small"
       disabled={isPolling}
-      onChange={(_, value) => {if (value !== null) handleUserEvaluation(value);}}
+      onChange={(_, value) => { if (value !== null) handleUserEvaluation(value); }}
     />
   );
 };

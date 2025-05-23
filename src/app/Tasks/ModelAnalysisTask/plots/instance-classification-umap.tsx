@@ -1,10 +1,10 @@
 
-import type { Dispatch, SetStateAction} from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect } from 'react';
 import { Box, FormControl, InputLabel, MenuItem, Select, Switch, Typography, useMediaQuery, useTheme } from '@mui/material';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import Loader from '../../../../shared/components/loader';
-import type { RootState} from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchUmap } from '../../../../store/slices/dataExplorationSlice';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
@@ -99,18 +99,18 @@ const ControlPanel = ({
               ))}
           </Select>
         </FormControl>
-      </Box>           
+      </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.2 }}>
-       <Typography 
-          variant="caption" 
-          sx={{ 
+        <Typography
+          variant="caption"
+          sx={{
             fontWeight: 500,
-          
+
           }}
         >
           UMAP
         </Typography>
-          
+
         <Switch
           checked={useUmap}
           onChange={(e) => setUseUmap(e.target.checked)}
@@ -120,6 +120,7 @@ const ControlPanel = ({
     </>
   );
 };
+
 interface Umapi {
   point: { id: string; data: TestInstance } | null
   showMisclassifiedOnly: boolean
@@ -132,35 +133,36 @@ interface Umapi {
 const InstanceClassificationUmap = (props: Umapi) => {
   const theme = useTheme();
   const { setPoint, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props;
-    const tab = useAppSelector((state: RootState) => state.workflowPage.tab);
-    const raw = tab?.workflowTasks.modelAnalysis?.modelInstances.data;
-    const parsedData = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
-    
+  const tab = useAppSelector((state: RootState) => state.workflowPage.tab);
+  const raw = tab?.workflowTasks.modelAnalysis?.modelInstances.data;
+  const parsedData = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
+
   const dispatch = useAppDispatch();
-  
-    useEffect(() => {
-      if (raw) {
-        // Ensure payload is proper 2D array of numbers
-        const umapPayload = parsedData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) =>
-          Object.values(row).map(val => parseFloat(val as string)),
-        );
-  
-        dispatch(
-          fetchUmap({
-            data: umapPayload.slice(0, 2000), // Limit to first 1000 rows
-            metadata: {
-              workflowId: tab?.workflowId,
-              query: 'umap',
-            },
-          }),
-        );
-      }
-    }, [raw, dispatch]);
+
+  useEffect(() => {
+    if (raw) {
+      // Ensure payload is proper 2D array of numbers
+      const umapPayload = parsedData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) =>
+        Object.values(row).map(val => parseFloat(val as string)),
+      );
+
+      dispatch(
+        fetchUmap({
+          data: umapPayload.slice(0, 2000), // Limit to first 1000 rows
+          metadata: {
+            workflowId: tab?.workflowId,
+            query: 'umap',
+          },
+        }),
+      );
+    }
+  }, [raw, dispatch]);
   const getVegaData = (data: TestInstance[]) => {
     return data.map((originalRow: TestInstance) => {
       const id = hashRow(originalRow);
       const isMisclassified = originalRow.actual !== originalRow.predicted;
+
       return {
         ...originalRow,
         isMisclassified,
@@ -169,48 +171,50 @@ const InstanceClassificationUmap = (props: Umapi) => {
     });
   };
 
-const umapResult = tab?.workflowTasks.dataExploration?.umap?.data ?? [];
-const combinedPlotData = umapResult.map((point: number[], index: number) => {
-  const original = parsedData[index];
-  const actual = original?.actual ?? '?';
-  const predicted = original?.predicted ?? '?';
-  return {
-    x: point[0],
-    y: point[1],
-    actual,
-    predicted,
-    index,
-  };
-});
+  const umapResult = tab?.workflowTasks.dataExploration?.umap?.data ?? [];
+  const combinedPlotData = umapResult.map((point: number[], index: number) => {
+    const original = parsedData[index];
+    const actual = original?.actual ?? '?';
+    const predicted = original?.predicted ?? '?';
 
-const handleNewView = (view: View) => {
-  view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
-    if (item && item.datum?.isMisclassified) {
-      const clickedIndex = item.datum.index;
-      const originalRow = parsedData[clickedIndex]; // This is the row you want
-
-      const id = hashRow(originalRow);
-      const { actual, predicted, ...rest } = originalRow;
-
-      setPoint({
-        id,
-        data: {
-          ...rest,
-          'label':actual,
-          predicted,
-          // index: clickedIndex,
-        },
-      });
-    } else {
-      setPoint(null);
-    }
+    return {
+      x: point[0],
+      y: point[1],
+      actual,
+      predicted,
+      index,
+    };
   });
-};
+
+  const handleNewView = (view: View) => {
+    view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
+      if (item && item.datum?.isMisclassified) {
+        const clickedIndex = item.datum.index;
+        const originalRow = parsedData[clickedIndex]; // This is the row you want
+
+        const id = hashRow(originalRow);
+        const { actual, predicted, ...rest } = originalRow;
+
+        setPoint({
+          id,
+          data: {
+            ...rest,
+            'label': actual,
+            predicted,
+          // index: clickedIndex,
+          },
+        });
+      } else {
+        setPoint(null);
+      }
+    });
+  };
 
   const info = (
     <Loader/>
   );
   const shouldShowInfoMessage = tab?.workflowTasks.dataExploration?.umap.loading && !tab?.workflowTasks.dataExploration?.umap.data;
+
   return (
     <ResponsiveCardVegaLite
       spec={{
@@ -246,9 +250,9 @@ const handleNewView = (view: View) => {
         },
 
         encoding: {
-             x: { field: 'x', type: 'quantitative',axis: { title:null } },
-      y: { field: 'y', type: 'quantitative',axis: { title:null } },
-        
+          x: { field: 'x', type: 'quantitative', axis: { title: null } },
+          y: { field: 'y', type: 'quantitative', axis: { title: null } },
+
           color: showMisclassifiedOnly
             ? {
               field: 'isMisclassified',
@@ -263,7 +267,7 @@ const handleNewView = (view: View) => {
               },
             }
             : {
-              field: 'predicted', 
+              field: 'predicted',
               type: 'nominal',
               scale: {
                 range: ['#1f77b4', '#2ca02c'],
@@ -284,23 +288,23 @@ const handleNewView = (view: View) => {
             : {
               value: 0.8,
             },
-            size: showMisclassifiedOnly?{
-              field: 'isMisclassified',
-              type: 'nominal',
-              scale: {
-                domain: [false, true],
-                range: [60, 200],
-                legend: false
-              },
-            }:
+          size: showMisclassifiedOnly ? {
+            field: 'isMisclassified',
+            type: 'nominal',
+            scale: {
+              domain: [false, true],
+              range: [60, 200],
+              legend: false
+            },
+          } :
             {
               value: 100,
             },
-       
+
           tooltip: [
             { field: 'actual', type: 'nominal', title: 'Actual' },
             { field: 'predicted', type: 'nominal', title: 'Predicted' },
-          
+
           ]
         },
       }}
@@ -309,7 +313,7 @@ const handleNewView = (view: View) => {
       onNewView={handleNewView}
       infoMessage={info}
       showInfoMessage={shouldShowInfoMessage}
-        aspectRatio={isSmallScreen ? 2.8 : 1.8}
+      aspectRatio={isSmallScreen ? 2.8 : 1.8}
       maxHeight={480}
       isStatic={true}
       controlPanel={
@@ -320,10 +324,10 @@ const handleNewView = (view: View) => {
           setYAxisOption={() => {}}
           showMisclassifiedOnly={showMisclassifiedOnly}
           options={[]}
-          plotData={null} useUmap={useUmap} setUseUmap={setuseUmap}          
+          plotData={null} useUmap={useUmap} setUseUmap={setuseUmap}
         />
       }
-       
+
     />
   );
 };

@@ -40,7 +40,7 @@ export interface IDataExploration {
     loading: boolean
     error: string | null
   }
-  
+
   metaData: {
     data: IDataExplorationMetaDataResponse | null
     loading: boolean
@@ -58,25 +58,25 @@ export interface IDataExploration {
     totalPages: number
     timestampField: string | null
 
-    //Line
+    // Line
     xAxis: VisualColumn
     yAxis: VisualColumn[]
-    //Bar
+    // Bar
     barGroupBy: string[]
-    barAggregation: Record<string,string[]>
+    barAggregation: Record<string, string[]>
     selectedMeasureColumn: string | null
 
-    //Scatter
+    // Scatter
     xAxisScatter: VisualColumn
     yAxisScatter: VisualColumn[]
     colorBy: VisualColumn
     umap: boolean
-    //Heatmap
+    // Heatmap
     barGroupByHeat: string[]
-    barAggregationHeat: Record<string,string[]>
+    barAggregationHeat: Record<string, string[]>
     selectedMeasureColumnHeat: string | null
 
-    //Map
+    // Map
     colorByMap: string
     segmentBy: string[]
     lat: string
@@ -171,9 +171,9 @@ export const dataExplorationDefault: IDataExploration = {
     pageSize: 100,
     queryItems: 0,
     totalPages: 0,
-    
+
   },
-  
+
   chart: {
     data: null,
     loading: false,

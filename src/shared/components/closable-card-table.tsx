@@ -81,9 +81,9 @@ const ClosableCardTable: React.FC<ClosableCardTableProps> = ({
                 {controlPanel}
               </Box>
             )}
-            
+
             {additionalOptions}
-            
+
             {showDownloadButton && onDownload && (
               <Button
                 onClick={handleDownload}
@@ -95,13 +95,13 @@ const ClosableCardTable: React.FC<ClosableCardTableProps> = ({
                 {downloadLabel}
               </Button>
             )}
-            
+
             <IconButton
               edge="end"
               color="inherit"
               onClick={onClose}
               aria-label="close"
-              sx={{mr: 1}}
+              sx={{ mr: 1 }}
             >
               <CloseIcon />
             </IconButton>

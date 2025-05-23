@@ -50,79 +50,79 @@ const ControlPanel = ({
       <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, px: 1.5 }}>
         {/* X-Axis Selector */}
         <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">
-              <Box display="flex" alignItems="center" gap={1}>
-                <ShowChartIcon fontSize="small" />
+          <InputLabel id="x-axis-select-label">
+            <Box display="flex" alignItems="center" gap={1}>
+              <ShowChartIcon fontSize="small" />
                 X-Axis
-              </Box>
-            </InputLabel>
-            <Select
-              labelId="x-axis-select-label"
-              label="X-Axis-----"
-              disabled={plotData?.loading || !plotData?.data}
-              value={xAxisOption}
-              onChange={handleAxisSelection('x')}
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {options
-                .filter(option => option !== yAxisOption)
-                .map((feature, idx) => (
-                  <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
-                    {feature}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-            <InputLabel id="y-axis-select-label">
-              <Box display="flex" alignItems="center" gap={1}>
-                <ShowChartIcon fontSize="small" />
+            </Box>
+          </InputLabel>
+          <Select
+            labelId="x-axis-select-label"
+            label="X-Axis-----"
+            disabled={plotData?.loading || !plotData?.data}
+            value={xAxisOption}
+            onChange={handleAxisSelection('x')}
+            MenuProps={{
+              PaperProps: { style: { maxHeight: 224, width: 250 } },
+            }}
+          >
+            {options
+              .filter(option => option !== yAxisOption)
+              .map((feature, idx) => (
+                <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
+                  {feature}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel id="y-axis-select-label">
+            <Box display="flex" alignItems="center" gap={1}>
+              <ShowChartIcon fontSize="small" />
                 Y-Axis
-              </Box>
-            </InputLabel>
-            <Select
-              labelId="y-axis-select-label"
-              label="Y-Axis-----"
-              disabled={plotData?.loading || !plotData?.data}
-              value={xAxisOption}
-              onChange={handleAxisSelection('y')}
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {options
-                .filter(option => option !== yAxisOption)
-                .map((feature, idx) => (
-                  <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
-                    {feature}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-          </Box>
-          
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.2 }}>
+            </Box>
+          </InputLabel>
+          <Select
+            labelId="y-axis-select-label"
+            label="Y-Axis-----"
+            disabled={plotData?.loading || !plotData?.data}
+            value={xAxisOption}
+            onChange={handleAxisSelection('y')}
+            MenuProps={{
+              PaperProps: { style: { maxHeight: 224, width: 250 } },
+            }}
+          >
+            {options
+              .filter(option => option !== yAxisOption)
+              .map((feature, idx) => (
+                <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
+                  {feature}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+      </Box>
 
-           <Typography 
-                variant="caption" 
-                sx={{ 
-                  fontWeight: 500,
-                 
-                }}
-              >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.2 }}>
+
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 500,
+
+          }}
+        >
                 UMAP
-              </Typography>
-        
-    <Switch
-      checked={useUmap}
-      onChange={(e) => setUseUmap(e.target.checked)}
-      color="primary"
-    />
+        </Typography>
+
+        <Switch
+          checked={useUmap}
+          onChange={(e) => setUseUmap(e.target.checked)}
+          color="primary"
+        />
 
       </Box>
-     
+
     </>
   );
 };
@@ -140,9 +140,9 @@ interface IInstanceClassification {
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
-const theme = useTheme();
+  const theme = useTheme();
 
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));  
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
   const [options, setOptions] = useState<string[]>([]);
   const [xAxisOption, setXAxisOption] = useState<string>('');
@@ -160,6 +160,7 @@ const theme = useTheme();
     return data.map((originalRow: TestInstance) => {
       const id = hashRow(originalRow);
       const isMisclassified = originalRow.actual !== originalRow.predicted;
+
       return {
         ...originalRow,
         isMisclassified,
@@ -180,24 +181,24 @@ const theme = useTheme();
       setYAxisOption(options[1]);
     }
   }, [options]);
-  
-const handleNewView = (view: View) => {
-  view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
-    const datum = item?.datum as (Partial<TestInstance> & { id: string; isMisclassified?: boolean }) | undefined;
 
-    if (datum?.isMisclassified) {
-      const { id, ...dataWithoutId } = datum;
+  const handleNewView = (view: View) => {
+    view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
+      const datum = item?.datum as (Partial<TestInstance> & { id: string; isMisclassified?: boolean }) | undefined;
 
-      const cleanedData = Object.fromEntries(
-        Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
-      ) as TestInstance;
+      if (datum?.isMisclassified) {
+        const { id, ...dataWithoutId } = datum;
 
-      setPoint({ id, data: cleanedData });
-    } else {
-      setPoint(null);
-    }
-  });
-};
+        const cleanedData = Object.fromEntries(
+          Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
+        ) as TestInstance;
+
+        setPoint({ id, data: cleanedData });
+      } else {
+        setPoint(null);
+      }
+    });
+  };
 
   const info = (
     <Box
@@ -220,89 +221,89 @@ const handleNewView = (view: View) => {
         point={point}
         showMisclassifiedOnly={showMisclassifiedOnly}
         setPoint={setPoint}
-        hashRow={hashRow} 
-        useUmap={useUmap} 
-        setuseUmap={setUseUmap } 
+        hashRow={hashRow}
+        useUmap={useUmap}
+        setuseUmap={setUseUmap }
       />
     ) : (
-    <ResponsiveCardVegaLite
-      spec={{
-        width: 'container',
-        height: 'container',
-        autosize: { type: 'fit', contains: 'padding', resize: true },
-        data: {
-          values: getVegaData(plotData?.data ?? []),
-        },
-        params: [
-          {
-            name: 'pts',
-            select: { type: 'point', toggle: false },
-            bind: 'legend',
+      <ResponsiveCardVegaLite
+        spec={{
+          width: 'container',
+          height: 'container',
+          autosize: { type: 'fit', contains: 'padding', resize: true },
+          data: {
+            values: getVegaData(plotData?.data ?? []),
           },
-          {
-            name: 'highlight',
-            select: { type: 'point', on: 'click', clear: 'clickoff',    fields: ['isMisclassified'],
+          params: [
+            {
+              name: 'pts',
+              select: { type: 'point', toggle: false },
+              bind: 'legend',
             },
-            value: { isMisclassified: true }
+            {
+              name: 'highlight',
+              select: { type: 'point', on: 'click', clear: 'clickoff',    fields: ['isMisclassified'],
+              },
+              value: { isMisclassified: true }
 
+            },
+            {
+              name: 'panZoom',
+              select: 'interval',
+              bind: 'scales',
+            },
+          ],
+          mark: {
+            type: 'point',
+            filled: true,
+            size: 100,
           },
-          {
-            name: 'panZoom',
-            select: 'interval',
-            bind: 'scales',
-          },
-        ],
-        mark: {
-          type: 'point',
-          filled: true,
-          size: 100,
-        },
 
-        encoding: {
-          x: {
-            field: xAxisOption || 'xAxis default',
-            type: 'quantitative',
-          },
-          y: {
-            field: yAxisOption || 'yAxis default',
-            type: 'quantitative',
-          },
-          color: showMisclassifiedOnly
-            ? {
-              field: 'isMisclassified',
-              type: 'nominal',
-              scale: {
-                domain: [false, true],
-                range: ['#cccccc', '#ff0000'],
-              },
-              legend: {
-                title: 'Misclassified',
-                labelExpr: 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\'',
-              },
-            }
-            : {
-              field: 'predicted', 
-              type: 'nominal',
-              scale: {
-                range: ['#1f77b4', '#2ca02c'],
-              },
-              legend: {
-                title: 'Predicted Class',
-              },
+          encoding: {
+            x: {
+              field: xAxisOption || 'xAxis default',
+              type: 'quantitative',
             },
-          opacity: showMisclassifiedOnly
-            ? {
-              field: 'isMisclassified',
-              type: 'nominal',
-              scale: {
-                domain: [false, true],
-                range: [0.45, 1.0],
-              },
-            }
-            : {
-              value: 0.8,
+            y: {
+              field: yAxisOption || 'yAxis default',
+              type: 'quantitative',
             },
-            size: showMisclassifiedOnly?{
+            color: showMisclassifiedOnly
+              ? {
+                field: 'isMisclassified',
+                type: 'nominal',
+                scale: {
+                  domain: [false, true],
+                  range: ['#cccccc', '#ff0000'],
+                },
+                legend: {
+                  title: 'Misclassified',
+                  labelExpr: 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\'',
+                },
+              }
+              : {
+                field: 'predicted',
+                type: 'nominal',
+                scale: {
+                  range: ['#1f77b4', '#2ca02c'],
+                },
+                legend: {
+                  title: 'Predicted Class',
+                },
+              },
+            opacity: showMisclassifiedOnly
+              ? {
+                field: 'isMisclassified',
+                type: 'nominal',
+                scale: {
+                  domain: [false, true],
+                  range: [0.45, 1.0],
+                },
+              }
+              : {
+                value: 0.8,
+              },
+            size: showMisclassifiedOnly ? {
               field: 'isMisclassified',
               type: 'nominal',
               scale: {
@@ -310,58 +311,58 @@ const handleNewView = (view: View) => {
                 range: [60, 200],
                 legend: false
               },
-            }:
-            {
-              value: 100,
-            },
-          // stroke: {
-          //   condition: {
-          //     param: "highlight",
-          //     empty: false,
-          //     value: "black", 
-          //   },
-          //   value: "transparent"
-          // },
-          // strokeWidth: {
-          //   condition: {
-          //     param: "highlight", 
-          //     empty: false, 
-          //     value: 2 
-          //   },
-          //   value: 0
-          // },
-          tooltip: [
-            { field: 'actual', type: 'nominal', title: 'Actual' },
-            { field: 'predicted', type: 'nominal', title: 'Predicted' },
-            { field: xAxisOption || 'xAxis default', type: 'quantitative', title: xAxisOption },
-            { field: yAxisOption || 'yAxis default', type: 'quantitative', title: yAxisOption },
-          ]
-        },
-      }}
+            } :
+              {
+                value: 100,
+              },
+            // stroke: {
+            //   condition: {
+            //     param: "highlight",
+            //     empty: false,
+            //     value: "black",
+            //   },
+            //   value: "transparent"
+            // },
+            // strokeWidth: {
+            //   condition: {
+            //     param: "highlight",
+            //     empty: false,
+            //     value: 2
+            //   },
+            //   value: 0
+            // },
+            tooltip: [
+              { field: 'actual', type: 'nominal', title: 'Actual' },
+              { field: 'predicted', type: 'nominal', title: 'Predicted' },
+              { field: xAxisOption || 'xAxis default', type: 'quantitative', title: xAxisOption },
+              { field: yAxisOption || 'yAxis default', type: 'quantitative', title: yAxisOption },
+            ]
+          },
+        }}
 
-      title={'Instance Classification Chart'}
-      actions={false}
-      controlPanel={
-        <ControlPanel
-          xAxisOption={xAxisOption}
-          yAxisOption={yAxisOption}
-          setXAxisOption={setXAxisOption}
-          setYAxisOption={setYAxisOption}
-          showMisclassifiedOnly={showMisclassifiedOnly}
-          options={options}
-          plotData={plotData} 
-          useUmap={useUmap} 
-          setUseUmap={setUseUmap}          
-        />
-      }
-      onNewView={handleNewView}
-      infoMessage={info}
-      showInfoMessage={shouldShowInfoMessage}
-      aspectRatio={isSmallScreen ? 2.8 : 1.8}
-      maxHeight={480}
-      isStatic={true}
-    />
-)
+        title={'Instance Classification Chart'}
+        actions={false}
+        controlPanel={
+          <ControlPanel
+            xAxisOption={xAxisOption}
+            yAxisOption={yAxisOption}
+            setXAxisOption={setXAxisOption}
+            setYAxisOption={setYAxisOption}
+            showMisclassifiedOnly={showMisclassifiedOnly}
+            options={options}
+            plotData={plotData}
+            useUmap={useUmap}
+            setUseUmap={setUseUmap}
+          />
+        }
+        onNewView={handleNewView}
+        infoMessage={info}
+        showInfoMessage={shouldShowInfoMessage}
+        aspectRatio={isSmallScreen ? 2.8 : 1.8}
+        maxHeight={480}
+        isStatic={true}
+      />
+    )
 
   );
 };

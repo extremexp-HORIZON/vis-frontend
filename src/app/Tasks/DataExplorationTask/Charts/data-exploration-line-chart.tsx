@@ -29,6 +29,7 @@ type LineChartDataRow = Record<string, number | string | Date | null>;
 
 const getAxisEncoding = (type: string, name?: string) => {
   const fieldType = getColumnType(type, name);
+
   return {
     type: fieldType,
     axis: {
@@ -60,7 +61,7 @@ const LineChart = () => {
         ].filter((col): col is string => typeof col === 'string')
       )
     );
-    
+
     if (!datasetId || !xAxis || !yAxis?.length) return;
 
     dispatch(
@@ -102,7 +103,7 @@ const LineChart = () => {
   }) => {
     const xField = xAxis.name;
     const longData: LineChartDataRow[] = [];
-  
+
     data.forEach(row => {
       yAxis.forEach(y => {
         longData.push({
@@ -112,7 +113,7 @@ const LineChart = () => {
         });
       });
     });
-  
+
     return {
       data: { values: longData },
       mark: { type: 'line', tooltip: true },
@@ -123,7 +124,7 @@ const LineChart = () => {
       },
     };
   };
-  
+
   const getSingleLineSpec = ({
     data,
     xAxis,
@@ -146,7 +147,7 @@ const LineChart = () => {
         y: {
           field: y.name,
           ...getAxisEncoding(y.type, y.name),
-          
+
         },
       },
     };
@@ -158,12 +159,13 @@ const LineChart = () => {
   const hasValidYAxis = Array.isArray(yAxis) && yAxis.length > 0;
 
   let infoMessageText = '';
+
   if (!hasValidXAxis || !hasValidYAxis) {
     infoMessageText = 'Please select x-Axis and y-Axis to display the chart.';
   } else if (!hasData) {
     infoMessageText = 'No data available for the selected configuration.';
   }
-  
+
   const info = (
     <InfoMessage
       message={infoMessageText}
@@ -180,51 +182,51 @@ const LineChart = () => {
       {shouldShowInfoMessage && !(
         tab?.workflowTasks.dataExploration?.lineChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading
       ) ? (
-        <ResponsiveCardVegaLite
-          spec={{}}
-          title="Line Chart"
-          actions={false}
-          controlPanel={<LineChartControlPanel />}
-          infoMessage={info}
-          showInfoMessage={true}
-          maxHeight={isSmallScreen ? undefined : 500}
-          aspectRatio={isSmallScreen ? 2.8 : 1.8}
-        />
-      ) : displayMode === 'overlay' ? (
-        <ResponsiveCardVegaLite
-          spec={getLineChartSpec({
-            data: Array.isArray(chartData) ? chartData : [],
-            xAxis: xAxis as VisualColumn,
-            yAxis: yAxis as VisualColumn[],
-          })}
-          title="Line Chart"
-          actions={false}
-          controlPanel={<LineChartControlPanel />}
-          maxHeight={500}
-          aspectRatio={isSmallScreen ? 2.8 : 1.8}
-          loading={tab?.workflowTasks.dataExploration?.lineChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
-        />
-      ) : (
-        <Grid container spacing={2}>
-          {yAxis?.map(y => (
-            <Grid key={`grid-${y.name}`} item xs={12} >
-              <ResponsiveCardVegaLite
-                key={y.name}
-                spec={getSingleLineSpec({
-                  data: Array.isArray(chartData) ? chartData : [],
-                  xAxis: xAxis as VisualColumn,
-                  y,
-                })}
-                title={y.name}
-                actions={false}
-                controlPanel={<LineChartControlPanel />}
-                loading={tab?.workflowTasks.dataExploration?.lineChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
-                isStatic={false}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+          <ResponsiveCardVegaLite
+            spec={{}}
+            title="Line Chart"
+            actions={false}
+            controlPanel={<LineChartControlPanel />}
+            infoMessage={info}
+            showInfoMessage={true}
+            maxHeight={isSmallScreen ? undefined : 500}
+            aspectRatio={isSmallScreen ? 2.8 : 1.8}
+          />
+        ) : displayMode === 'overlay' ? (
+          <ResponsiveCardVegaLite
+            spec={getLineChartSpec({
+              data: Array.isArray(chartData) ? chartData : [],
+              xAxis: xAxis as VisualColumn,
+              yAxis: yAxis as VisualColumn[],
+            })}
+            title="Line Chart"
+            actions={false}
+            controlPanel={<LineChartControlPanel />}
+            maxHeight={500}
+            aspectRatio={isSmallScreen ? 2.8 : 1.8}
+            loading={tab?.workflowTasks.dataExploration?.lineChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
+          />
+        ) : (
+          <Grid container spacing={2}>
+            {yAxis?.map(y => (
+              <Grid key={`grid-${y.name}`} item xs={12} >
+                <ResponsiveCardVegaLite
+                  key={y.name}
+                  spec={getSingleLineSpec({
+                    data: Array.isArray(chartData) ? chartData : [],
+                    xAxis: xAxis as VisualColumn,
+                    y,
+                  })}
+                  title={y.name}
+                  actions={false}
+                  controlPanel={<LineChartControlPanel />}
+                  loading={tab?.workflowTasks.dataExploration?.lineChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
+                  isStatic={false}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
     </Box>
   );
 };

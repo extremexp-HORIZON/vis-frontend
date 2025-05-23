@@ -5,21 +5,22 @@ interface INoRowsOverlayProps {
     title: string
 }
 
- const NoRowsOverlay = (props: INoRowsOverlayProps) => {
-    const {title} = props;
-    return (
-        <Box
-            height="100%"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            flexDirection="column"
-        >
-        <PlaylistRemoveRoundedIcon fontSize="large" />
-        <Typography variant="body2">{title}</Typography>
-      </Box>
-    
-    );
+const NoRowsOverlay = (props: INoRowsOverlayProps) => {
+  const { title } = props;
+
+  return (
+    <Box
+      height="100%"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      flexDirection="column"
+    >
+      <PlaylistRemoveRoundedIcon fontSize="large" />
+      <Typography variant="body2">{title}</Typography>
+    </Box>
+
+  );
 };
 
 interface INoRowsOverlayProps {
@@ -27,7 +28,7 @@ interface INoRowsOverlayProps {
 }
 
 const NoRowsOverlayWrapper = (props: INoRowsOverlayProps) => {
-    return <NoRowsOverlay title={props?.title} />;
-  };
+  return <NoRowsOverlay title={props?.title} />;
+};
 
 export default NoRowsOverlayWrapper;

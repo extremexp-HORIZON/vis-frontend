@@ -15,6 +15,7 @@ const BarChart = () => {
   const theme = useTheme();
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
+
   useEffect(() => {
     const groupBy = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy;
     const aggregation =
@@ -61,24 +62,24 @@ const BarChart = () => {
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
-const transformedData =
+  const transformedData =
   Array.isArray(tab?.workflowTasks.dataExploration?.barChart.data?.data) && Array.isArray(yAxisColumns)
     ? tab?.workflowTasks.dataExploration?.barChart.data?.data.flatMap(item =>
-        yAxisColumns.map(col => ({
-          [xAxisColumn as string]: item[xAxisColumn as string],
-          type: col,
-          value: item[col],
-          ...Object.fromEntries(
-            (categoricalColumns || []).map(catCol => [
-              catCol.name,
-              item[catCol.name],
-            ])
-          ),
-        }))
-      )
+      yAxisColumns.map(col => ({
+        [xAxisColumn as string]: item[xAxisColumn as string],
+        type: col,
+        value: item[col],
+        ...Object.fromEntries(
+          (categoricalColumns || []).map(catCol => [
+            catCol.name,
+            item[catCol.name],
+          ])
+        ),
+      }))
+    )
     : [];
 
-    const limitedData = transformedData?.slice(0, 20);
+  const limitedData = transformedData?.slice(0, 20);
 
   const specification = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',

@@ -31,13 +31,13 @@ export const prepareDataExplorationResponse = (payload: IDataExplorationResponse
   data: JSON.parse(payload.data as string),
 });
 
-//TODO: fix this whit correct typings to support multiple timeseries
+// TODO: fix this whit correct typings to support multiple timeseries
 export const handleMultiTimeSeriesData = (payload : IDataExplorationResponse) => {
   const fileData: RawRow[][] = JSON.parse(payload.data as string);
   // const seriesData = payload.fileNames;
   const flatFileData: ParsedRow[] =  fileData.flatMap((file, id)=> {
-    return file.map( row => {
-      return { 
+    return file.map(row => {
+      return {
         ...row,
         timestamp: new Date(row.timestamp), // Ensure timestamp is parsed as Date object
         value: +row.f3, // Ensure value is a number
@@ -45,7 +45,8 @@ export const handleMultiTimeSeriesData = (payload : IDataExplorationResponse) =>
       };
     });
   });
-  return {...payload, data: flatFileData};
+
+  return { ...payload, data: flatFileData };
 };
 
 export interface IModelAnalysis {
@@ -103,7 +104,7 @@ export interface IModelAnalysis {
       dataSplitSizes: Record<string, number>
     } | null
     loading: boolean
-    error: string | null  
+    error: string | null
   }
 }
 
@@ -116,7 +117,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   influenceFunctions: { data: null, loading: false, error: null },
   modelInstances: { data: null, loading: false, error: null },
   modelConfusionMatrix: { data: null, loading: false, error: null },
-  modelRocCurve: {data: null, loading: false, error: null },
+  modelRocCurve: { data: null, loading: false, error: null },
   multipleTimeSeries: { data: null, loading: false, error: null },
   multipleTimeSeriesMetadata: { data: null, loading: false, error: null },
   affected: { data: null, loading: false, error: null },

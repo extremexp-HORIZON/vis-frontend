@@ -13,7 +13,7 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredW
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useRef, useState } from 'react';
-import { Badge,  IconButton, Popover, styled, } from '@mui/material';
+import { Badge,  IconButton, Popover, styled } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
 import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
@@ -42,19 +42,19 @@ const WorkflowActions = (props: {
   return (
     <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
       <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== 'pending_input'}>
-      <Link
-        to={`/${experimentId}/workflow?workflowId=${workflowId}`}
-      >
-        <IconButton>
-          <LaunchIcon
-            style={{
-              cursor: 'pointer',
-              color: theme.palette.primary.main,
-            }}
-          />
-        </IconButton>
-      </Link>
-        </Badge>
+        <Link
+          to={`/${experimentId}/workflow?workflowId=${workflowId}`}
+        >
+          <IconButton>
+            <LaunchIcon
+              style={{
+                cursor: 'pointer',
+                color: theme.palette.primary.main,
+              }}
+            />
+          </IconButton>
+        </Link>
+      </Badge>
       {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && (
         <>
           <IconButton onClick={() => logger.log('Pause clicked')} >
@@ -107,7 +107,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     minHeight: '56px',
     borderTop: '1px solid rgba(224, 224, 224, 1)',
   },
-  
+
   '& .MuiTablePagination-root': {
     overflow: 'visible',
   },
@@ -125,7 +125,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 
 const CustomNoRowsOverlay = () => {
   return (
-    <InfoMessage 
+    <InfoMessage
       message="No workflows available."
       type="info"
       icon={<ScheduleIcon sx={{ fontSize: 40, color: 'info.main' }} />}
@@ -152,8 +152,8 @@ export default function WorkflowTable() {
     newSelection.forEach(workflowId => {
       dispatch(toggleWorkflowSelection(workflowId));
 
-  });
-  dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }));
+    });
+    dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }));
   };
 
   const handleLaunchCompletedTab =
@@ -173,6 +173,7 @@ export default function WorkflowTable() {
     value: string,
   ) => {
     const newFilters = [...workflowsTable.filters];
+
     newFilters[index] = { column, operator, value };
     dispatch(setWorkflowsTable({ filters: newFilters }));
   };
@@ -182,6 +183,7 @@ export default function WorkflowTable() {
       ...workflowsTable.filters,
       { column: '', operator: '', value: '' },
     ];
+
     dispatch(setWorkflowsTable({ filters: newFilters }));
   };
 
@@ -189,6 +191,7 @@ export default function WorkflowTable() {
     const newFilters = workflowsTable.filters.filter(
       (_, i) => i !== index,
     );
+
     dispatch(setWorkflowsTable({ filters: newFilters }));
   };
 
@@ -208,12 +211,13 @@ export default function WorkflowTable() {
   const handleAggregation = (
     rows: WorkflowTableRow[],
     groupKeys: string[],
-    metricKeys: string[]  
+    metricKeys: string[]
   ): WorkflowTableRow[] => {
     const grouped = new Map<string, WorkflowTableRow[]>();
 
     rows.forEach(row => {
       const key = groupKeys.map(k => row[k]).join('|');
+
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key)?.push(row);
     });
@@ -228,15 +232,17 @@ export default function WorkflowTable() {
         isGroupSummary: true,
         workflowId: group.length > 1 ? `${group.length} workflows` : `${group.length} workflow`,
       };
-  
+
       groupKeys.forEach(param => {
         summary[param] = values[param];
-      });  
+      });
 
       metricKeys.filter(metric => metric !== 'rating').forEach(metric => {
         const validValues = group.map(row => row[metric]).filter((v): v is number => typeof v === 'number');
+
         if (validValues.length > 0) {
           const avg = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
+
           summary[metric] = Number(avg.toFixed(3));
         } else {
           summary[metric] = 'n/a';
@@ -244,13 +250,14 @@ export default function WorkflowTable() {
       });
       aggregatedRows.push(summary);
     }
-  
+
     return aggregatedRows;
   };
 
   useEffect(() => {
     if(workflowsTable.initialized) {
       let counter = 0;
+
       for (let i = 0; i < workflowsTable.filters.length; i++) {
         if (workflowsTable.filters[i].value !== '') {
           counter++;
@@ -267,6 +274,7 @@ export default function WorkflowTable() {
             ?.toString()
             .toLowerCase();
           const filterValue = filter.value.toLowerCase();
+
           if (!cellValue) return false;
 
           switch (filter.operator) {
@@ -294,7 +302,7 @@ export default function WorkflowTable() {
 
       dispatch(setWorkflowsTable({ filteredRows, filtersCounter: counter }));
     }
-  }, [workflowsTable.filters, workflowsTable.rows,workflowsTable.rows]);
+  }, [workflowsTable.filters, workflowsTable.rows, workflowsTable.rows]);
 
   useEffect(() => {
     if(workflowsTable.initialized) {
@@ -310,7 +318,7 @@ export default function WorkflowTable() {
           ...workflowsTable.groupBy,
           ...workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating'),
         ]);
-      
+
         const reducedColumns = workflowsTable.columns.filter(col =>
           allowedFields.has(col.field)
         );
@@ -332,45 +340,51 @@ export default function WorkflowTable() {
 
   useEffect(() => {
     if (workflows.data.length > 0) {
-      //find unique parameters of each workflow -> model traning task
+      // find unique parameters of each workflow -> model traning task
       const uniqueParameters = new Set(
         workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
-        .reduce((acc: string[], workflow) => {
-          const params = workflow.params;
-          let paramNames: string[] = [];
-          if (params) {
-            paramNames = params.map(param => param.name);
-            return [...acc, ...paramNames];
-          } else {
-            return [...acc];
-          }
-        }, []),
+          .reduce((acc: string[], workflow) => {
+            const params = workflow.params;
+            let paramNames: string[] = [];
+
+            if (params) {
+              paramNames = params.map(param => param.name);
+
+              return [...acc, ...paramNames];
+            } else {
+              return [...acc];
+            }
+          }, []),
       );
       const uniqueMetrics = new Set(
         workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
-        .reduce((acc: string[], workflow) => {
-          const metrics = workflow.metrics;
-          let metricNames: string[] = [];
-          if(metrics) {
-            metricNames = metrics.map(metric => metric.name);
-            return [...acc, ...metricNames];
-          } else {
-            return [...acc];
-          }
-        }, [])
+          .reduce((acc: string[], workflow) => {
+            const metrics = workflow.metrics;
+            let metricNames: string[] = [];
+
+            if(metrics) {
+              metricNames = metrics.map(metric => metric.name);
+
+              return [...acc, ...metricNames];
+            } else {
+              return [...acc];
+            }
+          }, [])
       );
       const uniqueTasks = new Set(
         workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
-        .reduce((acc: string[], workflow) => {
-          const tasks = workflow?.tasks;
-          let taskNames: string[] = [];
-          if(tasks) {
-            taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
-            return [...acc, ...taskNames];
-          } else {
-            return [...acc];
-          }
-        }, [])
+          .reduce((acc: string[], workflow) => {
+            const tasks = workflow?.tasks;
+            let taskNames: string[] = [];
+
+            if(tasks) {
+              taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
+
+              return [...acc, ...taskNames];
+            } else {
+              return [...acc];
+            }
+          }, [])
       );
 
       // Create rows for the table based on the unique parameters we found
@@ -380,23 +394,26 @@ export default function WorkflowTable() {
           const params = workflow.params;
           const metrics = workflow?.metrics;
           const tasks = workflow?.tasks;
+
           return {
             id: workflow.id,
             workflowId: workflow.id,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
                 tasks?.find(task => task.name === variant)?.variant || '';
+
               return acc;
             }, {} as Record<string, string>),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 params?.find(param => param.name === variant)?.value || '';
+
               return acc;
             }, {} as Record<string, string>),
             ...Array.from(uniqueMetrics).reduce((acc, variant) => {
               if (metrics && metrics.length > 0) {
                 const matchingMetrics = metrics.filter(metric => metric.name === variant);
-            
+
                 // Pick the one with highest step or fallback to latest timestamp
                 const latestMetric = matchingMetrics.reduce((latest, current) => {
                   if (current.step != null && latest.step != null) {
@@ -405,11 +422,12 @@ export default function WorkflowTable() {
                     return current.timestamp > latest.timestamp ? current : latest;
                   }
                 }, matchingMetrics[0]);
-            
+
                 acc[variant] = latestMetric?.value != null ? latestMetric.value : 'n/a';
               } else {
                 acc[variant] = 'n/a';
               }
+
               return acc;
             }, {} as Record<string, number | string>),
             status: workflow.status,
@@ -419,16 +437,17 @@ export default function WorkflowTable() {
         });
 
       // Check if there are no rows completed then set the table to scheduled
-        if (rows.length=== 0) {
-          dispatch(setVisibleTable('scheduled'));
-          return; 
-        }
+      if (rows.length === 0) {
+        dispatch(setVisibleTable('scheduled'));
+
+        return;
+      }
 
       const columns: CustomGridColDef[] = Object.keys(rows[0])
         .filter(key => key !== 'id')
         .map(key => ({
           field: key,
-          headerName:  key === 'action' ? '' : key.replace('_', ' '),
+          headerName: key === 'action' ? '' : key.replace('_', ' '),
           headerClassName:
             key === 'action' ? 'datagrid-header-fixed' : 'datagrid-header',
           minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,
@@ -448,6 +467,7 @@ export default function WorkflowTable() {
           ...(key === 'action' && {
             renderCell: params => {
               const currentStatus = params.row.status;
+
               return (
                 <WorkflowActions
                   currentStatus={currentStatus}
@@ -460,19 +480,21 @@ export default function WorkflowTable() {
           ...(key === 'rating' && {
             renderCell: params => {
               const currentRating = params.row.rating;
+
               return (
                 <WorkflowRating
-                //here must be the workflow id that i selected somehow
-                currentRating={currentRating} experimentId={experimentId || ''} workflowId={params.row.id} />
+                // here must be the workflow id that i selected somehow
+                  currentRating={currentRating} experimentId={experimentId || ''} workflowId={params.row.id} />
               );
             },
           }),
         }));
 
-        const visibilityModel = columns.reduce((acc, col) => {
-          acc[col.field] = true;
-          return acc;
-        }, {} as Record<string, boolean>);        
+      const visibilityModel = columns.reduce((acc, col) => {
+        acc[col.field] = true;
+
+        return acc;
+      }, {} as Record<string, boolean>);
 
       dispatch(
         setWorkflowsTable({
@@ -492,8 +514,8 @@ export default function WorkflowTable() {
   }, [workflows.data]);
 
   return (
-    <Box sx={{height: '100%' }}>
-      <Paper elevation={2} sx={{height: '100%', width: '100%', mb: 2}}>
+    <Box sx={{ height: '100%' }}>
+      <Paper elevation={2} sx={{ height: '100%', width: '100%', mb: 2 }}>
         <Box >
           <ToolbarWorkflow
             key="workflows-toolbar"
@@ -548,8 +570,8 @@ export default function WorkflowTable() {
             disableColumnFilter
             onColumnVisibilityModelChange={(model) =>
               dispatch(setWorkflowsTable({ columnsVisibilityModel: model }))
-            }          
-            slots={{noRowsOverlay: CustomNoRowsOverlay}}
+            }
+            slots={{ noRowsOverlay: CustomNoRowsOverlay }}
             slotProps={
               {
                 row: {
@@ -557,6 +579,7 @@ export default function WorkflowTable() {
                     if(selectedTab === 1) {
                       const rowId = event.currentTarget.getAttribute('data-id');
                       const id = rowId ? workflowsTable.selectedWorkflows.includes(rowId) ? rowId : 'notSelected' : null;
+
                       handleHover(id);
                     }
                   },
@@ -622,10 +645,10 @@ export default function WorkflowTable() {
                 headerClassName: 'theme-parameters-group',
                 children: workflowsTable.uniqueParameters.length > 0
                   ? (workflowsTable.uniqueParameters.map(
-                      (param): GridColumnNode => ({
-                        field: param,
-                      }),
-                    ) as GridColumnNode[])
+                    (param): GridColumnNode => ({
+                      field: param,
+                    }),
+                  ) as GridColumnNode[])
                   : [],
               },
               {

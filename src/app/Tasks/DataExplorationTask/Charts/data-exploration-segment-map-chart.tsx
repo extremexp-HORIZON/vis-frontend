@@ -29,42 +29,39 @@ const SegmentMapChart = () => {
   const segmentBy = tab?.workflowTasks.dataExploration?.controlPanel.segmentBy || [];
   const data = tab?.workflowTasks.dataExploration?.mapChart.data?.data || [];
   const timestampField = 'timestamp';
-const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-
-
+  const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map());
   const dispatch = useAppDispatch();
 
-   useEffect(() => {
-      const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-      const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
-      if (!datasetId || !lat || !lon || segmentBy?.length === 0)
-        return;
-  
-      dispatch(
-        fetchDataExplorationData({
-          query: {
-            ...defaultDataExplorationQuery,
-            datasetId,
-            columns: [lat, lon, ...segmentBy, timestampField],
-            filters,
-            limit: 0,
-          },
-          metadata: {
-            workflowId: tab?.workflowId || '',
-            queryCase: 'mapChart',
-          },
-        }),
-      );
-    }, [
-      lat,
-      lon,
-      filters,
-      segmentBy,
-      tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
-      
-    
-    ]);
+  useEffect(() => {
+    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
+    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+
+    if (!datasetId || !lat || !lon || segmentBy?.length === 0)
+      return;
+
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          ...defaultDataExplorationQuery,
+          datasetId,
+          columns: [lat, lon, ...segmentBy, timestampField],
+          filters,
+          limit: 0,
+        },
+        metadata: {
+          workflowId: tab?.workflowId || '',
+          queryCase: 'mapChart',
+        },
+      }),
+    );
+  }, [
+    lat,
+    lon,
+    filters,
+    segmentBy,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source
+  ]);
 
   // Initialize map
   useEffect(() => {
@@ -82,6 +79,7 @@ const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
     if (!segmentBy || !data.length) return;
     const categories = Array.from(new Set(data.map(row => row[segmentBy])));
     const newMap = new Map<string, string>();
+
     categories.forEach((cat, i) =>
       newMap.set(cat, COLOR_PALETTE[i % COLOR_PALETTE.length]),
     );
@@ -103,10 +101,12 @@ const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
 
     // Group and sort data
     const groups: Record<string, { lat: number; lon: number; timestamp?: number }[]> = {};
+
     for (const row of data) {
       const groupKey = row[segmentBy];
       const latVal = parseFloat(row[lat]);
       const lonVal = parseFloat(row[lon]);
+
       if (!isNaN(latVal) && !isNaN(lonVal)) {
         const point = {
           lat: latVal,
@@ -115,6 +115,7 @@ const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
             ? new Date(row[timestampField]).getTime()
             : undefined,
         };
+
         if (!groups[groupKey]) groups[groupKey] = [];
         groups[groupKey].push(point);
       }
@@ -122,15 +123,19 @@ const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
 
     // Create and add polylines
     const allPoints: L.LatLngExpression[] = [];
+
     Object.entries(groups).forEach(([key, points]) => {
       const color = colorMap.get(key) || '#000000';
       const sorted = points.sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0));
       const path = sorted.map(p => {
         const coord: L.LatLngExpression = [p.lat, p.lon];
+
         allPoints.push(coord);
+
         return coord;
       });
       const polyline = L.polyline(path, { color, weight: 3 }).addTo(layerGroupRef.current!);
+
       polyline.bindTooltip(`${segmentBy}: ${key}`, {
         permanent: false,
         direction: 'top',
@@ -140,6 +145,7 @@ const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
     // Auto center
     if (allPoints.length) {
       const bounds = L.latLngBounds(allPoints);
+
       leafletMapRef.current.fitBounds(bounds, { padding: [30, 30] });
     }
 

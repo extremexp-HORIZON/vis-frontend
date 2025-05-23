@@ -38,7 +38,7 @@ export interface IWorkflowPageModel {
         loading: boolean;
     }
     workflowMetrics: {
-        data: { name: string, value: number, avgDiff: number, avgValue: number,maxValue: number; minValue: number; task?: string; step?: number; timestamp: number;}[] | null
+        data: { name: string, value: number, avgDiff: number, avgValue: number, maxValue: number; minValue: number; task?: string; step?: number; timestamp: number;}[] | null
         loading: boolean;
     }
     workflowSeriesMetrics: {
@@ -64,36 +64,36 @@ export interface IWorkflowPageModel {
 }
 
 export const defaultWorkflowPageModel: IWorkflowPageModel = {
-    workflowId: '0',
-    workflowName: '',
-    workflowConfiguration: {
-        tasks: null,
-        dataAssets: null,
-        params: null,
-        loading: true
-    },
-    workflowMetrics: {
-        data: null,
-        loading: true
-    },
-    workflowSeriesMetrics: {
-        data: [],
-        loading: true,
-        error: null
-    },
-    workflowSvg: {
-        data: null,
-        loading: true
-    },
-    workflowTasks: {
-        modelAnalysis: null,
-        dataExploration: null,
-        explainabilityTask: null,
-        userInteraction: null
-    },
-    dataTaskTable: {
-        selectedItem: null, 
-        selectedTask: null, 
-        selectedId: null
-    }
+  workflowId: '0',
+  workflowName: '',
+  workflowConfiguration: {
+    tasks: null,
+    dataAssets: null,
+    params: null,
+    loading: true
+  },
+  workflowMetrics: {
+    data: null,
+    loading: true
+  },
+  workflowSeriesMetrics: {
+    data: [],
+    loading: true,
+    error: null
+  },
+  workflowSvg: {
+    data: null,
+    loading: true
+  },
+  workflowTasks: {
+    modelAnalysis: null,
+    dataExploration: null,
+    explainabilityTask: null,
+    userInteraction: null
+  },
+  dataTaskTable: {
+    selectedItem: null,
+    selectedTask: null,
+    selectedId: null
+  }
 };

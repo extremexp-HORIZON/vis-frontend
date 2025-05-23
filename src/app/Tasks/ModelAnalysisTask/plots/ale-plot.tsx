@@ -28,8 +28,8 @@ const AlePlot = (props: AlePlotProps) => {
   );
   const dispatch = useAppDispatch();
   const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
-  ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
-  : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
+    ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
+    : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
 
   const plotModel = tab?.workflowTasks.modelAnalysis?.ale;
   const { experimentId } = useParams();
@@ -56,12 +56,14 @@ const AlePlot = (props: AlePlotProps) => {
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return [];
     const data: { [x: string]: string }[] = [];
+
     plmodel.xAxis.axisValues.forEach((val, idx) => {
       data.push({
         [plmodel.xAxis.axisName]: val,
         [plmodel.yAxis.axisName]: plmodel.yAxis.axisValues[idx],
       });
     });
+
     return data;
   };
 
@@ -94,7 +96,7 @@ const AlePlot = (props: AlePlotProps) => {
         field:
           tab?.workflowTasks.modelAnalysis?.ale?.data?.yAxis.axisName ||
           'yAxis default',
-          title: 'Average Predicted Effect',
+        title: 'Average Predicted Effect',
 
         type:
           tab?.workflowTasks.modelAnalysis?.ale?.data?.xAxis.axisType ===
@@ -126,37 +128,37 @@ const AlePlot = (props: AlePlotProps) => {
       dispatch(setSelectedFeature({ plotType: 'ale', feature: e.target.value }));
     };
 
-const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
-  <FormControl fullWidth>
-    <InputLabel id="feature-select-label">
-      {explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-    </InputLabel>
-    <Select
-      labelId="feature-select-label"
-      value={plotModel?.selectedFeature || ''}
-      label={explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-      onChange={handleFeatureSelection(plotModel?.data || null)}
-      disabled={plotModel?.loading || !plotModel?.data}
-      MenuProps={{
-        PaperProps: {
-          style: {
-            maxHeight: 250,
-            maxWidth: 300,
+  const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
+    <FormControl fullWidth>
+      <InputLabel id="feature-select-label">
+        {explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
+      </InputLabel>
+      <Select
+        labelId="feature-select-label"
+        value={plotModel?.selectedFeature || ''}
+        label={explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
+        onChange={handleFeatureSelection(plotModel?.data || null)}
+        disabled={plotModel?.loading || !plotModel?.data}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 250,
+              maxWidth: 300,
+            },
           },
-        },
-      }}
-    >
-      {featureOrHyperparameterList && featureOrHyperparameterList.map(feature => (
-        <MenuItem
-          key={`${plotModel?.data?.plotName}-${feature}`}
-          value={feature}
-        >
-          {feature}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-);
+        }}
+      >
+        {featureOrHyperparameterList && featureOrHyperparameterList.map(feature => (
+          <MenuItem
+            key={`${plotModel?.data?.plotName}-${feature}`}
+            value={feature}
+          >
+            {feature}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
 
   const loading = (
     <Loader />

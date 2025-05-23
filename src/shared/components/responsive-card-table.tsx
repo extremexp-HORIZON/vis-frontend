@@ -175,17 +175,18 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   // Effect to handle the resize observation
   useEffect(() => {
     if (!showControlsInHeader || !cardHeaderRef.current) return;
-    
+
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         // Check if there's enough space in the header
         const width = entry.contentRect.width;
+
         setHasSpaceInHeader(width > MIN_HEADER_WIDTH_FOR_CONTROLS);
       }
     });
-    
+
     resizeObserver.observe(cardHeaderRef.current);
-    
+
     return () => {
       resizeObserver.disconnect();
     };
@@ -217,8 +218,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                   {controlPanel}
                   {showDownloadButton && onDownload && (
                     <Tooltip title={downloadLabel}>
-                      <IconButton 
-                        aria-label="download" 
+                      <IconButton
+                        aria-label="download"
                         onClick={onDownload}
                         sx={{ ml: 1 }}
                       >
@@ -330,7 +331,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                   </Menu>
                 </>
               )}
-              
+
               {showFullScreenButton && (
                 <Tooltip title="Fullscreen">
                   <IconButton

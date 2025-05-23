@@ -27,22 +27,22 @@ const TableExpand: React.FC = () => {
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || [];
   const rows = Array.isArray(tab?.workflowTasks.dataExploration?.dataTable?.data?.data) ?
     tab?.workflowTasks.dataExploration?.dataTable?.data?.data
-    ?.filter((row): row is Record<string, unknown> => typeof row === 'object' && row !== null)
-    .map(
-      (row, index) => {
-        if (dateTimeColumn !== undefined) {
-          return {
-            id: row[dateTimeColumn] ?? index,
-            ...row,
-          };
-        } else {
-          return {
-            id: index,
-            ...row,
-          };
-        }
-      },
-    ): [];
+      ?.filter((row): row is Record<string, unknown> => typeof row === 'object' && row !== null)
+      .map(
+        (row, index) => {
+          if (dateTimeColumn !== undefined) {
+            return {
+              id: row[dateTimeColumn] ?? index,
+              ...row,
+            };
+          } else {
+            return {
+              id: index,
+              ...row,
+            };
+          }
+        },
+      ) : [];
 
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-scrollbarFiller': {
@@ -97,11 +97,12 @@ const TableExpand: React.FC = () => {
 
   useEffect(() => {
     dispatch(setCurrentPage(1));
-  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters, ]);
+  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters]);
   // Get column information from the state
   const selectedColumns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || [];
   const dispatch = useAppDispatch();
+
   useEffect(() => {
     const fetchData = async () => {
       if (
@@ -161,6 +162,7 @@ const TableExpand: React.FC = () => {
         headers
           .map(header => {
             const value = row[header];
+
             // Handle values with commas by wrapping in quotes
             return typeof value === 'string' && value.includes(',')
               ? `"${value}"`
@@ -175,10 +177,12 @@ const TableExpand: React.FC = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
+
     link.setAttribute('href', url);
     link.setAttribute(
       'download',
-      `data-table-export-${new Date().toISOString().split('T')[0]}.csv`,
+      `data-table-export-${new Date().toISOString()
+        .split('T')[0]}.csv`,
     );
     document.body.appendChild(link);
     link.click();
@@ -190,17 +194,17 @@ const TableExpand: React.FC = () => {
     rows.length > 0 &&
     Array.isArray(selectedColumns) &&
     selectedColumns.length > 0;
-  
-    const gridColumns: GridColDef<GridValidRowModel>[] = selectedColumns.map((col) => ({
-      field: col.name,
-      headerName: col.name,
-      width: 155,
-      headerAlign: 'center',
-      align: 'center',
-      type: col.type as GridColDef['type'],
-      flex: 1,
-      minWidth: 120,
-    }));
+
+  const gridColumns: GridColDef<GridValidRowModel>[] = selectedColumns.map((col) => ({
+    field: col.name,
+    headerName: col.name,
+    width: 155,
+    headerAlign: 'center',
+    align: 'center',
+    type: col.type as GridColDef['type'],
+    flex: 1,
+    minWidth: 120,
+  }));
 
   return (
     <Box sx={{ height: '99%' }}>
@@ -234,44 +238,44 @@ const TableExpand: React.FC = () => {
               }}
               ref={tableRef}
             >
-              { !tab?.workflowTasks.dataExploration?.dataTable.loading 
+              { !tab?.workflowTasks.dataExploration?.dataTable.loading
               && !tab?.workflowTasks.dataExploration?.metaData?.loading
-              ? (
-              <StyledDataGrid
-                rows={rows || []}
-                columns={gridColumns}
-                disableColumnMenu
-                hideFooter
-                disableColumnSelector
-                pagination
-                pageSizeOptions={[10, 25, 50, 100]}
-                initialState={{
-                  pagination: {
-                    paginationModel: { pageSize: 100 },
-                  },
-                }}
-                autoHeight={false}
-                sx={{
-                  width: '100%',
-                  border: 'none',
-                  '& .MuiDataGrid-cell': {
-                    whiteSpace: 'normal', // Allow text to wrap
-                    wordWrap: 'break-word',
-                  },
-                  '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
-                    // Add border to make cells more distinct
-                    borderRight: '1px solid rgba(224, 224, 224, 0.4)',
-                  },
-                  // Make the grid look better when fewer columns
-                  '& .MuiDataGrid-main': {
-                    overflow: 'hidden',
-                  },
-                }}
-              />
-              ):(
-               <Loader/>
-              )
-            }
+                ? (
+                  <StyledDataGrid
+                    rows={rows || []}
+                    columns={gridColumns}
+                    disableColumnMenu
+                    hideFooter
+                    disableColumnSelector
+                    pagination
+                    pageSizeOptions={[10, 25, 50, 100]}
+                    initialState={{
+                      pagination: {
+                        paginationModel: { pageSize: 100 },
+                      },
+                    }}
+                    autoHeight={false}
+                    sx={{
+                      width: '100%',
+                      border: 'none',
+                      '& .MuiDataGrid-cell': {
+                        whiteSpace: 'normal', // Allow text to wrap
+                        wordWrap: 'break-word',
+                      },
+                      '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
+                        // Add border to make cells more distinct
+                        borderRight: '1px solid rgba(224, 224, 224, 0.4)',
+                      },
+                      // Make the grid look better when fewer columns
+                      '& .MuiDataGrid-main': {
+                        overflow: 'hidden',
+                      },
+                    }}
+                  />
+                ) : (
+                  <Loader/>
+                )
+              }
               <Box
                 mt={5}
                 mb={2}
@@ -283,16 +287,16 @@ const TableExpand: React.FC = () => {
           ) : (
             !tab?.workflowTasks.dataExploration?.dataTable.loading &&
             !tab?.workflowTasks.dataExploration?.metaData?.loading
-            ? (
-            <InfoMessage
-              message="No data available for the selected configuration."
-              type="info"
-              icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-              fullHeight
-            />
-            ) : (
-              <Loader />
-            )
+              ? (
+                <InfoMessage
+                  message="No data available for the selected configuration."
+                  type="info"
+                  icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+                  fullHeight
+                />
+              ) : (
+                <Loader />
+              )
           )}
         </Box>
       </ResponsiveCardTable>

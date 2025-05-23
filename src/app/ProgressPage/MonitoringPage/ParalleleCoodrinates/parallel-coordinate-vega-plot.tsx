@@ -43,20 +43,22 @@ const ParallelCoordinateVega = ({
 
   useEffect(() => {
     const container = containerRef.current;
+
     if (!container) return;
-  
+
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         const { width } = entry.contentRect;
+
         setChartWidth(width);
-        setChartHeight(Math.max(window.innerHeight * 0.27,100));
+        setChartHeight(Math.max(window.innerHeight * 0.27, 100));
       }
     });
-  
+
     resizeObserver.observe(container);
-  
+
     return () => resizeObserver.disconnect();
-  }, []);  
+  }, []);
 
   const handleNewView: ViewListener = (view: View) => {
     if (!view) return;
@@ -64,24 +66,29 @@ const ParallelCoordinateVega = ({
     const tooltipHandler = vegaTooltip(view, {
       formatTooltip: (datum: Record<string, string | number | boolean>) => {
         const table = document.createElement('table');
+
         Object.entries(datum).forEach(([key, value]) => {
           const row = table.insertRow();
           const keyCell = row.insertCell();
           const valueCell = row.insertCell();
+
           keyCell.innerHTML = key;
           valueCell.innerHTML = ` <strong>${value}</strong>`;
         });
+
         return table.outerHTML;
       },
     });
 
     // Manually trigger tooltip on line mark hover (otherwise only triggered on intersections)
     var isTooltipVisible = false;
+
     view.addEventListener('mousemove', (event: ScenegraphEvent) => {
       const hover = view.signal('hover');
 
       if (hover) {
         const domEvent = (event as unknown as { event: MouseEvent }).event;
+
         tooltipHandler.call(view, domEvent, {} as Item, hover);
         isTooltipVisible = true;
       } else if (isTooltipVisible) {
@@ -105,8 +112,8 @@ const ParallelCoordinateVega = ({
 
   // generate scales:
   const numericValues = processedData
-  .map(d => d[progressParallel.selected])
-  .filter((v): v is number => typeof v === 'number' && !isNaN(v));
+    .map(d => d[progressParallel.selected])
+    .filter((v): v is number => typeof v === 'number' && !isNaN(v));
 
   let selectedLastColumnMin = Math.min(...numericValues);
   let selectedLastColumnMax = Math.max(...numericValues);
@@ -116,11 +123,12 @@ const ParallelCoordinateVega = ({
 
   if (isValidDomain && selectedLastColumnMin === selectedLastColumnMax) {
     const padding = selectedLastColumnMin === 0 ? 1 : Math.abs(selectedLastColumnMin * 0.5);
+
     selectedLastColumnMin -= padding;
     selectedLastColumnMax += padding;
   }
 
-    const generatedScales: Scale[] = [
+  const generatedScales: Scale[] = [
     {
       name: 'ord',
       type: 'point',
@@ -142,6 +150,7 @@ const ParallelCoordinateVega = ({
       }),
     },
   ];
+
   if (isValidDomain) {
     generatedScales.push({
       name: 'selectedLastColumnColorScale',
@@ -160,7 +169,7 @@ const ParallelCoordinateVega = ({
       ],
     });
   }
-  
+
   for (const columnName of foldArray.current) {
     generatedScales.push({
       name: columnName,
@@ -172,6 +181,7 @@ const ParallelCoordinateVega = ({
   }
 
   const generatedAxes: Axis[] = [];
+
   for (const columnName of columnNames) {
     generatedAxes.push({
       orient: 'left',
@@ -184,151 +194,153 @@ const ParallelCoordinateVega = ({
   const numericFilteredData = processedData.filter((row: ParallelDataItem & { selected: boolean }) => {
     const key = progressParallel.selected;
     const val = Number(row[key]);
+
     return !isNaN(val);
-  }); 
+  });
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-    <Vega
-      actions={false}
-      onNewView={handleNewView}
-      style={{ width: '100%' }}
-      spec={{
-        height: chartHeight,
-        width: chartWidth,
-        padding: { top: 15, left: 2, right: 2, bottom: 2 },
-        autosize: { type: 'fit', contains: 'padding' }, // Ensure the chart adjusts to container size
-        config: {
-          axisY: {
-            titleY: -12,
-            titleX: 10,
-            titleAngle: 0,
-            titleFontWeight: 'lighter',
-            zindex: 3,
+      <Vega
+        actions={false}
+        onNewView={handleNewView}
+        style={{ width: '100%' }}
+        spec={{
+          height: chartHeight,
+          width: chartWidth,
+          padding: { top: 15, left: 2, right: 2, bottom: 2 },
+          autosize: { type: 'fit', contains: 'padding' }, // Ensure the chart adjusts to container size
+          config: {
+            axisY: {
+              titleY: -12,
+              titleX: 10,
+              titleAngle: 0,
+              titleFontWeight: 'lighter',
+              zindex: 3,
+            },
           },
-        },
-        data: [
-          {
-            name: 'mydata',
-            values: numericFilteredData,
-          },
-          {
-            name: 'columnNames',
-            values: columnNames,
-          },
-          {
-            name: 'gradientData',
-            transform: [
-              {
-                type: 'sequence',
-                start: selectedLastColumnMin,
-                stop: selectedLastColumnMax,
-                step: (selectedLastColumnMax - selectedLastColumnMin) / 256,
-              },
-            ],
-          },
-        ],
-        signals: [
-          {
-            name: 'anySelected',
-            value: selectedWorkflows.length > 0,
-          },
-          {
-            name: 'hover',
-            value: null,
-            on: [
-              {
-                events: '@oneDataLine:mouseover',
-                update:
+          data: [
+            {
+              name: 'mydata',
+              values: numericFilteredData,
+            },
+            {
+              name: 'columnNames',
+              values: columnNames,
+            },
+            {
+              name: 'gradientData',
+              transform: [
+                {
+                  type: 'sequence',
+                  start: selectedLastColumnMin,
+                  stop: selectedLastColumnMax,
+                  step: (selectedLastColumnMax - selectedLastColumnMin) / 256,
+                },
+              ],
+            },
+          ],
+          signals: [
+            {
+              name: 'anySelected',
+              value: selectedWorkflows.length > 0,
+            },
+            {
+              name: 'hover',
+              value: null,
+              on: [
+                {
+                  events: '@oneDataLine:mouseover',
+                  update:
                   '!anySelected || group().datum.selected ? group().datum : null',
-              },
-              { events: '@oneDataLine:mouseout', update: 'null' },
-            ],
-          },
+                },
+                { events: '@oneDataLine:mouseout', update: 'null' },
+              ],
+            },
           // {
           //   name: "width",
           //   init: "containerSize()[0]",
           //   on: [{ events: "window:resize", update: "containerSize()[0]" }],
           // },
-        ],
+          ],
 
-        scales: generatedScales,
-        axes: generatedAxes,
-        marks: [
-          {
-            name: 'dataLines',
-            type: 'group',
-            role: 'frame',
-            interactive: true,
-            from: { data: 'mydata' },
-            marks: [
-              {
-                name: 'oneDataLine',
-                type: 'line',
-                from: { data: 'columnNames' },
-                encode: {
-                  enter: {
-                    x: { scale: 'ord', field: 'data' },
-                    y: {
-                      scale: { datum: 'data' },
-                      field: { parent: { datum: 'data' } },
-                    },
-                    stroke: {
-                      scale: 'selectedLastColumnColorScale',
-                      field: { parent: progressParallel.selected },
-                    },
-                    interpolate: { value: 'natural' },
-                  },
-                  update: {
-                    strokeWidth: { value: 2 },
-                    zindex: setValuesIfSelectedAndDefault(2, 1),
-                    strokeOpacity: setValuesIfSelectedAndDefault(0.1, 0.9),
-                    stroke: [
-                      {
-                        test: 'anySelected && parent.selected === false', // if any line is selected and this line is not selected then grey it out
-                        value: 'grey',
+          scales: generatedScales,
+          axes: generatedAxes,
+          marks: [
+            {
+              name: 'dataLines',
+              type: 'group',
+              role: 'frame',
+              interactive: true,
+              from: { data: 'mydata' },
+              marks: [
+                {
+                  name: 'oneDataLine',
+                  type: 'line',
+                  from: { data: 'columnNames' },
+                  encode: {
+                    enter: {
+                      x: { scale: 'ord', field: 'data' },
+                      y: {
+                        scale: { datum: 'data' },
+                        field: { parent: { datum: 'data' } },
                       },
-                      {
+                      stroke: {
                         scale: 'selectedLastColumnColorScale',
                         field: { parent: progressParallel.selected },
                       },
-                    ],
-                  },
-                  hover: {
-                    strokeWidth: setValuesIfSelectedAndDefault(2, 5),
-                    cursor: { value: 'pointer' },
-                    strokeOpacity: setValuesIfSelectedAndDefault(0.1, 1),
-                    zindex: setValuesIfSelectedAndDefault(1, 2),
+                      interpolate: { value: 'natural' },
+                    },
+                    update: {
+                      strokeWidth: { value: 2 },
+                      zindex: setValuesIfSelectedAndDefault(2, 1),
+                      strokeOpacity: setValuesIfSelectedAndDefault(0.1, 0.9),
+                      stroke: [
+                        {
+                          test: 'anySelected && parent.selected === false', // if any line is selected and this line is not selected then grey it out
+                          value: 'grey',
+                        },
+                        {
+                          scale: 'selectedLastColumnColorScale',
+                          field: { parent: progressParallel.selected },
+                        },
+                      ],
+                    },
+                    hover: {
+                      strokeWidth: setValuesIfSelectedAndDefault(2, 5),
+                      cursor: { value: 'pointer' },
+                      strokeOpacity: setValuesIfSelectedAndDefault(0.1, 1),
+                      zindex: setValuesIfSelectedAndDefault(1, 2),
+                    },
                   },
                 },
-              },
-            ],
-          },
-          {
-            name: 'colourRect',
-            type: 'rect',
-            from: { data: 'gradientData' },
-            encode: {
-              enter: {
-                x: { signal: 'width' },
-                y: {
-                  scale: progressParallel.selected,
-                  field: 'data',
-                  offset: -3,
-                },
-                width: { value: 30 },
-                height: { value: 3 },
-                fill: {
-                  scale: 'selectedLastColumnColorScale',
-                  field: 'data',
+              ],
+            },
+            {
+              name: 'colourRect',
+              type: 'rect',
+              from: { data: 'gradientData' },
+              encode: {
+                enter: {
+                  x: { signal: 'width' },
+                  y: {
+                    scale: progressParallel.selected,
+                    field: 'data',
+                    offset: -3,
+                  },
+                  width: { value: 30 },
+                  height: { value: 3 },
+                  fill: {
+                    scale: 'selectedLastColumnColorScale',
+                    field: 'data',
+                  },
                 },
               },
             },
-          },
-        ],
-      }}
-    />
+          ],
+        }}
+      />
     </div>
   );
 };
+
 export default ParallelCoordinateVega;

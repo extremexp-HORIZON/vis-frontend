@@ -11,7 +11,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ListRoundedIcon from '@mui/icons-material/ListRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
-import type { RootState} from '../../store/store';
+import type { RootState } from '../../store/store';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { setMenuOptions } from '../../store/slices/progressPageSlice';
 
@@ -83,17 +83,17 @@ const LeftMenu = () => {
         </Box> */}
         {menuOptions.collapsed && (
           <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1,
-                padding: 1,
-                height: '64px', // Fixed height to match experiment controls
-                boxSizing: 'border-box',
-                borderBottom: '1px solid #ddd',
-              }}
-            >
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              padding: 1,
+              height: '64px', // Fixed height to match experiment controls
+              boxSizing: 'border-box',
+              borderBottom: '1px solid #ddd',
+            }}
+          >
             <Box
               component="img"
               src="/images/extremexp-logo-removebg-preview.png"
@@ -106,20 +106,20 @@ const LeftMenu = () => {
               }}
             />
           </Box>
-          )}
+        )}
         {!menuOptions.collapsed && (
           <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                gap: 1,
-                padding: 1,
-                height: '64px', // Fixed height to match experiment controls
-                boxSizing: 'border-box',
-                borderBottom: '1px solid #ddd',
-              }}
-            >
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              gap: 1,
+              padding: 1,
+              height: '64px', // Fixed height to match experiment controls
+              boxSizing: 'border-box',
+              borderBottom: '1px solid #ddd',
+            }}
+          >
             <Box
               component="img"
               src="/images/extremexp-logo-full.png"
@@ -132,9 +132,9 @@ const LeftMenu = () => {
               }}
             />
           </Box>
-          )}
+        )}
         <Box>
-          <List sx={{p: 0}}>
+          <List sx={{ p: 0 }}>
             {navItems.map(({ icon, label, path }) => {
               const selected = menuOptions.selected === path;
               const item = (
@@ -172,8 +172,8 @@ const LeftMenu = () => {
           </List>
         </Box>
       </Box>
-      
-      <Box 
+
+      <Box
         sx={{
           display: 'flex',
           justifyContent: menuOptions.collapsed ? 'center' : 'flex-end',
@@ -182,8 +182,8 @@ const LeftMenu = () => {
           marginBottom: 1,
         }}
       >
-        <IconButton 
-          onClick={() => dispatch(setMenuOptions({...menuOptions, collapsed: !menuOptions.collapsed}))}
+        <IconButton
+          onClick={() => dispatch(setMenuOptions({ ...menuOptions, collapsed: !menuOptions.collapsed }))}
           sx={{
             backgroundColor: theme => theme.palette.customGrey.light || '#f5f5f5',
             borderRadius: '50%',
@@ -195,8 +195,8 @@ const LeftMenu = () => {
             boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
           }}
         >
-          {menuOptions.collapsed ? 
-            <ChevronRightRoundedIcon fontSize="small" /> : 
+          {menuOptions.collapsed ?
+            <ChevronRightRoundedIcon fontSize="small" /> :
             <ChevronLeftRoundedIcon fontSize="small" />
           }
         </IconButton>

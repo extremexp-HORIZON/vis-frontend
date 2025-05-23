@@ -19,7 +19,7 @@ import type { ParallelDataItem } from '../../../../shared/types/parallel.types';
 const ParallelCoordinatePlot = () => {
   const { workflows } =
     useAppSelector((state: RootState) => state.progressPage);
-  const {parallel, workflowsTable } = useAppSelector((state: RootState) => state.monitorPage);
+  const { parallel, workflowsTable } = useAppSelector((state: RootState) => state.monitorPage);
   const [parallelData, setParallelData] = useState<ParallelDataItem[]>([]);
   const foldArray = useRef<string[]>([]);
   const tooltipArray = useRef<{ [key: string]: string }[]>([]);
@@ -30,41 +30,48 @@ const ParallelCoordinatePlot = () => {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
         workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
-        .reduce((acc: string[], workflow) => {
-          const params = workflow.params;
-          let paramNames = [];
-          if (params) {
-            paramNames = params.map(param => param.name);
-            return [...acc, ...paramNames];
-          } else {
-            return [...acc];
-          }
-        }, [] as string[]),
+          .reduce((acc: string[], workflow) => {
+            const params = workflow.params;
+            let paramNames = [];
+
+            if (params) {
+              paramNames = params.map(param => param.name);
+
+              return [...acc, ...paramNames];
+            } else {
+              return [...acc];
+            }
+          }, [] as string[]),
       );
+
       foldArray.current = Array.from(uniqueParameters);
       const data = workflows.data
         .map(workflow => {
           const params = workflow.params;
+
           return {
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 params?.find(param => param.name === variant)?.value || '';
+
               return acc;
             }, {} as Record<string, string | number>),
             ...(workflow.metrics
               ? workflow.metrics?.reduce((acc, metric) => {
-                  return {
-                    ...acc,
-                    [metric.name]: metric.value,
-                  };
-                }, {})
+                return {
+                  ...acc,
+                  [metric.name]: metric.value,
+                };
+              }, {})
               : {}),
             workflowId: workflow.id,
           };
         });
+
       setParallelData(data);
       let selected = parallel.selected;
       let options = parallel.options;
+
       if (parallel.options.length === 0) {
         options = Array.from(
           new Set(
@@ -74,6 +81,7 @@ const ParallelCoordinatePlot = () => {
                 const metrics = workflow.metrics
                   ? workflow.metrics.filter(metric => metric.name !== 'rating').map((metric: IMetric) => metric.name)
                   : [];
+
                 return [...acc, ...metrics];
               }, []),
           ),
@@ -106,14 +114,15 @@ const ParallelCoordinatePlot = () => {
       }
 
       newItem.selected = workflowsTable.selectedWorkflows.includes(newItem.workflowId);
+
       return newItem;
     }) as (ParallelDataItem & { selected: boolean })[];
   }, [parallelData, workflowsTable.selectedWorkflows]);
 
   return (
-    <Paper elevation={2} sx={{height: '100%', width: '100%'}}>
+    <Paper elevation={2} sx={{ height: '100%', width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Typography/>
+        <Typography/>
         <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5 }}>
           <Typography fontSize={'0.8rem'}>Color by:</Typography>
           <FormControl
@@ -159,10 +168,10 @@ const ParallelCoordinatePlot = () => {
               selectedWorkflows={workflowsTable.selectedWorkflows}
               processedData={processedData}
             ></ParallelCoordinateVega>
-          </Box>  
+          </Box>
         ) : (
           <Box sx={{ width: '100%', px: 1 }}>
-            <InfoMessage 
+            <InfoMessage
               message="No Metric Data Available."
               type="info"
               icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}

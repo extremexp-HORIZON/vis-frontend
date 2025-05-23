@@ -36,6 +36,7 @@ const ResponsiveVegaLite: React.FC<ResponsiveVegaLiteProps> = ({
         minHeight,
         Math.min(newWidth / aspectRatio, maxHeight),
       ); // Calculate height based on the aspect ratio while respecting the maximum height
+
       setWidth(newWidth);
       setHeight(newHeight);
     }

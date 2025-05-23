@@ -6,7 +6,7 @@ import { Close } from '@mui/icons-material';
 import ToolBarWorkflow from './toolbar-workflow-table';
 import FilterBar from '../../../../shared/components/filter-bar';
 import { Popover, styled } from '@mui/material';
-import type { RootState} from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect, useRef, useState } from 'react';
 import { setScheduledTable } from '../../../../store/slices/monitorPageSlice';
@@ -34,17 +34,20 @@ const WorkflowActions = (props: {
   const handleIndexChange = (indexChange: number, id: number) => {
     const rowIndex = scheduledTable.rows.findIndex(row => row.id === id);
     const newIndex = rowIndex + indexChange;
+
     if (newIndex < 0 || newIndex >= scheduledTable.rows.length) {
       return;
     } else {
       const updatedRows = [...scheduledTable.rows];
       const [movedRow] = updatedRows.splice(rowIndex, 1);
+
       updatedRows.splice(newIndex, 0, movedRow);
 
       const newRows = updatedRows.map((row, index) => ({
         ...row,
         id: index + 1,
       }));
+
       dispatch(
         setScheduledTable({ rows: newRows, visibleRows: newRows }),
       );
@@ -54,8 +57,9 @@ const WorkflowActions = (props: {
   const removeRow =
   (list: Number) => {
     let filteredWorkflows = scheduledTable.rows.filter(
-        row => !(row.id === id),
-      );
+      row => !(row.id === id),
+    );
+
     dispatch(
       setScheduledTable({
         rows: filteredWorkflows,
@@ -69,12 +73,14 @@ const WorkflowActions = (props: {
     if (id === 1) {
       return true;
     }
+
     return false;
   };
   const isEndRow = (id: number): boolean => {
     if (id === scheduledTable.rows.length) {
       return true;
     }
+
     return false;
   };
 
@@ -163,7 +169,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 // Create a custom NoRowsOverlay component using InfoMessage
 const CustomNoRowsOverlay = () => {
   return (
-    <InfoMessage 
+    <InfoMessage
       message="No scheduled workflows available."
       type="info"
       icon={<ScheduleIcon sx={{ fontSize: 40, color: 'info.main' }} />}
@@ -188,29 +194,33 @@ export default function ScheduleTable() {
     if (workflows.data.length > 0) {
       const uniqueParameters = new Set(
         workflows.data.filter(workflow => workflow.status === 'SCHEDULED')
-        .reduce((acc: string[], workflow) => {
-          const params = workflow.params;
-          let paramNames: string[] = [];
-          if (params) {
-            paramNames = params.map(param => param.name);
-            return [...acc, ...paramNames];
-          } else {
-            return [...acc];
-          }
-        }, []),
+          .reduce((acc: string[], workflow) => {
+            const params = workflow.params;
+            let paramNames: string[] = [];
+
+            if (params) {
+              paramNames = params.map(param => param.name);
+
+              return [...acc, ...paramNames];
+            } else {
+              return [...acc];
+            }
+          }, []),
       );
       const uniqueTasks = new Set(
         workflows.data.filter(workflow => workflow.status === 'SCHEDULED')
-        .reduce((acc: string[], workflow) => {
-          const tasks = workflow?.tasks;
-          let taskNames: string[] = [];
-          if(tasks) {
-            taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
-            return [...acc, ...taskNames];
-          } else {
-            return [...acc];
-          }
-        }, [])
+          .reduce((acc: string[], workflow) => {
+            const tasks = workflow?.tasks;
+            let taskNames: string[] = [];
+
+            if(tasks) {
+              taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
+
+              return [...acc, ...taskNames];
+            } else {
+              return [...acc];
+            }
+          }, [])
       );
 
       const rows = workflows.data
@@ -218,17 +228,20 @@ export default function ScheduleTable() {
         .map(workflow => {
           const params = workflow.params;
           const tasks = workflow?.tasks;
+
           return {
             id: idCounter++,
             workflowId: workflow.name,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
                 tasks?.find(task => task.name === variant)?.variant || '';
+
               return acc;
             }, {} as Record<string, string>),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
               acc[variant] =
                 params?.find(param => param.name === variant)?.value || '';
+
               return acc;
             }, {} as Record<string, string>),
             status: workflow.status.toLowerCase(),
@@ -245,11 +258,13 @@ export default function ScheduleTable() {
         ...Array.from(uniqueTasks).reduce((acc, variant) => {
           acc[variant] =
             tasks?.find(task => task.name === variant)?.variant || '';
+
           return acc;
         }, {} as Record<string, string>),
         ...Array.from(uniqueParameters).reduce((acc, variant) => {
           acc[variant] =
             `${params?.find(param => param.name === variant)?.value}` || '';
+
           return acc;
         }, {} as Record<string, string>),
         status: workflow.status,
@@ -258,34 +273,36 @@ export default function ScheduleTable() {
       const columns: CustomGridColDef[] =
         infoRow
           ? Object.keys(infoRow)
-              .filter(key => key !== 'id')
-              .map(key => ({
-                field: key,
-                headerName:  key === 'action' ? '' : key.replace('_', ' '),
-                headerClassName:
+            .filter(key => key !== 'id')
+            .map(key => ({
+              field: key,
+              headerName: key === 'action' ? '' : key.replace('_', ' '),
+              headerClassName:
                 key === 'action' ? 'datagrid-header-fixed' : 'datagrid-header',
-                minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,
-                flex: 1,
-                align: 'center',
-                headerAlign: 'center',
-                sortable: false,    
-                type: (rows.length > 0 && typeof (rows[0] as Record<string, string | number | boolean | undefined>)[key] === 'number') ? 'number' : 'string',
-                ...(key === 'action' && {
-                  renderCell: (params) => {
-                    return (
-                      <WorkflowActions
-                        id={params.row.id}
-                      />
-                    );
-                  }
-                })
-              }))
+              minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,
+              flex: 1,
+              align: 'center',
+              headerAlign: 'center',
+              sortable: false,
+              type: (rows.length > 0 && typeof (rows[0] as Record<string, string | number | boolean | undefined>)[key] === 'number') ? 'number' : 'string',
+              ...(key === 'action' && {
+                renderCell: (params) => {
+                  return (
+                    <WorkflowActions
+                      id={params.row.id}
+                    />
+                  );
+                }
+              })
+            }))
           : [];
+
       paramLength.current = uniqueParameters.size;
-        const visibilityModel = columns.reduce((acc, col) => {
-          acc[col.field] = true;
-          return acc;
-        }, {} as Record<string, boolean>);        
+      const visibilityModel = columns.reduce((acc, col) => {
+        acc[col.field] = true;
+
+        return acc;
+      }, {} as Record<string, boolean>);
 
       dispatch(
         setScheduledTable({
@@ -309,6 +326,7 @@ export default function ScheduleTable() {
   const removeSelected =
     (list: Number[] | string) => (e: React.SyntheticEvent) => {
       let filteredWorkflows;
+
       if (typeof list !== 'string') {
         filteredWorkflows = scheduledTable.rows.filter(
           row => !list.includes(row.id),
@@ -334,6 +352,7 @@ export default function ScheduleTable() {
     value: string,
   ) => {
     const newFilters = [...scheduledTable.filters];
+
     newFilters[index] = { column, operator, value };
     dispatch(setScheduledTable({ filters: newFilters }));
   };
@@ -353,26 +372,29 @@ export default function ScheduleTable() {
     const newFilters = scheduledTable.filters.filter(
       (_, i) => i !== index,
     );
+
     dispatch(setScheduledTable({ filters: newFilters }));
   };
 
   useEffect(() => {
-      let counter = 0;
-      let newRows = scheduledTable.rows;
-      if(scheduledTable.filters.length > 0) {
+    let counter = 0;
+    let newRows = scheduledTable.rows;
+
+    if(scheduledTable.filters.length > 0) {
       for (let i = 0; i < scheduledTable.filters.length; i++) {
         if (scheduledTable.filters[i].value !== '') {
           counter++;
         }
       }
       // dispatch(setScheduledTable({ filtersCounter: counter }))
-       newRows = scheduledTable.rows.filter(row => {
+      newRows = scheduledTable.rows.filter(row => {
         return scheduledTable.filters.every(filter => {
           if (filter.value === '') return true;
           const cellValue = row[filter.column as keyof Data]
             ?.toString()
             .toLowerCase();
           const filterValue = filter.value.toLowerCase();
+
           if (!cellValue) return false;
 
           switch (filter.operator) {
@@ -391,7 +413,7 @@ export default function ScheduleTable() {
             case '>=':
               return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true;
             case '<=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true;    
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true;
             default:
               return true;
           }
@@ -399,15 +421,15 @@ export default function ScheduleTable() {
       });
     }
     dispatch(
-        setScheduledTable({
-          filtersCounter: counter,
-          filteredRows: newRows,
-        }),
-      );
+      setScheduledTable({
+        filtersCounter: counter,
+        filteredRows: newRows,
+      }),
+    );
   }, [scheduledTable.filters]);
 
   return (
-    <Box sx={{height: '100%'}} >
+    <Box sx={{ height: '100%' }} >
       <Paper sx={{ height: '100%', width: '100%', mb: 2 }} elevation={2}>
         <Box >
           <ToolBarWorkflow
@@ -452,7 +474,7 @@ export default function ScheduleTable() {
             columnVisibilityModel={scheduledTable.columnsVisibilityModel}
             onColumnVisibilityModelChange={(model) =>
               dispatch(setScheduledTable({ columnsVisibilityModel: model }))
-            }          
+            }
             slots={{
               noRowsOverlay: CustomNoRowsOverlay
             }}
@@ -508,10 +530,10 @@ export default function ScheduleTable() {
                 headerClassName: 'theme-parameters-group',
                 children: scheduledTable.uniqueParameters.length > 0
                   ? (scheduledTable.uniqueParameters.map(
-                      (param): GridColumnNode => ({
-                        field: param,
-                      }),
-                    ) as GridColumnNode[])
+                    (param): GridColumnNode => ({
+                      field: param,
+                    }),
+                  ) as GridColumnNode[])
                   : [],
               },
               {

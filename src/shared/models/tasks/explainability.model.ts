@@ -25,7 +25,7 @@ export interface IExplainability {
 }
 
 export const explainabilityDefault: IExplainability = {
-  //TODO: these hyperparameters names should be populated from the response
+  // TODO: these hyperparameters names should be populated from the response
   hyperparametersNames: [],
   '2dpdp': {
     data: null,

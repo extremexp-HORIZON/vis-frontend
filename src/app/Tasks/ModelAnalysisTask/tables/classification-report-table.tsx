@@ -16,7 +16,7 @@ import Loader from '../../../../shared/components/loader';
 const format = (value: string | number): string =>
   typeof value === 'number' ? value.toFixed(3) : String(value);
 
-const ClassificationReportTable = () => {  
+const ClassificationReportTable = () => {
   const { tab } = useAppSelector((state) => state.workflowPage);
   const summary = tab?.workflowTasks?.modelAnalysis?.modelSummary;
 
@@ -34,15 +34,17 @@ const ClassificationReportTable = () => {
   const computeAverage = (key: string, weighted = false): number => {
     if (weighted) {
       if (totalSupport === 0) return 0;
+
       return (
         classificationReport.reduce((sum, row) => {
           const val = Number(row[key] ?? 0);
           const support = Number(row.support ?? 0);
+
           return sum + val * support;
         }, 0) / totalSupport
       );
     }
-    
+
     if (classificationReport.length === 0) return 0;
 
     return (
@@ -53,20 +55,21 @@ const ClassificationReportTable = () => {
 
   const handleExportCsv = () => {
     if (!classificationReport.length) return;
-  
+
     const headers = ['label', ...metricKeys, 'support'];
-  
+
     const rowsCsv = classificationReport.map(row =>
       headers
         .map(h => {
           const value = row[h];
+
           return typeof value === 'string' && value.includes(',')
             ? `"${value}"`
             : value ?? '';
         })
         .join(',')
     );
-  
+
     const accuracyRow = [
       'Accuracy',
       ...metricKeys.map((_, idx) =>
@@ -76,7 +79,7 @@ const ClassificationReportTable = () => {
     ];
     const macroAvgRow = ['Macro avg', ...metricKeys.map(k => computeAverage(k)), totalSupport];
     const weightedAvgRow = ['Weighted avg', ...metricKeys.map(k => computeAverage(k, true)), totalSupport];
-  
+
     const csvContent = [
       headers.join(','),
       ...rowsCsv,
@@ -84,14 +87,16 @@ const ClassificationReportTable = () => {
       macroAvgRow.join(','),
       weightedAvgRow.join(',')
     ].join('\n');
-  
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
+
     link.setAttribute('href', url);
     link.setAttribute(
       'download',
-      `classification-summary-${new Date().toISOString().split('T')[0]}.csv`
+      `classification-summary-${new Date().toISOString()
+        .split('T')[0]}.csv`
     );
     document.body.appendChild(link);
     link.click();
@@ -104,7 +109,7 @@ const ClassificationReportTable = () => {
   const content = () => {
     if (loading)
       return (
-       <Loader/>
+        <Loader/>
       );
     if (error)
       return (
@@ -116,18 +121,18 @@ const ClassificationReportTable = () => {
         />
       );
 
-      if (!classificationReport.length && !loading && !error)
-        return (
-          <InfoMessage
-            message="No classification report available."
-            type="info"
-            icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-            fullHeight
-          />
+    if (!classificationReport.length && !loading && !error)
+      return (
+        <InfoMessage
+          message="No classification report available."
+          type="info"
+          icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+          fullHeight
+        />
       );
 
     return (
-      <Box sx={{overflowX: 'auto' }}>
+      <Box sx={{ overflowX: 'auto' }}>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -205,7 +210,7 @@ const ClassificationReportTable = () => {
             flexDirection: 'column',
           }}
         >
-        
+
           {content()}
         </Box>
       </ResponsiveCardTable>

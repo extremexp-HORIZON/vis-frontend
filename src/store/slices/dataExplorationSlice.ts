@@ -35,6 +35,7 @@ export const dataExplorationReducers = (
 
       if (task) {
         const asyncState = getAsyncState(task, queryCase);
+
         asyncState.data = queryCase === 'multipleTimeSeries'
           ? handleMultiTimeSeriesData(action.payload)
           : prepareDataExplorationResponse(action.payload);
@@ -44,6 +45,7 @@ export const dataExplorationReducers = (
         if (queryCase === 'dataTable') {
           const totalItems = action.payload.querySize || 0;
           const { pageSize } = task.controlPanel;
+
           task.controlPanel.queryItems = totalItems;
           task.controlPanel.totalPages = Math.ceil(totalItems / pageSize);
         }
@@ -54,6 +56,7 @@ export const dataExplorationReducers = (
         ? state.tab?.workflowTasks.dataExploration
         : null;
       const queryCase = action.meta.arg.metadata.queryCase as AsyncQueryKey;
+
       if (task) getAsyncState(task, queryCase).loading = true;
     })
     .addCase(fetchDataExplorationData.rejected, (state, action) => {
@@ -61,8 +64,10 @@ export const dataExplorationReducers = (
         ? state.tab?.workflowTasks.dataExploration
         : null;
       const queryCase = action.meta.arg.metadata.queryCase as AsyncQueryKey;
+
       if (task) {
         const asyncState = getAsyncState(task, queryCase);
+
         asyncState.loading = false;
         asyncState.error = 'Failed to fetch data';
       }
@@ -71,9 +76,11 @@ export const dataExplorationReducers = (
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
         ? state.tab?.workflowTasks.dataExploration
         : null;
+
       if (!task) return;
 
       const { originalColumns } = action.payload;
+
       task.metaData.data = action.payload;
       task.metaData.loading = false;
       task.metaData.error = null;
@@ -106,6 +113,7 @@ export const dataExplorationReducers = (
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
+
       if (heatmapGroupBy.length === 2) {
         task.controlPanel.barGroupByHeat = heatmapGroupBy;
       }
@@ -120,12 +128,14 @@ export const dataExplorationReducers = (
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
         ? state.tab?.workflowTasks.dataExploration
         : null;
+
       if (task) task.metaData.loading = true;
     })
     .addCase(fetchMetaData.rejected, (state, action) => {
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
         ? state.tab?.workflowTasks.dataExploration
         : null;
+
       if (task) {
         task.metaData.loading = false;
         task.metaData.error = 'Failed to fetch metadata';
@@ -135,6 +145,7 @@ export const dataExplorationReducers = (
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
         ? state.tab?.workflowTasks.dataExploration
         : null;
+
       if (task) {
         task.umap.data = action.payload;
         task.umap.loading = false;
@@ -145,12 +156,14 @@ export const dataExplorationReducers = (
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
         ? state.tab?.workflowTasks.dataExploration
         : null;
+
       if (task) task.umap.loading = true;
     })
     .addCase(fetchUmap.rejected, (state, action) => {
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
         ? state.tab?.workflowTasks.dataExploration
         : null;
+
       if (task) {
         task.umap.loading = false;
         task.umap.error = 'Failed to fetch umap';
@@ -162,6 +175,7 @@ export const fetchDataExplorationData = createAsyncThunk(
   'workflowTasks/data_exploration/fetch_data',
   async (payload: IDataExplorationRequest) => {
     const requestUrl = 'data/tabular';
+
     return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
       .then(response => response.data);
@@ -172,6 +186,7 @@ export const fetchMetaData = createAsyncThunk(
   'workflowTasks/data_exploration/fetch_metadata',
   async (payload: IMetaDataRequest) => {
     const requestUrl = 'data/metadata';
+
     return api
       .post<IDataExplorationMetaDataResponse>(requestUrl, payload.query)
       .then(response => response.data);
@@ -182,6 +197,7 @@ export const fetchUmap = createAsyncThunk(
   'workflowTasks/data_exploration/fetch_umap',
   async (payload: { data: number[][]; metadata: {workflowId: string; query: string;} }) => {
     const requestUrl = 'data/umap';
+
     return api
       .post<number[][]>(requestUrl, payload.data)
       .then(response => response.data);

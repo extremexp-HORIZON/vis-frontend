@@ -8,7 +8,7 @@ import { setControls } from '../../../../store/slices/workflowPageSlice';
 const ColumnSelectionPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
-  
+
   const originalColumns = tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || [];
   const selectedColumns = tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || [];
   const selectedColumnNames = selectedColumns.map(col => col.name);
@@ -17,9 +17,9 @@ const ColumnSelectionPanel: React.FC = () => {
     const newSelectedColumns = selectedColumns.some(col => col.name === columnName)
       ? selectedColumns.filter(col => col.name !== columnName)
       : [...selectedColumns, originalColumns.find(col => col.name === columnName)!];
-    
+
     dispatch(setControls({ selectedColumns: newSelectedColumns }));
-    
+
     // if (newSelectedColumns.length) {
     //   handleFetchDataExploration(newSelectedColumns);
     // }
@@ -27,7 +27,7 @@ const ColumnSelectionPanel: React.FC = () => {
 
   // const handleFetchDataExploration = (columns = selectedColumns) => {
   //   if (!columns?.length) return;
-  
+
   //   dispatch(fetchDataExplorationData({
   //     query: {
   //       ...defaultDataExplorationQuery,
@@ -44,7 +44,7 @@ const ColumnSelectionPanel: React.FC = () => {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ 
+      <Box sx={{
         display: 'flex',
         alignItems: 'center',
         mb: 1.5,
@@ -61,7 +61,7 @@ const ColumnSelectionPanel: React.FC = () => {
           Select columns to display
         </Typography>
       </Box>
-      <Box sx={{ 
+      <Box sx={{
         maxHeight: 250,
         overflow: 'auto',
         border: '1px solid rgba(0,0,0,0.08)',
@@ -70,8 +70,8 @@ const ColumnSelectionPanel: React.FC = () => {
       }}>
         <List dense disablePadding>
           {originalColumns.map((column) => (
-            <ListItem 
-              key={column.name} 
+            <ListItem
+              key={column.name}
               disablePadding
               divider
               sx={{
@@ -80,7 +80,7 @@ const ColumnSelectionPanel: React.FC = () => {
                 }
               }}
             >
-              <ListItemButton 
+              <ListItemButton
                 onClick={handleColumnToggle(column.name)}
                 sx={{
                   py: 0.5,
@@ -99,11 +99,11 @@ const ColumnSelectionPanel: React.FC = () => {
                     color="primary"
                   />
                 </ListItemIcon>
-                <ListItemText 
-                  primary={column.name} 
+                <ListItemText
+                  primary={column.name}
                   primaryTypographyProps={{
                     variant: 'body2',
-                    sx: { 
+                    sx: {
                       fontSize: '0.875rem',
                       fontWeight: selectedColumnNames.includes(column.name) ? 500 : 400,
                     }

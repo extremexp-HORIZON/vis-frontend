@@ -65,7 +65,7 @@ const SectionHeader = ({
       width: '100%', // Full width
     }}
   >
-    <Box sx={{ 
+    <Box sx={{
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -119,14 +119,14 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
   const updateSize = useCallback(() => {
     if (containerRef.current) {
       const containerWidth = containerRef.current.offsetWidth || window.innerWidth * 0.9;
-      
+
       // Adjust to fit exactly within the container with no overflow
       const newWidth = Math.max(minWidth, Math.min(containerWidth, maxWidth));
       const newHeight = Math.max(
         minHeight,
         Math.min(newWidth / aspectRatio, maxHeight),
       );
-      
+
       setWidth(newWidth);
       setHeight(newHeight);
     }
@@ -162,10 +162,13 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
     if (containerRef.current) {
       // Find the canvas element inside the container
       const canvas = containerRef.current.querySelector('canvas');
+
       if (canvas) {
         // Create a temporary link element
         const link = document.createElement('a');
-        link.download = `${title || 'chart'}_${new Date().toISOString().split('T')[0]}.png`;
+
+        link.download = `${title || 'chart'}_${new Date().toISOString()
+          .split('T')[0]}.png`;
         link.href = canvas.toDataURL('image/png');
         document.body.appendChild(link);
         link.click();
@@ -190,6 +193,7 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
     if (fullscreenOpen) {
       // Short delay to ensure the dialog is rendered before measuring
       const timer = setTimeout(() => updateSize(), 100);
+
       return () => clearTimeout(timer);
     }
   }, [fullscreenOpen, updateSize]);
@@ -199,7 +203,7 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
     // if (spec?.data) {
     //   // Extract data from spec
     //   let dataToExport;
-      
+
     //   if (spec.data.values) {
     //     dataToExport = spec.data.values;
     //   } else if (spec.data.name && otherProps.data && otherProps.data[spec.data.name]) {
@@ -207,20 +211,20 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
     //   } else {
     //     dataToExport = spec.data;
     //   }
-      
+
     //   // Convert data to JSON string
     //   const jsonData = JSON.stringify(dataToExport, null, 2);
-      
+
     //   // Create blob and download link
     //   const blob = new Blob([jsonData], { type: 'application/json' });
     //   const url = URL.createObjectURL(blob);
     //   const link = document.createElement('a');
-      
+
     //   link.href = url;
     //   link.download = `${title || 'chart-data'}_${new Date().toISOString().split('T')[0]}.json`;
     //   document.body.appendChild(link);
     //   link.click();
-      
+
     //   // Clean up
     //   document.body.removeChild(link);
     //   URL.revokeObjectURL(url);
@@ -238,11 +242,11 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
 
   return (
     <>
-      <Card sx={{ 
-        maxWidth: maxWidth, 
-        mx: 'auto', 
-        mb: 1, 
-        boxShadow: '0 4px 20px rgba(0,0,0,0.09)', 
+      <Card sx={{
+        maxWidth: maxWidth,
+        mx: 'auto',
+        mb: 1,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.09)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -303,7 +307,7 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                 {/* Advanced Controls Divider */}
                 {controlPanel && (
                   <>
-                    <Box sx={{ p: 2}}>
+                    <Box sx={{ p: 2 }}>
                       {controlPanel}
                     </Box>
                     <Divider sx={{ mt: 1, opacity: 0.6 }} />
@@ -315,20 +319,20 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                     <ListItemIcon>
                       <DownloadIcon fontSize="small" color="primary" />
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary="Download as PNG"
-                      secondary="Save chart as image" 
+                      secondary="Save chart as image"
                       primaryTypographyProps={{ fontWeight: 500 }}
                       secondaryTypographyProps={{ fontSize: '0.75rem' }}
                     />
                   </MenuItem>
-                  
+
                   <MenuItem onClick={handleDownloadData} sx={{ py: 1.5 }}>
                     <ListItemIcon>
                       <CodeIcon fontSize="small" color="primary" />
                     </ListItemIcon>
-                    <ListItemText 
-                      primary="Download Data as JSON" 
+                    <ListItemText
+                      primary="Download Data as JSON"
                       secondary="Export chart's underlying data"
                       primaryTypographyProps={{ fontWeight: 500 }}
                       secondaryTypographyProps={{ fontSize: '0.75rem' }}
@@ -337,8 +341,8 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
                 </Box>
               </Menu>
               <Tooltip title="Fullscreen">
-                <IconButton 
-                  aria-label="fullscreen" 
+                <IconButton
+                  aria-label="fullscreen"
                   onClick={handleFullScreen}
                   sx={{
                     mr: 0.5,
@@ -378,12 +382,12 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
             flexShrink: 0, // Prevent header from shrinking
           }}
         />
-        <CardContent sx={{ 
-          backgroundColor: '#ffffff', 
+        <CardContent sx={{
+          backgroundColor: '#ffffff',
           py: 2,
           px: 3,
-          '&:last-child': { 
-            paddingBottom: 3 
+          '&:last-child': {
+            paddingBottom: 3
           },
           borderRadius: '0 0 12px 12px',
           display: 'flex',
@@ -393,10 +397,10 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <Box 
-            ref={containerRef} 
-            sx={{ 
-              width: '100%', 
+          <Box
+            ref={containerRef}
+            sx={{
+              width: '100%',
               height: '100%',
               display: 'flex',
               alignItems: 'center',
@@ -405,11 +409,11 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
           >
             {
               showInfoMessage ? (
-                <Box sx={{ width: width, height: height}}>
-                {infoMessage}
+                <Box sx={{ width: width, height: height }}>
+                  {infoMessage}
                 </Box>
               ) : (
-                 <Box ref={mapRef} style={{ height: '100%', width: '100%' }} />
+                <Box ref={mapRef} style={{ height: '100%', width: '100%' }} />
               )
             }
           </Box>
@@ -436,16 +440,16 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
           }
         }}
       >
-        <DialogTitle sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <DialogTitle sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
           borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
           px: 3,
           py: 1.5,
         }}>
-          <Typography variant="h6" component="div" sx={{ 
+          <Typography variant="h6" component="div" sx={{
             fontWeight: 600,
             color: '#2a3f5f',
             letterSpacing: '0.3px',
@@ -455,8 +459,8 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {controlPanel && (
               <>
-                <IconButton 
-                  aria-label="settings" 
+                <IconButton
+                  aria-label="settings"
                   onClick={handleFullscreenMenuClick}
                   sx={{
                     mr: 1,
@@ -520,9 +524,9 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent dividers sx={{ 
-          p: 4, 
-          display: 'flex', 
+        <DialogContent dividers sx={{
+          p: 4,
+          display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           height: '100%',
@@ -530,21 +534,21 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
         }}>
           {!showInfoMessage ? (
             <Box ref={mapRef} style={{ width: fullScreen ? window.innerWidth * 0.9 : window.innerWidth * 0.8,
-                height: fullScreen ? window.innerHeight * 0.7 : window.innerHeight * 0.7, }} />
+              height: fullScreen ? window.innerHeight * 0.7 : window.innerHeight * 0.7 }} />
           ) : (
             <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {infoMessage}
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ 
-          px: 3, 
+        <DialogActions sx={{
+          px: 3,
           py: 2,
           borderTop: '1px solid rgba(0, 0, 0, 0.08)',
           background: '#f8f9fa',
         }}>
-          <Button 
-            onClick={handleDownloadChart} 
+          <Button
+            onClick={handleDownloadChart}
             startIcon={<DownloadIcon />}
             variant="outlined"
             color="primary"
@@ -552,8 +556,8 @@ const ResponsiveMapCard: React.FC<ResponsiveMapCardProps> = ({
           >
             Download as PNG
           </Button>
-          <Button 
-            onClick={handleCloseFullscreen} 
+          <Button
+            onClick={handleCloseFullscreen}
             color="primary"
             variant="contained"
             size="small"

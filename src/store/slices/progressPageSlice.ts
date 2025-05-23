@@ -61,7 +61,7 @@ const initialState: IProgressPage = {
   workflowEvaluation: {
     loading: false,
     error: null
-  }  
+  }
 };
 
 export const progressPageSlice = createSlice({
@@ -90,6 +90,7 @@ export const progressPageSlice = createSlice({
         const existing = state.workflows.data;
 
         const isDifferent = JSON.stringify(existing) !== JSON.stringify(incoming);
+
         if (isDifferent) {
           state.workflows.data = incoming;
         }
@@ -142,17 +143,18 @@ export const progressPageSlice = createSlice({
       .addCase(fetchUserEvaluation.fulfilled, (state, action) => {
         state.workflowEvaluation.loading = false;
         state.workflowEvaluation.error = null;
-      
+
         if (action.payload?.status === 'success') {
           const { runId, data } = action.meta.arg;
+
           if (data.rating === null) return;
           const workflowIndex = state.workflows.data.findIndex(w => w.id === runId);
-        
+
           if (workflowIndex !== -1) {
             const currentWorkflow = state.workflows.data[workflowIndex];
             const metrics = currentWorkflow.metrics ?? [];
             const ratingMetricIndex = metrics.findIndex(m => m.name === 'rating');
-          
+
             if (ratingMetricIndex !== -1) {
               metrics[ratingMetricIndex].value = data.rating;
             } else {
@@ -161,13 +163,13 @@ export const progressPageSlice = createSlice({
                 value: data.rating,
               } as IMetric);
             }
-          
+
             const updatedWorkflow: IRun = {
               ...currentWorkflow,
               metrics: [...metrics],
             };
-          
-            state.workflows.data[workflowIndex] = updatedWorkflow;          
+
+            state.workflows.data[workflowIndex] = updatedWorkflow;
           }
         }
       })
@@ -181,23 +183,25 @@ export const progressPageSlice = createSlice({
   },
 });
 
-//Thunk Calls for Experiment/Workflows fetching
+// Thunk Calls for Experiment/Workflows fetching
 
 export const fetchExperiment = createAsyncThunk(
   'progressPage/fetch_experiment',
   async (experimentId: string) => {
     const requestUrl = `${experimentId}`;
     const res = await experimentApi.get(requestUrl);
+
     return res.data;
   }
 );
 
 export const fetchExperimentWorkflows = createAsyncThunk(
-    'progressPage/fetch_experiment_workflows',
-    async (experimentId: string) => {
-        const requestUrl = `${experimentId}/runs`;
-        return experimentApi.get(requestUrl).then(response => response.data);
-});
+  'progressPage/fetch_experiment_workflows',
+  async (experimentId: string) => {
+    const requestUrl = `${experimentId}/runs`;
+
+    return experimentApi.get(requestUrl).then(response => response.data);
+  });
 
 // Calls for Workflow Actions
 
@@ -212,6 +216,7 @@ export const workflowsReordering = createAsyncThunk(
         [workflowId1]: workflowId2,
       },
     };
+
     return experimentApi
       .post<IRun[]>(requestUrl, requestPayload)
       .then(response => response.data);
@@ -222,8 +227,9 @@ export const workflowsReordering = createAsyncThunk(
 export const stateController = createAsyncThunk(
   'progressPage/state_controller',
   async (payload: {state: string, id: string, action: string}) => {
-    const {state, id, action} = payload;
+    const { state, id, action } = payload;
     const requestUrl = `/exp/${state}/${action}/${id}`;
+
     return axios
       .get(requestUrl)
       .then(response => response.data);
@@ -237,13 +243,14 @@ export const fetchUserEvaluation = createAsyncThunk(
   ) => {
     const { experimentId, runId, data } = payload;
     const requestUrl = `${experimentId}/runs/${runId}/user-evaluation`;
+
     return experimentApi
       .post<IUserEvaluationResponse>(requestUrl, data)
       .then(response => response.data);
-      
+
   },
 );
-//Reducer exports
+// Reducer exports
 export const {
   setProgressBarData,
   setIntialization,

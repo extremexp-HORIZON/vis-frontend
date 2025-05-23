@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import grey from '@mui/material/colors/grey';
-import type { RootState} from '../../store/store';
+import type { RootState } from '../../store/store';
 import { useAppSelector } from '../../store/store';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
@@ -25,14 +25,14 @@ const ProgressPageBar = () => {
           flexWrap: 'wrap',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1}}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Chip
             // icon={<ScienceIcon />}
             label={`Experiment: ${experimentId}`}
             color="primary"
             variant="outlined"
-            sx={{ 
-              border:'none',
+            sx={{
+              border: 'none',
               p: 0,
               alignContent: 'left',
               justifyContent: 'left',
@@ -42,9 +42,9 @@ const ProgressPageBar = () => {
               }
             }}
           />
-          <Box sx={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
+          <Box sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
             backgroundColor: theme.palette.background.paper,
             // borderRadius: '16px',
             // px: 1,
@@ -67,7 +67,7 @@ const ProgressPageBar = () => {
             </Typography>
           </Box>
         </Box>
-        
+
         {matches && (
           <Box
             sx={{ minWidth: 35, display: 'flex', columnGap: 1, flexWrap: 'wrap' }}
@@ -87,7 +87,7 @@ const ProgressPageBar = () => {
           </Box>
         )}
       </Box>
-      <Box sx={{ width: '100%', ml: 1}}>
+      <Box sx={{ width: '100%', ml: 1 }}>
         <LinearProgress
           variant="determinate"
           value={Math.round(progressBar.progress)}

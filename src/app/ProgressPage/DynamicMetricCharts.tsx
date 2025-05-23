@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useState } from 'react';
-import type { RootState} from '../../store/store';
+import type { RootState } from '../../store/store';
 import { useAppSelector } from '../../store/store';
 import {
   Grid,
@@ -28,7 +28,7 @@ const WorkflowCharts: React.FC = () => {
   );
   const [isMosaic, setIsMosaic] = useState(true);
   const { hoveredWorkflowId } = workflowsTable;
-  
+
   const filteredWorkflows = (
     workflowsTable.groupBy.length > 0
       ? workflowsTable.aggregatedRows
@@ -46,37 +46,37 @@ const WorkflowCharts: React.FC = () => {
     ...groupByTooltipFields,
     { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
   ];
-  
-  const groupedMetrics: Record<string, BaseMetric[]> = workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating')
-  .reduce(
-    (acc: Record<string, BaseMetric[]>, metricName: string) => {
-      acc[metricName] = [];
 
-      filteredWorkflows.forEach(workflow => {
-        if (Object.prototype.hasOwnProperty.call(workflow, metricName)) {
-          const value = workflow[metricName];
-  
-          // Skip non-numeric or NaN values
-          if (typeof value === 'number' && !isNaN(value)) {
-            const metricPoint: BaseMetric = {
-              value,
-              id: workflow.id,
-              name: metricName,
-            };
-            
-            workflowsTable.groupBy.forEach(groupKey => {
-              metricPoint[groupKey] = workflow[groupKey];
-            });
-            
-            acc[metricName].push(metricPoint);
+  const groupedMetrics: Record<string, BaseMetric[]> = workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating')
+    .reduce(
+      (acc: Record<string, BaseMetric[]>, metricName: string) => {
+        acc[metricName] = [];
+
+        filteredWorkflows.forEach(workflow => {
+          if (Object.prototype.hasOwnProperty.call(workflow, metricName)) {
+            const value = workflow[metricName];
+
+            // Skip non-numeric or NaN values
+            if (typeof value === 'number' && !isNaN(value)) {
+              const metricPoint: BaseMetric = {
+                value,
+                id: workflow.id,
+                name: metricName,
+              };
+
+              workflowsTable.groupBy.forEach(groupKey => {
+                metricPoint[groupKey] = workflow[groupKey];
+              });
+
+              acc[metricName].push(metricPoint);
+            }
           }
-        }
-      });
-  
-      return acc;
-    },
+        });
+
+        return acc;
+      },
     {} as Record<string, BaseMetric[]>
-  );
+    );
   // Render charts for each grouped metric name
   const renderCharts = Object.keys(groupedMetrics).map(metricName => {
     // task name is the same across workflows
@@ -92,11 +92,11 @@ const WorkflowCharts: React.FC = () => {
 
     const isGrouped = workflowsTable.groupBy.length > 0;
     const hasMultipleSteps = uniqueSteps.size > 1;
-    
+
     const xAxisTitle = isGrouped
       ? (hasMultipleSteps ? 'Group Step' : 'Workflow Group')
       : (hasMultipleSteps ? 'Step' : 'Workflow');
-  
+
     const chartSpec = {
       mark: uniqueSteps.size <= 1 ? 'bar' : 'line',
       encoding: {
@@ -137,9 +137,9 @@ const WorkflowCharts: React.FC = () => {
         // Only add these properties when needed
         ...(hoveredWorkflowId ? {
           strokeWidth: { value: 1 },
-          stroke: { 
+          stroke: {
             condition: { test: `datum.id === '${hoveredWorkflowId}'`, value: '#868686' },
-            value: null 
+            value: null
           }
         } : {}),
         tooltip: tooltipFields,
@@ -152,7 +152,7 @@ const WorkflowCharts: React.FC = () => {
         item
         xs={isMosaic ? 6 : 12}
         key={metricName}
-        sx={{ textAlign: 'left', width: '100%'}} // Ensure full width
+        sx={{ textAlign: 'left', width: '100%' }} // Ensure full width
       >
         <ResponsiveCardVegaLite
           spec={chartSpec}
@@ -167,7 +167,7 @@ const WorkflowCharts: React.FC = () => {
 
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (
-      <InfoMessage 
+      <InfoMessage
         message="Select Workflows to display metrics."
         type="info"
         icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
@@ -177,7 +177,7 @@ const WorkflowCharts: React.FC = () => {
   }
 
   return (
-    <Container maxWidth={false} sx={{padding: 2}} >
+    <Container maxWidth={false} sx={{ padding: 2 }} >
       <Grid
         container
         justifyContent="flex-end" // Align to the right

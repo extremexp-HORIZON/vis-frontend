@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import ParallelCoordinatePlot from './ParalleleCoodrinates/parallel-coordinate-plot';
 import WorkflowTable from './WorkFlowTables/workflow-table';
 import ScheduleTable from './WorkFlowTables/schedule-table';
-import type { RootState} from '../../../store/store';
+import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import WorkflowCharts from '../DynamicMetricCharts';
 import { Resizable } from 're-resizable';
@@ -30,6 +30,7 @@ const MonitoringPage = () => {
   useEffect(() => {
     if (compareId) {
       const parsed = getCache<{ workflowIds: string[] }>(compareId);
+
       if (parsed?.workflowIds) {
         compareWorkflowsRef.current = parsed.workflowIds;
       }
@@ -68,18 +69,19 @@ const MonitoringPage = () => {
           value={selectedTab}
           onChange={(event, newValue) => {
             const searchParams = new URLSearchParams(location.search);
+
             searchParams.delete('compareId');
             searchParams.set('tab', newValue);
             navigate({
               pathname: location.pathname,
               search: searchParams.toString(),
             }, { replace: true });
-          
+
             if (newValue === 1) {
               dispatch(setVisibleTable('workflows'));
             }
           }}
-          
+
           // aria-label="tab menu"
         >
           <Tab label="OVERVIEW" />
@@ -92,12 +94,12 @@ const MonitoringPage = () => {
           flexDirection: 'column',
           rowGap: 1,
           height: '100%',
-          overflow: 'auto', //enables scrolling when table minHeight is applied in the overview page
+          overflow: 'auto', // enables scrolling when table minHeight is applied in the overview page
           px: 2
         }}
       >
         {selectedTab === 0 && (
-          <Box sx={{height: '98%'}}>
+          <Box sx={{ height: '98%' }}>
             <Box sx={{ height: '60%', minHeight: '350px', paddingBottom: 1 }}>
               {visibleTable === 'workflows' ? (
                 <WorkflowTable />
@@ -136,7 +138,7 @@ const MonitoringPage = () => {
               }}
               maxWidth="80%"
               maxHeight="100%"
-              style={{ height: '100%', position: 'relative'}}          
+              style={{ height: '100%', position: 'relative' }}
               handleStyles={{
                 right: {
                   display: 'flex',
@@ -149,25 +151,25 @@ const MonitoringPage = () => {
               }}
               handleComponent={{
                 right: (
-                <Box
-                  sx={{
-                    height: '100%',
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center', 
-                    cursor: 'ew-resize',
-                  }}        
-                >
-                  <MoreVertRoundedIcon style={{ color: theme.palette.action.active }} />
-                </Box>
+                  <Box
+                    sx={{
+                      height: '100%',
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'ew-resize',
+                    }}
+                  >
+                    <MoreVertRoundedIcon style={{ color: theme.palette.action.active }} />
+                  </Box>
                 )
               }}
             >
               <WorkflowTable />
             </Resizable>
-            <Paper elevation={2} sx={{ flex: 1, overflow: 'auto', height: '100%', ml: '8px'}}>
-                <WorkflowCharts />
+            <Paper elevation={2} sx={{ flex: 1, overflow: 'auto', height: '100%', ml: '8px' }}>
+              <WorkflowCharts />
             </Paper>
           </Box>
         )}

@@ -26,6 +26,7 @@ const HeatMapControlPanel = () => {
       tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns.find(
         col => col.name === selectedColumn,
       );
+
     return column?.type === 'DOUBLE' ||
       column?.type === 'FLOAT' ||
       column?.type === 'INTEGER'
@@ -78,11 +79,12 @@ const HeatMapControlPanel = () => {
             }
             onChange={e => {
               const selected = e.target.value as string[];
+
               if (selected.length <= 2) {
                 dispatch(setControls({ barGroupByHeat: selected }));
               }
             }}
-            renderValue={(selected) => selected.join(', ')}            
+            renderValue={(selected) => selected.join(', ')}
             MenuProps={{
               PaperProps: {
                 style: { maxHeight: 224, width: 250 },
@@ -123,6 +125,7 @@ const HeatMapControlPanel = () => {
             value={selectedColumn || ''}
             onChange={e => {
               const newColumn = e.target.value as string;
+
               // Clear previous aggregation and set new selected column
               dispatch(
                 setControls({
@@ -164,6 +167,7 @@ const HeatMapControlPanel = () => {
               }
               onChange={event => {
                 const value = event.target.value as string;
+
                 if (!selectedColumn) return;
                 const currentAgg =
                   tab?.workflowTasks.dataExploration?.controlPanel

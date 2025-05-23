@@ -57,7 +57,7 @@ const InfoMessage: React.FC<InfoMessageProps> = ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: fullHeight ? '100%' : 'auto', 
+        height: fullHeight ? '100%' : 'auto',
         width: '100%',
       }}
     >
@@ -74,9 +74,9 @@ const InfoMessage: React.FC<InfoMessageProps> = ({
         }}
       >
         <Box sx={{ mb: 2 }}>{icon || getDefaultIcon()}</Box>
-        <Typography 
-          align="center" 
-          variant="body1" 
+        <Typography
+          align="center"
+          variant="body1"
           fontWeight="medium"
           color="text.primary"
         >

@@ -33,6 +33,7 @@ const RocCurvePlot = () => {
         tpr: tpr[i],
         threshold: thresholds?.[i] ?? -1,
       }));
+
       setRocData(data);
     }
   }, [rocState?.data]);
@@ -64,7 +65,7 @@ const RocCurvePlot = () => {
           ]
         }
       },
-  
+
       // Diagonal Reference Line
       {
         mark: { type: 'line', strokeDash: [4, 4], color: '#888' },
@@ -74,7 +75,7 @@ const RocCurvePlot = () => {
           y: { field: 'tpr', type: 'quantitative' }
         }
       },
-  
+
       // Dynamically Positioned AUC Label
       ...(aucValue ? [
         {
@@ -115,9 +116,9 @@ const RocCurvePlot = () => {
       }
     }
   };
-    
+
   const loading = (
-   <Loader/>
+    <Loader/>
   );
 
   const error = (

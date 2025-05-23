@@ -20,15 +20,20 @@ const MapChart = () => {
   const leafletMapRef = useRef<L.Map | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const heatLayerRef = useRef<L.HeatLayer | null>(null);
-  const isNumericField = (values: any[]): boolean => {
-  return values.every(v => !isNaN(parseFloat(v)));
-};
+  const isNumericField = (values: string[]): boolean => {
+    return values.every(v => !isNaN(parseFloat(v)));
+  };
 
-const getColorForValue = (value: number, min: number, max: number): string => {
-  const percent = (value - min) / (max - min);
-  const hue = (1 - percent) * 72; // 240 = blue, 0 = red
-  return `hsl(${hue}, 100%, 50%)`;
-};
+  const getColorForValue = (
+    value: number,
+    min: number,
+    max: number,
+  ): string => {
+    const percent = (value - min) / (max - min);
+    const hue = (1 - percent) * 72; // 240 = blue, 0 = red
+
+    return `hsl(${hue}, 100%, 50%)`;
+  };
 
   const { tab } = useAppSelector(state => state.workflowPage);
   const dispatch = useAppDispatch();
@@ -40,13 +45,15 @@ const getColorForValue = (value: number, min: number, max: number): string => {
   const data = tab?.workflowTasks.dataExploration?.mapChart.data?.data || [];
   const colorByMap = tab?.workflowTasks.dataExploration?.controlPanel.colorByMap;
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map());
-  const segmentBy = tab?.workflowTasks.dataExploration?.controlPanel.segmentBy;
-  const timestampField = 'timestamp';
+  // const segmentBy = tab?.workflowTasks.dataExploration?.controlPanel.segmentBy;
+  // const timestampField = 'timestamp';
 
   // Fetch data
   useEffect(() => {
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const datasetId =
+      tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+
     if (!datasetId || !lat || !lon || !colorByMap || colorByMap === 'None')
       return;
 
@@ -94,7 +101,13 @@ const getColorForValue = (value: number, min: number, max: number): string => {
   }, [lat, lon, colorByMap, data, filters]);
 
   useEffect(() => {
-    if (!Array.isArray(data) || !data.length || !colorByMap || colorByMap === 'None') return;
+    if (
+      !Array.isArray(data) ||
+      !data.length ||
+      !colorByMap ||
+      colorByMap === 'None'
+    )
+      return;
 
     const categories = Array.from(
       new Set(data.map((row: any) => row[colorByMap])),
@@ -103,7 +116,10 @@ const getColorForValue = (value: number, min: number, max: number): string => {
 
     categories.forEach((category, index) => {
       // Get a color from the COLOR_PALETTE or generate your own strategy here
-      newColorMap.set(category as string, COLOR_PALETTE[index % COLOR_PALETTE.length]);
+      newColorMap.set(
+        category as string,
+        COLOR_PALETTE[index % COLOR_PALETTE.length],
+      );
     });
 
     setColorMap(newColorMap);
@@ -132,9 +148,11 @@ const getColorForValue = (value: number, min: number, max: number): string => {
         .map((row: any) => {
           const latVal = parseFloat(row[lat]);
           const lonVal = parseFloat(row[lon]);
+
           if (!isNaN(latVal) && !isNaN(lonVal)) {
             return [latVal, lonVal, 0.5]; // [lat, lon, intensity]
           }
+
           return null;
         })
         .filter(Boolean);
@@ -151,19 +169,22 @@ const getColorForValue = (value: number, min: number, max: number): string => {
         const latVal = parseFloat(row[lat]);
         const lonVal = parseFloat(row[lon]);
         const category = row[colorByMap || ''];
-        if (!isNaN(latVal) && !isNaN(lonVal) && category) {
-const colorValue = row[colorByMap || ''];
-let color = '#000000';
 
-if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
-  const values = data.map((r: any) => parseFloat(r[colorByMap || '']));
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const numericVal = parseFloat(colorValue);
-  color = getColorForValue(numericVal, min, max);
-} else {
-  color = colorMap.get(colorValue) || '#000000';
-}          L.marker([latVal, lonVal], {
+        if (!isNaN(latVal) && !isNaN(lonVal) && category) {
+          const colorValue = row[colorByMap || ''];
+          let color = '#000000';
+
+          if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
+            const values = data.map((r: any) => parseFloat(r[colorByMap || '']));
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const numericVal = parseFloat(colorValue);
+
+            color = getColorForValue(numericVal, min, max);
+          } else {
+            color = colorMap.get(colorValue) || '#000000';
+          }
+          L.marker([latVal, lonVal], {
             icon: L.divIcon({
               className: '',
               html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
@@ -171,10 +192,10 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
               iconAnchor: [6, 6],
             }),
           })
-.bindTooltip(
-  `Lat: ${latVal.toFixed(5)}, Lon: ${lonVal.toFixed(5)}<br/>${colorByMap}: ${category}`,
-  { permanent: false, direction: 'top' }
-)
+            .bindTooltip(
+              `Lat: ${latVal.toFixed(5)}, Lon: ${lonVal.toFixed(5)}<br/>${colorByMap}: ${category}`,
+              { permanent: false, direction: 'top' },
+            )
             .addTo(markerLayerRef.current!);
         }
       });
@@ -182,25 +203,29 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
 
     // Remove existing legend if it exists
     const existingLegend = document.querySelector('.leaflet-legend');
+
     if (existingLegend) existingLegend.remove();
     if (!useHeatmap && Array.isArray(data) && data.length > 0) {
-  const legend = L.control({ position: 'topright' });
-  const isNumeric = isNumericField(data.map((r: any) => r[colorByMap || '']));
+      const legend = L.control({ position: 'topright' });
+      const isNumeric = isNumericField(
+        data.map((r: any) => r[colorByMap || '']),
+      );
 
-  legend.onAdd = function () {
-    const div = L.DomUtil.create('div', 'leaflet-legend');
-    div.style.background = 'lightgray';
-    div.style.padding = '8px';
-    div.style.borderRadius = '4px';
-    div.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)';
-    div.innerHTML = `<div style="text-align: center;"><strong>${colorByMap}</strong></div><br/>`;
+      legend.onAdd = function () {
+        const div = L.DomUtil.create('div', 'leaflet-legend');
 
-    if (isNumeric) {
-      const values = data.map((r: any) => parseFloat(r[colorByMap || '']));
-      const min = Math.min(...values);
-      const max = Math.max(...values);
+        div.style.background = 'lightgray';
+        div.style.padding = '8px';
+        div.style.borderRadius = '4px';
+        div.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)';
+        div.innerHTML = `<div style="text-align: center;"><strong>${colorByMap}</strong></div><br/>`;
 
-      div.innerHTML += `
+        if (isNumeric) {
+          const values = data.map((r: any) => parseFloat(r[colorByMap || '']));
+          const min = Math.min(...values);
+          const max = Math.max(...values);
+
+          div.innerHTML += `
       <div style="width: 200px;">
         <div style="background: linear-gradient(to right, hsl(72, 100.00%, 50.00%), hsl(0, 100.00%, 50.00%)); height: 12px; width: 100%; margin-bottom: 4px;"></div>
         <div style="display: flex; justify-content: space-between; font-size: 12px;">
@@ -209,23 +234,23 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
         </div>
       </div>
     `;
+        } else {
+          const firstEntries = Array.from(colorMap.entries()).slice(0, 10);
 
-    } else {
-      const firstEntries = Array.from(colorMap.entries()).slice(0, 10);
-      firstEntries.forEach(([category, color]) => {
-        div.innerHTML += `
+          firstEntries.forEach(([category, color]) => {
+            div.innerHTML += `
           <div style="display: flex; align-items: center; margin-bottom: 4px;">
             <div style="width: 12px; height: 12px; background:${color}; border-radius: 50%; margin-right: 6px;"></div>
             ${category}
           </div>
         `;
-      });
-    }
+          });
+        }
 
-    return div;
-  };
-  legend.addTo(leafletMapRef.current!);
-}
+        return div;
+      };
+      legend.addTo(leafletMapRef.current!);
+    }
     // Optionally pan to average center
     if (Array.isArray(data) && data.length) {
       const avgLat =
@@ -238,6 +263,7 @@ if (isNumericField(data.map((r: any) => r[colorByMap || '']))) {
           (sum: number, r: { [x: string]: string }) => sum + parseFloat(r[lon]),
           0,
         ) / data.length;
+
       leafletMapRef.current.setView([avgLat, avgLon], 16);
     }
   }, [data, lat, lon, colorMap, useHeatmap, filters]);

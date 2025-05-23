@@ -18,6 +18,7 @@ export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
   async (payload: FetchExplainabilityPlotPayload) => {
     const requestUrl = `explainability/${payload.metadata.experimentId}/${payload.metadata.workflowId}`;
     const response = await api.post<IPlotModel>(requestUrl, payload.query);
+
     return response.data;
   }
 );
@@ -49,6 +50,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     .addCase(fetchModelAnalysisExplainabilityPlot.pending, (state, action) => {
       const task = getTask(state, action.meta.arg.metadata.workflowId);
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
+
       if (task && plotType !== 'featureNames') {
         task[plotType].loading = true;
       }
@@ -56,8 +58,10 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     .addCase(fetchModelAnalysisExplainabilityPlot.fulfilled, (state, action) => {
       const task = getTask(state, action.meta.arg.metadata.workflowId);
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
+
       if (task && plotType !== 'featureNames') {
         const section = task[plotType];
+
         if ('selectedFeature' in section) {
           section.selectedFeature = action.payload.features.feature1;
         }
@@ -67,6 +71,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     .addCase(fetchModelAnalysisExplainabilityPlot.rejected, (state, action) => {
       const task = getTask(state, action.meta.arg.metadata.workflowId);
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
+
       if (task && plotType !== 'featureNames') {
         assignError(task[plotType], 'Failed to fetch data');
       }
@@ -74,8 +79,10 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     .addCase(setSelectedFeature, (state, action) => {
       const task = state.tab?.workflowTasks.modelAnalysis;
       const { plotType, feature } = action.payload;
+
       if (task && plotType !== 'featureNames' && plotType in task) {
         const section = task[plotType];
+
         if ('selectedFeature' in section) {
           section.selectedFeature = feature;
         }

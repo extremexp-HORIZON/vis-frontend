@@ -13,11 +13,11 @@ if (container) {
 
   root.render(
     // <React.StrictMode>
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <App />
-        </ThemeProvider>
-      </Provider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+    </Provider>
     // </React.StrictMode>,
   );
 } else {

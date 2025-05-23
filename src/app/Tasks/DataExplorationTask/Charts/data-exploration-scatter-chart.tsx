@@ -32,7 +32,9 @@ const MAX_UNIQUE_VALUES = 50;
 
 const getUniqueValueCount = (data: ScatterChartDataRow[], field: string): number => {
   const values = new Set();
+
   data.forEach(row => values.add(row[field]));
+
   return values.size;
 };
 
@@ -62,7 +64,7 @@ const getScatterChartOverlaySpec = ({
     layer: yAxis.map(y => ({
       mark: 'point',
       encoding: {
-        
+
         x: {
           field: xAxis.name,
           type: getColumnType(xAxis.type, xAxis.name),
@@ -71,13 +73,13 @@ const getScatterChartOverlaySpec = ({
             labelLimit: 30,
             labelOverlap: true
           }
-          
+
         },
         y: {
           field: y.name,
           type: getColumnType(y.type, y.name),
           // axis: { title: y.name },
-          title:'Value'
+          title: 'Value'
         },
         ...(colorField && !isTooManyUniqueValues(colorBy, data) && {
           color: {
@@ -139,8 +141,8 @@ const getSingleScatterSpec = ({
           type: colorType,
           legend: { title: colorField },
           scale: {
-              range: ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8']
-            }
+            range: ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8']
+          }
         },
       }),
       tooltip: [
@@ -169,15 +171,15 @@ const ScatterChart = () => {
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
-const cols = Array.from(
-  new Set(
-    [
-      colorBy?.name,
-      xAxis?.name,
-      ...(yAxis?.map((axis: VisualColumn) => axis.name) || [])
-    ].filter((name): name is string => typeof name === 'string' && name.trim() !== '')
-  )
-);
+    const cols = Array.from(
+      new Set(
+        [
+          colorBy?.name,
+          xAxis?.name,
+          ...(yAxis?.map((axis: VisualColumn) => axis.name) || [])
+        ].filter((name): name is string => typeof name === 'string' && name.trim() !== '')
+      )
+    );
 
     if (!datasetId || !xAxis || !yAxis?.length) return;
 
@@ -210,6 +212,7 @@ const cols = Array.from(
   const hasValidColorBy = colorBy && colorBy.name;
 
   let infoMessageText = '';
+
   if (!hasValidXAxis || !hasValidYAxis || !hasValidColorBy) {
     infoMessageText = 'Please select x-Axis, y-Axis and color fields to display the chart.';
   } else if (!hasData) {
@@ -231,59 +234,59 @@ const cols = Array.from(
     <Box sx={{ height: '99%' }}>
       {umap ? (
         <Uchart />
-      ) : shouldShowInfoMessage && 
-      !(tab?.workflowTasks.dataExploration?.scatterChart?.loading 
+      ) : shouldShowInfoMessage &&
+      !(tab?.workflowTasks.dataExploration?.scatterChart?.loading
         || tab?.workflowTasks.dataExploration?.metaData?.loading) ? (
-        <ResponsiveCardVegaLite
-          spec={{}}
-          title="Scatter Chart"
-          actions={false}
-          controlPanel={<ScatterChartControlPanel />}
-          infoMessage={info}
-          showInfoMessage={true}
-          maxHeight={isSmallScreen ? undefined : 500}
-          aspectRatio={isSmallScreen ? 2.8 : 1.8}
-        />
-      ) : displayMode === 'overlay' ? (
-        <ResponsiveCardVegaLite
-          spec={getScatterChartOverlaySpec({
-            data: Array.isArray(chartData) ? chartData : [],
-            xAxis: xAxis as VisualColumn,
-            yAxis: yAxis as VisualColumn[],
-            colorBy: colorBy as VisualColumn,
-          })}
-          title="Scatter Chart"
-          actions={false}
-          controlPanel={<ScatterChartControlPanel />}
-          blinkOnStart={false}
-          infoMessage={info}
-          showInfoMessage={false}
-          maxHeight={500}
-          aspectRatio={isSmallScreen ? 2.8 : 1.8}
-          loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
-          minHeight={300}
-        />
-      ) : (
-        <Grid container spacing={2}>
-          {yAxis?.map(y => (
-            <Grid item xs={12} key={y.name}>
-              <ResponsiveCardVegaLite
-                spec={getSingleScatterSpec({
-                  data: Array.isArray(chartData) ? chartData : [],
-                  xAxis: xAxis as VisualColumn,
-                  y,
-                  colorBy: colorBy as VisualColumn,
-                })}
-                title={y.name}  
-                actions={false}
-                controlPanel={<ScatterChartControlPanel />}
-                loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
-                isStatic={false}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+          <ResponsiveCardVegaLite
+            spec={{}}
+            title="Scatter Chart"
+            actions={false}
+            controlPanel={<ScatterChartControlPanel />}
+            infoMessage={info}
+            showInfoMessage={true}
+            maxHeight={isSmallScreen ? undefined : 500}
+            aspectRatio={isSmallScreen ? 2.8 : 1.8}
+          />
+        ) : displayMode === 'overlay' ? (
+          <ResponsiveCardVegaLite
+            spec={getScatterChartOverlaySpec({
+              data: Array.isArray(chartData) ? chartData : [],
+              xAxis: xAxis as VisualColumn,
+              yAxis: yAxis as VisualColumn[],
+              colorBy: colorBy as VisualColumn,
+            })}
+            title="Scatter Chart"
+            actions={false}
+            controlPanel={<ScatterChartControlPanel />}
+            blinkOnStart={false}
+            infoMessage={info}
+            showInfoMessage={false}
+            maxHeight={500}
+            aspectRatio={isSmallScreen ? 2.8 : 1.8}
+            loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
+            minHeight={300}
+          />
+        ) : (
+          <Grid container spacing={2}>
+            {yAxis?.map(y => (
+              <Grid item xs={12} key={y.name}>
+                <ResponsiveCardVegaLite
+                  spec={getSingleScatterSpec({
+                    data: Array.isArray(chartData) ? chartData : [],
+                    xAxis: xAxis as VisualColumn,
+                    y,
+                    colorBy: colorBy as VisualColumn,
+                  })}
+                  title={y.name}
+                  actions={false}
+                  controlPanel={<ScatterChartControlPanel />}
+                  loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
+                  isStatic={false}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
     </Box>
   );
 };

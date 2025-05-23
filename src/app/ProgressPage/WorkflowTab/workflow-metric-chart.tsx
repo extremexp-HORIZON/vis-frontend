@@ -1,5 +1,5 @@
 import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
-import type { RootState} from '../../../store/store';
+import type { RootState } from '../../../store/store';
 import { useAppSelector } from '../../../store/store';
 import type { IMetric } from '../../../shared/models/experiment/metric.model';
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -22,9 +22,9 @@ interface GroupMetrics {
   task: string | undefined;
 }
 
-export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
+export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage);
-  const {workflowsTable} = useAppSelector((state: RootState) => state.monitorPage);
+  const { workflowsTable } = useAppSelector((state: RootState) => state.monitorPage);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const location = useLocation();
@@ -40,19 +40,19 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
   const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1;
 
   const chartSpec = {
-    mark: isSingleStep ? 'point' 
-    : {
-      type: 'line',
-      tooltip: true,
-      point: {
-        size: 20
-      }
-    },
+    mark: isSingleStep ? 'point'
+      : {
+        type: 'line',
+        tooltip: true,
+        point: {
+          size: 20
+        }
+      },
     encoding: {
       x: {
-        field: metrics[0].step=== null?'timestamp':'step', // Use the 'step' field for the x-axis (time or step sequence)
+        field: metrics[0].step === null ? 'timestamp' : 'step', // Use the 'step' field for the x-axis (time or step sequence)
         type: 'ordinal',
-        axis: { labels: false, title: metrics[0].step=== null?'Timestamp':'Step' }, // Hide x-axis labels
+        axis: { labels: false, title: metrics[0].step === null ? 'Timestamp' : 'Step' }, // Hide x-axis labels
       },
       y: {
         field: 'value', // Use the 'value' field for the y-axis (metric values like CPU Load)
@@ -75,10 +75,10 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
           domain: workflowColorScale.map(w => w.id), // Workflow IDs
           range: workflowColorScale.map(w => w.color), // Corresponding Colors
         },
-        legend:null,
+        legend: null,
       },
       tooltip: [
-        { field: metrics[0].step=== null?'timestamp':'step', type: 'nominal' },
+        { field: metrics[0].step === null ? 'timestamp' : 'step', type: 'nominal' },
         { field: 'value', type: 'quantitative' },
       ],
     },
@@ -86,7 +86,7 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
   };
 
   return (
-    <Box sx={{height: '99%'}}>
+    <Box sx={{ height: '99%' }}>
       <ResponsiveCardVegaLite
         spec={chartSpec}
         actions={false}
@@ -99,31 +99,33 @@ export const MetricLineChart = ({metrics}: {metrics: GroupMetrics[]}) => {
 };
 
 export const WorkflowMetricChart = () => {
-    const { tab } = useAppSelector(state => state.workflowPage);
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query
+  const { tab } = useAppSelector(state => state.workflowPage);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query
 
-    const groupedMetrics: Record<string, GroupMetrics[]> | undefined = tab?.workflowSeriesMetrics.data.reduce(
-        (acc: Record<string, GroupMetrics[]>, entry) => {
-            entry.seriesMetric.forEach((m: IMetric) => {
-              if (!acc[m.name]) acc[m.name] = [];
-              acc[m.name].push({
-                value: m.value,
-                id: workflowId,
-                metricName: m.name,
-                step: m.step,
-                timestamp: new Date(m.timestamp).toLocaleString(),
-                task: m.task
-              });
-            });
-          return acc;
-        },
-        {}
-      );
+  const groupedMetrics: Record<string, GroupMetrics[]> | undefined = tab?.workflowSeriesMetrics.data.reduce(
+    (acc: Record<string, GroupMetrics[]>, entry) => {
+      entry.seriesMetric.forEach((m: IMetric) => {
+        if (!acc[m.name]) acc[m.name] = [];
+        acc[m.name].push({
+          value: m.value,
+          id: workflowId,
+          metricName: m.name,
+          step: m.step,
+          timestamp: new Date(m.timestamp).toLocaleString(),
+          task: m.task
+        });
+      });
 
-      const metrics = tab?.dataTaskTable.selectedItem?.data?.metric?.name ? 
-      groupedMetrics?.[tab?.dataTaskTable.selectedItem?.data?.metric?.name] || [] : [];
+      return acc;
+    },
+    {}
+  );
+
+  const metrics = tab?.dataTaskTable.selectedItem?.data?.metric?.name ?
+    groupedMetrics?.[tab?.dataTaskTable.selectedItem?.data?.metric?.name] || [] : [];
+
   return (
     (metrics?.length ?? 0) > 1 ?
       <Box
@@ -132,13 +134,13 @@ export const WorkflowMetricChart = () => {
           flexDirection: 'column',
           rowGap: 1,
           height: '100%',
-          overflow: 'auto', //enables scrolling when table minHeight is applied in the overview page
+          overflow: 'auto', // enables scrolling when table minHeight is applied in the overview page
         }}
       >
-       <MetricLineChart metrics={metrics} /> 
+        <MetricLineChart metrics={metrics} />
       </Box>
-    :
-    <MetricCards />
+      :
+      <MetricCards />
   );
 };
 
@@ -173,6 +175,7 @@ export const MetricCards = () => {
   const handleClickMin = () => {
     if (minWorkflows.length > 1) {
       const workflowIds = minWorkflows.map(w => w.id);
+
       setCache(compareIdMin, { workflowIds }, 5 * 60 * 1000);
     }
   };
@@ -180,12 +183,14 @@ export const MetricCards = () => {
   const handleClickMax = () => {
     if (maxWorkflows.length > 1) {
       const workflowIds = maxWorkflows.map(w => w.id);
+
       setCache(compareIdMax, { workflowIds }, 5 * 60 * 1000);
     }
   };
 
   const renderDiffIcon = () => {
     if (!metricData?.metric?.avgDiff) return null;
+
     return metricData.metric.avgDiff > 0 ? (
       <ArrowDropUpIcon sx={{ color: green[500], mb: 1 }} />
     ) : (

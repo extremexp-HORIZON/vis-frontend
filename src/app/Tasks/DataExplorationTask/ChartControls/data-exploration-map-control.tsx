@@ -40,6 +40,7 @@ const MapControls = () => {
 
   const handleSegmentByChange = (e: SelectChangeEvent<string[]>) => {
     const value = e.target.value;
+
     handleChange('segmentBy', value as string);
 
     // if (value.length > 0 && colorByMap !== 'None') {
@@ -57,14 +58,14 @@ const MapControls = () => {
             value={lat}
             onChange={e => handleChange('lat', e.target.value)}
             input={<OutlinedInput label="Latitude" />}
-             MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
-                  },
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 250,
+                  maxWidth: 300,
                 },
-              }}
+              },
+            }}
           >
             {doubleColumns.map(col => (
               <MenuItem key={col.name} value={col.name}>
@@ -81,14 +82,14 @@ const MapControls = () => {
             value={lon}
             onChange={e => handleChange('lon', e.target.value)}
             input={<OutlinedInput label="Longitude" />}
-             MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
-                  },
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 250,
+                  maxWidth: 300,
                 },
-              }}
+              },
+            }}
           >
             {doubleColumns.map(col => (
               <MenuItem key={col.name} value={col.name}>
@@ -107,14 +108,14 @@ const MapControls = () => {
             value={colorByMap}
             onChange={e => handleChange('colorByMap', e.target.value)}
             input={<OutlinedInput label="Color By" />}
-             MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
-                  },
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 250,
+                  maxWidth: 300,
                 },
-              }}
+              },
+            }}
           >
             {selectedColumns.map(col => (
               <MenuItem key={col.name} value={col.name}>
@@ -148,14 +149,14 @@ const MapControls = () => {
         </FormControl>
       </Box>
       <FormControlLabel
-          control={
-            <Switch
-              checked={useHeatmap}
-              onChange={e => handleChange('heatmap', e.target.checked)}
-            />
-          }
-          label="Heatmap"
-        />
+        control={
+          <Switch
+            checked={useHeatmap}
+            onChange={e => handleChange('heatmap', e.target.checked)}
+          />
+        }
+        label="Heatmap"
+      />
     </Box>
   );
 };

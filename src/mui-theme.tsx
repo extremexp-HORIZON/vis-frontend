@@ -72,6 +72,6 @@ let theme = createTheme({
   },
 });
 
-theme = responsiveFontSizes(theme, {factor: 2});
+theme = responsiveFontSizes(theme, { factor: 2 });
 
 export default theme;
