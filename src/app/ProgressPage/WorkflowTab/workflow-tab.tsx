@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { RootState} from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -10,6 +10,8 @@ import WorkflowTreeView from './workflow-tree-view';
 import SelectedItemViewer from './SelectedItemViewer';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
+import { isEqual } from 'lodash';
+import { IRun } from '../../../shared/models/experiment/run.model';
 
 const WorkflowTab = () => {
   const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage);
@@ -20,12 +22,28 @@ const WorkflowTab = () => {
   const dispatch = useAppDispatch();
   const { experimentId } = useParams();
   const theme = useTheme();
+  const prevWorkflowRef = useRef<IRun | null>(null);
 
-  useEffect(() => {
-    if (!workflows.data.find(workflow => workflow.id === workflowId))
-      navigate(`/${experimentId}/monitoring`);
-    else dispatch(initTab({ tab: workflowId, workflows }));
-  }, [workflows.data]);
+useEffect(() => {
+  const currentWorkflow = workflows.data.find((w) => w.id === workflowId);
+  if (!currentWorkflow) {
+    navigate(`/${experimentId}/monitoring`);
+    return;
+  }
+
+  const workflowWithoutRatingMetric = {
+    ...currentWorkflow,
+    metrics: (currentWorkflow.metrics || []).filter(
+      (metric) => metric.name !== "rating"
+    ),
+  };
+
+  if (!isEqual(prevWorkflowRef.current, workflowWithoutRatingMetric)) {
+    prevWorkflowRef.current = workflowWithoutRatingMetric;
+    dispatch(initTab({ tab: workflowId, workflows }));
+  }
+}, [workflows.data]);
+
 
   useEffect(() => {
     const metricNames = tab?.workflowMetrics.data?.map((m) => m.name);
