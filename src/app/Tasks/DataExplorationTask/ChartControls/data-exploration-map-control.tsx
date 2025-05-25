@@ -49,16 +49,15 @@ const MapControls = () => {
   // };
 
   const handleSegmentByChange = (e: SelectChangeEvent<string[]>) => {
-  const value = e.target.value as string[];
+    const value = e.target.value as string[];
 
-  handleChange('segmentBy', value);
+    handleChange('segmentBy', value);
 
-  // If segmentBy has items, reset colorByMap to 'None'
-  if (value.length > 0) {
-    handleChange('colorByMap', 'None');
-  }
-};
-
+    // If segmentBy has items, reset colorByMap to 'None'
+    if (value.length > 0) {
+      handleChange('colorByMap', 'None');
+    }
+  };
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
@@ -116,34 +115,35 @@ const MapControls = () => {
         {/* Color By Selector */}
         <FormControl  fullWidth>
           <InputLabel>Color By</InputLabel>
-         <Select
-  value={colorByMap}
-  onChange={e => {
-    const value = e.target.value;
-    handleChange('colorByMap', value);
+          <Select
+            value={colorByMap}
+            onChange={e => {
+              const value = e.target.value;
 
-    // If colorByMap is set to something other than 'None', reset segmentBy
-    if (value !== 'None') {
-      handleChange('segmentBy', []);
-    }
-  }}
-  input={<OutlinedInput label="Color By" />}
-  MenuProps={{
-    PaperProps: {
-      style: {
-        maxHeight: 250,
-        maxWidth: 300,
-      },
-    },
-  }}
->
-  <MenuItem value="None">None</MenuItem>
-  {selectedColumns.map(col => (
-    <MenuItem key={col.name} value={col.name}>
-      {col.name}
-    </MenuItem>
-  ))}
-</Select>
+              handleChange('colorByMap', value);
+
+              // If colorByMap is set to something other than 'None', reset segmentBy
+              if (value !== 'None') {
+                handleChange('segmentBy', []);
+              }
+            }}
+            input={<OutlinedInput label="Color By" />}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 250,
+                  maxWidth: 300,
+                },
+              },
+            }}
+          >
+            <MenuItem value="None">None</MenuItem>
+            {selectedColumns.map(col => (
+              <MenuItem key={col.name} value={col.name}>
+                {col.name}
+              </MenuItem>
+            ))}
+          </Select>
 
         </FormControl>
 
