@@ -38,15 +38,27 @@ const MapControls = () => {
     dispatch(setControls({ [key]: value }));
   };
 
+  // const handleSegmentByChange = (e: SelectChangeEvent<string[]>) => {
+  //   const value = e.target.value;
+
+  //   handleChange('segmentBy', value as string);
+
+  //   // if (value.length > 0 && colorByMap !== 'None') {
+  //   //   handleChange('colorByMap', 'None');
+  //   // }
+  // };
+
   const handleSegmentByChange = (e: SelectChangeEvent<string[]>) => {
-    const value = e.target.value;
+  const value = e.target.value as string[];
 
-    handleChange('segmentBy', value as string);
+  handleChange('segmentBy', value);
 
-    // if (value.length > 0 && colorByMap !== 'None') {
-    //   handleChange('colorByMap', 'None');
-    // }
-  };
+  // If segmentBy has items, reset colorByMap to 'None'
+  if (value.length > 0) {
+    handleChange('colorByMap', 'None');
+  }
+};
+
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
@@ -104,25 +116,35 @@ const MapControls = () => {
         {/* Color By Selector */}
         <FormControl  fullWidth>
           <InputLabel>Color By</InputLabel>
-          <Select
-            value={colorByMap}
-            onChange={e => handleChange('colorByMap', e.target.value)}
-            input={<OutlinedInput label="Color By" />}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                  maxWidth: 300,
-                },
-              },
-            }}
-          >
-            {selectedColumns.map(col => (
-              <MenuItem key={col.name} value={col.name}>
-                {col.name}
-              </MenuItem>
-            ))}
-          </Select>
+         <Select
+  value={colorByMap}
+  onChange={e => {
+    const value = e.target.value;
+    handleChange('colorByMap', value);
+
+    // If colorByMap is set to something other than 'None', reset segmentBy
+    if (value !== 'None') {
+      handleChange('segmentBy', []);
+    }
+  }}
+  input={<OutlinedInput label="Color By" />}
+  MenuProps={{
+    PaperProps: {
+      style: {
+        maxHeight: 250,
+        maxWidth: 300,
+      },
+    },
+  }}
+>
+  <MenuItem value="None">None</MenuItem>
+  {selectedColumns.map(col => (
+    <MenuItem key={col.name} value={col.name}>
+      {col.name}
+    </MenuItem>
+  ))}
+</Select>
+
         </FormControl>
 
         {/* Segment By Selector */}
