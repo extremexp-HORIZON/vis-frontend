@@ -18,6 +18,7 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
 import FeatureExplainability from './workflow-feature-explainability';
+import Testaki from './testaki';
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -68,7 +69,7 @@ const SelectedItemViewer = () => {
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ overflow: 'auto', height: '100%' }}>
-            <DataExplorationComponent />
+            <Testaki />
           </Box>
         </Box>
       </Box>
