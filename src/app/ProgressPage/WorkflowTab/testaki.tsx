@@ -147,7 +147,7 @@ const Testaki = () => {
   const { tab } = useAppSelector((state) => state.workflowPage);
   const selectedItem = tab?.dataTaskTable?.selectedItem || null;
   const { dataset } = selectedItem?.data || {};
-  const isDirectory = true;
+  const isDirectory = false;
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
   return (
@@ -197,7 +197,7 @@ const Testaki = () => {
 
       {/* Preview Panel */}
       <DetailsCard title={`Preview ${selectedFile || ""}`} minWidth="10%">
-        {selectedFile ? (
+        {selectedFile|| !isDirectory ? (
           <Box mt={1}>
             {/* Replace with actual preview component logic */}
             <DataExplorationComponent />
