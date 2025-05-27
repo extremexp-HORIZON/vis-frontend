@@ -22,16 +22,32 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 import InfoMessage from "../../../shared/components/InfoMessage";
+import ClosableCardTable from "../../../shared/components/closable-card-table";
+import InfoIcon from "@mui/icons-material/Info";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import CloseIcon from "@mui/icons-material/Close";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const DataAssetMetadata = ({ dataset }) => (
-  <DetailsCard title="Data Asset Metadata" minWidth="10%">
+
+const DataAssetMetadata = ({ dataset,onClose }) => (
+  <ClosableCardTable title={"Data asset Metadata"} children={
+    <>
     <DetailsCardItem label="Name" value={dataset?.name} />
     <DetailsCardItem label="Format" value={dataset?.format} />
     <DetailsCardItem label="Role" value={dataset?.role} />
     <DetailsCardItem label="Source" value={dataset?.source} />
     <DetailsCardItem label="Type" value={dataset?.sourceType} />
     <DetailsCardItem label="Task" value={dataset?.task} />
-  </DetailsCard>
+        </>
+
+  } onClose={onClose}
+>
+
+  
+    </ClosableCardTable>
+
 );
 
 // Example dataset as a tree
@@ -149,8 +165,16 @@ const Testaki = () => {
   const { dataset } = selectedItem?.data || {};
   const isDirectory = false;
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
+   const [showMetadata, setShowMetadata] = useState(true); // Added
 
-  return (
+  const handleCloseMetadata = () => setShowMetadata(false);
+  const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
+const handleOpenMetadataDialog = () => setMetadataDialogOpen(true);
+const handleCloseMetadataDialog = () => setMetadataDialogOpen(false);
+
+
+
+return (
     <Box
       sx={{
         height: "100%",
@@ -161,45 +185,26 @@ const Testaki = () => {
         overflow: "auto"
       }}
     >
-      {isDirectory ? (
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            overflow: "auto"
-          }}
-        >
-          <Box sx={{ flex: "1 1 300px", minWidth: "300px" }}>
-            <DataAssetMetadata dataset={dataset} />
-          </Box>
-
-          <Box sx={{ flex: "1 1 300px", minWidth: "300px" }}>
-            <DetailsCard title="File Explorer" minWidth="10%">
-              <Paper elevation={3} sx={{ p: 2 }}>
-                <List dense>
-                  {treeData.map((node) => (
-                    <TreeItem
-                      key={node.name}
-                      node={node}
-                      onSelect={(fileName) => setSelectedFile(fileName)}
-                      selectedFile={selectedFile}
-                    />
-                  ))}
-                </List>
-              </Paper>
-            </DetailsCard>
-          </Box>
-        </Box>
-      ) : (
-        <DataAssetMetadata dataset={dataset} />
-      )}
+   
 
       {/* Preview Panel */}
-      <DetailsCard title={`Preview ${selectedFile || ""}`} minWidth="10%">
-        {selectedFile|| !isDirectory ? (
+<DetailsCard
+  title={
+    <Box display="flex" alignItems="center" justifyContent="space-between">
+      {`Preview ${selectedFile || ""}`}
+      <IconButton
+        size="small"
+        onClick={handleOpenMetadataDialog}
+        sx={{ ml: 1 }}
+      >
+        <VisibilityIcon  />
+      </IconButton>
+    </Box>
+  }
+  minWidth="10%"
+>
+        {selectedFile || !isDirectory ? (
           <Box mt={1}>
-            {/* Replace with actual preview component logic */}
             <DataExplorationComponent />
           </Box>
         ) : (
@@ -210,7 +215,21 @@ const Testaki = () => {
           />
         )}
       </DetailsCard>
+      <Dialog
+  open={metadataDialogOpen}
+  onClose={handleCloseMetadataDialog}
+  maxWidth="sm"
+  fullWidth
+>
+
+  <DialogContent dividers>
+    <DataAssetMetadata dataset={dataset} onClose={handleCloseMetadataDialog} />
+  </DialogContent>
+</Dialog>
+
     </Box>
+    
+
   );
 };
 
