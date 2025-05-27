@@ -171,11 +171,11 @@ const Testaki = () => {
   const handleCloseMetadataDialog = () => setMetadataDialogOpen(false);
 
   return (
-    <>
+    <Box overflow={'hidden'} sx={{ height: '99%' }}>
       {/* Preview Panel */}
       <ResponsiveCardTable
         title={
-          <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box display='flex' alignItems="center" justifyContent="space-between" overflow={'hidden'}>
             {`Preview ${selectedFile || ''}`}
             <IconButton
               size="small"
@@ -201,7 +201,7 @@ const Testaki = () => {
         </Box>
       </Dialog>
 
-    </>
+    </Box>
   );
 };
 
