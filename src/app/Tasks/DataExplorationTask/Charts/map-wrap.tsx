@@ -5,6 +5,7 @@ import { useAppSelector } from '../../../../store/store';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SegmentMapChart from './data-exploration-segment-map-chart';
+import { Box } from '@mui/material';
 
 const MapCardWrapper = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -26,15 +27,17 @@ const MapCardWrapper = () => {
   const shouldUseSegmentView = segmentBy?.length > 0 ;
 
   return (
-    <ResponsiveCardTable
-      title={
-        useHeatmap ?
-          'Map (Heat View)' : shouldUseSegmentView ? 'Map (Segment View)' : 'Map (Point View)'}
-      controlPanel={<MapControls />}
-      noPadding={true}
-    >
-      {shouldShowInfoMessage ? info : shouldUseSegmentView ? <SegmentMapChart /> : <MapChart />}
-    </ResponsiveCardTable>
+    <Box height="99%">
+      <ResponsiveCardTable
+        title={
+          useHeatmap ?
+            'Map (Heat View)' : shouldUseSegmentView ? 'Map (Segment View)' : 'Map (Point View)'}
+        controlPanel={<MapControls />}
+        noPadding={true}
+      >
+        {shouldShowInfoMessage ? info : shouldUseSegmentView ? <SegmentMapChart /> : <MapChart />}
+      </ResponsiveCardTable>
+    </Box>
   );
 };
 

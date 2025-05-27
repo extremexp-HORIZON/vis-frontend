@@ -100,7 +100,7 @@ const DataExplorationComponent = () => {
         {chartType === 'scatter' && <ScatterChart />}
         {chartType === 'bar' && <BarChart />}
         {chartType === 'heatmap' && <HeatMap/>}
-        {chartType === 'map' && (<MapCardWrapper/>)}
+        {chartType === 'map' && <MapCardWrapper/>}
       
 
     </Box>
