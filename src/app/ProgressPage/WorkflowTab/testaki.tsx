@@ -71,6 +71,7 @@ const Testaki = () => {
           </Box>
         }
         showFullScreenButton={false}
+        showOptionsButton={false}
       >
         <DataExplorationComponent />
       </ResponsiveCardTable>
