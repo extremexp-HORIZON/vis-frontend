@@ -1,6 +1,7 @@
 import {
   Box,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import { useAppSelector } from '../../../store/store';
 import DataExplorationComponent from '../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent';
@@ -12,8 +13,9 @@ import ClosableCardTable from '../../../shared/components/closable-card-table';
 import Dialog from '@mui/material/Dialog';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
+import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 
-const DataAssetMetadata = ({ dataset, onClose }) => (
+const DataAssetMetadata = ({ dataset, onClose }: {dataset: IDataAsset | undefined; onClose: () => void;}) => (
   <ClosableCardTable title={'Data asset Metadata'} children={
     <>
       <DetailsCardItem label="Name" value={dataset?.name} />
@@ -55,17 +57,20 @@ const Testaki = () => {
       {/* Preview Panel */}
       <ResponsiveCardTable
         title={
-          <Box display='flex' alignItems="center" justifyContent="space-between" overflow={'hidden'}>
+          <Box display='flex' alignItems="center" justifyContent="space-between">
             {`Preview ${selectedFile || ''}`}
-            <IconButton
-              size="small"
-              onClick={handleOpenMetadataDialog}
-              sx={{ ml: 1 }}
-            >
-              <VisibilityIcon  />
-            </IconButton>
+            <Tooltip title="File Metadata">
+              <IconButton
+                size="small"
+                onClick={handleOpenMetadataDialog}
+                sx={{ ml: 1 }}
+              >
+                <VisibilityIcon  />
+              </IconButton>
+            </Tooltip>
           </Box>
         }
+        showFullScreenButton={false}
       >
         <DataExplorationComponent />
       </ResponsiveCardTable>

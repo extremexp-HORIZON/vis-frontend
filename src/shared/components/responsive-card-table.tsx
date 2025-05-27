@@ -30,7 +30,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 interface ResponsiveCardTableProps {
-  title: string
+  title: string | React.ReactElement
   controlPanel?: React.ReactNode
   children: React.ReactNode
   onDownload?: () => void
