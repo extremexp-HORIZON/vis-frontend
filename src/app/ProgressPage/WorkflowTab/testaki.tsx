@@ -1,6 +1,7 @@
 import {
   Box,
   IconButton,
+  Tabs,
   Tooltip,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
@@ -44,6 +45,7 @@ const Testaki = () => {
   const isDirectory = !source.includes('.') || source.endsWith('/');
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
+  
   const handleOpenMetadataDialog = () => setMetadataDialogOpen(true);
   const handleCloseMetadataDialog = () => setMetadataDialogOpen(false);
   console.log('selectedItem', selectedItem?.data.dataset?.source);
@@ -52,6 +54,9 @@ const Testaki = () => {
     // Dispatch the thunk to fetch catalog assets
     dispatch(fetchCatalogAssets({ project_id:'TestZenohExp/IEwJDZcBpHPS2GeIwzH6/IUwJDZcBpHPS2GeIyjFx' , page: '1', perPage: '10', sort: 'created,desc' }));
   }, [dispatch]);
+
+  const catalog=tab?.catalogAssets.data || [];
+  console.log('catalog', catalog);
 
 
   return (
