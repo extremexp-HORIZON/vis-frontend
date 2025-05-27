@@ -77,8 +77,6 @@ const Testaki = () => {
         controlPanel={
           <Box sx={{ display: 'flex',flexDirection: 'column',rowGap: 1,height: '100%',overflow: 'auto'}}>
             <LeftPanel />
-
-
           </Box>
           }
         >

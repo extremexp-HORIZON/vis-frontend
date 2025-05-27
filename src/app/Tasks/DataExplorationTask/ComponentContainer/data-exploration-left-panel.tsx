@@ -210,7 +210,8 @@ const LeftPanel = () => {
     <Box sx={{
       display: 'flex',
       justifyContent: 'space-between', // This pushes content to opposite ends
-      width: '100%'
+      width: '100%',
+      alignItems: 'center'
     }}>
       {/* Left side components */}
       <Stack direction="row" spacing={1}>
