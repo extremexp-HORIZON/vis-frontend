@@ -8,81 +8,79 @@ import {
   ListItemText,
   IconButton,
   Collapse
-} from "@mui/material";
-import { useAppSelector } from "../../../store/store";
-import DataExplorationComponent from "../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent";
+} from '@mui/material';
+import { useAppSelector } from '../../../store/store';
+import DataExplorationComponent from '../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent';
 import {
   DetailsCard,
   DetailsCardItem
-} from "../../../shared/components/details-card";
-import FolderIcon from "@mui/icons-material/Folder";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import DownloadIcon from "@mui/icons-material/Download";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useState } from "react";
-import InfoMessage from "../../../shared/components/InfoMessage";
-import ClosableCardTable from "../../../shared/components/closable-card-table";
-import InfoIcon from "@mui/icons-material/Info";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import CloseIcon from "@mui/icons-material/Close";
+} from '../../../shared/components/details-card';
+import FolderIcon from '@mui/icons-material/Folder';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import DownloadIcon from '@mui/icons-material/Download';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useState } from 'react';
+import InfoMessage from '../../../shared/components/InfoMessage';
+import ClosableCardTable from '../../../shared/components/closable-card-table';
+import InfoIcon from '@mui/icons-material/Info';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 
-
-const DataAssetMetadata = ({ dataset,onClose }) => (
-  <ClosableCardTable title={"Data asset Metadata"} children={
+const DataAssetMetadata = ({ dataset, onClose }) => (
+  <ClosableCardTable title={'Data asset Metadata'} children={
     <>
-    <DetailsCardItem label="Name" value={dataset?.name} />
-    <DetailsCardItem label="Format" value={dataset?.format} />
-    <DetailsCardItem label="Role" value={dataset?.role} />
-    <DetailsCardItem label="Source" value={dataset?.source} />
-    <DetailsCardItem label="Type" value={dataset?.sourceType} />
-    <DetailsCardItem label="Task" value={dataset?.task} />
-        </>
+      <DetailsCardItem label="Name" value={dataset?.name} />
+      <DetailsCardItem label="Format" value={dataset?.format} />
+      <DetailsCardItem label="Role" value={dataset?.role} />
+      <DetailsCardItem label="Source" value={dataset?.source} />
+      <DetailsCardItem label="Type" value={dataset?.sourceType} />
+      <DetailsCardItem label="Task" value={dataset?.task} />
+    </>
 
   } onClose={onClose}
->
+  >
 
-  
-    </ClosableCardTable>
-
+  </ClosableCardTable>
 );
 
 // Example dataset as a tree
 const treeData = [
   {
-    name: "root",
-    type: "folder",
+    name: 'root',
+    type: 'folder',
     children: [
       {
-        name: "data.csv",
-        size: "2MB",
-        type: "file"
+        name: 'data.csv',
+        size: '2MB',
+        type: 'file'
       },
       {
-        name: "image.png",
-        size: "500KB",
-        type: "file"
+        name: 'image.png',
+        size: '500KB',
+        type: 'file'
       },
       {
-        name: "subfolder",
-        type: "folder",
+        name: 'subfolder',
+        type: 'folder',
         children: [
           {
-            name: "nestedfile.txt",
-            size: "1KB",
-            type: "file"
+            name: 'nestedfile.txt',
+            size: '1KB',
+            type: 'file'
           },
           {
-            name: "deepfolder",
-            type: "folder",
+            name: 'deepfolder',
+            type: 'folder',
             children: [
               {
-                name: "deepfile.docx",
-                size: "20KB",
-                type: "file"
+                name: 'deepfile.docx',
+                size: '20KB',
+                type: 'file'
               }
             ]
           }
@@ -102,7 +100,7 @@ const TreeItem = ({
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
-    if (node.type === "folder") {
+    if (node.type === 'folder') {
       setOpen(!open);
     } else {
       onSelect(node.name);
@@ -118,7 +116,7 @@ const TreeItem = ({
         sx={{ pl: 2 + level * 2 }}
       >
         <ListItemIcon>
-          {node.type === "folder" ? (
+          {node.type === 'folder' ? (
             <FolderIcon color="primary" />
           ) : (
             <InsertDriveFileIcon color="action" />
@@ -126,9 +124,9 @@ const TreeItem = ({
         </ListItemIcon>
         <ListItemText
           primary={node.name}
-          secondary={node.size || ""}
+          secondary={node.size || ''}
         />
-        {node.type === "folder" ? (
+        {node.type === 'folder' ? (
           open ? (
             <ExpandLessIcon fontSize="small" />
           ) : (
@@ -140,7 +138,7 @@ const TreeItem = ({
           </IconButton>
         )}
       </ListItem>
-      {node.type === "folder" && (
+      {node.type === 'folder' && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List disablePadding dense>
             {node.children?.map((child) => (
@@ -165,71 +163,45 @@ const Testaki = () => {
   const { dataset } = selectedItem?.data || {};
   const isDirectory = false;
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-   const [showMetadata, setShowMetadata] = useState(true); // Added
+  const [showMetadata, setShowMetadata] = useState(true); // Added
 
   const handleCloseMetadata = () => setShowMetadata(false);
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
-const handleOpenMetadataDialog = () => setMetadataDialogOpen(true);
-const handleCloseMetadataDialog = () => setMetadataDialogOpen(false);
+  const handleOpenMetadataDialog = () => setMetadataDialogOpen(true);
+  const handleCloseMetadataDialog = () => setMetadataDialogOpen(false);
 
-
-
-return (
-    <Box
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        p: 2,
-        overflow: "auto"
-      }}
-    >
-   
-
+  return (
+    <>
       {/* Preview Panel */}
-<DetailsCard
-  title={
-    <Box display="flex" alignItems="center" justifyContent="space-between">
-      {`Preview ${selectedFile || ""}`}
-      <IconButton
-        size="small"
-        onClick={handleOpenMetadataDialog}
-        sx={{ ml: 1 }}
-      >
-        <VisibilityIcon  />
-      </IconButton>
-    </Box>
-  }
-  minWidth="10%"
->
-        {selectedFile || !isDirectory ? (
-          <Box mt={1}>
-            <DataExplorationComponent />
+      <ResponsiveCardTable
+        title={
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            {`Preview ${selectedFile || ''}`}
+            <IconButton
+              size="small"
+              onClick={handleOpenMetadataDialog}
+              sx={{ ml: 1 }}
+            >
+              <VisibilityIcon  />
+            </IconButton>
           </Box>
-        ) : (
-          <InfoMessage
-            type="info"
-            message="No file selected. Select a file from the explorer to preview."
-            fullHeight={false}
-          />
-        )}
-      </DetailsCard>
+        }
+      >
+        <DataExplorationComponent />
+      </ResponsiveCardTable>
       <Dialog
-  open={metadataDialogOpen}
-  onClose={handleCloseMetadataDialog}
-  maxWidth="sm"
-  fullWidth
->
+        open={metadataDialogOpen}
+        onClose={handleCloseMetadataDialog}
+        maxWidth="sm"
+        fullWidth
+      >
 
-  <DialogContent dividers>
-    <DataAssetMetadata dataset={dataset} onClose={handleCloseMetadataDialog} />
-  </DialogContent>
-</Dialog>
+        <Box>
+          <DataAssetMetadata dataset={dataset} onClose={handleCloseMetadataDialog} />
+        </Box>
+      </Dialog>
 
-    </Box>
-    
-
+    </>
   );
 };
 
