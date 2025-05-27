@@ -61,6 +61,11 @@ export interface IWorkflowPageModel {
         selectedTask:  {role: string; task: string; taskId: string; variant: string; } | null
         selectedId: string | null
     }
+    catalogAssets: {
+      data: IDataAsset[] | null
+      loading: boolean | null
+      error: string | null
+    }
 }
 
 export const defaultWorkflowPageModel: IWorkflowPageModel = {
@@ -95,5 +100,10 @@ export const defaultWorkflowPageModel: IWorkflowPageModel = {
     selectedItem: null,
     selectedTask: null,
     selectedId: null
+  },
+  catalogAssets: {
+    data: null,
+    loading: false,
+    error: null
   }
 };

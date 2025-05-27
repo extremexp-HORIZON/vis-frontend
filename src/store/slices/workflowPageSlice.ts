@@ -13,10 +13,12 @@ import {
 import { userInteractionDefault } from '../../shared/models/tasks/user-interaction.model';
 import type { IRun } from '../../shared/models/experiment/run.model';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
-import { experimentApi } from '../../app/api/api';
+import { api, experimentApi } from '../../app/api/api';
 import { dataExplorationReducers } from './dataExplorationSlice';
 import { modelAnalysisReducers } from './modelAnalysisSlice';
 import { explainabilityReducers } from './explainabilitySlice';
+import { IDataAsset } from '../../shared/models/experiment/data-asset.model';
+import { Tab } from '@mui/material';
 
 type MetricFetchResult = {
   name: string;
@@ -136,7 +138,23 @@ export const workflowPageSlice = createSlice({
         state.tab.workflowSeriesMetrics.loading = false;
         state.tab.workflowSeriesMetrics.error =
             action.error.message || 'Error while fetching data';
-      });
+      })
+      .addCase(fetchCatalogAssets.fulfilled, (state,action) => {
+        if (!state.tab) return;
+        state.tab.catalogAssets.data = action.payload;
+        state.tab.catalogAssets.loading = false;
+        state.tab.catalogAssets.error = null;
+      })
+      .addCase(fetchCatalogAssets.pending, state => {
+        if (!state.tab) return;
+        state.tab.catalogAssets.loading = true;
+        state.tab.catalogAssets.error = null;
+      })
+      .addCase(fetchCatalogAssets.rejected, (state,action) => {
+        if (!state.tab) return;
+        state.tab.catalogAssets.loading = false;
+        state.tab.catalogAssets.error = action.error.message || 'Error while fetching catalog';
+      })
 
   },
 });
@@ -232,7 +250,7 @@ const initializeTab = ({
 };
 
 export const fetchWorkflowMetrics = createAsyncThunk(
-  'progressPage/fetchWorkflowMetrics',
+  'workflowPage/fetchWorkflowMetrics',
   async ({ experimentId, workflowId, metricNames }: { experimentId: string; workflowId: string; metricNames: string[] }) => {
 
     const results = await Promise.allSettled(
@@ -256,6 +274,24 @@ export const fetchWorkflowMetrics = createAsyncThunk(
 
     return successful.map(res => res.value);
   });
+
+  const fetchCatalogAssets = createAsyncThunk(
+    'workflowPage/fetchCatalogAssets',
+    async({experimentId, workflowId, page='1', perPage='100', sort='created,desc'}: 
+      {experimentId: string; workflowId: string; page?: string; perPage?: string; sort?: string}) => {
+
+    const params = new URLSearchParams({
+        page: page,
+        perPage: perPage,
+        sort: sort,
+        project_id: experimentId,
+        run_id: workflowId,
+      });
+
+      const requestUrl = `data/catalog-assets?${params.toString()}`;
+      return api.get<IDataAsset[]>(requestUrl).then(response => response.data);;
+    }
+  );
 
 // Reducer exports
 export const { initTab, resetWorkflowTab, setControls, setMetaData, setDataTable, setSelectedItem, setSelectedTask, setSelectedId, setCurrentPage, setTotalSize } =
