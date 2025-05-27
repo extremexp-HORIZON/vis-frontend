@@ -17,6 +17,7 @@ import ResponsiveCardTable from '../../../shared/components/responsive-card-tabl
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import LeftPanel from '../../Tasks/DataExplorationTask/ComponentContainer/data-exploration-left-panel';
 import { fetchCatalogAssets } from '../../../store/slices/workflowPageSlice';
+import FileExplorer from './fileexplorer';
 
 const DataAssetMetadata = ({ dataset, onClose }: {dataset: IDataAsset | undefined; onClose: () => void;}) => (
   <ClosableCardTable title={'Data asset Metadata'} children={
@@ -42,7 +43,7 @@ const Testaki = () => {
   const selectedItem = tab?.dataTaskTable?.selectedItem || null;
   const { dataset } = selectedItem?.data || {};
   const source = selectedItem?.data?.dataset?.source || '';
-  const isDirectory = !source.includes('.') || source.endsWith('/');
+  const isDirectory = true;
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const handleOpenMetadataDialog = () => setMetadataDialogOpen(true);
@@ -64,9 +65,8 @@ const Testaki = () => {
     <Box overflow={'hidden'} sx={{ height: '99%' }}>
       {isDirectory && (
         <Box>
-          {/* Render something for directories here */}
-          <p>This is a directory. Maybe show directory listing or nested files.</p>
-        </Box>
+       < FileExplorer/>
+       </Box>
       )}
       {/* Preview Panel */}
       <ResponsiveCardTable
