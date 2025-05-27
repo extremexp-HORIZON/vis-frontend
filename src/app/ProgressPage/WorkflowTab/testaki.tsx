@@ -1,33 +1,15 @@
 import {
   Box,
-  Typography,
-  Paper,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   IconButton,
-  Collapse
 } from '@mui/material';
 import { useAppSelector } from '../../../store/store';
 import DataExplorationComponent from '../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent';
 import {
-  DetailsCard,
   DetailsCardItem
 } from '../../../shared/components/details-card';
-import FolderIcon from '@mui/icons-material/Folder';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import DownloadIcon from '@mui/icons-material/Download';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
-import InfoMessage from '../../../shared/components/InfoMessage';
 import ClosableCardTable from '../../../shared/components/closable-card-table';
-import InfoIcon from '@mui/icons-material/Info';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 
@@ -48,130 +30,28 @@ const DataAssetMetadata = ({ dataset, onClose }) => (
   </ClosableCardTable>
 );
 
-// Example dataset as a tree
-const treeData = [
-  {
-    name: 'root',
-    type: 'folder',
-    children: [
-      {
-        name: 'data.csv',
-        size: '2MB',
-        type: 'file'
-      },
-      {
-        name: 'image.png',
-        size: '500KB',
-        type: 'file'
-      },
-      {
-        name: 'subfolder',
-        type: 'folder',
-        children: [
-          {
-            name: 'nestedfile.txt',
-            size: '1KB',
-            type: 'file'
-          },
-          {
-            name: 'deepfolder',
-            type: 'folder',
-            children: [
-              {
-                name: 'deepfile.docx',
-                size: '20KB',
-                type: 'file'
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-];
 
-// Recursive tree item renderer
-const TreeItem = ({
-  node,
-  level = 0,
-  onSelect,
-  selectedFile
-}) => {
-  const [open, setOpen] = useState(false);
-
-  const handleClick = () => {
-    if (node.type === 'folder') {
-      setOpen(!open);
-    } else {
-      onSelect(node.name);
-    }
-  };
-
-  return (
-    <>
-      <ListItem
-        button
-        onClick={handleClick}
-        selected={selectedFile === node.name}
-        sx={{ pl: 2 + level * 2 }}
-      >
-        <ListItemIcon>
-          {node.type === 'folder' ? (
-            <FolderIcon color="primary" />
-          ) : (
-            <InsertDriveFileIcon color="action" />
-          )}
-        </ListItemIcon>
-        <ListItemText
-          primary={node.name}
-          secondary={node.size || ''}
-        />
-        {node.type === 'folder' ? (
-          open ? (
-            <ExpandLessIcon fontSize="small" />
-          ) : (
-            <ExpandMoreIcon fontSize="small" />
-          )
-        ) : (
-          <IconButton edge="end">
-            <DownloadIcon fontSize="small" />
-          </IconButton>
-        )}
-      </ListItem>
-      {node.type === 'folder' && (
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List disablePadding dense>
-            {node.children?.map((child) => (
-              <TreeItem
-                key={child.name}
-                node={child}
-                level={level + 1}
-                onSelect={onSelect}
-                selectedFile={selectedFile}
-              />
-            ))}
-          </List>
-        </Collapse>
-      )}
-    </>
-  );
-};
 
 const Testaki = () => {
   const { tab } = useAppSelector((state) => state.workflowPage);
   const selectedItem = tab?.dataTaskTable?.selectedItem || null;
   const { dataset } = selectedItem?.data || {};
-  const isDirectory = false;
+  const source = selectedItem?.data?.dataset?.source || '';
+  const isDirectory = !source.includes('.') || source.endsWith('/');
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [showMetadata, setShowMetadata] = useState(true); // Added
-
-  const handleCloseMetadata = () => setShowMetadata(false);
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const handleOpenMetadataDialog = () => setMetadataDialogOpen(true);
   const handleCloseMetadataDialog = () => setMetadataDialogOpen(false);
+  console.log('selectedItem', selectedItem?.data.dataset?.source);
 
   return (
     <Box overflow={'hidden'} sx={{ height: '99%' }}>
+      {isDirectory && (
+        <Box>
+          {/* Render something for directories here */}
+          <p>This is a directory. Maybe show directory listing or nested files.</p>
+        </Box>
+      )}
       {/* Preview Panel */}
       <ResponsiveCardTable
         title={
