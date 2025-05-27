@@ -92,19 +92,16 @@ const DataExplorationComponent = () => {
         overflow: 'auto', // enables scrolling when table minHeight is applied in the overview page
       }}
     >
-      <LeftPanel />
+      {/* <LeftPanel /> */}
 
-      <Paper
-        elevation={1}
-        sx={{ flex: 1, overflow: 'auto', height: '100%', width: '100%' }}
-      >
+     
         {chartType === 'datatable' && <TableExpand />}
         {chartType === 'line' && <LineChart />}
         {chartType === 'scatter' && <ScatterChart />}
         {chartType === 'bar' && <BarChart />}
         {chartType === 'heatmap' && <HeatMap/>}
         {chartType === 'map' && (<MapCardWrapper/>)}
-      </Paper>
+      
 
     </Box>
   );

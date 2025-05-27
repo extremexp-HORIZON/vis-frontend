@@ -14,6 +14,7 @@ import Dialog from '@mui/material/Dialog';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
+import LeftPanel from '../../Tasks/DataExplorationTask/ComponentContainer/data-exploration-left-panel';
 
 const DataAssetMetadata = ({ dataset, onClose }: {dataset: IDataAsset | undefined; onClose: () => void;}) => (
   <ClosableCardTable title={'Data asset Metadata'} children={
@@ -72,7 +73,15 @@ const Testaki = () => {
         }
         showFullScreenButton={false}
         showOptionsButton={false}
-      >
+        showControlsInHeader={true}
+        controlPanel={
+          <Box sx={{ display: 'flex',flexDirection: 'column',rowGap: 1,height: '100%',overflow: 'auto'}}>
+            <LeftPanel />
+
+
+          </Box>
+          }
+        >
         <DataExplorationComponent />
       </ResponsiveCardTable>
       <Dialog
