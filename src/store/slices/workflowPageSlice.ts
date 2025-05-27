@@ -275,7 +275,7 @@ export const fetchWorkflowMetrics = createAsyncThunk(
     return successful.map(res => res.value);
   });
 
-  const fetchCatalogAssets = createAsyncThunk(
+  export const fetchCatalogAssets = createAsyncThunk(
     'workflowPage/fetchCatalogAssets',
     async({experimentId, workflowId, page='1', perPage='100', sort='created,desc'}: 
       {experimentId: string; workflowId: string; page?: string; perPage?: string; sort?: string}) => {
@@ -289,7 +289,7 @@ export const fetchWorkflowMetrics = createAsyncThunk(
       });
 
       const requestUrl = `data/catalog-assets?${params.toString()}`;
-      return api.get<IDataAsset[]>(requestUrl).then(response => response.data);;
+      return api.get<IDataAsset[]>(requestUrl).then(response => response.data);
     }
   );
 
