@@ -3,18 +3,19 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import { useAppSelector } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import DataExplorationComponent from '../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent';
 import {
   DetailsCardItem
 } from '../../../shared/components/details-card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ClosableCardTable from '../../../shared/components/closable-card-table';
 import Dialog from '@mui/material/Dialog';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import LeftPanel from '../../Tasks/DataExplorationTask/ComponentContainer/data-exploration-left-panel';
+import { fetchCatalogAssets } from '../../../store/slices/workflowPageSlice';
 
 const DataAssetMetadata = ({ dataset, onClose }: {dataset: IDataAsset | undefined; onClose: () => void;}) => (
   <ClosableCardTable title={'Data asset Metadata'} children={
@@ -46,6 +47,12 @@ const Testaki = () => {
   const handleOpenMetadataDialog = () => setMetadataDialogOpen(true);
   const handleCloseMetadataDialog = () => setMetadataDialogOpen(false);
   console.log('selectedItem', selectedItem?.data.dataset?.source);
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    // Dispatch the thunk to fetch catalog assets
+    dispatch(fetchCatalogAssets({ project_id:'TestZenohExp/IEwJDZcBpHPS2GeIwzH6/IUwJDZcBpHPS2GeIyjFx' , page: '1', perPage: '10', sort: 'created,desc' }));
+  }, [dispatch]);
+
 
   return (
     <Box overflow={'hidden'} sx={{ height: '99%' }}>
@@ -99,3 +106,5 @@ const Testaki = () => {
 };
 
 export default Testaki;
+
+

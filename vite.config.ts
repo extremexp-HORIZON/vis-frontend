@@ -10,10 +10,10 @@ export default defineConfig({
     proxy: {
       // "/api": "http://pulsar.imsi.athenarc.gr:9680",
       '/api': {
-        target: 'http://pulsar.imsi.athenarc.gr:9680',
+        target: 'http://localhost:8080',
       },
       '/experiments': {
-        target: 'http://pulsar.imsi.athenarc.gr:9680',
+        target: 'http://localhost:8080',
       },
       '/auth': {
         target: 'http://localhost:5521',
