@@ -112,7 +112,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   noPadding = false,
   details = null,
   showControlsInHeader = false,
-  showOptionsButton = true, 
+  showOptionsButton = true,
 
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -233,7 +233,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                   )}
                 </Box>
               )}
-{showOptionsButton !== false && (!shouldShowControlsInHeader || additionalMenuItems) && (
+              {showOptionsButton !== false && (!shouldShowControlsInHeader || additionalMenuItems) && (
                 <>
                   <IconButton
                     aria-label="settings"

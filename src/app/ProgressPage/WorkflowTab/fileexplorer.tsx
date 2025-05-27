@@ -1,87 +1,103 @@
-// import { Typography } from "@mui/material";
-// import { DetailsCard } from "../../../shared/components/details-card";
-// import { useAppDispatch, useAppSelector } from "../../../store/store";
-// import { useEffect, useState } from "react";
-// import { fetchCatalogAssets } from "../../../store/slices/workflowPageSlice";
-
-// const FileExplorer = () => { 
-    
-    
-//     const dispatch = useAppDispatch();
-//     const tab= useAppSelector((state) => state.workflowPage.tab);
-//     const experimentId='IEwJDZcBpHPS2GeIwzH6';
-//       const workflowId='IUwJDZcBpHPS2GeIyjFx';
-//     const [selectedItem, setSelectedItem] = useState<any>(null);
-    
-
-//       useEffect(() => {
-//         // Dispatch the thunk to fetch catalog assets
-//         dispatch(fetchCatalogAssets({ project_id:`${experimentId}/${workflowId}` , page: '1', perPage: '10', sort: 'created,desc' }));
-//       }, [dispatch]);
-    
-//       const catalog=tab?.catalogAssets.data || [];
-//       console.log('catalog', catalog);
-//       console.log('tab', tab);
-      
-//   return (
-//     <DetailsCard title={""}>
-//     <Typography>
-//         This is a placeholder for the File Explorer component. 
-//         It can be used to display files and directories in a structured format.
-//     </Typography>
-
-//     </DetailsCard>
-//   );
-// }
-// export default FileExplorer;
-import { Typography, Breadcrumbs, Link, List, ListItem, ListItemText, ListItemIcon, IconButton, Box, Button } from "@mui/material";
+import { Typography, Breadcrumbs, Box } from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { useEffect, useState } from "react";
-import { fetchCatalogAssets } from "../../../store/slices/workflowPageSlice";
-import { Details } from "@mui/icons-material";
-import { DetailsCard } from "../../../shared/components/details-card";
+import { useAppSelector } from '../../../store/store';
+import { useEffect, useState } from 'react';
+import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
+import { DataGrid } from '@mui/x-data-grid';
+import { styled } from '@mui/material';
+import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
+
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  '& .MuiDataGrid-scrollbarFiller': {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-columnHeader': {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
+    backgroundColor: theme.palette.customGrey.main,
+  },
+  '& .MuiDataGrid-columnHeaderTitle': {
+    whiteSpace: 'nowrap',
+    overflow: 'visible',
+  },
+  '& .MuiDataGrid-main': {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  },
+  '& .MuiDataGrid-columnHeaders': {
+    position: 'sticky',
+    top: 0,
+    zIndex: 2,
+  },
+  '& .MuiDataGrid-virtualScroller': {
+    flex: 1,
+    overflow: 'auto',
+  },
+  '& .MuiDataGrid-footerContainer': {
+    minHeight: '56px',
+    borderTop: '1px solid rgba(224, 224, 224, 1)',
+    position: 'sticky',
+    bottom: 0,
+    zIndex: 2,
+    backgroundColor: '#ffffff',
+  },
+  '& .MuiTablePagination-root': {
+    overflow: 'visible',
+  },
+  '&.MuiDataGrid-root': {
+    borderRadius: '0 0 12px 12px',
+    border: 'none',
+    height: '100%',
+  },
+}));
 
 type FileItem = {
   name: string;
   isFile: boolean;
   source?: string;
-  data?: any; // original item for file
+  data?: IDataAsset; // original item for file
   children?: Record<string, FileItem>;
 };
 
-const FileExplorer = () => {
-  const dispatch = useAppDispatch();
+interface IFileExplorer {
+  selectedFile: string | null;
+  setSelectedFile: (file: string | null) => void;
+}
+
+const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
   const tab = useAppSelector((state) => state.workflowPage.tab);
-  const experimentId = 'IEwJDZcBpHPS2GeIwzH6';
   const workflowId = 'IUwJDZcBpHPS2GeIyjFx';
   const [currentPath, setCurrentPath] = useState<string[]>([]); // array of folder names representing the path
-  const [tree, setTree] = useState<FileItem>({ name: "root", isFile: false, children: {} });
-  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [tree, setTree] = useState<FileItem>({ name: 'root', isFile: false, children: {} });
+  // const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
 
   // Build folder tree from catalog data
   useEffect(() => {
     const catalog = tab?.catalogAssets?.data || [];
 
-    const root: FileItem = { name: "root", isFile: false, children: {} };
+    const root: FileItem = { name: 'root', isFile: false, children: {} };
 
-    catalog.forEach((item: any) => {
-      const projectId = item.tags.projectId; // e.g. TestZenohExp/IEwJDZcBpHPS2GeIwzH6/IUwJDZcBpHPS2GeIyjFx/intermediate_datasets/Task1
+    catalog.forEach((item: IDataAsset) => {
+      const projectId = item?.tags?.projectId; // e.g. TestZenohExp/IEwJDZcBpHPS2GeIwzH6/IUwJDZcBpHPS2GeIyjFx/intermediate_datasets/Task1
+
       // We want only the part after project identifiers - to keep folder structure from intermediate_datasets down
       // So split and find the index of workflowId or experimentId to skip until there, then keep rest as folders
-
+      if(!projectId) return;
       // Split by slash:
       const parts = projectId.split('/');
       // Find index of workflowId in parts
-      const workflowIdx = parts.findIndex(p => p === workflowId);
+      const workflowIdx = parts.findIndex((p: string) => p === workflowId);
 
       // Take folders starting from after workflowId (e.g. intermediate_datasets/Task1)
       const folderParts = workflowIdx >= 0 ? parts.slice(workflowIdx + 1) : parts;
 
       // Insert into tree
       let currentNode = root;
-      folderParts.forEach((folderName, idx) => {
+
+      folderParts.forEach((folderName: string, idx: number) => {
         if (!currentNode.children) currentNode.children = {};
 
         if (idx === folderParts.length - 1) {
@@ -116,10 +132,12 @@ const FileExplorer = () => {
   // Get current folder node based on currentPath
   const getCurrentFolderNode = () => {
     let node = tree;
+
     for (const folder of currentPath) {
       if (!node.children || !node.children[folder]) return null;
       node = node.children[folder];
     }
+
     return node;
   };
 
@@ -130,110 +148,158 @@ const FileExplorer = () => {
     setSelectedFile(null);
   };
 
-  const handleFileClick = (file: FileItem) => {
+  const handleFileClick = (file: string) => {
     setSelectedFile(file);
   };
 
-  const handleBreadcrumbClick = (index: number) => {
-    setCurrentPath(currentPath.slice(0, index + 1));
-    setSelectedFile(null);
-  };
-
   return (
-<DetailsCard
-  title={
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      <Typography variant="h6" component="div" sx={{ mb: 1 }}>
-        File Explorer
-      </Typography>
-    <Breadcrumbs aria-label="breadcrumb" sx={{ cursor: 'pointer' }}>
-      <Link
-        color={currentPath.length === 0 ? "text.primary" : "inherit"}
-        underline="hover"
-        onClick={() => {
-          setCurrentPath([]);
-          setSelectedFile(null);
-        }}
-        style={{ cursor: 'pointer' }}
-      >
-        root
-      </Link>
-      {currentPath.map((folder, idx) => (
-        <Link
-          key={folder}
-          color={idx === currentPath.length - 1 ? "text.primary" : "inherit"}
-          underline="hover"
-          onClick={() => {
-            setCurrentPath(currentPath.slice(0, idx + 1));
-            setSelectedFile(null);
-          }}
-          style={{ cursor: 'pointer' }}
-        >
-          {folder}
-        </Link>
-      ))}
-    </Breadcrumbs>
-    </Box>}
->
-      {/* <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-        <Link
-          color={currentPath.length === 0 ? "text.primary" : "inherit"}
-          onClick={() => {
-            setCurrentPath([]);
-            setSelectedFile(null);
-          }}
-          style={{ cursor: 'pointer' }}
-        >
-          root
-        </Link>
-        {currentPath.map((folder, idx) => (
-          <Link
-            key={folder}
-            color={idx === currentPath.length - 1 ? "text.primary" : "inherit"}
-            onClick={() => handleBreadcrumbClick(idx)}
-            style={{ cursor: 'pointer' }}
-          >
-            {folder}
-          </Link>
-        ))}
-      </Breadcrumbs> */}
-
-      {/* <Typography variant="h6" gutterBottom>
-        {selectedFile ? `File: ${selectedFile.name}` : `Folder: /${currentPath.join('/')}`}
-      </Typography> */}
-
-      {!selectedFile && currentFolder && (
-        <List>
-          {currentFolder.children &&
-            Object.values(currentFolder.children).map((item) => (
-              <ListItem
-                key={item.name}
-                button
-                onClick={() => (item.isFile ? handleFileClick(item) : handleFolderClick(item.name))}
+    <ResponsiveCardTable
+      title={
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            File Explorer
+          <Breadcrumbs aria-label="breadcrumb" sx={{ cursor: 'pointer' }}>
+            <Box
+              component="span"
+              onClick={() => {
+                setCurrentPath([]);
+                setSelectedFile(null);
+              }}
+              sx={{
+                cursor: 'pointer',
+                '&:hover': { color: 'primary.main' },
+              }}
+            >
+              <Typography
+                variant="overline"
+                sx={{
+                  fontWeight: 600,
+                  letterSpacing: '0.5px',
+                  color: currentPath.length === 0 ? 'text.primary' : '#64748b',
+                  textTransform: 'uppercase',
+                }}
               >
-                <ListItemIcon>
-                  {item.isFile ? <InsertDriveFileIcon /> : <FolderIcon />}
-                </ListItemIcon>
-                <ListItemText primary={item.name} />
-              </ListItem>
-            ))}
-        </List>
-      )}
+                root
+              </Typography>
+            </Box>
 
-      {selectedFile && (
-        <div>
-  
-          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-            {JSON.stringify(selectedFile.data, null, 2)}
-          </Typography>
-          <Button>
-            <Typography variant="body2" color="primary">
-              Preview
-            </Typography>
-          </Button>
-        </div>
+            {currentPath.map((folder, idx) => (
+              <Box
+                key={folder}
+                component="span"
+                onClick={() => {
+                  setCurrentPath(currentPath.slice(0, idx + 1));
+                  setSelectedFile(null);
+                }}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' },
+                }}
+              >
+                <Typography
+                  variant="overline"
+                  sx={{
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                    color: idx === currentPath.length - 1 ? 'text.primary' : '#64748b',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {folder}
+                </Typography>
+              </Box>
+            ))}
+          </Breadcrumbs>
+        </Box>
+      }
+      showFullScreenButton={false}
+      showOptionsButton={false}
+      noPadding={true}
+    >
+      {currentFolder && (
+        <StyledDataGrid
+          rows={Object.values(currentFolder.children || {}).map((item, index) => ({
+            id: index,
+            name: item.name,
+            type: item.isFile ? item?.data?.format ? item?.data?.format : '-' : 'Folder',
+            role: item?.data?.role || '-',
+            size: item?.data?.tags?.file_size ? `${Math.round(Number(item.data.tags.file_size) / 1024)} KB` : '-',
+            created: item?.data?.tags?.created,
+            isFile: item.isFile,
+            raw: item,
+          }))}
+          columns={[
+            {
+              field: 'name',
+              headerName: 'Name',
+              flex: 1,
+              minWidth: 200,
+              renderCell: (params) => (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {params.row.isFile ? <InsertDriveFileIcon fontSize="small" /> : <FolderIcon fontSize="small" />}
+                  {params.row.name}
+                </Box>
+              ),
+            },
+            {
+              field: 'type',
+              headerName: 'Type',
+              width: 200,
+            },
+            {
+              field: 'role',
+              headerName: 'Role',
+              width: 200,
+            },
+            {
+              field: 'size',
+              headerName: 'Size',
+              width: 200
+            },
+            {
+              field: 'createdAt',
+              headerName: 'Created',
+              width: 200,
+              renderCell: (params) => {
+                const raw = params.row.created;
+
+                if (!raw) return '-';
+                const safe = raw.replace(/\.\d+$/, '');
+
+                return new Date(safe).toLocaleString(undefined, {
+                  year: 'numeric',
+                  month: 'short',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+              },
+            },
+          ]}
+          disableColumnMenu
+          disableRowSelectionOnClick
+          hideFooter
+          onRowClick={(params) => {
+            const item = params.row.raw as FileItem;
+
+            item.isFile ? handleFileClick(item.name) : handleFolderClick(item.name);
+          }}
+          getRowClassName={(params) =>
+            params.row.name === selectedFile ? 'Mui-selected' : ''
+          }
+          sx={{
+            '& .MuiDataGrid-cell': {
+              whiteSpace: 'normal',
+              wordWrap: 'break-word',
+              cursor: 'pointer'
+            },
+            '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
+              borderRight: '1px solid rgba(224, 224, 224, 0.4)',
+            },
+          }}
+        />
+
       )}
-    </DetailsCard>
+    </ResponsiveCardTable>
   );
 };
 

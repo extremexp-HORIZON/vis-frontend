@@ -5,11 +5,11 @@ import {
 import { fetchMetaData } from '../../../../store/slices/dataExplorationSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
-import LeftPanel from './data-exploration-left-panel';
+// import LeftPanel from './data-exploration-left-panel';
 import LineChart from '../Charts/data-exploration-line-chart';
 import ScatterChart from '../Charts/data-exploration-scatter-chart';
 import  BarChart from '../Charts/data-exploration-bar-chart';
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import TableExpand from '../Charts/data-exploration-data-table';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import InfoMessage from '../../../../shared/components/InfoMessage';
@@ -94,14 +94,12 @@ const DataExplorationComponent = () => {
     >
       {/* <LeftPanel /> */}
 
-     
-        {chartType === 'datatable' && <TableExpand />}
-        {chartType === 'line' && <LineChart />}
-        {chartType === 'scatter' && <ScatterChart />}
-        {chartType === 'bar' && <BarChart />}
-        {chartType === 'heatmap' && <HeatMap/>}
-        {chartType === 'map' && <MapCardWrapper/>}
-      
+      {chartType === 'datatable' && <TableExpand />}
+      {chartType === 'line' && <LineChart />}
+      {chartType === 'scatter' && <ScatterChart />}
+      {chartType === 'bar' && <BarChart />}
+      {chartType === 'heatmap' && <HeatMap/>}
+      {chartType === 'map' && <MapCardWrapper/>}
 
     </Box>
   );

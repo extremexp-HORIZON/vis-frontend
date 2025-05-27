@@ -17,8 +17,7 @@ import { api, experimentApi } from '../../app/api/api';
 import { dataExplorationReducers } from './dataExplorationSlice';
 import { modelAnalysisReducers } from './modelAnalysisSlice';
 import { explainabilityReducers } from './explainabilitySlice';
-import { IDataAsset } from '../../shared/models/experiment/data-asset.model';
-import { Tab } from '@mui/material';
+import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
 
 type MetricFetchResult = {
   name: string;
@@ -139,7 +138,7 @@ export const workflowPageSlice = createSlice({
         state.tab.workflowSeriesMetrics.error =
             action.error.message || 'Error while fetching data';
       })
-      .addCase(fetchCatalogAssets.fulfilled, (state,action) => {
+      .addCase(fetchCatalogAssets.fulfilled, (state, action) => {
         if (!state.tab) return;
         state.tab.catalogAssets.data = action.payload;
         state.tab.catalogAssets.loading = false;
@@ -150,11 +149,11 @@ export const workflowPageSlice = createSlice({
         state.tab.catalogAssets.loading = true;
         state.tab.catalogAssets.error = null;
       })
-      .addCase(fetchCatalogAssets.rejected, (state,action) => {
+      .addCase(fetchCatalogAssets.rejected, (state, action) => {
         if (!state.tab) return;
         state.tab.catalogAssets.loading = false;
         state.tab.catalogAssets.error = action.error.message || 'Error while fetching catalog';
-      })
+      });
 
   },
 });
@@ -275,9 +274,9 @@ export const fetchWorkflowMetrics = createAsyncThunk(
     return successful.map(res => res.value);
   });
 
-  export const fetchCatalogAssets = createAsyncThunk(
-    'workflowPage/fetchCatalogAssets',
-    async({project_id, page='1', perPage='100', sort='created,desc'}: 
+export const fetchCatalogAssets = createAsyncThunk(
+  'workflowPage/fetchCatalogAssets',
+  async({ project_id, page = '1', perPage = '100', sort = 'created,desc' }:
       {project_id: string; page?: string; perPage?: string; sort?: string}) => {
 
     const params = new URLSearchParams();
@@ -291,10 +290,11 @@ export const fetchWorkflowMetrics = createAsyncThunk(
       params.append('project_id', project_id);
     }
 
-      const requestUrl = `data/catalog-assets?${params.toString()}`;
-      return api.get<IDataAsset[]>(requestUrl).then(response => response.data);
-    }
-  );
+    const requestUrl = `data/catalog-assets?${params.toString()}`;
+
+    return api.get<IDataAsset[]>(requestUrl).then(response => response.data);
+  }
+);
 
 // Reducer exports
 export const { initTab, resetWorkflowTab, setControls, setMetaData, setDataTable, setSelectedItem, setSelectedTask, setSelectedId, setCurrentPage, setTotalSize } =

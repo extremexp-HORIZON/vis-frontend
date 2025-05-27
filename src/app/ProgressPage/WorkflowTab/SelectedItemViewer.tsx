@@ -1,6 +1,5 @@
 import { Typography, Box } from '@mui/material';
 import { useAppSelector } from '../../../store/store';
-import DataExplorationComponent from '../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent';
 import { WorkflowMetricChart } from './workflow-metric-chart';
 import WorkflowTaskOverview from './workflow-task-overview';
 import InfoMessage from '../../../shared/components/InfoMessage';
