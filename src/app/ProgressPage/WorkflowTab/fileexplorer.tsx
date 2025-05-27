@@ -34,7 +34,7 @@
 //   );
 // }
 // export default FileExplorer;
-import { Typography, Breadcrumbs, Link, List, ListItem, ListItemText, ListItemIcon, IconButton, Box } from "@mui/material";
+import { Typography, Breadcrumbs, Link, List, ListItem, ListItemText, ListItemIcon, IconButton, Box, Button } from "@mui/material";
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -222,15 +222,15 @@ const FileExplorer = () => {
 
       {selectedFile && (
         <div>
-          <Typography variant="body1">
-            {/* Example: show link to file */}
-            <a href={selectedFile.source} target="_blank" rel="noopener noreferrer">
-              Open {selectedFile.name}
-            </a>
-          </Typography>
+  
           <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
             {JSON.stringify(selectedFile.data, null, 2)}
           </Typography>
+          <Button>
+            <Typography variant="body2" color="primary">
+              Preview
+            </Typography>
+          </Button>
         </div>
       )}
     </DetailsCard>
