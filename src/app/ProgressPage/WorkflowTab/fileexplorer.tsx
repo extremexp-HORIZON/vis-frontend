@@ -1,6 +1,9 @@
 import { Typography, Breadcrumbs, Box, Tooltip, IconButton } from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
+import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
+import ImageRoundedIcon from '@mui/icons-material/ImageRounded';
+import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useEffect, useState } from 'react';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
@@ -172,6 +175,50 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
     return '-';
   };
 
+  function getDatasetIcon(type: string) {
+    if (!type || type.trim() === '') return;
+
+    switch (type.toLowerCase()) {
+      case 'csv':
+      case 'xls':
+      case 'xlsx':
+        return (
+          <TableChartRoundedIcon
+            style={{ color: theme.palette.primary.main }}
+            fontSize="small"
+          />
+        );
+
+      case 'json':
+      case 'yaml':
+        return (
+          <DataObjectRoundedIcon
+            style={{ color: theme.palette.primary.main }}
+            fontSize="small"
+          />
+        );
+
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'image':
+        return (
+          <ImageRoundedIcon
+            style={{ color: theme.palette.primary.main }}
+            fontSize="small"
+          />
+        );
+
+      default:
+        return (
+          <InsertDriveFileRoundedIcon
+            style={{ color: theme.palette.primary.main }}
+            fontSize="small"
+          />
+        );
+    }
+  };
+
   return (
     <ResponsiveCardTable
       title={
@@ -258,7 +305,7 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
               minWidth: 200,
               renderCell: (params) => (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {params.row.isFile ? <InsertDriveFileIcon fontSize="small" /> : <FolderIcon fontSize="small" />}
+                  {params.row.isFile ? getDatasetIcon(params.row.type) : <FolderIcon style={{ color: theme.palette.primary.main }} fontSize="small" />}
                   {params.row.name}
                 </Box>
               ),
