@@ -25,6 +25,7 @@ type SelectedItem = {
     }
     variant?: string;
     model?: string;
+    name?: string;
   }
 } | null;
 

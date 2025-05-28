@@ -1,12 +1,15 @@
-import { Typography, Breadcrumbs, Box } from '@mui/material';
+import { Typography, Breadcrumbs, Box, Tooltip, IconButton } from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { useAppSelector } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useEffect, useState } from 'react';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import { DataGrid } from '@mui/x-data-grid';
 import { styled } from '@mui/material';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
+import { setSelectedItemDataset } from '../../../store/slices/workflowPageSlice';
+import LaunchIcon from '@mui/icons-material/Launch';
+import theme from '../../../mui-theme';
 
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   '& .MuiDataGrid-scrollbarFiller': {
@@ -22,35 +25,39 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     whiteSpace: 'nowrap',
     overflow: 'visible',
   },
-  '& .MuiDataGrid-main': {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-  },
-  '& .MuiDataGrid-columnHeaders': {
+  '& .datagrid-header-fixed': {
+    // Action column
     position: 'sticky',
-    top: 0,
-    zIndex: 2,
+    right: 0,
+    zIndex: 9999,
+    backgroundColor: theme.palette.customGrey.main,
+    borderLeft: '1px solid #ddd',
   },
-  '& .MuiDataGrid-virtualScroller': {
-    flex: 1,
-    overflow: 'auto',
+  '& .MuiDataGrid-cell[data-field="action"]': {
+    position: 'sticky',
+    right: 0,
+    backgroundColor: theme.palette.customGrey.light,
+    zIndex: 9999,
+    borderLeft: '1px solid #ddd',
   },
+  // Add pagination styling
   '& .MuiDataGrid-footerContainer': {
     minHeight: '56px',
     borderTop: '1px solid rgba(224, 224, 224, 1)',
-    position: 'sticky',
-    bottom: 0,
-    zIndex: 2,
-    backgroundColor: '#ffffff',
   },
+
   '& .MuiTablePagination-root': {
     overflow: 'visible',
   },
-  '&.MuiDataGrid-root': {
-    borderRadius: '0 0 12px 12px',
-    border: 'none',
-    height: '100%',
+  '& .MuiDataGrid-columnHeader[data-field="__action_group__"]': {
+    position: 'sticky',
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: theme.palette.customGrey.main,
+    borderLeft: '1px solid #ddd',
+    display: 'flex',
+    justifyContent: 'center', // Center the header content
+    alignItems: 'center', // Vertically center
   },
 }));
 
@@ -71,14 +78,14 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
   const tab = useAppSelector((state) => state.workflowPage.tab);
   const workflowId = 'IUwJDZcBpHPS2GeIyjFx';
   const [currentPath, setCurrentPath] = useState<string[]>([]); // array of folder names representing the path
-  const [tree, setTree] = useState<FileItem>({ name: 'root', isFile: false, children: {} });
-  // const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [tree, setTree] = useState<FileItem>({ name: tab?.dataTaskTable.selectedItem?.data?.name ?? 'root', isFile: false, children: {} });
+  const dispatch = useAppDispatch();
 
   // Build folder tree from catalog data
   useEffect(() => {
     const catalog = tab?.catalogAssets?.data || [];
 
-    const root: FileItem = { name: 'root', isFile: false, children: {} };
+    const root: FileItem = { name: tab?.dataTaskTable.selectedItem?.data?.name ?? 'root', isFile: false, children: {} };
 
     catalog.forEach((item: IDataAsset) => {
       const projectId = item?.tags?.projectId; // e.g. TestZenohExp/IEwJDZcBpHPS2GeIwzH6/IUwJDZcBpHPS2GeIyjFx/intermediate_datasets/Task1
@@ -148,8 +155,21 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
     setSelectedFile(null);
   };
 
-  const handleFileClick = (file: string) => {
+  const handleFileClick = ({ file, dataset }: {file: string; dataset: IDataAsset | undefined;}) => {
     setSelectedFile(file);
+    dispatch(setSelectedItemDataset(dataset));
+  };
+
+  const getFileType = (dataset: IDataAsset | undefined) => {
+    if(!dataset) return '-';
+    if(dataset?.format) return dataset.format;
+
+    const extension = dataset?.source?.split('.').pop()
+      ?.toLowerCase();
+
+    if(extension) return extension;
+
+    return '-';
   };
 
   return (
@@ -178,7 +198,7 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
                   textTransform: 'uppercase',
                 }}
               >
-                root
+                {tab?.dataTaskTable.selectedItem?.data?.name ?? 'root'}
               </Typography>
             </Box>
 
@@ -220,17 +240,20 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
           rows={Object.values(currentFolder.children || {}).map((item, index) => ({
             id: index,
             name: item.name,
-            type: item.isFile ? item?.data?.format ? item?.data?.format : '-' : 'Folder',
+            type: item.isFile ? getFileType(item?.data) : 'Folder',
             role: item?.data?.role || '-',
             size: item?.data?.tags?.file_size ? `${Math.round(Number(item.data.tags.file_size) / 1024)} KB` : '-',
             created: item?.data?.tags?.created,
             isFile: item.isFile,
             raw: item,
+            action: '',
           }))}
           columns={[
             {
               field: 'name',
               headerName: 'Name',
+              headerAlign: 'center',
+              align: 'center',
               flex: 1,
               minWidth: 200,
               renderCell: (params) => (
@@ -243,21 +266,29 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
             {
               field: 'type',
               headerName: 'Type',
+              headerAlign: 'center',
+              align: 'center',
               width: 200,
             },
             {
               field: 'role',
               headerName: 'Role',
+              headerAlign: 'center',
+              align: 'center',
               width: 200,
             },
             {
               field: 'size',
+              headerAlign: 'center',
+              align: 'center',
               headerName: 'Size',
               width: 200
             },
             {
               field: 'createdAt',
               headerName: 'Created',
+              headerAlign: 'center',
+              align: 'center',
               width: 200,
               renderCell: (params) => {
                 const raw = params.row.created;
@@ -274,15 +305,42 @@ const FileExplorer = ({ selectedFile, setSelectedFile }: IFileExplorer) => {
                 });
               },
             },
+            {
+              field: 'action',
+              headerName: 'Actions',
+              headerAlign: 'center',
+              align: 'center',
+              sortable: false,
+              filterable: false,
+              headerClassName: 'datagrid-header-fixed',
+              width: 100,
+              renderCell: (params) => {
+                const type = params.row.type;
+
+                return(
+                  <Tooltip title={type === 'Folder' ? 'Open Folder' : 'Preview File'}>
+                    <IconButton onClick={() => {
+                      const item = params.row.raw as FileItem;
+
+                      item.isFile ? handleFileClick({ file: item.name, dataset: item.data }) : handleFolderClick(item.name);
+                    }}>
+                      <LaunchIcon
+                        style={{
+                          cursor: 'pointer',
+                          color: theme.palette.primary.main,
+                        }}
+
+                      />
+                    </IconButton>
+                  </Tooltip>
+                );
+              }
+            }
           ]}
           disableColumnMenu
+          disableVirtualization
           disableRowSelectionOnClick
           hideFooter
-          onRowClick={(params) => {
-            const item = params.row.raw as FileItem;
-
-            item.isFile ? handleFileClick(item.name) : handleFolderClick(item.name);
-          }}
           getRowClassName={(params) =>
             params.row.name === selectedFile ? 'Mui-selected' : ''
           }

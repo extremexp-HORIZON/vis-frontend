@@ -63,7 +63,7 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Header
-          title={`${selectedItem?.data?.dataset?.name} Details`}
+          title={`${selectedItem?.data?.name} Details`}
           icon={<DatasetIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

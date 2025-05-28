@@ -34,10 +34,14 @@ export default function WorkflowTreeView() {
   const [workflowExpanded, setWorkflowExpanded] = useState(true);
   const [modelExpanded, setModelExpanded] = useState(true);
 
-  function getDatasetIcon(format: string | null | undefined) {
-    if (!format || format.trim() === '') return;
+  function getDatasetIcon({ format, source }: {format: string | null | undefined; source: string}) {
+    const extension = source.split('.').pop()
+      ?.toLowerCase();
+    const type = format ? format : extension;
 
-    switch (format.toLowerCase()) {
+    if (!type || type.trim() === '') return;
+
+    switch (type.toLowerCase()) {
       case 'csv':
       case 'xls':
       case 'xlsx':
@@ -417,7 +421,7 @@ export default function WorkflowTreeView() {
                                     dispatch(
                                       setSelectedItem({
                                         type: 'DATASET',
-                                        data: { dataset: ds },
+                                        data: { dataset: ds, name: ds.name },
                                       }),
                                     );
                                   }
@@ -431,7 +435,7 @@ export default function WorkflowTreeView() {
                                   cursor: 'pointer',
                                 }}
                               >
-                                {getDatasetIcon(ds.format)}
+                                {getDatasetIcon({ format: ds.format, source: ds.source })}
                                 <Typography variant="body2" sx={{ ml: 1 }}>
                                   {ds.name}
                                 </Typography>
@@ -504,7 +508,7 @@ export default function WorkflowTreeView() {
                                     dispatch(
                                       setSelectedItem({
                                         type: 'DATASET',
-                                        data: { dataset: ds },
+                                        data: { dataset: ds, name: ds.name },
                                       }),
                                     );
                                   }
@@ -518,7 +522,7 @@ export default function WorkflowTreeView() {
                                   cursor: 'pointer',
                                 }}
                               >
-                                {getDatasetIcon(ds.format)}
+                                {getDatasetIcon({ format: ds.format, source: ds.source })}
                                 <Typography variant="body2" sx={{ ml: 1 }}>
                                   {ds.name}
                                 </Typography>
@@ -689,7 +693,7 @@ export default function WorkflowTreeView() {
                                     dispatch(
                                       setSelectedItem({
                                         type: 'DATASET',
-                                        data: { dataset: ds },
+                                        data: { dataset: ds, name: ds.name },
                                       }),
                                     );
                                   }
@@ -703,7 +707,7 @@ export default function WorkflowTreeView() {
                                   cursor: 'pointer',
                                 }}
                               >
-                                {getDatasetIcon(ds.format)}
+                                {getDatasetIcon({ format: ds.format, source: ds.source })}
                                 <Typography variant="body2" sx={{ ml: 1 }}>
                                   {ds.name}
                                 </Typography>
@@ -776,7 +780,7 @@ export default function WorkflowTreeView() {
                                     dispatch(
                                       setSelectedItem({
                                         type: 'DATASET',
-                                        data: { dataset: ds },
+                                        data: { dataset: ds, name: ds.name },
                                       }),
                                     );
                                   }
@@ -790,7 +794,7 @@ export default function WorkflowTreeView() {
                                   cursor: 'pointer',
                                 }}
                               >
-                                {getDatasetIcon(ds.format)}
+                                {getDatasetIcon({ format: ds.format, source: ds.source })}
                                 <Typography variant="body2" sx={{ ml: 1 }}>
                                   {ds.name}
                                 </Typography>

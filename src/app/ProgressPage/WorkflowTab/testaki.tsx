@@ -18,22 +18,40 @@ import LeftPanel from '../../Tasks/DataExplorationTask/ComponentContainer/data-e
 import { fetchCatalogAssets } from '../../../store/slices/workflowPageSlice';
 import FileExplorer from './fileexplorer';
 
-const DataAssetMetadata = ({ dataset, onClose }: {dataset: IDataAsset | undefined; onClose: () => void;}) => (
-  <ClosableCardTable title={'Data asset Metadata'} children={
-    <>
-      <DetailsCardItem label="Name" value={dataset?.name} />
-      <DetailsCardItem label="Format" value={dataset?.format} />
-      <DetailsCardItem label="Role" value={dataset?.role} />
-      <DetailsCardItem label="Source" value={dataset?.source} />
-      <DetailsCardItem label="Type" value={dataset?.sourceType} />
-      <DetailsCardItem label="Task" value={dataset?.task} />
-    </>
+const DataAssetMetadata = ({ dataset, onClose }: {dataset: IDataAsset | undefined; onClose: () => void;}) => {
 
-  } onClose={onClose}
-  >
+  const getDate = (date: string | undefined) => {
+    if(!date) return '-';
+    const safe = date.replace(/\.\d+$/, '');
 
-  </ClosableCardTable>
-);
+    return new Date(safe).toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  return (
+    <ClosableCardTable title={'Data asset Metadata'} children={
+      <>
+        <DetailsCardItem label="Name" value={dataset?.name ?? '-'} />
+        <DetailsCardItem label="Format" value={dataset?.format ?? '-'} />
+        <DetailsCardItem label="Role" value={dataset?.role ?? '-'} />
+        <DetailsCardItem label="Source" value={dataset?.source ?? '-'} />
+        <DetailsCardItem label="Type" value={dataset?.sourceType ?? '-'} />
+        <DetailsCardItem label="Task" value={dataset?.task} />
+        <DetailsCardItem label="Size" value={ dataset?.tags?.file_size ? `${Math.round(Number(dataset.tags.file_size) / 1024)} KB` : '-'} />
+        <DetailsCardItem label="Created" value={getDate(dataset?.tags?.created)} />
+      </>
+
+    } onClose={onClose}
+    >
+
+    </ClosableCardTable>
+  );
+};
 
 const Testaki = () => {
   const { tab } = useAppSelector((state) => state.workflowPage);
@@ -64,12 +82,12 @@ const Testaki = () => {
           />
         </Box>
       )}
-      {!isDirectory || selectedFile &&
+      {(!isDirectory || selectedFile) &&
         <Box sx={{ height: '60%', minHeight: '450px' }}>
           <ResponsiveCardTable
             title={
               <Box display='flex' alignItems="center" justifyContent="space-between">
-                {`Preview ${selectedFile || ''}`}
+                {`Preview ${dataset?.name || ''}`}
                 <Tooltip title="File Metadata">
                   <IconButton
                     size="small"

@@ -61,6 +61,16 @@ export const workflowPageSlice = createSlice({
       state.tab.dataTaskTable.selectedItem = action.payload;
       state.tab.dataTaskTable.selectedTask = null;
     },
+    setSelectedItemDataset: (state, action) => {
+      if (!state?.tab?.dataTaskTable?.selectedItem) return;
+      state.tab.dataTaskTable.selectedItem = {
+        ...state.tab.dataTaskTable.selectedItem,
+        data: {
+          ...state.tab.dataTaskTable.selectedItem?.data,
+          dataset: action.payload,
+        },
+      };
+    },
     setControls: (state, action) => {
       if (!state.tab?.workflowTasks.dataExploration) return;
       state.tab.workflowTasks.dataExploration.controlPanel = {
@@ -297,7 +307,7 @@ export const fetchCatalogAssets = createAsyncThunk(
 );
 
 // Reducer exports
-export const { initTab, resetWorkflowTab, setControls, setMetaData, setDataTable, setSelectedItem, setSelectedTask, setSelectedId, setCurrentPage, setTotalSize } =
+export const { initTab, resetWorkflowTab, setControls, setMetaData, setDataTable, setSelectedItem, setSelectedItemDataset, setSelectedTask, setSelectedId, setCurrentPage, setTotalSize } =
   workflowPageSlice.actions;
 
 export default workflowPageSlice.reducer;
