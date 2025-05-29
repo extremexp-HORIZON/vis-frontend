@@ -207,21 +207,19 @@ export default function ScheduleTable() {
             }
           }, []),
       );
-      const uniqueTasks = new Set(
-        workflows.data.filter(workflow => workflow.status === 'SCHEDULED')
-          .reduce((acc: string[], workflow) => {
-            const tasks = workflow?.tasks;
-            let taskNames: string[] = [];
 
-            if(tasks) {
-              taskNames = tasks.filter(task => task.variant && task.variant !== task.name).map(task => task.name);
-
-              return [...acc, ...taskNames];
-            } else {
-              return [...acc];
-            }
-          }, [])
-      );
+      const uniqueTasks = Object.entries(workflows.data.filter(workflow => workflow.status === 'SCHEDULED').flatMap(workflow => workflow.tasks || [])
+            .reduce((acc: Record<string, Set<string>>, task) => {
+                if (task && task.name) {
+                    if (!acc[task.name]) {
+                        acc[task.name] = new Set<string>();
+                    }
+                    if (task.variant) {
+                        acc[task.name].add(task.variant);
+                    }
+                }
+                return acc;
+            }, {})).filter(([_, variants]) => variants.size > 1).map(([name]) => name)  
 
       const rows = workflows.data
         .filter(workflow => workflow.status === 'SCHEDULED')
