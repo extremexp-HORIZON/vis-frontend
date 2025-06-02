@@ -32,7 +32,7 @@ const ExperimentControls = () => {
   const workflowStatus = workflow?.status;
   const completedTasks = workflow?.tasks?.filter(task => task.endTime).length;
   const taskLength = workflow?.tasks?.length;
-  const workflowRating = workflow?.metrics?.find(metric => metric.name === 'rating')?.value;
+  const workflowRating = workflow?.metrics?.find(metric => metric.name === 'rating')?.value ?? 0;
   const [isPolling, setPolling] = useState(false);
   const [localRating, setLocalRating] = useState<number | null>(null);
   const { tab } = useAppSelector((state: RootState) => state.workflowPage);
@@ -204,18 +204,16 @@ const ExperimentControls = () => {
                     </Tooltip>
                   )}
 
-                  {workflowRating !== undefined && <Typography variant="h5" sx={{ fontWeight: 600, ml: 1 }}>-</Typography> }
-                  {workflowRating !== undefined &&
-                      <Rating
-                        name="workflow-rating"
-                        size="large"
-                        value={ localRating !== null ? localRating : workflowRating}
-                        disabled={isPolling}
-                        onChange={(_, value) => {
-                          if (value !== null) handleUserEvaluation(value);
-                        }}
-                      />
-                  }
+                  <Typography variant="h5" sx={{ fontWeight: 600, ml: 1 }}>-</Typography>
+                  <Rating
+                    name="workflow-rating"
+                    size="large"
+                    value={ localRating !== null ? localRating : workflowRating}
+                    disabled={isPolling}
+                    onChange={(_, value) => {
+                      if (value !== null) handleUserEvaluation(value);
+                    }}
+                  />
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
                   <Typography variant="body2">Status: {workflowStatus?.toLowerCase()}</Typography>

@@ -316,7 +316,7 @@ export default function WorkflowTable() {
         const allowedFields = new Set([
           'workflowId',
           ...workflowsTable.groupBy,
-          ...workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating'),
+          ...workflowsTable.uniqueMetrics,
         ]);
 
         const reducedColumns = workflowsTable.columns.filter(col =>
@@ -363,7 +363,7 @@ export default function WorkflowTable() {
             let metricNames: string[] = [];
 
             if(metrics) {
-              metricNames = metrics.map(metric => metric.name);
+              metricNames = metrics.map(metric => metric.name).filter(name => name !== 'rating');;
 
               return [...acc, ...metricNames];
             } else {
@@ -428,6 +428,13 @@ export default function WorkflowTable() {
 
               return acc;
             }, {} as Record<string, number | string>),
+            rating: (() => {
+              if (metrics && metrics.length > 0) {
+                const ratingMetric = metrics.find(metric => metric.name === 'rating');
+                return ratingMetric?.value ?? 0;
+              }
+              return 0;
+            })(),
             status: workflow.status,
             // rating: 2,
             action: '',
