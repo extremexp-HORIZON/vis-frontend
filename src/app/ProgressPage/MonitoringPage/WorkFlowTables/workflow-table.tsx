@@ -521,6 +521,12 @@ export default function WorkflowTable() {
     }
   }, [workflows.data]);
 
+const hasVisibleParameterColumns = workflowsTable.visibleColumns.some(
+  (col) =>
+    workflowsTable.uniqueParameters.includes(col.field) &&
+    workflowsTable.columnsVisibilityModel[col.field] !== false
+);
+
   return (
     <Box sx={{ height: '100%' }}>
       <Paper elevation={2} sx={{ height: '100%', width: '100%', mb: 2 }}>
@@ -672,7 +678,7 @@ export default function WorkflowTable() {
               },
               {
                 groupId: 'Task Variants',
-                headerClassName: 'theme-parameters-group-2',
+                headerClassName: hasVisibleParameterColumns ? 'theme-parameters-group-2' : 'theme-parameters-group',
                 children: workflowsTable.uniqueTasks.length > 0 ? (
                   workflowsTable.uniqueTasks.map(
                     (task): GridColumnNode => ({
