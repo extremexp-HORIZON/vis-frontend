@@ -110,12 +110,10 @@ const ExperimentControls = () => {
     }
   }, [workflows]);
 
-  const taskInfo = taskLength ? (
+  const taskInfo = taskLength && (
     <Typography variant="body2">
         Completed Tasks: {completedTasks}/{taskLength}
     </Typography>
-  ) : (
-    <Typography variant="body2">No task input</Typography>
   );
 
   return (

@@ -373,17 +373,19 @@ export default function WorkflowTable() {
       );
 
       const uniqueTasks = Object.entries(workflows.data.filter(workflow => workflow.status !== 'SCHEDULED').flatMap(workflow => workflow.tasks || [])
-            .reduce((acc: Record<string, Set<string>>, task) => {
-                if (task && task.name) {
-                    if (!acc[task.name]) {
-                        acc[task.name] = new Set<string>();
-                    }
-                    if (task.variant) {
-                        acc[task.name].add(task.variant);
-                    }
-                }
-                return acc;
-            }, {})).filter(([_, variants]) => variants.size > 1).map(([name]) => name)       
+        .reduce((acc: Record<string, Set<string>>, task) => {
+          if (task && task.name) {
+            if (!acc[task.name]) {
+              acc[task.name] = new Set<string>();
+            }
+            if (task.variant) {
+              acc[task.name].add(task.variant);
+            }
+          }
+
+          return acc;
+        }, {})).filter(([_, variants]) => variants.size > 1)
+        .map(([name]) => name);
 
       // Create rows for the table based on the unique parameters we found
       const rows = workflows.data
@@ -431,12 +433,13 @@ export default function WorkflowTable() {
             rating: (() => {
               if (metrics && metrics.length > 0) {
                 const ratingMetric = metrics.find(metric => metric.name === 'rating');
+
                 return ratingMetric?.value ?? 0;
               }
+
               return 0;
             })(),
             status: workflow.status,
-            // rating: 2,
             action: '',
           };
         });
