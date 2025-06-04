@@ -5,6 +5,7 @@ import { useAppSelector } from '../../../../store/store';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SegmentMapChart from './data-exploration-segment-map-chart';
+import HeatMapChart from './data-exploration-new-heatmap-chart';
 
 const MapCardWrapper = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -61,7 +62,7 @@ const MapCardWrapper = () => {
           controlPanel={<MapControls />}
           noPadding={true}
         >
-          <MapChart />
+          <HeatMapChart />
         </ResponsiveCardTable>
       )}
     </>

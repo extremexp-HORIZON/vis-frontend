@@ -79,7 +79,6 @@ const MapChart = () => {
     colorByMap,
     filters,
   ]);
-  logger.log(data);
 
   // Initialize map
   useEffect(() => {

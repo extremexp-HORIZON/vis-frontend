@@ -86,7 +86,7 @@ export interface IDataExploration {
     selectedColumnsMap: string[]
     mapType: string
     weightBy: string
-    radius: string
+    radius: number
 
   }
   chart: {
@@ -176,7 +176,7 @@ export const dataExplorationDefault: IDataExploration = {
     totalPages: 0,
     mapType: 'point',
     weightBy: 'None',
-    radius: 'None',
+    radius: 25,
   },
 
   chart: {

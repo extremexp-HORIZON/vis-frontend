@@ -10,11 +10,15 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  Slider,
+  Typography,
+  createTheme,
 } from '@mui/material';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type{ SelectChangeEvent } from '@mui/material';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import { ThemeProvider } from '@emotion/react';
 const MapControls = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -35,7 +39,7 @@ const MapControls = () => {
   //   tab?.workflowTasks?.dataExploration?.controlPanel.timestampField || '';
   const useHeatmap =
     tab?.workflowTasks?.dataExploration?.controlPanel.heatmap || false;
-  const handleChange = (key: string, value: string | string[] | boolean) => {
+  const handleChange = (key: string, value: string | string[] | boolean | number) => {
     dispatch(setControls({ [key]: value }));
   };
   const timestampField =
@@ -55,6 +59,17 @@ const MapControls = () => {
     handleChange('segmentBy', value);
   };
 
+
+  const theme = createTheme({
+    palette: {
+      primary: { main: "#1976d2" },
+      secondary: { main: "#dc004e" },
+    },
+    typography: {
+      fontFamily: "Arial",
+      h6: { fontWeight: 600 },
+    },
+  })
   return (
     <Box display="flex" flexDirection="column" gap={2}>
       <FormControl size="small">
@@ -114,7 +129,8 @@ const MapControls = () => {
         )}
 
         {mapType === 'heatmap' && (
-          <FormControl  fullWidth>
+          <>
+            <FormControl  fullWidth>
             <InputLabel>Weight By</InputLabel>
             <Select
               value={tab?.workflowTasks?.dataExploration?.controlPanel.weightBy || ''}
@@ -145,6 +161,24 @@ const MapControls = () => {
             </Select>
 
           </FormControl>
+           <FormControl fullWidth>
+           
+            <ThemeProvider theme={theme}>
+
+      <Typography gutterBottom>Radius</Typography>
+          <Slider
+            value={tab?.workflowTasks?.dataExploration?.controlPanel.radius }
+            onChange={(e, newValue) => handleChange('radius', newValue as number)}
+            valueLabelDisplay="auto"
+            
+            min={10}
+            step={1}
+            max={50}
+          />
+        </ThemeProvider>
+    </FormControl>
+          </>
+        
 
         )}
 
