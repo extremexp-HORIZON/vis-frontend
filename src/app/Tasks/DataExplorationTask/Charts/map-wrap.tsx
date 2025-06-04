@@ -12,6 +12,7 @@ const MapCardWrapper = () => {
   const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon;
   const useHeatmap = tab?.workflowTasks.dataExploration?.controlPanel.heatmap;
   // const colorByMap = tab?.workflowTasks.dataExploration?.controlPanel.colorByMap;
+  const mapType = tab?.workflowTasks.dataExploration?.controlPanel.mapType;
   const shouldShowInfoMessage = !lat || !lon ;
   const info = (
     <InfoMessage
@@ -26,15 +27,46 @@ const MapCardWrapper = () => {
   const shouldUseSegmentView = segmentBy?.length > 0 ;
 
   return (
-    <ResponsiveCardTable
+    <>
+    {mapType==="point" && (
+      <ResponsiveCardTable
       title={
-        useHeatmap ?
-          'Map (Heat View)' : shouldUseSegmentView ? 'Map (Segment View)' : 'Map (Point View)'}
+        "point"
+      }
+
       controlPanel={<MapControls />}
       noPadding={true}
     >
-      {shouldShowInfoMessage ? info : shouldUseSegmentView ? <SegmentMapChart /> : <MapChart />}
+       <MapChart />
     </ResponsiveCardTable>
+    )}
+    {mapType==="trajectory" && (
+      <ResponsiveCardTable
+      title={
+        "Trajectory"
+      }
+
+      controlPanel={<MapControls />}
+      noPadding={true}
+    >
+       <SegmentMapChart />
+    </ResponsiveCardTable>
+    )}
+     {mapType==="heatmap" && (
+      <ResponsiveCardTable
+      title={
+        "Heatmap"
+      }
+
+      controlPanel={<MapControls />}
+      noPadding={true}
+    >
+       <MapChart />
+    </ResponsiveCardTable>
+    )}
+    </>
+
+    
   );
 };
 

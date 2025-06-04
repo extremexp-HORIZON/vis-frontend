@@ -9,11 +9,14 @@ import {
   ListItemText,
   FormControlLabel,
   Switch,
+  FormLabel,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type{ SelectChangeEvent } from '@mui/material';
-
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 const MapControls = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -38,6 +41,14 @@ const MapControls = () => {
     dispatch(setControls({ [key]: value }));
   };
 
+  const mapType = tab?.workflowTasks?.dataExploration?.controlPanel.mapType;
+
+  const options = [
+    { value: 'point', label: 'Point Map' },
+    { value: 'heatmap', label: 'Heatmap' },
+    { value: 'trajectory', label: 'Trajectory' },
+  ];
+
   // const handleSegmentByChange = (e: SelectChangeEvent<string[]>) => {
   //   const value = e.target.value;
 
@@ -61,6 +72,24 @@ const MapControls = () => {
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
+ <FormControl size="small">
+     
+          <Box display="flex" alignItems="center" gap={0.5}>
+            <TravelExploreIcon fontSize="small" /> {/* Replace or conditionally render icons if needed */}
+            <span style={{ fontSize: 12 }}>{'Map Type'}</span>
+          </Box>
+        
+      <RadioGroup row aria-labelledby="type-label" name="maptpe" value={mapType} onChange={e => handleChange('mapType', e.target.value)}>
+        {options.map(({ value, label }) => (
+          <FormControlLabel
+            key={value}
+            value={value}
+            control={<Radio size="small" />}
+            label={<span style={{ fontSize: 12 }}>{label}</span>}
+          />
+        ))}
+      </RadioGroup>
+    </FormControl>
       <Box display="flex" gap={2}>
         {/* Latitude Selector */}
         <FormControl fullWidth>

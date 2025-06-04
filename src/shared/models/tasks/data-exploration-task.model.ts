@@ -84,6 +84,7 @@ export interface IDataExploration {
     heatmap: boolean
     tripsMode: boolean
     selectedColumnsMap: string[]
+    mapType: string
 
   }
   chart: {
@@ -171,6 +172,7 @@ export const dataExplorationDefault: IDataExploration = {
     pageSize: 100,
     queryItems: 0,
     totalPages: 0,
+    mapType: 'point'
 
   },
 

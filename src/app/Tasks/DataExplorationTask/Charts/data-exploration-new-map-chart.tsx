@@ -64,7 +64,7 @@ const MapChart = () => {
           datasetId,
           columns: [lat, lon, colorByMap],
           filters,
-          limit: 200,
+          limit: 0,
         },
         metadata: {
           workflowId: tab?.workflowId || '',
