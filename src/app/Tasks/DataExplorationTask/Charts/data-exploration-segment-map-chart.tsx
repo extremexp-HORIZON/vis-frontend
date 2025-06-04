@@ -566,8 +566,6 @@ const SegmentMapChart = () => {
     }
   };
 
-  console.log('selectedKey', selectedKey);
-
   useEffect(() => {
     pathMap.forEach((polyline, key) => {
       polyline.setStyle({

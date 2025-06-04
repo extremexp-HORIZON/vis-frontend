@@ -59,11 +59,8 @@ const WorkflowTaskOverview = () => {
       },
   );
 
-  console.log('Selected Task:', selectedTask);
-
   const task = tab?.workflowConfiguration.tasks?.find(task => task.name === selectedTask?.task);
 
-  console.log('Task Details:', task);
   const parameters = tab?.workflowConfiguration.params?.filter(param => param.task === selectedTask?.taskId);
 
   if (!task) return null;

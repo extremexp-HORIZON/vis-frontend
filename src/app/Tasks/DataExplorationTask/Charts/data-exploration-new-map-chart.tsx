@@ -3,7 +3,6 @@ import 'leaflet/dist/leaflet.css';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
-import { logger } from '../../../../shared/utils/logger';
 import * as L from 'leaflet';
 const COLOR_PALETTE = [
   '#1f77b4', // blue

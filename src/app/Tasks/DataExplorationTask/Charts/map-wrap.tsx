@@ -26,8 +26,6 @@ const MapCardWrapper = () => {
   const timestampError =
     tab?.workflowTasks.dataExploration?.controlPanel.timestampError;
 
-  const weight = tab?.workflowTasks.dataExploration?.controlPanel.weightBy;
-
   const shouldShowInfoMessagePoint = !lat || !lon || colorByMap === 'None';
 
   const shouldShowInfoMessageSegment =

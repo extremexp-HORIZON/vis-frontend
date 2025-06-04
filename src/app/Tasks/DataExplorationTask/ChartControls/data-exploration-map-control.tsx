@@ -29,16 +29,16 @@ const MapControls = () => {
   const stringColumns = selectedColumns.filter(col => col.type === 'STRING');
   const doubleColumns = selectedColumns.filter(col => col.type === 'DOUBLE');
 
-  const lat = tab?.workflowTasks?.dataExploration?.controlPanel.lat ;
-  const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon ;
+  // const lat = tab?.workflowTasks?.dataExploration?.controlPanel.lat ;
+  // const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon ;
   const colorByMap =
     tab?.workflowTasks?.dataExploration?.controlPanel.colorByMap || 'None';
   const segmentBy =
     tab?.workflowTasks?.dataExploration?.controlPanel.segmentBy || [];
   // const timestampField =
   //   tab?.workflowTasks?.dataExploration?.controlPanel.timestampField || '';
-  const useHeatmap =
-    tab?.workflowTasks?.dataExploration?.controlPanel.heatmap || false;
+  // const useHeatmap =
+  //   tab?.workflowTasks?.dataExploration?.controlPanel.heatmap || false;
   const handleChange = (key: string, value: string | string[] | boolean | number) => {
     dispatch(setControls({ [key]: value }));
   };
@@ -207,7 +207,7 @@ const MapControls = () => {
             >
               <InputLabel>Order By</InputLabel>
               <Select
-                value={tab?.workflowTasks?.dataExploration?.controlPanel.timestampField}
+                value={timestampField}
                 onChange={e => handleChange('timestampField', e.target.value as string)}
                 input={<OutlinedInput label="Order By" />}
               >
