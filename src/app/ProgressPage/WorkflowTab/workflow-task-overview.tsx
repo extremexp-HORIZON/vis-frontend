@@ -62,63 +62,61 @@ const WorkflowTaskOverview = () => {
   console.log('Selected Task:', selectedTask);
 
   const task = tab?.workflowConfiguration.tasks?.find(task => task.name === selectedTask?.task);
- console.log('Task Details:', task);
+
+  console.log('Task Details:', task);
   const parameters = tab?.workflowConfiguration.params?.filter(param => param.task === selectedTask?.taskId);
 
   if (!task) return null;
 
   return (
     <>
-    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, width: '100%' }}>
-      <DetailsCard title="Task Metadata">
-        <StatusIndicator completed={!!task.endTime} />
-        {task.startTime && (
-          <DetailsCardItem
-            label="Start time"
-            value={new Date(task.startTime).toLocaleString()}
-          />
-        )}
-        {task.endTime && (
-          <DetailsCardItem
-            label="End time"
-            value={new Date(task.endTime).toLocaleString()}
-          />
-        )}
-        {task.endTime && task.startTime && (
-          <DetailsCardItem
-            label="Duration"
-            value={formatDuration((task.endTime - task.startTime) / 1000)}
-          />
-        )}
-      </DetailsCard>
-
-      <DetailsCard title="Task Parameters">
-        {parameters?.length ? (
-          parameters.map(param => (
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, width: '100%' }}>
+        <DetailsCard title="Task Metadata">
+          <StatusIndicator completed={!!task.endTime} />
+          {task.startTime && (
             <DetailsCardItem
-              key={`param-${param.name}`}
-              label={param.name}
-              value={param.value}
+              label="Start time"
+              value={new Date(task.startTime).toLocaleString()}
             />
-          ))
-        ) : (
-          <EmptyState />
-        )}
-      </DetailsCard>
-    </Box>
-    <Box sx={{ mt: 2 }}>
-      
-     {task.tags?.type === 'interactive'  && task.tags?.URL && task?.endTime===null &&  (
-  <UserInteractiveTask url={task.tags.URL} />
-  )}
-    
-  </Box>
-  
+          )}
+          {task.endTime && (
+            <DetailsCardItem
+              label="End time"
+              value={new Date(task.endTime).toLocaleString()}
+            />
+          )}
+          {task.endTime && task.startTime && (
+            <DetailsCardItem
+              label="Duration"
+              value={formatDuration((task.endTime - task.startTime) / 1000)}
+            />
+          )}
+        </DetailsCard>
 
+        <DetailsCard title="Task Parameters">
+          {parameters?.length ? (
+            parameters.map(param => (
+              <DetailsCardItem
+                key={`param-${param.name}`}
+                label={param.name}
+                value={param.value}
+              />
+            ))
+          ) : (
+            <EmptyState />
+          )}
+        </DetailsCard>
+      </Box>
+      <Box sx={{ mt: 2 }}>
+
+        {task.tags?.type === 'interactive'  && task.tags?.URL && task?.endTime === null &&  (
+          <UserInteractiveTask url={task.tags.URL} />
+        )}
+
+      </Box>
 
     </>
-    
-    
+
   );
 };
 

@@ -387,16 +387,6 @@
 
 // export default SegmentMapChart;
 
-
-
-
-
-
-
-
-
-
-
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -414,9 +404,9 @@ const SegmentMapChart = () => {
   const leafletMapRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const [highlightedPolyline, setHighlightedPolyline] = useState<L.Polyline | null>(null);
-const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-const [markerMap, setMarkerMap] = useState<Map<string, { start: L.CircleMarker, end: L.CircleMarker }>>(new Map());
+  const [markerMap, setMarkerMap] = useState<Map<string, { start: L.CircleMarker, end: L.CircleMarker }>>(new Map());
 
   const { tab } = useAppSelector(state => state.workflowPage);
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;
@@ -427,15 +417,14 @@ const [markerMap, setMarkerMap] = useState<Map<string, { start: L.CircleMarker, 
   const data: Record<string, string | number>[] = Array.isArray(rawData) ? rawData : [];
   const timestampField = 'timestamp';
   const dispatch = useAppDispatch();
-  
 
-  
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map());
   const [pathMap, setPathMap] = useState<Map<string, L.Polyline>>(new Map());
 
   // Fetch data
   useEffect(() => {
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+
     if (!datasetId || !lat || !lon || segmentBy.length === 0) return;
 
     dispatch(fetchDataExplorationData({
@@ -496,19 +485,23 @@ const [markerMap, setMarkerMap] = useState<Map<string, { start: L.CircleMarker, 
           lon: lonVal,
           timestamp: row[timestampField] ? new Date(row[timestampField]).getTime() : undefined,
         };
+
         if (!groups[groupKey]) groups[groupKey] = [];
         groups[groupKey].push(point);
       }
     }
 
-const markerMapTemp = new Map<string, { start: L.CircleMarker, end: L.CircleMarker }>();
+    const markerMapTemp = new Map<string, { start: L.CircleMarker, end: L.CircleMarker }>();
+
     Object.entries(groups).forEach(([key, points]) => {
       const color = colorMap.get(key) || '#000000';
       const sorted = points.sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0));
       const path = sorted.map(p => [p.lat, p.lon] as L.LatLngExpression);
+
       if (!path.length) return;
 
       const polyline = L.polyline(path, { color, weight: 3 }).addTo(layerGroupRef.current!);
+
       polyline.bindTooltip(`
         <div>
           <strong>${segmentBy.join(', ')}: ${key}</strong><br/>
@@ -518,9 +511,10 @@ const markerMapTemp = new Map<string, { start: L.CircleMarker, end: L.CircleMark
       `);
 
       // Start/End markers
-     const startMarker = L.circleMarker(path[0], { radius: 5, color: 'green' }).addTo(layerGroupRef.current!);
-  const endMarker = L.circleMarker(path[path.length - 1], { radius: 5, color: 'red' }).addTo(layerGroupRef.current!);
-  markerMapTemp.set(key, { start: startMarker, end: endMarker });
+      const startMarker = L.circleMarker(path[0], { radius: 5, color: 'green' }).addTo(layerGroupRef.current!);
+      const endMarker = L.circleMarker(path[path.length - 1], { radius: 5, color: 'red' }).addTo(layerGroupRef.current!);
+
+      markerMapTemp.set(key, { start: startMarker, end: endMarker });
       newPathMap.set(key, polyline);
       allPoints.push(...path);
     });
@@ -528,19 +522,19 @@ const markerMapTemp = new Map<string, { start: L.CircleMarker, end: L.CircleMark
     setPathMap(newPathMap);
     setMarkerMap(markerMapTemp);
 
-
     if (allPoints.length) {
       leafletMapRef.current.fitBounds(L.latLngBounds(allPoints), { padding: [30, 30] });
     }
   }, [data, lat, lon, segmentBy, colorMap]);
 
   useEffect(() => {
-  markerMap.forEach((markers, key) => {
-    const visible = !selectedKey || key === selectedKey;
-    markers.start.setStyle({ opacity: visible ? 1 : 0 });
-    markers.end.setStyle({ opacity: visible ? 1 : 0 });
-  });
-}, [selectedKey, markerMap]);
+    markerMap.forEach((markers, key) => {
+      const visible = !selectedKey || key === selectedKey;
+
+      markers.start.setStyle({ opacity: visible ? 1 : 0 });
+      markers.end.setStyle({ opacity: visible ? 1 : 0 });
+    });
+  }, [selectedKey, markerMap]);
   // Fix map resizing
   useEffect(() => {
     setTimeout(() => {
@@ -550,6 +544,7 @@ const markerMapTemp = new Map<string, { start: L.CircleMarker, end: L.CircleMark
 
   const handleLegendHover = (key: string) => {
     const polyline = pathMap.get(key);
+
     if (!polyline) return;
 
     polyline.setStyle({ weight: 6 });
@@ -562,23 +557,24 @@ const markerMapTemp = new Map<string, { start: L.CircleMarker, end: L.CircleMark
   };
 
   const handleLegendClick = (key: string) => {
-      setSelectedKey(prev => (prev === key ? null : key)); // toggle selection
+    setSelectedKey(prev => (prev === key ? null : key)); // toggle selection
 
     const polyline = pathMap.get(key);
+
     if (polyline) {
       leafletMapRef.current?.fitBounds(polyline.getBounds(), { padding: [30, 30] });
     }
   };
 
-  console.log("selectedKey", selectedKey);
+  console.log('selectedKey', selectedKey);
 
   useEffect(() => {
-  pathMap.forEach((polyline, key) => {
-    polyline.setStyle({
-      opacity: selectedKey ? (key === selectedKey ? 1 : 0.1) : 1,
+    pathMap.forEach((polyline, key) => {
+      polyline.setStyle({
+        opacity: selectedKey ? (key === selectedKey ? 1 : 0.1) : 1,
+      });
     });
-  });
-}, [selectedKey, pathMap]);
+  }, [selectedKey, pathMap]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>

@@ -40,21 +40,21 @@ const WorkflowActions = (props: {
   const { currentStatus, workflowId, experimentId } = props;
 
   return (
-    <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
-        <Link
-          to={`/${experimentId}/workflow?workflowId=${workflowId}`}
-        >
-          <IconButton>
-            <Badge color="warning" badgeContent="" variant="dot" invisible={currentStatus !== 'PENDING_INPUT'}>
-              <LaunchIcon
-                style={{
-                  cursor: 'pointer',
-                  color: theme.palette.primary.main,
-                }}
-              />
-            </Badge>
-          </IconButton>
-        </Link>
+    <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <Link
+        to={`/${experimentId}/workflow?workflowId=${workflowId}`}
+      >
+        <IconButton>
+          <Badge color="warning" badgeContent="" variant="dot" invisible={currentStatus !== 'PENDING_INPUT'}>
+            <LaunchIcon
+              style={{
+                cursor: 'pointer',
+                color: theme.palette.primary.main,
+              }}
+            />
+          </Badge>
+        </IconButton>
+      </Link>
       {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && (
         <>
           <IconButton onClick={() => logger.log('Pause clicked')} >
@@ -521,11 +521,11 @@ export default function WorkflowTable() {
     }
   }, [workflows.data]);
 
-const hasVisibleParameterColumns = workflowsTable.visibleColumns.some(
-  (col) =>
-    workflowsTable.uniqueParameters.includes(col.field) &&
+  const hasVisibleParameterColumns = workflowsTable.visibleColumns.some(
+    (col) =>
+      workflowsTable.uniqueParameters.includes(col.field) &&
     workflowsTable.columnsVisibilityModel[col.field] !== false
-);
+  );
 
   return (
     <Box sx={{ height: '100%' }}>

@@ -267,40 +267,40 @@ export default function WorkflowTreeView() {
                           fontSize="small"
                           sx={{ mr: 1, color: theme.palette.primary.main }}
                         />
-                     {(() => {
-        const fullTask = tab.workflowConfiguration.tasks?.find(t => t.id === id);
-        const isInteractiveUnfinished =
+                        {(() => {
+                          const fullTask = tab.workflowConfiguration.tasks?.find(t => t.id === id);
+                          const isInteractiveUnfinished =
           fullTask?.tags?.type === 'interactive' && !fullTask?.endTime;
 
-        return (
-          <Typography
-            sx={{
-              fontWeight: 500,
-              mr: 1,
-              color: isInteractiveUnfinished ? 'orange' : 'inherit',
-            }}
-          >
-            {name}
-          </Typography>
-        );
-      })()}
+                          return (
+                            <Typography
+                              sx={{
+                                fontWeight: 500,
+                                mr: 1,
+                                color: isInteractiveUnfinished ? 'orange' : 'inherit',
+                              }}
+                            >
+                              {name}
+                            </Typography>
+                          );
+                        })()}
 
-      {taskVariants[name] && taskVariants[name] !== name && (() => {
-  const fullTask = tab.workflowConfiguration.tasks?.find(t => t.id === id);
-  const isInteractiveUnfinished =
+                        {taskVariants[name] && taskVariants[name] !== name && (() => {
+                          const fullTask = tab.workflowConfiguration.tasks?.find(t => t.id === id);
+                          const isInteractiveUnfinished =
     fullTask?.tags?.type === 'interactive' && fullTask?.endTime == null;
 
-  return (
-    <Typography
-      sx={{
-        fontWeight: 500,
-        color: isInteractiveUnfinished ? 'orange' : theme.palette.primary.main,
-      }}
-    >
-      {`[${taskVariants[name]}]`}
-    </Typography>
-  );
-})()}
+                          return (
+                            <Typography
+                              sx={{
+                                fontWeight: 500,
+                                color: isInteractiveUnfinished ? 'orange' : theme.palette.primary.main,
+                              }}
+                            >
+                              {`[${taskVariants[name]}]`}
+                            </Typography>
+                          );
+                        })()}
                       </Box>
                     </Box>
                   }

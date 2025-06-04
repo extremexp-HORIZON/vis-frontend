@@ -28,45 +28,44 @@ const MapCardWrapper = () => {
 
   return (
     <>
-    {mapType==="point" && (
-      <ResponsiveCardTable
-      title={
-        "point"
-      }
+      {mapType === 'point' && (
+        <ResponsiveCardTable
+          title={
+            'point'
+          }
 
-      controlPanel={<MapControls />}
-      noPadding={true}
-    >
-       <MapChart />
-    </ResponsiveCardTable>
-    )}
-    {mapType==="trajectory" && (
-      <ResponsiveCardTable
-      title={
-        "Trajectory"
-      }
+          controlPanel={<MapControls />}
+          noPadding={true}
+        >
+          <MapChart />
+        </ResponsiveCardTable>
+      )}
+      {mapType === 'trajectory' && (
+        <ResponsiveCardTable
+          title={
+            'Trajectory'
+          }
 
-      controlPanel={<MapControls />}
-      noPadding={true}
-    >
-       <SegmentMapChart />
-    </ResponsiveCardTable>
-    )}
-     {mapType==="heatmap" && (
-      <ResponsiveCardTable
-      title={
-        "Heatmap"
-      }
+          controlPanel={<MapControls />}
+          noPadding={true}
+        >
+          <SegmentMapChart />
+        </ResponsiveCardTable>
+      )}
+      {mapType === 'heatmap' && (
+        <ResponsiveCardTable
+          title={
+            'Heatmap'
+          }
 
-      controlPanel={<MapControls />}
-      noPadding={true}
-    >
-       <MapChart />
-    </ResponsiveCardTable>
-    )}
+          controlPanel={<MapControls />}
+          noPadding={true}
+        >
+          <MapChart />
+        </ResponsiveCardTable>
+      )}
     </>
 
-    
   );
 };
 

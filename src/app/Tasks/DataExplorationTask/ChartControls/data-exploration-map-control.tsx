@@ -72,24 +72,24 @@ const MapControls = () => {
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
- <FormControl size="small">
-     
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <TravelExploreIcon fontSize="small" /> {/* Replace or conditionally render icons if needed */}
-            <span style={{ fontSize: 12 }}>{'Map Type'}</span>
-          </Box>
-        
-      <RadioGroup row aria-labelledby="type-label" name="maptpe" value={mapType} onChange={e => handleChange('mapType', e.target.value)}>
-        {options.map(({ value, label }) => (
-          <FormControlLabel
-            key={value}
-            value={value}
-            control={<Radio size="small" />}
-            label={<span style={{ fontSize: 12 }}>{label}</span>}
-          />
-        ))}
-      </RadioGroup>
-    </FormControl>
+      <FormControl size="small">
+
+        <Box display="flex" alignItems="center" gap={0.5}>
+          <TravelExploreIcon fontSize="small" /> {/* Replace or conditionally render icons if needed */}
+          <span style={{ fontSize: 12 }}>{'Map Type'}</span>
+        </Box>
+
+        <RadioGroup row aria-labelledby="type-label" name="maptpe" value={mapType} onChange={e => handleChange('mapType', e.target.value)}>
+          {options.map(({ value, label }) => (
+            <FormControlLabel
+              key={value}
+              value={value}
+              control={<Radio size="small" />}
+              label={<span style={{ fontSize: 12 }}>{label}</span>}
+            />
+          ))}
+        </RadioGroup>
+      </FormControl>
       <Box display="flex" gap={2}>
         {/* Latitude Selector */}
         <FormControl fullWidth>
