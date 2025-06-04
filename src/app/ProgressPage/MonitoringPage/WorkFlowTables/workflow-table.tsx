@@ -40,21 +40,21 @@ const WorkflowActions = (props: {
   const { currentStatus, workflowId, experimentId } = props;
 
   return (
-    <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-      <Badge color="secondary" badgeContent="" variant="dot" invisible={currentStatus !== 'pending_input'}>
+    <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
         <Link
           to={`/${experimentId}/workflow?workflowId=${workflowId}`}
         >
           <IconButton>
-            <LaunchIcon
-              style={{
-                cursor: 'pointer',
-                color: theme.palette.primary.main,
-              }}
-            />
+            <Badge color="warning" badgeContent="" variant="dot" invisible={currentStatus !== 'PENDING_INPUT'}>
+              <LaunchIcon
+                style={{
+                  cursor: 'pointer',
+                  color: theme.palette.primary.main,
+                }}
+              />
+            </Badge>
           </IconButton>
         </Link>
-      </Badge>
       {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && (
         <>
           <IconButton onClick={() => logger.log('Pause clicked')} >
