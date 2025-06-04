@@ -85,6 +85,8 @@ export interface IDataExploration {
     tripsMode: boolean
     selectedColumnsMap: string[]
     mapType: string
+    weightBy: string
+    radius: string
 
   }
   chart: {
@@ -158,8 +160,8 @@ export const dataExplorationDefault: IDataExploration = {
     tripsMode: false,
     selectedColumnsMap: [],
     selectedDataset: '',
-    lat: '',
-    lon: '',
+    lat: 'latitude',
+    lon: 'longitude',
     umap: false,
     segmentBy: [],
     timestampField: null,
@@ -172,8 +174,9 @@ export const dataExplorationDefault: IDataExploration = {
     pageSize: 100,
     queryItems: 0,
     totalPages: 0,
-    mapType: 'point'
-
+    mapType: 'point',
+    weightBy: 'None',
+    radius: 'None',
   },
 
   chart: {
