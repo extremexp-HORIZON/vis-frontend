@@ -100,11 +100,7 @@ const MapControls = () => {
                 const value = e.target.value;
 
                 handleChange('colorByMap', value);
-
-                // If colorByMap is set to something other than 'None', reset segmentBy
-                if (value !== 'None') {
-                  handleChange('segmentBy', []);
-                }
+               
               }}
               input={<OutlinedInput label="Color By" />}
               MenuProps={{
