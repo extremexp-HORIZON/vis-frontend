@@ -29,8 +29,8 @@ const MapControls = () => {
   const stringColumns = selectedColumns.filter(col => col.type === 'STRING');
   const doubleColumns = selectedColumns.filter(col => col.type === 'DOUBLE');
 
-  // const lat = tab?.workflowTasks?.dataExploration?.controlPanel.lat ;
-  // const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon ;
+  const lat = tab?.workflowTasks?.dataExploration?.controlPanel.lat ;
+  const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon ;
   const colorByMap =
     tab?.workflowTasks?.dataExploration?.controlPanel.colorByMap || 'None';
   const segmentBy =
@@ -88,6 +88,53 @@ const MapControls = () => {
           ))}
         </RadioGroup>
       </FormControl>
+       {/* <Box display="flex" gap={2}>
+        <FormControl fullWidth>
+          <InputLabel>Latitude</InputLabel>
+          <Select
+            value={lat}
+            onChange={e => handleChange('lat', e.target.value)}
+            input={<OutlinedInput label="Latitude" />}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 250,
+                  maxWidth: 300,
+                },
+              },
+            }}
+          >
+            {doubleColumns.map(col => (
+              <MenuItem key={col.name} value={col.name}>
+                {col.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel>Longitude</InputLabel>
+          <Select
+            value={lon}
+            onChange={e => handleChange('lon', e.target.value)}
+            input={<OutlinedInput label="Longitude" />}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 250,
+                  maxWidth: 300,
+                },
+              },
+            }}
+          >
+            {doubleColumns.map(col => (
+              <MenuItem key={col.name} value={col.name}>
+                {col.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box> */}
 
       <Box display="flex" gap={2}>
         {/* Color By Selector */}
