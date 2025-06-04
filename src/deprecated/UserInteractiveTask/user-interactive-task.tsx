@@ -1,7 +1,4 @@
-import Box from "@mui/material/Box"
-import grey from "@mui/material/colors/grey"
-import Grid from "@mui/material/Grid"
-import Typography from "@mui/material/Typography"
+
 import ResponsiveCardTable from "../../shared/components/responsive-card-table"
 
 interface UserInteractiveTaskProps {
