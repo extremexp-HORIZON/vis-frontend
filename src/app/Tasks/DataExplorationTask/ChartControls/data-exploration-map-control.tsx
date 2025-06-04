@@ -59,23 +59,23 @@ const MapControls = () => {
     handleChange('segmentBy', value);
   };
 
-
   const theme = createTheme({
     palette: {
-      primary: { main: "#1976d2" },
-      secondary: { main: "#dc004e" },
+      primary: { main: '#1976d2' },
+      secondary: { main: '#dc004e' },
     },
     typography: {
-      fontFamily: "Arial",
+      fontFamily: 'Arial',
       h6: { fontWeight: 600 },
     },
-  })
+  });
+
   return (
     <Box display="flex" flexDirection="column" gap={2}>
       <FormControl size="small">
         <Box display="flex" alignItems="center" gap={0.5}>
           <TravelExploreIcon fontSize="small" /> {/* Replace or conditionally render icons if needed */}
-          <span style={{ fontSize: 14,fontWeight: 600 }}>{'Map Type'}</span>
+          <span style={{ fontSize: 14, fontWeight: 600 }}>{'Map Type'}</span>
         </Box>
         <RadioGroup row aria-labelledby="type-label" name="maptpe" value={mapType} onChange={e => handleChange('mapType', e.target.value)}>
           {options.map(({ value, label }) => (
@@ -100,7 +100,7 @@ const MapControls = () => {
                 const value = e.target.value;
 
                 handleChange('colorByMap', value);
-               
+
               }}
               input={<OutlinedInput label="Color By" />}
               MenuProps={{
@@ -127,54 +127,53 @@ const MapControls = () => {
         {mapType === 'heatmap' && (
           <>
             <FormControl  fullWidth>
-            <InputLabel>Weight By</InputLabel>
-            <Select
-              value={tab?.workflowTasks?.dataExploration?.controlPanel.weightBy || ''}
-              onChange={e => {
-                const value = e.target.value;
+              <InputLabel>Weight By</InputLabel>
+              <Select
+                value={tab?.workflowTasks?.dataExploration?.controlPanel.weightBy || ''}
+                onChange={e => {
+                  const value = e.target.value;
 
-                handleChange('weightBy', value);
+                  handleChange('weightBy', value);
 
-                // If colorByMap is set to something other than 'None', reset segmentBy
+                  // If colorByMap is set to something other than 'None', reset segmentBy
 
-              }}
-              input={<OutlinedInput label="Weight By" />}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
+                }}
+                input={<OutlinedInput label="Weight By" />}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 250,
+                      maxWidth: 300,
+                    },
                   },
-                },
-              }}
-            >
-              <MenuItem value="None">None</MenuItem>
-              {doubleColumns.map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-            </Select>
+                }}
+              >
+                <MenuItem value="None">None</MenuItem>
+                {doubleColumns.map(col => (
+                  <MenuItem key={col.name} value={col.name}>
+                    {col.name}
+                  </MenuItem>
+                ))}
+              </Select>
 
-          </FormControl>
-           <FormControl fullWidth>
-           
-            <ThemeProvider theme={theme}>
+            </FormControl>
+            <FormControl fullWidth>
 
-      <Typography gutterBottom>Radius</Typography>
-          <Slider
-            value={tab?.workflowTasks?.dataExploration?.controlPanel.radius }
-            onChange={(e, newValue) => handleChange('radius', newValue as number)}
-            valueLabelDisplay="auto"
-            
-            min={10}
-            step={1}
-            max={50}
-          />
-        </ThemeProvider>
-    </FormControl>
+              <ThemeProvider theme={theme}>
+
+                <Typography gutterBottom>Radius</Typography>
+                <Slider
+                  value={tab?.workflowTasks?.dataExploration?.controlPanel.radius }
+                  onChange={(e, newValue) => handleChange('radius', newValue as number)}
+                  valueLabelDisplay="auto"
+
+                  min={10}
+                  step={1}
+                  max={50}
+                />
+              </ThemeProvider>
+            </FormControl>
           </>
-        
 
         )}
 

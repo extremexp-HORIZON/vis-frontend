@@ -134,9 +134,8 @@ const MapChart = () => {
       return;
 
     if (markerLayerRef.current) markerLayerRef.current.clearLayers();
-   
 
-     if (Array.isArray(data)) {
+    if (Array.isArray(data)) {
       // Marker rendering as before
       data.forEach((row: Record<string, string | number>) => {
         const latVal = parseFloat(String(row[lat]));

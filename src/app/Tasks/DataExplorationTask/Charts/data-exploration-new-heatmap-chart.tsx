@@ -29,9 +29,9 @@ const HeatMapChart = () => {
 
     if (!datasetId || !lat || !lon) return;
 
-   const columns = [lat, lon];
-  if (weightBy && weightBy !== 'None') columns.push(weightBy); // ✅ only if valid
+    const columns = [lat, lon];
 
+    if (weightBy && weightBy !== 'None') columns.push(weightBy); // ✅ only if valid
 
     dispatch(
       fetchDataExplorationData({
@@ -85,14 +85,14 @@ const HeatMapChart = () => {
             ? parseFloat(String(row[weightBy]))
             : 0.5;
 
-        const isValid =
+          const isValid =
           !isNaN(latVal) &&
           !isNaN(lonVal) &&
           (!weightBy || weightBy === 'None' || !isNaN(weightVal));
 
-        return isValid ? [latVal, lonVal, weightVal] : null;
-      })
-      .filter((entry): entry is [number, number, number] => entry !== null);
+          return isValid ? [latVal, lonVal, weightVal] : null;
+        })
+        .filter((entry): entry is [number, number, number] => entry !== null);
 
       heatLayerRef.current = L.heatLayer(heatData, {
         radius: radius,
@@ -105,6 +105,7 @@ const HeatMapChart = () => {
 
     // Clean up any existing legends
     const existingLegend = document.querySelector('.leaflet-legend');
+
     if (existingLegend) existingLegend.remove();
   }, [data, lat, lon, filters, radius, weightBy]);
 
