@@ -3,7 +3,7 @@ import { CheckCircle as CheckCircleIcon, WarningAmberRounded as WarningAmberRoun
 import type { RootState } from '../../../store/store';
 import { useAppSelector } from '../../../store/store';
 import { DetailsCard, DetailsCardItem } from '../../../shared/components/details-card';
-
+import UserInteractiveTask from '../../../deprecated/UserInteractiveTask/user-interactive-task';
 const StatusIndicator = ({ completed }: {completed: boolean}) => (
   <Box
     sx={{
@@ -59,12 +59,16 @@ const WorkflowTaskOverview = () => {
       },
   );
 
+  console.log('Selected Task:', selectedTask);
+
   const task = tab?.workflowConfiguration.tasks?.find(task => task.name === selectedTask?.task);
+ console.log('Task Details:', task);
   const parameters = tab?.workflowConfiguration.params?.filter(param => param.task === selectedTask?.taskId);
 
   if (!task) return null;
 
   return (
+    <>
     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, width: '100%' }}>
       <DetailsCard title="Task Metadata">
         <StatusIndicator completed={!!task.endTime} />
@@ -102,6 +106,19 @@ const WorkflowTaskOverview = () => {
         )}
       </DetailsCard>
     </Box>
+    <Box sx={{ mt: 2 }}>
+      
+     {task.tags?.type === 'interactive'  && task.tags?.URL && task?.endTime===null &&  (
+  <UserInteractiveTask url={task.tags.URL} />
+  )}
+    
+  </Box>
+  
+
+
+    </>
+    
+    
   );
 };
 
