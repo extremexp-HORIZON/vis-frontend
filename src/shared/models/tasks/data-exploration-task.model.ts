@@ -57,6 +57,7 @@ export interface IDataExploration {
     queryItems: number
     totalPages: number
     timestampField: string | null
+    timestampError: boolean
 
     // Line
     xAxis: VisualColumn
@@ -177,6 +178,7 @@ export const dataExplorationDefault: IDataExploration = {
     mapType: 'point',
     weightBy: 'None',
     radius: 25,
+    timestampError: false,
   },
 
   chart: {

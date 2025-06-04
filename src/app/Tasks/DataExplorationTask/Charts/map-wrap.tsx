@@ -23,14 +23,17 @@ const MapCardWrapper = () => {
   const timestampField =
     tab?.workflowTasks.dataExploration?.controlPanel.timestampField
 
+    const timestampError =
+    tab?.workflowTasks.dataExploration?.controlPanel.timestampError
+
   const weight = tab?.workflowTasks.dataExploration?.controlPanel.weightBy
 
   const shouldShowInfoMessagePoint = !lat || !lon || colorByMap === "None"
 
   const shouldShowInfoMessageSegment =
-    !lat || !lon || segmentBy.length === 0 || timestampField === null
+    !lat || !lon || segmentBy.length === 0 || timestampField === null || timestampError
 
-  const shouldShowInfoMessageHeatmap = !lat || !lon || weight === "None"
+  const shouldShowInfoMessageHeatmap = !lat || !lon 
 
   const infoPoint = (
     <InfoMessage
@@ -72,7 +75,7 @@ const MapCardWrapper = () => {
       )}
       {mapType === "trajectory" && (
         <ResponsiveCardTable
-          title={"Trajectory"}
+          title={"Trajectory Map"}
           controlPanel={<MapControls />}
           noPadding={true}
         >
