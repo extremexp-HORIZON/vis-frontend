@@ -5,7 +5,6 @@ import { fetchDataExplorationData } from '../../../../store/slices/dataExplorati
 import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import { logger } from '../../../../shared/utils/logger';
 import * as L from 'leaflet';
-import 'leaflet.heat';
 const COLOR_PALETTE = [
   '#1f77b4', // blue
   '#ff7f0e', // orange
@@ -18,7 +17,6 @@ const MapChart = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
-  const heatLayerRef = useRef<L.Layer | null>(null);
   const isNumericField = (values: string[]): boolean => {
     return values.every(v => !isNaN(parseFloat(v)));
   };
@@ -39,7 +37,6 @@ const MapChart = () => {
 
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;
   const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon;
-  const useHeatmap = tab?.workflowTasks.dataExploration?.controlPanel.heatmap;
   const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
   const rawData = tab?.workflowTasks.dataExploration?.mapChart.data?.data;
   const data: Record<string, string | number>[] = Array.isArray(rawData) ? rawData : [];
@@ -137,28 +134,9 @@ const MapChart = () => {
       return;
 
     if (markerLayerRef.current) markerLayerRef.current.clearLayers();
-    if (heatLayerRef.current) {
-      heatLayerRef.current.remove();
-      heatLayerRef.current = null;
-    }
+   
 
-    if (useHeatmap && Array.isArray(data)) {
-      const heatData: [number, number, number][] = data
-        .map((row) => {
-          const latVal = parseFloat(String(row[lat]));
-          const lonVal = parseFloat(String(row[lon]));
-
-          return !isNaN(latVal) && !isNaN(lonVal) ? [latVal, lonVal, 0.5] : null;
-        })
-        .filter((entry): entry is [number, number, number] => entry !== null);
-
-      heatLayerRef.current = L.heatLayer(heatData, {
-        radius: 25,
-        blur: 15,
-        maxZoom: 17,
-      });
-      if (heatLayerRef.current) heatLayerRef.current.addTo(leafletMapRef.current!);
-    } else if (Array.isArray(data)) {
+     if (Array.isArray(data)) {
       // Marker rendering as before
       data.forEach((row: Record<string, string | number>) => {
         const latVal = parseFloat(String(row[lat]));
@@ -200,7 +178,7 @@ const MapChart = () => {
     const existingLegend = document.querySelector('.leaflet-legend');
 
     if (existingLegend) existingLegend.remove();
-    if (!useHeatmap && Array.isArray(data) && data.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
       const LegendControl = L.Control.extend({
         onAdd: function () {
           const div = L.DomUtil.create('div', 'leaflet-legend');
@@ -263,7 +241,7 @@ const MapChart = () => {
 
       leafletMapRef.current.setView([avgLat, avgLon], 16);
     }
-  }, [data, lat, lon, colorMap, useHeatmap, filters]);
+  }, [data, lat, lon, colorMap, filters]);
   useEffect(() => {
     setTimeout(() => {
       leafletMapRef.current?.invalidateSize();
