@@ -88,7 +88,7 @@ const MapControls = () => {
           ))}
         </RadioGroup>
       </FormControl>
-       {/* <Box display="flex" gap={2}>
+      {/* <Box display="flex" gap={2}>
         <FormControl fullWidth>
           <InputLabel>Latitude</InputLabel>
           <Select
@@ -161,17 +161,17 @@ const MapControls = () => {
             >
               <MenuItem value="None">None</MenuItem>
               {selectedColumns
-        .filter(
-          col =>
-            col.name !== lat &&
+                .filter(
+                  col =>
+                    col.name !== lat &&
             col.name !== lon &&
           !timestampField?.includes(col.name)
-        )
-        .map(col => (
-          <MenuItem key={col.name} value={col.name}>
-            {col.name}
-          </MenuItem>
-        ))}
+                )
+                .map(col => (
+                  <MenuItem key={col.name} value={col.name}>
+                    {col.name}
+                  </MenuItem>
+                ))}
             </Select>
 
           </FormControl>
