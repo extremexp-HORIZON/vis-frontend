@@ -143,7 +143,7 @@ const MapChart = () => {
           let color = '#000000'; // default to black
 
           if (colorByMap && colorByMap !== 'None') {
-            const category = row[colorByMap];
+            // const category = row[colorByMap];
             const colorValue = row[colorByMap];
 
             if (isNumericField(data.map(r => String(r[colorByMap])))) {
