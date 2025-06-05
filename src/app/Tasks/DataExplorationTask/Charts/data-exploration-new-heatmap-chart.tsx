@@ -58,27 +58,27 @@ const HeatMapChart = () => {
 
   // Initialize map
   useEffect(() => {
-  if (!mapRef.current || leafletMapRef.current || !lat || !lon || data.length === 0) return;
+    if (!mapRef.current || leafletMapRef.current || !lat || !lon || data.length === 0) return;
 
-  const coords = data
-    .map((row) => {
-      const latVal = parseFloat(String(row[lat]));
-      const lonVal = parseFloat(String(row[lon]));
-      return !isNaN(latVal) && !isNaN(lonVal) ? [latVal, lonVal] : null;
-    })
-    .filter((entry): entry is [number, number] => entry !== null);
+    const coords = data
+      .map((row) => {
+        const latVal = parseFloat(String(row[lat]));
+        const lonVal = parseFloat(String(row[lon]));
 
-  if (coords.length === 0) return;
+        return !isNaN(latVal) && !isNaN(lonVal) ? [latVal, lonVal] : null;
+      })
+      .filter((entry): entry is [number, number] => entry !== null);
 
-  const avgLat = coords.reduce((sum, [lat]) => sum + lat, 0) / coords.length;
-  const avgLon = coords.reduce((sum, [, lon]) => sum + lon, 0) / coords.length;
+    if (coords.length === 0) return;
 
-  leafletMapRef.current = L.map(mapRef.current).setView([avgLat, avgLon], 16);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
-    leafletMapRef.current,
-  );
-}, [lat, lon, data]);
+    const avgLat = coords.reduce((sum, [lat]) => sum + lat, 0) / coords.length;
+    const avgLon = coords.reduce((sum, [, lon]) => sum + lon, 0) / coords.length;
 
+    leafletMapRef.current = L.map(mapRef.current).setView([avgLat, avgLon], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
+      leafletMapRef.current,
+    );
+  }, [lat, lon, data]);
 
   // Update heatmap layer
   useEffect(() => {
@@ -122,26 +122,29 @@ const HeatMapChart = () => {
 
     if (existingLegend) existingLegend.remove();
     const LegendControl = L.Control.extend({
-  onAdd: function () {
-    const div = L.DomUtil.create('div', 'leaflet-legend');
-    div.style.background = 'white';
-    div.style.padding = '8px';
-    div.style.borderRadius = '8px';
-    div.style.boxShadow = '0 0 6px rgba(0,0,0,0.3)';
-    div.style.fontSize = '12px';
-    div.innerHTML = `
+      onAdd: function () {
+        const div = L.DomUtil.create('div', 'leaflet-legend');
+
+        div.style.background = 'white';
+        div.style.padding = '8px';
+        div.style.borderRadius = '8px';
+        div.style.boxShadow = '0 0 6px rgba(0,0,0,0.3)';
+        div.style.fontSize = '12px';
+        div.innerHTML = `
       <div><b>Weight by:</b> ${weightBy || 'None'}</div>
       <div><b>Radius:</b> ${radius || 'Default'}</div>
     `;
-    return div;
-  },
-  onRemove: function () {
-    // Optional cleanup if needed
-  },
-});
 
-const legendControl = new LegendControl({ position: 'topright' });
-legendControl.addTo(leafletMapRef.current!);
+        return div;
+      },
+      onRemove: function () {
+        // Optional cleanup if needed
+      },
+    });
+
+    const legendControl = new LegendControl({ position: 'topright' });
+
+    legendControl.addTo(leafletMapRef.current!);
   }, [data, lat, lon, filters, radius, weightBy]);
 
   useEffect(() => {

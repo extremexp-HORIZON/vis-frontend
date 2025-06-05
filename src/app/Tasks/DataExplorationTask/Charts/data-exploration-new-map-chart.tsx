@@ -42,43 +42,42 @@ const MapChart = () => {
   const colorByMap = tab?.workflowTasks.dataExploration?.controlPanel.colorByMap;
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map());
 
-
   // Fetch data
   useEffect(() => {
-  const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-  const datasetId =
+    const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
+    const datasetId =
     tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
-  if (!datasetId || !lat || !lon) return;
+    if (!datasetId || !lat || !lon) return;
 
-  const columns = [lat, lon];
-  if (colorByMap && colorByMap !== 'None') {
-    columns.push(colorByMap);
-  }
+    const columns = [lat, lon];
 
-  dispatch(
-    fetchDataExplorationData({
-      query: {
-        ...defaultDataExplorationQuery,
-        datasetId,
-        columns,
-        filters,
-        limit: 0,
-      },
-      metadata: {
-        workflowId: tab?.workflowId || '',
-        queryCase: 'mapChart',
-      },
-    }),
-  );
-}, [
-  lat,
-  lon,
-  tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
-  colorByMap,
-  filters,
-]);
+    if (colorByMap && colorByMap !== 'None') {
+      columns.push(colorByMap);
+    }
 
+    dispatch(
+      fetchDataExplorationData({
+        query: {
+          ...defaultDataExplorationQuery,
+          datasetId,
+          columns,
+          filters,
+          limit: 0,
+        },
+        metadata: {
+          workflowId: tab?.workflowId || '',
+          queryCase: 'mapChart',
+        },
+      }),
+    );
+  }, [
+    lat,
+    lon,
+    tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
+    colorByMap,
+    filters,
+  ]);
 
   // Initialize map
   useEffect(() => {
@@ -86,7 +85,7 @@ const MapChart = () => {
       !mapRef.current ||
       leafletMapRef.current ||
       !lat ||
-      !lon 
+      !lon
     )
       return;
 
@@ -102,7 +101,7 @@ const MapChart = () => {
     if (
       !Array.isArray(data) ||
       !data.length ||
-      !colorByMap 
+      !colorByMap
     )
       return;
 
@@ -129,55 +128,56 @@ const MapChart = () => {
       !lat ||
       !lon ||
       !markerLayerRef.current ||
-      !colorMap 
+      !colorMap
     )
       return;
 
     if (markerLayerRef.current) markerLayerRef.current.clearLayers();
 
-   if (Array.isArray(data)) {
-  data.forEach((row: Record<string, string | number>) => {
-    const latVal = parseFloat(String(row[lat]));
-    const lonVal = parseFloat(String(row[lon]));
+    if (Array.isArray(data)) {
+      data.forEach((row: Record<string, string | number>) => {
+        const latVal = parseFloat(String(row[lat]));
+        const lonVal = parseFloat(String(row[lon]));
 
-    if (!isNaN(latVal) && !isNaN(lonVal)) {
-      let color = '#000000'; // default to black
+        if (!isNaN(latVal) && !isNaN(lonVal)) {
+          let color = '#000000'; // default to black
 
-      if (colorByMap && colorByMap !== 'None') {
-        const category = row[colorByMap];
-        const colorValue = row[colorByMap];
+          if (colorByMap && colorByMap !== 'None') {
+            const category = row[colorByMap];
+            const colorValue = row[colorByMap];
 
-        if (isNumericField(data.map(r => String(r[colorByMap])))) {
-          const values = data.map(r => parseFloat(String(r[colorByMap])));
-          const min = Math.min(...values);
-          const max = Math.max(...values);
-          const numericVal = parseFloat(String(colorValue));
-          color = getColorForValue(numericVal, min, max);
-        } else {
-          color = colorMap.get(String(colorValue)) || '#000000';
+            if (isNumericField(data.map(r => String(r[colorByMap])))) {
+              const values = data.map(r => parseFloat(String(r[colorByMap])));
+              const min = Math.min(...values);
+              const max = Math.max(...values);
+              const numericVal = parseFloat(String(colorValue));
+
+              color = getColorForValue(numericVal, min, max);
+            } else {
+              color = colorMap.get(String(colorValue)) || '#000000';
+            }
+          }
+
+          L.marker([latVal, lonVal], {
+            icon: L.divIcon({
+              className: '',
+              html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
+              iconSize: [12, 12],
+              iconAnchor: [6, 6],
+            }),
+          })
+            .bindTooltip(
+              `Lat: ${latVal.toFixed(5)}, Lon: ${lonVal.toFixed(5)}${
+                colorByMap && colorByMap !== 'None'
+                  ? `<br/>${colorByMap}: ${row[colorByMap]}`
+                  : ''
+              }`,
+              { permanent: false, direction: 'top' },
+            )
+            .addTo(markerLayerRef.current!);
         }
-      }
-
-      L.marker([latVal, lonVal], {
-        icon: L.divIcon({
-          className: '',
-          html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
-          iconSize: [12, 12],
-          iconAnchor: [6, 6],
-        }),
-      })
-        .bindTooltip(
-          `Lat: ${latVal.toFixed(5)}, Lon: ${lonVal.toFixed(5)}${
-            colorByMap && colorByMap !== 'None'
-              ? `<br/>${colorByMap}: ${row[colorByMap]}`
-              : ''
-          }`,
-          { permanent: false, direction: 'top' },
-        )
-        .addTo(markerLayerRef.current!);
+      });
     }
-  });
-}
 
     // Remove existing legend if it exists
     const existingLegend = document.querySelector('.leaflet-legend');
@@ -185,30 +185,31 @@ const MapChart = () => {
     if (existingLegend) existingLegend.remove();
     if (colorByMap && colorByMap !== 'None') {
 
-    if (Array.isArray(data) && data.length > 0) {
-      const LegendControl = L.Control.extend({
-        onAdd: function () {
-          const div = L.DomUtil.create('div', 'leaflet-legend');
+      if (Array.isArray(data) && data.length > 0) {
+        const LegendControl = L.Control.extend({
+          onAdd: function () {
+            const div = L.DomUtil.create('div', 'leaflet-legend');
 
-          div.style.background = 'lightgray';
-          div.style.padding = '8px';
-          div.style.borderRadius = '4px';
-          div.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)';
-          div.innerHTML = `<div style="text-align: center;"><strong>${colorByMap}</strong></div><br/>`;
+            div.style.background = 'lightgray';
+            div.style.padding = '8px';
+            div.style.borderRadius = '4px';
+            div.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)';
+            div.innerHTML = `<div style="text-align: center;"><strong>${colorByMap}</strong></div><br/>`;
 
-          const isNumeric = isNumericField(data.map(r => String(r[colorByMap || ''])));
+            const isNumeric = isNumericField(data.map(r => String(r[colorByMap || ''])));
 
-          if (isNumeric) {
-            const values = data.map(r => parseFloat(String(r[colorByMap || ''])));
-            const min = Math.min(...values);
-            const max = Math.max(...values);
-             if (min === max) {
-    div.innerHTML += `
+            if (isNumeric) {
+              const values = data.map(r => parseFloat(String(r[colorByMap || ''])));
+              const min = Math.min(...values);
+              const max = Math.max(...values);
+
+              if (min === max) {
+                div.innerHTML += `
       <div style="color: gray; font-size: 12px;">Unique value: ${min.toFixed(2)}</div>
     `;
-  } else {
+              } else {
 
-            div.innerHTML += `
+                div.innerHTML += `
             <div style="width: 200px;">
               <div style="background: linear-gradient(to right, hsl(72, 100%, 50%), hsl(0, 100%, 50%)); height: 12px; margin-bottom: 4px;"></div>
               <div style="display: flex; justify-content: space-between; font-size: 12px;">
@@ -217,27 +218,28 @@ const MapChart = () => {
               </div>
             </div>
           `;
-          }} else {
-            Array.from(colorMap.entries()).slice(0, 10)
-              .forEach(([category, color]) => {
-                div.innerHTML += `
+              }
+            } else {
+              Array.from(colorMap.entries()).slice(0, 10)
+                .forEach(([category, color]) => {
+                  div.innerHTML += `
               <div style="display: flex; align-items: center; margin-bottom: 4px;">
                 <div style="width: 12px; height: 12px; background:${color}; border-radius: 50%; margin-right: 6px;"></div>
                 ${category}
               </div>
             `;
-              });
+                });
+            }
+
+            return div;
           }
+        });
 
-          return div;
-        }
-      });
+        const legend = new LegendControl({ position: 'topright' });
 
-      const legend = new LegendControl({ position: 'topright' });
-
-      legend.addTo(leafletMapRef.current!);
+        legend.addTo(leafletMapRef.current!);
+      }
     }
-  }
     // Optionally pan to average center
     if (Array.isArray(data) && data.length) {
       const avgLat =
