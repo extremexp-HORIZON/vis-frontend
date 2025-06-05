@@ -415,7 +415,7 @@ const SegmentMapChart = () => {
   const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
   const rawData = tab?.workflowTasks.dataExploration?.mapChart.data?.data;
   const data: Record<string, string | number>[] = Array.isArray(rawData) ? rawData : [];
-  const timestampField = 'timestamp';
+  const orderBy = tab?.workflowTasks.dataExploration?.controlPanel.orderBy ;
   const dispatch = useAppDispatch();
 
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map());
@@ -425,13 +425,13 @@ const SegmentMapChart = () => {
   useEffect(() => {
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
-    if (!datasetId || !lat || !lon || segmentBy.length === 0) return;
+    if (!datasetId || !lat || !lon || segmentBy.length === 0|| !orderBy ) return;
 
     dispatch(fetchDataExplorationData({
       query: {
         ...defaultDataExplorationQuery,
         datasetId,
-        columns: [lat, lon, ...segmentBy, timestampField],
+        columns: [lat, lon, ...segmentBy, orderBy],
         filters,
         limit: 0,
       },
@@ -440,7 +440,7 @@ const SegmentMapChart = () => {
         queryCase: 'mapChart',
       },
     }));
-  }, [lat, lon, filters, segmentBy, tab?.dataTaskTable.selectedItem?.data?.dataset?.source]);
+  }, [lat, lon, filters, segmentBy, tab?.dataTaskTable.selectedItem?.data?.dataset?.source,orderBy]);
 
   // Initialize map
   useEffect(() => {
@@ -462,7 +462,7 @@ const SegmentMapChart = () => {
       newMap.set(cat, COLOR_PALETTE[i % COLOR_PALETTE.length])
     );
     setColorMap(newMap);
-  }, [segmentBy, data]);
+  }, [segmentBy, data, orderBy]);
 
   // Draw polylines with enhancements
   useEffect(() => {
@@ -483,7 +483,7 @@ const SegmentMapChart = () => {
         const point = {
           lat: latVal,
           lon: lonVal,
-          timestamp: row[timestampField] ? new Date(row[timestampField]).getTime() : undefined,
+          timestamp: row[orderBy] ? new Date(row[orderBy]).getTime() : undefined,
         };
 
         if (!groups[groupKey]) groups[groupKey] = [];
@@ -525,7 +525,7 @@ const SegmentMapChart = () => {
     if (allPoints.length) {
       leafletMapRef.current.fitBounds(L.latLngBounds(allPoints), { padding: [30, 30] });
     }
-  }, [data, lat, lon, segmentBy, colorMap]);
+  }, [data, lat, lon, segmentBy, colorMap, orderBy]);
 
   useEffect(() => {
     markerMap.forEach((markers, key) => {
