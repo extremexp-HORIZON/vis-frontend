@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from '../../store/store';
 import Rating from '@mui/material/Rating';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useEffect, useState } from 'react';
-import { fetchUserEvaluation, setProgressBarData } from '../../store/slices/progressPageSlice';
+import { fetchUserEvaluation, setProgressBarData, stateController } from '../../store/slices/progressPageSlice';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
@@ -107,6 +107,8 @@ const ExperimentControls = () => {
       const progress = Math.round(((completed + failed) / total) * 100);
 
       dispatch(setProgressBarData({ total, completed, running, failed, progress }));
+        dispatch(stateController({ experimentId:experimentId || '' , runId: workflowId || '',action:"pause"}));
+
     }
   }, [workflows]);
 
@@ -146,10 +148,10 @@ const ExperimentControls = () => {
             </Box>
             { progressBar.progress !== 100 && (
               <Box className={'progress-page-actions'} >
-                <IconButton onClick={() => logger.log('Paused')} color="primary">
+                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"pause"}))} color="primary">
                   <PauseIcon fontSize="large" />
                 </IconButton>
-                <IconButton onClick={() => logger.log('Stopped')} color="primary">
+                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"stop"}))} color="primary">
                   <StopIcon fontSize="large" />
                 </IconButton>
               </Box>
@@ -247,10 +249,10 @@ const ExperimentControls = () => {
               </Box>
               {progressBar.progress !== 100 && (
                 <>
-                  <IconButton onClick={() => logger.log('Paused')} color="primary">
+                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"pause"}))} color="primary">
                     <PauseIcon fontSize="large" />
                   </IconButton>
-                  <IconButton onClick={() => logger.log('Stopped')} color="primary">
+                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"stop"}))} color="primary">
                     <StopIcon fontSize="large" />
                   </IconButton>
                 </>

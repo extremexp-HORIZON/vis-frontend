@@ -226,15 +226,13 @@ export const workflowsReordering = createAsyncThunk(
 // TODO: create this once state changes done
 export const stateController = createAsyncThunk(
   'progressPage/state_controller',
-  async (payload: {state: string, id: string, action: string}) => {
-    const { state, id, action } = payload;
-    const requestUrl = `/exp/${state}/${action}/${id}`;
-
-    return axios
-      .get(requestUrl)
+  async (payload: { experimentId: string; runId: string; action: string }) => {
+    return experimentApi
+      .post<string>('/life-cycle', payload)
       .then(response => response.data);
-  },
+  }
 );
+
 
 export const fetchUserEvaluation = createAsyncThunk(
   'workflowTasks/user_evaluation/fetch_data',
