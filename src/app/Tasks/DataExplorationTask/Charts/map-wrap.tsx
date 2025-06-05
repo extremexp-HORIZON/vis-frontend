@@ -11,11 +11,6 @@ const MapCardWrapper = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const mapType = tab?.workflowTasks.dataExploration?.controlPanel.mapType;
 
-  const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;
-
-  const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon;
-
-  const colorByMap = tab?.workflowTasks.dataExploration?.controlPanel.colorByMap;
 
   const segmentBy =
     tab?.workflowTasks.dataExploration?.controlPanel.segmentBy || [];
@@ -26,12 +21,10 @@ const MapCardWrapper = () => {
   const timestampError =
     tab?.workflowTasks.dataExploration?.controlPanel.timestampError;
 
-  const shouldShowInfoMessagePoint = !lat || !lon || colorByMap === 'None';
 
   const shouldShowInfoMessageSegment =
-    !lat || !lon || segmentBy.length === 0 || timestampField === null || timestampError;
+    segmentBy.length === 0 || timestampField === null || timestampError;
 
-  const shouldShowInfoMessageHeatmap = !lat || !lon;
 
   const infoPoint = (
     <InfoMessage
@@ -68,7 +61,7 @@ const MapCardWrapper = () => {
           controlPanel={<MapControls />}
           noPadding={true}
         >
-          {shouldShowInfoMessagePoint ? infoPoint : <MapChart />}
+          <MapChart />
         </ResponsiveCardTable>
       )}
       {mapType === 'trajectory' && (
@@ -86,7 +79,7 @@ const MapCardWrapper = () => {
           controlPanel={<MapControls />}
           noPadding={true}
         >
-          {shouldShowInfoMessageHeatmap ? infoHeatmap : <HeatMapChart />}
+          <HeatMapChart />
         </ResponsiveCardTable>
       )}
     </>

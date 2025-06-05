@@ -160,11 +160,18 @@ const MapControls = () => {
               }}
             >
               <MenuItem value="None">None</MenuItem>
-              {selectedColumns.map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
+              {selectedColumns
+        .filter(
+          col =>
+            col.name !== lat &&
+            col.name !== lon &&
+          !timestampField?.includes(col.name)
+        )
+        .map(col => (
+          <MenuItem key={col.name} value={col.name}>
+            {col.name}
+          </MenuItem>
+        ))}
             </Select>
 
           </FormControl>
@@ -254,13 +261,13 @@ const MapControls = () => {
             >
               <InputLabel>Order By</InputLabel>
               <Select
-                value={timestampField}
-                onChange={e => handleChange('timestampField', e.target.value as string)}
+                value={tab?.workflowTasks.dataExploration?.controlPanel.orderBy || ''}
+                onChange={e => handleChange('orderBy', e.target.value as string)}
                 input={<OutlinedInput label="Order By" />}
               >
-                {stringColumns.map(col => (
-                  <MenuItem key={col.name} value={col.name}>
-                    {col.name}
+                {timestampField?.map(col => (
+                  <MenuItem key={col} value={col}>
+                    {col}
                   </MenuItem>
                 ))}
               </Select>

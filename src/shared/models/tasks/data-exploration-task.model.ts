@@ -56,7 +56,7 @@ export interface IDataExploration {
     pageSize: number
     queryItems: number
     totalPages: number
-    timestampField: string | null
+    timestampField: string[] | null
     timestampError: boolean
 
     // Line
@@ -88,6 +88,7 @@ export interface IDataExploration {
     mapType: string
     weightBy: string
     radius: number
+    orderBy: string | null
 
   }
   chart: {
@@ -179,6 +180,7 @@ export const dataExplorationDefault: IDataExploration = {
     weightBy: 'None',
     radius: 25,
     timestampError: false,
+    orderBy: null,
   },
 
   chart: {
