@@ -203,7 +203,10 @@ const MapControls = () => {
                 }}
               >
                 <MenuItem value="None">None</MenuItem>
-                {doubleColumns.map(col => (
+                {doubleColumns.filter(
+                  col =>
+                    col.name !== lat &&
+            col.name !== lon).map(col => (
                   <MenuItem key={col.name} value={col.name}>
                     {col.name}
                   </MenuItem>
