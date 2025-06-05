@@ -249,7 +249,7 @@ const MapControls = () => {
                 onChange={handleSegmentByChange}
                 input={<OutlinedInput label="Segment By" />}
                 renderValue={selected => (selected as string[]).join(', ')}
-                 MenuProps={{
+                MenuProps={{
                   PaperProps: {
                     style: {
                       maxHeight: 150,
@@ -259,7 +259,7 @@ const MapControls = () => {
                 }}
               >
                 {stringColumns.filter(col => col.name !== lat && col.name !== lon &&
-          !timestampField?.includes(col.name) ).map(col => (
+          !timestampField?.includes(col.name)).map(col => (
                   <MenuItem key={col.name} value={col.name}>
                     <Checkbox checked={segmentBy.includes(col.name)} />
                     <ListItemText primary={col.name} />
@@ -269,8 +269,8 @@ const MapControls = () => {
             </FormControl>
             <FormControl
               fullWidth
-               required
-               error={!tab?.workflowTasks.dataExploration?.controlPanel.orderBy}
+              required
+              error={!tab?.workflowTasks.dataExploration?.controlPanel.orderBy}
 
               // disabled={timestampField === null || timestampField === ''}
             >
@@ -279,7 +279,7 @@ const MapControls = () => {
                 value={tab?.workflowTasks.dataExploration?.controlPanel.orderBy || ''}
                 onChange={e => handleChange('orderBy', e.target.value as string)}
                 input={<OutlinedInput label="Order By" />}
-                 MenuProps={{
+                MenuProps={{
                   PaperProps: {
                     style: {
                       maxHeight: 150,
