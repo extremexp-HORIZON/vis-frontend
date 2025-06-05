@@ -36,13 +36,13 @@ const SegmentMapChart = () => {
   useEffect(() => {
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
-    if (!datasetId || !lat || !lon || segmentBy.length === 0|| !orderBy ) return;
+if (!datasetId || !lat || !lon || !orderBy) return;
 
     dispatch(fetchDataExplorationData({
       query: {
         ...defaultDataExplorationQuery,
         datasetId,
-        columns: [lat, lon, ...segmentBy, orderBy],
+columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         filters,
         limit: 0,
       },
@@ -64,10 +64,11 @@ const SegmentMapChart = () => {
 
   // Color mapping
   useEffect(() => {
-    if (!segmentBy || !data.length) return;
+    if (!data.length) return;
 
-    const categories = Array.from(new Set(data.map(row => segmentBy.map(field => row[field]).join('|'))));
-    const newMap = new Map<string, string>();
+const categories = segmentBy.length > 0
+  ? Array.from(new Set(data.map(row => segmentBy.map(field => row[field]).join('|'))))
+  : ['all'];    const newMap = new Map<string, string>();
 
     categories.forEach((cat, i) =>
       newMap.set(cat, COLOR_PALETTE[i % COLOR_PALETTE.length])
@@ -86,7 +87,7 @@ const SegmentMapChart = () => {
     const groups: Record<string, { lat: number; lon: number; timestamp?: number }[]> = {};
 
     for (const row of data) {
-      const groupKey = segmentBy.map(field => row[field]).join('|');
+      const groupKey = segmentBy.length > 0 ? segmentBy.map(field => row[field]).join('|') : 'all';
       const latVal = parseFloat(String(row[lat]));
       const lonVal = parseFloat(String(row[lon]));
 
@@ -94,7 +95,7 @@ const SegmentMapChart = () => {
         const point = {
           lat: latVal,
           lon: lonVal,
-          timestamp: row[orderBy] ? new Date(row[orderBy]).getTime() : undefined,
+          timestamp: row[orderBy as keyof typeof row] ? new Date(row[orderBy as keyof typeof row]).getTime() : undefined,
         };
 
         if (!groups[groupKey]) groups[groupKey] = [];
@@ -115,8 +116,10 @@ const SegmentMapChart = () => {
 
       polyline.bindTooltip(`
         <div>
-          <strong>${segmentBy.join(', ')}: ${key}</strong><br/>
-          Start: ${new Date(sorted[0].timestamp ?? 0).toLocaleString()}<br/>
+${segmentBy.length > 0
+  ? `<strong>${segmentBy.join(', ')}: ${key}</strong><br/>`
+  : ''
+}          Start: ${new Date(sorted[0].timestamp ?? 0).toLocaleString()}<br/>
           End: ${new Date(sorted[sorted.length - 1].timestamp ?? 0).toLocaleString()}
         </div>
       `);
@@ -189,7 +192,7 @@ const SegmentMapChart = () => {
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
 
-      {colorMap.size > 0 && (
+{segmentBy.length > 0 && colorMap.size > 0 && (
         <div
           style={{
             position: 'absolute',
