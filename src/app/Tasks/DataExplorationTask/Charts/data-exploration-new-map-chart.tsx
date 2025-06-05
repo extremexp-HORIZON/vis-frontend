@@ -202,6 +202,11 @@ const MapChart = () => {
             const values = data.map(r => parseFloat(String(r[colorByMap || ''])));
             const min = Math.min(...values);
             const max = Math.max(...values);
+             if (min === max) {
+    div.innerHTML += `
+      <div style="color: gray; font-size: 12px;">Unique value: ${min.toFixed(2)}</div>
+    `;
+  } else {
 
             div.innerHTML += `
             <div style="width: 200px;">
@@ -212,7 +217,7 @@ const MapChart = () => {
               </div>
             </div>
           `;
-          } else {
+          }} else {
             Array.from(colorMap.entries()).slice(0, 10)
               .forEach(([category, color]) => {
                 div.innerHTML += `

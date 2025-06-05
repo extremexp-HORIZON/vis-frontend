@@ -69,7 +69,7 @@ export interface IFilter {
 
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
   datasetId: '',
-  limit: 100,
+  limit: 0,
   columns: [],
   filters: [],
   offset: 0,
