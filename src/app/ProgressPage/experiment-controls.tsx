@@ -107,7 +107,6 @@ const ExperimentControls = () => {
       const progress = Math.round(((completed + failed) / total) * 100);
 
       dispatch(setProgressBarData({ total, completed, running, failed, progress }));
-        dispatch(stateController({ experimentId:experimentId || '' , runId: workflowId || '',action:"pause"}));
 
     }
   }, [workflows]);
