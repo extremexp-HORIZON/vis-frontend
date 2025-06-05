@@ -153,8 +153,8 @@ const MapControls = () => {
               MenuProps={{
                 PaperProps: {
                   style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
+                    maxHeight: 150,
+                    maxWidth: 150,
                   },
                 },
               }}
@@ -196,8 +196,8 @@ const MapControls = () => {
                 MenuProps={{
                   PaperProps: {
                     style: {
-                      maxHeight: 250,
-                      maxWidth: 300,
+                      maxHeight: 150,
+                      maxWidth: 150,
                     },
                   },
                 }}
