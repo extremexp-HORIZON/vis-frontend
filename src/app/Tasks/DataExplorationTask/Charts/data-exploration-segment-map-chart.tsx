@@ -207,7 +207,9 @@ ${segmentBy.length > 0
             zIndex: 1000,
           }}
         >
-          <h4 style={{ margin: '0 0 6px' }}>{segmentBy.join(', ')}</h4>
+          <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '6px', fontSize: '13px' }}>
+            {segmentBy.join(' | ')}
+          </div>
           {Array.from(colorMap.entries()).map(([key, color]) => (
             <div
               key={key}
@@ -231,7 +233,16 @@ ${segmentBy.length > 0
                   marginRight: '6px',
                 }}
               />
-              <span style={{ fontSize: '12px' }}>{key}</span>
+              <span style={{ fontSize: '12px' }}>
+                {key.split('|').map((part, index, arr) => (
+                  <span key={index}>
+                    <span style={{ fontWeight: 500 }}>{part}</span>
+                    {index < arr.length - 1 && (
+                      <span style={{ margin: '0 6px', color: '#999' }}>|</span>
+                    )}
+                  </span>
+                ))}
+              </span>
             </div>
           ))}
         </div>

@@ -187,7 +187,7 @@ const MapChart = () => {
           onAdd: function () {
             const div = L.DomUtil.create('div', 'leaflet-legend');
 
-            div.style.background = 'lightgray';
+            div.style.background = 'white';
             div.style.padding = '8px';
             div.style.borderRadius = '4px';
             div.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)';
