@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import * as L from 'leaflet';
+import Loader from '../../../../shared/components/loader';
 const COLOR_PALETTE = [
   '#1f77b4', // blue
   '#ff7f0e', // orange
@@ -40,6 +41,7 @@ const MapChart = () => {
   const rawData = tab?.workflowTasks.dataExploration?.mapChart.data?.data;
   const data: Record<string, string | number>[] = Array.isArray(rawData) ? rawData : [];
   const colorByMap = tab?.workflowTasks.dataExploration?.controlPanel.colorByMap;
+  const loading = tab?.workflowTasks.dataExploration?.mapChart.loading;
   const [colorMap, setColorMap] = useState<Map<string, string>>(new Map());
 
   // Fetch data
@@ -121,6 +123,7 @@ const MapChart = () => {
   // Update markers
   useEffect(() => {
     if (
+      loading ||
       !leafletMapRef.current ||
       !lat ||
       !lon ||
@@ -260,7 +263,29 @@ const MapChart = () => {
     }, 100); // give the layout a moment to settle
   }, [lat, lon]);
 
-  return <div ref={mapRef} style={{ width: '100%', height: '100%' }} />;
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            zIndex: 1000,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Loader />
+        </div>
+      )}
+      <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+    </div>
+  );
 };
 
 export default MapChart;

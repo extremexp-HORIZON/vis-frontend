@@ -5,6 +5,7 @@ import { fetchDataExplorationData } from '../../../../store/slices/dataExplorati
 import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import * as L from 'leaflet';
 import 'leaflet.heat';
+import Loader from '../../../../shared/components/loader';
 
 const HeatMapChart = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -20,6 +21,7 @@ const HeatMapChart = () => {
   const weightBy = tab?.workflowTasks.dataExploration?.controlPanel.weightBy;
   const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
   const rawData = tab?.workflowTasks.dataExploration?.mapChart.data?.data;
+  const loading = tab?.workflowTasks.dataExploration?.mapChart.loading;
   const data: Record<string, string | number>[] = Array.isArray(rawData) ? rawData : [];
 
   // Fetch data
@@ -58,7 +60,7 @@ const HeatMapChart = () => {
 
   // Initialize map
   useEffect(() => {
-    if (!mapRef.current || leafletMapRef.current || !lat || !lon || data.length === 0) return;
+    if (loading || !mapRef.current || leafletMapRef.current || !lat || !lon || data.length === 0) return;
 
     const coords = data
       .map((row) => {
@@ -153,7 +155,29 @@ const HeatMapChart = () => {
     }, 100);
   }, [lat, lon]);
 
-  return <div ref={mapRef} style={{ width: '100%', height: '100%' }} />;
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            zIndex: 1000,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Loader />
+        </div>
+      )}
+      <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+    </div>
+  );
 };
 
 export default HeatMapChart;

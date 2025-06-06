@@ -6,6 +6,7 @@ import SegmentMapChart from './data-exploration-segment-map-chart';
 import HeatMapChart from './data-exploration-new-heatmap-chart';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import { Box } from '@mui/material';
 
 const MapCardWrapper = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -26,31 +27,37 @@ const MapCardWrapper = () => {
   return (
     <>
       {mapType === 'point' && (
-        <ResponsiveCardTable
-          title={'point map'}
-          controlPanel={<MapControls />}
-          noPadding={true}
-        >
-          <MapChart />
-        </ResponsiveCardTable>
+        <Box height='99%'>
+          <ResponsiveCardTable
+            title={'point map'}
+            controlPanel={<MapControls />}
+            noPadding={true}
+          >
+            <MapChart />
+          </ResponsiveCardTable>
+        </Box>
       )}
       {mapType === 'trajectory' && (
-        <ResponsiveCardTable
-          title={'Trajectory Map'}
-          controlPanel={<MapControls />}
-          noPadding={true}
-        >
-          {shouldShowInfoMessageSegment ? infoSegment : <SegmentMapChart />}
-        </ResponsiveCardTable>
+        <Box height='99%'>
+          <ResponsiveCardTable
+            title={'Trajectory Map'}
+            controlPanel={<MapControls />}
+            noPadding={true}
+          >
+            {shouldShowInfoMessageSegment ? infoSegment : <SegmentMapChart />}
+          </ResponsiveCardTable>
+        </Box>
       )}
       {mapType === 'heatmap' && (
-        <ResponsiveCardTable
-          title={'Heatmap'}
-          controlPanel={<MapControls />}
-          noPadding={true}
-        >
-          <HeatMapChart />
-        </ResponsiveCardTable>
+        <Box height='99%'>
+          <ResponsiveCardTable
+            title={'Heatmap'}
+            controlPanel={<MapControls />}
+            noPadding={true}
+          >
+            <HeatMapChart />
+          </ResponsiveCardTable>
+        </Box>
       )}
     </>
   );
