@@ -112,10 +112,7 @@ const MapChart = () => {
 
     categories.forEach((category, index) => {
       // Get a color from the COLOR_PALETTE or generate your own strategy here
-      newColorMap.set(
-        category as string,
-        COLOR_PALETTE[index % COLOR_PALETTE.length],
-      );
+      newColorMap.set(String(category), COLOR_PALETTE[index % COLOR_PALETTE.length]);
     });
 
     setColorMap(newColorMap);
