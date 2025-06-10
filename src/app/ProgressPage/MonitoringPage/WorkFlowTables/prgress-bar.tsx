@@ -16,9 +16,9 @@ export default function ProgressBar({ workflowStatus, workflowId } : {workflowSt
     if (workflow?.tasks === undefined) {
       progressValue = 0;
     } else {
-      const completedTasks = workflow?.tasks.filter(task => task.endTime).length;
+      // const completedTasks = workflow?.tasks.filter(task => task.endTime).length;
 
-      progressValue = (completedTasks / workflow?.tasks.length) * 100;
+      // progressValue = (completedTasks / workflow?.tasks.length) * 100;
     }
   }
   const color = workflowStatus === 'COMPLETED' ? 'success' : workflowStatus === 'RUNNING' ? 'primary' : workflowStatus === 'PENDING_INPUT' ? 'warning' : 'error';
