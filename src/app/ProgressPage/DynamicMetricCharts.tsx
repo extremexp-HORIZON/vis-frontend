@@ -20,94 +20,144 @@ interface BaseMetric {
 }
 
 const WorkflowCharts: React.FC = () => {
-  const { workflowsTable } = useAppSelector(
+  const { workflowsTable, selectedWorkflowsMetrics } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
-  const { workflows } = useAppSelector(
-    (state: RootState) => state.progressPage,
-  );
+  // const { workflows } = useAppSelector(
+  //   (state: RootState) => state.progressPage,
+  // );
   const [isMosaic, setIsMosaic] = useState(true);
   const { hoveredWorkflowId } = workflowsTable;
 
-  const filteredWorkflows = (
-    workflowsTable.groupBy.length > 0
-      ? workflowsTable.aggregatedRows
-      : workflowsTable.filteredRows
-  ).filter(row => workflowsTable.selectedWorkflows.includes(row.id));
+  // const filteredWorkflows = (
+  //   workflowsTable.groupBy.length > 0
+  //     ? workflowsTable.aggregatedRows
+  //     : workflowsTable.filteredRows
+  // ).filter(row => workflowsTable.selectedWorkflows.includes(row.id));
 
-  const groupByTooltipFields = workflowsTable.groupBy.map(col => ({
-    field: col,
-    type: 'nominal',
-    title: col
-  }));
+  // const groupByTooltipFields = workflowsTable.groupBy.map(col => ({
+  //   field: col,
+  //   type: 'nominal',
+  //   title: col
+  // }));
 
-  const tooltipFields = [
-    ...(workflowsTable.groupBy.length === 0 ? [{ field: 'id', type: 'nominal' }] : []),
-    ...groupByTooltipFields,
-    { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
-  ];
+  // const tooltipFields = [
+  //   ...(workflowsTable.groupBy.length === 0 ? [{ field: 'id', type: 'nominal' }] : []),
+  //   ...groupByTooltipFields,
+  //   { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
+  // ];
 
-  const groupedMetrics: Record<string, BaseMetric[]> = workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating')
-    .reduce(
-      (acc: Record<string, BaseMetric[]>, metricName: string) => {
-        acc[metricName] = [];
+  const groupedMetrics: Record<string, BaseMetric[]> = {};
 
-        filteredWorkflows.forEach(workflow => {
-          if (Object.prototype.hasOwnProperty.call(workflow, metricName)) {
-            const value = workflow[metricName];
+  if (workflowsTable.groupBy.length > 0) {
+    workflowsTable.uniqueMetrics
+      .filter(metric => metric !== 'rating')
+      .forEach(metricName => {
+        groupedMetrics[metricName] = [];
 
-            // Skip non-numeric or NaN values
+        workflowsTable.aggregatedRows
+          .filter(row => workflowsTable.selectedWorkflows.includes(row.id))
+          .forEach(row => {
+            const value = row[metricName];
+
             if (typeof value === 'number' && !isNaN(value)) {
-              const metricPoint: BaseMetric = {
-                value,
-                id: workflow.id,
+              const enriched: BaseMetric = {
+                id: row.id,
                 name: metricName,
+                value,
               };
 
               workflowsTable.groupBy.forEach(groupKey => {
-                metricPoint[groupKey] = workflow[groupKey];
+                enriched[groupKey] = row[groupKey];
               });
 
-              acc[metricName].push(metricPoint);
+              groupedMetrics[metricName].push(enriched);
             }
-          }
-        });
+          });
+      });
 
-        return acc;
-      },
-    {} as Record<string, BaseMetric[]>
-    );
-  // Render charts for each grouped metric name
-  const renderCharts = Object.keys(groupedMetrics).map(metricName => {
-    // task name is the same across workflows
-    const metricTaskId = workflows.data.find(w => w.metrics.some(m => m.name === metricName))?.metrics?.find(m => m.name === metricName)?.task;
-    const metricTask = workflows.data?.find(w => w.tasks?.some(task => task.id === metricTaskId))?.tasks?.find(task => task.name === metricTaskId)?.name;
-    const metricSeries = groupedMetrics[metricName];
-    const uniqueSteps = new Set(metricSeries.map(m => m.step));
-    const workflowColorMap = workflowsTable.workflowColors;
-    const workflowColorScale = filteredWorkflows.map(wf => ({
-      id: wf.id,
-      color: workflowColorMap[wf.id] || '#000000', // Default to black if not found
+  } else {
+    const selectedWorkflowIds = workflowsTable.selectedWorkflows;
+
+    selectedWorkflowIds.forEach(workflowId => {
+      const metrics = selectedWorkflowsMetrics?.data?.[workflowId] || [];
+      const row = workflowsTable.filteredRows.find(r => r.id === workflowId);
+
+      metrics.forEach(({ name, seriesMetric }) => {
+        if (name === 'rating') return;
+
+        seriesMetric.forEach(metric => {
+          if (typeof metric.value !== 'number' || isNaN(metric.value)) return;
+
+          const enriched: BaseMetric = {
+            id: workflowId,
+            name,
+            value: metric.value,
+            step: metric.step,
+            timestamp: metric.timestamp,
+          };
+
+          workflowsTable.groupBy.forEach(groupKey => {
+            enriched[groupKey] = row?.[groupKey];
+          });
+
+          if (!groupedMetrics[name]) {
+            groupedMetrics[name] = [];
+          }
+
+          groupedMetrics[name].push(enriched);
+        });
+      });
+    });
+  }
+
+  const renderCharts = Object.entries(groupedMetrics).map(([metricName, metricSeries]) => {
+    const isGrouped = workflowsTable.groupBy.length > 0;
+
+    // Determine if line chart is needed: any workflow with multiple values for this metric
+    const isLineChart = (() => {
+      if (isGrouped) return false;
+
+      const workflowCounts = new Map<string, number>();
+
+      metricSeries.forEach(m => {
+        workflowCounts.set(m.id, (workflowCounts.get(m.id) ?? 0) + 1);
+      });
+
+      return Array.from(workflowCounts.values()).some(count => count > 1);
+    })();
+
+    // Determine x-axis
+    const xField = isLineChart ? 'step' : 'id';
+    const xType = 'ordinal'; // step and id are both ordinal for visual clarity
+    const xTitle = isLineChart
+      ? isGrouped ? 'Group Step' : 'Step'
+      : isGrouped ? 'Workflow Group' : 'Workflow';
+
+    // Set up color scale
+    const workflowColorScale = workflowsTable.selectedWorkflows.map(id => ({
+      id,
+      color: workflowsTable.workflowColors[id] || '#000000',
     }));
 
-    const isGrouped = workflowsTable.groupBy.length > 0;
-    const hasMultipleSteps = uniqueSteps.size > 1;
+    const mark = isLineChart
+      ? {
+        type: 'line',
+        tooltip: true,
+        point: {
+          size: 20,
+        },
+      }
+      : 'bar';
 
-    const xAxisTitle = isGrouped
-      ? (hasMultipleSteps ? 'Group Step' : 'Workflow Group')
-      : (hasMultipleSteps ? 'Step' : 'Workflow');
-
+    // Vega-Lite spec
     const chartSpec = {
-      mark: uniqueSteps.size <= 1 ? 'bar' : 'line',
+      mark,
       encoding: {
         x: {
-          field: uniqueSteps.size <= 1 ? 'id' : 'step',
-          type: 'ordinal',
-          axis: { labels: false, title: xAxisTitle },
-          scale: {
-            paddingInner: 0.2,
-            paddingOuter: 1,
-          },
+          field: xField,
+          type: xType,
+          axis: { labels: false, title: xTitle },
         },
         y: {
           field: 'value',
@@ -116,7 +166,7 @@ const WorkflowCharts: React.FC = () => {
           scale: {
             domain: [
               0,
-              Math.max(...metricSeries.map((d: BaseMetric) => d.value)) * 1.05,
+              Math.max(...metricSeries.map(d => d.value)) * 1.05,
             ],
           },
         },
@@ -129,20 +179,29 @@ const WorkflowCharts: React.FC = () => {
           },
           legend: null,
         },
-        // Simplify the conditional encoding to maintain responsiveness
         opacity: hoveredWorkflowId ? {
           condition: { test: `datum.id === '${hoveredWorkflowId}'`, value: 1 },
-          value: 0.5
+          value: 0.5,
         } : undefined,
-        // Only add these properties when needed
-        ...(hoveredWorkflowId ? {
-          strokeWidth: { value: 1 },
-          stroke: {
-            condition: { test: `datum.id === '${hoveredWorkflowId}'`, value: '#868686' },
-            value: null
-          }
-        } : {}),
-        tooltip: tooltipFields,
+
+        strokeWidth: hoveredWorkflowId ? {
+          condition: { test: `datum.id === '${hoveredWorkflowId}'`, value: 3 },
+          value: 1,
+        } : undefined,
+        tooltip: [
+          ...(isGrouped ? [] : [{ field: 'id', type: 'nominal', title: 'Workflow' }]),
+          ...workflowsTable.groupBy.map(field => ({
+            field,
+            type: 'nominal',
+            title: field
+          })),
+          ...(isLineChart ? [{ field: 'step', type: 'ordinal', title: 'Step' }] : []),
+          {
+            field: 'value',
+            type: 'quantitative',
+            title: 'Value'
+          },
+        ]
       },
       data: { values: metricSeries },
     };
@@ -152,14 +211,14 @@ const WorkflowCharts: React.FC = () => {
         item
         xs={isMosaic ? 6 : 12}
         key={metricName}
-        sx={{ textAlign: 'left', width: '100%' }} // Ensure full width
+        sx={{ textAlign: 'left', width: '100%' }}
       >
         <ResponsiveCardVegaLite
           spec={chartSpec}
           actions={false}
           isStatic={false}
-          title={metricTask ? `${metricTask}／${metricName}` : metricName}
-          sx={{ width: '100%', maxWidth: '100%' }} // Ensure it expands properly
+          title={metricName}
+          sx={{ width: '100%', maxWidth: '100%' }}
         />
       </Grid>
     );

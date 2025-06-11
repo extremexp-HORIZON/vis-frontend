@@ -17,7 +17,6 @@ import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import StaticDirectedGraph from './WorkflowTab/worfklow-flow-chart';
 import CloseIcon from '@mui/icons-material/Close';
-import { logger } from '../../shared/utils/logger';
 
 const ExperimentControls = () => {
   const [searchParams] = useSearchParams();
@@ -147,10 +146,10 @@ const ExperimentControls = () => {
             </Box>
             { progressBar.progress !== 100 && (
               <Box className={'progress-page-actions'} >
-                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"pause"}))} color="primary">
+                <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'pause' }))} color="primary">
                   <PauseIcon fontSize="large" />
                 </IconButton>
-                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"stop"}))} color="primary">
+                <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'stop' }))} color="primary">
                   <StopIcon fontSize="large" />
                 </IconButton>
               </Box>
@@ -248,10 +247,10 @@ const ExperimentControls = () => {
               </Box>
               {progressBar.progress !== 100 && (
                 <>
-                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"pause"}))} color="primary">
+                  <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'pause' }))} color="primary">
                     <PauseIcon fontSize="large" />
                   </IconButton>
-                <IconButton onClick={() => dispatch(stateController({ experimentId:experimentId ||"", runId: workflowId ||"",action:"stop"}))} color="primary">
+                  <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'stop' }))} color="primary">
                     <StopIcon fontSize="large" />
                   </IconButton>
                 </>

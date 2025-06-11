@@ -38,13 +38,13 @@ const SegmentMapChart = () => {
   useEffect(() => {
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
 
-if (!datasetId || !lat || !lon || !orderBy) return;
+    if (!datasetId || !lat || !lon || !orderBy) return;
 
     dispatch(fetchDataExplorationData({
       query: {
         ...defaultDataExplorationQuery,
         datasetId,
-columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
+        columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         filters,
         limit: 0,
       },
@@ -53,7 +53,7 @@ columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         queryCase: 'mapChart',
       },
     }));
-  }, [lat, lon, filters, segmentBy, tab?.dataTaskTable.selectedItem?.data?.dataset?.source,orderBy]);
+  }, [lat, lon, filters, segmentBy, tab?.dataTaskTable.selectedItem?.data?.dataset?.source, orderBy]);
 
   // Initialize map
   useEffect(() => {
@@ -68,9 +68,9 @@ columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
   useEffect(() => {
     if (!data.length) return;
 
-const categories = segmentBy.length > 0
-  ? Array.from(new Set(data.map(row => segmentBy.map(field => row[field]).join('|'))))
-  : ['all'];    const newMap = new Map<string, string>();
+    const categories = segmentBy.length > 0
+      ? Array.from(new Set(data.map(row => segmentBy.map(field => row[field]).join('|'))))
+      : ['all'];    const newMap = new Map<string, string>();
 
     categories.forEach((cat, i) =>
       newMap.set(cat, COLOR_PALETTE[i % COLOR_PALETTE.length])
@@ -119,8 +119,8 @@ const categories = segmentBy.length > 0
       polyline.bindTooltip(`
         <div>
 ${segmentBy.length > 0
-  ? `<strong>${segmentBy.join(', ')}: ${key}</strong><br/>`
-  : ''
+    ? `<strong>${segmentBy.join(', ')}: ${key}</strong><br/>`
+    : ''
 }          Start: ${new Date(sorted[0].timestamp ?? 0).toLocaleString()}<br/>
           End: ${new Date(sorted[sorted.length - 1].timestamp ?? 0).toLocaleString()}
         </div>
@@ -190,87 +190,87 @@ ${segmentBy.length > 0
     });
   }, [selectedKey, pathMap]);
 
-return (
-  <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-    {loading && (
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(255,255,255,0.7)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000,
-        }}
-      >
-        <Loader />
-      </div>
-    )}
-
-    <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
-
-    {segmentBy.length > 0 && colorMap.size > 0 && (
-      <div
-        style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          background: 'rgba(255, 255, 255, 0.9)',
-          padding: '8px',
-          borderRadius: '4px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
-          maxHeight: '50%',
-          overflowY: 'auto',
-          zIndex: 1000,
-        }}
-      >
-        {/* Legend contents */}
-        <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '6px', fontSize: '13px' }}>
-          {segmentBy.join(' | ')}
+  return (
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <Loader />
         </div>
-        {Array.from(colorMap.entries()).map(([key, color]) => (
-          <div
-            key={key}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginBottom: '4px',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={() => handleLegendHover(key)}
-            onMouseLeave={handleLegendLeave}
-            onClick={() => handleLegendClick(key)}
-            title="Click to zoom to path"
-          >
-            <span
-              style={{
-                display: 'inline-block',
-                width: '14px',
-                height: '14px',
-                backgroundColor: color,
-                marginRight: '6px',
-              }}
-            />
-            <span style={{ fontSize: '12px' }}>
-              {key.split('|').map((part, index, arr) => (
-                <span key={index}>
-                  <span style={{ fontWeight: 500 }}>{part}</span>
-                  {index < arr.length - 1 && (
-                    <span style={{ margin: '0 6px', color: '#999' }}>|</span>
-                  )}
-                </span>
-              ))}
-            </span>
+      )}
+
+      <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+
+      {segmentBy.length > 0 && colorMap.size > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            background: 'rgba(255, 255, 255, 0.9)',
+            padding: '8px',
+            borderRadius: '4px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            maxHeight: '50%',
+            overflowY: 'auto',
+            zIndex: 1000,
+          }}
+        >
+          {/* Legend contents */}
+          <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '6px', fontSize: '13px' }}>
+            {segmentBy.join(' | ')}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+          {Array.from(colorMap.entries()).map(([key, color]) => (
+            <div
+              key={key}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '4px',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={() => handleLegendHover(key)}
+              onMouseLeave={handleLegendLeave}
+              onClick={() => handleLegendClick(key)}
+              title="Click to zoom to path"
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '14px',
+                  height: '14px',
+                  backgroundColor: color,
+                  marginRight: '6px',
+                }}
+              />
+              <span style={{ fontSize: '12px' }}>
+                {key.split('|').map((part, index, arr) => (
+                  <span key={index}>
+                    <span style={{ fontWeight: 500 }}>{part}</span>
+                    {index < arr.length - 1 && (
+                      <span style={{ margin: '0 6px', color: '#999' }}>|</span>
+                    )}
+                  </span>
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default SegmentMapChart;
