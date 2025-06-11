@@ -1,5 +1,7 @@
 export type DataAssetRole = 'INPUT' | 'OUTPUT';
 
+export type DataAssetType = 'INTERNAL' | 'EXTERNAL';
+
 export interface IDataAsset {
   /** The name of the data asset. */
   name: string;
@@ -18,6 +20,21 @@ export interface IDataAsset {
 
   /** Optional: The task this asset is related to. */
   task?: string;
+
+  /**
+   * Logical folder or catalog this data asset belongs to.
+   * This field is used to group multiple file-level assets under a virtual
+   * folder.
+   * This does not imply that the data asset is a folder itself. If the asset
+   * represents a real folder (e.g., a directory on the file system), this field
+   * should be {@code null}.
+   */
+  folder: string | null;
+
+  /**
+  * The type of the data asset (e.g., "INTERNAL", "EXTERNAL").
+   */
+  type: DataAssetType;
 
   /** Optional: Additional metadata as key-value pairs. */
   tags?: Record<string, string>;
