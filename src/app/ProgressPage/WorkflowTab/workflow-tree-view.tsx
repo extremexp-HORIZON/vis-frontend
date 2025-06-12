@@ -27,12 +27,15 @@ import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
+import { useParams } from 'react-router-dom';
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage);
   const dispatch = useAppDispatch();
   const [workflowExpanded, setWorkflowExpanded] = useState(true);
   const [modelExpanded, setModelExpanded] = useState(true);
+  const workflowId = tab?.workflowId;
+  const { experimentId } = useParams();
 
   function getDatasetIcon(format: string | null | undefined) {
     if (!format || format.trim() === '') return;
@@ -443,6 +446,7 @@ export default function WorkflowTreeView() {
                                       setSelectedItem({
                                         type: 'DATASET',
                                         data: { dataset: ds },
+                                        meta: {experimentId: experimentId, workflowId: workflowId}
                                       }),
                                     );
                                   }
@@ -530,6 +534,7 @@ export default function WorkflowTreeView() {
                                       setSelectedItem({
                                         type: 'DATASET',
                                         data: { dataset: ds },
+                                        meta: {experimentId: experimentId, workflowId: workflowId}
                                       }),
                                     );
                                   }
@@ -715,6 +720,7 @@ export default function WorkflowTreeView() {
                                       setSelectedItem({
                                         type: 'DATASET',
                                         data: { dataset: ds },
+                                        meta: {experimentId: experimentId, workflowId: workflowId}
                                       }),
                                     );
                                   }
@@ -802,6 +808,7 @@ export default function WorkflowTreeView() {
                                       setSelectedItem({
                                         type: 'DATASET',
                                         data: { dataset: ds },
+                                        meta: {experimentId: experimentId, workflowId: workflowId}
                                       }),
                                     );
                                   }

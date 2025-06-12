@@ -57,7 +57,31 @@ export const workflowPageSlice = createSlice({
     },
     setSelectedItem: (state, action) => {
       if (!state.tab) return;
-      state.tab.dataTaskTable.selectedItem = action.payload;
+      const {type, data, meta} = action.payload;
+
+      if (type === 'DATASET' && data.dataset && meta) {
+        const workflowId = meta?.workflowId;
+        const experimentId = meta?.experimentId;
+        const originalSource = data.dataset.source;
+        const queryString = originalSource.split('?')[1] || '';
+        const params = new URLSearchParams(queryString);
+        const path = params.get('path');
+        const newSource = `${experimentId}/${workflowId}/${path}`;
+
+        const modifiedPayload = {
+          type,
+          data: {
+            dataset: {
+              ...data.dataset,
+              source: newSource,
+            },
+          },
+        };
+        state.tab.dataTaskTable.selectedItem = modifiedPayload;
+      }
+      else {
+        state.tab.dataTaskTable.selectedItem = action.payload;
+      }
       state.tab.dataTaskTable.selectedTask = null;
     },
     setControls: (state, action) => {
