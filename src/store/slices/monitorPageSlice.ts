@@ -1,5 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { CustomGridColDef } from '../../shared/types/table-types';
+import type { IMetric } from '../../shared/models/experiment/metric.model';
+import { experimentApi } from '../../app/api/api';
+import type { MetricFetchResult } from './workflowPageSlice';
 
 export interface WorkflowTableRow {
   id: string;
@@ -63,6 +66,11 @@ interface IMonitoringPageSlice {
       }
       visibleTable: string
       selectedTab: number
+      selectedWorkflowsMetrics: {
+        data: {[key: string]: {name: string; seriesMetric: IMetric[]}[]}
+        loading: boolean
+        error: string | null
+      }
 }
 
 const generateUniqueColor = (existingColors: Set<string>) => {
@@ -118,7 +126,7 @@ const initialState: IMonitoringPageSlice = {
     uniqueMetrics: [],
     uniqueParameters: [],
     uniqueTasks: [],
-    initialized: false
+    initialized: false,
   },
   scheduledTable: {
     order: 'asc',
@@ -137,7 +145,12 @@ const initialState: IMonitoringPageSlice = {
     uniqueTasks: []
   },
   visibleTable: 'workflows',
-  selectedTab: 0
+  selectedTab: 0,
+  selectedWorkflowsMetrics: {
+    data: {},
+    loading: false,
+    error: null
+  }
 };
 
 export const monitoringPageSlice = createSlice({
@@ -242,8 +255,69 @@ export const monitoringPageSlice = createSlice({
       state.workflowsTable.filteredRows = updateRowRating(state.workflowsTable.filteredRows);
       state.workflowsTable.visibleRows = updateRowRating(state.workflowsTable.visibleRows);
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
+      const { workflowId } = action.meta.arg;
+      const fetchedMetrics = action.payload;
+
+      if (!(workflowId in state.selectedWorkflowsMetrics.data)) {
+        state.selectedWorkflowsMetrics.data[workflowId] = [];
+      }
+
+      const currentMetrics = state.selectedWorkflowsMetrics.data[workflowId];
+
+      const metricMap = new Map(currentMetrics.map(m => [m.name, m]));
+
+      for (const metric of fetchedMetrics) {
+        metricMap.set(metric.name, {
+          name: metric.name,
+          seriesMetric: metric.data,
+        });
+      }
+
+      state.selectedWorkflowsMetrics.data[workflowId] = Array.from(metricMap.values());
+
+      state.selectedWorkflowsMetrics.loading = false;
+      state.selectedWorkflowsMetrics.error = null;
+    })
+      .addCase(fetchWorkflowMetrics.pending, state => {
+        state.selectedWorkflowsMetrics.loading = true;
+      })
+      .addCase(fetchWorkflowMetrics.rejected, (state, action) => {
+        state.selectedWorkflowsMetrics.loading = false;
+        state.selectedWorkflowsMetrics.error =
+          action.error.message || 'Error while fetching data';
+      });
+
   }
 });
+
+export const fetchWorkflowMetrics = createAsyncThunk(
+  'progressPage/fetchWorkflowMetrics',
+  async ({ experimentId, workflowId, metricNames }: { experimentId: string; workflowId: string; metricNames: string[] }) => {
+
+    const results = await Promise.allSettled(
+      metricNames.map((name) => {
+        const requestUrl = `${experimentId}/runs/${workflowId}/metrics-all/${name}`;
+
+        return experimentApi.get(requestUrl).then((response) => ({
+          name,
+          data: response.data as IMetric[],
+        }));
+      })
+    );
+
+    const successful = results.filter(
+      (res): res is PromiseFulfilledResult<MetricFetchResult> => res.status === 'fulfilled'
+    );
+
+    if (successful.length === 0) {
+      throw new Error('Failed to fetch all metrics');
+    }
+
+    return successful.map(res => res.value);
+  });
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally

@@ -18,7 +18,7 @@ import { dataExplorationReducers } from './dataExplorationSlice';
 import { modelAnalysisReducers } from './modelAnalysisSlice';
 import { explainabilityReducers } from './explainabilitySlice';
 
-type MetricFetchResult = {
+export type MetricFetchResult = {
   name: string;
   data: IMetric[];
 };

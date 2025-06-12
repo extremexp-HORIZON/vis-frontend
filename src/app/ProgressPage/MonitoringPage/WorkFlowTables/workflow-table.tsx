@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable } from '../../../../store/slices/monitorPageSlice';
+import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable, fetchWorkflowMetrics } from '../../../../store/slices/monitorPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useRef, useState } from 'react';
@@ -151,6 +151,13 @@ export default function WorkflowTable() {
   const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
     newSelection.forEach(workflowId => {
       dispatch(toggleWorkflowSelection(workflowId));
+      const run = workflowId as string;
+
+      const metrics = workflows.data.find(workflow => workflow.id === run)?.metrics?.map(metric => metric.name);
+
+      if(experimentId && metrics) {
+        dispatch(fetchWorkflowMetrics({ experimentId, workflowId: run, metricNames: metrics }));
+      }
 
     });
     dispatch(setWorkflowsTable({ selectedWorkflows: newSelection }));

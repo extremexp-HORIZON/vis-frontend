@@ -3,7 +3,6 @@ import type { IExperiment } from '../../shared/models/experiment/experiment.mode
 import type { IRun } from '../../shared/models/experiment/run.model';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
 import { experimentApi } from '../../app/api/api';
-import axios from 'axios';
 
 interface IUserEvaluationResponse {
   status: string;
@@ -232,7 +231,6 @@ export const stateController = createAsyncThunk(
       .then(response => response.data);
   }
 );
-
 
 export const fetchUserEvaluation = createAsyncThunk(
   'workflowTasks/user_evaluation/fetch_data',
