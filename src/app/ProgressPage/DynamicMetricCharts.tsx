@@ -47,6 +47,12 @@ const WorkflowCharts: React.FC = () => {
   //   { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
   // ];
 
+    const normalizeTimestamp = (timestamp: number | undefined): string | undefined => {
+    if (timestamp == null) return undefined;
+    const date = new Date(timestamp);
+    return isNaN(date.getTime()) ? undefined : date.toISOString();
+  };
+
   const groupedMetrics: Record<string, BaseMetric[]> = {};
 
   if (workflowsTable.groupBy.length > 0) {
@@ -94,7 +100,7 @@ const WorkflowCharts: React.FC = () => {
             name,
             value: metric.value,
             step: metric.step,
-            timestamp: metric.timestamp,
+            timestamp: normalizeTimestamp(metric.timestamp),
           };
 
           workflowsTable.groupBy.forEach(groupKey => {
@@ -127,12 +133,25 @@ const WorkflowCharts: React.FC = () => {
       return Array.from(workflowCounts.values()).some(count => count > 1);
     })();
 
-    // Determine x-axis
-    const xField = isLineChart ? 'step' : 'id';
-    const xType = 'ordinal'; // step and id are both ordinal for visual clarity
-    const xTitle = isLineChart
-      ? isGrouped ? 'Group Step' : 'Step'
-      : isGrouped ? 'Workflow Group' : 'Workflow';
+  const hasStep = isLineChart && metricSeries.every(m => m.step !== undefined && m.step !== null);
+  const hasTimestamp = metricSeries.some(m => m.timestamp !== undefined && m.timestamp !== null);
+
+  const xField = isLineChart
+    ? hasStep
+      ? 'step'
+      : hasTimestamp
+        ? 'timestamp'
+        : 'id'
+    : 'id';
+
+  const xType = xField === 'timestamp' ? 'temporal' : 'ordinal';
+
+  const xTitle = (() => {
+    if (!isLineChart) return isGrouped ? 'Workflow Group' : 'Workflow';
+    if (xField === 'timestamp') return 'Timestamp';
+    if (xField === 'step') return isGrouped ? 'Group Step' : 'Step';
+    return 'Workflow';
+  })();
 
     // Set up color scale
     const workflowColorScale = workflowsTable.selectedWorkflows.map(id => ({
@@ -157,7 +176,10 @@ const WorkflowCharts: React.FC = () => {
         x: {
           field: xField,
           type: xType,
-          axis: { labels: false, title: xTitle },
+          axis: {
+            title: xTitle,
+            ...(xType === 'temporal' ? { format: '%b %d %H:%M' } : { labels: false }),
+          },
         },
         y: {
           field: 'value',
@@ -195,11 +217,13 @@ const WorkflowCharts: React.FC = () => {
             type: 'nominal',
             title: field
           })),
-          ...(isLineChart ? [{ field: 'step', type: 'ordinal', title: 'Step' }] : []),
+          ...(isLineChart && xField !== 'id'
+            ? [{ field: xField, type: xType, title: xTitle }]
+            : []),
           {
             field: 'value',
             type: 'quantitative',
-            title: 'Value'
+            title: 'Value',
           },
         ]
       },
