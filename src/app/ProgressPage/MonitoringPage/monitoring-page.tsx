@@ -1,5 +1,5 @@
 import { Box, Tab, Tabs, Paper } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import ParallelCoordinatePlot from './ParalleleCoodrinates/parallel-coordinate-plot';
 import WorkflowTable from './WorkFlowTables/workflow-table';
@@ -8,16 +8,22 @@ import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import WorkflowCharts from '../DynamicMetricCharts';
 import { Resizable } from 're-resizable';
-import { bulkToggleWorkflowSelection, setSelectedTab, setVisibleTable } from '../../../store/slices/monitorPageSlice';
+import { bulkToggleWorkflowSelection, fetchWorkflowMetrics, setSelectedTab, setVisibleTable } from '../../../store/slices/monitorPageSlice';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
 import { getCache } from '../../../shared/utils/localStorageCache';
 import { useLocation } from 'react-router-dom';
 
 const MonitoringPage = () => {
-  const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
+  const { visibleTable, selectedTab, workflowsTable, selectedWorkflowsMetrics } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
+  const { experimentId } = useParams();
+  const previousSelectedRef = useRef<string[]>([]);
+  const hasFetchedOnInit = useRef(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -52,6 +58,49 @@ const MonitoringPage = () => {
       compareWorkflowsRef.current = null; // avoid rerunning
     }
   }, [workflowsTable.initialized]);
+
+  // when we fetch workflows we need to clear the previous metrics and fetch new in case they are changed
+  useEffect(() => {
+    hasFetchedOnInit.current = false;
+  }, [workflows.data]);
+
+  // fetch all selected workflows metrics
+  useEffect(() => {
+    if (workflowsTable.initialized && experimentId && !hasFetchedOnInit.current) {
+      workflowsTable.selectedWorkflows.forEach(workflowId => {
+        const metricNames = workflows.data.find(wf => wf.id === workflowId)?.metrics?.map(m => m.name);
+
+        if (metricNames?.length) {
+          dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
+        }
+      });
+
+      hasFetchedOnInit.current = true;
+      previousSelectedRef.current = workflowsTable.selectedWorkflows;
+    }
+  }, [workflows.data, workflowsTable.initialized]);
+
+  // fetch only new selected
+  useEffect(() => {
+    if (!workflowsTable.initialized || !experimentId || !hasFetchedOnInit.current) return;
+
+    const previousSelected = previousSelectedRef.current;
+    const currentSelected = workflowsTable.selectedWorkflows;
+
+    const added = currentSelected.filter(id => !previousSelected.includes(id));
+
+    previousSelectedRef.current = currentSelected;
+
+    added.forEach(workflowId => {
+      if (workflowId in selectedWorkflowsMetrics.data) return;
+
+      const metricNames = workflows.data.find(wf => wf.id === workflowId)?.metrics?.map(m => m.name);
+
+      if (metricNames?.length) {
+        dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
+      }
+    });
+  }, [workflowsTable.selectedWorkflows, workflowsTable.initialized]);
 
   return (
     <>
