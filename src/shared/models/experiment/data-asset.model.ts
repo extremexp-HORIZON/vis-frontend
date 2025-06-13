@@ -19,6 +19,8 @@ export interface IDataAsset {
   /** Optional: The task this asset is related to. */
   task?: string;
 
+  folder: string | null;
+
   /** Optional: Additional metadata as key-value pairs. */
   tags?: Record<string, string>;
 }
