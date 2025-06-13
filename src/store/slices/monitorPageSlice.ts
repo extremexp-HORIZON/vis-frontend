@@ -255,11 +255,6 @@ export const monitoringPageSlice = createSlice({
       state.workflowsTable.filteredRows = updateRowRating(state.workflowsTable.filteredRows);
       state.workflowsTable.visibleRows = updateRowRating(state.workflowsTable.visibleRows);
     },
-    resetSelectedMetrics: (state) => {
-      state.selectedWorkflowsMetrics.data = {}
-      state.selectedWorkflowsMetrics.loading = false;
-      state.selectedWorkflowsMetrics.error = null;
-    },
   },
   extraReducers: builder => {
     builder.addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
@@ -324,5 +319,5 @@ export const fetchWorkflowMetrics = createAsyncThunk(
   });
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally, resetSelectedMetrics
+  setHoveredWorkflow, updateWorkflowRatingLocally
 } = monitoringPageSlice.actions;
