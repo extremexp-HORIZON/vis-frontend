@@ -47,9 +47,10 @@ const WorkflowCharts: React.FC = () => {
   //   { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
   // ];
 
-    const normalizeTimestamp = (timestamp: number | undefined): string | undefined => {
+  const normalizeTimestamp = (timestamp: number | undefined): string | undefined => {
     if (timestamp == null) return undefined;
     const date = new Date(timestamp);
+
     return isNaN(date.getTime()) ? undefined : date.toISOString();
   };
 
@@ -133,25 +134,26 @@ const WorkflowCharts: React.FC = () => {
       return Array.from(workflowCounts.values()).some(count => count > 1);
     })();
 
-  const hasStep = isLineChart && metricSeries.every(m => m.step !== undefined && m.step !== null);
-  const hasTimestamp = metricSeries.some(m => m.timestamp !== undefined && m.timestamp !== null);
+    const hasStep = isLineChart && metricSeries.every(m => m.step !== undefined && m.step !== null);
+    const hasTimestamp = metricSeries.some(m => m.timestamp !== undefined && m.timestamp !== null);
 
-  const xField = isLineChart
-    ? hasStep
-      ? 'step'
-      : hasTimestamp
-        ? 'timestamp'
-        : 'id'
-    : 'id';
+    const xField = isLineChart
+      ? hasStep
+        ? 'step'
+        : hasTimestamp
+          ? 'timestamp'
+          : 'id'
+      : 'id';
 
-  const xType = xField === 'timestamp' ? 'temporal' : 'ordinal';
+    const xType = xField === 'timestamp' ? 'temporal' : 'ordinal';
 
-  const xTitle = (() => {
-    if (!isLineChart) return isGrouped ? 'Workflow Group' : 'Workflow';
-    if (xField === 'timestamp') return 'Timestamp';
-    if (xField === 'step') return isGrouped ? 'Group Step' : 'Step';
-    return 'Workflow';
-  })();
+    const xTitle = (() => {
+      if (!isLineChart) return isGrouped ? 'Workflow Group' : 'Workflow';
+      if (xField === 'timestamp') return 'Timestamp';
+      if (xField === 'step') return isGrouped ? 'Group Step' : 'Step';
+
+      return 'Workflow';
+    })();
 
     // Set up color scale
     const workflowColorScale = workflowsTable.selectedWorkflows.map(id => ({
