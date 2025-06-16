@@ -3,7 +3,7 @@ import { Vega } from 'react-vega';
 import { scheme } from 'vega';
 import vegaTooltip from 'vega-tooltip';
 import type { Axis, Item, Scale } from 'vega-typings/types';
-import type { ScenegraphEvent, View } from 'vega';
+import type { View } from 'vega';
 import { useEffect, useState, useRef } from 'react';
 import type { ParallelDataItem } from '../../../../shared/types/parallel.types';
 
@@ -62,6 +62,7 @@ const ParallelCoordinateVega = ({
 
   const handleNewView: ViewListener = (view: View) => {
     if (!view) return;
+    let lastMouseEvent: MouseEvent | null = null;
 
     const tooltipHandler = vegaTooltip(view, {
       formatTooltip: (datum: Record<string, string | number | boolean>) => {
@@ -80,32 +81,23 @@ const ParallelCoordinateVega = ({
       },
     });
 
-    // Manually trigger tooltip on line mark hover (otherwise only triggered on intersections)
-    var isTooltipVisible = false;
+    const canvas = document.querySelector('canvas');
 
-    view.addEventListener('mousemove', (event: ScenegraphEvent) => {
-      const hover = view.signal('hover');
+    canvas?.addEventListener('mousemove', (e: MouseEvent) => {
+      lastMouseEvent = e;
+    });
 
-      if (hover) {
-        const domEvent = (event as unknown as { event: MouseEvent }).event;
-
-        tooltipHandler.call(view, domEvent, {} as Item, hover);
-        isTooltipVisible = true;
-      } else if (isTooltipVisible) {
-        hideTooltip();
+    view.addSignalListener('hover', (name, value) => {
+      if (value && lastMouseEvent) {
+        tooltipHandler.call(view, lastMouseEvent, {} as Item, value);
+      } else {
+        tooltipHandler.call(view, new MouseEvent('mousemove'), {} as Item, null);
       }
     });
+
     window.addEventListener('scroll', () => {
-      if (isTooltipVisible) {
-        hideTooltip();
-      }
-    });
-
-    function hideTooltip() {
-      // To hide tooltip, simulate an empty/null value
       tooltipHandler.call(view, new MouseEvent('mousemove'), {} as Item, null);
-      isTooltipVisible = false;
-    }
+    });
   };
 
   const columnNames = [...foldArray.current, progressParallel.selected];
