@@ -57,7 +57,10 @@ export const dataExplorationReducers = (
         : null;
       const queryCase = action.meta.arg.metadata.queryCase as AsyncQueryKey;
 
-      if (task) getAsyncState(task, queryCase).loading = true;
+      if (task) {
+        getAsyncState(task, queryCase).loading = true;
+        getAsyncState(task, queryCase).error = null;
+      }
     })
     .addCase(fetchDataExplorationData.rejected, (state, action) => {
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
@@ -130,7 +133,10 @@ export const dataExplorationReducers = (
         ? state.tab?.workflowTasks.dataExploration
         : null;
 
-      if (task) task.metaData.loading = true;
+      if (task) {
+        task.metaData.loading = true;
+        task.metaData.error = null;
+      }
     })
     .addCase(fetchMetaData.rejected, (state, action) => {
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
@@ -158,7 +164,10 @@ export const dataExplorationReducers = (
         ? state.tab?.workflowTasks.dataExploration
         : null;
 
-      if (task) task.umap.loading = true;
+      if (task) {
+        task.umap.loading = true;
+        task.umap.error = null;
+      }
     })
     .addCase(fetchUmap.rejected, (state, action) => {
       const task = state.tab?.workflowId === action.meta.arg.metadata.workflowId
