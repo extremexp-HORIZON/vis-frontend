@@ -86,14 +86,14 @@ const ControlPanel = ({
             labelId="y-axis-select-label"
             label="Y-Axis-----"
             disabled={plotData?.loading || !plotData?.data}
-            value={xAxisOption}
+            value={yAxisOption}
             onChange={handleAxisSelection('y')}
             MenuProps={{
               PaperProps: { style: { maxHeight: 224, width: 250 } },
             }}
           >
             {options
-              .filter(option => option !== yAxisOption)
+              .filter(option => option !== xAxisOption)
               .map((feature, idx) => (
                 <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
                   {feature}
