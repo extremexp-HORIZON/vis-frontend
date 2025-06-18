@@ -237,7 +237,7 @@ const yFieldType = plotData?.data ? inferFieldType(plotData.data, yAxisOption) :
           </Box>
         ) : (
           <InfoMessage
-            message="No Metric Data Available."
+            message="No Data Available."
             type="info"
             icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
             fullHeight

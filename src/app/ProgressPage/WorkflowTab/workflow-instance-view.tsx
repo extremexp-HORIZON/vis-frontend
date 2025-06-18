@@ -32,7 +32,7 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 const CustomNoRowsOverlay = () => {
   return (
     <InfoMessage
-      message="No data available."
+      message="No Data Available."
       type="info"
       icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
