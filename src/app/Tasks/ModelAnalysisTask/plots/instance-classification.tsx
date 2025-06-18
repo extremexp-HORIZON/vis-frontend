@@ -93,12 +93,18 @@ const ControlPanel = ({
             }}
           >
             {options
-              .filter(option => option !== xAxisOption)
-              .map((feature, idx) => (
-                <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
-                  {feature}
-                </MenuItem>
-              ))}
+  .filter(option => option !== xAxisOption)
+  .map((feature, idx) => (
+    <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
+      {feature}
+    </MenuItem>
+  ))}
+
+{options.filter(option => option !== xAxisOption).length === 0 && (
+  <MenuItem disabled value="">
+    No available options
+  </MenuItem>
+)}
           </Select>
         </FormControl>
       </Box>
