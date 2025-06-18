@@ -27,6 +27,19 @@ import { getLabelTestInstances } from '../../../store/slices/modelAnalysisSlice'
 import type { GridColDef } from '@mui/x-data-grid';
 import type { TestInstance } from '../../../shared/models/tasks/model-analysis.model';
 import type { GridRenderCellParams } from '@mui/x-data-grid';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+
+const CustomNoRowsOverlay = () => {
+  return (
+    <InfoMessage
+      message="No data available."
+      type="info"
+      icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
+  );
+};
+
 
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(
@@ -332,6 +345,7 @@ const InstanceView = () => {
                         },
                       },
                     }}
+                    slots={{ noRowsOverlay: CustomNoRowsOverlay }}
                     rowSelectionModel={point ? [point.id] : []}
                     checkboxSelection={false}
                     disableRowSelectionOnClick={false}
