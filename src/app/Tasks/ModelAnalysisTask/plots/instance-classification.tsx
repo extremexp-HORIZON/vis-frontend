@@ -93,12 +93,18 @@ const ControlPanel = ({
             }}
           >
             {options
-              .filter(option => option !== xAxisOption)
-              .map((feature, idx) => (
-                <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
-                  {feature}
-                </MenuItem>
-              ))}
+  .filter(option => option !== xAxisOption)
+  .map((feature, idx) => (
+    <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
+      {feature}
+    </MenuItem>
+  ))}
+
+{options.filter(option => option !== xAxisOption).length === 0 && (
+  <MenuItem disabled value="">
+    No available options
+  </MenuItem>
+)}
           </Select>
         </FormControl>
       </Box>
@@ -149,6 +155,14 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const [yAxisOption, setYAxisOption] = useState<string>('');
   const [useUmap, setUseUmap] = useState(false);
 
+  const inferFieldType = (data: TestInstance[], field: string): 'quantitative' | 'nominal' => {
+  const sample = data.find(d => d[field] !== undefined)?.[field];
+
+  if (typeof sample === 'number') return 'quantitative';
+  return 'nominal';
+};
+
+
   // const getVegaData = (data: any) => {
   //   let newData: any[] = _.cloneDeep(data)
   //   if (checkbox) {
@@ -176,11 +190,12 @@ const InstanceClassification = (props: IInstanceClassification) => {
   }, [plotData]);
 
   useEffect(() => {
-    if (options.length > 0) {
-      setXAxisOption(options[0]);
-      setYAxisOption(options[1]);
-    }
-  }, [options]);
+  if (options.length > 1) {
+    setXAxisOption(options[0]);
+    const yOption = options.find(opt => opt !== options[0]);
+    if (yOption) setYAxisOption(yOption);
+  }
+}, [options]);
 
   const handleNewView = (view: View) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
@@ -199,6 +214,10 @@ const InstanceClassification = (props: IInstanceClassification) => {
       }
     });
   };
+
+  const xFieldType = plotData?.data ? inferFieldType(plotData.data, xAxisOption) : 'nominal';
+const yFieldType = plotData?.data ? inferFieldType(plotData.data, yAxisOption) : 'nominal';
+
 
   const info = (
     <Box
@@ -262,11 +281,11 @@ const InstanceClassification = (props: IInstanceClassification) => {
           encoding: {
             x: {
               field: xAxisOption || 'xAxis default',
-              type: 'quantitative',
+              type: xFieldType,
             },
             y: {
               field: yAxisOption || 'yAxis default',
-              type: 'quantitative',
+              type: yFieldType,
             },
             color: showMisclassifiedOnly
               ? {
