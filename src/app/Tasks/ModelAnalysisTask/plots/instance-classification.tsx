@@ -14,6 +14,7 @@ import type { TestInstance } from '../../../../shared/models/tasks/model-analysi
 import type { View, Item, ScenegraphEvent } from 'vega';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import Loader from '../../../../shared/components/loader';
 
 
 interface ControlPanelProps {
@@ -231,10 +232,7 @@ const yFieldType = plotData?.data ? inferFieldType(plotData.data, yAxisOption) :
     >
       {
         plotData?.loading ? (
-          <Box>
-            <CircularProgress />
-            <Typography>'Loading...'</Typography>
-          </Box>
+          <Loader />
         ) : (
           <InfoMessage
             message="No Data Available."
