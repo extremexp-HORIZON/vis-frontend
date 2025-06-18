@@ -176,11 +176,12 @@ const InstanceClassification = (props: IInstanceClassification) => {
   }, [plotData]);
 
   useEffect(() => {
-    if (options.length > 0) {
-      setXAxisOption(options[0]);
-      setYAxisOption(options[1]);
-    }
-  }, [options]);
+  if (options.length > 1) {
+    setXAxisOption(options[0]);
+    const yOption = options.find(opt => opt !== options[0]);
+    if (yOption) setYAxisOption(yOption);
+  }
+}, [options]);
 
   const handleNewView = (view: View) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
