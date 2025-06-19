@@ -1,31 +1,34 @@
-export interface IDataExplorationQuery {
-  datasetId: string
-  columns?: string[]
-  filters?: IFilter[]
-  limit: number
-  offset?: number
-  groupBy?: string[] // Optional, added
-  aggregation?: {
-    // Optional, a map of columns to an array of aggregation functions
-    [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
-  }
-  type?: 'csv' | 'zenoh'
-}
+import { DataAssetType } from "./experiment/data-asset.model"
 
-export interface IDataExplorationRequest {
-  query: IDataExplorationQuery
-  metadata: {
-    workflowId: string
-    queryCase: string
-  }
-}
+//Old data exploration
+// export interface IDataExplorationQuery {
+//   datasetId: string
+//   columns?: string[]
+//   filters?: IFilter[]
+//   limit: number
+//   offset?: number
+//   groupBy?: string[] // Optional, added
+//   aggregation?: {
+//     // Optional, a map of columns to an array of aggregation functions
+//     [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
+//   }
+//   type?: 'csv' | 'zenoh'
+// }
 
-export interface IMetaDataQuery{
-  datasetId: string
-  type?: 'csv' | 'zenoh'
-}
+// export interface IDataExplorationRequest {
+//   query: IDataExplorationQuery
+//   metadata: {
+//     workflowId: string
+//     queryCase: string
+//   }
+// }
+
+// export interface IMetaDataQuery{
+//   datasetId: string
+//   type?: 'csv' | 'zenoh'
+// }
 export interface IMetaDataRequest {
-  query: IMetaDataQuery
+  query: IDatasetMeta
   metadata: {
     workflowId: string
     queryCase: string
@@ -67,13 +70,56 @@ export interface IFilter {
   value: number | string;
 }
 
-export const defaultDataExplorationQuery: IDataExplorationQuery = {
-  datasetId: '',
+// export const defaultDataExplorationQuery: IDataExplorationQuery = {
+//   datasetId: '',
+//   limit: 0,
+//   columns: [],
+//   filters: [],
+//   offset: 0,
+//   groupBy: [],
+//   aggregation: {},
+//   type: 'csv',
+// };
+
+export const defaultDataRequestQuery: IDataRequestQuery = {
+  datasetMeta: {
+    source: '',
+    projectId: '',
+    fileName: '',
+  },
   limit: 0,
   columns: [],
   filters: [],
   offset: 0,
   groupBy: [],
   aggregation: {},
-  type: 'csv',
 };
+
+
+export interface IDataRequestQuery {
+    datasetMeta: IDatasetMeta;
+    columns?: string[]
+    limit?: number
+    offset?: number
+    groupBy?: string[]
+    filters?: IFilter[]
+    aggregation?: {
+    // Optional, a map of columns to an array of aggregation functions
+    [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
+  }
+}
+
+export interface IDatasetMeta {
+    source: string;
+    projectId?: string;
+    fileName?: string;
+    type?: DataAssetType;
+}
+
+export interface IDataRequest {
+  query: IDataRequestQuery
+  metadata: {
+    workflowId: string
+    queryCase: string
+  }
+}

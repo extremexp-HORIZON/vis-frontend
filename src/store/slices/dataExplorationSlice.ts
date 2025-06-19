@@ -7,8 +7,8 @@ import {
 import type { IWorkflowPage } from './workflowPageSlice';
 import type {
   IDataExplorationMetaDataResponse,
-  IDataExplorationRequest,
   IDataExplorationResponse,
+  IDataRequest,
   IMetaDataRequest,
   VisualColumn,
 } from '../../shared/models/dataexploration.model';
@@ -182,9 +182,9 @@ export const dataExplorationReducers = (
 };
 
 export const fetchDataExplorationData = createAsyncThunk(
-  'workflowTasks/data_exploration/fetch_data',
-  async (payload: IDataExplorationRequest) => {
-    const requestUrl = 'data/tabular';
+  'workflowTasks/data_exploration/fetch',
+  async (payload: IDataRequest) => {
+    const requestUrl = 'data/fetch';
 
     return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
@@ -195,7 +195,7 @@ export const fetchDataExplorationData = createAsyncThunk(
 export const fetchMetaData = createAsyncThunk(
   'workflowTasks/data_exploration/fetch_metadata',
   async (payload: IMetaDataRequest) => {
-    const requestUrl = 'data/metadata';
+    const requestUrl = 'data/meta';
 
     return api
       .post<IDataExplorationMetaDataResponse>(requestUrl, payload.query)
@@ -213,3 +213,4 @@ export const fetchUmap = createAsyncThunk(
       .then(response => response.data);
   },
 );
+

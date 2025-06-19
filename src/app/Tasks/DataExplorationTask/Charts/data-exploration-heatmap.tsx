@@ -5,7 +5,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect } from 'react';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
+import { defaultDataRequestQuery } from '../../../../shared/models/dataexploration.model';
 import HeatMapControlPanel from '../ChartControls/data-exploration-heatmap-control';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
@@ -35,8 +35,18 @@ const HeatMap = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataExplorationQuery,
-          datasetId,
+          ...defaultDataRequestQuery,
+          datasetMeta: {
+              source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
+              projectId: "test/project",
+              fileName: "sales.csv",
+              type: "EXTERNAL"
+
+                // source: tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
+                // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
+                // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
+                // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
+          },
           groupBy,
           aggregation,
           filters,

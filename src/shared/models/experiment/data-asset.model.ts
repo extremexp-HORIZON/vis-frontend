@@ -1,5 +1,7 @@
 export type DataAssetRole = 'INPUT' | 'OUTPUT';
 
+export type DataAssetType = 'INTERNAL' | 'EXTERNAL'
+
 export interface IDataAsset {
   /** The name of the data asset. */
   name: string;
@@ -20,6 +22,8 @@ export interface IDataAsset {
   task?: string;
 
   folder: string | null;
+
+  type: DataAssetType;
 
   /** Optional: Additional metadata as key-value pairs. */
   tags?: Record<string, string>;

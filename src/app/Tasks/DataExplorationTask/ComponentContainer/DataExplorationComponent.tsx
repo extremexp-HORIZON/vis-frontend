@@ -4,7 +4,6 @@ import {
 } from '../../../../shared/models/tasks/data-exploration-task.model';
 import { fetchMetaData } from '../../../../store/slices/dataExplorationSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import LeftPanel from './data-exploration-left-panel';
 import LineChart from '../Charts/data-exploration-line-chart';
 import ScatterChart from '../Charts/data-exploration-scatter-chart';
@@ -36,15 +35,22 @@ const DataExplorationComponent = () => {
         ?.chartType || '',
   );
   const isImage = selectedDataset?.match(/\.(jpe?g|png|gif|webp|bmp|tiff?|svg)$/i);
+  const source = tab?.dataTaskTable.selectedItem?.data?.dataset?.source
 
   useEffect(() => {
-    if (selectedDataset && workflowId) {
+    if (selectedDataset && workflowId && source ) {
       dispatch(setControls({ ...dataExplorationDefault.controlPanel }));
       dispatch(
         fetchMetaData({
           query: {
-            ...defaultDataExplorationQuery,
-            datasetId: selectedDataset,
+            source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
+            projectId: "test/project",
+            fileName: "sales.csv",
+            type: "EXTERNAL"
+            // source: source,
+            // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
+            // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
+            // sourceType: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
           },
           metadata: {
             workflowId: workflowId,

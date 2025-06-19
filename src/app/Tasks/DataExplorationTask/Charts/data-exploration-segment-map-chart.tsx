@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
+import { defaultDataRequestQuery } from '../../../../shared/models/dataexploration.model';
 import Loader from '../../../../shared/components/loader';
 
 const COLOR_PALETTE = [
@@ -42,8 +42,18 @@ const SegmentMapChart = () => {
 
     dispatch(fetchDataExplorationData({
       query: {
-        ...defaultDataExplorationQuery,
-        datasetId,
+        ...defaultDataRequestQuery,
+        datasetMeta: {
+            source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
+            projectId: "test/project",
+            fileName: "sales.csv",
+            type: "EXTERNAL"
+            
+            // source: tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
+            // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
+            // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
+            // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
+          },
         columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         filters,
         limit: 0,

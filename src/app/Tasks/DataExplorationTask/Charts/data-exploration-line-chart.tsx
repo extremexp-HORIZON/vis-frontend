@@ -8,7 +8,7 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
+import { defaultDataRequestQuery } from '../../../../shared/models/dataexploration.model';
 
 const getColumnType = (columnType: string, fieldName?: string) => {
   if (fieldName?.toLowerCase() === 'timestamp') return 'temporal';
@@ -67,8 +67,18 @@ const LineChart = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataExplorationQuery,
-          datasetId,
+          ...defaultDataRequestQuery,
+          datasetMeta: {
+            source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
+            projectId: "test/project",
+            fileName: "sales.csv",
+            type: "EXTERNAL"
+            
+            // source: tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
+            // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
+            // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
+            // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
+          },
           columns: cols,
           filters,
           // limit: 5000,
