@@ -5,7 +5,6 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect } from 'react';
-import { defaultDataRequestQuery } from '../../../../shared/models/dataexploration.model';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
@@ -26,14 +25,13 @@ const BarChart = () => {
     if (
       !datasetId ||
       !groupBy?.length ||
-      !Object.keys(aggregation || {}).length
+      !aggregation?.length
     ) {
       return; // Don't dispatch if missing dataset, groupBy, or aggregation
     }
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataRequestQuery,
           datasetMeta: {
               source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
               projectId: "test/project",
@@ -46,7 +44,7 @@ const BarChart = () => {
                 // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
           },
           groupBy,
-          aggregation,
+          aggregations: aggregation,
           filters,
         },
         metadata: {

@@ -5,7 +5,6 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect } from 'react';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import { defaultDataRequestQuery } from '../../../../shared/models/dataexploration.model';
 import HeatMapControlPanel from '../ChartControls/data-exploration-heatmap-control';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
@@ -27,7 +26,7 @@ const HeatMap = () => {
     if (
       !datasetId ||
       !groupBy?.length ||
-      !Object.keys(aggregation || {}).length
+      !aggregation?.length
     ) {
       return; // Don't dispatch if missing dataset, groupBy, or aggregation
     }
@@ -35,7 +34,6 @@ const HeatMap = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataRequestQuery,
           datasetMeta: {
               source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
               projectId: "test/project",
@@ -48,7 +46,7 @@ const HeatMap = () => {
                 // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
           },
           groupBy,
-          aggregation,
+          aggregations: aggregation,
           filters,
         },
         metadata: {

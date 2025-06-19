@@ -2,7 +2,6 @@ import { useRef, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import { defaultDataRequestQuery } from '../../../../shared/models/dataexploration.model';
 import * as L from 'leaflet';
 import 'leaflet.heat';
 import Loader from '../../../../shared/components/loader';
@@ -38,7 +37,6 @@ const HeatMapChart = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataRequestQuery,
           datasetMeta: {
             source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
             projectId: "test/project",

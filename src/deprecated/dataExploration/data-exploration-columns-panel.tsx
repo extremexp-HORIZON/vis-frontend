@@ -14,7 +14,6 @@ import {
 } from "@mui/material"
 import { setControls } from "../../store/slices/workflowPageSlice"
 import { fetchDataExplorationData } from "../../store/slices/dataExplorationSlice"
-import { defaultDataRequestQuery } from "../../shared/models/dataexploration.model"
 import { useEffect, useState } from "react"
 import TableRowsIcon from "@mui/icons-material/TableRows"
 import ViewColumnIcon from "@mui/icons-material/ViewColumn"
@@ -66,7 +65,6 @@ const ColumnsPanel = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataRequestQuery,
           datasetMeta: {
             source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
             projectId: "test/project",

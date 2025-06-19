@@ -12,6 +12,7 @@ import { setControls } from '../../../../store/slices/workflowPageSlice';
 import CategoryIcon from '@mui/icons-material/Category';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FunctionsIcon from '@mui/icons-material/Functions';
+import { AggregationFunction } from '../../../../shared/models/dataexploration.model';
 
 const BarChartControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -32,8 +33,13 @@ const BarChartControlPanel = () => {
     return column?.type === 'DOUBLE' ||
       column?.type === 'FLOAT' ||
       column?.type === 'INTEGER'
-      ? ['Avg', 'Min', 'Max', 'Count']
-      : ['Count'];
+      ? [
+          AggregationFunction.AVG,
+          AggregationFunction.MIN,
+          AggregationFunction.MAX,
+          AggregationFunction.COUNT,
+      ]
+      : [AggregationFunction.COUNT];
   };
 
   const aggregationOptions = getAggregationOptions();
@@ -139,24 +145,36 @@ const BarChartControlPanel = () => {
             label="Apply Aggregation(s)oook"
             multiple
             value={
-              selectedColumn && tab?.workflowTasks.dataExploration?.controlPanel.barAggregation[
-                selectedColumn
-              ] || []
+              selectedColumn && Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation)
+                ? tab.workflowTasks.dataExploration.controlPanel.barAggregation
+                    .filter(aggr => aggr.column === selectedColumn)
+                    .map(aggr => aggr.function)
+                : []
             }
             onChange={event => {
-              const value = event.target.value as string[];
+              const selectedFunctions = event.target.value as AggregationFunction[];
 
               if (!selectedColumn) return;
               const currentAgg =
                 tab?.workflowTasks.dataExploration?.controlPanel
-                  .barAggregation || {};
+                  .barAggregation || [];
+              
+              // Remove old aggregations for this column
+              const updatedAggs = currentAgg.filter(
+                aggr => aggr.column !== selectedColumn
+              );
+            
+              // Add new ones
+              selectedFunctions.forEach(func => {
+                updatedAggs.push({
+                  column: selectedColumn,
+                  function: func,
+                });
+              });
 
               dispatch(
                 setControls({
-                  barAggregation: {
-                    ...currentAgg,
-                    [selectedColumn]: value,
-                  },
+                  barAggregation: updatedAggs,
                 }),
               );
             }}

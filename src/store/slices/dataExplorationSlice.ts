@@ -5,12 +5,13 @@ import {
   createAsyncThunk,
 } from '@reduxjs/toolkit';
 import type { IWorkflowPage } from './workflowPageSlice';
-import type {
-  IDataExplorationMetaDataResponse,
-  IDataExplorationResponse,
-  IDataRequest,
-  IMetaDataRequest,
-  VisualColumn,
+import {
+  AggregationFunction,
+  type IDataExplorationMetaDataResponse,
+  type IDataExplorationResponse,
+  type IDataRequest,
+  type IMetaDataRequest,
+  type VisualColumn,
 } from '../../shared/models/dataexploration.model';
 import type { IDataExploration } from '../../shared/models/tasks/data-exploration-task.model';
 import { handleMultiTimeSeriesData, prepareDataExplorationResponse } from '../../shared/models/tasks/model-analysis.model';
@@ -111,9 +112,10 @@ export const dataExplorationReducers = (
       if (stringCols[0]) task.controlPanel.barGroupBy = [stringCols[0].name];
 
       if (intCol) {
-        task.controlPanel.barAggregation = {
-          [intCol.name]: ['count']
-        };
+        task.controlPanel.barAggregation.push({
+          column: intCol.name,
+          function: AggregationFunction.COUNT
+        });
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
@@ -123,9 +125,10 @@ export const dataExplorationReducers = (
       }
 
       if (doubleCol) {
-        task.controlPanel.barAggregationHeat = {
-          [doubleCol.name]: ['count']
-        };
+        task.controlPanel.barAggregationHeat.push({
+          column: doubleCol.name,
+          function: AggregationFunction.COUNT
+        });
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {

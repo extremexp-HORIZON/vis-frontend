@@ -12,6 +12,7 @@ import { setControls } from '../../../../store/slices/workflowPageSlice';
 import CategoryIcon from '@mui/icons-material/Category';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FunctionsIcon from '@mui/icons-material/Functions';
+import { AggregationFunction } from '../../../../shared/models/dataexploration.model';
 
 const HeatMapControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -30,8 +31,13 @@ const HeatMapControlPanel = () => {
     return column?.type === 'DOUBLE' ||
       column?.type === 'FLOAT' ||
       column?.type === 'INTEGER'
-      ? ['Avg', 'Min', 'Max', 'Count']
-      : ['Count'];
+      ? [
+          AggregationFunction.AVG,
+          AggregationFunction.MIN,
+          AggregationFunction.MAX,
+          AggregationFunction.COUNT,
+        ]
+      : [AggregationFunction.COUNT];
   };
 
   const aggregationOptions = getAggregationOptions();
@@ -126,14 +132,14 @@ const HeatMapControlPanel = () => {
             onChange={e => {
               const newColumn = e.target.value as string;
 
-              // Clear previous aggregation and set new selected column
+              const currentAgg =
+                tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || [];
+                          
               dispatch(
                 setControls({
                   selectedMeasureColumnHeat: newColumn,
-                  barAggregationHeat: {
-                    [newColumn]: [], // Reset aggregation for new column
-                  },
-                }),
+                  barAggregationHeat: currentAgg.filter(aggr => aggr.column !== newColumn),
+                })
               );
             }}
             MenuProps={{
@@ -162,23 +168,26 @@ const HeatMapControlPanel = () => {
             <Select
               label="Apply Aggregation-----"
               value={
-                tab?.workflowTasks.dataExploration?.controlPanel
-                  .barAggregationHeat[selectedColumn]?.[0] || ''
+                tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat
+                  ?.find(aggr => aggr.column === selectedColumn)?.function || ''
               }
               onChange={event => {
-                const value = event.target.value as string;
+                const value = event.target.value as AggregationFunction;
 
                 if (!selectedColumn) return;
                 const currentAgg =
                   tab?.workflowTasks.dataExploration?.controlPanel
-                    .barAggregationHeat || {};
+                    .barAggregationHeat || [];
 
                 dispatch(
                   setControls({
-                    barAggregationHeat: {
-                      ...currentAgg,
-                      [selectedColumn]: [value], // wrap in array since your state expects an array
-                    },
+                    barAggregationHeat: [
+                      ...currentAgg.filter(aggr => aggr.column !== selectedColumn),
+                      {
+                        column: selectedColumn,
+                        function: value,
+                      },
+                    ],
                   }),
                 );
               }}
