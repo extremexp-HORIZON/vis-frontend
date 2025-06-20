@@ -13,6 +13,18 @@ const BarChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const theme = useTheme();
 
+  const groupByCols = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy ?? [];
+
+  const aggregationCols = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
+  ?.map(aggr => aggr.column) ?? [];
+
+  const cols = Array.from(
+    new Set([
+      ...groupByCols,
+      ...aggregationCols,
+    ])
+  );
+
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
 
   useEffect(() => {
@@ -46,6 +58,7 @@ const BarChart = () => {
           groupBy,
           aggregations: aggregation,
           filters,
+          columns: cols
         },
         metadata: {
           workflowId: tab?.workflowId || '',

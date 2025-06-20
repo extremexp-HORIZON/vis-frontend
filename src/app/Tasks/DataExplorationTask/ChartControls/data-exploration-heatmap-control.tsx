@@ -131,14 +131,22 @@ const HeatMapControlPanel = () => {
             value={selectedColumn || ''}
             onChange={e => {
               const newColumn = e.target.value as string;
-
+            
               const currentAgg =
                 tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || [];
-                          
+            
+              const currentGroupBy =
+                tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [];
+            
+              const updatedGroupBy = Array.from(
+                new Set([...currentGroupBy, newColumn])
+              );
+            
               dispatch(
                 setControls({
                   selectedMeasureColumnHeat: newColumn,
                   barAggregationHeat: currentAgg.filter(aggr => aggr.column !== newColumn),
+                  barGroupByHeat: updatedGroupBy,
                 })
               );
             }}

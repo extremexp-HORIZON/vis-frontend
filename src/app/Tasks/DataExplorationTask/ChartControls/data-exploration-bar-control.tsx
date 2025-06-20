@@ -84,9 +84,19 @@ const BarChartControlPanel = () => {
               tab?.workflowTasks.dataExploration?.controlPanel
                 .barGroupBy?.[0] || ''
             }
-            onChange={e =>
-              dispatch(setControls({ barGroupBy: [e.target.value] }))
-            }
+            onChange={e => {
+              const newGroupBy = e.target.value;
+              const measureCol = selectedColumn;
+            
+              const existingGroupBy =
+                tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || [];
+            
+              const updatedSet = new Set(existingGroupBy);
+              updatedSet.add(newGroupBy);
+              if (measureCol) updatedSet.add(measureCol);
+            
+              dispatch(setControls({ barGroupBy: Array.from(updatedSet) }));
+            }}
             MenuProps={{
               PaperProps: {
                 style: { maxHeight: 224, width: 250 },
@@ -115,9 +125,21 @@ const BarChartControlPanel = () => {
           <Select
             label="Measure (Value Column)ooo"
             value={selectedColumn || ''}
-            onChange={e =>
-              dispatch(setControls({ selectedMeasureColumn: e.target.value }))
-            }
+            onChange={e => {
+              const measureCol = e.target.value;
+              const existingGroupBy =
+                tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || [];
+            
+              const updatedSet = new Set(existingGroupBy);
+              updatedSet.add(measureCol);
+            
+              dispatch(
+                setControls({
+                  selectedMeasureColumn: measureCol,
+                  barGroupBy: Array.from(updatedSet),
+                }),
+              );
+            }}
             MenuProps={{
               PaperProps: { style: { maxHeight: 224, width: 250 } },
             }}
