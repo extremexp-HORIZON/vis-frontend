@@ -79,7 +79,7 @@ const BarChart = () => {
     col => col.type === 'STRING' && col.name !== xAxisColumn,
   );
   const yAxisColumns = columns
-    ?.filter(col => col.type === 'DOUBLE')
+    ?.filter(col => ['DOUBLE', 'BIGINT'].includes(col.type))
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
@@ -178,9 +178,12 @@ const BarChart = () => {
       fullHeight
     />
   );
-  const hasValidAggregation = Object.values(
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {},
-  ).some((val) => Array.isArray(val) && val.length > 0);
+  const hasValidAggregation = (
+  Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation) &&
+  tab.workflowTasks.dataExploration.controlPanel.barAggregation.some(
+    aggr => aggr?.column && aggr?.function
+  )
+);
 
   const hasGroupBy =
     (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length >

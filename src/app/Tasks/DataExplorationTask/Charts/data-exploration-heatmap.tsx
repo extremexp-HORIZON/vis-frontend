@@ -22,17 +22,16 @@ const HeatMap = () => {
       tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat;
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-    console.log(aggregation)
     const groupByCols = groupBy ?? [];
 
     const aggregationCols = aggregation?.map(aggr => aggr.column) ?? [];
-    console.log(aggregationCols)
     const cols = Array.from(
       new Set([
         ...groupByCols,
         ...aggregationCols,
       ])
     );
+        console.log(cols)
 
 
     if (

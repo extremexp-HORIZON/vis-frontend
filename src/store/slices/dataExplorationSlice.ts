@@ -116,12 +116,6 @@ export const dataExplorationReducers = (
           column: intCol.name,
           function: AggregationFunction.COUNT
         });
-
-        // Ensure selectedMeasureColumn is in barGroupBy
-        const groupBySet = new Set(task.controlPanel.barGroupBy ?? []);
-        groupBySet.add(intCol.name);
-        task.controlPanel.barGroupBy = Array.from(groupBySet);
-
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
