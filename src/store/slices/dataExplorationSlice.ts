@@ -116,6 +116,12 @@ export const dataExplorationReducers = (
           column: intCol.name,
           function: AggregationFunction.COUNT
         });
+
+        // Ensure selectedMeasureColumn is in barGroupBy
+        const groupBySet = new Set(task.controlPanel.barGroupBy ?? []);
+        groupBySet.add(intCol.name);
+        task.controlPanel.barGroupBy = Array.from(groupBySet);
+
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
@@ -129,6 +135,11 @@ export const dataExplorationReducers = (
           column: doubleCol.name,
           function: AggregationFunction.COUNT
         });
+      
+      const groupBySet = new Set(task.controlPanel.barGroupByHeat ?? []);
+      groupBySet.add(doubleCol.name);
+      task.controlPanel.barGroupByHeat = Array.from(groupBySet);
+
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {
