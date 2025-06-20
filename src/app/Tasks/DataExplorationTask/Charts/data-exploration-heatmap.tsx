@@ -31,8 +31,6 @@ const HeatMap = () => {
         ...aggregationCols,
       ])
     );
-        console.log(cols)
-
 
     if (
       !datasetId ||
@@ -46,15 +44,15 @@ const HeatMap = () => {
       fetchDataExplorationData({
         query: {
           datasetMeta: {
-              source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
-              projectId: "test/project",
-              fileName: "sales.csv",
-              type: "EXTERNAL"
+            source: 'http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78',
+            projectId: 'test/project',
+            fileName: 'sales.csv',
+            type: 'EXTERNAL'
 
-                // source: tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
-                // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
-                // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
-                // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
+            // source: tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
+            // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
+            // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
+            // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
           },
           groupBy,
           aggregations: aggregation,
@@ -83,7 +81,7 @@ const HeatMap = () => {
     col => col.type === 'STRING' && col.name !== xAxisColumn,
   );
   const yAxisColumns = columns
-    ?.filter(col => col.type === 'DOUBLE')
+    ?.filter(col => ['DOUBLE', 'BIGINT', 'INTEGER'].includes(col.type))
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
@@ -223,9 +221,12 @@ const HeatMap = () => {
     />
   );
 
-  const hasValidAggregation = Object.values(
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {},
-  ).some((val) => Array.isArray(val) && val.length > 0);
+  const hasValidAggregation = (
+    Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat) &&
+  tab.workflowTasks.dataExploration.controlPanel.barAggregationHeat.some(
+    aggr => aggr?.column && aggr?.function
+  )
+  );
 
   const hasGroupBy =
     (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [])

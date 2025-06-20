@@ -34,10 +34,10 @@ const BarChartControlPanel = () => {
       column?.type === 'FLOAT' ||
       column?.type === 'INTEGER'
       ? [
-          AggregationFunction.AVG,
-          AggregationFunction.MIN,
-          AggregationFunction.MAX,
-          AggregationFunction.COUNT,
+        AggregationFunction.AVG,
+        AggregationFunction.MIN,
+        AggregationFunction.MAX,
+        AggregationFunction.COUNT,
       ]
       : [AggregationFunction.COUNT];
   };
@@ -84,7 +84,7 @@ const BarChartControlPanel = () => {
               tab?.workflowTasks.dataExploration?.controlPanel
                 .barGroupBy?.[0] || ''
             }
-            onChange={e => 
+            onChange={e =>
               dispatch(setControls({ barGroupBy: [e.target.value] }))
             }
             MenuProps={{
@@ -145,8 +145,8 @@ const BarChartControlPanel = () => {
             value={
               selectedColumn && Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation)
                 ? tab.workflowTasks.dataExploration.controlPanel.barAggregation
-                    .filter(aggr => aggr.column === selectedColumn)
-                    .map(aggr => aggr.function)
+                  .filter(aggr => aggr.column === selectedColumn)
+                  .map(aggr => aggr.function)
                 : []
             }
             onChange={event => {
@@ -156,12 +156,12 @@ const BarChartControlPanel = () => {
               const currentAgg =
                 tab?.workflowTasks.dataExploration?.controlPanel
                   .barAggregation || [];
-              
+
               // Remove old aggregations for this column
               const updatedAggs = currentAgg.filter(
                 aggr => aggr.column !== selectedColumn
               );
-            
+
               // Add new ones
               selectedFunctions.forEach(func => {
                 updatedAggs.push({

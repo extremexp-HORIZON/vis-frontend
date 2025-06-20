@@ -226,6 +226,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof inputDatasets>, noFolder: [] as typeof inputDatasets }
@@ -239,6 +240,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof outputDatasets>, noFolder: [] as typeof outputDatasets }
@@ -508,7 +510,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={
@@ -669,7 +671,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={
@@ -757,6 +759,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof fallbackInput>, noFolder: [] as typeof fallbackInput }
@@ -770,6 +773,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof fallbackOutput>, noFolder: [] as typeof fallbackOutput }
@@ -955,7 +959,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={
@@ -1116,7 +1120,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={

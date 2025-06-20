@@ -1,30 +1,31 @@
-import { DataAssetType } from "./experiment/data-asset.model"
+import type { DataAssetType } from './experiment/data-asset.model';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export enum AggregationFunction {
   // Basic aggregations
-  COUNT = "COUNT",
-  COUNT_ALL = "COUNT_ALL",
-  SUM = "SUM",
-  AVG = "AVG",
-  MIN = "MIN",
-  MAX = "MAX",
+  COUNT = 'COUNT',
+  COUNT_ALL = 'COUNT_ALL',
+  SUM = 'SUM',
+  AVG = 'AVG',
+  MIN = 'MIN',
+  MAX = 'MAX',
 
   // Statistical functions
-  STDDEV = "STDDEV",
-  VARIANCE = "VARIANCE",
-  MEDIAN = "MEDIAN",
+  STDDEV = 'STDDEV',
+  VARIANCE = 'VARIANCE',
+  MEDIAN = 'MEDIAN',
 
   // Percentiles
-  PERCENTILE = "PERCENTILE",
+  PERCENTILE = 'PERCENTILE',
 
   // String aggregations
-  STRING_AGG = "STRING_AGG",
-  ARRAY_AGG = "ARRAY_AGG",
+  STRING_AGG = 'STRING_AGG',
+  ARRAY_AGG = 'ARRAY_AGG',
 
   // Advanced
-  FIRST = "FIRST",
-  LAST = "LAST",
-  MODE = "MODE"
+  FIRST = 'FIRST',
+  LAST = 'LAST',
+  MODE = 'MODE'
 }
 
 export interface IMetaDataRequest {
@@ -75,7 +76,7 @@ export interface AggregationOptions {
   percentileValue?: number;        // For percentile functions (0.0 to 1.0)
   separator?: string;              // For STRING_AGG
   orderBy?: string;                // For ordered aggregations like ARRAY_AGG
-  orderDirection?: "ASC" | "DESC"; // ASC or DESC, default: "ASC"
+  orderDirection?: 'ASC' | 'DESC'; // ASC or DESC, default: "ASC"
 }
 
 export interface IAggregation {
@@ -84,7 +85,6 @@ export interface IAggregation {
   alias?: string;
   options?: AggregationOptions;
 }
-
 
 export const defaultDataRequestQuery: IDataRequestQuery = {
   datasetMeta: {
@@ -99,7 +99,6 @@ export const defaultDataRequestQuery: IDataRequestQuery = {
   groupBy: [],
   aggregations: [],
 };
-
 
 export interface IDataRequestQuery {
     datasetMeta: IDatasetMeta;

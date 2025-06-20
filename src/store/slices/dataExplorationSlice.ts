@@ -116,6 +116,13 @@ export const dataExplorationReducers = (
           column: intCol.name,
           function: AggregationFunction.COUNT
         });
+        task.controlPanel.selectedMeasureColumn = intCol.name;
+      } else if (doubleCol) {
+        task.controlPanel.barAggregation.push({
+          column: doubleCol.name,
+          function: AggregationFunction.COUNT
+        });
+        task.controlPanel.selectedMeasureColumn = doubleCol.name;
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
@@ -129,11 +136,13 @@ export const dataExplorationReducers = (
           column: doubleCol.name,
           function: AggregationFunction.COUNT
         });
-      
-      const groupBySet = new Set(task.controlPanel.barGroupByHeat ?? []);
-      groupBySet.add(doubleCol.name);
-      task.controlPanel.barGroupByHeat = Array.from(groupBySet);
-
+        task.controlPanel.selectedMeasureColumnHeat = doubleCol.name;
+      } else if (intCol) {
+        task.controlPanel.barAggregationHeat.push({
+          column: intCol.name,
+          function: AggregationFunction.COUNT
+        });
+        task.controlPanel.selectedMeasureColumnHeat = intCol.name;
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {
@@ -221,4 +230,3 @@ export const fetchUmap = createAsyncThunk(
       .then(response => response.data);
   },
 );
-

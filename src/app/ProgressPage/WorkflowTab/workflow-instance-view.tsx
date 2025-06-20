@@ -40,7 +40,6 @@ const CustomNoRowsOverlay = () => {
   );
 };
 
-
 const InstanceView = () => {
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,

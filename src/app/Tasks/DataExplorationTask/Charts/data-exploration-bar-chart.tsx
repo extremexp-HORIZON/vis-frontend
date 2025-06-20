@@ -16,7 +16,7 @@ const BarChart = () => {
   const groupByCols = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy ?? [];
 
   const aggregationCols = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
-  ?.map(aggr => aggr.column) ?? [];
+    ?.map(aggr => aggr.column) ?? [];
 
   const cols = Array.from(
     new Set([
@@ -45,15 +45,15 @@ const BarChart = () => {
       fetchDataExplorationData({
         query: {
           datasetMeta: {
-              source: "http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78",
-              projectId: "test/project",
-              fileName: "sales.csv",
-              type: "EXTERNAL"
+            source: 'http://146.124.106.200/api/file/333d7fc7-4180-4f23-8eff-99ce8c8e9c78',
+            projectId: 'test/project',
+            fileName: 'sales.csv',
+            type: 'EXTERNAL'
 
-                // source: tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
-                // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
-                // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
-                // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
+            // source: tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
+            // projectId: tab?.dataTaskTable.selectedItem?.data?.dataset?.tags?.projectId,
+            // fileName: tab?.dataTaskTable.selectedItem?.data?.dataset?.name,
+            // type: tab?.dataTaskTable.selectedItem?.data?.dataset?.type
           },
           groupBy,
           aggregations: aggregation,
@@ -79,7 +79,7 @@ const BarChart = () => {
     col => col.type === 'STRING' && col.name !== xAxisColumn,
   );
   const yAxisColumns = columns
-    ?.filter(col => ['DOUBLE', 'BIGINT'].includes(col.type))
+    ?.filter(col => ['DOUBLE', 'BIGINT', 'INTEGER'].includes(col.type))
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
@@ -178,12 +178,13 @@ const BarChart = () => {
       fullHeight
     />
   );
+
   const hasValidAggregation = (
-  Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation) &&
+    Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation) &&
   tab.workflowTasks.dataExploration.controlPanel.barAggregation.some(
     aggr => aggr?.column && aggr?.function
   )
-);
+  );
 
   const hasGroupBy =
     (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length >

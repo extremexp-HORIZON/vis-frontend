@@ -32,11 +32,11 @@ const HeatMapControlPanel = () => {
       column?.type === 'FLOAT' ||
       column?.type === 'INTEGER'
       ? [
-          AggregationFunction.AVG,
-          AggregationFunction.MIN,
-          AggregationFunction.MAX,
-          AggregationFunction.COUNT,
-        ]
+        AggregationFunction.AVG,
+        AggregationFunction.MIN,
+        AggregationFunction.MAX,
+        AggregationFunction.COUNT,
+      ]
       : [AggregationFunction.COUNT];
   };
 
@@ -131,22 +131,13 @@ const HeatMapControlPanel = () => {
             value={selectedColumn || ''}
             onChange={e => {
               const newColumn = e.target.value as string;
-            
               const currentAgg =
                 tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || [];
-            
-              const currentGroupBy =
-                tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [];
-            
-              const updatedGroupBy = Array.from(
-                new Set([...currentGroupBy, newColumn])
-              );
-            
+
               dispatch(
                 setControls({
                   selectedMeasureColumnHeat: newColumn,
                   barAggregationHeat: currentAgg.filter(aggr => aggr.column !== newColumn),
-                  barGroupByHeat: updatedGroupBy,
                 })
               );
             }}
