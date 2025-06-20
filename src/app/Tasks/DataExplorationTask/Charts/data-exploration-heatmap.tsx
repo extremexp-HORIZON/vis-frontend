@@ -205,22 +205,6 @@ const HeatMap = () => {
 
   const hasData = limitedData.length > 0;
 
-  const info = !hasData ? (
-    <InfoMessage
-      message="No data available for the selected configuration."
-      type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-      fullHeight
-    />
-  ) : (
-    <InfoMessage
-      message="Please select both Group By and Aggregation to display the chart."
-      type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-      fullHeight
-    />
-  );
-
   const hasValidAggregation = (
     Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat) &&
   tab.workflowTasks.dataExploration.controlPanel.barAggregationHeat.some(
@@ -232,7 +216,31 @@ const HeatMap = () => {
     (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [])
       .length > 0;
 
-  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData;
+  const info = !hasData ? (
+    <InfoMessage
+      message="No data available for the selected configuration."
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
+  ) : !hasGroupBy || !hasValidAggregation ? (
+    <InfoMessage
+      message="Please select both Group By and Aggregation to display the chart."
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
+  ) : (
+    <InfoMessage
+      message= {tab?.workflowTasks.dataExploration?.barChart.error || "Error fetching the data."}
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
+  );
+
+
+  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData || tab?.workflowTasks.dataExploration?.heatChart.error !== null;
 
   return (
     <Box sx={{ height: '99%' }}>
