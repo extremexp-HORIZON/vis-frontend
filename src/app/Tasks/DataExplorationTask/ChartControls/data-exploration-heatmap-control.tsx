@@ -30,7 +30,8 @@ const HeatMapControlPanel = () => {
 
     return column?.type === 'DOUBLE' ||
       column?.type === 'FLOAT' ||
-      column?.type === 'INTEGER'
+      column?.type === 'INTEGER' ||
+      column?.type === 'BIGINT'
       ? [
         AggregationFunction.AVG,
         AggregationFunction.MIN,

@@ -106,23 +106,18 @@ export const dataExplorationReducers = (
       task.controlPanel.timestampField = task.metaData.data?.timeColumn || null;
       task.controlPanel.orderBy = (task?.metaData?.data?.timeColumn as string[])[0] || null;
       const stringCols = originalColumns.filter((col: VisualColumn) => col.type === 'STRING');
-      const intCol = originalColumns.find((col: VisualColumn) => col.type === 'INTEGER');
-      const doubleCol = originalColumns.find((col: VisualColumn) => col.type === 'DOUBLE');
-
+      const numericColumn = originalColumns.find((col: VisualColumn) =>
+        col.type === 'INTEGER' || col.type === 'DOUBLE' || col.type === 'FLOAT' || col.type === 'BIGINT'
+      );
+      
       if (stringCols[0]) task.controlPanel.barGroupBy = [stringCols[0].name];
 
-      if (intCol) {
+      if (numericColumn) {
         task.controlPanel.barAggregation.push({
-          column: intCol.name,
+          column: numericColumn.name,
           function: AggregationFunction.COUNT
         });
-        task.controlPanel.selectedMeasureColumn = intCol.name;
-      } else if (doubleCol) {
-        task.controlPanel.barAggregation.push({
-          column: doubleCol.name,
-          function: AggregationFunction.COUNT
-        });
-        task.controlPanel.selectedMeasureColumn = doubleCol.name;
+        task.controlPanel.selectedMeasureColumn = numericColumn.name;
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
@@ -131,18 +126,12 @@ export const dataExplorationReducers = (
         task.controlPanel.barGroupByHeat = heatmapGroupBy;
       }
 
-      if (doubleCol) {
+      if (numericColumn) {
         task.controlPanel.barAggregationHeat.push({
-          column: doubleCol.name,
+          column: numericColumn.name,
           function: AggregationFunction.COUNT
         });
-        task.controlPanel.selectedMeasureColumnHeat = doubleCol.name;
-      } else if (intCol) {
-        task.controlPanel.barAggregationHeat.push({
-          column: intCol.name,
-          function: AggregationFunction.COUNT
-        });
-        task.controlPanel.selectedMeasureColumnHeat = intCol.name;
+        task.controlPanel.selectedMeasureColumnHeat = numericColumn.name;
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {

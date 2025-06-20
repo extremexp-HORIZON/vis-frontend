@@ -79,7 +79,7 @@ const BarChart = () => {
     col => col.type === 'STRING' && col.name !== xAxisColumn,
   );
   const yAxisColumns = columns
-    ?.filter(col => ['DOUBLE', 'BIGINT', 'INTEGER'].includes(col.type))
+    ?.filter(col => ['DOUBLE', 'BIGINT', 'INTEGER', 'FLOAT'].includes(col.type))
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
