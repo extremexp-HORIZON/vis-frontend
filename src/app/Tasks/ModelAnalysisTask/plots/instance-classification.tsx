@@ -12,6 +12,10 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import InstanceClassificationUmap from './instance-classification-umap';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 import type { View, Item, ScenegraphEvent } from 'vega';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import Loader from '../../../../shared/components/loader';
+
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -226,10 +230,18 @@ const yFieldType = plotData?.data ? inferFieldType(plotData.data, yAxisOption) :
       alignItems="center"
       height="100%"
     >
-      <CircularProgress />
-      <Typography fontSize={'0.8rem'} sx={{ ml: 1 }}>
-        {plotData?.loading ? 'Loading...' : 'No data available'}
-      </Typography>
+      {
+        plotData?.loading ? (
+          <Loader />
+        ) : (
+          <InfoMessage
+            message="No Data Available."
+            type="info"
+            icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+            fullHeight
+          />
+        )
+      }
     </Box>
   );
   const shouldShowInfoMessage = plotData?.loading || !plotData?.data;

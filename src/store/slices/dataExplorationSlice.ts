@@ -103,8 +103,7 @@ export const dataExplorationReducers = (
       task.controlPanel.yAxis = defaultYAxis;
       task.controlPanel.yAxisScatter = defaultYAxis;
       task.controlPanel.timestampField = task.metaData.data?.timeColumn || null;
-      // task.controlPanel.orderBy = (task?.metaData?.data?.timeColumn as string[])[0] || null;
-       task.controlPanel.orderBy =  null;
+      task.controlPanel.orderBy =  null;
       const stringCols = originalColumns.filter((col: VisualColumn) => col.type === 'STRING');
       const intCol = originalColumns.find((col: VisualColumn) => col.type === 'INTEGER');
       const doubleCol = originalColumns.find((col: VisualColumn) => col.type === 'DOUBLE');
