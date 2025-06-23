@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
@@ -339,7 +339,49 @@ export default function WorkflowTreeView() {
                   }
                 >
                   {/* Parameters */}
-
+                  <TreeItem2
+                    itemId={`parameters-header`}
+                    slotProps={{
+                      content: {
+                        style: {
+                          pointerEvents: 'none',
+                          backgroundColor: 'transparent',
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                      
+                      },
+                    }}
+                    label={
+                      <Box sx={{ px: 1, py: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            borderRadius: 1,
+                            bgcolor: 'transparent',
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            Parameters
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, ml: 1 }}
+                          >
+                            ({paramsForTask.length})
+                          </Typography>
+                        </Box>
+                      </Box>
+                    }
+                  />
                   {paramsForTask.map((param, index) => (
                     <TreeItem2
                       key={`${param.name}-${index}`}
@@ -378,7 +420,49 @@ export default function WorkflowTreeView() {
                   ))}
 
                   {/* Metrics */}
-
+                  <TreeItem2
+                    itemId={`metrics-header`}
+                    slotProps={{
+                      content: {
+                        style: {
+                          pointerEvents: 'none',
+                          backgroundColor: 'transparent',
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                      
+                      },
+                    }}
+                    label={
+                      <Box sx={{ px: 1, py: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            borderRadius: 1,
+                            bgcolor: 'transparent',
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            Metrics
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, ml: 1 }}
+                          >
+                            ({uniqueMetricsByName.length})
+                          </Typography>
+                        </Box>
+                      </Box>
+                    }
+                  />
                   {uniqueMetricsByName.map((metric, index) => (
                     <TreeItem2
                       key={`${metric.name}-${index}`}
@@ -789,6 +873,49 @@ export default function WorkflowTreeView() {
               return (
                 <>
                   {/* Parameters */}
+                  <TreeItem2
+                    itemId={`parameters-header`}
+                    slotProps={{
+                      content: {
+                        style: {
+                          pointerEvents: 'none',
+                          backgroundColor: 'transparent',
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                      
+                      },
+                    }}
+                    label={
+                      <Box sx={{ px: 1, py: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            borderRadius: 1,
+                            bgcolor: 'transparent',
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            Parameters
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, ml: 1 }}
+                          >
+                            ({fallbackParams.length})
+                          </Typography>
+                        </Box>
+                      </Box>
+                    }
+                  />
                   {fallbackParams.map((param, index) => (
                     <TreeItem2
                       key={`null-param-${index}`}
@@ -826,6 +953,49 @@ export default function WorkflowTreeView() {
                     />
                   ))}
                   {/* Metrics */}
+                  <TreeItem2
+                    itemId={`metrics-header`}
+                    slotProps={{
+                      content: {
+                        style: {
+                          pointerEvents: 'none',
+                          backgroundColor: 'transparent',
+                        },
+                        onMouseEnter: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                        onMouseLeave: (e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        },
+                      
+                      },
+                    }}
+                    label={
+                      <Box sx={{ px: 1, py: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            borderRadius: 1,
+                            bgcolor: 'transparent',
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            Metrics
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, ml: 1 }}
+                          >
+                            ({fallbackMetrics.length})
+                          </Typography>
+                        </Box>
+                      </Box>
+                    }
+                  />
                   {fallbackMetrics.map((metric, index) => (
                     <TreeItem2
                       key={`null-metric-${index}`}
