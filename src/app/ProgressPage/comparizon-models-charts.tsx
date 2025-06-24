@@ -7,6 +7,9 @@ import {
   Container,
   ButtonGroup,
   Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
 import ResponsiveCardVegaLite from '../../shared/components/responsive-card-vegalite';
 import InfoMessage from '../../shared/components/InfoMessage';
@@ -26,6 +29,8 @@ const ComparisonModelsCharts: React.FC = () => {
   const [isMosaic, setIsMosaic] = useState(true);
 
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
+
+  const [selectedOption, setSelectedOption] = useState('confusionMatrix');
 
   // Dispatch fetchComparativeConfusionMatrix for each selected workflow (runId)
   useEffect(() => {
@@ -164,27 +169,44 @@ const ComparisonModelsCharts: React.FC = () => {
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }}>
-      <Grid container justifyContent="flex-end" alignItems="center" sx={{ marginBottom: 2 }}>
-        <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
-          <Button
-            variant={isMosaic ? 'contained' : 'outlined'}
-            color="primary"
-            onClick={() => setIsMosaic(true)}
+      <Grid container justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
+
+        {/* Left-aligned Button Group */}
+        <Grid item>
+          <RadioGroup
+            row
+            value={selectedOption}
+            onChange={(e) => setSelectedOption(e.target.value)}
+            aria-label="view type"
+            name="view-type-radio"
           >
+            <FormControlLabel value="confusionMatrix" control={<Radio />} label="Confusion Matrix" />
+            {/* <FormControlLabel value="scatterPlot" control={<Radio />} label="Scatter Plot" /> */}
+          </RadioGroup>
+        </Grid>
+        <Grid item>
+          <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
+            <Button
+              variant={isMosaic ? 'contained' : 'outlined'}
+              color="primary"
+              onClick={() => setIsMosaic(true)}
+            >
             Mosaic
-          </Button>
-          <Button
-            variant={!isMosaic ? 'contained' : 'outlined'}
-            color="primary"
-            onClick={() => setIsMosaic(false)}
-          >
+            </Button>
+            <Button
+              variant={!isMosaic ? 'contained' : 'outlined'}
+              color="primary"
+              onClick={() => setIsMosaic(false)}
+            >
             Stacked
-          </Button>
-        </ButtonGroup>
+            </Button>
+          </ButtonGroup>
+        </Grid>
+
       </Grid>
 
       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
-        {renderCharts}
+        {selectedOption === 'confusionMatrix' ? renderCharts : null}
       </Grid>
     </Container>
   );
