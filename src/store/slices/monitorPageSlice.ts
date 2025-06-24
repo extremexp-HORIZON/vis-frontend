@@ -3,7 +3,7 @@ import type { CustomGridColDef } from '../../shared/types/table-types';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
 import { experimentApi } from '../../app/api/api';
 import type { MetricFetchResult } from './workflowPageSlice';
-import { ConfusionMatrixResult } from '../../shared/models/tasks/model-analysis.model';
+import type { ConfusionMatrixResult } from '../../shared/models/tasks/model-analysis.model';
 
 export interface WorkflowTableRow {
   id: string;
@@ -320,7 +320,7 @@ export const monitoringPageSlice = createSlice({
 
       .addCase(fetchComparativeConfusionMatrix.fulfilled, (state, action) => {
         const runId = action.meta.arg.runId;
-      
+
         state.comparativeModelConfusionMatrix[runId] = {
           data: action.payload,
           loading: false,
@@ -330,7 +330,7 @@ export const monitoringPageSlice = createSlice({
 
       .addCase(fetchComparativeConfusionMatrix.rejected, (state, action) => {
         const runId = action.meta.arg.runId;
-      
+
         if (!state.comparativeModelConfusionMatrix[runId]) {
           state.comparativeModelConfusionMatrix[runId] = {
             data: null,
@@ -371,14 +371,13 @@ export const fetchWorkflowMetrics = createAsyncThunk(
     return successful.map(res => res.value);
   });
 
-  export const fetchComparativeConfusionMatrix = createAsyncThunk(
+export const fetchComparativeConfusionMatrix = createAsyncThunk(
   'modelAnalysis/fetch_comparative_confusion_matrix',
-    async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
+  async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
     const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/confusion-matrix`);
 
     return response.data;
-  }
-);
+  });
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally

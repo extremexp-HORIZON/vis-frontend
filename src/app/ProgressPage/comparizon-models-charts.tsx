@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import type { RootState } from '../../store/store';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
@@ -12,6 +13,7 @@ import InfoMessage from '../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchComparativeConfusionMatrix } from '../../store/slices/monitorPageSlice';
 import ResponsiveCardTable from '../../shared/components/responsive-card-table';
+import Loader from '../../shared/components/loader';
 
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -31,7 +33,7 @@ const ComparisonModelsCharts: React.FC = () => {
     selectedWorkflowIds.forEach((runId) => {
       dispatch(fetchComparativeConfusionMatrix({ experimentId, runId }));
     });
-  }, [selectedWorkflowIds, experimentId, dispatch]);
+  }, [selectedWorkflowIds, experimentId]);
 
   // Transform matrix data to Vega-Lite format
   const transformConfusionMatrix = (labels: string[], matrix: number[][]) => {
@@ -46,6 +48,7 @@ const ComparisonModelsCharts: React.FC = () => {
         });
       }
     }
+
     return data;
   };
 
@@ -56,13 +59,8 @@ const ComparisonModelsCharts: React.FC = () => {
     if (!matrixState || matrixState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-                    <ResponsiveCardTable title={''} >
-
-          <InfoMessage
-            message={`Loading confusion matrix for run ${runId}...`}
-            type="info"
-            fullHeight
-          />
+          <ResponsiveCardTable title={runId} minHeight={400}>
+            <Loader />
           </ResponsiveCardTable>
         </Grid>
       );
@@ -71,28 +69,28 @@ const ComparisonModelsCharts: React.FC = () => {
     if (matrixState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-            <ResponsiveCardTable title={''} >
-
-          <InfoMessage
-            message={`Error loading confusion matrix for run ${runId}: ${matrixState.error}`}
-            type="error"
-            fullHeight
-          />
-            </ResponsiveCardTable>
+          <ResponsiveCardTable title={runId} minHeight={400}>
+            <InfoMessage
+              message={matrixState.error}
+              type="error"
+              fullHeight
+            />
+          </ResponsiveCardTable>
         </Grid>
       );
     }
 
     const dataRaw = matrixState.data;
+
     if (!dataRaw || !dataRaw.labels || !dataRaw.matrix) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={''} >
-          <InfoMessage
-            message={`No confusion matrix data available for run ${runId}.`}
-            type="info"
-            fullHeight
-          />
+          <ResponsiveCardTable title={runId} minHeight={400}>
+            <InfoMessage
+              message={'No confusion matrix data available'}
+              type="info"
+              fullHeight
+            />
           </ResponsiveCardTable>
         </Grid>
       );
