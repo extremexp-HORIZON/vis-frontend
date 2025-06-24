@@ -19,7 +19,7 @@ interface BaseMetric {
   [key: string]: string | number | boolean | null | undefined
 }
 
-const WorkflowCharts: React.FC = () => {
+const ComparisonModelsCharts: React.FC = () => {
   const { workflowsTable, selectedWorkflowsMetrics } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
@@ -303,4 +303,4 @@ const WorkflowCharts: React.FC = () => {
   );
 };
 
-export default WorkflowCharts;
+export default ComparisonModelsCharts;

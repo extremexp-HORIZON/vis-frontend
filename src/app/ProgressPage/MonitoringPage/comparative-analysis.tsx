@@ -2,8 +2,9 @@ import { Box, Tab, Tabs } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { setSelectedComparisonTab } from '../../../store/slices/monitorPageSlice';
-import WorkflowCharts from '../DynamicMetricCharts';
-
+import ComparisonMetricsCharts from '../comparison-metrics-charts';
+import ComparisonModelsCharts from '../comparizon-models-charts';
+import ComparisonDataCharts from '../comparizon-data-charts';
 const ComparativeAnalysis = () => {
   const { selectedComparisonTab } = useAppSelector(
     (state: RootState) => state.monitorPage,
@@ -31,15 +32,25 @@ const ComparativeAnalysis = () => {
           scrollButtons="auto"
           // aria-label="tab menu"
         >
-          <Tab label="METRICS" />
-          <Tab label="MODELS" />
-          <Tab label="DATA" />
+          <Tab label="Metrics" />
+          <Tab label="Models Insights" />
+          <Tab label="Data" />
         </Tabs>
       </Box>
       <Box sx={{ width: '100%', flexGrow: 1, overflow: 'auto' }}>
         {
           selectedComparisonTab === 0 && (
-            <WorkflowCharts />
+            <ComparisonMetricsCharts />
+          )
+        }
+        {
+          selectedComparisonTab === 1 && (
+            <ComparisonModelsCharts />
+          )
+        }
+        {
+          selectedComparisonTab === 2 && (
+            <ComparisonDataCharts />
           )
         }
       </Box>
