@@ -253,7 +253,7 @@ const ComparisonDataCharts: React.FC = () => {
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (
       <InfoMessage
-        message="Select Workflows to display metrics."
+        message="Select Workflows to display comparisons over data."
         type="info"
         icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
         fullHeight
