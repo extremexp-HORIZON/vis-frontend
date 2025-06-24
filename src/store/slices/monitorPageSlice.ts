@@ -66,6 +66,7 @@ interface IMonitoringPageSlice {
       }
       visibleTable: string
       selectedTab: number
+      selectedComparisonTab: number
       selectedWorkflowsMetrics: {
         data: {[key: string]: {name: string; seriesMetric: IMetric[]}[]}
         loading: boolean
@@ -146,6 +147,7 @@ const initialState: IMonitoringPageSlice = {
   },
   visibleTable: 'workflows',
   selectedTab: 0,
+  selectedComparisonTab: 0,
   selectedWorkflowsMetrics: {
     data: {},
     loading: false,
@@ -198,6 +200,9 @@ export const monitoringPageSlice = createSlice({
     },
     setSelectedTab: (state, action) => {
       state.selectedTab = action.payload;
+    },
+    setSelectedComparisonTab: (state, action) => {
+      state.selectedComparisonTab = action.payload;
     },
     toggleWorkflowSelection: (state, action) => {
       const workflowId = action.payload;
@@ -318,6 +323,6 @@ export const fetchWorkflowMetrics = createAsyncThunk(
     return successful.map(res => res.value);
   });
 
-export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
+export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally
 } = monitoringPageSlice.actions;

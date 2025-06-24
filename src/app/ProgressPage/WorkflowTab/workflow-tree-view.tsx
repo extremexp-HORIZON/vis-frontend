@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
@@ -226,6 +226,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof inputDatasets>, noFolder: [] as typeof inputDatasets }
@@ -239,6 +240,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof outputDatasets>, noFolder: [] as typeof outputDatasets }
@@ -340,7 +342,7 @@ export default function WorkflowTreeView() {
                 >
                   {/* Parameters */}
                   <TreeItem2
-                    itemId={`parameters-header`}
+                    itemId={'parameters-header'}
                     slotProps={{
                       content: {
                         style: {
@@ -353,7 +355,7 @@ export default function WorkflowTreeView() {
                         onMouseLeave: (e) => {
                           e.currentTarget.style.backgroundColor = 'transparent';
                         },
-                      
+
                       },
                     }}
                     label={
@@ -421,7 +423,7 @@ export default function WorkflowTreeView() {
 
                   {/* Metrics */}
                   <TreeItem2
-                    itemId={`metrics-header`}
+                    itemId={'metrics-header'}
                     slotProps={{
                       content: {
                         style: {
@@ -434,7 +436,7 @@ export default function WorkflowTreeView() {
                         onMouseLeave: (e) => {
                           e.currentTarget.style.backgroundColor = 'transparent';
                         },
-                      
+
                       },
                     }}
                     label={
@@ -592,7 +594,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={
@@ -753,7 +755,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={
@@ -841,6 +843,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof fallbackInput>, noFolder: [] as typeof fallbackInput }
@@ -854,6 +857,7 @@ export default function WorkflowTreeView() {
                   } else {
                     acc.noFolder.push(ds);
                   }
+
                   return acc;
                 },
                 { folders: {} as Record<string, typeof fallbackOutput>, noFolder: [] as typeof fallbackOutput }
@@ -874,7 +878,7 @@ export default function WorkflowTreeView() {
                 <>
                   {/* Parameters */}
                   <TreeItem2
-                    itemId={`parameters-header`}
+                    itemId={'parameters-header'}
                     slotProps={{
                       content: {
                         style: {
@@ -887,7 +891,7 @@ export default function WorkflowTreeView() {
                         onMouseLeave: (e) => {
                           e.currentTarget.style.backgroundColor = 'transparent';
                         },
-                      
+
                       },
                     }}
                     label={
@@ -954,7 +958,7 @@ export default function WorkflowTreeView() {
                   ))}
                   {/* Metrics */}
                   <TreeItem2
-                    itemId={`metrics-header`}
+                    itemId={'metrics-header'}
                     slotProps={{
                       content: {
                         style: {
@@ -967,7 +971,7 @@ export default function WorkflowTreeView() {
                         onMouseLeave: (e) => {
                           e.currentTarget.style.backgroundColor = 'transparent';
                         },
-                      
+
                       },
                     }}
                     label={
@@ -1125,7 +1129,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={
@@ -1286,7 +1290,7 @@ export default function WorkflowTreeView() {
                                 paddingLeft: 0,
                                 paddingRight: 0,
                               },
-                              onClick: (e) => e.stopPropagation(), 
+                              onClick: (e) => e.stopPropagation(),
                             },
                           }}
                           label={

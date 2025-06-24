@@ -6,13 +6,13 @@ import WorkflowTable from './WorkFlowTables/workflow-table';
 import ScheduleTable from './WorkFlowTables/schedule-table';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import WorkflowCharts from '../DynamicMetricCharts';
 import { Resizable } from 're-resizable';
 import { bulkToggleWorkflowSelection, fetchWorkflowMetrics, setSelectedTab, setVisibleTable } from '../../../store/slices/monitorPageSlice';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
 import { getCache } from '../../../shared/utils/localStorageCache';
 import { useLocation } from 'react-router-dom';
+import ComparativeAnalysis from './comparative-analysis';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab, workflowsTable, selectedWorkflowsMetrics } = useAppSelector(
@@ -218,7 +218,7 @@ const MonitoringPage = () => {
               <WorkflowTable />
             </Resizable>
             <Paper elevation={2} sx={{ flex: 1, overflow: 'auto', height: '100%', ml: '8px' }}>
-              <WorkflowCharts />
+              <ComparativeAnalysis />
             </Paper>
           </Box>
         )}

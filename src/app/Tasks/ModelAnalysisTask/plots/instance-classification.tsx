@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 // import _ from 'lodash';
-import { CircularProgress, InputLabel, Switch, useMediaQuery, useTheme } from '@mui/material';
+import { InputLabel, Switch, useMediaQuery, useTheme } from '@mui/material';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import InstanceClassificationUmap from './instance-classification-umap';
@@ -15,7 +15,6 @@ import type { View, Item, ScenegraphEvent } from 'vega';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import Loader from '../../../../shared/components/loader';
-
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -97,18 +96,18 @@ const ControlPanel = ({
             }}
           >
             {options
-  .filter(option => option !== xAxisOption)
-  .map((feature, idx) => (
-    <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
-      {feature}
-    </MenuItem>
-  ))}
+              .filter(option => option !== xAxisOption)
+              .map((feature, idx) => (
+                <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
+                  {feature}
+                </MenuItem>
+              ))}
 
-{options.filter(option => option !== xAxisOption).length === 0 && (
-  <MenuItem disabled value="">
-    No available options
-  </MenuItem>
-)}
+            {options.filter(option => option !== xAxisOption).length === 0 && (
+              <MenuItem disabled value="">
+                No available options
+              </MenuItem>
+            )}
           </Select>
         </FormControl>
       </Box>
@@ -160,12 +159,12 @@ const InstanceClassification = (props: IInstanceClassification) => {
   const [useUmap, setUseUmap] = useState(false);
 
   const inferFieldType = (data: TestInstance[], field: string): 'quantitative' | 'nominal' => {
-  const sample = data.find(d => d[field] !== undefined)?.[field];
+    const sample = data.find(d => d[field] !== undefined)?.[field];
 
-  if (typeof sample === 'number') return 'quantitative';
-  return 'nominal';
-};
+    if (typeof sample === 'number') return 'quantitative';
 
+    return 'nominal';
+  };
 
   // const getVegaData = (data: any) => {
   //   let newData: any[] = _.cloneDeep(data)
@@ -194,12 +193,13 @@ const InstanceClassification = (props: IInstanceClassification) => {
   }, [plotData]);
 
   useEffect(() => {
-  if (options.length > 1) {
-    setXAxisOption(options[0]);
-    const yOption = options.find(opt => opt !== options[0]);
-    if (yOption) setYAxisOption(yOption);
-  }
-}, [options]);
+    if (options.length > 1) {
+      setXAxisOption(options[0]);
+      const yOption = options.find(opt => opt !== options[0]);
+
+      if (yOption) setYAxisOption(yOption);
+    }
+  }, [options]);
 
   const handleNewView = (view: View) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
@@ -220,8 +220,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
   };
 
   const xFieldType = plotData?.data ? inferFieldType(plotData.data, xAxisOption) : 'nominal';
-const yFieldType = plotData?.data ? inferFieldType(plotData.data, yAxisOption) : 'nominal';
-
+  const yFieldType = plotData?.data ? inferFieldType(plotData.data, yAxisOption) : 'nominal';
 
   const info = (
     <Box
