@@ -17,6 +17,8 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchComparativeConfusionMatrix } from '../../store/slices/monitorPageSlice';
 import ResponsiveCardTable from '../../shared/components/responsive-card-table';
 import Loader from '../../shared/components/loader';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+
 
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -77,7 +79,10 @@ const ComparisonModelsCharts: React.FC = () => {
           <ResponsiveCardTable title={runId} minHeight={400}>
             <InfoMessage
               message={matrixState.error}
-              type="error"
+              type="info"
+              icon={
+                 <ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />
+              }
               fullHeight
             />
           </ResponsiveCardTable>
