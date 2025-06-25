@@ -3,7 +3,8 @@ import type { CustomGridColDef } from '../../shared/types/table-types';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
 import { experimentApi } from '../../app/api/api';
 import type { MetricFetchResult } from './workflowPageSlice';
-import type { ConfusionMatrixResult } from '../../shared/models/tasks/model-analysis.model';
+import type { ConfusionMatrixResult, TestInstance } from '../../shared/models/tasks/model-analysis.model';
+import { AxiosError } from 'axios';
 
 export interface WorkflowTableRow {
   id: string;
@@ -86,6 +87,9 @@ interface IMonitoringPageSlice {
           loading: boolean
           error: string | null
         }
+      }
+      comparativeModelInstance: {
+        [workflowId: string]: { data: TestInstance[] | null; loading: boolean; error: string | null }
       }
       selectedModelComparisonChart: string
 }
@@ -171,6 +175,7 @@ const initialState: IMonitoringPageSlice = {
   },
   comparativeModelConfusionMatrix: {},
   comparativeModelRocCurve: {},
+  comparativeModelInstance: {},
   selectedModelComparisonChart: 'confusionMatrix'
 };
 
@@ -409,6 +414,45 @@ export const monitoringPageSlice = createSlice({
           state.comparativeModelRocCurve[runId].loading = false;
           state.comparativeModelRocCurve[runId].error = 'Failed to fetch roc curve';
         }
+      })
+      .addCase(fetchComparativeModelInstances.pending, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelInstance[runId]) {
+          state.comparativeModelInstance[runId] = {
+            data: null,
+            loading: true,
+            error: null,
+          };
+        } else {
+          state.comparativeModelInstance[runId].loading = true;
+          state.comparativeModelInstance[runId].error = null;
+        }
+      })
+
+      .addCase(fetchComparativeModelInstances.fulfilled, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        state.comparativeModelInstance[runId] = {
+          data: action.payload,
+          loading: false,
+          error: null,
+        };
+      })
+
+      .addCase(fetchComparativeModelInstances.rejected, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelInstance[runId]) {
+          state.comparativeModelInstance[runId] = {
+            data: null,
+            loading: false,
+            error: 'Failed to fetch instances',
+          };
+        } else {
+          state.comparativeModelInstance[runId].loading = false;
+          state.comparativeModelInstance[runId].error = 'Failed to fetch instances';
+        }
       });
   }
 });
@@ -446,6 +490,28 @@ export const fetchComparativeConfusionMatrix = createAsyncThunk(
 
     return response.data;
   });
+
+
+export const fetchComparativeModelInstances = createAsyncThunk(
+  'monitoringPage/fetch_comparative_model_instances',
+  async ({ experimentId, runId, offset = 0, limit = 1000 }: { experimentId: string; runId: string; offset?: number; limit?: number }, { rejectWithValue }) => {
+    try {
+      const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/test-instances`, {
+        params: { offset, limit },
+      });
+
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+
+      if (error.response) {
+        return rejectWithValue(error.response.data);
+      }
+
+      return rejectWithValue(error.message || 'Unknown error occurred');
+    }
+  }
+);
 
 export const fetchComparativeRocCurve = createAsyncThunk(
   'monitoringPage/fetch_comparative_roc_curve',

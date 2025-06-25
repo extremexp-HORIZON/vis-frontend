@@ -1,40 +1,38 @@
 import { Grid } from '@mui/material';
 import type { RootState } from '../../../../store/store';
-import { useAppSelector } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import { useEffect, useState } from 'react';
+import { fetchComparativeModelInstances } from '../../../../store/slices/monitorPageSlice';
+import { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 
 const ComparisonModelInstance = ({ isMosaic }: {isMosaic: boolean}) => {
-  const { workflowsTable, comparativeModelConfusionMatrix } = useAppSelector(
+  const { workflowsTable, comparativeModelInstance } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
+const experimentId = useAppSelector(
+    (state: RootState) => state.progressPage.experiment.data?.id || '',
+  );
+    const dispatch = useAppDispatch();
+    const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(true);
+  
+    useEffect(() => {
+      if (!experimentId) return;
+      selectedWorkflowIds.forEach((runId) => {
+        dispatch(fetchComparativeModelInstances({ experimentId, runId }));
+      });
+    }, [selectedWorkflowIds, experimentId]);
 
-  // Transform matrix data to Vega-Lite format
-  const transformConfusionMatrix = (labels: string[], matrix: number[][]) => {
-    const data: { actual: string; predicted: string; value: number }[] = [];
-
-    for (let actualIdx = 0; actualIdx < matrix.length; actualIdx++) {
-      for (let predictedIdx = 0; predictedIdx < matrix[actualIdx].length; predictedIdx++) {
-        data.push({
-          actual: labels[actualIdx],
-          predicted: labels[predictedIdx],
-          value: matrix[actualIdx][predictedIdx],
-        });
-      }
-    }
-
-    return data;
-  };
 
   const renderCharts = selectedWorkflowIds.map((runId) => {
-    const matrixState = comparativeModelConfusionMatrix[runId];
-
+    const instanceState = comparativeModelInstance[runId];
     // Handle loading and error states
-    if (!matrixState || matrixState.loading) {
+    if (!instanceState || instanceState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
           <ResponsiveCardTable title={runId} minHeight={400}>
@@ -44,12 +42,12 @@ const ComparisonModelInstance = ({ isMosaic }: {isMosaic: boolean}) => {
       );
     }
 
-    if (matrixState.error) {
+    if (instanceState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
           <ResponsiveCardTable title={runId} minHeight={400}>
             <InfoMessage
-              message={matrixState.error}
+              message={instanceState.error}
               type="info"
               icon={
                 <ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />
@@ -61,14 +59,15 @@ const ComparisonModelInstance = ({ isMosaic }: {isMosaic: boolean}) => {
       );
     }
 
-    const dataRaw = matrixState.data;
+    const dataRaw = instanceState.data;
+    console.log("dataRaw", dataRaw);
 
-    if (!dataRaw || !dataRaw.labels || !dataRaw.matrix) {
+    if (!dataRaw) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
           <ResponsiveCardTable title={runId} minHeight={400}>
             <InfoMessage
-              message={'No confusion matrix data available'}
+              message={'No instance data available'}
               type="info"
               fullHeight
             />
@@ -76,43 +75,149 @@ const ComparisonModelInstance = ({ isMosaic }: {isMosaic: boolean}) => {
         </Grid>
       );
     }
+    const hashRow = (row: TestInstance): string => {
+        const stringified = JSON.stringify(row, Object.keys(row).sort());
+        let hash = 0;
+    
+        for (let i = 0; i < stringified.length; i++) {
+          const char = stringified.charCodeAt(i);
+    
+          hash = (hash << 5) - hash + char;
+          hash |= 0; // Convert to 32bit integer
+        }
+    
+        return `row-${Math.abs(hash)}`;
+      };
+    
 
-    const confusionMatrixData = transformConfusionMatrix(dataRaw.labels, dataRaw.matrix);
-    const maxValue = Math.max(...confusionMatrixData.map(d => d.value));
-    const dataWithMax = confusionMatrixData.map(d => ({ ...d, __max__: maxValue }));
+    // const confusionMatrixData = transformConfusionMatrix(dataRaw.labels, dataRaw.matrix);
+    // const maxValue = Math.max(...confusionMatrixData.map(d => d.value));
+    // const dataWithMax = confusionMatrixData.map(d => ({ ...d, __max__: maxValue }));
 
+    const getVegaData = (data: TestInstance[]) => {
+        return data.map((originalRow: TestInstance) => {
+          const id = hashRow(originalRow);
+          const isMisclassified = originalRow.actual !== originalRow.predicted;
+    
+          return {
+            ...originalRow,
+            isMisclassified,
+            id,
+          };
+        });
+      };
     const confusionMatrixSpec = {
-      data: { values: dataWithMax },
-      encoding: {
-        x: { field: 'predicted', type: 'ordinal', axis: { title: 'Predicted Label', labelAngle: 0 } },
-        y: { field: 'actual', type: 'ordinal', axis: { title: 'Actual Label' } },
-        color: {
-          field: 'value',
-          type: 'quantitative',
-          scale: { range: ['#ffffe0', '#08306b'] },
-          legend: { title: 'Count' },
-        },
-      },
-      layer: [
-        { mark: { type: 'rect', tooltip: true } },
-        {
-          mark: {
-            type: 'text',
-            align: 'center',
-            baseline: 'middle',
-            fontSize: 12,
-            fontWeight: 'bold',
+          width: 'container',
+          height: 'container',
+          autosize: { type: 'fit', contains: 'padding', resize: true },
+          data: {
+            values: getVegaData(instanceState.data as TestInstance[]),
           },
-          encoding: {
-            text: { field: 'value', type: 'quantitative' },
-            color: {
-              condition: { test: 'datum.value > 0.4 * datum.__max__', value: 'white' },
-              value: 'black',
+          params: [
+            {
+              name: 'pts',
+              select: { type: 'point', toggle: false },
+              bind: 'legend',
             },
+            {
+              name: 'highlight',
+              select: { type: 'point', on: 'click', clear: 'clickoff',    fields: ['isMisclassified'],
+              },
+              value: { isMisclassified: true }
+
+            },
+            {
+              name: 'panZoom',
+              select: 'interval',
+              bind: 'scales',
+            },
+          ],
+          mark: {
+            type: 'point',
+            filled: true,
+            size: 100,
           },
-        },
-      ],
-    };
+
+          encoding: {
+            y: {
+              field: "workclass",
+              type: "nominal",
+            },
+            x: {
+              field: "age" ,
+              type: "quantitative",
+            },
+            color: showMisclassifiedOnly
+              ? {
+                field: 'isMisclassified',
+                type: 'nominal',
+                scale: {
+                  domain: [false, true],
+                  range: ['#cccccc', '#ff0000'],
+                },
+                legend: {
+                  title: 'Misclassified',
+                  labelExpr: 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\'',
+                },
+              }
+              : {
+                field: 'predicted',
+                type: 'nominal',
+                scale: {
+                  range: ['#1f77b4', '#2ca02c'],
+                },
+                legend: {
+                  title: 'Predicted Class',
+                },
+              },
+            opacity: showMisclassifiedOnly
+              ? {
+                field: 'isMisclassified',
+                type: 'nominal',
+                scale: {
+                  domain: [false, true],
+                  range: [0.45, 1.0],
+                },
+              }
+              : {
+                value: 0.8,
+              },
+            size: showMisclassifiedOnly ? {
+              field: 'isMisclassified',
+              type: 'nominal',
+              scale: {
+                domain: [false, true],
+                range: [60, 200],
+                legend: false
+              },
+            } :
+              {
+                value: 100,
+              },
+            // stroke: {
+            //   condition: {
+            //     param: "highlight",
+            //     empty: false,
+            //     value: "black",
+            //   },
+            //   value: "transparent"
+            // },
+            // strokeWidth: {
+            //   condition: {
+            //     param: "highlight",
+            //     empty: false,
+            //     value: 2
+            //   },
+            //   value: 0
+            // },
+            tooltip: [
+              { field: 'actual', type: 'nominal', title: 'Actual' },
+              { field: 'predicted', type: 'nominal', title: 'Predicted' },
+              { field: "workclass" , type: 'nominal', title: "workclass" },
+              { field: "age" , type: 'quantitative', title: "age" },
+            ]
+          },
+        }
 
     return (
       <Grid
