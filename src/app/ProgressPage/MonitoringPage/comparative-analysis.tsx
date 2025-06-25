@@ -2,9 +2,9 @@ import { Box, Tab, Tabs } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { setSelectedComparisonTab } from '../../../store/slices/monitorPageSlice';
-import ComparisonMetricsCharts from '../comparison-metrics-charts';
-import ComparisonModelsCharts from '../comparizon-models-charts';
-import ComparisonDataCharts from '../comparizon-data-charts';
+import ComparisonMetricsCharts from './comparison-metrics-charts';
+import ComparisonModelsCharts from './comparizon-models-charts';
+import ComparisonDataCharts from './comparizon-data-charts';
 const ComparativeAnalysis = () => {
   const { selectedComparisonTab } = useAppSelector(
     (state: RootState) => state.monitorPage,

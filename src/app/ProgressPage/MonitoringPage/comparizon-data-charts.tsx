@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
-import type { RootState } from '../../store/store';
-import { useAppSelector } from '../../store/store';
+import type { RootState } from '../../../store/store';
+import { useAppSelector } from '../../../store/store';
 import {
   Grid,
   Container,
@@ -9,8 +9,7 @@ import {
   Button,
   Typography,
 } from '@mui/material';
-import ResponsiveCardVegaLite from '../../shared/components/responsive-card-vegalite';
-import InfoMessage from '../../shared/components/InfoMessage';
+import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
 interface BaseMetric {
