@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
@@ -12,13 +12,13 @@ import {
 } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { fetchComparativeConfusionMatrix, setSelectedModelComparisonChart } from '../../../store/slices/monitorPageSlice';
+import { setSelectedModelComparisonChart } from '../../../store/slices/monitorPageSlice';
 import WindowRoundedIcon from '@mui/icons-material/WindowRounded';
 import RoundedCornerRoundedIcon from '@mui/icons-material/RoundedCornerRounded';
 import ComparisonModelConfusion from './ModelComparison/comparison-model-confusion';
 import BlurLinearIcon from '@mui/icons-material/BlurLinear';
 import ComparisonModelInstance from './ModelComparison/comparison-model-instance';
-import ComparisonModelRoc from './ModelComparison/comparion-model-roc';
+import ComparisonModelRoc from './ModelComparison/comparison-model-roc';
 
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -94,10 +94,10 @@ const ComparisonModelsCharts: React.FC = () => {
       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
         {selectedModelComparisonChart === 'confusionMatrix' && <ComparisonModelConfusion isMosaic={isMosaic} />}
       </Grid>
-       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
+      <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
         {selectedModelComparisonChart === 'rocCurve' && <ComparisonModelRoc isMosaic={isMosaic} />}
       </Grid>
-       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
+      <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
         {selectedModelComparisonChart === 'instanceView' && <ComparisonModelInstance isMosaic={isMosaic} />}
       </Grid>
     </Container>

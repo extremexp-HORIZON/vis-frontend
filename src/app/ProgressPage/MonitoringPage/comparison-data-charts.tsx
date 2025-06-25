@@ -26,8 +26,6 @@ const ComparisonDataCharts: React.FC = () => {
   const [isMosaic, setIsMosaic] = useState(true);
   const { hoveredWorkflowId } = workflowsTable;
 
-
-
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (
       <InfoMessage
@@ -78,7 +76,7 @@ const ComparisonDataCharts: React.FC = () => {
         <Typography variant="h6" sx={{ mb: 2 }}>
           Comparisons
         </Typography>
-       
+
       </Grid>
     </Container>
   );

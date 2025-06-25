@@ -371,7 +371,7 @@ export const monitoringPageSlice = createSlice({
       })
       .addCase(fetchComparativeRocCurve.fulfilled, (state, action) => {
         const runId = action.meta.arg.runId;
-  
+
         let rawData = typeof action.payload === 'string'
           ? JSON.parse(
             action.payload
@@ -394,7 +394,7 @@ export const monitoringPageSlice = createSlice({
           loading: false,
           error: null,
         };
-  
+
       })
       .addCase(fetchComparativeRocCurve.rejected, (state, action) => {
         const runId = action.meta.arg.runId;
@@ -455,7 +455,6 @@ export const fetchComparativeRocCurve = createAsyncThunk(
     return response.data;
   }
 );
-
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart

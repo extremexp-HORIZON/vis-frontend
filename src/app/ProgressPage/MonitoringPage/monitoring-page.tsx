@@ -1,5 +1,5 @@
 import { Box, Tab, Tabs, Paper } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import ParallelCoordinatePlot from './ParalleleCoodrinates/parallel-coordinate-plot';
 import WorkflowTable from './WorkFlowTables/workflow-table';
@@ -7,7 +7,7 @@ import ScheduleTable from './WorkFlowTables/schedule-table';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { Resizable } from 're-resizable';
-import { bulkToggleWorkflowSelection, fetchWorkflowMetrics, setSelectedTab, setVisibleTable } from '../../../store/slices/monitorPageSlice';
+import { bulkToggleWorkflowSelection, setSelectedTab, setVisibleTable } from '../../../store/slices/monitorPageSlice';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
 import { getCache } from '../../../shared/utils/localStorageCache';
@@ -52,7 +52,6 @@ const MonitoringPage = () => {
       compareWorkflowsRef.current = null; // avoid rerunning
     }
   }, [workflowsTable.initialized]);
-
 
   return (
     <>

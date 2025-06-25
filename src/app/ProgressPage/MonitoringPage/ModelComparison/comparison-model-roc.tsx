@@ -19,13 +19,13 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
   const dispatch = useAppDispatch();
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
 
-    useEffect(() => {
-      if (!experimentId) return;
-      selectedWorkflowIds.forEach((runId) => {
-        dispatch(fetchComparativeRocCurve({ experimentId, runId }));
-      });
-    }, [selectedWorkflowIds, experimentId]);
-  
+  useEffect(() => {
+    if (!experimentId) return;
+    selectedWorkflowIds.forEach((runId) => {
+      dispatch(fetchComparativeRocCurve({ experimentId, runId }));
+    });
+  }, [selectedWorkflowIds, experimentId]);
+
   const renderCharts = selectedWorkflowIds.map((runId) => {
     const rocState = comparativeModelRocCurve[runId];
 
@@ -76,9 +76,9 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
     const { fpr, tpr, thresholds, auc } = dataRaw;
     const aucValue = auc?.toFixed(3) || '';
     const rocData = fpr.map((f: number, i: number) => ({
-        fpr: f,
-        tpr: tpr[i],
-        threshold: thresholds?.[i] ?? -1,
+      fpr: f,
+      tpr: tpr[i],
+      threshold: thresholds?.[i] ?? -1,
     }));
 
     const rocSpec = {

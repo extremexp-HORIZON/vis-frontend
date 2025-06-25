@@ -33,7 +33,7 @@ const ComparisonMetricsCharts: React.FC = () => {
   );
   const previousSelectedRef = useRef<string[]>([]);
   const hasFetchedOnInit = useRef(false);
-  
+
   // const { workflows } = useAppSelector(
   //   (state: RootState) => state.progressPage,
   // );
@@ -58,48 +58,48 @@ const ComparisonMetricsCharts: React.FC = () => {
   //   { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
   // ];
 
-    // when we fetch workflows we need to clear the previous metrics and fetch new in case they are changed
-    useEffect(() => {
-      hasFetchedOnInit.current = false;
-    }, [workflows.data]);
-  
-    // fetch all selected workflows metrics
-    useEffect(() => {
-      if (workflowsTable.initialized && experimentId && !hasFetchedOnInit.current) {
-        workflowsTable.selectedWorkflows.forEach(workflowId => {
-          const metricNames = workflows.data.find(wf => wf.id === workflowId)?.metrics?.map(m => m.name);
-  
-          if (metricNames?.length) {
-            dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
-          }
-        });
-  
-        hasFetchedOnInit.current = true;
-        previousSelectedRef.current = workflowsTable.selectedWorkflows;
-      }
-    }, [workflows.data, workflowsTable.initialized]);
-  
-    // fetch only new selected
-    useEffect(() => {
-      if (!workflowsTable.initialized || !experimentId || !hasFetchedOnInit.current) return;
-  
-      const previousSelected = previousSelectedRef.current;
-      const currentSelected = workflowsTable.selectedWorkflows;
-  
-      const added = currentSelected.filter(id => !previousSelected.includes(id));
-  
-      previousSelectedRef.current = currentSelected;
-  
-      added.forEach(workflowId => {
-        if (workflowId in selectedWorkflowsMetrics.data) return;
-  
+  // when we fetch workflows we need to clear the previous metrics and fetch new in case they are changed
+  useEffect(() => {
+    hasFetchedOnInit.current = false;
+  }, [workflows.data]);
+
+  // fetch all selected workflows metrics
+  useEffect(() => {
+    if (workflowsTable.initialized && experimentId && !hasFetchedOnInit.current) {
+      workflowsTable.selectedWorkflows.forEach(workflowId => {
         const metricNames = workflows.data.find(wf => wf.id === workflowId)?.metrics?.map(m => m.name);
-  
+
         if (metricNames?.length) {
           dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
         }
       });
-    }, [workflowsTable.selectedWorkflows, workflowsTable.initialized]);
+
+      hasFetchedOnInit.current = true;
+      previousSelectedRef.current = workflowsTable.selectedWorkflows;
+    }
+  }, [workflows.data, workflowsTable.initialized]);
+
+  // fetch only new selected
+  useEffect(() => {
+    if (!workflowsTable.initialized || !experimentId || !hasFetchedOnInit.current) return;
+
+    const previousSelected = previousSelectedRef.current;
+    const currentSelected = workflowsTable.selectedWorkflows;
+
+    const added = currentSelected.filter(id => !previousSelected.includes(id));
+
+    previousSelectedRef.current = currentSelected;
+
+    added.forEach(workflowId => {
+      if (workflowId in selectedWorkflowsMetrics.data) return;
+
+      const metricNames = workflows.data.find(wf => wf.id === workflowId)?.metrics?.map(m => m.name);
+
+      if (metricNames?.length) {
+        dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
+      }
+    });
+  }, [workflowsTable.selectedWorkflows, workflowsTable.initialized]);
 
   const normalizeTimestamp = (timestamp: number | undefined): string | undefined => {
     if (timestamp == null) return undefined;
