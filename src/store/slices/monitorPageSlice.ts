@@ -407,7 +407,7 @@ export const monitoringPageSlice = createSlice({
           };
         } else {
           state.comparativeModelRocCurve[runId].loading = false;
-          state.comparativeModelRocCurve[runId].error = 'Failed to fetch confusion matrix';
+          state.comparativeModelRocCurve[runId].error = 'Failed to fetch roc curve';
         }
       });
   }

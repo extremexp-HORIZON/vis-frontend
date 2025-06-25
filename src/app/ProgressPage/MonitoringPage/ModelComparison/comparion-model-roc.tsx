@@ -64,7 +64,7 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
           <ResponsiveCardTable title={runId} minHeight={400}>
             <InfoMessage
-              message={'No confusion matrix data available'}
+              message={'No roc curve data available'}
               type="info"
               fullHeight
             />
