@@ -414,7 +414,7 @@ export const monitoringPageSlice = createSlice({
 });
 
 export const fetchWorkflowMetrics = createAsyncThunk(
-  'monitorPage/fetchWorkflowMetrics',
+  'monitoringPage/fetchWorkflowMetrics',
   async ({ experimentId, workflowId, metricNames }: { experimentId: string; workflowId: string; metricNames: string[] }) => {
 
     const results = await Promise.allSettled(
@@ -440,7 +440,7 @@ export const fetchWorkflowMetrics = createAsyncThunk(
   });
 
 export const fetchComparativeConfusionMatrix = createAsyncThunk(
-  'monitorPage/fetch_comparative_confusion_matrix',
+  'monitoringPage/fetch_comparative_confusion_matrix',
   async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
     const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/confusion-matrix`);
 
@@ -448,7 +448,7 @@ export const fetchComparativeConfusionMatrix = createAsyncThunk(
   });
 
 export const fetchComparativeRocCurve = createAsyncThunk(
-  'monitorPage/fetch_comparative_roc_curve',
+  'monitoringPage/fetch_comparative_roc_curve',
   async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
     const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/roc-curve`);
 
