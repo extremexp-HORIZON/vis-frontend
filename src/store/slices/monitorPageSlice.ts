@@ -4,7 +4,7 @@ import type { IMetric } from '../../shared/models/experiment/metric.model';
 import { experimentApi } from '../../app/api/api';
 import type { MetricFetchResult } from './workflowPageSlice';
 import type { ConfusionMatrixResult, TestInstance } from '../../shared/models/tasks/model-analysis.model';
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 
 export interface WorkflowTableRow {
   id: string;
@@ -490,7 +490,6 @@ export const fetchComparativeConfusionMatrix = createAsyncThunk(
 
     return response.data;
   });
-
 
 export const fetchComparativeModelInstances = createAsyncThunk(
   'monitoringPage/fetch_comparative_model_instances',

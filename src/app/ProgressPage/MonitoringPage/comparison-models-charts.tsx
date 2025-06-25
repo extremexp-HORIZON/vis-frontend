@@ -73,39 +73,39 @@ const ComparisonModelsCharts: React.FC = () => {
             ))}
           </Box>
         </Grid>
-      
-        <Grid item>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
 
-           {selectedModelComparisonChart === 'instanceView' && (
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Checkbox
-          checked={showMisclassifiedOnly}
-          size="small"
-          onChange={(e) => setShowMisclassifiedOnly(e.target.checked)}
-        />
-        <Typography variant="body1" >
+        <Grid item>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+
+            {selectedModelComparisonChart === 'instanceView' && (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Checkbox
+                  checked={showMisclassifiedOnly}
+                  size="small"
+                  onChange={(e) => setShowMisclassifiedOnly(e.target.checked)}
+                />
+                <Typography variant="body1" >
           Show Misclassified
-        </Typography>
-      </Box>
-    )}
-          <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
-            <Button
-              variant={isMosaic ? 'contained' : 'outlined'}
-              color="primary"
-              onClick={() => setIsMosaic(true)}
-            >
+                </Typography>
+              </Box>
+            )}
+            <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
+              <Button
+                variant={isMosaic ? 'contained' : 'outlined'}
+                color="primary"
+                onClick={() => setIsMosaic(true)}
+              >
             Mosaic
-            </Button>
-            <Button
-              variant={!isMosaic ? 'contained' : 'outlined'}
-              color="primary"
-              onClick={() => setIsMosaic(false)}
-            >
+              </Button>
+              <Button
+                variant={!isMosaic ? 'contained' : 'outlined'}
+                color="primary"
+                onClick={() => setIsMosaic(false)}
+              >
             Stacked
-            </Button>
-          </ButtonGroup>
-        </Box>
+              </Button>
+            </ButtonGroup>
+          </Box>
         </Grid>
 
       </Grid>
