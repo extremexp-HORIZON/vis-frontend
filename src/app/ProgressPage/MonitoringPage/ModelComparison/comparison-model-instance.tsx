@@ -22,7 +22,7 @@ interface ControlPanelProps {
     loading: boolean
     error: string | null
   } | null
-  
+
 }
 
 const ControlPanel = ({
@@ -32,7 +32,7 @@ const ControlPanel = ({
   setYAxisOption,
   options,
   plotData,
-  
+
 }: ControlPanelProps) => {
   const handleAxisSelection =
     (axis: 'x' | 'y') => (e: { target: { value: string } }) => {
@@ -119,29 +119,31 @@ const ComparisonModelInstance = ({ isMosaic, showMisclassifiedOnly }: {isMosaic:
   const dispatch = useAppDispatch();
 
   const [options, setOptions] = useState<string[]>([]);
-    const [xAxisOption, setXAxisOption] = useState<string>('');
-    const [yAxisOption, setYAxisOption] = useState<string>('');
-    useEffect(() => {
-  const instanceStates = Object.values(comparativeModelInstance);
-  const dataAvailable = instanceStates.find(d => d?.data?.length);
-  if (dataAvailable?.data) {
-    const firstItem = dataAvailable.data[0];
-    setOptions(Object.keys(firstItem));
-    // Optional: Set default X/Y
-    if (!xAxisOption) setXAxisOption(Object.keys(firstItem)[0]);
-    if (!yAxisOption) setYAxisOption(Object.keys(firstItem)[1] || '');
-  }
-}, [comparativeModelInstance]);
+  const [xAxisOption, setXAxisOption] = useState<string>('');
+  const [yAxisOption, setYAxisOption] = useState<string>('');
 
-    const inferFieldType = (data: TestInstance[], field: string): 'quantitative' | 'nominal' => {
-        const sample = data.find(d => d[field] !== undefined)?.[field];
-    
-        if (typeof sample === 'number') return 'quantitative';
-    
-        return 'nominal';
-      };
-   
-    
+  useEffect(() => {
+    const instanceStates = Object.values(comparativeModelInstance);
+    const dataAvailable = instanceStates.find(d => d?.data?.length);
+
+    if (dataAvailable?.data) {
+      const firstItem = dataAvailable.data[0];
+
+      setOptions(Object.keys(firstItem));
+      // Optional: Set default X/Y
+      if (!xAxisOption) setXAxisOption(Object.keys(firstItem)[0]);
+      if (!yAxisOption) setYAxisOption(Object.keys(firstItem)[1] || '');
+    }
+  }, [comparativeModelInstance]);
+
+  const inferFieldType = (data: TestInstance[], field: string): 'quantitative' | 'nominal' => {
+    const sample = data.find(d => d[field] !== undefined)?.[field];
+
+    if (typeof sample === 'number') return 'quantitative';
+
+    return 'nominal';
+  };
+
   useEffect(() => {
     if (!experimentId) return;
     selectedWorkflowIds.forEach((runId) => {
@@ -255,14 +257,14 @@ const ComparisonModelInstance = ({ isMosaic, showMisclassifiedOnly }: {isMosaic:
       },
 
       encoding: {
-x: {
-  field: xAxisOption,
-  type: inferFieldType(instanceState.data ?? [], xAxisOption),
-},
-y: {
-  field: yAxisOption,
-  type: inferFieldType(instanceState.data ?? [], yAxisOption),
-},
+        x: {
+          field: xAxisOption,
+          type: inferFieldType(instanceState.data ?? [], xAxisOption),
+        },
+        y: {
+          field: yAxisOption,
+          type: inferFieldType(instanceState.data ?? [], yAxisOption),
+        },
 
         color: showMisclassifiedOnly
           ? {
@@ -314,8 +316,8 @@ y: {
         tooltip: [
           { field: 'actual', type: 'nominal', title: 'Actual' },
           { field: 'predicted', type: 'nominal', title: 'Predicted' },
-          { field: xAxisOption, type: inferFieldType(instanceState.data ?? [], xAxisOption) , title: xAxisOption },
-          { field: yAxisOption, type: inferFieldType(instanceState.data ?? [], yAxisOption) , title: yAxisOption },
+          { field: xAxisOption, type: inferFieldType(instanceState.data ?? [], xAxisOption), title: xAxisOption },
+          { field: yAxisOption, type: inferFieldType(instanceState.data ?? [], yAxisOption), title: yAxisOption },
         ]
       },
     };
@@ -334,17 +336,17 @@ y: {
           title={runId}
           sx={{ width: '100%', maxWidth: '100%' }}
           controlPanel={<ControlPanel
-    xAxisOption={xAxisOption}
-    yAxisOption={yAxisOption}
-    setXAxisOption={setXAxisOption}
-    setYAxisOption={setYAxisOption}
-    options={options}
-    plotData={{
-      data: instanceState.data,
-      loading: instanceState.loading,
-      error: instanceState.error,
-    }}
-  />}
+            xAxisOption={xAxisOption}
+            yAxisOption={yAxisOption}
+            setXAxisOption={setXAxisOption}
+            setYAxisOption={setYAxisOption}
+            options={options}
+            plotData={{
+              data: instanceState.data,
+              loading: instanceState.loading,
+              error: instanceState.error,
+            }}
+          />}
         />
       </Grid>
     );
