@@ -1,4 +1,4 @@
-import { Box, FormControl, Grid, InputLabel, MenuItem, Select, Switch, Typography } from '@mui/material';
+import { Box, FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import Loader from '../../../../shared/components/loader';
@@ -183,8 +183,6 @@ const ComparisonModelInstance = ({ isMosaic, showMisclassifiedOnly }: {isMosaic:
     }
 
     const dataRaw = instanceState.data;
-
-    console.log('dataRaw', dataRaw);
 
     if (!dataRaw) {
       return (

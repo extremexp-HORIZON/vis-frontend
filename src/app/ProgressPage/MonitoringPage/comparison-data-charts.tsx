@@ -12,13 +12,6 @@ import {
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
-interface BaseMetric {
-  id: string
-  name: string
-  value: number
-  [key: string]: string | number | boolean | null | undefined
-}
-
 const ComparisonDataCharts: React.FC = () => {
   const { workflowsTable, selectedWorkflowsMetrics } = useAppSelector(
     (state: RootState) => state.monitorPage,
