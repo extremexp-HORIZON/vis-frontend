@@ -1,17 +1,31 @@
 import { Grid } from '@mui/material';
 import type { RootState } from '../../../../store/store';
-import { useAppSelector } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import { useEffect } from 'react';
+import { fetchComparativeConfusionMatrix } from '../../../../store/slices/monitorPageSlice';
 
 const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
   const { workflowsTable, comparativeModelConfusionMatrix } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
+  const experimentId = useAppSelector(
+    (state: RootState) => state.progressPage.experiment.data?.id || '',
+  );
+  const dispatch = useAppDispatch();
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
+
+  // Dispatch fetchComparativeConfusionMatrix for each selected workflow (runId)
+  useEffect(() => {
+    if (!experimentId) return;
+    selectedWorkflowIds.forEach((runId) => {
+      dispatch(fetchComparativeConfusionMatrix({ experimentId, runId }));
+    });
+  }, [selectedWorkflowIds, experimentId]);
 
   // Transform matrix data to Vega-Lite format
   const transformConfusionMatrix = (labels: string[], matrix: number[][]) => {

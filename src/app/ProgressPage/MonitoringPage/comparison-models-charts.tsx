@@ -25,9 +25,6 @@ const ComparisonModelsCharts: React.FC = () => {
   const { workflowsTable, selectedModelComparisonChart } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
-  const experimentId = useAppSelector(
-    (state: RootState) => state.progressPage.experiment.data?.id || '',
-  );
   const [isMosaic, setIsMosaic] = useState(true);
 
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
@@ -37,14 +34,6 @@ const ComparisonModelsCharts: React.FC = () => {
     { label: 'rocCurve', name: 'Roc Curve', icon: <RoundedCornerRoundedIcon /> },
     { label: 'instanceView', name: 'Instance View', icon: <BlurLinearIcon /> }
   ];
-
-  // Dispatch fetchComparativeConfusionMatrix for each selected workflow (runId)
-  useEffect(() => {
-    if (!experimentId) return;
-    selectedWorkflowIds.forEach((runId) => {
-      dispatch(fetchComparativeConfusionMatrix({ experimentId, runId }));
-    });
-  }, [selectedWorkflowIds, experimentId]);
 
   if (selectedWorkflowIds.length === 0) {
     return (
