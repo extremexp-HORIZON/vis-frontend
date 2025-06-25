@@ -15,8 +15,8 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchComparativeConfusionMatrix, setSelectedModelComparisonChart } from '../../../store/slices/monitorPageSlice';
 import WindowRoundedIcon from '@mui/icons-material/WindowRounded';
 import RoundedCornerRoundedIcon from '@mui/icons-material/RoundedCornerRounded';
-import ScatterPlotRoundedIcon from '@mui/icons-material/ScatterPlotRounded';
 import ComparisonModelConfusion from './ModelComparison/comparison-model-confusion';
+import BlurLinearIcon from '@mui/icons-material/BlurLinear';
 
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -33,7 +33,7 @@ const ComparisonModelsCharts: React.FC = () => {
   const options = [
     { label: 'confusionMatrix', name: 'Confusion Matrix', icon: <WindowRoundedIcon /> },
     { label: 'rocCurve', name: 'Roc Curve', icon: <RoundedCornerRoundedIcon /> },
-    { label: 'instanceView', name: 'Instance View', icon: <ScatterPlotRoundedIcon /> }
+    { label: 'instanceView', name: 'Instance View', icon: <BlurLinearIcon /> }
   ];
 
   // Dispatch fetchComparativeConfusionMatrix for each selected workflow (runId)
