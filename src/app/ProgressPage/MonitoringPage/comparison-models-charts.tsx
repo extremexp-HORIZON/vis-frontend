@@ -8,7 +8,9 @@ import {
   ButtonGroup,
   Button,
   Chip,
-  Box
+  Box,
+  Checkbox,
+  Typography
 } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -28,6 +30,7 @@ const ComparisonModelsCharts: React.FC = () => {
   const [isMosaic, setIsMosaic] = useState(true);
 
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
+  const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(true);
 
   const options = [
     { label: 'confusionMatrix', name: 'Confusion Matrix', icon: <WindowRoundedIcon /> },
@@ -70,7 +73,22 @@ const ComparisonModelsCharts: React.FC = () => {
             ))}
           </Box>
         </Grid>
+      
         <Grid item>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+
+           {selectedModelComparisonChart === 'instanceView' && (
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Checkbox
+          checked={showMisclassifiedOnly}
+          size="small"
+          onChange={(e) => setShowMisclassifiedOnly(e.target.checked)}
+        />
+        <Typography variant="body1" >
+          Show Misclassified
+        </Typography>
+      </Box>
+    )}
           <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
             <Button
               variant={isMosaic ? 'contained' : 'outlined'}
@@ -87,6 +105,7 @@ const ComparisonModelsCharts: React.FC = () => {
             Stacked
             </Button>
           </ButtonGroup>
+        </Box>
         </Grid>
 
       </Grid>
@@ -98,7 +117,7 @@ const ComparisonModelsCharts: React.FC = () => {
         {selectedModelComparisonChart === 'rocCurve' && <ComparisonModelRoc isMosaic={isMosaic} />}
       </Grid>
       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
-        {selectedModelComparisonChart === 'instanceView' && <ComparisonModelInstance isMosaic={isMosaic} />}
+        {selectedModelComparisonChart === 'instanceView' && <ComparisonModelInstance isMosaic={isMosaic} showMisclassifiedOnly={showMisclassifiedOnly} />}
       </Grid>
     </Container>
   );

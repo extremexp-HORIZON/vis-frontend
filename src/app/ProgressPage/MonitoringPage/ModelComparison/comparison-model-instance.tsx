@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Box, Checkbox, Grid, Typography } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import Loader from '../../../../shared/components/loader';
@@ -6,20 +6,20 @@ import ResponsiveCardTable from '../../../../shared/components/responsive-card-t
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { fetchComparativeModelInstances } from '../../../../store/slices/monitorPageSlice';
 import { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 
-const ComparisonModelInstance = ({ isMosaic }: {isMosaic: boolean}) => {
+const ComparisonModelInstance = ({ isMosaic,showMisclassifiedOnly }: {isMosaic: boolean,showMisclassifiedOnly: boolean}) => {
   const { workflowsTable, comparativeModelInstance } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
+
 const experimentId = useAppSelector(
     (state: RootState) => state.progressPage.experiment.data?.id || '',
   );
     const dispatch = useAppDispatch();
-    const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(true);
   
     useEffect(() => {
       if (!experimentId) return;
@@ -88,7 +88,7 @@ const experimentId = useAppSelector(
     
         return `row-${Math.abs(hash)}`;
       };
-    
+
 
     // const confusionMatrixData = transformConfusionMatrix(dataRaw.labels, dataRaw.matrix);
     // const maxValue = Math.max(...confusionMatrixData.map(d => d.value));
@@ -231,7 +231,7 @@ const experimentId = useAppSelector(
           actions={false}
           isStatic={false}
           title={runId}
-          sx={{ width: '100%', maxWidth: '100%' }}
+          sx={{ width: '100%', maxWidth: '100%' }}   
         />
       </Grid>
     );
