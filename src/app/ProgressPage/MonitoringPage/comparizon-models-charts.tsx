@@ -17,6 +17,8 @@ import WindowRoundedIcon from '@mui/icons-material/WindowRounded';
 import RoundedCornerRoundedIcon from '@mui/icons-material/RoundedCornerRounded';
 import ComparisonModelConfusion from './ModelComparison/comparison-model-confusion';
 import BlurLinearIcon from '@mui/icons-material/BlurLinear';
+import ComparisonModelInstance from './ModelComparison/comparison-model-instance';
+import ComparisonModelRoc from './ModelComparison/comparion-model-roc';
 
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -102,6 +104,12 @@ const ComparisonModelsCharts: React.FC = () => {
 
       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
         {selectedModelComparisonChart === 'confusionMatrix' && <ComparisonModelConfusion isMosaic={isMosaic} />}
+      </Grid>
+       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
+        {selectedModelComparisonChart === 'rocCurve' && <ComparisonModelRoc isMosaic={isMosaic} />}
+      </Grid>
+       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
+        {selectedModelComparisonChart === 'instanceView' && <ComparisonModelInstance isMosaic={isMosaic} />}
       </Grid>
     </Container>
   );
