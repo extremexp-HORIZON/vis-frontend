@@ -15,15 +15,9 @@ import { useLocation } from 'react-router-dom';
 import ComparativeAnalysis from './comparative-analysis';
 
 const MonitoringPage = () => {
-  const { visibleTable, selectedTab, workflowsTable, selectedWorkflowsMetrics } = useAppSelector(
+  const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
-  const { workflows } = useAppSelector(
-    (state: RootState) => state.progressPage,
-  );
-  const { experimentId } = useParams();
-  const previousSelectedRef = useRef<string[]>([]);
-  const hasFetchedOnInit = useRef(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -59,48 +53,6 @@ const MonitoringPage = () => {
     }
   }, [workflowsTable.initialized]);
 
-  // when we fetch workflows we need to clear the previous metrics and fetch new in case they are changed
-  useEffect(() => {
-    hasFetchedOnInit.current = false;
-  }, [workflows.data]);
-
-  // fetch all selected workflows metrics
-  useEffect(() => {
-    if (workflowsTable.initialized && experimentId && !hasFetchedOnInit.current) {
-      workflowsTable.selectedWorkflows.forEach(workflowId => {
-        const metricNames = workflows.data.find(wf => wf.id === workflowId)?.metrics?.map(m => m.name);
-
-        if (metricNames?.length) {
-          dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
-        }
-      });
-
-      hasFetchedOnInit.current = true;
-      previousSelectedRef.current = workflowsTable.selectedWorkflows;
-    }
-  }, [workflows.data, workflowsTable.initialized]);
-
-  // fetch only new selected
-  useEffect(() => {
-    if (!workflowsTable.initialized || !experimentId || !hasFetchedOnInit.current) return;
-
-    const previousSelected = previousSelectedRef.current;
-    const currentSelected = workflowsTable.selectedWorkflows;
-
-    const added = currentSelected.filter(id => !previousSelected.includes(id));
-
-    previousSelectedRef.current = currentSelected;
-
-    added.forEach(workflowId => {
-      if (workflowId in selectedWorkflowsMetrics.data) return;
-
-      const metricNames = workflows.data.find(wf => wf.id === workflowId)?.metrics?.map(m => m.name);
-
-      if (metricNames?.length) {
-        dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
-      }
-    });
-  }, [workflowsTable.selectedWorkflows, workflowsTable.initialized]);
 
   return (
     <>
