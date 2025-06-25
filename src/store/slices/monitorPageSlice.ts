@@ -3,6 +3,8 @@ import type { CustomGridColDef } from '../../shared/types/table-types';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
 import { experimentApi } from '../../app/api/api';
 import type { MetricFetchResult } from './workflowPageSlice';
+import type { ConfusionMatrixResult, TestInstance } from '../../shared/models/tasks/model-analysis.model';
+import type { AxiosError } from 'axios';
 
 export interface WorkflowTableRow {
   id: string;
@@ -66,11 +68,30 @@ interface IMonitoringPageSlice {
       }
       visibleTable: string
       selectedTab: number
+      selectedComparisonTab: number
       selectedWorkflowsMetrics: {
         data: {[key: string]: {name: string; seriesMetric: IMetric[]}[]}
         loading: boolean
         error: string | null
       }
+      comparativeModelConfusionMatrix: {
+        [workflowId: string]: {
+          data: ConfusionMatrixResult | null
+          loading: boolean
+          error: string | null
+        }
+      }
+      comparativeModelRocCurve: {
+        [workflowId: string]: {
+          data: {fpr: number[]; tpr: number[]; thresholds?: number[]; auc?: number} | null
+          loading: boolean
+          error: string | null
+        }
+      }
+      comparativeModelInstance: {
+        [workflowId: string]: { data: TestInstance[] | null; loading: boolean; error: string | null }
+      }
+      selectedModelComparisonChart: string
 }
 
 const generateUniqueColor = (existingColors: Set<string>) => {
@@ -146,11 +167,16 @@ const initialState: IMonitoringPageSlice = {
   },
   visibleTable: 'workflows',
   selectedTab: 0,
+  selectedComparisonTab: 0,
   selectedWorkflowsMetrics: {
     data: {},
     loading: false,
     error: null
-  }
+  },
+  comparativeModelConfusionMatrix: {},
+  comparativeModelRocCurve: {},
+  comparativeModelInstance: {},
+  selectedModelComparisonChart: 'confusionMatrix'
 };
 
 export const monitoringPageSlice = createSlice({
@@ -198,6 +224,9 @@ export const monitoringPageSlice = createSlice({
     },
     setSelectedTab: (state, action) => {
       state.selectedTab = action.payload;
+    },
+    setSelectedComparisonTab: (state, action) => {
+      state.selectedComparisonTab = action.payload;
     },
     toggleWorkflowSelection: (state, action) => {
       const workflowId = action.payload;
@@ -255,6 +284,9 @@ export const monitoringPageSlice = createSlice({
       state.workflowsTable.filteredRows = updateRowRating(state.workflowsTable.filteredRows);
       state.workflowsTable.visibleRows = updateRowRating(state.workflowsTable.visibleRows);
     },
+    setSelectedModelComparisonChart: (state, action) => {
+      state.selectedModelComparisonChart = action.payload;
+    }
   },
   extraReducers: builder => {
     builder.addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
@@ -288,12 +320,145 @@ export const monitoringPageSlice = createSlice({
         state.selectedWorkflowsMetrics.loading = false;
         state.selectedWorkflowsMetrics.error =
           action.error.message || 'Error while fetching data';
+      })
+      .addCase(fetchComparativeConfusionMatrix.pending, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelConfusionMatrix[runId]) {
+          state.comparativeModelConfusionMatrix[runId] = {
+            data: null,
+            loading: true,
+            error: null,
+          };
+        } else {
+          state.comparativeModelConfusionMatrix[runId].loading = true;
+          state.comparativeModelConfusionMatrix[runId].error = null;
+        }
+      })
+
+      .addCase(fetchComparativeConfusionMatrix.fulfilled, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        state.comparativeModelConfusionMatrix[runId] = {
+          data: action.payload,
+          loading: false,
+          error: null,
+        };
+      })
+
+      .addCase(fetchComparativeConfusionMatrix.rejected, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelConfusionMatrix[runId]) {
+          state.comparativeModelConfusionMatrix[runId] = {
+            data: null,
+            loading: false,
+            error: 'Failed to fetch confusion matrix',
+          };
+        } else {
+          state.comparativeModelConfusionMatrix[runId].loading = false;
+          state.comparativeModelConfusionMatrix[runId].error = 'Failed to fetch confusion matrix';
+        }
+      })
+      .addCase(fetchComparativeRocCurve.pending, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelRocCurve[runId]) {
+          state.comparativeModelRocCurve[runId] = {
+            data: null,
+            loading: true,
+            error: null,
+          };
+        } else {
+          state.comparativeModelRocCurve[runId].loading = true;
+          state.comparativeModelRocCurve[runId].error = null;
+        }
+      })
+      .addCase(fetchComparativeRocCurve.fulfilled, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        let rawData = typeof action.payload === 'string'
+          ? JSON.parse(
+            action.payload
+              .replace(/\bInfinity\b/g, '1e9')
+              .replace(/\b-Infinity\b/g, '-1e9')
+          )
+          : action.payload;
+
+        if (Array.isArray(rawData.thresholds)) {
+          rawData.thresholds = (rawData.thresholds as Array<string | number>).map((t): number => {
+            if (t === Infinity || t === 'Infinity') return 1e9;
+            if (t === -Infinity || t === '-Infinity') return -1e9;
+
+            return Number(t);
+          });
+        }
+
+        state.comparativeModelRocCurve[runId] = {
+          data: rawData,
+          loading: false,
+          error: null,
+        };
+
+      })
+      .addCase(fetchComparativeRocCurve.rejected, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelRocCurve[runId]) {
+          state.comparativeModelRocCurve[runId] = {
+            data: null,
+            loading: false,
+            error: 'Failed to fetch roc curve',
+          };
+        } else {
+          state.comparativeModelRocCurve[runId].loading = false;
+          state.comparativeModelRocCurve[runId].error = 'Failed to fetch roc curve';
+        }
+      })
+      .addCase(fetchComparativeModelInstances.pending, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelInstance[runId]) {
+          state.comparativeModelInstance[runId] = {
+            data: null,
+            loading: true,
+            error: null,
+          };
+        } else {
+          state.comparativeModelInstance[runId].loading = true;
+          state.comparativeModelInstance[runId].error = null;
+        }
+      })
+
+      .addCase(fetchComparativeModelInstances.fulfilled, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        state.comparativeModelInstance[runId] = {
+          data: action.payload,
+          loading: false,
+          error: null,
+        };
+      })
+
+      .addCase(fetchComparativeModelInstances.rejected, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelInstance[runId]) {
+          state.comparativeModelInstance[runId] = {
+            data: null,
+            loading: false,
+            error: 'Failed to fetch instances',
+          };
+        } else {
+          state.comparativeModelInstance[runId].loading = false;
+          state.comparativeModelInstance[runId].error = 'Failed to fetch instances';
+        }
       });
   }
 });
 
 export const fetchWorkflowMetrics = createAsyncThunk(
-  'progressPage/fetchWorkflowMetrics',
+  'monitoringPage/fetchWorkflowMetrics',
   async ({ experimentId, workflowId, metricNames }: { experimentId: string; workflowId: string; metricNames: string[] }) => {
 
     const results = await Promise.allSettled(
@@ -318,6 +483,44 @@ export const fetchWorkflowMetrics = createAsyncThunk(
     return successful.map(res => res.value);
   });
 
-export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally
+export const fetchComparativeConfusionMatrix = createAsyncThunk(
+  'monitoringPage/fetch_comparative_confusion_matrix',
+  async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
+    const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/confusion-matrix`);
+
+    return response.data;
+  });
+
+export const fetchComparativeModelInstances = createAsyncThunk(
+  'monitoringPage/fetch_comparative_model_instances',
+  async ({ experimentId, runId, offset = 0, limit = 1000 }: { experimentId: string; runId: string; offset?: number; limit?: number }, { rejectWithValue }) => {
+    try {
+      const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/test-instances`, {
+        params: { offset, limit },
+      });
+
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+
+      if (error.response) {
+        return rejectWithValue(error.response.data);
+      }
+
+      return rejectWithValue(error.message || 'Unknown error occurred');
+    }
+  }
+);
+
+export const fetchComparativeRocCurve = createAsyncThunk(
+  'monitoringPage/fetch_comparative_roc_curve',
+  async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
+    const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/roc-curve`);
+
+    return response.data;
+  }
+);
+
+export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart
 } = monitoringPageSlice.actions;

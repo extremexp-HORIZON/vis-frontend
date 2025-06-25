@@ -2,7 +2,6 @@ import {
   Box,
   Card,
   CardContent,
-  CardHeader,
   IconButton,
   Menu,
   MenuItem,
@@ -292,147 +291,158 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         }}
       >
-        <CardHeader
-          action={
-            <>
-              <IconButton
-                aria-label="settings"
-                onClick={handleMenuClick}
-                sx={{
-                  position: 'relative',
-                  '& svg': {
-                    zIndex: 1,
-                    position: 'relative',
-                  },
-                }}
-              >
-                {/* <MoreVertIcon /> */}
-                <SettingsIcon />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={menuOpen}
-                onClose={handleMenuClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                PaperProps={{
-                  elevation: 3,
-                  sx: {
-                    width: 320,
-                    maxHeight: 500,
-                    overflowY: 'hidden',
-                    overflowX: 'hidden',
-                    padding: 0,
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
-                    border: '1px solid rgba(0,0,0,0.04)',
-                    mt: 1, // Add small margin to top
-                    '& .MuiMenu-list': {
-                      padding: 0, // Remove default padding
-                    },
-                  },
-                }}
-                MenuListProps={{
-                  sx: {
-                    padding: 0, // Remove padding from MenuList
-                  },
-                }}
-              >
-                <SectionHeader
-                  icon={<SettingsSuggestIcon fontSize="small" />}
-                  title="Chart Options"
-                />
-                {/* Advanced Controls Divider */}
-                {controlPanel && (
-                  <>
-                    <Box sx={{ p: 2 }}>{controlPanel}</Box>
-                    <Divider sx={{ mt: 1, opacity: 0.6 }} />
-                  </>
-                )}
-                {/* Quick Actions */}
-                <Box sx={{ py: 1 }}>
-                  <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
-                    <ListItemIcon>
-                      <DownloadIcon fontSize="small" color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Download as PNG"
-                      secondary="Save chart as image"
-                      primaryTypographyProps={{ fontWeight: 500 }}
-                      secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                    />
-                  </MenuItem>
-
-                  <MenuItem onClick={handleDownloadData} sx={{ py: 1.5 }}>
-                    <ListItemIcon>
-                      <CodeIcon fontSize="small" color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Download Data as JSON"
-                      secondary="Export chart's underlying data"
-                      primaryTypographyProps={{ fontWeight: 500 }}
-                      secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                    />
-                  </MenuItem>
-                </Box>
-              </Menu>
-              <Tooltip title="Fullscreen">
-                <IconButton
-                  aria-label="fullscreen"
-                  onClick={handleFullScreen}
-                  sx={{
-                    mr: 0.5,
-                    '& svg': {
-                      position: 'relative',
-                      zIndex: 1,
-                    },
-                  }}
-                >
-                  <FullscreenIcon />
-                </IconButton>
-              </Tooltip>
-            </>
-          }
-          title={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography
-                variant="overline"
-                sx={{
-                  padding: '4px 0px',
-                  textTransform: 'uppercase',
-                  fontWeight: 600,
-                  letterSpacing: '0.5px',
-                  color: '#2a3f5f',
-                }}
-              >
-                {title}
-              </Typography>
-              {details && (
-                <Tooltip title={details}>
-                  <InfoOutlinedIcon
-                    sx={{ fontSize: 16, color: 'grey.600', cursor: 'default' }}
-                  />
-                </Tooltip>
-              )}
-            </Box>
-          }
-          // subheader="September 14, 2016"
+        <Box
           sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
             borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
             padding: '4px 16px',
             height: '40px',
             borderTopLeftRadius: '12px',
             borderTopRightRadius: '12px',
-            flexShrink: 0, // Prevent header from shrinking
+            flexShrink: 0,
+            minWidth: 0,
           }}
-        />
+        >
+          {/* Title (unchanged, just wrapped for truncation) */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
+            <Typography
+              variant="overline"
+              sx={{
+                padding: '4px 0px',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+                letterSpacing: '0.5px',
+                color: '#2a3f5f',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                flexShrink: 1,
+              }}
+            >
+              {title}
+            </Typography>
+            {details && (
+              <Tooltip title={details}>
+                <InfoOutlinedIcon
+                  sx={{ fontSize: 16, color: 'grey.600', cursor: 'default' }}
+                />
+              </Tooltip>
+            )}
+          </Box>
+
+          {/* Actions */}
+          <>
+            <IconButton
+              aria-label="settings"
+              onClick={handleMenuClick}
+              sx={{
+                position: 'relative',
+                '& svg': {
+                  zIndex: 1,
+                  position: 'relative',
+                },
+              }}
+            >
+              <SettingsIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={menuOpen}
+              onClose={handleMenuClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  width: 320,
+                  maxHeight: 500,
+                  overflowY: 'hidden',
+                  overflowX: 'hidden',
+                  padding: 0,
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  mt: 1,
+                  '& .MuiMenu-list': {
+                    padding: 0,
+                  },
+                },
+              }}
+              MenuListProps={{
+                sx: {
+                  padding: 0,
+                },
+              }}
+            >
+              <SectionHeader
+                icon={<SettingsSuggestIcon fontSize="small" />}
+                title="Chart Options"
+              />
+              {controlPanel && (
+                <>
+                  <Box sx={{ p: 2 }}>{controlPanel}</Box>
+                  <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                </>
+              )}
+              <Box sx={{ py: 1 }}>
+                <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
+                  <ListItemIcon>
+                    <DownloadIcon fontSize="small" color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Download as PNG"
+                    secondary="Save chart as image"
+                    primaryTypographyProps={{ fontWeight: 500 }}
+                    secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                  />
+                </MenuItem>
+                <MenuItem onClick={handleDownloadData} sx={{ py: 1.5 }}>
+                  <ListItemIcon>
+                    <CodeIcon fontSize="small" color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Download Data as JSON"
+                    secondary="Export chart's underlying data"
+                    primaryTypographyProps={{ fontWeight: 500 }}
+                    secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                  />
+                </MenuItem>
+              </Box>
+            </Menu>
+            <Tooltip title="Fullscreen">
+              <IconButton
+                aria-label="fullscreen"
+                onClick={handleFullScreen}
+                sx={{
+                  mr: 0.5,
+                  '& svg': {
+                    position: 'relative',
+                    zIndex: 1,
+                  },
+                }}
+              >
+                <FullscreenIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        </Box>
         <CardContent
           sx={{
             backgroundColor: '#ffffff',
