@@ -7,22 +7,24 @@ import {
   Container,
   ButtonGroup,
   Button,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
+  Chip,
+  Box
 } from '@mui/material';
 import ResponsiveCardVegaLite from '../../shared/components/responsive-card-vegalite';
 import InfoMessage from '../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { fetchComparativeConfusionMatrix } from '../../store/slices/monitorPageSlice';
+import { fetchComparativeConfusionMatrix, setSelectedModelComparisonChart } from '../../store/slices/monitorPageSlice';
 import ResponsiveCardTable from '../../shared/components/responsive-card-table';
 import Loader from '../../shared/components/loader';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
+import ShowChartRoundedIcon from '@mui/icons-material/ShowChartRounded';
+import ScatterPlotRoundedIcon from '@mui/icons-material/ScatterPlotRounded';
 
 
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { workflowsTable, comparativeModelConfusionMatrix } = useAppSelector(
+  const { workflowsTable, comparativeModelConfusionMatrix, selectedModelComparisonChart } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
   const experimentId = useAppSelector(
@@ -32,7 +34,11 @@ const ComparisonModelsCharts: React.FC = () => {
 
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
 
-  const [selectedOption, setSelectedOption] = useState('confusionMatrix');
+  const options = [
+    {label: 'confusionMatrix', name: 'Confusion Matrix',icon: <TableChartRoundedIcon />},
+    {label: 'rocCurve', name:'Roc Curve',icon: <ShowChartRoundedIcon />},
+    {label: 'instanceView', name:'Instance View', icon: <ScatterPlotRoundedIcon />}
+  ]
 
   // Dispatch fetchComparativeConfusionMatrix for each selected workflow (runId)
   useEffect(() => {
@@ -174,20 +180,27 @@ const ComparisonModelsCharts: React.FC = () => {
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }}>
-      <Grid container justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
+      <Grid container justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }} gap={1}>
 
         {/* Left-aligned Button Group */}
         <Grid item>
-          <RadioGroup
-            row
-            value={selectedOption}
-            onChange={(e) => setSelectedOption(e.target.value)}
-            aria-label="view type"
-            name="view-type-radio"
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            gap={1}
           >
-            <FormControlLabel value="confusionMatrix" control={<Radio />} label="Confusion Matrix" />
-            {/* <FormControlLabel value="scatterPlot" control={<Radio />} label="Scatter Plot" /> */}
-          </RadioGroup>
+            {options.map(option => (
+              <Chip
+                key={option.label}
+                label={option.name}
+                icon={option.icon}
+                clickable
+                color={selectedModelComparisonChart === option.label ? 'primary' : 'default'}
+                variant={selectedModelComparisonChart === option.label ? 'filled' : 'outlined'}
+                onClick={() => dispatch(setSelectedModelComparisonChart(option.label))}
+              />
+            ))}
+          </Box>
         </Grid>
         <Grid item>
           <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
@@ -211,7 +224,7 @@ const ComparisonModelsCharts: React.FC = () => {
       </Grid>
 
       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
-        {selectedOption === 'confusionMatrix' ? renderCharts : null}
+        {selectedModelComparisonChart === 'confusionMatrix' ? renderCharts : null}
       </Grid>
     </Container>
   );

@@ -80,6 +80,7 @@ interface IMonitoringPageSlice {
           error: string | null
         }
       }
+      selectedModelComparisonChart: string
 }
 
 const generateUniqueColor = (existingColors: Set<string>) => {
@@ -161,7 +162,8 @@ const initialState: IMonitoringPageSlice = {
     loading: false,
     error: null
   },
-  comparativeModelConfusionMatrix: {}
+  comparativeModelConfusionMatrix: {},
+  selectedModelComparisonChart: 'confusionMatrix'
 };
 
 export const monitoringPageSlice = createSlice({
@@ -269,6 +271,9 @@ export const monitoringPageSlice = createSlice({
       state.workflowsTable.filteredRows = updateRowRating(state.workflowsTable.filteredRows);
       state.workflowsTable.visibleRows = updateRowRating(state.workflowsTable.visibleRows);
     },
+    setSelectedModelComparisonChart: (state, action) => {
+      state.selectedModelComparisonChart = action.payload;
+    }
   },
   extraReducers: builder => {
     builder.addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
@@ -380,5 +385,5 @@ export const fetchComparativeConfusionMatrix = createAsyncThunk(
   });
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart
 } = monitoringPageSlice.actions;
