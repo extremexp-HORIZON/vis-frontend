@@ -80,6 +80,13 @@ interface IMonitoringPageSlice {
           error: string | null
         }
       }
+      comparativeModelRocCurve: {
+        [workflowId: string]: {
+          data: {fpr: number[]; tpr: number[]; thresholds?: number[]; auc?: number} | null
+          loading: boolean
+          error: string | null
+        }
+      }
       selectedModelComparisonChart: string
 }
 
@@ -163,6 +170,7 @@ const initialState: IMonitoringPageSlice = {
     error: null
   },
   comparativeModelConfusionMatrix: {},
+  comparativeModelRocCurve: {},
   selectedModelComparisonChart: 'confusionMatrix'
 };
 
@@ -346,12 +354,67 @@ export const monitoringPageSlice = createSlice({
           state.comparativeModelConfusionMatrix[runId].loading = false;
           state.comparativeModelConfusionMatrix[runId].error = 'Failed to fetch confusion matrix';
         }
+      })
+      .addCase(fetchComparativeRocCurve.pending, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelRocCurve[runId]) {
+          state.comparativeModelRocCurve[runId] = {
+            data: null,
+            loading: true,
+            error: null,
+          };
+        } else {
+          state.comparativeModelRocCurve[runId].loading = true;
+          state.comparativeModelRocCurve[runId].error = null;
+        }
+      })
+      .addCase(fetchComparativeRocCurve.fulfilled, (state, action) => {
+        const runId = action.meta.arg.runId;
+  
+        let rawData = typeof action.payload === 'string'
+          ? JSON.parse(
+            action.payload
+              .replace(/\bInfinity\b/g, '1e9')
+              .replace(/\b-Infinity\b/g, '-1e9')
+          )
+          : action.payload;
+
+        if (Array.isArray(rawData.thresholds)) {
+          rawData.thresholds = (rawData.thresholds as Array<string | number>).map((t): number => {
+            if (t === Infinity || t === 'Infinity') return 1e9;
+            if (t === -Infinity || t === '-Infinity') return -1e9;
+
+            return Number(t);
+          });
+        }
+
+        state.comparativeModelRocCurve[runId] = {
+          data: rawData,
+          loading: false,
+          error: null,
+        };
+  
+      })
+      .addCase(fetchComparativeRocCurve.rejected, (state, action) => {
+        const runId = action.meta.arg.runId;
+
+        if (!state.comparativeModelRocCurve[runId]) {
+          state.comparativeModelRocCurve[runId] = {
+            data: null,
+            loading: false,
+            error: 'Failed to fetch roc curve',
+          };
+        } else {
+          state.comparativeModelRocCurve[runId].loading = false;
+          state.comparativeModelRocCurve[runId].error = 'Failed to fetch confusion matrix';
+        }
       });
   }
 });
 
 export const fetchWorkflowMetrics = createAsyncThunk(
-  'progressPage/fetchWorkflowMetrics',
+  'monitorPage/fetchWorkflowMetrics',
   async ({ experimentId, workflowId, metricNames }: { experimentId: string; workflowId: string; metricNames: string[] }) => {
 
     const results = await Promise.allSettled(
@@ -377,12 +440,22 @@ export const fetchWorkflowMetrics = createAsyncThunk(
   });
 
 export const fetchComparativeConfusionMatrix = createAsyncThunk(
-  'modelAnalysis/fetch_comparative_confusion_matrix',
+  'monitorPage/fetch_comparative_confusion_matrix',
   async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
     const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/confusion-matrix`);
 
     return response.data;
   });
+
+export const fetchComparativeRocCurve = createAsyncThunk(
+  'monitorPage/fetch_comparative_roc_curve',
+  async ({ experimentId, runId }: { experimentId: string; runId: string }) => {
+    const response = await experimentApi.get(`${experimentId}/runs/${runId}/evaluation/roc-curve`);
+
+    return response.data;
+  }
+);
+
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart
