@@ -133,6 +133,8 @@ const ControlPanel = ({
 };
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
+  const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
   const { workflowsTable, selectedModelComparisonChart } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
@@ -161,9 +163,6 @@ const ComparisonModelsCharts: React.FC = () => {
       />
     );
   }
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const menuOpen = Boolean(anchorEl);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

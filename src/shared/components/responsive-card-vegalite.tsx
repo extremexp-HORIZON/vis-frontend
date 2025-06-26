@@ -47,6 +47,7 @@ interface ResponsiveCardVegaLiteProps {
   details?: string | null
   loading?: boolean
   title?: string
+  showSettings?: boolean;
 }
 const SectionHeader = ({
   icon,
@@ -109,6 +110,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   isStatic = true,
   details = null,
   loading = false,
+  showSettings = true,
 
   ...otherProps
 }) => {
@@ -343,89 +345,93 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
           {/* Actions */}
           <>
-            <IconButton
-              aria-label="settings"
-              onClick={handleMenuClick}
-              sx={{
-                position: 'relative',
-                '& svg': {
-                  zIndex: 1,
-                  position: 'relative',
-                },
-              }}
-            >
-              <SettingsIcon />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={menuOpen}
-              onClose={handleMenuClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              PaperProps={{
-                elevation: 3,
-                sx: {
-                  width: 320,
-                  maxHeight: 500,
-                  overflowY: 'hidden',
-                  overflowX: 'hidden',
-                  padding: 0,
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                  mt: 1,
-                  '& .MuiMenu-list': {
-                    padding: 0,
-                  },
-                },
-              }}
-              MenuListProps={{
-                sx: {
-                  padding: 0,
-                },
-              }}
-            >
-              <SectionHeader
-                icon={<SettingsSuggestIcon fontSize="small" />}
-                title="Chart Options"
-              />
-              {controlPanel && (
-                <>
-                  <Box sx={{ p: 2 }}>{controlPanel}</Box>
-                  <Divider sx={{ mt: 1, opacity: 0.6 }} />
-                </>
-              )}
-              <Box sx={{ py: 1 }}>
-                <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
-                  <ListItemIcon>
-                    <DownloadIcon fontSize="small" color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Download as PNG"
-                    secondary="Save chart as image"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontSize: '0.75rem' }}
+            {showSettings && (
+              <>
+                <IconButton
+                  aria-label="settings"
+                  onClick={handleMenuClick}
+                  sx={{
+                    position: 'relative',
+                    '& svg': {
+                      zIndex: 1,
+                      position: 'relative',
+                    },
+                  }}
+                >
+                  <SettingsIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={menuOpen}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  PaperProps={{
+                    elevation: 3,
+                    sx: {
+                      width: 320,
+                      maxHeight: 500,
+                      overflowY: 'hidden',
+                      overflowX: 'hidden',
+                      padding: 0,
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                      border: '1px solid rgba(0,0,0,0.04)',
+                      mt: 1,
+                      '& .MuiMenu-list': {
+                        padding: 0,
+                      },
+                    },
+                  }}
+                  MenuListProps={{
+                    sx: {
+                      padding: 0,
+                    },
+                  }}
+                >
+                  <SectionHeader
+                    icon={<SettingsSuggestIcon fontSize="small" />}
+                    title="Chart Options"
                   />
-                </MenuItem>
-                <MenuItem onClick={handleDownloadData} sx={{ py: 1.5 }}>
-                  <ListItemIcon>
-                    <CodeIcon fontSize="small" color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Download Data as JSON"
-                    secondary="Export chart's underlying data"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                  />
-                </MenuItem>
-              </Box>
-            </Menu>
+                  {controlPanel && (
+                    <>
+                      <Box sx={{ p: 2 }}>{controlPanel}</Box>
+                      <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                    </>
+                  )}
+                  <Box sx={{ py: 1 }}>
+                    <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
+                      <ListItemIcon>
+                        <DownloadIcon fontSize="small" color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Download as PNG"
+                        secondary="Save chart as image"
+                        primaryTypographyProps={{ fontWeight: 500 }}
+                        secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                      />
+                    </MenuItem>
+                    <MenuItem onClick={handleDownloadData} sx={{ py: 1.5 }}>
+                      <ListItemIcon>
+                        <CodeIcon fontSize="small" color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Download Data as JSON"
+                        secondary="Export chart's underlying data"
+                        primaryTypographyProps={{ fontWeight: 500 }}
+                        secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                      />
+                    </MenuItem>
+                  </Box>
+                </Menu>
+              </>
+            )}
             <Tooltip title="Fullscreen">
               <IconButton
                 aria-label="fullscreen"

@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs, Tooltip } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { setSelectedComparisonTab } from '../../../store/slices/monitorPageSlice';
@@ -18,8 +18,6 @@ const ComparativeAnalysis = () => {
 
   if (groupBy.length > 0)
     dispatch(setSelectedComparisonTab(0));
-
-  const disabledMessage = 'This tab is disabled when grouping is active';
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>

@@ -33,7 +33,7 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
     if (!rocState || rocState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <Loader />
           </ResponsiveCardTable>
         </Grid>
@@ -43,7 +43,7 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
     if (rocState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <InfoMessage
               message={rocState.error}
               type="info"
@@ -62,7 +62,7 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
     if (!dataRaw || !dataRaw.fpr || !dataRaw.tpr) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <InfoMessage
               message={'No roc curve data available'}
               type="info"
@@ -171,6 +171,8 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
           spec={rocSpec}
           actions={false}
           isStatic={false}
+          showSettings={false}
+
           title={runId}
           sx={{ width: '100%', maxWidth: '100%' }}
         />

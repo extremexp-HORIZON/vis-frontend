@@ -51,7 +51,7 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
     if (!matrixState || matrixState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <Loader />
           </ResponsiveCardTable>
         </Grid>
@@ -61,7 +61,7 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
     if (matrixState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <InfoMessage
               message={matrixState.error}
               type="info"
@@ -80,7 +80,7 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
     if (!dataRaw || !dataRaw.labels || !dataRaw.matrix) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <InfoMessage
               message={'No confusion matrix data available'}
               type="info"
@@ -141,6 +141,7 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
           isStatic={false}
           title={runId}
           sx={{ width: '100%', maxWidth: '100%' }}
+          showSettings={false}
         />
       </Grid>
     );

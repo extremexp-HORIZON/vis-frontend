@@ -75,7 +75,7 @@ const ComparisonModelInstance = ({
     if (!instanceState || instanceState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <Loader />
           </ResponsiveCardTable>
         </Grid>
@@ -85,7 +85,7 @@ const ComparisonModelInstance = ({
     if (instanceState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <InfoMessage
               message={instanceState.error}
               type="info"
@@ -104,7 +104,7 @@ const ComparisonModelInstance = ({
     if (!dataRaw) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400}>
+          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
             <InfoMessage
               message={'No instance data available'}
               type="info"
@@ -250,6 +250,7 @@ const ComparisonModelInstance = ({
           isStatic={false}
           title={runId}
           sx={{ width: '100%', maxWidth: '100%' }}
+          showSettings={false}
         />
       </Grid>
     );
