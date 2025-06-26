@@ -104,6 +104,18 @@ const ParallelCoordinatePlot = () => {
   };
 
   const processedData = useMemo(() => {
+    const selectedSet = new Set<string>();
+    const isGrouped = workflowsTable.groupBy.length > 0;
+
+    workflowsTable.selectedWorkflows.forEach(id => {
+      if (isGrouped) {
+        const groupMembers = workflowsTable.grouppedWorkflows[id] || [];
+        groupMembers.forEach(id => selectedSet.add(id));
+      } else {
+        selectedSet.add(id);
+      }
+    });
+
     return parallelData.map((item, index) => {
       const newItem = { ...item };
 
@@ -113,7 +125,7 @@ const ParallelCoordinatePlot = () => {
         }
       }
 
-      newItem.selected = workflowsTable.selectedWorkflows.includes(newItem.workflowId);
+      newItem.selected = selectedSet.has(item.workflowId);
 
       return newItem;
     }) as (ParallelDataItem & { selected: boolean })[];

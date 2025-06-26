@@ -211,8 +211,12 @@ export default function WorkflowTable() {
     rows: WorkflowTableRow[],
     groupKeys: string[],
     metricKeys: string[]
-  ): WorkflowTableRow[] => {
+  ): {
+    aggregatedRows: WorkflowTableRow[],
+    grouppedWorkflows: Record<string,string[]>
+  } => {
     const grouped = new Map<string, WorkflowTableRow[]>();
+    const grouppedWorkflows: Record<string, string[]> = {};
 
     rows.forEach(row => {
       const key = groupKeys.map(k => row[k]).join('|');
@@ -226,11 +230,15 @@ export default function WorkflowTable() {
 
     for (const [, group] of grouped.entries()) {
       const values = group[0];
+      const workflowIds = group.map(row => row.workflowId);
+      const groupId = (idCounter++).toString();
       const summary: WorkflowTableRow = {
-        id: (idCounter++).toString(),
+        id: groupId,
         isGroupSummary: true,
         workflowId: group.length > 1 ? `${group.length} workflows` : `${group.length} workflow`,
       };
+
+      grouppedWorkflows[groupId] = workflowIds;
 
       groupKeys.forEach(param => {
         summary[param] = values[param];
@@ -250,7 +258,7 @@ export default function WorkflowTable() {
       aggregatedRows.push(summary);
     }
 
-    return aggregatedRows;
+    return {aggregatedRows, grouppedWorkflows};
   };
 
   useEffect(() => {
@@ -306,7 +314,7 @@ export default function WorkflowTable() {
   useEffect(() => {
     if(workflowsTable.initialized) {
       if (workflowsTable.groupBy.length > 0 && workflowsTable.filteredRows.length > 0) {
-        const aggregatedRows = handleAggregation(
+        const {aggregatedRows, grouppedWorkflows} = handleAggregation(
           workflowsTable.filteredRows,
           workflowsTable.groupBy,
           workflowsTable.uniqueMetrics
@@ -330,7 +338,8 @@ export default function WorkflowTable() {
           visibleRows: aggregatedRows,
           aggregatedRows: aggregatedRows,
           visibleColumns: reducedColumns,
-          selectedWorkflows: preservedSelections
+          selectedWorkflows: preservedSelections,
+          grouppedWorkflows
         }));
       } else {
         dispatch(setWorkflowsTable({

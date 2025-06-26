@@ -45,6 +45,7 @@ interface IMonitoringPageSlice {
         columnsVisibilityModel: { [field: string]: boolean }
         aggregatedRows: WorkflowTableRow[]
         groupBy: string[]
+        grouppedWorkflows: Record<string,string[]>
         uniqueMetrics: string[]
         uniqueParameters: string[]
         uniqueTasks: string[]
@@ -144,6 +145,7 @@ const initialState: IMonitoringPageSlice = {
     columnsVisibilityModel: {},
     aggregatedRows: [],
     groupBy: [],
+    grouppedWorkflows: {},
     uniqueMetrics: [],
     uniqueParameters: [],
     uniqueTasks: [],
