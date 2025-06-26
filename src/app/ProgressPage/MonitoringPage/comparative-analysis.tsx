@@ -42,17 +42,16 @@ const ComparativeAnalysis = () => {
           // aria-label="tab menu"
         >
           <Tab label="Metrics" />
-         
-              <Tab
-                label="Models Insights"
-                disabled={groupBy.length > 0}
-              />
-         
-              <Tab
-                label="Data"
-                disabled={groupBy.length > 0}
-              />
-          
+
+          <Tab
+            label="Models Insights"
+            disabled={groupBy.length > 0}
+          />
+
+          <Tab
+            label="Data"
+            disabled={groupBy.length > 0}
+          />
 
         </Tabs>
       </Box>

@@ -1,4 +1,4 @@
-import { Box, FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/material';
+import {  Grid } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import Loader from '../../../../shared/components/loader';
@@ -6,108 +6,29 @@ import ResponsiveCardTable from '../../../../shared/components/responsive-card-t
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { fetchComparativeModelInstances } from '../../../../store/slices/monitorPageSlice';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
-import ShowChartIcon from '@mui/icons-material/ShowChart';
 
-interface ControlPanelProps {
-  xAxisOption: string
-  yAxisOption: string
-  setXAxisOption: (val: string) => void
-  setYAxisOption: (val: string) => void
-  options: string[]
-  plotData: {
-    data: TestInstance[] | null
-    loading: boolean
-    error: string | null
-  } | null
-
-}
-
-const ControlPanel = ({
+const ComparisonModelInstance = ({
+  isMosaic,
+  showMisclassifiedOnly,
   xAxisOption,
   yAxisOption,
   setXAxisOption,
   setYAxisOption,
   options,
-  plotData,
-
-}: ControlPanelProps) => {
-  const handleAxisSelection =
-    (axis: 'x' | 'y') => (e: { target: { value: string } }) => {
-      if (axis === 'x') setXAxisOption(e.target.value);
-      else setYAxisOption(e.target.value);
-    };
-
-  return (
-    <>
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, px: 1.5 }}>
-        {/* X-Axis Selector */}
-        <FormControl fullWidth>
-          <InputLabel id="x-axis-select-label">
-            <Box display="flex" alignItems="center" gap={1}>
-              <ShowChartIcon fontSize="small" />
-                X-Axis
-            </Box>
-          </InputLabel>
-          <Select
-            labelId="x-axis-select-label"
-            label="X-Axis-----"
-            disabled={plotData?.loading || !plotData?.data}
-            value={xAxisOption}
-            onChange={handleAxisSelection('x')}
-            MenuProps={{
-              PaperProps: { style: { maxHeight: 224, width: 250 } },
-            }}
-          >
-            {options
-              .filter(option => option !== yAxisOption)
-              .map((feature, idx) => (
-                <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
-                  {feature}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel id="y-axis-select-label">
-            <Box display="flex" alignItems="center" gap={1}>
-              <ShowChartIcon fontSize="small" />
-                Y-Axis
-            </Box>
-          </InputLabel>
-          <Select
-            labelId="y-axis-select-label"
-            label="Y-Axis-----"
-            disabled={plotData?.loading || !plotData?.data}
-            value={yAxisOption}
-            onChange={handleAxisSelection('y')}
-            MenuProps={{
-              PaperProps: { style: { maxHeight: 224, width: 250 } },
-            }}
-          >
-            {options
-              .filter(option => option !== xAxisOption)
-              .map((feature, idx) => (
-                <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
-                  {feature}
-                </MenuItem>
-              ))}
-
-            {options.filter(option => option !== xAxisOption).length === 0 && (
-              <MenuItem disabled value="">
-                No available options
-              </MenuItem>
-            )}
-          </Select>
-        </FormControl>
-      </Box>
-
-    </>
-  );
-};
-const ComparisonModelInstance = ({ isMosaic, showMisclassifiedOnly }: {isMosaic: boolean, showMisclassifiedOnly: boolean}) => {
+  setOptions,
+}: {
+  isMosaic: boolean,
+  showMisclassifiedOnly: boolean,
+  xAxisOption: string,
+  yAxisOption: string,
+  setXAxisOption: (val: string) => void,
+  setYAxisOption: (val: string) => void,
+  options: string[],
+  setOptions: (opts: string[]) => void
+}) => {
   const { workflowsTable, comparativeModelInstance } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
@@ -117,10 +38,6 @@ const ComparisonModelInstance = ({ isMosaic, showMisclassifiedOnly }: {isMosaic:
     (state: RootState) => state.progressPage.experiment.data?.id || '',
   );
   const dispatch = useAppDispatch();
-
-  const [options, setOptions] = useState<string[]>([]);
-  const [xAxisOption, setXAxisOption] = useState<string>('');
-  const [yAxisOption, setYAxisOption] = useState<string>('');
 
   useEffect(() => {
     const instanceStates = Object.values(comparativeModelInstance);
@@ -333,18 +250,6 @@ const ComparisonModelInstance = ({ isMosaic, showMisclassifiedOnly }: {isMosaic:
           isStatic={false}
           title={runId}
           sx={{ width: '100%', maxWidth: '100%' }}
-          controlPanel={<ControlPanel
-            xAxisOption={xAxisOption}
-            yAxisOption={yAxisOption}
-            setXAxisOption={setXAxisOption}
-            setYAxisOption={setYAxisOption}
-            options={options}
-            plotData={{
-              data: instanceState.data,
-              loading: instanceState.loading,
-              error: instanceState.error,
-            }}
-          />}
         />
       </Grid>
     );
