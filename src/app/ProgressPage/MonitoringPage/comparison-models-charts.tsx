@@ -293,10 +293,15 @@ const ComparisonModelsCharts: React.FC = () => {
                       mt: 0,
                     },
                   }}
+                  MenuListProps={{
+                    sx: {
+                      pt: 0,
+                    }
+                  }}
                 >
                   <SectionHeader
                     icon={<SettingsSuggestIcon fontSize="small" />}
-                    title="Options"
+                    title="Control Options"
                   />
 
                   {/* Checkbox */}
