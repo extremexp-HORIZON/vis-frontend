@@ -10,8 +10,14 @@ const ComparativeAnalysis = () => {
   const { selectedComparisonTab } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
+  const groupBy = useAppSelector(
+    (state: RootState) => state.monitorPage.workflowsTable.groupBy,
+  );
 
   const dispatch = useAppDispatch();
+
+  if (groupBy.length>0)
+    dispatch(setSelectedComparisonTab(0));
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -34,8 +40,8 @@ const ComparativeAnalysis = () => {
           // aria-label="tab menu"
         >
           <Tab label="Metrics" />
-          <Tab label="Models Insights" />
-          <Tab label="Data" />
+          <Tab label="Models Insights" disabled={groupBy.length > 0} />
+          <Tab label="Data" disabled={groupBy.length > 0} />
         </Tabs>
       </Box>
       <Box sx={{ width: '100%', flexGrow: 1, overflow: 'auto' }}>
