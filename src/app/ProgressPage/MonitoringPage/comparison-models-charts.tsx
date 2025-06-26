@@ -21,6 +21,7 @@ import ComparisonModelConfusion from './ModelComparison/comparison-model-confusi
 import BlurLinearIcon from '@mui/icons-material/BlurLinear';
 import ComparisonModelInstance from './ModelComparison/comparison-model-instance';
 import ComparisonModelRoc from './ModelComparison/comparison-model-roc';
+import theme from '../../../mui-theme';
 
 const ComparisonModelsCharts: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -33,9 +34,9 @@ const ComparisonModelsCharts: React.FC = () => {
   const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(true);
 
   const options = [
-    { label: 'confusionMatrix', name: 'Confusion Matrix', icon: <WindowRoundedIcon /> },
-    { label: 'rocCurve', name: 'Roc Curve', icon: <RoundedCornerRoundedIcon /> },
-    { label: 'instanceView', name: 'Instance View', icon: <BlurLinearIcon /> }
+    { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon /> },
+    { label: 'rocCurve', name: 'Roc\nCurve', icon: <RoundedCornerRoundedIcon /> },
+    { label: 'instanceView', name: 'Instance\nView', icon: <BlurLinearIcon /> }
   ];
 
   if (selectedWorkflowIds.length === 0) {
@@ -66,6 +67,27 @@ const ComparisonModelsCharts: React.FC = () => {
                 label={option.name}
                 icon={option.icon}
                 clickable
+                sx={{
+                  height: 40,
+                  // width: 150,
+                  background:
+                    selectedModelComparisonChart === option.label
+                      ? undefined
+                      : theme.palette.customGrey.light,
+                  px: 2,
+                  borderRadius: 2,
+                  fontWeight: 500,
+                  '& .MuiChip-icon': {
+                    fontSize: 25,
+                    marginLeft: 0,
+                    marginRight: 0.1
+                  },
+                  '& .MuiChip-label': {
+                    whiteSpace: 'pre-line',
+                    textAlign: 'left',
+                    lineHeight: 1.2,
+                  },
+                }}
                 color={selectedModelComparisonChart === option.label ? 'primary' : 'default'}
                 variant={selectedModelComparisonChart === option.label ? 'filled' : 'outlined'}
                 onClick={() => dispatch(setSelectedModelComparisonChart(option.label))}
