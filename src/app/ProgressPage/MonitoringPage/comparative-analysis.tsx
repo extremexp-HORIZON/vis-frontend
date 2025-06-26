@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs, Tooltip } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { setSelectedComparisonTab } from '../../../store/slices/monitorPageSlice';
@@ -16,8 +16,10 @@ const ComparativeAnalysis = () => {
 
   const dispatch = useAppDispatch();
 
-  if (groupBy.length>0)
+  if (groupBy.length > 0)
     dispatch(setSelectedComparisonTab(0));
+
+  const disabledMessage = 'This tab is disabled when grouping is active';
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -40,8 +42,23 @@ const ComparativeAnalysis = () => {
           // aria-label="tab menu"
         >
           <Tab label="Metrics" />
-          <Tab label="Models Insights" disabled={groupBy.length > 0} />
-          <Tab label="Data" disabled={groupBy.length > 0} />
+          <Tooltip title={groupBy.length > 0 ? disabledMessage : ''}>
+            <span> {/* Wrapper span for disabled tab tooltip */}
+              <Tab
+                label="Models Insights"
+                disabled={groupBy.length > 0}
+              />
+            </span>
+          </Tooltip>
+          <Tooltip title={groupBy.length > 0 ? disabledMessage : ''}>
+            <span> {/* Wrapper span for disabled tab tooltip */}
+              <Tab
+                label="Data"
+                disabled={groupBy.length > 0}
+              />
+            </span>
+          </Tooltip>
+
         </Tabs>
       </Box>
       <Box sx={{ width: '100%', flexGrow: 1, overflow: 'auto' }}>

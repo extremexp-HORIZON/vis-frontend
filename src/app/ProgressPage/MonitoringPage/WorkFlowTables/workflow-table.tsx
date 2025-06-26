@@ -213,7 +213,7 @@ export default function WorkflowTable() {
     metricKeys: string[]
   ): {
     aggregatedRows: WorkflowTableRow[],
-    grouppedWorkflows: Record<string,string[]>
+    grouppedWorkflows: Record<string, string[]>
   } => {
     const grouped = new Map<string, WorkflowTableRow[]>();
     const grouppedWorkflows: Record<string, string[]> = {};
@@ -258,7 +258,7 @@ export default function WorkflowTable() {
       aggregatedRows.push(summary);
     }
 
-    return {aggregatedRows, grouppedWorkflows};
+    return { aggregatedRows, grouppedWorkflows };
   };
 
   useEffect(() => {
@@ -314,7 +314,7 @@ export default function WorkflowTable() {
   useEffect(() => {
     if(workflowsTable.initialized) {
       if (workflowsTable.groupBy.length > 0 && workflowsTable.filteredRows.length > 0) {
-        const {aggregatedRows, grouppedWorkflows} = handleAggregation(
+        const { aggregatedRows, grouppedWorkflows } = handleAggregation(
           workflowsTable.filteredRows,
           workflowsTable.groupBy,
           workflowsTable.uniqueMetrics
@@ -332,7 +332,6 @@ export default function WorkflowTable() {
 
         const newVisibleIds = new Set(aggregatedRows.map(r => r.id));
         const preservedSelections = workflowsTable.selectedWorkflows.filter(id => newVisibleIds.has(id));
-
 
         dispatch(setWorkflowsTable({
           visibleRows: aggregatedRows,

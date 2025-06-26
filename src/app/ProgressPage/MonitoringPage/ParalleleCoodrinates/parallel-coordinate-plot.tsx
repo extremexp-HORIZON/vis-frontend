@@ -110,6 +110,7 @@ const ParallelCoordinatePlot = () => {
     workflowsTable.selectedWorkflows.forEach(id => {
       if (isGrouped) {
         const groupMembers = workflowsTable.grouppedWorkflows[id] || [];
+
         groupMembers.forEach(id => selectedSet.add(id));
       } else {
         selectedSet.add(id);
