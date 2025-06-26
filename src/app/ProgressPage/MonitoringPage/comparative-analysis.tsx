@@ -42,22 +42,17 @@ const ComparativeAnalysis = () => {
           // aria-label="tab menu"
         >
           <Tab label="Metrics" />
-          <Tooltip title={groupBy.length > 0 ? disabledMessage : ''}>
-            <span> {/* Wrapper span for disabled tab tooltip */}
+         
               <Tab
                 label="Models Insights"
                 disabled={groupBy.length > 0}
               />
-            </span>
-          </Tooltip>
-          <Tooltip title={groupBy.length > 0 ? disabledMessage : ''}>
-            <span> {/* Wrapper span for disabled tab tooltip */}
+         
               <Tab
                 label="Data"
                 disabled={groupBy.length > 0}
               />
-            </span>
-          </Tooltip>
+          
 
         </Tabs>
       </Box>
