@@ -322,10 +322,15 @@ export default function WorkflowTable() {
           allowedFields.has(col.field)
         );
 
+        const newVisibleIds = new Set(aggregatedRows.map(r => r.id));
+        const preservedSelections = workflowsTable.selectedWorkflows.filter(id => newVisibleIds.has(id));
+
+
         dispatch(setWorkflowsTable({
           visibleRows: aggregatedRows,
           aggregatedRows: aggregatedRows,
-          visibleColumns: reducedColumns
+          visibleColumns: reducedColumns,
+          selectedWorkflows: preservedSelections
         }));
       } else {
         dispatch(setWorkflowsTable({
