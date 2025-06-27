@@ -1,4 +1,4 @@
-import {  Grid } from '@mui/material';
+import {  Box, Grid } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import Loader from '../../../../shared/components/loader';
@@ -278,8 +278,14 @@ const ComparisonModelInstance = ({
   });
 
   return( <>
-    <SharedLegend showMisclassifiedOnly={showMisclassifiedOnly} />
-    {renderCharts}
+    <Box display='flex' flexDirection='column' gap={2} width='100%'>
+      <Box display='flex' justifyContent='flex-end'>
+        <SharedLegend showMisclassifiedOnly={showMisclassifiedOnly} />
+      </Box>
+      <Grid container spacing={2}>
+        {renderCharts}
+      </Grid>
+    </Box>
   </>)
   
 };
