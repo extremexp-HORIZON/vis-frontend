@@ -39,6 +39,21 @@ const ComparisonModelInstance = ({
   );
   const dispatch = useAppDispatch();
 
+  //TODO: fix palette colors
+  const chartPalette = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
+
+  let classColorMap: Record<string, string> = {};
+  const instance = Object.values(comparativeModelInstance).find(d => d?.data?.length)?.data;
+
+  if (!showMisclassifiedOnly && instance?.length) {
+    const predictedValues = Array.from(new Set(instance.map(d => d.predicted))).slice(0, chartPalette.length);
+    classColorMap = predictedValues.reduce((acc, val, idx) => {
+      acc[String(val)] = chartPalette[idx % chartPalette.length];
+      return acc;
+    }, {} as Record<string, string>);
+  }
+
+
   useEffect(() => {
     const instanceStates = Object.values(comparativeModelInstance);
     const dataAvailable = instanceStates.find(d => d?.data?.length);
@@ -62,23 +77,25 @@ const ComparisonModelInstance = ({
   };
 
 
-  const SharedLegend = ({ showMisclassifiedOnly }: { showMisclassifiedOnly: boolean }) => {
-  if (showMisclassifiedOnly) {
-    return (
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <div><span style={{ backgroundColor: '#ff0000', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Misclassified</div>
-        <div><span style={{ backgroundColor: '#cccccc', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Correct</div>
+const SharedLegend = ({ entries }: { entries: { label: string; color: string }[] }) => (
+  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+    {entries.map((entry, idx) => (
+      <div key={idx}>
+        <span
+          style={{
+            backgroundColor: entry.color,
+            width: 12,
+            height: 12,
+            display: 'inline-block',
+            marginRight: 4,
+            borderRadius: '50%'
+          }}
+        />
+        {entry.label}
       </div>
-    );
-  }
-
-  return (
-    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-      <div><span style={{ backgroundColor: '#1f77b4', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Class A</div>
-      <div><span style={{ backgroundColor: '#2ca02c', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Class B</div>
-    </div>
-  );
-};
+    ))}
+  </div>
+);
 
   useEffect(() => {
     if (!experimentId) return;
@@ -218,7 +235,8 @@ const ComparisonModelInstance = ({
             field: 'predicted',
             type: 'nominal',
             scale: {
-              range: ['#1f77b4', '#2ca02c'],
+              domain: Object.keys(classColorMap),
+              range: Object.values(classColorMap),
             },
             // legend: {
             //   title: 'Predicted Class',
@@ -277,10 +295,24 @@ const ComparisonModelInstance = ({
     );
   });
 
+  let legendEntries: { label: string; color: string }[] = [];
+
+  if (showMisclassifiedOnly) {
+    legendEntries = [
+      { label: 'Misclassified', color: '#ff0000' },
+      { label: 'Correct', color: '#cccccc' },
+    ];
+  } else {
+    legendEntries = Object.entries(classColorMap).map(([label, color]) => ({
+      label,
+      color,
+    }));
+  }
+
   return(
     <Box display='flex' flexDirection='column' gap={2} width='100%'>
       <Box display='flex' justifyContent='flex-end'>
-        <SharedLegend showMisclassifiedOnly={showMisclassifiedOnly} />
+        <SharedLegend entries={legendEntries} />
       </Box>
       <Grid container spacing={2}>
         {renderCharts}
