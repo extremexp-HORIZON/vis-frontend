@@ -61,6 +61,25 @@ const ComparisonModelInstance = ({
     return 'nominal';
   };
 
+
+  const SharedLegend = ({ showMisclassifiedOnly }: { showMisclassifiedOnly: boolean }) => {
+  if (showMisclassifiedOnly) {
+    return (
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div><span style={{ backgroundColor: '#ff0000', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Misclassified</div>
+        <div><span style={{ backgroundColor: '#cccccc', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Correct</div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <div><span style={{ backgroundColor: '#1f77b4', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Class A</div>
+      <div><span style={{ backgroundColor: '#2ca02c', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Class B</div>
+    </div>
+  );
+};
+
   useEffect(() => {
     if (!experimentId) return;
     selectedWorkflowIds.forEach((runId) => {
@@ -189,10 +208,11 @@ const ComparisonModelInstance = ({
               domain: [false, true],
               range: ['#cccccc', '#ff0000'],
             },
-            legend: {
-              title: 'Misclassified',
-              labelExpr: 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\'',
-            },
+            // legend: {
+            //   title: 'Misclassified',
+            //   labelExpr: 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\'',
+            // },
+            legend:null
           }
           : {
             field: 'predicted',
@@ -200,9 +220,10 @@ const ComparisonModelInstance = ({
             scale: {
               range: ['#1f77b4', '#2ca02c'],
             },
-            legend: {
-              title: 'Predicted Class',
-            },
+            // legend: {
+            //   title: 'Predicted Class',
+            // },
+            legend:null
           },
         opacity: showMisclassifiedOnly
           ? {
@@ -256,7 +277,11 @@ const ComparisonModelInstance = ({
     );
   });
 
-  return renderCharts;
+  return( <>
+    <SharedLegend showMisclassifiedOnly={showMisclassifiedOnly} />
+    {renderCharts}
+  </>)
+  
 };
 
 export default ComparisonModelInstance;
