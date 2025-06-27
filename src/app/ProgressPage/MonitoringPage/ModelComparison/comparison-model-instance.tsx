@@ -66,16 +66,16 @@ const ComparisonModelInstance = ({
   if (showMisclassifiedOnly) {
     return (
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <div><span style={{ backgroundColor: '#ff0000', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Misclassified</div>
-        <div><span style={{ backgroundColor: '#cccccc', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Correct</div>
+        <div><span style={{ backgroundColor: '#ff0000', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Misclassified</div>
+        <div><span style={{ backgroundColor: '#cccccc', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Correct</div>
       </div>
     );
   }
 
   return (
     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-      <div><span style={{ backgroundColor: '#1f77b4', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Class A</div>
-      <div><span style={{ backgroundColor: '#2ca02c', width: 12, height: 12, display: 'inline-block', marginRight: 4 }} /> Class B</div>
+      <div><span style={{ backgroundColor: '#1f77b4', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Class A</div>
+      <div><span style={{ backgroundColor: '#2ca02c', width: 12, height: 12, display: 'inline-block', marginRight: 4, borderRadius: '50%' }} /> Class B</div>
     </div>
   );
 };
@@ -277,7 +277,7 @@ const ComparisonModelInstance = ({
     );
   });
 
-  return( <>
+  return(
     <Box display='flex' flexDirection='column' gap={2} width='100%'>
       <Box display='flex' justifyContent='flex-end'>
         <SharedLegend showMisclassifiedOnly={showMisclassifiedOnly} />
@@ -286,7 +286,7 @@ const ComparisonModelInstance = ({
         {renderCharts}
       </Grid>
     </Box>
-  </>)
+  )
   
 };
 
