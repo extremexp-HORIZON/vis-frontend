@@ -1,23 +1,78 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { RootState } from '../../../store/store';
-import { useAppSelector } from '../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
   Grid,
   Container,
   ButtonGroup,
   Button,
-  Typography,
 } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import { setCommonDataAssets, type CommonDataAssets } from '../../../store/slices/monitorPageSlice';
+import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 
 const ComparisonDataCharts: React.FC = () => {
-  const { workflowsTable, selectedWorkflowsMetrics } = useAppSelector(
+  const { workflowsTable, comparativeDataExploration } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
+  const { workflows } =
+      useAppSelector((state: RootState) => state.progressPage);
+  const experimentId = useAppSelector(
+      (state: RootState) => state.progressPage.experiment.data?.id || '',
+  );
+  const selectedWorkflowIds = workflowsTable.selectedWorkflows;
   const [isMosaic, setIsMosaic] = useState(true);
   const { hoveredWorkflowId } = workflowsTable;
+  const dispatch = useAppDispatch();
+  const commonDataAssets = comparativeDataExploration.commonDataAssets;
+
+  const getCommonDataAssets = () => {
+    if (selectedWorkflowIds.length === 0) return {};
+    const selectedWorkflows = workflows.data.filter(w => selectedWorkflowIds.includes(w.id));
+    const assetGroups: CommonDataAssets = {};
+
+    for (const workflow of selectedWorkflows) {
+      for (const asset of workflow.dataAssets) {
+        const name = asset.name;
+        if (!assetGroups[name]) {
+          assetGroups[name] = [];
+        }
+        assetGroups[name].push({ workflowId: workflow.id, dataAsset: asset });
+      }
+    }
+
+    const commonAssets: CommonDataAssets = {};
+
+    for (const [name, entries] of Object.entries(assetGroups)) {
+      const uniqueWorkflows = new Set(entries.map(e => e.workflowId));
+      if (uniqueWorkflows.size === selectedWorkflowIds.length) {
+        commonAssets[name] = entries;
+      }
+    }
+    return commonAssets;
+  }
+
+  useEffect(() => {
+    if (!experimentId) return;
+    dispatch(setCommonDataAssets(getCommonDataAssets()));
+
+  },[selectedWorkflowIds]);
+
+  const renderCharts = Object.entries(commonDataAssets).map(([assetName, assetList]) => {
+    return (
+      <Grid item xs={isMosaic ? 6 : 12} key={assetName}>
+        <ResponsiveCardTable title={assetName} minHeight={400} showSettings={false}>
+          <InfoMessage
+            message={assetList.map(a => `${a.workflowId}`).join('\n')}
+            type="info"
+            fullHeight
+          />
+        </ResponsiveCardTable>
+      </Grid>
+    );
+  })
 
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (
@@ -66,10 +121,7 @@ const ComparisonDataCharts: React.FC = () => {
         spacing={2}
         sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}
       >
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Comparisons
-        </Typography>
-
+        {renderCharts}
       </Grid>
     </Container>
   );

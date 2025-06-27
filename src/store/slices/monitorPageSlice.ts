@@ -5,6 +5,7 @@ import { experimentApi } from '../../app/api/api';
 import type { MetricFetchResult } from './workflowPageSlice';
 import type { ConfusionMatrixResult, TestInstance } from '../../shared/models/tasks/model-analysis.model';
 import type { AxiosError } from 'axios';
+import { IDataAsset } from '../../shared/models/experiment/data-asset.model';
 
 export interface WorkflowTableRow {
   id: string;
@@ -19,6 +20,13 @@ export interface ScheduleTableRow {
   status?: string;
   [key: string]: string | number | boolean | null | undefined;
 }
+
+export type CommonDataAssets = {
+  [assetName: string]: {
+    workflowId: string;
+    dataAsset: IDataAsset;
+  }[];
+};
 
 interface IMonitoringPageSlice {
     parallel: {
@@ -93,6 +101,9 @@ interface IMonitoringPageSlice {
         [workflowId: string]: { data: TestInstance[] | null; loading: boolean; error: string | null }
       }
       selectedModelComparisonChart: string
+      comparativeDataExploration: {
+        commonDataAssets: CommonDataAssets
+      }
 }
 
 const generateUniqueColor = (existingColors: Set<string>) => {
@@ -178,7 +189,10 @@ const initialState: IMonitoringPageSlice = {
   comparativeModelConfusionMatrix: {},
   comparativeModelRocCurve: {},
   comparativeModelInstance: {},
-  selectedModelComparisonChart: 'confusionMatrix'
+  selectedModelComparisonChart: 'confusionMatrix',
+  comparativeDataExploration: {
+    commonDataAssets: {}
+  }
 };
 
 export const monitoringPageSlice = createSlice({
@@ -288,6 +302,9 @@ export const monitoringPageSlice = createSlice({
     },
     setSelectedModelComparisonChart: (state, action) => {
       state.selectedModelComparisonChart = action.payload;
+    },
+    setCommonDataAssets: (state, action) => {
+      state.comparativeDataExploration.commonDataAssets = action.payload;
     }
   },
   extraReducers: builder => {
@@ -524,5 +541,5 @@ export const fetchComparativeRocCurve = createAsyncThunk(
 );
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets
 } = monitoringPageSlice.actions;
