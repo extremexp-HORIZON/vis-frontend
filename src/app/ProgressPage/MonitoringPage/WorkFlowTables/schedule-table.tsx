@@ -234,16 +234,19 @@ export default function ScheduleTable() {
             workflowId: workflow.name,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
-                tasks?.find(task => task.name === variant)?.variant || '';
+                tasks?.find(task => task.name === variant)?.variant || 'n/a';
 
               return acc;
             }, {} as Record<string, string>),
             ...Array.from(uniqueParameters).reduce((acc, variant) => {
-              acc[variant] =
-                params?.find(param => param.name === variant)?.value || '';
-
+              const rawValue = params?.find(param => param.name === variant)?.value;
+              const parsedValue =
+                rawValue != null && !isNaN(Number(rawValue)) && rawValue !== ''
+                  ? Number(rawValue)
+                  : rawValue ?? 'n/a';
+              acc[variant] = parsedValue;
               return acc;
-            }, {} as Record<string, string>),
+            }, {} as Record<string, string | number>),
             status: workflow.status.toLowerCase(),
             action: '',
           };
@@ -257,16 +260,19 @@ export default function ScheduleTable() {
         workflowId: workflow.id,
         ...Array.from(uniqueTasks).reduce((acc, variant) => {
           acc[variant] =
-            tasks?.find(task => task.name === variant)?.variant || '';
+            tasks?.find(task => task.name === variant)?.variant || 'n/a';
 
           return acc;
         }, {} as Record<string, string>),
-        ...Array.from(uniqueParameters).reduce((acc, variant) => {
-          acc[variant] =
-            `${params?.find(param => param.name === variant)?.value}` || '';
-
-          return acc;
-        }, {} as Record<string, string>),
+            ...Array.from(uniqueParameters).reduce((acc, variant) => {
+              const rawValue = params?.find(param => param.name === variant)?.value;
+              const parsedValue =
+                rawValue != null && !isNaN(Number(rawValue)) && rawValue !== ''
+                  ? Number(rawValue)
+                  : rawValue ?? 'n/a';
+              acc[variant] = parsedValue;
+              return acc;
+            }, {} as Record<string, string | number>),
         status: workflow.status,
         action: '',
       };
