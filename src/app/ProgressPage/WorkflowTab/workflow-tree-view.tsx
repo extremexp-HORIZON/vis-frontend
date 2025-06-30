@@ -86,6 +86,7 @@ export default function WorkflowTreeView() {
     if (!tab?.workflowConfiguration.tasks) return [];
 
     const seen = new Set<string>();
+    console.log("mpainw")
 
     return tab.workflowConfiguration.tasks.reduce(
       (acc: { id: string; name: string }[], task) => {
@@ -98,6 +99,7 @@ export default function WorkflowTreeView() {
       },
       [],
     );
+    console.log("vgainw")
   }, [tab?.workflowConfiguration.tasks]);
 
   const expandedTaskItemIds = useMemo(() => {
@@ -208,7 +210,7 @@ export default function WorkflowTreeView() {
               const taskVariants: Record<string, string> =
               tab?.workflowConfiguration.tasks?.reduce(
                 (acc, task) => {
-                  acc[task.name] = task.variant;
+                  acc[task.name] = task.id;
 
                   return acc;
                 },
@@ -342,7 +344,7 @@ export default function WorkflowTreeView() {
                 >
                   {/* Parameters */}
                   <TreeItem2
-                    itemId={'parameters-header'}
+  itemId={`parameters-header-${id}`} // ✅ Use a dynamic, unique ID
                     slotProps={{
                       content: {
                         style: {
@@ -423,7 +425,7 @@ export default function WorkflowTreeView() {
 
                   {/* Metrics */}
                   <TreeItem2
-                    itemId={'metrics-header'}
+  itemId={`metrics-header-${id}`} // ✅ Use a dynamic, unique ID
                     slotProps={{
                       content: {
                         style: {
