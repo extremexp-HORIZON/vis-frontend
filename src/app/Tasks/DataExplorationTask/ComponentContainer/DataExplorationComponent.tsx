@@ -53,7 +53,7 @@ const DataExplorationComponent = () => {
         }),
       );
     }
-  }, [selectedDataset, workflowId, dispatch]);
+  }, [selectedDataset, workflowId]);
 
   if (!selectedDataset)
     return (

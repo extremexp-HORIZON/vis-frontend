@@ -10,8 +10,12 @@ import {
 } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { setCommonDataAssets, type CommonDataAssets } from '../../../store/slices/monitorPageSlice';
+import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, type CommonDataAssets } from '../../../store/slices/monitorPageSlice';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
+import type { VisualColumn } from '../../../shared/models/dataexploration.model';
+import { defaultDataExplorationQuery } from '../../../shared/models/dataexploration.model';
+import Loader from '../../../shared/components/loader';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 const ComparisonDataCharts: React.FC = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(
@@ -20,13 +24,13 @@ const ComparisonDataCharts: React.FC = () => {
   const { workflows } =
       useAppSelector((state: RootState) => state.progressPage);
   const experimentId = useAppSelector(
-      (state: RootState) => state.progressPage.experiment.data?.id || '',
+    (state: RootState) => state.progressPage.experiment.data?.id || '',
   );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
   const [isMosaic, setIsMosaic] = useState(true);
   const { hoveredWorkflowId } = workflowsTable;
   const dispatch = useAppDispatch();
-  const commonDataAssets = comparativeDataExploration.commonDataAssets;
+  const { commonDataAssets, dataAssetsMetaData } = comparativeDataExploration;
 
   const getCommonDataAssets = () => {
     if (selectedWorkflowIds.length === 0) return {};
@@ -36,6 +40,7 @@ const ComparisonDataCharts: React.FC = () => {
     for (const workflow of selectedWorkflows) {
       for (const asset of workflow.dataAssets) {
         const name = asset.name;
+
         if (!assetGroups[name]) {
           assetGroups[name] = [];
         }
@@ -47,20 +52,113 @@ const ComparisonDataCharts: React.FC = () => {
 
     for (const [name, entries] of Object.entries(assetGroups)) {
       const uniqueWorkflows = new Set(entries.map(e => e.workflowId));
+
       if (uniqueWorkflows.size === selectedWorkflowIds.length) {
         commonAssets[name] = entries;
       }
     }
+
     return commonAssets;
-  }
+  };
 
   useEffect(() => {
     if (!experimentId) return;
     dispatch(setCommonDataAssets(getCommonDataAssets()));
 
-  },[selectedWorkflowIds]);
+  }, [selectedWorkflowIds]);
+
+  useEffect(() => {
+    if (!commonDataAssets) return;
+
+    Object.entries(commonDataAssets)
+      .flatMap(([assetName, assetList]) =>
+        assetList.forEach(({ workflowId, dataAsset }) => {
+          dispatch(
+            fetchMetaData({
+              query: {
+                ...defaultDataExplorationQuery,
+                datasetId: dataAsset?.source || '',
+              },
+              metadata: {
+                workflowId: workflowId,
+                queryCase: 'metaData',
+                assetName: dataAsset.name,
+              }
+            })
+          );
+        })
+      );
+
+  }, [commonDataAssets]);
+
+  useEffect(() => {
+    Object.entries(commonDataAssets).forEach(([assetName, assetList]) => {
+      const metaList = assetList.map(({ workflowId }) =>
+        dataAssetsMetaData?.[assetName]?.[workflowId]?.meta
+      );
+
+      const anyLoading = metaList.some(meta => meta?.loading);
+      const isAlreadyInitialized = !!comparativeDataExploration.dataAssetsControlPanel[assetName];
+
+      if (anyLoading || isAlreadyInitialized) return;
+
+      const successfulMeta = metaList.filter(meta => meta?.data && !meta.error);
+
+      if (successfulMeta.length === 0) return;
+
+      const allColumnsArrays = successfulMeta.map(meta => meta!.data!.originalColumns);
+      const columnNameToColumn: Record<string, VisualColumn> = {};
+      const commonColumnNames = allColumnsArrays
+        .map(cols => cols.map(c => c.name))
+        .reduce((acc, names) => acc.filter(name => names.includes(name)));
+
+      const commonColumns = commonColumnNames.map(name => {
+        const col = allColumnsArrays.find(cols => cols.find(c => c.name === name))?.find(c => c.name === name);
+
+        if (col) columnNameToColumn[name] = col;
+
+        return col!;
+      });
+
+      dispatch(setDataAssetsControlPanel({
+        assetName,
+        controlPanel: {
+          commonColumns
+        }
+      }));
+    });
+  }, [commonDataAssets, dataAssetsMetaData]);
 
   const renderCharts = Object.entries(commonDataAssets).map(([assetName, assetList]) => {
+    const metadataEntries = assetList.map(({ workflowId }) =>
+      dataAssetsMetaData?.[assetName]?.[workflowId]?.meta
+    );
+    const metadataLoading = metadataEntries.some(meta => meta?.loading);
+    const allMetadataFailed = metadataEntries.length > 0 && metadataEntries.every(meta => meta?.error && !meta?.loading);
+
+    if(metadataLoading) return (
+      <Grid item xs={isMosaic ? 6 : 12} key={assetName}>
+        <ResponsiveCardTable title={assetName} minHeight={400} showSettings={false}>
+          <Loader />
+        </ResponsiveCardTable>
+      </Grid>
+    );
+
+    if(allMetadataFailed) return (
+      <Grid item xs={isMosaic ? 6 : 12} key={assetName}>
+        <ResponsiveCardTable title={assetName} minHeight={400} showSettings={false}>
+          <InfoMessage
+            message="Failed to fetch metadata."
+            type="info"
+            icon={
+              <ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />
+            }
+            fullHeight
+          />
+        </ResponsiveCardTable>
+      </Grid>
+    );
+
     return (
       <Grid item xs={isMosaic ? 6 : 12} key={assetName}>
         <ResponsiveCardTable title={assetName} minHeight={400} showSettings={false}>
@@ -72,7 +170,7 @@ const ComparisonDataCharts: React.FC = () => {
         </ResponsiveCardTable>
       </Grid>
     );
-  })
+  });
 
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (

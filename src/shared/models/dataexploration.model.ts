@@ -29,6 +29,7 @@ export interface IMetaDataRequest {
   metadata: {
     workflowId: string
     queryCase: string
+    assetName?: string
   }
 }
 

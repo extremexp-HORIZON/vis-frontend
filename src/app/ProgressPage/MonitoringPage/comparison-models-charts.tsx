@@ -246,9 +246,9 @@ const ComparisonModelsCharts: React.FC = () => {
                     }
                     label="Misclassified"
                     sx={{ ml: 0.5 }}
-                  
+
                   />
-                  
+
                 )}
 
                 <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
@@ -279,7 +279,7 @@ const ComparisonModelsCharts: React.FC = () => {
                     >
                       <SettingsIcon />
                     </IconButton>
-                    
+
                     <Menu
                       anchorEl={anchorEl}
                       open={menuOpen}
@@ -310,7 +310,7 @@ const ComparisonModelsCharts: React.FC = () => {
                       />
 
                       {/* Checkbox */}
-                    
+
                       {/* Control Panel */}
                       <Box sx={{ mt: 2 }}>
                         <ControlPanel

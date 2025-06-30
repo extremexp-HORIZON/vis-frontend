@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { CustomGridColDef } from '../../shared/types/table-types';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
-import { experimentApi } from '../../app/api/api';
+import { api, experimentApi } from '../../app/api/api';
 import type { MetricFetchResult } from './workflowPageSlice';
 import type { ConfusionMatrixResult, TestInstance } from '../../shared/models/tasks/model-analysis.model';
 import type { AxiosError } from 'axios';
-import { IDataAsset } from '../../shared/models/experiment/data-asset.model';
+import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
+import type { IDataExplorationMetaDataResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
 
 export interface WorkflowTableRow {
   id: string;
@@ -27,6 +28,24 @@ export type CommonDataAssets = {
     dataAsset: IDataAsset;
   }[];
 };
+
+export type DataAssetsMetaData = {
+  [assetName: string]: {
+    [workflowId: string]: {
+      meta: {
+        data: IDataExplorationMetaDataResponse | null;
+        loading: boolean;
+        error: string | null;
+      }
+    }
+  }
+}
+// only for bar charts
+export type DataAssetsControlPanel = {
+  [assetName: string]: {
+    commonColumns: VisualColumn[]
+  }
+}
 
 interface IMonitoringPageSlice {
     parallel: {
@@ -103,6 +122,8 @@ interface IMonitoringPageSlice {
       selectedModelComparisonChart: string
       comparativeDataExploration: {
         commonDataAssets: CommonDataAssets
+        dataAssetsMetaData: DataAssetsMetaData
+        dataAssetsControlPanel: DataAssetsControlPanel
       }
 }
 
@@ -191,7 +212,9 @@ const initialState: IMonitoringPageSlice = {
   comparativeModelInstance: {},
   selectedModelComparisonChart: 'confusionMatrix',
   comparativeDataExploration: {
-    commonDataAssets: {}
+    commonDataAssets: {},
+    dataAssetsMetaData: {},
+    dataAssetsControlPanel: {}
   }
 };
 
@@ -305,6 +328,17 @@ export const monitoringPageSlice = createSlice({
     },
     setCommonDataAssets: (state, action) => {
       state.comparativeDataExploration.commonDataAssets = action.payload;
+    },
+    setDataAssetsControlPanel: (state, action: {
+      payload: {
+        assetName: string;
+        controlPanel: {
+          commonColumns: VisualColumn[];
+        };
+      };
+    }) => {
+      state.comparativeDataExploration.dataAssetsControlPanel[action.payload.assetName] =
+        action.payload.controlPanel;
     }
   },
   extraReducers: builder => {
@@ -472,6 +506,57 @@ export const monitoringPageSlice = createSlice({
           state.comparativeModelInstance[runId].loading = false;
           state.comparativeModelInstance[runId].error = 'Failed to fetch instances';
         }
+      })
+      .addCase(fetchMetaData.fulfilled, (state, action) => {
+        const workflowId = action.meta.arg.metadata.workflowId;
+        const assetName = action.meta.arg.metadata?.assetName;
+
+        if(!assetName) return;
+
+        if(!state.comparativeDataExploration.dataAssetsMetaData[assetName]) {
+          state.comparativeDataExploration.dataAssetsMetaData[assetName] = {};
+        };
+        state.comparativeDataExploration.dataAssetsMetaData[assetName][workflowId] = {
+          meta: {
+            data: action.payload,
+            loading: false,
+            error: null,
+          }
+        };
+      })
+      .addCase(fetchMetaData.pending, (state, action) => {
+        const { workflowId, assetName } = action.meta.arg.metadata;
+
+        if(!assetName) return;
+
+        if (!state.comparativeDataExploration.dataAssetsMetaData[assetName]) {
+          state.comparativeDataExploration.dataAssetsMetaData[assetName] = {};
+        }
+
+        state.comparativeDataExploration.dataAssetsMetaData[assetName][workflowId] = {
+          meta: {
+            data: null,
+            loading: true,
+            error: null,
+          }
+        };
+      })
+      .addCase(fetchMetaData.rejected, (state, action) => {
+        const { workflowId, assetName } = action.meta.arg.metadata;
+
+        if(!assetName) return;
+
+        if (!state.comparativeDataExploration.dataAssetsMetaData[assetName]) {
+          state.comparativeDataExploration.dataAssetsMetaData[assetName] = {};
+        }
+
+        state.comparativeDataExploration.dataAssetsMetaData[assetName][workflowId] = {
+          meta: {
+            data: null,
+            loading: false,
+            error: 'Failed to fetch metadata',
+          }
+        };
       });
   }
 });
@@ -540,6 +625,17 @@ export const fetchComparativeRocCurve = createAsyncThunk(
   }
 );
 
+export const fetchMetaData = createAsyncThunk(
+  'monitoringPage/fetch_metadata',
+  async (payload: IMetaDataRequest) => {
+    const requestUrl = 'data/metadata';
+
+    return api
+      .post<IDataExplorationMetaDataResponse>(requestUrl, payload.query)
+      .then(response => response.data);
+  },
+);
+
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel
 } = monitoringPageSlice.actions;

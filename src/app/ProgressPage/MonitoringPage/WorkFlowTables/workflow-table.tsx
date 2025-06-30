@@ -422,7 +422,9 @@ export default function WorkflowTable() {
                 rawValue != null && !isNaN(Number(rawValue)) && rawValue !== ''
                   ? Number(rawValue)
                   : rawValue ?? 'n/a';
+
               acc[variant] = parsedValue;
+
               return acc;
             }, {} as Record<string, string | number>),
             ...Array.from(uniqueMetrics).reduce((acc, variant) => {

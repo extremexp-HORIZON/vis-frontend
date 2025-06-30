@@ -244,7 +244,9 @@ export default function ScheduleTable() {
                 rawValue != null && !isNaN(Number(rawValue)) && rawValue !== ''
                   ? Number(rawValue)
                   : rawValue ?? 'n/a';
+
               acc[variant] = parsedValue;
+
               return acc;
             }, {} as Record<string, string | number>),
             status: workflow.status.toLowerCase(),
@@ -264,15 +266,17 @@ export default function ScheduleTable() {
 
           return acc;
         }, {} as Record<string, string>),
-            ...Array.from(uniqueParameters).reduce((acc, variant) => {
-              const rawValue = params?.find(param => param.name === variant)?.value;
-              const parsedValue =
+        ...Array.from(uniqueParameters).reduce((acc, variant) => {
+          const rawValue = params?.find(param => param.name === variant)?.value;
+          const parsedValue =
                 rawValue != null && !isNaN(Number(rawValue)) && rawValue !== ''
                   ? Number(rawValue)
                   : rawValue ?? 'n/a';
-              acc[variant] = parsedValue;
-              return acc;
-            }, {} as Record<string, string | number>),
+
+          acc[variant] = parsedValue;
+
+          return acc;
+        }, {} as Record<string, string | number>),
         status: workflow.status,
         action: '',
       };
