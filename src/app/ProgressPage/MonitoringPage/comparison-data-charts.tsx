@@ -13,7 +13,6 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, type CommonDataAssets } from '../../../store/slices/monitorPageSlice';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import type { VisualColumn } from '../../../shared/models/dataexploration.model';
-import { defaultDataExplorationQuery } from '../../../shared/models/dataexploration.model';
 import Loader from '../../../shared/components/loader';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
@@ -76,8 +75,10 @@ const ComparisonDataCharts: React.FC = () => {
           dispatch(
             fetchMetaData({
               query: {
-                ...defaultDataExplorationQuery,
-                datasetId: dataAsset?.source || '',
+                source: dataAsset?.source || '',
+                format: dataAsset?.format || '',
+                sourceType: dataAsset?.sourceType || '',
+                fileName: dataAsset?.name || ''
               },
               metadata: {
                 workflowId: workflowId,

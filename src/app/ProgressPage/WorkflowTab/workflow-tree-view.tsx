@@ -87,7 +87,6 @@ export default function WorkflowTreeView() {
 
     const seen = new Set<string>();
 
-
     return tab.workflowConfiguration.tasks.reduce(
       (acc: { id: string; name: string }[], task) => {
         if (task.name && !seen.has(task.id)) {

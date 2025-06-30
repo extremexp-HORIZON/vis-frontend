@@ -4,7 +4,6 @@ import {
 } from '../../../../shared/models/tasks/data-exploration-task.model';
 import { fetchMetaData } from '../../../../store/slices/dataExplorationSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import LeftPanel from './data-exploration-left-panel';
 import LineChart from '../Charts/data-exploration-line-chart';
 import ScatterChart from '../Charts/data-exploration-scatter-chart';
@@ -23,9 +22,9 @@ const DataExplorationComponent = () => {
   const dispatch = useAppDispatch();
 
   const { tab } = useAppSelector(state => state.workflowPage);
-  const selectedDataset = useAppSelector(
+  const dataset = useAppSelector(
     state =>
-      state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset?.source || '',
+      state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
   );
   const workflowId = useAppSelector(
     state => state.workflowPage?.tab?.workflowId || '',
@@ -35,6 +34,7 @@ const DataExplorationComponent = () => {
       state.workflowPage?.tab?.workflowTasks?.dataExploration?.controlPanel
         ?.chartType || '',
   );
+  const selectedDataset = dataset?.source || '';
   const isImage = selectedDataset?.match(/\.(jpe?g|png|gif|webp|bmp|tiff?|svg)$/i);
 
   useEffect(() => {
@@ -43,8 +43,10 @@ const DataExplorationComponent = () => {
       dispatch(
         fetchMetaData({
           query: {
-            ...defaultDataExplorationQuery,
-            datasetId: selectedDataset,
+            source: selectedDataset,
+            format: dataset?.format || '',
+            sourceType: dataset?.sourceType || '',
+            fileName: dataset?.name || ''
           },
           metadata: {
             workflowId: workflowId,

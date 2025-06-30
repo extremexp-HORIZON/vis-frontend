@@ -2,7 +2,6 @@ import { useRef, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import * as L from 'leaflet';
 import 'leaflet.heat';
 import Loader from '../../../../shared/components/loader';
@@ -28,6 +27,7 @@ const HeatMapChart = () => {
   useEffect(() => {
     const datasetId =
       tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
     if (!datasetId || !lat || !lon) return;
 
@@ -38,8 +38,12 @@ const HeatMapChart = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataExplorationQuery,
-          datasetId,
+          dataSource: {
+            source: datasetId,
+            format: dataset?.format || '',
+            sourceType: dataset?.sourceType || '',
+            fileName: dataset?.name || ''
+          },
           columns,
           filters,
           limit: 0,

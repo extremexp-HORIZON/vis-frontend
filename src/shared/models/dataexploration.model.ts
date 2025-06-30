@@ -1,15 +1,61 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export enum AggregationFunction {
+  // Basic aggregations
+  COUNT = 'COUNT',
+  COUNT_ALL = 'COUNT_ALL',
+  SUM = 'SUM',
+  AVG = 'AVG',
+  MIN = 'MIN',
+  MAX = 'MAX',
+
+  // Statistical functions
+  STDDEV = 'STDDEV',
+  VARIANCE = 'VARIANCE',
+  MEDIAN = 'MEDIAN',
+
+  // Percentiles
+  PERCENTILE = 'PERCENTILE',
+
+  // String aggregations
+  STRING_AGG = 'STRING_AGG',
+  ARRAY_AGG = 'ARRAY_AGG',
+
+  // Advanced
+  FIRST = 'FIRST',
+  LAST = 'LAST',
+  MODE = 'MODE'
+}
+
+export interface AggregationOptions {
+  distinct?: boolean;               // Default: false
+  percentileValue?: number;        // For percentile functions (0.0 to 1.0)
+  separator?: string;              // For STRING_AGG
+  orderBy?: string;                // For ordered aggregations like ARRAY_AGG
+  orderDirection?: 'ASC' | 'DESC'; // ASC or DESC, default: "ASC"
+}
+
+export interface IAggregation {
+  column: string;
+  function: AggregationFunction;
+  alias?: string;
+  options?: AggregationOptions;
+}
+
+export interface IDataSource {
+  source: string
+  format: string
+  sourceType: string
+  fileName: string
+}
+
 export interface IDataExplorationQuery {
-  datasetId: string
+  dataSource: IDataSource
   columns?: string[]
   filters?: IFilter[]
-  limit: number
+  limit?: number
   offset?: number
   groupBy?: string[] // Optional, added
-  aggregation?: {
-    // Optional, a map of columns to an array of aggregation functions
-    [column: string]: string[] // Example: { column1: ["sum", "avg"], column2: ["min", "max"] }
-  }
-  type?: 'csv' | 'zenoh'
+  aggregations?: IAggregation[]
 }
 
 export interface IDataExplorationRequest {
@@ -21,8 +67,10 @@ export interface IDataExplorationRequest {
 }
 
 export interface IMetaDataQuery{
-  datasetId: string
-  type?: 'csv' | 'zenoh'
+  source: string
+  format: string
+  sourceType: string
+  fileName: string
 }
 export interface IMetaDataRequest {
   query: IMetaDataQuery
@@ -69,12 +117,16 @@ export interface IFilter {
 }
 
 export const defaultDataExplorationQuery: IDataExplorationQuery = {
-  datasetId: '',
+  dataSource: {
+    source: '',
+    format: '',
+    sourceType: '',
+    fileName: '',
+  },
   limit: 0,
   columns: [],
   filters: [],
   offset: 0,
   groupBy: [],
-  aggregation: {},
-  type: 'csv',
+  aggregations: [],
 };

@@ -8,7 +8,6 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import ScatterChartControlPanel from '../ChartControls/data-exploration-scatter-control';
 import Uchart from './data-exploration-u-chart';
 import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 
 type ScatterChartDataRow = Record<string, number | string | Date | null>;
@@ -170,6 +169,7 @@ const ScatterChart = () => {
   useEffect(() => {
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
     const cols = Array.from(
       new Set(
@@ -186,8 +186,12 @@ const ScatterChart = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataExplorationQuery,
-          datasetId,
+          dataSource: {
+            source: datasetId,
+            format: dataset?.format || '',
+            sourceType: dataset?.sourceType || '',
+            fileName: dataset?.name || ''
+          },
           columns: cols,
           filters,
         },

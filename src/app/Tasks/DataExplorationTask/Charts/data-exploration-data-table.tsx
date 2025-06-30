@@ -102,6 +102,7 @@ const TableExpand: React.FC = () => {
   const selectedColumns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || [];
   const dispatch = useAppDispatch();
+  const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,7 +123,12 @@ const TableExpand: React.FC = () => {
         await dispatch(
           fetchDataExplorationData({
             query: {
-              datasetId: tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '',
+              dataSource: {
+                source: dataset?.source || '',
+                format: dataset?.format || '',
+                sourceType: dataset?.sourceType || '',
+                fileName: dataset?.name || ''
+              },
               columns: columns.map((col: VisualColumn) => col.name),
               filters:
                 tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],

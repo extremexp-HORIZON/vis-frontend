@@ -628,7 +628,7 @@ export const fetchComparativeRocCurve = createAsyncThunk(
 export const fetchMetaData = createAsyncThunk(
   'monitoringPage/fetch_metadata',
   async (payload: IMetaDataRequest) => {
-    const requestUrl = 'data/metadata';
+    const requestUrl = 'data/meta';
 
     return api
       .post<IDataExplorationMetaDataResponse>(requestUrl, payload.query)

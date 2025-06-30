@@ -8,7 +8,6 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 
 const getColumnType = (columnType: string, fieldName?: string) => {
   if (fieldName?.toLowerCase() === 'timestamp') return 'temporal';
@@ -52,6 +51,7 @@ const LineChart = () => {
     const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis;
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
     const cols = Array.from(
       new Set(
@@ -67,8 +67,12 @@ const LineChart = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataExplorationQuery,
-          datasetId,
+          dataSource: {
+            source: datasetId,
+            format: dataset?.format || '',
+            sourceType: dataset?.sourceType || '',
+            fileName: dataset?.name || ''
+          },
           columns: cols,
           filters,
           // limit: 5000,

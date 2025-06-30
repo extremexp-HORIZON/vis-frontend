@@ -1,4 +1,5 @@
 import type {
+  IAggregation,
   IDataExplorationMetaDataResponse,
   IDataExplorationResponse,
   IFilter,
@@ -63,7 +64,7 @@ export interface IDataExploration {
     yAxis: VisualColumn[]
     // Bar
     barGroupBy: string[]
-    barAggregation: Record<string, string[]>
+    barAggregation: IAggregation[]
     selectedMeasureColumn: string | null
 
     // Scatter
@@ -73,7 +74,7 @@ export interface IDataExploration {
     umap: boolean
     // Heatmap
     barGroupByHeat: string[]
-    barAggregationHeat: Record<string, string[]>
+    barAggregationHeat: IAggregation[]
     selectedMeasureColumnHeat: string | null
 
     // Map
@@ -154,7 +155,7 @@ export const dataExplorationDefault: IDataExploration = {
     yAxis: [],
     yAxisScatter: [],
     barGroupBy: [],
-    barAggregation: {},
+    barAggregation: [],
     viewMode: 'overlay',
     colorBy: { name: '', type: '' },
     colorByMap: 'None',
@@ -169,7 +170,7 @@ export const dataExplorationDefault: IDataExploration = {
     selectedMeasureColumn: null,
     heatmap: false,
     barGroupByHeat: [],
-    barAggregationHeat: {},
+    barAggregationHeat: [],
     selectedMeasureColumnHeat: null,
     currentPage: 1,
     pageSize: 100,

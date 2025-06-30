@@ -5,7 +5,6 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect } from 'react';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import HeatMapControlPanel from '../ChartControls/data-exploration-heatmap-control';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
@@ -22,12 +21,22 @@ const HeatMap = () => {
     const aggregation =
       tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat;
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
+    const groupByCols = groupBy ?? [];
+
+    const aggregationCols = aggregation?.map(aggr => aggr.column) ?? [];
+    const cols = Array.from(
+      new Set([
+        ...groupByCols,
+        ...aggregationCols,
+      ])
+    );
 
     if (
       !datasetId ||
       !groupBy?.length ||
-      !Object.keys(aggregation || {}).length
+      !aggregation?.length
     ) {
       return; // Don't dispatch if missing dataset, groupBy, or aggregation
     }
@@ -35,11 +44,16 @@ const HeatMap = () => {
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataExplorationQuery,
-          datasetId,
+          dataSource: {
+            source: datasetId,
+            format: dataset?.format || '',
+            sourceType: dataset?.sourceType || '',
+            fileName: dataset?.name || ''
+          },
           groupBy,
-          aggregation,
+          aggregations: aggregation,
           filters,
+          columns: cols
         },
         metadata: {
           workflowId: tab?.workflowId || '',
@@ -63,7 +77,7 @@ const HeatMap = () => {
     col => col.type === 'STRING' && col.name !== xAxisColumn,
   );
   const yAxisColumns = columns
-    ?.filter(col => col.type === 'DOUBLE')
+    ?.filter(col => ['DOUBLE', 'BIGINT', 'INTEGER', 'FLOAT'].includes(col.type))
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
@@ -187,6 +201,17 @@ const HeatMap = () => {
 
   const hasData = limitedData.length > 0;
 
+  const hasValidAggregation = (
+    Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat) &&
+  tab.workflowTasks.dataExploration.controlPanel.barAggregationHeat.some(
+    aggr => aggr?.column && aggr?.function
+  )
+  );
+
+  const hasGroupBy =
+    (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [])
+      .length > 0;
+
   const info = !hasData ? (
     <InfoMessage
       message="No data available for the selected configuration."
@@ -194,24 +219,23 @@ const HeatMap = () => {
       icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
-  ) : (
+  ) : !hasGroupBy || !hasValidAggregation ? (
     <InfoMessage
       message="Please select both Group By and Aggregation to display the chart."
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
+  ) : (
+    <InfoMessage
+      message= {tab?.workflowTasks.dataExploration?.barChart.error || 'Error fetching the data.'}
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
   );
 
-  const hasValidAggregation = Object.values(
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || {},
-  ).some((val) => Array.isArray(val) && val.length > 0);
-
-  const hasGroupBy =
-    (tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || [])
-      .length > 0;
-
-  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData;
+  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData || tab?.workflowTasks.dataExploration?.heatChart.error !== null;
 
   return (
     <Box sx={{ height: '99%' }}>

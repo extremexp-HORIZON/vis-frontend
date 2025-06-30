@@ -3,7 +3,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import Loader from '../../../../shared/components/loader';
 
 const COLOR_PALETTE = [
@@ -37,13 +36,18 @@ const SegmentMapChart = () => {
   // Fetch data
   useEffect(() => {
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
     if (!datasetId || !lat || !lon || !orderBy) return;
 
     dispatch(fetchDataExplorationData({
       query: {
-        ...defaultDataExplorationQuery,
-        datasetId,
+        dataSource: {
+          source: datasetId,
+          format: dataset?.format || '',
+          sourceType: dataset?.sourceType || '',
+          fileName: dataset?.name || ''
+        },
         columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         filters,
         limit: 0,

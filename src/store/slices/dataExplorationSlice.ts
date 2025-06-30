@@ -5,12 +5,13 @@ import {
   createAsyncThunk,
 } from '@reduxjs/toolkit';
 import type { IWorkflowPage } from './workflowPageSlice';
-import type {
-  IDataExplorationMetaDataResponse,
-  IDataExplorationRequest,
-  IDataExplorationResponse,
-  IMetaDataRequest,
-  VisualColumn,
+import {
+  AggregationFunction,
+  type IDataExplorationMetaDataResponse,
+  type IDataExplorationRequest,
+  type IDataExplorationResponse,
+  type IMetaDataRequest,
+  type VisualColumn,
 } from '../../shared/models/dataexploration.model';
 import type { IDataExploration } from '../../shared/models/tasks/data-exploration-task.model';
 import { handleMultiTimeSeriesData, prepareDataExplorationResponse } from '../../shared/models/tasks/model-analysis.model';
@@ -105,15 +106,18 @@ export const dataExplorationReducers = (
       task.controlPanel.timestampField = task.metaData.data?.timeColumn || null;
       task.controlPanel.orderBy =  null;
       const stringCols = originalColumns.filter((col: VisualColumn) => col.type === 'STRING');
-      const intCol = originalColumns.find((col: VisualColumn) => col.type === 'INTEGER');
-      const doubleCol = originalColumns.find((col: VisualColumn) => col.type === 'DOUBLE');
+      const numericColumn = originalColumns.find((col: VisualColumn) =>
+        col.type === 'INTEGER' || col.type === 'DOUBLE' || col.type === 'FLOAT' || col.type === 'BIGINT'
+      );
 
       if (stringCols[0]) task.controlPanel.barGroupBy = [stringCols[0].name];
 
-      if (intCol) {
-        task.controlPanel.barAggregation = {
-          [intCol.name]: ['count']
-        };
+      if (numericColumn) {
+        task.controlPanel.barAggregation.push({
+          column: numericColumn.name,
+          function: AggregationFunction.COUNT
+        });
+        task.controlPanel.selectedMeasureColumn = numericColumn.name;
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);
@@ -122,10 +126,12 @@ export const dataExplorationReducers = (
         task.controlPanel.barGroupByHeat = heatmapGroupBy;
       }
 
-      if (doubleCol) {
-        task.controlPanel.barAggregationHeat = {
-          [doubleCol.name]: ['count']
-        };
+      if (numericColumn) {
+        task.controlPanel.barAggregationHeat.push({
+          column: numericColumn.name,
+          function: AggregationFunction.COUNT
+        });
+        task.controlPanel.selectedMeasureColumnHeat = numericColumn.name;
       }
     })
     .addCase(fetchMetaData.pending, (state, action) => {
@@ -184,7 +190,7 @@ export const dataExplorationReducers = (
 export const fetchDataExplorationData = createAsyncThunk(
   'workflowTasks/data_exploration/fetch_data',
   async (payload: IDataExplorationRequest) => {
-    const requestUrl = 'data/tabular';
+    const requestUrl = 'data/fetch';
 
     return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
@@ -195,7 +201,7 @@ export const fetchDataExplorationData = createAsyncThunk(
 export const fetchMetaData = createAsyncThunk(
   'workflowTasks/data_exploration/fetch_metadata',
   async (payload: IMetaDataRequest) => {
-    const requestUrl = 'data/metadata';
+    const requestUrl = 'data/meta';
 
     return api
       .post<IDataExplorationMetaDataResponse>(requestUrl, payload.query)

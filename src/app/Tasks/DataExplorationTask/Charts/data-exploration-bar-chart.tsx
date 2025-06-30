@@ -5,7 +5,6 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect } from 'react';
-import { defaultDataExplorationQuery } from '../../../../shared/models/dataexploration.model';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 
 // Assuming dataExploration is passed as a prop or obtained from elsewhere
@@ -14,6 +13,18 @@ const BarChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const theme = useTheme();
 
+  const groupByCols = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy ?? [];
+
+  const aggregationCols = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
+    ?.map(aggr => aggr.column) ?? [];
+
+  const cols = Array.from(
+    new Set([
+      ...groupByCols,
+      ...aggregationCols,
+    ])
+  );
+
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
 
   useEffect(() => {
@@ -21,23 +32,29 @@ const BarChart = () => {
     const aggregation =
       tab?.workflowTasks.dataExploration?.controlPanel.barAggregation;
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
 
     if (
       !datasetId ||
       !groupBy?.length ||
-      !Object.keys(aggregation || {}).length
+      !aggregation?.length
     ) {
       return; // Don't dispatch if missing dataset, groupBy, or aggregation
     }
     dispatch(
       fetchDataExplorationData({
         query: {
-          ...defaultDataExplorationQuery,
-          datasetId,
+          dataSource: {
+            source: datasetId,
+            format: dataset?.format || '',
+            sourceType: dataset?.sourceType || '',
+            fileName: dataset?.name || ''
+          },
           groupBy,
-          aggregation,
+          aggregations: aggregation,
           filters,
+          columns: cols
         },
         metadata: {
           workflowId: tab?.workflowId || '',
@@ -58,7 +75,7 @@ const BarChart = () => {
     col => col.type === 'STRING' && col.name !== xAxisColumn,
   );
   const yAxisColumns = columns
-    ?.filter(col => col.type === 'DOUBLE')
+    ?.filter(col => ['DOUBLE', 'BIGINT', 'INTEGER', 'FLOAT'].includes(col.type))
     .map(col => col.name);
 
   // Transform the data into a suitable format for grouped bar chart
@@ -142,6 +159,17 @@ const BarChart = () => {
 
   const hasData = limitedData.length > 0;
 
+  const hasValidAggregation = (
+    Array.isArray(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation) &&
+  tab.workflowTasks.dataExploration.controlPanel.barAggregation.some(
+    aggr => aggr?.column && aggr?.function
+  )
+  );
+
+  const hasGroupBy =
+    (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length >
+    0;
+
   const info = !hasData ? (
     <InfoMessage
       message="No data available for the selected configuration."
@@ -149,23 +177,23 @@ const BarChart = () => {
       icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
-  ) : (
+  ) : !hasGroupBy || !hasValidAggregation ? (
     <InfoMessage
       message="Please select both Group By and Aggregation to display the chart."
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
     />
+  ) : (
+    <InfoMessage
+      message= {tab?.workflowTasks.dataExploration?.barChart.error || 'Error fetching the data.'}
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
   );
-  const hasValidAggregation = Object.values(
-    tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || {},
-  ).some((val) => Array.isArray(val) && val.length > 0);
 
-  const hasGroupBy =
-    (tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy || []).length >
-    0;
-
-  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData;
+  const shouldShowInfoMessage = !hasGroupBy || !hasValidAggregation || !hasData || tab?.workflowTasks.dataExploration?.barChart.error !== null;
 
   return (
     <Box sx={{ height: '99%' }}>
