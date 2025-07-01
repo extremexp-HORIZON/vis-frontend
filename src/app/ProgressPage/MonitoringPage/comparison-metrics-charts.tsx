@@ -34,10 +34,13 @@ const ComparisonMetricsCharts: React.FC = () => {
   const previousSelectedRef = useRef<string[]>([]);
   const hasFetchedOnInit = useRef(false);
 
+  const isMosaic = useAppSelector(
+    (state: RootState) => state.monitorPage.isMosaic,
+  );
+
   // const { workflows } = useAppSelector(
   //   (state: RootState) => state.progressPage,
   // );
-  const [isMosaic, setIsMosaic] = useState(true);
   const { hoveredWorkflowId } = workflowsTable;
 
   // const filteredWorkflows = (
@@ -318,35 +321,7 @@ const ComparisonMetricsCharts: React.FC = () => {
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }} >
-      <Grid
-        container
-        justifyContent="flex-end" // Align to the right
-        alignItems="center"
-        sx={{ marginBottom: 2 }}
-      >
-        <ButtonGroup
-          variant="contained"
-          aria-label="view mode"
-          sx={{
-            height: '25px', // Ensure consistent height for the button group
-          }}
-        >
-          <Button
-            variant={isMosaic ? 'contained' : 'outlined'}
-            color="primary"
-            onClick={() => setIsMosaic(true)}
-          >
-            Mosaic
-          </Button>
-          <Button
-            variant={!isMosaic ? 'contained' : 'outlined'}
-            color="primary"
-            onClick={() => setIsMosaic(false)}
-          >
-           Stacked
-          </Button>
-        </ButtonGroup>
-      </Grid>
+     
       <Grid
         container
         spacing={2}

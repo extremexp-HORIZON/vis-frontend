@@ -5,6 +5,7 @@ import { setSelectedComparisonTab } from '../../../store/slices/monitorPageSlice
 import ComparisonMetricsCharts from './comparison-metrics-charts';
 import ComparisonModelsCharts from './comparison-models-charts';
 import ComparisonDataCharts from './comparison-data-charts';
+import ComparativeAnalysisControls from './comparative-analysis-controls';
 
 const ComparativeAnalysis = () => {
   const { selectedComparisonTab } = useAppSelector(
@@ -53,6 +54,7 @@ const ComparativeAnalysis = () => {
 
         </Tabs>
       </Box>
+    <ComparativeAnalysisControls/>
       <Box sx={{ width: '100%', flexGrow: 1, overflow: 'auto' }}>
         {
           selectedComparisonTab === 0 && (

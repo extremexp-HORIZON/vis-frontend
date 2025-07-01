@@ -97,6 +97,8 @@ interface IMonitoringPageSlice {
       visibleTable: string
       selectedTab: number
       selectedComparisonTab: number
+      isMosaic: boolean
+      showMisclassifiedOnly: boolean
       selectedWorkflowsMetrics: {
         data: {[key: string]: {name: string; seriesMetric: IMetric[]}[]}
         loading: boolean
@@ -202,6 +204,8 @@ const initialState: IMonitoringPageSlice = {
   visibleTable: 'workflows',
   selectedTab: 0,
   selectedComparisonTab: 0,
+  isMosaic:true,
+  showMisclassifiedOnly: false,
   selectedWorkflowsMetrics: {
     data: {},
     loading: false,
@@ -266,6 +270,12 @@ export const monitoringPageSlice = createSlice({
     },
     setSelectedComparisonTab: (state, action) => {
       state.selectedComparisonTab = action.payload;
+    },
+    setIsMosaic: (state, action) => {
+      state.isMosaic = action.payload;
+    },
+    setShowMisclassifiedOnly: (state, action) => {
+      state.showMisclassifiedOnly = action.payload;
     },
     toggleWorkflowSelection: (state, action) => {
       const workflowId = action.payload;
@@ -637,5 +647,5 @@ export const fetchMetaData = createAsyncThunk(
 );
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel,setIsMosaic,setShowMisclassifiedOnly
 } = monitoringPageSlice.actions;

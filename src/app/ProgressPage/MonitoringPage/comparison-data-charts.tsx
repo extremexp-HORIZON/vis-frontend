@@ -26,7 +26,9 @@ const ComparisonDataCharts: React.FC = () => {
     (state: RootState) => state.progressPage.experiment.data?.id || '',
   );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
-  const [isMosaic, setIsMosaic] = useState(true);
+  const isMosaic = useAppSelector(
+    (state: RootState) => state.monitorPage.isMosaic,
+  );
   const { hoveredWorkflowId } = workflowsTable;
   const dispatch = useAppDispatch();
   const { commonDataAssets, dataAssetsMetaData } = comparativeDataExploration;
@@ -186,35 +188,6 @@ const ComparisonDataCharts: React.FC = () => {
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }} >
-      <Grid
-        container
-        justifyContent="flex-end" // Align to the right
-        alignItems="center"
-        sx={{ marginBottom: 2 }}
-      >
-        <ButtonGroup
-          variant="contained"
-          aria-label="view mode"
-          sx={{
-            height: '25px', // Ensure consistent height for the button group
-          }}
-        >
-          <Button
-            variant={isMosaic ? 'contained' : 'outlined'}
-            color="primary"
-            onClick={() => setIsMosaic(true)}
-          >
-            Mosaic
-          </Button>
-          <Button
-            variant={!isMosaic ? 'contained' : 'outlined'}
-            color="primary"
-            onClick={() => setIsMosaic(false)}
-          >
-           Stacked
-          </Button>
-        </ButtonGroup>
-      </Grid>
       <Grid
         container
         spacing={2}

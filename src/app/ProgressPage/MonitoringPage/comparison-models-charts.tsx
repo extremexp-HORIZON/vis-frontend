@@ -16,7 +16,9 @@ import {
   Select,
   IconButton,
   Menu,
-  FormControlLabel
+  FormControlLabel,
+  Divider,
+  Card
 } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -132,22 +134,14 @@ const ControlPanel = ({
   );
 };
 const ComparisonModelsCharts: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
-  const menuOpen = Boolean(anchorEl);
-  const { workflowsTable, selectedModelComparisonChart } = useAppSelector(
+ 
+  const { workflowsTable, selectedModelComparisonChart ,showMisclassifiedOnly} = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
-  const [isMosaic, setIsMosaic] = useState(true);
-
+  const isMosaic = useAppSelector(
+    (state: RootState) => state.monitorPage.isMosaic,
+  );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
-  const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(true);
-
-  const options1 = [
-    { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon /> },
-    { label: 'rocCurve', name: 'Roc\nCurve', icon: <RoundedCornerRoundedIcon /> },
-    { label: 'instanceView', name: 'Instance\nView', icon: <BlurLinearIcon /> }
-  ];
 
   const [options, setOptions] = useState<string[]>([]);
   const [xAxisOption, setXAxisOption] = useState<string>('');
@@ -164,192 +158,22 @@ const ComparisonModelsCharts: React.FC = () => {
     );
   }
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }}>
-      <Grid container direction="column" sx={{ marginBottom: 2 }} spacing={2}>
-
+<Grid
+  container
+  justifyContent="space-between"
+  alignItems="center"
+  sx={{ marginBottom: 2, flexWrap: 'wrap', gap: 2 }}
+>
         {/* Left-aligned Button Group */}
-        <Grid item>
-          <Grid container justifyContent="flex-start">
-            <Grid item>
-              <Box
-                display="flex"
-                flexWrap="wrap"
-                gap={1}
-              >
-                {options1.map(option => (
-                  <Chip
-                    key={option.label}
-                    label={option.name}
-                    icon={option.icon}
-                    clickable
-                    sx={{
-                      height: 40,
-                      // width: 150,
-                      background:
-                        selectedModelComparisonChart === option.label
-                          ? undefined
-                          : theme.palette.customGrey.light,
-                      px: 2,
-                      borderRadius: 2,
-                      fontWeight: 500,
-                      '& .MuiChip-icon': {
-                        fontSize: 25,
-                        marginLeft: 0,
-                        marginRight: 0.1
-                      },
-                      '& .MuiChip-label': {
-                        whiteSpace: 'pre-line',
-                        textAlign: 'left',
-                        lineHeight: 1.2,
-                      },
-                    }}
-                    color={selectedModelComparisonChart === option.label ? 'primary' : 'default'}
-                    variant={selectedModelComparisonChart === option.label ? 'filled' : 'outlined'}
-                    onClick={() => dispatch(setSelectedModelComparisonChart(option.label))}
-                  />
-                ))}
-              </Box>
-            </Grid>
-          </Grid>
-        </Grid>
 
-        <Grid item>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Checkbox
-                    checked={showMisclassifiedOnly}
-                    size="small"
-                    onChange={(e) => setShowMisclassifiedOnly(e.target.checked)}
-                  />
-                  <Typography variant="body1">Misclassified</Typography>
-                </Box> */}
-                {selectedModelComparisonChart === 'instanceView' && (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={showMisclassifiedOnly}
-                        size="small"
-                        onChange={(e) => setShowMisclassifiedOnly(e.target.checked)}
-                      />
-                    }
-                    label="Misclassified"
-                    sx={{ ml: 0.5 }}
-
-                  />
-
-                )}
-
-                <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
-                  <Button
-                    variant={isMosaic ? 'contained' : 'outlined'}
-                    color="primary"
-                    onClick={() => setIsMosaic(true)}
-                  >
-                Mosaic
-                  </Button>
-                  <Button
-                    variant={!isMosaic ? 'contained' : 'outlined'}
-                    color="primary"
-                    onClick={() => setIsMosaic(false)}
-                  >
-                Stacked
-                  </Button>
-                </ButtonGroup>
-                {selectedModelComparisonChart === 'instanceView' && (
-                  <>
-                    <IconButton
-                      aria-label="settings"
-                      onClick={handleMenuClick}
-                      sx={{
-                        position: 'relative',
-                        '& svg': { zIndex: 1, position: 'relative' },
-                      }}
-                    >
-                      <SettingsIcon />
-                    </IconButton>
-
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={menuOpen}
-                      onClose={handleMenuClose}
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                      PaperProps={{
-                        elevation: 3,
-                        sx: {
-                          width: 320,
-                          maxHeight: 500,
-                          padding: 0,
-                          borderRadius: '12px',
-                          boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
-                          border: '1px solid rgba(0,0,0,0.04)',
-                          mt: 0,
-                        },
-                      }}
-                      MenuListProps={{
-                        sx: {
-                          pt: 0,
-                        }
-                      }}
-                    >
-                      <SectionHeader
-                        icon={<SettingsSuggestIcon fontSize="small" />}
-                        title="Control Options"
-                      />
-
-                      {/* Checkbox */}
-
-                      {/* Control Panel */}
-                      <Box sx={{ mt: 2 }}>
-                        <ControlPanel
-                          xAxisOption={xAxisOption}
-                          yAxisOption={yAxisOption}
-                          setXAxisOption={setXAxisOption}
-                          setYAxisOption={setYAxisOption}
-                          options={options}
-                          plotData={null}
-                        />
-                      </Box>
-                    </Menu>
-                  </>
-                )}
-                {/* {selectedModelComparisonChart === 'instanceView' && (
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Checkbox
-                      checked={showMisclassifiedOnly}
-                      size="small"
-                      onChange={(e) => setShowMisclassifiedOnly(e.target.checked)}
-                    />
-                    <Typography variant="body1" >
-                      Show Misclassified
-                    </Typography>
-                     <ControlPanel
-                      xAxisOption={xAxisOption}
-                      yAxisOption={yAxisOption}
-                      setXAxisOption={setXAxisOption}
-                      setYAxisOption={setYAxisOption}
-                      options={options}
-                      plotData={null} // not needed here visually but must be passed; can be adjusted
-                    />
-                </Box>
-                )} */}
-              </Box>
-            </Grid>
-          </Grid>
-        </Grid>
+      
       </Grid>
+
+
 
       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
         {selectedModelComparisonChart === 'confusionMatrix' && <ComparisonModelConfusion isMosaic={isMosaic} />}
