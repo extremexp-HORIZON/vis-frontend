@@ -19,7 +19,7 @@ import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
 import { debounce } from 'lodash';
 import type { CustomGridColDef } from '../../../../shared/types/table-types';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import WorkflowRating from './workflow-rating';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -145,6 +145,7 @@ export default function WorkflowTable() {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const lastHoveredIdRef = useRef<string | null>(null);
   const { experimentId } = useParams();
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
 
@@ -158,6 +159,12 @@ export default function WorkflowTable() {
   const handleLaunchCompletedTab =
     () => (e: React.SyntheticEvent) => {
       dispatch(setSelectedTab(1));
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('tab', '1');
+      navigate({
+        pathname: location.pathname,
+        search: searchParams.toString(),
+      }, { replace: true });
     };
 
   const filterClicked = (event: React.MouseEvent<HTMLElement>) => {
