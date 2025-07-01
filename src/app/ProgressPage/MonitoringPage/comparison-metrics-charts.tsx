@@ -1,12 +1,10 @@
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
   Grid,
   Container,
-  ButtonGroup,
-  Button,
 } from '@mui/material';
 import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
 import InfoMessage from '../../../shared/components/InfoMessage';

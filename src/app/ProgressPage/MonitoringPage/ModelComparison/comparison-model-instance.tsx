@@ -28,7 +28,7 @@ const ComparisonModelInstance = ({
     (state: RootState) => state.progressPage.experiment.data?.id || '',
 
   );
-  const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
+  const { xAxisOption, yAxisOption } = comparativeModelInstanceControlPanel;
 
   const dispatch = useAppDispatch();
 
