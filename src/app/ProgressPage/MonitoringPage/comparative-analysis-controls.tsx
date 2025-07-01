@@ -40,20 +40,20 @@ const ComparativeAnalysisControls = ()=> {
         alignItems="center"
         flexWrap="wrap"
         gap={2}
-        sx={{ p: 2 }}
+        sx={{ p: 1 }}
       >
         {selectedComparisonTab === 1 && (
-          <Card
-            variant="outlined"
-            sx={{
-              p: 1,
-              borderRadius: 2,
-              display: 'flex',
-              alignItems: 'center',
-              boxShadow: 1,
-              backgroundColor: theme.palette.customGrey.light,
-            }}
-          >
+          // <Card
+          //   variant="outlined"
+          //   sx={{
+          //     p: 1,
+          //     borderRadius: 2,
+          //     display: 'flex',
+          //     alignItems: 'center',
+          //     boxShadow: 1,
+          //     backgroundColor: theme.palette.customGrey.light,
+          //   }}
+          // >
             <Box display="flex" flexWrap="wrap" gap={1}>
               {options1.map(option => (
                 <Chip
@@ -88,7 +88,7 @@ const ComparativeAnalysisControls = ()=> {
                 />
               ))}
             </Box>
-          </Card>
+          // </Card>
         )}
 
         <Box
@@ -113,7 +113,7 @@ const ComparativeAnalysisControls = ()=> {
             />
           )}
 
-          <Card
+          {/* <Card
             variant="outlined"
             sx={{
               p: 1,
@@ -122,7 +122,7 @@ const ComparativeAnalysisControls = ()=> {
               alignItems: 'center',
               boxShadow: 1,
             }}
-          >
+          > */}
             <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
               <Button
                 variant={isMosaic ? 'contained' : 'outlined'}
@@ -139,7 +139,7 @@ const ComparativeAnalysisControls = ()=> {
                 Stacked
               </Button>
             </ButtonGroup>
-          </Card>
+          {/* </Card> */}
           
           {selectedModelComparisonChart === 'instanceView' && selectedComparisonTab === 1 && (
             <>
@@ -187,7 +187,7 @@ const ComparativeAnalysisControls = ()=> {
 
       <Divider
         sx={{
-          my: 2,
+          my: 0.5,
           borderBottomWidth: 2,
           borderColor: 'grey.300',
         }}
