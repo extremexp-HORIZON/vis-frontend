@@ -321,7 +321,7 @@ const ComparisonMetricsCharts: React.FC = () => {
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }} >
-     
+
       <Grid
         container
         spacing={2}

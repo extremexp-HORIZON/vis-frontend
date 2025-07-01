@@ -54,7 +54,7 @@ const ComparativeAnalysis = () => {
 
         </Tabs>
       </Box>
-    <ComparativeAnalysisControls/>
+      <ComparativeAnalysisControls/>
       <Box sx={{ width: '100%', flexGrow: 1, overflow: 'auto' }}>
         {
           selectedComparisonTab === 0 && (

@@ -1,40 +1,23 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import { useAppSelector } from '../../../store/store';
 import {
   Grid,
   Container,
-  ButtonGroup,
-  Button,
-  Chip,
   Box,
-  Checkbox,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  IconButton,
-  Menu,
-  FormControlLabel,
-  Divider,
-  Card
 } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { setSelectedModelComparisonChart } from '../../../store/slices/monitorPageSlice';
-import WindowRoundedIcon from '@mui/icons-material/WindowRounded';
-import RoundedCornerRoundedIcon from '@mui/icons-material/RoundedCornerRounded';
 import ComparisonModelConfusion from './ModelComparison/comparison-model-confusion';
-import BlurLinearIcon from '@mui/icons-material/BlurLinear';
 import ComparisonModelInstance from './ModelComparison/comparison-model-instance';
 import ComparisonModelRoc from './ModelComparison/comparison-model-roc';
 import type { TestInstance } from '../../../shared/models/tasks/model-analysis.model';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import theme from '../../../mui-theme';
-import SettingsIcon from '@mui/icons-material/Settings';
-import { SectionHeader } from '../../../shared/components/responsive-card-table';
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -134,8 +117,8 @@ const ControlPanel = ({
   );
 };
 const ComparisonModelsCharts: React.FC = () => {
- 
-  const { workflowsTable, selectedModelComparisonChart ,showMisclassifiedOnly} = useAppSelector(
+
+  const { workflowsTable, selectedModelComparisonChart, showMisclassifiedOnly } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
   const isMosaic = useAppSelector(
@@ -158,23 +141,8 @@ const ComparisonModelsCharts: React.FC = () => {
     );
   }
 
-
   return (
-    <Container maxWidth={false} sx={{ padding: 2 }}>
-<Grid
-  container
-  justifyContent="space-between"
-  alignItems="center"
-  sx={{ marginBottom: 2, flexWrap: 'wrap', gap: 2 }}
->
-        {/* Left-aligned Button Group */}
-
-
-      
-      </Grid>
-
-
-
+    <Container maxWidth={false} sx={{ p: 2 }}>
       <Grid container spacing={2} sx={{ width: '100%', margin: '0 auto', flexWrap: 'wrap' }}>
         {selectedModelComparisonChart === 'confusionMatrix' && <ComparisonModelConfusion isMosaic={isMosaic} />}
       </Grid>

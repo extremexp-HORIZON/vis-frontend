@@ -204,7 +204,7 @@ const initialState: IMonitoringPageSlice = {
   visibleTable: 'workflows',
   selectedTab: 0,
   selectedComparisonTab: 0,
-  isMosaic:true,
+  isMosaic: true,
   showMisclassifiedOnly: false,
   selectedWorkflowsMetrics: {
     data: {},
@@ -647,5 +647,5 @@ export const fetchMetaData = createAsyncThunk(
 );
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel,setIsMosaic,setShowMisclassifiedOnly
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly
 } = monitoringPageSlice.actions;
