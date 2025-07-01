@@ -1,7 +1,7 @@
-import { Box, Button, ButtonGroup, Card, Checkbox, Chip, Divider, FormControlLabel, Grid, IconButton, Menu } from '@mui/material';
+import { Box, Button, ButtonGroup, Card, Checkbox, Chip, Divider, FormControl, FormControlLabel, Grid, IconButton, InputLabel, Menu, MenuItem, Select } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../store/slices/monitorPageSlice';
+import { setComparativeModelInstanceControlPanel, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../store/slices/monitorPageSlice';
 import theme from '../../../mui-theme';
 import WindowRoundedIcon from '@mui/icons-material/WindowRounded';
 import RoundedCornerRoundedIcon from '@mui/icons-material/RoundedCornerRounded';
@@ -10,6 +10,7 @@ import { SectionHeader } from '../../../shared/components/responsive-card-table'
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import { useState } from 'react';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 
 const ComparativeAnalysisControls = ()=> {
   const isMosaic = useAppSelector((state: RootState) => state.monitorPage.isMosaic);
@@ -17,8 +18,11 @@ const ComparativeAnalysisControls = ()=> {
   const showMisclassifiedOnly = useAppSelector((state: RootState) => state.monitorPage.showMisclassifiedOnly);
   const selectedComparisonTab = useAppSelector((state: RootState) => state.monitorPage.selectedComparisonTab);
   const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
+  const comparativeModelInstanceControlPanel = useAppSelector((state: RootState) => state.monitorPage.comparativeModelInstanceControlPanel);
   const menuOpen = Boolean(anchorEl);
   const dispatch = useAppDispatch();
+  const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
+
   const options1 = [
     { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon /> },
     { label: 'rocCurve', name: 'Roc\nCurve', icon: <RoundedCornerRoundedIcon /> },
@@ -54,40 +58,40 @@ const ComparativeAnalysisControls = ()=> {
           //     backgroundColor: theme.palette.customGrey.light,
           //   }}
           // >
-            <Box display="flex" flexWrap="wrap" gap={1}>
-              {options1.map(option => (
-                <Chip
-                  key={option.label}
-                  label={option.name}
-                  icon={option.icon}
-                  clickable
-                  size="small"
-                  sx={{
-                    height: 35,
-                    px: 2,
-                    borderRadius: 2,
-                    fontWeight: 500,
-                    background:
+          <Box display="flex" flexWrap="wrap" gap={1}>
+            {options1.map(option => (
+              <Chip
+                key={option.label}
+                label={option.name}
+                icon={option.icon}
+                clickable
+                size="small"
+                sx={{
+                  height: 35,
+                  px: 2,
+                  borderRadius: 2,
+                  fontWeight: 500,
+                  background:
                       selectedModelComparisonChart === option.label
                         ? undefined
                         : theme.palette.customGrey.light,
-                    '& .MuiChip-icon': {
-                      fontSize: 25,
-                      marginLeft: 0,
-                      marginRight: 0.1,
-                    },
-                    '& .MuiChip-label': {
-                      whiteSpace: 'pre-line',
-                      textAlign: 'left',
-                      lineHeight: 1.2,
-                    },
-                  }}
-                  color={selectedModelComparisonChart === option.label ? 'primary' : 'default'}
-                  variant={selectedModelComparisonChart === option.label ? 'filled' : 'outlined'}
-                  onClick={() => dispatch(setSelectedModelComparisonChart(option.label))}
-                />
-              ))}
-            </Box>
+                  '& .MuiChip-icon': {
+                    fontSize: 25,
+                    marginLeft: 0,
+                    marginRight: 0.1,
+                  },
+                  '& .MuiChip-label': {
+                    whiteSpace: 'pre-line',
+                    textAlign: 'left',
+                    lineHeight: 1.2,
+                  },
+                }}
+                color={selectedModelComparisonChart === option.label ? 'primary' : 'default'}
+                variant={selectedModelComparisonChart === option.label ? 'filled' : 'outlined'}
+                onClick={() => dispatch(setSelectedModelComparisonChart(option.label))}
+              />
+            ))}
+          </Box>
           // </Card>
         )}
 
@@ -123,24 +127,24 @@ const ComparativeAnalysisControls = ()=> {
               boxShadow: 1,
             }}
           > */}
-            <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
-              <Button
-                variant={isMosaic ? 'contained' : 'outlined'}
-                color="primary"
-                onClick={() => dispatch(setIsMosaic(true))}
-              >
+          <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
+            <Button
+              variant={isMosaic ? 'contained' : 'outlined'}
+              color="primary"
+              onClick={() => dispatch(setIsMosaic(true))}
+            >
                 Mosaic
-              </Button>
-              <Button
-                variant={!isMosaic ? 'contained' : 'outlined'}
-                color="primary"
-                onClick={() => dispatch(setIsMosaic(false))}
-              >
+            </Button>
+            <Button
+              variant={!isMosaic ? 'contained' : 'outlined'}
+              color="primary"
+              onClick={() => dispatch(setIsMosaic(false))}
+            >
                 Stacked
-              </Button>
-            </ButtonGroup>
+            </Button>
+          </ButtonGroup>
           {/* </Card> */}
-          
+
           {selectedModelComparisonChart === 'instanceView' && selectedComparisonTab === 1 && (
             <>
               <IconButton
@@ -153,7 +157,7 @@ const ComparativeAnalysisControls = ()=> {
               >
                 <SettingsIcon />
               </IconButton>
-              
+
               <Menu
                 anchorEl={anchorEl}
                 open={menuOpen}
@@ -179,6 +183,71 @@ const ComparativeAnalysisControls = ()=> {
                   title="Control Options"
                 />
                 <Box sx={{ mt: 2 }} />
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, px: 1.5 }}>
+
+                  {/* X-Axis Selector */}
+                  <FormControl fullWidth>
+                    <InputLabel id="x-axis-select-label">
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <ShowChartIcon fontSize="small" />
+                X-Axis
+                      </Box>
+                    </InputLabel>
+                    <Select
+                      labelId="x-axis-select-label"
+                      label="X-Axis-----"
+                      // disabled={plotData?.loading || !plotData?.data}
+                      value={xAxisOption}
+                      onChange={(e) =>
+                        dispatch(setComparativeModelInstanceControlPanel({ xAxisOption: e.target.value }))
+                      }
+                      MenuProps={{
+                        PaperProps: { style: { maxHeight: 224, width: 250 } },
+                      }}
+                    >
+                      {options
+                        .filter(option => option !== yAxisOption)
+                        .map((feature, idx) => (
+                          <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
+                            {feature}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth>
+                    <InputLabel id="y-axis-select-label">
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <ShowChartIcon fontSize="small" />
+                Y-Axis
+                      </Box>
+                    </InputLabel>
+                    <Select
+                      labelId="y-axis-select-label"
+                      label="Y-Axis-----"
+                      // disabled={plotData?.loading || !plotData?.data}
+                      value={yAxisOption}
+                      onChange={(e) =>
+                        dispatch(setComparativeModelInstanceControlPanel({ yAxisOption: e.target.value }))
+                      }            MenuProps={{
+                        PaperProps: { style: { maxHeight: 224, width: 250 } },
+                      }}
+                    >
+                      {options
+                        .filter(option => option !== xAxisOption)
+                        .map((feature, idx) => (
+                          <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
+                            {feature}
+                          </MenuItem>
+                        ))}
+
+                      {options.filter(option => option !== xAxisOption).length === 0 && (
+                        <MenuItem disabled value="">
+                No available options
+                        </MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Box>
               </Menu>
             </>
           )}

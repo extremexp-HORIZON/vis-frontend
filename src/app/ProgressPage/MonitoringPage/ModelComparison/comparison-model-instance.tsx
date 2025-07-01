@@ -7,36 +7,29 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useEffect } from 'react';
-import { fetchComparativeModelInstances } from '../../../../store/slices/monitorPageSlice';
+import { fetchComparativeModelInstances, setComparativeModelInstanceControlPanel } from '../../../../store/slices/monitorPageSlice';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 
 const ComparisonModelInstance = ({
   isMosaic,
   showMisclassifiedOnly,
-  xAxisOption,
-  yAxisOption,
-  setXAxisOption,
-  setYAxisOption,
-  options,
-  setOptions,
+
 }: {
   isMosaic: boolean,
   showMisclassifiedOnly: boolean,
-  xAxisOption: string,
-  yAxisOption: string,
-  setXAxisOption: (val: string) => void,
-  setYAxisOption: (val: string) => void,
-  options: string[],
-  setOptions: (opts: string[]) => void
+
 }) => {
-  const { workflowsTable, comparativeModelInstance } = useAppSelector(
+  const { workflowsTable, comparativeModelInstance, comparativeModelInstanceControlPanel } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
 
   const experimentId = useAppSelector(
     (state: RootState) => state.progressPage.experiment.data?.id || '',
+
   );
+  const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
+
   const dispatch = useAppDispatch();
 
   // TODO: fix palette colors
@@ -62,10 +55,13 @@ const ComparisonModelInstance = ({
     if (dataAvailable?.data) {
       const firstItem = dataAvailable.data[0];
 
-      setOptions(Object.keys(firstItem));
-      // Optional: Set default X/Y
-      if (!xAxisOption) setXAxisOption(Object.keys(firstItem)[0]);
-      if (!yAxisOption) setYAxisOption(Object.keys(firstItem)[1] || '');
+      const keys = Object.keys(firstItem);
+
+      dispatch(setComparativeModelInstanceControlPanel({
+        options: keys,
+        xAxisOption: xAxisOption || keys[0],
+        yAxisOption: yAxisOption || keys[1] || keys[0],
+      }));
     }
   }, [comparativeModelInstance]);
 

@@ -160,6 +160,7 @@ export default function WorkflowTable() {
     () => (e: React.SyntheticEvent) => {
       dispatch(setSelectedTab(1));
       const searchParams = new URLSearchParams(location.search);
+
       searchParams.set('tab', '1');
       navigate({
         pathname: location.pathname,

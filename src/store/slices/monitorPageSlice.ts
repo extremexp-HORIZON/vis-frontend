@@ -127,6 +127,12 @@ interface IMonitoringPageSlice {
         dataAssetsMetaData: DataAssetsMetaData
         dataAssetsControlPanel: DataAssetsControlPanel
       }
+      comparativeModelInstanceControlPanel: {
+         xAxisOption: string
+         yAxisOption: string
+         options: string[]
+
+      }
 }
 
 const generateUniqueColor = (existingColors: Set<string>) => {
@@ -219,6 +225,11 @@ const initialState: IMonitoringPageSlice = {
     commonDataAssets: {},
     dataAssetsMetaData: {},
     dataAssetsControlPanel: {}
+  },
+  comparativeModelInstanceControlPanel: {
+    xAxisOption: '',
+    yAxisOption: '',
+    options: []
   }
 };
 
@@ -335,6 +346,21 @@ export const monitoringPageSlice = createSlice({
     },
     setSelectedModelComparisonChart: (state, action) => {
       state.selectedModelComparisonChart = action.payload;
+    },
+    setComparativeModelInstanceControlPanel: (
+      state,
+      action: {
+    payload: {
+      xAxisOption?: string;
+      yAxisOption?: string;
+      options?: string[];
+    };
+  }
+    ) => {
+      state.comparativeModelInstanceControlPanel = {
+        ...state.comparativeModelInstanceControlPanel,
+        ...action.payload,
+      };
     },
     setCommonDataAssets: (state, action) => {
       state.comparativeDataExploration.commonDataAssets = action.payload;
@@ -647,5 +673,5 @@ export const fetchMetaData = createAsyncThunk(
 );
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel
 } = monitoringPageSlice.actions;
