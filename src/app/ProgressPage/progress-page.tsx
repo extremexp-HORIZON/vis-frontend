@@ -63,7 +63,7 @@ const ProgressPage = (props: ProgressPageProps) => {
     const fetchWorkflows = () =>
       dispatch(fetchExperimentWorkflows(experiment?.data?.id ?? ''));
 
-    intervalId.current = setInterval(fetchWorkflows, 60 * 1000); // 1 minute
+    intervalId.current = setInterval(fetchWorkflows, 10 * 1000); // 1 minute
 
     return () => {
       if (intervalId.current) {
