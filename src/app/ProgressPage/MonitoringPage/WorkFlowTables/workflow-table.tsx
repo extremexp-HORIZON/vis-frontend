@@ -475,12 +475,12 @@ export default function WorkflowTable() {
 
         return;
       }
-
+      const isGrouped = workflowsTable.groupBy.length > 0;
       const columns: CustomGridColDef[] = Object.keys(rows[0])
         .filter(key => key !== 'id')
         .map(key => ({
           field: key,
-          headerName: key === 'action' ? '' : key.replace('_', ' '),
+          headerName: key === 'action' ? '' : (isGrouped && uniqueMetrics.has(key)) ? `AVG ${key.replace('_', ' ')}` : key.replace('_', ' '),
           headerClassName:
             key === 'action' ? 'datagrid-header-fixed' : 'datagrid-header',
           minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,

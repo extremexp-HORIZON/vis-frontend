@@ -36,28 +36,7 @@ const ComparisonMetricsCharts: React.FC = () => {
     (state: RootState) => state.monitorPage.isMosaic,
   );
 
-  // const { workflows } = useAppSelector(
-  //   (state: RootState) => state.progressPage,
-  // );
   const { hoveredWorkflowId } = workflowsTable;
-
-  // const filteredWorkflows = (
-  //   workflowsTable.groupBy.length > 0
-  //     ? workflowsTable.aggregatedRows
-  //     : workflowsTable.filteredRows
-  // ).filter(row => workflowsTable.selectedWorkflows.includes(row.id));
-
-  // const groupByTooltipFields = workflowsTable.groupBy.map(col => ({
-  //   field: col,
-  //   type: 'nominal',
-  //   title: col
-  // }));
-
-  // const tooltipFields = [
-  //   ...(workflowsTable.groupBy.length === 0 ? [{ field: 'id', type: 'nominal' }] : []),
-  //   ...groupByTooltipFields,
-  //   { field: 'value', type: 'quantitative', title: workflowsTable.groupBy.length > 0 ? 'average value' : 'value' },
-  // ];
 
   // when we fetch workflows we need to clear the previous metrics and fetch new in case they are changed
   useEffect(() => {
@@ -174,7 +153,7 @@ const ComparisonMetricsCharts: React.FC = () => {
   }
 
   const renderCharts = Object.entries(groupedMetrics).map(([metricName, metricSeries]) => {
-    const isGrouped = workflowsTable.groupBy.length > 0;
+  const isGrouped = workflowsTable.groupBy.length > 0;
 
     // Determine if line chart is needed: any workflow with multiple values for this metric
     const isLineChart = (() => {
@@ -280,7 +259,7 @@ const ComparisonMetricsCharts: React.FC = () => {
           {
             field: 'value',
             type: 'quantitative',
-            title: 'Value',
+            title: isGrouped ? 'AVG Value' : 'Value',
           },
         ]
       },
