@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, Menu, MenuItem, Select } from '@mui/material';
+import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, ListItemIcon, ListItemText, Menu, MenuItem, Select } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { setComparativeModelInstanceControlPanel, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../store/slices/monitorPageSlice';
@@ -11,6 +11,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import { useState } from 'react';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import DownloadIcon from '@mui/icons-material/Download';
+import CodeIcon from '@mui/icons-material/Code';
 
 const ComparativeAnalysisControls = ()=> {
   const isMosaic = useAppSelector((state: RootState) => state.monitorPage.isMosaic);
@@ -22,6 +24,7 @@ const ComparativeAnalysisControls = ()=> {
   const menuOpen = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
+ 
 
   const options1 = [
     { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon /> },
@@ -29,6 +32,8 @@ const ComparativeAnalysisControls = ()=> {
     { label: 'instanceView', name: 'Instance\nView', icon: <BlurLinearIcon /> }
   ];
 
+
+  
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -248,6 +253,32 @@ const ComparativeAnalysisControls = ()=> {
                     </Select>
                   </FormControl>
                 </Box>
+                <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                 <Box sx={{ py: 1 }}>
+                                    <MenuItem  sx={{ py: 1.5 }}>
+                                      <ListItemIcon>
+                                        <DownloadIcon fontSize="small" color="primary" />
+                                      </ListItemIcon>
+                                      <ListItemText
+                                        primary="Download as PNG"
+                                        secondary="Save chart as image"
+                                        primaryTypographyProps={{ fontWeight: 500 }}
+                                        secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                                      />
+                                    </MenuItem>
+                                    <MenuItem  sx={{ py: 1.5 }}>
+                                      <ListItemIcon>
+                                        <CodeIcon fontSize="small" color="primary" />
+                                      </ListItemIcon>
+                                      <ListItemText
+                                        primary="Download Data as JSON"
+                                        secondary="Export chart's underlying data"
+                                        primaryTypographyProps={{ fontWeight: 500 }}
+                                        secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                                      />
+                                    </MenuItem>
+                                  </Box>
+                
               </Menu>
             </>
           )}
