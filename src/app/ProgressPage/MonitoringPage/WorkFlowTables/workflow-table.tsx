@@ -530,7 +530,6 @@ export default function WorkflowTable() {
 
               return (
                 <WorkflowRating
-                // here must be the workflow id that i selected somehow
                   currentRating={currentRating} experimentId={experimentId || ''} workflowId={params.row.id} />
               );
             },
