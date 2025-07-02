@@ -153,7 +153,7 @@ const ComparisonMetricsCharts: React.FC = () => {
   }
 
   const renderCharts = Object.entries(groupedMetrics).map(([metricName, metricSeries]) => {
-  const isGrouped = workflowsTable.groupBy.length > 0;
+    const isGrouped = workflowsTable.groupBy.length > 0;
 
     // Determine if line chart is needed: any workflow with multiple values for this metric
     const isLineChart = (() => {

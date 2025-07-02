@@ -1,30 +1,22 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-export enum AggregationFunction {
-  // Basic aggregations
-  COUNT = 'COUNT',
-  COUNT_ALL = 'COUNT_ALL',
-  SUM = 'SUM',
-  AVG = 'AVG',
-  MIN = 'MIN',
-  MAX = 'MAX',
+export const AggregationFunction = {
+  COUNT: 'COUNT',
+  COUNT_ALL: 'COUNT_ALL',
+  SUM: 'SUM',
+  AVG: 'AVG',
+  MIN: 'MIN',
+  MAX: 'MAX',
+  STDDEV: 'STDDEV',
+  VARIANCE: 'VARIANCE',
+  MEDIAN: 'MEDIAN',
+  PERCENTILE: 'PERCENTILE',
+  STRING_AGG: 'STRING_AGG',
+  ARRAY_AGG: 'ARRAY_AGG',
+  FIRST: 'FIRST',
+  LAST: 'LAST',
+  MODE: 'MODE',
+} as const;
 
-  // Statistical functions
-  STDDEV = 'STDDEV',
-  VARIANCE = 'VARIANCE',
-  MEDIAN = 'MEDIAN',
-
-  // Percentiles
-  PERCENTILE = 'PERCENTILE',
-
-  // String aggregations
-  STRING_AGG = 'STRING_AGG',
-  ARRAY_AGG = 'ARRAY_AGG',
-
-  // Advanced
-  FIRST = 'FIRST',
-  LAST = 'LAST',
-  MODE = 'MODE'
-}
+export type AggregationFunction = typeof AggregationFunction[keyof typeof AggregationFunction];
 
 export interface AggregationOptions {
   distinct?: boolean;               // Default: false

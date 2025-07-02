@@ -19,7 +19,7 @@ import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
 import { debounce } from 'lodash';
 import type { CustomGridColDef } from '../../../../shared/types/table-types';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import WorkflowRating from './workflow-rating';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -146,6 +146,7 @@ export default function WorkflowTable() {
   const lastHoveredIdRef = useRef<string | null>(null);
   const { experimentId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const dispatch = useAppDispatch();
 
@@ -334,9 +335,22 @@ export default function WorkflowTable() {
           ...workflowsTable.uniqueMetrics,
         ]);
 
-        const reducedColumns = workflowsTable.columns.filter(col =>
-          allowedFields.has(col.field)
-        );
+        const reducedColumns = workflowsTable.columns
+          .filter(col => allowedFields.has(col.field))
+          .map(col => {
+            const isMetric = workflowsTable.uniqueMetrics.includes(col.field);
+            const isGroupBy = workflowsTable.groupBy.includes(col.field);
+
+            // Rename column header if it's a metric and aggregation is applied
+            if (isMetric && !isGroupBy) {
+              return {
+                ...col,
+                headerName: `AVG ${col.headerName || col.field}`,
+              };
+            }
+
+            return col;
+          });
 
         const newVisibleIds = new Set(aggregatedRows.map(r => r.id));
         const preservedSelections = workflowsTable.selectedWorkflows.filter(id => newVisibleIds.has(id));
@@ -475,12 +489,12 @@ export default function WorkflowTable() {
 
         return;
       }
-      const isGrouped = workflowsTable.groupBy.length > 0;
+
       const columns: CustomGridColDef[] = Object.keys(rows[0])
         .filter(key => key !== 'id')
         .map(key => ({
           field: key,
-          headerName: key === 'action' ? '' : (isGrouped && uniqueMetrics.has(key)) ? `AVG ${key.replace('_', ' ')}` : key.replace('_', ' '),
+          headerName: key === 'action' ? '' : key.replace('_', ' '),
           headerClassName:
             key === 'action' ? 'datagrid-header-fixed' : 'datagrid-header',
           minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,
