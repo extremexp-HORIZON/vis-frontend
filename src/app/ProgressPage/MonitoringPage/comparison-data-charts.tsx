@@ -72,6 +72,16 @@ const ComparisonDataCharts: React.FC = () => {
     Object.entries(commonDataAssets)
       .flatMap(([assetName, assetList]) =>
         assetList.forEach(({ workflowId, dataAsset }) => {
+          const alreadyFetched = dataAssetsMetaData?.[assetName]?.[workflowId]?.meta;
+
+          if (
+            alreadyFetched?.loading ||
+            alreadyFetched?.data ||
+            alreadyFetched?.error === null
+          ) {
+            return;
+          }
+
           dispatch(
             fetchMetaData({
               query: {

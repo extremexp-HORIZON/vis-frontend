@@ -236,6 +236,30 @@ const initialState: IMonitoringPageSlice = {
   }
 };
 
+const pruneComparativeMetadata = (state: IMonitoringPageSlice) => {
+  const selectedIds = new Set(state.workflowsTable.selectedWorkflows);
+
+  for (const assetName in state.comparativeDataExploration.dataAssetsMetaData) {
+    const workflowMeta = state.comparativeDataExploration.dataAssetsMetaData[assetName];
+
+    for (const workflowId in workflowMeta) {
+      if (!selectedIds.has(workflowId)) {
+        delete workflowMeta[workflowId];
+      }
+    }
+
+    if (Object.keys(workflowMeta).length === 0) {
+      delete state.comparativeDataExploration.dataAssetsMetaData[assetName];
+    }
+  }
+
+  for (const assetName in state.comparativeDataExploration.dataAssetsControlPanel) {
+    if (!state.comparativeDataExploration.commonDataAssets[assetName]) {
+      delete state.comparativeDataExploration.dataAssetsControlPanel[assetName];
+    }
+  }
+};
+
 export const monitoringPageSlice = createSlice({
   name: 'monitoringPage',
   initialState,
@@ -367,6 +391,7 @@ export const monitoringPageSlice = createSlice({
     },
     setCommonDataAssets: (state, action) => {
       state.comparativeDataExploration.commonDataAssets = action.payload;
+      pruneComparativeMetadata(state);
     },
     setDataAssetsControlPanel: (state, action: {
       payload: {
