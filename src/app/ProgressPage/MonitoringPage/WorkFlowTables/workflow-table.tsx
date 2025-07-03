@@ -237,11 +237,10 @@ export default function WorkflowTable() {
       grouped.get(key)?.push(row);
     });
 
-    let idCounter = 0;
     const aggregatedRows: WorkflowTableRow[] = [];
 
     for (const [key, group] of grouped.entries()) {
-      const groupId = `group-${key}`;      
+      const groupId = `group-${key}`;
       const values = group[0];
       const workflowIds = group.map(row => row.workflowId);
       const summary: WorkflowTableRow = {
@@ -379,6 +378,7 @@ export default function WorkflowTable() {
           ) {
             const children = workflowsTable.grouppedWorkflows[groupId];
             const childRows = workflowsTable.filteredRows.filter(row => children.includes(row.workflowId));
+
             visibleRows.push(...childRows);
           }
         });
@@ -530,7 +530,7 @@ export default function WorkflowTable() {
           flex: 1,
           align: 'center',
           headerAlign: 'center',
-          sortable: key !== 'action',
+          sortable: key !== 'action' && !workflowsTable.groupBy.length,
           type: (rows.length > 0 && typeof (rows[0] as Record<string, string | number | boolean | undefined>)[key] === 'number') ? 'number' : 'string',
           ...(key === 'status' && {
             renderCell: params => (

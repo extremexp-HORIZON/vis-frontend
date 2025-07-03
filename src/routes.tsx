@@ -20,8 +20,8 @@ const routes = createBrowserRouter([
     path: '/:experimentId',
     element: (
       <ProtectedRoute>
-      <ProgressPageLoading />
-       </ProtectedRoute>
+        <ProgressPageLoading />
+      </ProtectedRoute>
     ),
     errorElement: <ErrorPage />
   },
@@ -33,22 +33,22 @@ const routes = createBrowserRouter([
   {
     path: '/:experimentId/monitoring',
     element: (
-       <ProtectedRoute>
-      <ProgressPage>
-        <MonitoringPage />
-      </ProgressPage>
-       </ProtectedRoute>
+      <ProtectedRoute>
+        <ProgressPage>
+          <MonitoringPage />
+        </ProgressPage>
+      </ProtectedRoute>
     ),
     errorElement: <ErrorPage />
   },
   {
     path: '/:experimentId/workflow',
     element: (
-       <ProtectedRoute>
-      <ProgressPage>
-        <WorkflowTab />
-      </ProgressPage>
-       </ProtectedRoute>
+      <ProtectedRoute>
+        <ProgressPage>
+          <WorkflowTab />
+        </ProgressPage>
+      </ProtectedRoute>
     ),
     errorElement: <ErrorPage />
   },
