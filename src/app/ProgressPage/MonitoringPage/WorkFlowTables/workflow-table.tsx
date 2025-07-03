@@ -9,7 +9,9 @@ import Box from '@mui/material/Box';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable } from '../../../../store/slices/monitorPageSlice';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable, setExpandedGroup } from '../../../../store/slices/monitorPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useRef, useState } from 'react';
@@ -149,6 +151,7 @@ export default function WorkflowTable() {
   const location = useLocation();
 
   const dispatch = useAppDispatch();
+  const prevGroupByRef = useRef<string[]>([]);
 
   const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
     newSelection.forEach(workflowId => {
@@ -322,6 +325,15 @@ export default function WorkflowTable() {
 
   useEffect(() => {
     if(workflowsTable.initialized) {
+      const groupByChanged =
+        prevGroupByRef.current.join('|') !== workflowsTable.groupBy.join('|');
+
+      if (groupByChanged) {
+        dispatch(setWorkflowsTable({ expandedGroups: [] }));
+      }
+
+      prevGroupByRef.current = workflowsTable.groupBy;
+
       if (workflowsTable.groupBy.length > 0 && workflowsTable.filteredRows.length > 0) {
         const { aggregatedRows, grouppedWorkflows } = handleAggregation(
           workflowsTable.filteredRows,
@@ -333,6 +345,7 @@ export default function WorkflowTable() {
           'workflowId',
           ...workflowsTable.groupBy,
           ...workflowsTable.uniqueMetrics,
+          'action'
         ]);
 
         const reducedColumns = workflowsTable.columns
@@ -345,7 +358,7 @@ export default function WorkflowTable() {
             if (isMetric && !isGroupBy) {
               return {
                 ...col,
-                headerName: `AVG ${col.headerName || col.field}`,
+                headerName: col.headerName || col.field,
               };
             }
 
@@ -355,22 +368,39 @@ export default function WorkflowTable() {
         const newVisibleIds = new Set(aggregatedRows.map(r => r.id));
         const preservedSelections = workflowsTable.selectedWorkflows.filter(id => newVisibleIds.has(id));
 
+        const visibleRows: WorkflowTableRow[] = [];
+
+        aggregatedRows.forEach((groupRow) => {
+          visibleRows.push(groupRow);
+          const groupId = groupRow.id;
+
+          if (workflowsTable.expandedGroups.includes(groupId) &&
+            Array.isArray(workflowsTable.grouppedWorkflows[groupId])
+          ) {
+            const children = workflowsTable.grouppedWorkflows[groupId];
+            const childRows = workflowsTable.filteredRows.filter(row => children.includes(row.workflowId));
+
+            visibleRows.push(...childRows);
+          }
+        });
+
         dispatch(setWorkflowsTable({
-          visibleRows: aggregatedRows,
+          visibleRows: visibleRows,
           aggregatedRows: aggregatedRows,
           visibleColumns: reducedColumns,
           selectedWorkflows: preservedSelections,
-          grouppedWorkflows
+          grouppedWorkflows,
         }));
       } else {
         dispatch(setWorkflowsTable({
           visibleRows: workflowsTable.filteredRows,
           aggregatedRows: [],
           visibleColumns: workflowsTable.columns,
+          grouppedWorkflows: {}
         }));
       }
     }
-  }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics]);
+  }, [workflowsTable.groupBy, workflowsTable.filteredRows, workflowsTable.uniqueMetrics, workflowsTable.expandedGroups]);
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -513,6 +543,8 @@ export default function WorkflowTable() {
           }),
           ...(key === 'action' && {
             renderCell: params => {
+              if (params.row.isGroupSummary) return null;
+
               const currentStatus = params.row.status;
 
               return (
@@ -534,10 +566,50 @@ export default function WorkflowTable() {
               );
             },
           }),
+          ...(key === 'workflowId' && {
+            renderCell: (params) => {
+              if (params.row.isGroupSummary) {
+                const groupId = params.row.id;
+                const isExpanded = workflowsTable.expandedGroups.includes(groupId);
+
+                return (
+                  <Box
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dispatch(setExpandedGroup(groupId));
+                    }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '100%',
+                      height: '100%',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {isExpanded ? (
+                      <ExpandMoreIcon fontSize="small" />
+                    ) : (
+                      <ChevronRightIcon fontSize="small" />
+                    )}
+                    <span>{params.value}</span>
+                  </Box>
+                );
+              }
+
+              return <span>{params.value}</span>;
+            }
+          }),
         }));
 
+      const showActionColumn = !workflowsTable.groupBy.length || workflowsTable.expandedGroups.length > 0;
+
       const visibilityModel = columns.reduce((acc, col) => {
-        acc[col.field] = true;
+        if (col.field === 'action') {
+          acc[col.field] = showActionColumn;
+        } else {
+          acc[col.field] = true;
+        }
 
         return acc;
       }, {} as Record<string, boolean>);
@@ -557,13 +629,19 @@ export default function WorkflowTable() {
         }),
       );
     }
-  }, [workflows.data]);
+  }, [workflows.data, workflowsTable.expandedGroups]);
 
   const hasVisibleParameterColumns = workflowsTable.visibleColumns.some(
     (col) =>
       workflowsTable.uniqueParameters.includes(col.field) &&
     workflowsTable.columnsVisibilityModel[col.field] !== false
   );
+
+  const isGroupedWorkflow = (id: string): boolean => {
+    return Object.values(workflowsTable.grouppedWorkflows).some(workflowIds =>
+      workflowIds.includes(id)
+    );
+  };
 
   return (
     <Box sx={{ height: '100%' }}>
@@ -623,6 +701,11 @@ export default function WorkflowTable() {
             onColumnVisibilityModelChange={(model) =>
               dispatch(setWorkflowsTable({ columnsVisibilityModel: model }))
             }
+            isRowSelectable={(params) => {
+              if (workflowsTable.groupBy.length === 0) return true;
+
+              return !isGroupedWorkflow(params.row.id);
+            }}
             slots={{ noRowsOverlay: CustomNoRowsOverlay }}
             slotProps={
               {

@@ -12,6 +12,7 @@ export interface WorkflowTableRow {
   id: string;
   workflowId: string;
   status?: string;
+  isGroupSummary?: boolean;
   [key: string]: string | number | boolean | null | undefined;
 }
 
@@ -72,6 +73,7 @@ interface IMonitoringPageSlice {
         columnsVisibilityModel: { [field: string]: boolean }
         aggregatedRows: WorkflowTableRow[]
         groupBy: string[]
+        expandedGroups: string[]
         grouppedWorkflows: Record<string, string[]>
         uniqueMetrics: string[]
         uniqueParameters: string[]
@@ -185,6 +187,7 @@ const initialState: IMonitoringPageSlice = {
     columnsVisibilityModel: {},
     aggregatedRows: [],
     groupBy: [],
+    expandedGroups: [],
     grouppedWorkflows: {},
     uniqueMetrics: [],
     uniqueParameters: [],
@@ -375,6 +378,15 @@ export const monitoringPageSlice = createSlice({
     }) => {
       state.comparativeDataExploration.dataAssetsControlPanel[action.payload.assetName] =
         action.payload.controlPanel;
+    },
+    setExpandedGroup: (state, action) => {
+      const groupId = action.payload;
+
+      if (state.workflowsTable.expandedGroups.includes(groupId)) {
+        state.workflowsTable.expandedGroups = state.workflowsTable.expandedGroups.filter(id => id !== groupId);
+      } else {
+        state.workflowsTable.expandedGroups.push(groupId);
+      }
     }
   },
   extraReducers: builder => {
@@ -673,5 +685,6 @@ export const fetchMetaData = createAsyncThunk(
 );
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
-  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel
+  setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel,
+  setExpandedGroup
 } = monitoringPageSlice.actions;
