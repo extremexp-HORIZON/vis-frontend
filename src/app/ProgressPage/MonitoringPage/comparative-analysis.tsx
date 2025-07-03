@@ -6,6 +6,7 @@ import ComparisonMetricsCharts from './comparison-metrics-charts';
 import ComparisonModelsCharts from './comparison-models-charts';
 import ComparisonDataCharts from './comparison-data-charts';
 import ComparativeAnalysisControls from './comparative-analysis-controls';
+import { useEffect } from 'react';
 
 const ComparativeAnalysis = () => {
   const { selectedComparisonTab } = useAppSelector(
@@ -17,8 +18,11 @@ const ComparativeAnalysis = () => {
 
   const dispatch = useAppDispatch();
 
-  if (groupBy.length > 0)
-    dispatch(setSelectedComparisonTab(0));
+  useEffect(() => {
+    if (groupBy.length > 0 && selectedComparisonTab !== 0) {
+      dispatch(setSelectedComparisonTab(0));
+    }
+  }, [groupBy, selectedComparisonTab]);
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>

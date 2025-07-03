@@ -240,10 +240,10 @@ export default function WorkflowTable() {
     let idCounter = 0;
     const aggregatedRows: WorkflowTableRow[] = [];
 
-    for (const [, group] of grouped.entries()) {
+    for (const [key, group] of grouped.entries()) {
+      const groupId = `group-${key}`;      
       const values = group[0];
       const workflowIds = group.map(row => row.workflowId);
-      const groupId = (idCounter++).toString();
       const summary: WorkflowTableRow = {
         id: groupId,
         isGroupSummary: true,
@@ -379,7 +379,9 @@ export default function WorkflowTable() {
           ) {
             const children = workflowsTable.grouppedWorkflows[groupId];
             const childRows = workflowsTable.filteredRows.filter(row => children.includes(row.workflowId));
-
+            console.log(children)
+            console.log(workflowsTable.filteredRows)
+            console.log(childRows)
             visibleRows.push(...childRows);
           }
         });
