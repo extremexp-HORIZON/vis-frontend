@@ -379,9 +379,6 @@ export default function WorkflowTable() {
           ) {
             const children = workflowsTable.grouppedWorkflows[groupId];
             const childRows = workflowsTable.filteredRows.filter(row => children.includes(row.workflowId));
-            console.log(children)
-            console.log(workflowsTable.filteredRows)
-            console.log(childRows)
             visibleRows.push(...childRows);
           }
         });
