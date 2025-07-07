@@ -293,23 +293,30 @@ const ComparisonModelInstance = ({
 
   let legendEntries: { label: string; color: string }[] = [];
 
-  if (showMisclassifiedOnly) {
-    legendEntries = [
-      { label: 'Misclassified', color: '#ff0000' },
-      { label: 'Correct', color: '#cccccc' },
-    ];
-  } else {
-    legendEntries = Object.entries(classColorMap).map(([label, color]) => ({
-      label,
-      color,
-    }));
+  const hasData = Object.values(comparativeModelInstance).some(
+    instance => Array.isArray(instance?.data) && instance.data.length > 0
+  );
+  if(hasData) {
+    if (showMisclassifiedOnly) {
+      legendEntries = [
+        { label: 'Misclassified', color: '#ff0000' },
+        { label: 'Correct', color: '#cccccc' },
+      ];
+    } else {
+      legendEntries = Object.entries(classColorMap).map(([label, color]) => ({
+        label,
+        color,
+      }));
+    }
   }
 
   return(
     <Box display='flex' flexDirection='column' gap={2} width='100%'>
-      <Box display='flex' justifyContent='flex-end'>
-        <SharedLegend entries={legendEntries} />
-      </Box>
+      {legendEntries.length > 0 && (
+        <Box display='flex' justifyContent='flex-end'>
+          <SharedLegend entries={legendEntries} />
+        </Box>
+      )}
       <Grid container spacing={2}>
         {renderCharts}
       </Grid>
