@@ -128,6 +128,7 @@ interface IMonitoringPageSlice {
         commonDataAssets: CommonDataAssets
         dataAssetsMetaData: DataAssetsMetaData
         dataAssetsControlPanel: DataAssetsControlPanel
+        selectedDataset: string | null
       }
       comparativeModelInstanceControlPanel: {
          xAxisOption: string
@@ -227,7 +228,8 @@ const initialState: IMonitoringPageSlice = {
   comparativeDataExploration: {
     commonDataAssets: {},
     dataAssetsMetaData: {},
-    dataAssetsControlPanel: {}
+    dataAssetsControlPanel: {},
+    selectedDataset: null
   },
   comparativeModelInstanceControlPanel: {
     xAxisOption: '',
@@ -412,6 +414,9 @@ export const monitoringPageSlice = createSlice({
       } else {
         state.workflowsTable.expandedGroups.push(groupId);
       }
+    },
+    setSelectedDataset: (state, action) => {
+      state.comparativeDataExploration.selectedDataset = action.payload;
     }
   },
   extraReducers: builder => {
@@ -711,5 +716,5 @@ export const fetchMetaData = createAsyncThunk(
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel,
-  setExpandedGroup
+  setExpandedGroup, setSelectedDataset
 } = monitoringPageSlice.actions;

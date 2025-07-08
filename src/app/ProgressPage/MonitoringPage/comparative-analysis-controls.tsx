@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, ListItemIcon, ListItemText, Menu, MenuItem, Select } from '@mui/material';
+import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, ListItemIcon, ListItemText, Menu, MenuItem, Popover, Select, Tooltip } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { setComparativeModelInstanceControlPanel, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../store/slices/monitorPageSlice';
@@ -13,6 +13,8 @@ import { useState } from 'react';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import DownloadIcon from '@mui/icons-material/Download';
 import CodeIcon from '@mui/icons-material/Code';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import DatasetSelectorBar from './comparative-data-selector-bar';
 
 const ComparativeAnalysisControls = ()=> {
   const isMosaic = useAppSelector((state: RootState) => state.monitorPage.isMosaic);
@@ -24,6 +26,12 @@ const ComparativeAnalysisControls = ()=> {
   const menuOpen = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
+  const [isDatasetSelectorOpen, setDatasetSelector] = useState(false);
+
+  const datasetSelectorClicked = (event: React.MouseEvent<HTMLElement>) => {
+    setDatasetSelector(!isDatasetSelectorOpen);
+    !isDatasetSelectorOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
+  };
 
   const options1 = [
     { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon /> },
@@ -48,18 +56,7 @@ const ComparativeAnalysisControls = ()=> {
         gap={2}
         sx={{ p: 1 }}
       >
-        {selectedComparisonTab === 1 && (
-          // <Card
-          //   variant="outlined"
-          //   sx={{
-          //     p: 1,
-          //     borderRadius: 2,
-          //     display: 'flex',
-          //     alignItems: 'center',
-          //     boxShadow: 1,
-          //     backgroundColor: theme.palette.customGrey.light,
-          //   }}
-          // >
+        {selectedComparisonTab === 1 ? (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {options1.map(option => (
               <Chip
@@ -94,7 +91,40 @@ const ComparativeAnalysisControls = ()=> {
               />
             ))}
           </Box>
-          // </Card>
+        ) : selectedComparisonTab === 2 && (
+          <>
+            <Box display="flex" flexWrap="wrap" gap={1}>
+              <Tooltip title="Select Dataset">
+                <IconButton onClick={datasetSelectorClicked}>
+                  <FilterListIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Popover
+              id={'Datasets'}
+              open={isDatasetSelectorOpen}
+              anchorEl={anchorEl}
+              onClose={() => setDatasetSelector(false)}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              PaperProps={{
+                sx: {
+                  width: '550px',
+                  p: 2,
+                  borderRadius: 1,
+                  boxShadow: 3
+                }
+              }}
+            >
+              <DatasetSelectorBar />
+            </Popover>
+          </>
         )}
 
         <Box

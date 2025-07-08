@@ -296,6 +296,7 @@ const ComparisonModelInstance = ({
   const hasData = Object.values(comparativeModelInstance).some(
     instance => Array.isArray(instance?.data) && instance.data.length > 0
   );
+
   if(hasData) {
     if (showMisclassifiedOnly) {
       legendEntries = [

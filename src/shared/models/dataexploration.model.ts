@@ -91,6 +91,21 @@ export interface IDataExplorationResponse {
   columns: VisualColumn[]
 
 }
+
+export interface IMetaDataSummary {
+  std?: number
+  min?: number
+  avg?: number
+  max?: number
+  q25?: number
+  approx_unique?: number
+  column_name?: string
+  count?: number
+  null_percentage?: number
+  column_type?: string
+  q50?: number
+  q75?: number
+}
 export interface IDataExplorationMetaDataResponse {
   datasetType: string
   fileNames: string[]
@@ -99,6 +114,7 @@ export interface IDataExplorationMetaDataResponse {
   uniqueColumnValues: Record<string, unknown[]>
   hasLatLonColumns:boolean
   timeColumn?: string[]
+  summary: IMetaDataSummary[]
 }
 
 export interface IFilter {
