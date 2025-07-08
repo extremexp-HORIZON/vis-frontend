@@ -8,7 +8,6 @@ import ProgressPageLoading from './app/ProgressPage/progress-page-loading';
 import LoginPage from './app/LoginPage/login-page';
 // import ProtectedRoute from './protected-route';
 import TokenAuthHandler from './token-auth-handler';
-import ProtectedRoute from './protected-route';
 
 const routes = createBrowserRouter([
   {
@@ -19,9 +18,7 @@ const routes = createBrowserRouter([
   {
     path: '/:experimentId',
     element: (
-      <ProtectedRoute>
         <ProgressPageLoading />
-      </ProtectedRoute>
     ),
     errorElement: <ErrorPage />
   },
@@ -33,22 +30,27 @@ const routes = createBrowserRouter([
   {
     path: '/:experimentId/monitoring',
     element: (
-      <ProtectedRoute>
         <ProgressPage>
           <MonitoringPage />
         </ProgressPage>
-      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: '/:experimentId/exploring',
+    element: (
+        <ProgressPage>
+          <></>
+        </ProgressPage>
     ),
     errorElement: <ErrorPage />
   },
   {
     path: '/:experimentId/workflow',
     element: (
-      <ProtectedRoute>
         <ProgressPage>
           <WorkflowTab />
         </ProgressPage>
-      </ProtectedRoute>
     ),
     errorElement: <ErrorPage />
   },

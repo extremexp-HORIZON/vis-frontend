@@ -11,6 +11,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ListRoundedIcon from '@mui/icons-material/ListRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import type { RootState } from '../../store/store';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { setMenuOptions } from '../../store/slices/progressPageSlice';
@@ -28,6 +29,11 @@ const LeftMenu = () => {
       icon: <ListRoundedIcon />,
       label: 'Monitoring',
       path: 'monitoring'
+    },
+    {
+      icon: <LocationSearchingIcon />,
+      label: 'Exploring',
+      path: 'exploring'
     },
   ];
 

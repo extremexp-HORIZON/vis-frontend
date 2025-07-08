@@ -2,7 +2,7 @@ import { Box, IconButton, Typography, CircularProgress, Chip, Dialog, DialogTitl
 import ProgressPageBar from './progress-page-bar';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { RootState } from '../../store/store';
 import { useAppSelector, useAppDispatch } from '../../store/store';
 import Rating from '@mui/material/Rating';
@@ -38,6 +38,7 @@ const ExperimentControls = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const location = useLocation();
 
   const handleOpenDiagram = () => {
     setDialogOpen(true);
@@ -115,6 +116,8 @@ const ExperimentControls = () => {
         Completed Tasks: {completedTasks}/{taskLength}
     </Typography>
   );
+
+  if (location.pathname.includes("exploring")) return <></>;
 
   return (
     <Box
