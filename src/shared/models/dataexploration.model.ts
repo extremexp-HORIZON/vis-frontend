@@ -131,7 +131,7 @@ export const defaultDataExplorationQuery: IDataExplorationQuery = {
     sourceType: '',
     fileName: '',
   },
-  limit: 0,
+  // limit: 0,
   columns: [],
   filters: [],
   offset: 0,

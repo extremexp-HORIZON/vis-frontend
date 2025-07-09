@@ -50,7 +50,7 @@ const SegmentMapChart = () => {
         },
         columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         filters,
-        limit: 0,
+        // limit: 0,
       },
       metadata: {
         workflowId: tab?.workflowId || '',
