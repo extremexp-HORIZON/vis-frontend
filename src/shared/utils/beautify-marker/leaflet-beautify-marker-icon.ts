@@ -120,8 +120,10 @@ export const BeautifyIcon = {
       // having a marker requires an extra parent div for rotation correction
       if (this.options.iconShape === 'marker') {
         const wrapperDiv = document.createElement('div');
+
         wrapperDiv.className = 'beautify-marker';
         wrapperDiv.appendChild(iconDiv);
+
         return wrapperDiv;
       }
 
@@ -140,11 +142,13 @@ export const BeautifyIcon = {
       }
 
       const innerIconStyle = this.getInnerIconStyle(options);
+
       if (options.isAlphaNumericIcon) {
         return '<div style="' + innerIconStyle + '">' + options.text + '</div>';
       }
 
       let spinClass = '';
+
       if (options.spin) {
         spinClass = ' fa-spin';
       }
@@ -165,6 +169,7 @@ export const BeautifyIcon = {
 
     getInnerIconStyle(options) {
       const innerAnchor = L.point(options.innerIconAnchor);
+
       return (
         'color:' +
         options.textColor +
@@ -210,6 +215,7 @@ export const BeautifyIcon = {
 
       if (options.iconStyle) {
         let cStyle = iconDiv.getAttribute('style');
+
         cStyle += options.iconStyle;
         iconDiv.setAttribute('style', cStyle);
       }

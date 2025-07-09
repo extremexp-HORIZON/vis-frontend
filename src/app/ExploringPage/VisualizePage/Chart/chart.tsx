@@ -17,12 +17,13 @@ import {
 import React from 'react';
 import type { VisualizationSpec } from 'react-vega';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
+import type {
+  RootState } from '../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../store/store';
-import { IDataset } from '../../../../shared/models/exploring/dataset.model';
+import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import { AggregateFunctionType } from '../../../../shared/models/exploring/enum/aggregate-function-type.model';
 import {
   setAggType,
@@ -96,6 +97,7 @@ export const Chart = (props: IChartProps) => {
     if (type !== chartType) {
       if (type === 'heatmap') {
         const secondDim = dimensions.find(d => d !== groupByCols[0]);
+
         dispatch(setGroupByCols([groupByCols[0], secondDim!]));
       } else if (chartType === 'heatmap') {
         dispatch(setGroupByCols([groupByCols[0]]));
@@ -141,25 +143,25 @@ export const Chart = (props: IChartProps) => {
     encoding:
       chartType === 'heatmap'
         ? {
-            x: { field: 'x', type: 'nominal', title: xAxis },
-            y: { field: 'y', type: 'nominal', title: yAxis },
-            color: { field: 'value', type: 'quantitative' },
-            tooltip: { field: 'value', type: 'quantitative' },
-          }
+          x: { field: 'x', type: 'nominal', title: xAxis },
+          y: { field: 'y', type: 'nominal', title: yAxis },
+          color: { field: 'value', type: 'quantitative' },
+          tooltip: { field: 'value', type: 'quantitative' },
+        }
         : {
-            x: {
-              field: 'category',
-              type: 'nominal',
-              title: xAxis,
-              sort: { field: 'value', order: 'ascending' },
-            },
-            y: {
-              field: 'value',
-              type: 'quantitative',
-              title: `${aggType}${aggType === AggregateFunctionType.COUNT ? '' : `(${measure})`}`,
-            },
-            tooltip: { field: 'value', type: 'quantitative' },
+          x: {
+            field: 'category',
+            type: 'nominal',
+            title: xAxis,
+            sort: { field: 'value', order: 'ascending' },
           },
+          y: {
+            field: 'value',
+            type: 'quantitative',
+            title: `${aggType}${aggType === AggregateFunctionType.COUNT ? '' : `(${measure})`}`,
+          },
+          tooltip: { field: 'value', type: 'quantitative' },
+        },
     data: {
       values: vegaSeriesData,
     },

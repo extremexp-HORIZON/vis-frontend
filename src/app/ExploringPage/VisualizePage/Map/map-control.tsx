@@ -20,6 +20,7 @@ const ToggleControl = L.Control.extend({
       'div',
       'leaflet-bar leaflet-control leaflet-control-custom',
     );
+
     container.style.backgroundColor = 'white';
     container.style.width = '34px';
     container.style.height = '34px';
@@ -38,6 +39,7 @@ const ToggleControl = L.Control.extend({
         map._toggleClusterMap();
       }
     });
+
     return container;
   },
   onRemove: function () {},
@@ -71,6 +73,7 @@ export const MapControl = ({
 
       if ('getBounds' in layer) {
         const bounds = layer.getBounds();
+
         dispatch(
           setDrawnRect({
             id,
@@ -91,6 +94,7 @@ export const MapControl = ({
 
     function onMoveEnd() {
       const bounds = map.getBounds();
+
       dispatch(
         updateMapBounds({
           id,
@@ -110,6 +114,7 @@ export const MapControl = ({
     }
 
     const drawnItems = drawnItemsRef.current;
+
     map.addLayer(drawnItems);
 
     const drawControl = new L.Control.Draw({
@@ -139,6 +144,7 @@ export const MapControl = ({
 
     legend.onAdd = function () {
       const div = L.DomUtil.create('div', 'legend');
+
       div.innerHTML +=
         '<div class="color-block" style="background-color: #FC6666;"></div> <span class="label">Poor</span><br>';
       div.innerHTML +=
@@ -147,6 +153,7 @@ export const MapControl = ({
         '<div class="color-block" style="background-color: #FFF966;"></div> <span class="label">Good</span><br>';
       div.innerHTML +=
         '<div class="color-block" style="background-color: #99FF99;"></div> <span class="label">Excellent</span>';
+
       return div;
     };
 

@@ -1,4 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { api } from '../../../app/api/api';
 import {
   type IDataset,
@@ -8,10 +9,10 @@ import {
   type ITimeRange,
   defaultValue as timeRangeDefaultValue,
 } from '../../../shared/models/exploring/time-range.model';
-import { IDataSource } from '../../../shared/models/dataexploration.model';
+import type { IDataSource } from '../../../shared/models/dataexploration.model';
 import { setChartType, setGroupByCols, setMeasureCol } from './chartSlice';
 import { setViewRect, updateClusters } from './mapSlice';
-import { AppStartListening } from '../../listenerMiddleware';
+import type { AppStartListening } from '../../listenerMiddleware';
 import { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
 import { updateAnalysisResults } from './statsSlice';
 
@@ -72,6 +73,7 @@ export const getRow = createAsyncThunk<
     const response = await api.get<string[]>(
       `/data/fetch/${datasetId}/row/${rowId}`,
     );
+
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || error.message);
@@ -85,7 +87,7 @@ export const postFileMeta = createAsyncThunk<
   { rejectValue: string; dispatch: any }
 >('api/postFileMeta', async ({ body }, { dispatch, rejectWithValue }) => {
   try {
-    const response = await api.post<IDataset>(`/data/meta`, body);
+    const response = await api.post<IDataset>('/data/meta', body);
     const dataset = response.data;
 
     dispatch(setGroupByCols([dataset.dimensions?.[0] ?? 'defaultDimension']));
@@ -102,6 +104,7 @@ export const postFileMeta = createAsyncThunk<
     return { ...dataset, id: body.fileName };
   } catch (error: any) {
     console.error('Error on postFileMeta', error);
+
     return rejectWithValue(error.response?.data?.message || error.message);
   }
 });
@@ -113,7 +116,7 @@ export const executeQuery = createAsyncThunk<
   { rejectValue: string }
 >('api/executeQuery', async ({ id, body }, { rejectWithValue }) => {
   try {
-    const response = await api.post(`/data/fetch`, {
+    const response = await api.post('/data/fetch', {
       ...(body || {}),
       dataSource: {
         sourceType: 'local',
@@ -123,6 +126,7 @@ export const executeQuery = createAsyncThunk<
       },
       dataType: 'map',
     });
+
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || error.message);
@@ -136,7 +140,7 @@ export const exeucuteTimeSeriesQuery = createAsyncThunk<
   { rejectValue: string }
 >('api/exeucuteTimeSeriesQuery', async ({ id, body }, { rejectWithValue }) => {
   try {
-    const response = await api.post(`/data/fetch`, {
+    const response = await api.post('/data/fetch', {
       ...(body || {}),
       dataSource: {
         sourceType: 'local',
@@ -146,6 +150,7 @@ export const exeucuteTimeSeriesQuery = createAsyncThunk<
       },
       dataType: 'timeseries',
     });
+
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || error.message);

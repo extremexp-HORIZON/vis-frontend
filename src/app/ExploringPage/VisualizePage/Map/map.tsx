@@ -7,7 +7,7 @@ import { MapContainer, Marker, TileLayer, ZoomControl } from 'react-leaflet';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import type { ICluster } from '../../../../shared/models/exploring/cluster.model';
 import {
-  RootState,
+  type RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../store/store';
@@ -33,10 +33,13 @@ const rsrpIntensityExtractor = (dataset: IDataset, rsrp_rscp_rssi: number) => {
     // rsrp is excellent(pure green color) when it is  bigger/equal to -70 and on cell edge(pure red color) when it is smaller/equal to -100
     const min = 70;
     const max = 100;
+
     if (rsrp_rscp_rssi < min) rsrp_rscp_rssi = min;
     if (rsrp_rscp_rssi > max) rsrp_rscp_rssi = max;
     let percentage = ((rsrp_rscp_rssi - min) * 100) / (max - min);
+
     percentage = percentage / 100;
+
     return percentage;
   } else {
     return 1;
@@ -55,6 +58,7 @@ const generateRsrpColor = (dataset: IDataset, rsrp_rscp_rssi: number) => {
     // hue1: the hue value of the color you want to get when the percentage is 1, value 0 is red
     const hue1 = 0;
     const hue = percentage * (hue1 - hue0) + hue0;
+
     return 'hsl(' + hue + ', 100%, 70%)';
   } else {
     return 'rgba(212,62,42)';
@@ -131,32 +135,34 @@ const SinglePoint = (props: {
         row &&
         row.length > 0 &&
         dataset.originalColumns && (
-          <CustomPopup
-            latlng={[selectedMarker.lat, selectedMarker.lng]}
-            onClose={() => {
-              setSelectedMarker(null);
-              // reset();
-            }}
-          >
-            <div>
-              {dataset.originalColumns.map((col, colIndex) => {
-                if (col.name === 'id') return null;
+        <CustomPopup
+          latlng={[selectedMarker.lat, selectedMarker.lng]}
+          onClose={() => {
+            setSelectedMarker(null);
+            // reset();
+          }}
+        >
+          <div>
+            {dataset.originalColumns.map((col, colIndex) => {
+              if (col.name === 'id') return null;
 
-                let val = row[colIndex];
-                if (val == null) val = '';
-                return (
-                  <div key={colIndex}>
-                    <span>
-                      <b>{col.name}: </b>
-                      {val.startsWith('http') ? <a href={val}>{val}</a> : val}
-                    </span>
-                    <br></br>
-                  </div>
-                );
-              })}
-            </div>
-          </CustomPopup>
-        )}
+              let val = row[colIndex];
+
+              if (val == null) val = '';
+
+              return (
+                <div key={colIndex}>
+                  <span>
+                    <b>{col.name}: </b>
+                    {val.startsWith('http') ? <a href={val}>{val}</a> : val}
+                  </span>
+                  <br></br>
+                </div>
+              );
+            })}
+          </div>
+        </CustomPopup>
+      )}
     </Marker>
   );
 };
@@ -206,6 +212,7 @@ export const Map = (props: IMapProps) => {
 
   const points = useMemo(() => {
     if (!clusters) return [];
+
     // return clusters.flatMap((cluster) =>
     //   cluster.properties.points
     //     .filter((point) => typeof point[0] === 'number' && typeof point[1] === 'number')
@@ -221,9 +228,9 @@ export const Map = (props: IMapProps) => {
   const center: [number, number] =
     viewRect != null
       ? [
-          (viewRect.lat[0] + viewRect.lat[1]) / 2, // Midpoint of latitude
-          (viewRect.lon[0] + viewRect.lon[1]) / 2, // Midpoint of longitude
-        ]
+        (viewRect.lat[0] + viewRect.lat[1]) / 2, // Midpoint of latitude
+        (viewRect.lon[0] + viewRect.lon[1]) / 2, // Midpoint of longitude
+      ]
       : [51.505, -0.09];
 
   if (clusters) {
@@ -243,130 +250,132 @@ export const Map = (props: IMapProps) => {
         <MapControl id={id} toggleClusterMap={toggleClusterMap} />
         {clusterMap
           ? clusters.map((cluster, index) => {
-              // every cluster point has coordinates
-              // the point may be either a cluster or a single point
-              const { totalCount, points, rsrp_rscp_rssi } = cluster.properties;
-              if (totalCount === 1) {
-                return (
-                  <SinglePoint
-                    key={`single-point-${index}`}
-                    dataset={{ ...dataset, id }}
-                    point={points[0]}
-                    coordinates={cluster.geometry.coordinates}
-                    selectedMarker={selectedSinglePointMarker}
-                    setSelectedMarker={setSelectedSinglePointMarker}
-                  />
-                );
-              }
+            // every cluster point has coordinates
+            // the point may be either a cluster or a single point
+            const { totalCount, points, rsrp_rscp_rssi } = cluster.properties;
+
+            if (totalCount === 1) {
               return (
-                <Marker
-                  key={'cluster' + index}
-                  position={[
-                    cluster.geometry.coordinates[1],
-                    cluster.geometry.coordinates[0],
-                  ]}
-                  icon={fetchIcon(
-                    totalCount,
-                    true,
-                    generateRsrpColor(dataset, rsrp_rscp_rssi as number),
-                  )}
-                  eventHandlers={{
-                    click: () => {
-                      setSelectedClusterMarker({
-                        lat: cluster.geometry.coordinates[1],
-                        lng: cluster.geometry.coordinates[0],
-                      });
-                    },
-                  }}
-                >
-                  {selectedClusterMarker &&
+                <SinglePoint
+                  key={`single-point-${index}`}
+                  dataset={{ ...dataset, id }}
+                  point={points[0]}
+                  coordinates={cluster.geometry.coordinates}
+                  selectedMarker={selectedSinglePointMarker}
+                  setSelectedMarker={setSelectedSinglePointMarker}
+                />
+              );
+            }
+
+            return (
+              <Marker
+                key={'cluster' + index}
+                position={[
+                  cluster.geometry.coordinates[1],
+                  cluster.geometry.coordinates[0],
+                ]}
+                icon={fetchIcon(
+                  totalCount,
+                  true,
+                  generateRsrpColor(dataset, rsrp_rscp_rssi as number),
+                )}
+                eventHandlers={{
+                  click: () => {
+                    setSelectedClusterMarker({
+                      lat: cluster.geometry.coordinates[1],
+                      lng: cluster.geometry.coordinates[0],
+                    });
+                  },
+                }}
+              >
+                {selectedClusterMarker &&
                     selectedClusterMarker.lat ===
                       cluster.geometry.coordinates[1] &&
                     selectedClusterMarker.lng ===
                       cluster.geometry.coordinates[0] && (
-                      <CustomPopup
-                        latlng={[
-                          cluster.geometry.coordinates[1],
-                          cluster.geometry.coordinates[0],
-                        ]}
-                        onClose={() => {
-                          setSelectedClusterMarker(null);
-                        }}
-                      >
-                        <div>
-                          <div>
-                            <span>
-                              <b>{dataset.measure0}:</b>{' '}
-                              {cluster.properties[dataset.measure0!] &&
+                  <CustomPopup
+                    latlng={[
+                      cluster.geometry.coordinates[1],
+                      cluster.geometry.coordinates[0],
+                    ]}
+                    onClose={() => {
+                      setSelectedClusterMarker(null);
+                    }}
+                  >
+                    <div>
+                      <div>
+                        <span>
+                          <b>{dataset.measure0}:</b>{' '}
+                          {cluster.properties[dataset.measure0!] &&
                                 (
                                   cluster.properties[
                                     dataset.measure0!
                                   ] as number
                                 ).toFixed(4)}
-                            </span>
-                            <br></br>
-                          </div>
-                          <div>
-                            <span>
-                              <b>{dataset.measure1}:</b>{' '}
-                              {cluster.properties[dataset.measure1!] &&
+                        </span>
+                        <br></br>
+                      </div>
+                      <div>
+                        <span>
+                          <b>{dataset.measure1}:</b>{' '}
+                          {cluster.properties[dataset.measure1!] &&
                                 (
                                   cluster.properties[
                                     dataset.measure1!
                                   ] as number
                                 ).toFixed(4)}
-                            </span>
-                            <br></br>
-                          </div>
-                          {dataset.dimensions &&
+                        </span>
+                        <br></br>
+                      </div>
+                      {dataset.dimensions &&
                             dataset.dimensions.map(dim => (
                               <div key={dim}>
                                 <span>
                                   <b>{dim}:</b>{' '}
                                   {Array.isArray(cluster.properties[dim])
                                     ? // Check if there are more than 10 items
-                                      cluster.properties[dim].length > 10
+                                    cluster.properties[dim].length > 10
                                       ? // Join the first 10 items and add ellipsis
-                                        `${cluster.properties[dim].slice(0, 10).join(', ')}...`
+                                      `${cluster.properties[dim].slice(0, 10).join(', ')}...`
                                       : // Join all items if 10 or fewer
-                                        cluster.properties[dim].join(', ')
+                                      cluster.properties[dim].join(', ')
                                     : // Handle the case where it's not an array
-                                      cluster.properties[dim]}
+                                    cluster.properties[dim]}
                                 </span>
                                 <br />
                               </div>
                             ))}
-                        </div>
-                      </CustomPopup>
-                    )}
-                </Marker>
-              );
-            })
+                    </div>
+                  </CustomPopup>
+                )}
+              </Marker>
+            );
+          })
           : points && (
-              <HeatmapLayer
-                fitBoundsOnLoad
-                points={points}
-                latitudeExtractor={latitudeExtractor}
-                longitudeExtractor={longitudeExtractor}
-                intensityExtractor={intensityExtractor}
-                radius={zoom}
-                // points={clusters.filter(c => c.properties.totalCount > 1)}
-                // latitudeExtractor={(r:ICluster) => r.geometry.coordinates[1]}
-                // longitudeExtractor={(r:ICluster) =>  r.geometry.coordinates[0]}
-                // intensityExtractor={(r:ICluster) => {
-                //   return rsrpIntensityExtractor(dataset, r.properties.rsrp_rscp_rssi);
-                // }}
-                useLocalExtrema={false}
-                gradient={{
-                  0: '#00FFFF',
-                  0.2: '#00FF00',
-                  0.4: '#66FF33',
-                  0.6: '#FFFF00',
-                  0.8: '#FF6600',
-                  1.0: '#FF0000',
-                }}
-              />
-            )}
+            <HeatmapLayer
+              fitBoundsOnLoad
+              points={points}
+              latitudeExtractor={latitudeExtractor}
+              longitudeExtractor={longitudeExtractor}
+              intensityExtractor={intensityExtractor}
+              radius={zoom}
+              // points={clusters.filter(c => c.properties.totalCount > 1)}
+              // latitudeExtractor={(r:ICluster) => r.geometry.coordinates[1]}
+              // longitudeExtractor={(r:ICluster) =>  r.geometry.coordinates[0]}
+              // intensityExtractor={(r:ICluster) => {
+              //   return rsrpIntensityExtractor(dataset, r.properties.rsrp_rscp_rssi);
+              // }}
+              useLocalExtrema={false}
+              gradient={{
+                0: '#00FFFF',
+                0.2: '#00FF00',
+                0.4: '#66FF33',
+                0.6: '#FFFF00',
+                0.8: '#FF6600',
+                1.0: '#FF0000',
+              }}
+            />
+          )}
         <ZoomControl position="topright" />
         <MapSearch />
       </MapContainer>

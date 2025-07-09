@@ -27,6 +27,7 @@ export const statsSlice = createSlice({
       action: PayloadAction<{ rectStats: IRectStats; series: IGroupedStats[] }>,
     ) => {
       const { rectStats, series } = action.payload;
+
       state.rectStats = rectStats;
       state.series = series;
     },

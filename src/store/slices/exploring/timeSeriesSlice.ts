@@ -1,9 +1,10 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IUnivariateDataPoint } from '../../../shared/models/exploring/univariate-datapoint.model';
-import { RootState } from '../../store';
-import { ITimeSeriesDataResponse } from '../../../shared/models/exploring/time-series-data-response.model';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import type { IUnivariateDataPoint } from '../../../shared/models/exploring/univariate-datapoint.model';
+import type { RootState } from '../../store';
+import type { ITimeSeriesDataResponse } from '../../../shared/models/exploring/time-series-data-response.model';
 import { exeucuteTimeSeriesQuery } from './datasetSlice';
-import { AppStartListening } from '../../listenerMiddleware';
+import type { AppStartListening } from '../../listenerMiddleware';
 
 interface TimeSeriesState {
   data: IUnivariateDataPoint[] | null;
@@ -48,6 +49,7 @@ export const updateTimeSeries = createAsyncThunk(
           body: timeSeriesBody,
         }),
       );
+
       if (exeucuteTimeSeriesQuery.fulfilled.match(action)) {
         const result = action.payload as ITimeSeriesDataResponse;
 

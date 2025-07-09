@@ -16,11 +16,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import {
-  RootState,
+  type RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../store/store';
@@ -50,12 +50,14 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
 
   const handleFilterChange = (dim: string, value: string | null) => {
     const newFilters = { ...categoricalFilters, [dim]: value || null };
+
     dispatch(setCategoricalFilters(newFilters));
     dispatch(triggerDatasetUiUpdate());
   };
 
   const removeFilter = (dim: string) => {
     const newFilters = _.omit(categoricalFilters, [dim]);
+
     dispatch(setCategoricalFilters(newFilters));
     dispatch(triggerDatasetUiUpdate());
   };
@@ -93,7 +95,9 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
 
   const handleDateChange = (newValue: [Dayjs | null, Dayjs | null]) => {
     setDateRange(newValue);
+
     const [from, to] = newValue;
+
     if (from && to) {
       dispatch(setTimeRange({ from: from.valueOf(), to: to.valueOf() }));
       dispatch(triggerDatasetUiUpdate());

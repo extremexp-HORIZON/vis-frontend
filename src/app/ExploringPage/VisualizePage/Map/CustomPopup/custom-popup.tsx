@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import { createPortal } from 'react-dom';
 import CustomPopupPointArrow from './custom-popup-point-arror';
@@ -34,10 +34,13 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
     const rect = container.getBoundingClientRect();
     const left = rect.left + point.x;
     const top = rect.top + point.y;
+
     setPos({ left, top });
 
     // Determine direction
+
     let dir: typeof direction = 'top';
+
     if (point.y < EDGE_MARGIN) dir = 'bottom';
     else if (point.x < EDGE_MARGIN) dir = 'right';
     else if (point.x > rect.width - EDGE_MARGIN) dir = 'left';
@@ -46,18 +49,23 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
     const update = () => {
       const pt = map.latLngToContainerPoint(latlng);
       const rect = container.getBoundingClientRect();
+
       const l = rect.left + pt.x;
       const t = rect.top + pt.y;
+
       setPos({ left: l, top: t });
 
       let d: typeof direction = 'top';
+
       if (pt.y < EDGE_MARGIN) d = 'bottom';
       else if (pt.x < EDGE_MARGIN) d = 'right';
       else if (pt.x > rect.width - EDGE_MARGIN) d = 'left';
       setDirection(d);
     };
+
     map.on('move zoom', update);
     window.addEventListener('resize', update);
+
     return () => {
       map.off('move zoom', update);
       window.removeEventListener('resize', update);
@@ -68,6 +76,7 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
   useEffect(() => {
     if (!map || !onClose) return;
     map.on('click', onClose);
+
     return () => {
       map.off('click', onClose);
     };
@@ -83,6 +92,7 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
 
   // Choose transform based on direction
   let transform = `translate(-50%, calc(-100% - ${POPUP_MARGIN}px))`; // top
+
   if (direction === 'bottom') transform = `translate(-50%, ${POPUP_MARGIN}px)`;
   else if (direction === 'left')
     transform = `translate(calc(-100% - ${POPUP_MARGIN}px), -50%)`;

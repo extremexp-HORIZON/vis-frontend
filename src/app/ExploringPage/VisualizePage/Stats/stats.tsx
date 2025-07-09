@@ -10,9 +10,9 @@ import {
   Grid,
   Box,
 } from '@mui/material';
-import { IDataset } from '../../../../shared/models/exploring/dataset.model';
-import { RootState, useAppSelector } from '../../../../store/store';
-import { IRectStats } from '../../../../shared/models/exploring/rect-stats.model';
+import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
+import { type RootState, useAppSelector } from '../../../../store/store';
+import type { IRectStats } from '../../../../shared/models/exploring/rect-stats.model';
 
 export interface IStatsPanelProps {
   dataset: IDataset;
@@ -29,8 +29,8 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
 
   const formatStat = (stat: number | null) =>
     stat !== null ? stat.toFixed(2) : 'N/A';
-  const formatStatPercent = (stat: string | null) =>
-    stat !== null ? (parseFloat(stat) * 100).toFixed(3) + ' %' : 'N/A';
+  // const formatStatPercent = (stat: string | null) =>
+  //   stat !== null ? (parseFloat(stat) * 100).toFixed(3) + ' %' : 'N/A';
 
   const measureOptions = [
     { label: dataset.measure0, value: 0 },

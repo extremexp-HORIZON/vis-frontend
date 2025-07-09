@@ -117,7 +117,7 @@ const ExperimentControls = () => {
     </Typography>
   );
 
-  if (location.pathname.includes("exploring")) return <></>;
+  if (location.pathname.includes('exploring')) return <></>;
 
   return (
     <Box

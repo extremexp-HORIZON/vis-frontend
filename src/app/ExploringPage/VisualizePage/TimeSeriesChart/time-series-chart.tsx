@@ -8,9 +8,9 @@ import {
   FormControl,
   Box,
 } from '@mui/material';
-import { IDataset } from '../../../../shared/models/exploring/dataset.model';
+import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import {
-  RootState,
+  type RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../store/store';
@@ -34,6 +34,7 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
 
   const handleTimeInterval = (value: string) => {
     let freq = 900;
+
     setFrequencyData(value);
     switch (value) {
       case '15m':
@@ -68,6 +69,7 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
           return '15m';
       }
     };
+
     setFrequencyData(getTimeIntervalFromFrequency());
   }, [frequency]);
 

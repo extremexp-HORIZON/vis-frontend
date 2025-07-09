@@ -16,7 +16,7 @@ interface HeatmapLayerProps<T> {
   fitBoundsOnLoad?: boolean;
 }
 
-export const HeatmapLayer = <T,>({
+export const HeatmapLayer = <T, >({
   points,
   latitudeExtractor,
   longitudeExtractor,
@@ -51,6 +51,7 @@ export const HeatmapLayer = <T,>({
     if (fitBoundsOnLoad && !hasFitBounds.current) {
       const latlngs = heatData.map(([lat, lng]) => L.latLng(lat, lng));
       const bounds = L.latLngBounds(latlngs);
+
       map.fitBounds(bounds, { padding: [20, 20] });
       hasFitBounds.current = true;
     }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   TextField,
   Popper,
@@ -46,6 +46,7 @@ const MapSearch: React.FC = () => {
         setResults([]);
         setLoading(false);
         setOpen(false);
+
         return;
       }
 

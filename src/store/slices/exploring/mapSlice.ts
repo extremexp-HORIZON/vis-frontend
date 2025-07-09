@@ -1,13 +1,14 @@
 import type { RootState } from '../../store';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { ICluster } from '../../../shared/models/exploring/cluster.model';
 import type { IFacet } from '../../../shared/models/exploring/facet.model';
 import type { IQueryInfo } from '../../../shared/models/exploring/query-info.model';
 import type { IRectangle } from '../../../shared/models/exploring/rectangle.model';
 import { prepareSupercluster } from '../../../shared/utils/clusterUtils';
-import { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
+import type { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
 import { executeQuery } from './datasetSlice';
-import { AppStartListening } from '../../listenerMiddleware';
+import type { AppStartListening } from '../../listenerMiddleware';
 import { updateAnalysisResults } from './statsSlice';
 import { updateTimeSeries } from './timeSeriesSlice';
 
@@ -72,8 +73,10 @@ export const updateClusters = createAsyncThunk(
     const action = await thunkApi.dispatch(
       executeQuery({ id: datasetId, body }),
     );
+
     if (executeQuery.fulfilled.match(action)) {
       const result = action.payload as IVisQueryResults;
+
       thunkApi.dispatch(setFacets(result.facets));
       const responseTime = Date.now();
       const queryInfo: IQueryInfo = {
@@ -85,6 +88,7 @@ export const updateClusters = createAsyncThunk(
         totalTileCount: result.totalTileCount,
         totalPointCount: result.totalPointCount,
       };
+
       thunkApi.dispatch(setQueryInfo(queryInfo));
       if (drawnRect == null) {
         thunkApi.dispatch(
@@ -140,6 +144,7 @@ export const mapSlice = createSlice({
           lat: [bounds.south, bounds.north],
           lon: [bounds.west, bounds.east],
         } as IRectangle);
+
       state.drawnRect = drawnRect;
     },
     setClusters: (state, action: PayloadAction<ICluster[]>) => {
@@ -160,6 +165,7 @@ export const mapSlice = createSlice({
       }>,
     ) => {
       const { bounds, zoom } = action.payload;
+
       state.zoom = zoom;
       state.viewRect = {
         lat: [bounds.south, bounds.north],
@@ -191,6 +197,7 @@ export const mapListeners = (startAppListening: AppStartListening) => {
     actionCreator: updateMapBounds,
     effect: async (action, listenerApi) => {
       const { id } = action.payload;
+
       // Dispatch the updateClusters action
       await listenerApi.dispatch(updateClusters(id));
     },
@@ -219,6 +226,7 @@ export const mapListeners = (startAppListening: AppStartListening) => {
 
       try {
         const action2 = await dispatch(executeQuery({ id, body: queryBody }));
+
         if (executeQuery.fulfilled.match(action2)) {
           const result = action2.payload as IVisQueryResults;
 

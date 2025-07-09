@@ -21,9 +21,9 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
   // const predictions = useAppSelector(selectPredictions);
 
   const [seriesData, setSeriesData] = useState<number[][] | null>(null);
-  const [predictionSeriesData, setPredictionSeriesData] = useState<number[][]>(
-    [],
-  );
+  // const [predictionSeriesData, setPredictionSeriesData] = useState<number[][]>(
+  //   [],
+  // );
 
   const getZones = () => {
     // if (forecastingForm && data) {
@@ -59,6 +59,7 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
         datapoint.timestamp,
         datapoint.value,
       ]);
+
       setSeriesData(formattedData);
     }
   }, [data]);
@@ -83,9 +84,11 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
     zones: { value: number; color: string }[],
   ) {
     if (!zones.length) return data.map(d => ({ ...d, zoneColor: '#1f77b4' }));
+
     return data.map(d => {
       // Find the first zone where d.timestamp <= zone.value
       const zone = zones.find(z => d.timestamp <= z.value);
+
       return { ...d, zoneColor: zone ? zone.color : '#1f77b4' };
     });
   }

@@ -58,6 +58,7 @@ export const prepareSupercluster = (
         coordinates: [point[1], point[0]],
       },
     } as ISuperclusterFeature;
+
     geoJsonPoint.properties[measure0] = point[4];
     geoJsonPoint.properties[measure1] = point[5];
 
@@ -88,12 +89,14 @@ export const prepareSupercluster = (
 
         // Combine and deduplicate
         const uniqueValues = new Set([...accumValues, ...propValues]);
+
         accumulated[dim] = Array.from(uniqueValues);
       });
 
       const measure0Values = accumulated.points
         .map(point => point[4])
         .filter(val => val !== null);
+
       accumulated[measure0] =
         measure0Values.length > 0
           ? measure0Values.reduce((acc, val) => acc + val, 0) /
@@ -103,6 +106,7 @@ export const prepareSupercluster = (
       const measure1Values = accumulated.points
         .map(point => point[5])
         .filter(val => val !== null);
+
       accumulated[measure1] =
         measure1Values.length > 0
           ? measure1Values.reduce((acc, val) => acc + val, 0) /
@@ -110,7 +114,9 @@ export const prepareSupercluster = (
           : null;
     },
   });
+
   supercluster.load(geoJsonPoints);
+
   return supercluster;
 };
 
