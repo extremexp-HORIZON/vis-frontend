@@ -9,10 +9,13 @@ import {
   defaultValue as timeRangeDefaultValue,
 } from '../../../shared/models/exploring/time-range.model';
 import { IDataSource } from '../../../shared/models/dataexploration.model';
+import { setChartType, setGroupByCols, setMeasureCol } from './chartSlice';
+import { setViewRect } from './mapSlice';
 
 interface exploringDatasetState {
   dataset: IDataset;
   datasets: IDataset[];
+  row: string[];
   categoricalFilters: Record<string, unknown>;
   timeRange: ITimeRange;
   loading: {
@@ -36,6 +39,7 @@ interface exploringDatasetState {
 const initialState: exploringDatasetState = {
   dataset: datasetDefaultValue,
   datasets: [],
+  row: [],
   categoricalFilters: {},
   timeRange: timeRangeDefaultValue,
   loading: {
@@ -81,17 +85,16 @@ export const postFileMeta = createAsyncThunk<
     const response = await api.post<IDataset>(`/data/meta`, body);
     const dataset = response.data;
 
-    // Simulate onQueryStarted logic
-    // dispatch(setGroupByCols([dataset.dimensions?.[0] ?? 'defaultDimension']));
-    // dispatch(setMeasureCol(dataset.measure0 ?? 'defaultMeasure0'));
-    // dispatch(
-    //   setViewRect({
-    //     lat: [dataset.queryYMin ?? 0, dataset.queryYMax ?? 0],
-    //     lon: [dataset.queryXMin ?? 0, dataset.queryXMax ?? 0],
-    //   }),
-    // );
-    // dispatch(setChartType('column'));
-    // dispatch(setTimeRange({ from: dataset.timeMin ?? 0, to: Date.now() }));
+    dispatch(setGroupByCols([dataset.dimensions?.[0] ?? 'defaultDimension']));
+    dispatch(setMeasureCol(dataset.measure0 ?? 'defaultMeasure0'));
+    dispatch(
+      setViewRect({
+        lat: [dataset.queryYMin ?? 0, dataset.queryYMax ?? 0],
+        lon: [dataset.queryXMin ?? 0, dataset.queryXMax ?? 0],
+      }),
+    );
+    dispatch(setChartType('column'));
+    dispatch(setTimeRange({ from: dataset.timeMin ?? 0, to: Date.now() }));
 
     return dataset;
   } catch (error: any) {
@@ -171,8 +174,9 @@ export const datasetSlice = createSlice({
         state.loading.getRow = true;
         state.error.getRow = null;
       })
-      .addCase(getRow.fulfilled, state => {
+      .addCase(getRow.fulfilled, (state, action: PayloadAction<string[]>) => {
         state.loading.getRow = false;
+        state.row = action.payload;
         // The result of getRow is not directly stored in the state, it's typically used ad-hoc.
       })
       .addCase(
