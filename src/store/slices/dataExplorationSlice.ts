@@ -4,7 +4,7 @@ import type {
 import {
   createAsyncThunk,
 } from '@reduxjs/toolkit';
-import { workflowPageSlice, type IWorkflowPage } from './workflowPageSlice';
+import { type IWorkflowPage } from './workflowPageSlice';
 import {
   AggregationFunction,
   type IDataExplorationMetaDataResponse,

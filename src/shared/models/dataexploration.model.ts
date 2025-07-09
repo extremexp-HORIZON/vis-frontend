@@ -55,6 +55,8 @@ export interface IDataExplorationRequest {
   metadata: {
     workflowId: string
     queryCase: string
+    assetName?: string
+    columnName?: string
   }
 }
 

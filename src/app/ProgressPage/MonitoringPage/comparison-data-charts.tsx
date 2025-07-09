@@ -1,4 +1,3 @@
-import type React from 'react';
 import { useEffect } from 'react';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
@@ -15,7 +14,7 @@ import Loader from '../../../shared/components/loader';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import SummaryTable from './comparative-data-table';
 
-const ComparisonDataCharts: React.FC = () => {
+const ComparisonDataCharts = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
@@ -31,7 +30,6 @@ const ComparisonDataCharts: React.FC = () => {
   const isMosaic = useAppSelector(
     (state: RootState) => state.monitorPage.isMosaic,
   );
-  const { hoveredWorkflowId } = workflowsTable;
   const dispatch = useAppDispatch();
   const { commonDataAssets, dataAssetsMetaData } = comparativeDataExploration;
 
@@ -195,7 +193,7 @@ const ComparisonDataCharts: React.FC = () => {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
           <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={400} showSettings={false} noPadding={true}>
-            <SummaryTable summary={summary} />
+            <SummaryTable summary={summary} dataset={dataAsset} workflowId={workflowId} />
           </ResponsiveCardTable>
         </Grid>
       );
@@ -213,17 +211,16 @@ const ComparisonDataCharts: React.FC = () => {
     );
   }
 
-    if (selectedDataset === null) {
-      return (
-        <InfoMessage
-          message="Select Dataset to display comparisons over data."
-          type="info"
-          icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-          fullHeight
-        />
-      );
-    }
-  
+  if (selectedDataset === null) {
+    return (
+      <InfoMessage
+        message="Select Dataset to display comparisons over data."
+        type="info"
+        icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+        fullHeight
+      />
+    );
+  }
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }} >

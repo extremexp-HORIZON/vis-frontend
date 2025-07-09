@@ -1,87 +1,99 @@
-import { Box } from '@mui/material';
-import type { GridColDef } from '@mui/x-data-grid';
-import { DataGrid } from '@mui/x-data-grid';
-import type React from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+  Typography,
+} from '@mui/material';
 import type { IMetaDataSummary } from '../../../shared/models/dataexploration.model';
+import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
+import Histogram from './comparative-data-histogram';
+import React, { useMemo } from 'react';
 
 export interface SummaryTableProps {
   summary: IMetaDataSummary[];
+  dataset: IDataAsset;
+  workflowId: string;
   title?: string;
 }
 
 type StatKey = keyof IMetaDataSummary;
 
-const SummaryTable: React.FC<SummaryTableProps> = ({ summary }) => {
-  const columnNames: string[] = summary.map(column => column.column_name).filter((name): name is string => typeof name === 'string');
+const stats: { key: StatKey; label: string }[] = [
+  { key: 'min', label: 'Min' },
+  { key: 'max', label: 'Max' },
+  { key: 'avg', label: 'Avg' },
+  { key: 'std', label: 'Std' },
+  { key: 'approx_unique', label: 'Unique' },
+  { key: 'null_percentage', label: 'Null %' },
+];
 
-  const columns: GridColDef[] = [
-    {
-      field: '__stat',
-      headerName: '',
-      minWidth: 100,
-      flex: 0.5,
-      sortable: false,
-      filterable: false,
-      headerAlign: 'center',
-      align: 'left',
-    },
-    ...columnNames.map((col): GridColDef => ({
-      field: col,
-      headerName: col,
-      flex: 1,
-      minWidth: 100,
-      align: 'center',
-      headerAlign: 'center',
-      sortable: false,
-      filterable: false,
-    })),
-  ];
+const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps) => {
+  const columnNames = useMemo(
+    () => summary.map(col => col.column_name).filter((name): name is string => typeof name === 'string'),
+    [summary]
+  );
 
-  const buildStatRow = (statKey: StatKey, label: string) => ({
-    id: statKey,
-    __stat: label,
-    ...Object.fromEntries(
-      columnNames.map(col => {
-        const colSummary = summary.find(s => s.column_name === col);
-        const value = colSummary?.[statKey];
+  const getStatValue = (col: string, statKey: StatKey) => {
+    const colSummary = summary.find(s => s.column_name === col);
+    const value = colSummary?.[statKey];
 
-        return [col, value != null ? Number(value).toFixed(3) : '—'];
-      })
-    ),
-  });
-
-  const rows = [
-    buildStatRow('min', 'Min'),
-    buildStatRow('max', 'Max'),
-    buildStatRow('avg', 'Avg'),
-    buildStatRow('std', 'Std'),
-    buildStatRow('approx_unique', 'Unique'),
-    buildStatRow('null_percentage', 'Null Percentage'),
-  ];
+    return value != null ? Number(value).toFixed(3) : '—';
+  };
 
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
-      <DataGrid
-        columns={columns}
-        rows={rows}
-        hideFooter
-        disableColumnMenu
-        disableRowSelectionOnClick
-        sx={{
-          '& .MuiDataGrid-cell': {
-            justifyContent: 'center',
-            fontSize: '0.85rem',
-          },
-          '& .MuiDataGrid-columnHeaderTitle': {
-            fontWeight: 'bold',
-          },
-          '& .MuiDataGrid-virtualScroller': {
-            overflow: 'auto',
-          },
-        }}
-      />
+    <Box sx={{ width: '100%' }}>
+      {title && (
+        <Typography variant="h6" gutterBottom sx={{ pl: 2 }}>
+          {title}
+        </Typography>
+      )}
+      <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              {/* <TableCell /> */}
+              {columnNames.map(col => (
+                <TableCell key={col} align="center" sx={{ minWidth: 300, fontWeight: 'bold' }}>
+                  {col}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {/* Histogram Row */}
+            <TableRow>
+              {/* <TableCell/> */}
+              {columnNames.map(col => (
+                <TableCell key={col}>
+                  <Box sx={{ height: 300, width: '100%' }}>
+                    <Histogram columnName={col} dataset={dataset} workflowId={workflowId} />
+                  </Box>
+                </TableCell>
+              ))}
+            </TableRow>
+
+            {/* Summary Stat Rows */}
+            {/* {stats.map(({ key, label }) => (
+              <TableRow key={key}>
+                <TableCell sx={{ fontWeight: 'bold' }}>{label}</TableCell>
+                {columnNames.map(col => (
+                  <TableCell key={col} align="center">
+                    {getStatValue(col, key)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))} */}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 };
 
-export default SummaryTable;
+export default React.memo(SummaryTable);

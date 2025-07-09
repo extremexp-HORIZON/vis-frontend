@@ -24,9 +24,9 @@ const ComparativeAnalysisControls = ()=> {
   const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
   const comparativeModelInstanceControlPanel = useAppSelector((state: RootState) => state.monitorPage.comparativeModelInstanceControlPanel);
   const { workflowsTable } = useAppSelector(
-      (state: RootState) => state.monitorPage
+    (state: RootState) => state.monitorPage
   );
-  
+
   const menuOpen = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
