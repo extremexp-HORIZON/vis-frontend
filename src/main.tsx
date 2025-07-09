@@ -5,6 +5,8 @@ import App from './App';
 import { store } from './store/store';
 import './index.css';
 import theme from './mui-theme';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const container = document.getElementById('root');
 
@@ -15,7 +17,9 @@ if (container) {
     // <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <App />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <App />
+        </LocalizationProvider>
       </ThemeProvider>
     </Provider>
     // </React.StrictMode>,

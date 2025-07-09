@@ -10,7 +10,10 @@ import {
 } from '../../../shared/models/exploring/time-range.model';
 import { IDataSource } from '../../../shared/models/dataexploration.model';
 import { setChartType, setGroupByCols, setMeasureCol } from './chartSlice';
-import { setViewRect } from './mapSlice';
+import { setViewRect, updateClusters } from './mapSlice';
+import { AppStartListening } from '../../listenerMiddleware';
+import { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
+import { updateAnalysisResults } from './statsSlice';
 
 interface exploringDatasetState {
   dataset: IDataset;
@@ -96,7 +99,7 @@ export const postFileMeta = createAsyncThunk<
     dispatch(setChartType('column'));
     dispatch(setTimeRange({ from: dataset.timeMin ?? 0, to: Date.now() }));
 
-    return dataset;
+    return { ...dataset, id: body.fileName };
   } catch (error: any) {
     console.error('Error on postFileMeta', error);
     return rejectWithValue(error.response?.data?.message || error.message);
@@ -163,7 +166,6 @@ export const datasetSlice = createSlice({
       state.timeRange = action.payload;
     },
     triggerDatasetUiUpdate: () => {
-      // TODO: They do not use Redux listeners. Figure out why and how to refactor this if needed.
       // No-op reducer: just used to trigger side effects via listeners
     },
   },
@@ -250,6 +252,40 @@ export const datasetSlice = createSlice({
       );
   },
 });
+
+export const datasetUiListeners = (startAppListening: AppStartListening) => {
+  startAppListening({
+    actionCreator: triggerDatasetUiUpdate,
+    effect: async (_, { dispatch, getState }) => {
+      const state = getState();
+      const dataset = state.dataset;
+      const datasetId = dataset.dataset.id;
+
+      if (datasetId && state.dataset.timeRange.from != 0) {
+        // Check if timeRange.from is initial value to not trigger updates
+        const queryBody = {
+          categoricalFilters: state.dataset.categoricalFilters,
+          aggType: state.chart.aggType,
+          groupByCols: state.chart.groupByCols,
+          measureCol: state.chart.measureCol,
+          rect: state.map.drawnRect || state.map.viewRect,
+        };
+
+        try {
+          await dispatch(updateClusters(datasetId));
+          if (state.map.drawnRect) {
+            // dispatch(updateTimeSeries());
+          }
+        } catch (error) {
+          console.error(
+            'Error executingQuery after triggerDatasetUiUpdate:',
+            error,
+          );
+        }
+      }
+    },
+  });
+};
 
 export const { setCategoricalFilters, setTimeRange, triggerDatasetUiUpdate } =
   datasetSlice.actions;

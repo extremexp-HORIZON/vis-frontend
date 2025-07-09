@@ -8,6 +8,7 @@ import { prepareSupercluster } from '../../../shared/utils/clusterUtils';
 import { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
 import { executeQuery } from './datasetSlice';
 import { AppStartListening } from '../../listenerMiddleware';
+import { updateAnalysisResults } from './statsSlice';
 
 interface MapState {
   zoom: number;
@@ -85,8 +86,7 @@ export const updateClusters = createAsyncThunk(
       };
       thunkApi.dispatch(setQueryInfo(queryInfo));
       if (drawnRect == null) {
-        // TODO: Add updateAnalysisResults when stats slice is added.
-        // thunkApi.dispatch(updateAnalysisResults({ rectStats: result.rectStats, series: result.series }));
+        thunkApi.dispatch(updateAnalysisResults({ rectStats: result.rectStats, series: result.series }));
       }
       const points = result.points || [];
       const supercluster = prepareSupercluster(

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Box } from '@mui/material';
 import {
   RootState,
   useAppDispatch,
@@ -8,6 +9,8 @@ import {
 import { postFileMeta } from '../../../store/slices/exploring/datasetSlice';
 import Loader from '../../../shared/components/loader';
 import { Map } from './Map/map';
+import Stats from './Stats/stats';
+import { VisControl } from './VisControl/vis-control';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -35,7 +38,37 @@ const VisualizePage = () => {
     return <Loader />;
   }
 
-  return <Map id={datasetId} dataset={dataset} />;
+  return (
+    <>
+      <Box
+        position="absolute"
+        zIndex={999}
+        top={0}
+        sx={{ p: 2, minWidth: 200 }}
+      >
+        <VisControl dataset={dataset} />
+      </Box>
+      <Map id={datasetId} dataset={dataset} />
+      <Box
+        position="absolute"
+        zIndex={999}
+        bottom={0}
+        sx={{ p: 2, minWidth: 200 }}
+      >
+        <Stats dataset={dataset} />
+      </Box>
+      {/* <Box
+        position="absolute"
+        zIndex={999}
+        bottom={0}
+        right={0}
+        sx={{ p: 1, width: 1 / 4 }}
+      >
+        <Chart dataset={dataset} />
+        {drawnRect && <TimeSeriesChart dataset={dataset} />}
+      </Box> */}
+    </>
+  );
 };
 
 export default VisualizePage;
