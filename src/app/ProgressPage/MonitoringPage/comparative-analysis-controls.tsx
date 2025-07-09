@@ -23,6 +23,10 @@ const ComparativeAnalysisControls = ()=> {
   const selectedComparisonTab = useAppSelector((state: RootState) => state.monitorPage.selectedComparisonTab);
   const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
   const comparativeModelInstanceControlPanel = useAppSelector((state: RootState) => state.monitorPage.comparativeModelInstanceControlPanel);
+  const { workflowsTable } = useAppSelector(
+      (state: RootState) => state.monitorPage
+  );
+  
   const menuOpen = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
@@ -91,7 +95,7 @@ const ComparativeAnalysisControls = ()=> {
               />
             ))}
           </Box>
-        ) : selectedComparisonTab === 2 && (
+        ) : selectedComparisonTab === 2 && workflowsTable.selectedWorkflows.length > 0 && (
           <>
             <Box display="flex" flexWrap="wrap" gap={1}>
               <Tooltip title="Select Dataset">
@@ -149,16 +153,6 @@ const ComparativeAnalysisControls = ()=> {
             />
           )}
 
-          {/* <Card
-            variant="outlined"
-            sx={{
-              p: 1,
-              borderRadius: 2,
-              display: 'flex',
-              alignItems: 'center',
-              boxShadow: 1,
-            }}
-          > */}
           <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
             <Button
               variant={isMosaic ? 'contained' : 'outlined'}
@@ -175,8 +169,6 @@ const ComparativeAnalysisControls = ()=> {
                 Stacked
             </Button>
           </ButtonGroup>
-          {/* </Card> */}
-
           {selectedModelComparisonChart === 'instanceView' && selectedComparisonTab === 1 && (
             <>
               <IconButton

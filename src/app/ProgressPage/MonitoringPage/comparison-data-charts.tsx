@@ -213,6 +213,18 @@ const ComparisonDataCharts: React.FC = () => {
     );
   }
 
+    if (selectedDataset === null) {
+      return (
+        <InfoMessage
+          message="Select Dataset to display comparisons over data."
+          type="info"
+          icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+          fullHeight
+        />
+      );
+    }
+  
+
   return (
     <Container maxWidth={false} sx={{ padding: 2 }} >
       <Grid
