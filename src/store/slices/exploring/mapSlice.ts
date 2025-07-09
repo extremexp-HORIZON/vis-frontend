@@ -9,6 +9,7 @@ import { IVisQueryResults } from '../../../shared/models/exploring/vis-query-res
 import { executeQuery } from './datasetSlice';
 import { AppStartListening } from '../../listenerMiddleware';
 import { updateAnalysisResults } from './statsSlice';
+import { updateTimeSeries } from './timeSeriesSlice';
 
 interface MapState {
   zoom: number;
@@ -86,7 +87,12 @@ export const updateClusters = createAsyncThunk(
       };
       thunkApi.dispatch(setQueryInfo(queryInfo));
       if (drawnRect == null) {
-        thunkApi.dispatch(updateAnalysisResults({ rectStats: result.rectStats, series: result.series }));
+        thunkApi.dispatch(
+          updateAnalysisResults({
+            rectStats: result.rectStats,
+            series: result.series,
+          }),
+        );
       }
       const points = result.points || [];
       const supercluster = prepareSupercluster(
@@ -190,43 +196,45 @@ export const mapListeners = (startAppListening: AppStartListening) => {
     },
   });
 
-  // TODO: Uncomment when stats and timeSeries slices are integrated.
   // setDrawnRectListener
-  // startAppListening({
-  //   actionCreator: setDrawnRect,
-  //   effect: async (action, { dispatch, getState }) => {
-  //     const { id } = action.payload;
-  //     const state = getState() as RootState;
-  //     const { zoom, drawnRect, viewRect } = state.map;
-  //     const { categoricalFilters, timeRange } = state.dataset;
-  //     const { groupByCols, measureCol, aggType } = state.chart;
+  startAppListening({
+    actionCreator: setDrawnRect,
+    effect: async (action, { dispatch, getState }) => {
+      const { id } = action.payload;
+      const state = getState() as RootState;
+      const { zoom, drawnRect, viewRect } = state.map;
+      const { categoricalFilters, timeRange } = state.dataset;
+      const { groupByCols, measureCol, aggType } = state.chart;
 
-  //     const queryBody = {
-  //       rect: drawnRect || viewRect,
-  //       zoom,
-  //       categoricalFilters,
-  //       groupByCols,
-  //       measureCol,
-  //       aggType,
-  //       from: timeRange.from,
-  //       to: timeRange.to,
-  //     };
+      const queryBody = {
+        rect: drawnRect || viewRect,
+        zoom,
+        categoricalFilters,
+        groupByCols,
+        measureCol,
+        aggType,
+        from: timeRange.from,
+        to: timeRange.to,
+      };
 
-  //     const result = (
-  //       await dispatch(
-  //         apiSlice.endpoints.executeQuery.initiate({ id, body: queryBody }),
-  //       )
-  //     ).data as IVisQueryResults;
+      try {
+        const action2 = await dispatch(executeQuery({ id, body: queryBody }));
+        if (executeQuery.fulfilled.match(action2)) {
+          const result = action2.payload as IVisQueryResults;
 
-  //     dispatch(
-  //       updateAnalysisResults({
-  //         rectStats: result.rectStats,
-  //         series: result.series,
-  //       }),
-  //     );
-  //     dispatch(updateTimeSeries());
-  //   },
-  // });
+          dispatch(
+            updateAnalysisResults({
+              rectStats: result.rectStats,
+              series: result.series,
+            }),
+          );
+          dispatch(updateTimeSeries());
+        }
+      } catch (error) {
+        console.error('Error executing query after setDrawnRect:', error);
+      }
+    },
+  });
 };
 
 export const {

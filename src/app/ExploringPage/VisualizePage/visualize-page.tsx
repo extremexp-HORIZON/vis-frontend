@@ -12,6 +12,7 @@ import { Map } from './Map/map';
 import Stats from './Stats/stats';
 import { VisControl } from './VisControl/vis-control';
 import { Chart } from './Chart/chart';
+import { TimeSeriesChart } from './TimeSeriesChart/time-series-chart';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -19,6 +20,7 @@ const VisualizePage = () => {
   const { dataset, loading } = useAppSelector(
     (state: RootState) => state.dataset,
   );
+  const { drawnRect } = useAppSelector((state: RootState) => state.map);
 
   useEffect(() => {
     if (datasetId) {
@@ -66,7 +68,7 @@ const VisualizePage = () => {
         sx={{ p: 1, width: 1 / 4 }}
       >
         <Chart dataset={dataset} />
-        {/* {drawnRect && <TimeSeriesChart dataset={dataset} />} */}
+        {drawnRect && <TimeSeriesChart dataset={dataset} />}
       </Box>
     </>
   );

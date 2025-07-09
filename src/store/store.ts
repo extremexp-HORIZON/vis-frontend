@@ -15,6 +15,7 @@ import { listenerMiddleware, startAppListening } from './listenerMiddleware';
 import { mapListeners } from './slices/exploring/mapSlice';
 import { datasetUiListeners } from './slices/exploring/datasetSlice';
 import { chartListeners } from './slices/exploring/chartSlice';
+import { timeSeriesListeners } from './slices/exploring/timeSeriesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -45,3 +46,4 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 chartListeners(startAppListening);
 datasetUiListeners(startAppListening);
 mapListeners(startAppListening);
+timeSeriesListeners(startAppListening);
