@@ -11,6 +11,7 @@ import Loader from '../../../shared/components/loader';
 import { Map } from './Map/map';
 import Stats from './Stats/stats';
 import { VisControl } from './VisControl/vis-control';
+import { Chart } from './Chart/chart';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -57,7 +58,7 @@ const VisualizePage = () => {
       >
         <Stats dataset={dataset} />
       </Box>
-      {/* <Box
+      <Box
         position="absolute"
         zIndex={999}
         bottom={0}
@@ -65,8 +66,8 @@ const VisualizePage = () => {
         sx={{ p: 1, width: 1 / 4 }}
       >
         <Chart dataset={dataset} />
-        {drawnRect && <TimeSeriesChart dataset={dataset} />}
-      </Box> */}
+        {/* {drawnRect && <TimeSeriesChart dataset={dataset} />} */}
+      </Box>
     </>
   );
 };

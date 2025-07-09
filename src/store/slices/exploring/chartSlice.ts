@@ -1,5 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { AggregateFunctionType } from '../../../shared/models/exploring/enum/aggregate-function-type.model';
+import { AppStartListening } from '../../listenerMiddleware';
+import { shallowEqual } from 'react-redux';
+import { executeQuery, setCategoricalFilters } from './datasetSlice';
+import { updateAnalysisResults } from './statsSlice';
+import { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
 
 interface ChartState {
   groupByCols: string[];
@@ -36,6 +41,64 @@ export const chartSlice = createSlice({
     },
   },
 });
+
+export const chartListeners = (startApplistening: AppStartListening) => {
+  startApplistening({
+    actionCreator: triggerChartUpdate,
+    effect: async (_, { dispatch, getState }) => {
+      const state = getState();
+      const datasetId = state.dataset.dataset.id;
+
+      if (datasetId) {
+        const newFilters: Record<string, unknown> = {
+          ...state.dataset.categoricalFilters,
+        };
+        state.chart.groupByCols.forEach(col => delete newFilters[col]);
+
+        console.log(
+          'newFilters',
+          newFilters,
+          'datasetUiCategoricalFilters',
+          state.dataset.categoricalFilters,
+        );
+        const queryBody = {
+          categoricalFilters:
+            newFilters !== state.dataset.categoricalFilters
+              ? newFilters
+              : state.dataset.categoricalFilters,
+          aggType: state.chart.aggType,
+          groupByCols: state.chart.groupByCols,
+          measureCol: state.chart.measureCol,
+          rect: state.map.drawnRect || state.map.viewRect,
+        };
+
+        try {
+          const action = await dispatch(
+            executeQuery({ id: datasetId, body: queryBody }),
+          );
+
+          if (executeQuery.fulfilled.match(action)) {
+            const result = action.payload as IVisQueryResults;
+            dispatch(
+              updateAnalysisResults({
+                rectStats: result.rectStats,
+                series: result.series,
+              }),
+            );
+            if (!shallowEqual(newFilters, state.dataset.categoricalFilters)) {
+              dispatch(setCategoricalFilters(newFilters));
+            }
+          }
+        } catch (error) {
+          console.error(
+            'Error executing query after triggerChartUpdate:',
+            error,
+          );
+        }
+      }
+    },
+  });
+};
 
 export const {
   setAggType,

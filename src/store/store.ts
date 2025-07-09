@@ -10,9 +10,11 @@ import { datasetSlice } from './slices/exploring/datasetSlice';
 import { mapSlice } from './slices/exploring/mapSlice';
 import { chartSlice } from './slices/exploring/chartSlice';
 import { statsSlice } from './slices/exploring/statsSlice';
+import { timeSeriesSlice } from './slices/exploring/timeSeriesSlice';
 import { listenerMiddleware, startAppListening } from './listenerMiddleware';
 import { mapListeners } from './slices/exploring/mapSlice';
 import { datasetUiListeners } from './slices/exploring/datasetSlice';
+import { chartListeners } from './slices/exploring/chartSlice';
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +26,7 @@ export const store = configureStore({
     map: mapSlice.reducer,
     chart: chartSlice.reducer,
     stats: statsSlice.reducer,
+    timeSeries: timeSeriesSlice.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
@@ -39,5 +42,6 @@ export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 // Register listeners
-mapListeners(startAppListening);
+chartListeners(startAppListening);
 datasetUiListeners(startAppListening);
+mapListeners(startAppListening);
