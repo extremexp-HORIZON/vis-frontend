@@ -58,7 +58,7 @@ const ComparativeAnalysisControls = ()=> {
         alignItems="center"
         flexWrap="wrap"
         gap={2}
-        sx={{ p: 1 }}
+        sx={{ p: 2 }}
       >
         {selectedComparisonTab === 1 ? (
           <Box display="flex" flexWrap="wrap" gap={1}>
@@ -156,6 +156,7 @@ const ComparativeAnalysisControls = ()=> {
           <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
             <Button
               variant={isMosaic ? 'contained' : 'outlined'}
+              disabled={selectedComparisonTab === 2}
               color="primary"
               onClick={() => dispatch(setIsMosaic(true))}
             >

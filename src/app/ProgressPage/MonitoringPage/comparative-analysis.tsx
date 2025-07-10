@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { setSelectedComparisonTab } from '../../../store/slices/monitorPageSlice';
+import { setIsMosaic, setSelectedComparisonTab } from '../../../store/slices/monitorPageSlice';
 import ComparisonMetricsCharts from './comparison-metrics-charts';
 import ComparisonModelsCharts from './comparison-models-charts';
 import ComparisonDataCharts from './comparison-data-charts';
@@ -21,6 +21,9 @@ const ComparativeAnalysis = () => {
   useEffect(() => {
     if (groupBy.length > 0 && selectedComparisonTab !== 0) {
       dispatch(setSelectedComparisonTab(0));
+    }
+    if(selectedComparisonTab === 2) {
+      dispatch(setIsMosaic(false));
     }
   }, [groupBy, selectedComparisonTab]);
 

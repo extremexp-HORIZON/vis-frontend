@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import type { IAggregation } from '../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import { fetchComparisonData } from '../../../store/slices/monitorPageSlice';
-import { VegaLite } from 'react-vega';
+import { VegaLite, VisualizationSpec } from 'react-vega';
 
 export interface IHistogramProps {
     columnName: string
@@ -157,7 +157,7 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
       })) : [];
   }
 
-  const specification = {
+  const specification: VisualizationSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     description: `Distribution of ${columnName}`,
     title: `${columnName}`,
@@ -170,7 +170,9 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
         field: 'binLabel',
         type: 'ordinal',
         title: columnName,
-        axis: { labelAngle: -45,      labelFontSize: 8 // Adjust this value as needed
+        axis: { 
+          labelAngle: -45,      
+          labelFontSize: 8 // Adjust this value as needed
         },
         sort: {
           op: 'min',
