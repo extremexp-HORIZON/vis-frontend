@@ -40,7 +40,6 @@ const stickyCellSx = {
   fontWeight: 'bold',
 };
 
-
 const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps) => {
   const columnNames = useMemo(
     () => summary.map(col => col.column_name).filter((name): name is string => typeof name === 'string'),
@@ -63,17 +62,6 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
       )}
       <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
         <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={stickyCellSx}/>
-              {columnNames.map(col => (
-                <TableCell key={col} align="center" sx={{ minWidth: 300, fontWeight: 'bold' }}>
-                  {col}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
           <TableBody>
             {/* Histogram Row */}
             <TableRow>

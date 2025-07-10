@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import type { IAggregation } from '../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import { fetchComparisonData } from '../../../store/slices/monitorPageSlice';
+import { VegaLite } from 'react-vega';
 
 export interface IHistogramProps {
     columnName: string
@@ -63,62 +64,65 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
     );
   }, [meta]);
 
-function binData(
-  data: { value: number; count: number }[],
-  maxBinCount = 10
-): { binLabel: string; xStart: number; count: number }[] {
-  if (!Array.isArray(data) || data.length === 0) return [];
+  function binData(
+    data: { value: number; count: number }[],
+    maxBinCount = 10
+  ): { binLabel: string; xStart: number; count: number }[] {
+    if (!Array.isArray(data) || data.length === 0) return [];
 
-  const values = data.map(d => d.value);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min;
+    const values = data.map(d => d.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min;
 
-  if (range === 0) {
-    const rounded = parseFloat(min.toFixed(2));
-    return [
-      {
-        binLabel: `${rounded.toFixed(2)}`,
-        xStart: rounded,
-        count: data.reduce((acc, d) => acc + d.count, 0),
-      },
-    ];
-  }
+    if (range === 0) {
+      const rounded = parseFloat(min.toFixed(2));
 
-  const binCount = maxBinCount;
-  const binSize = range / binCount;
-  const roundedMin = Math.floor(min / binSize) * binSize;
+      return [
+        {
+          binLabel: `${rounded.toFixed(2)}`,
+          xStart: rounded,
+          count: data.reduce((acc, d) => acc + d.count, 0),
+        },
+      ];
+    }
 
-  const bins = Array.from({ length: binCount }, (_, i) => {
-    const binStart = roundedMin + i * binSize;
-    const binEnd = binStart + binSize;
-    return {
-      binStart,
-      binEnd,
-      xStart: binStart,
-      count: 0,
+    const binCount = maxBinCount;
+    const binSize = range / binCount;
+    const roundedMin = Math.floor(min / binSize) * binSize;
+
+    const bins = Array.from({ length: binCount }, (_, i) => {
+      const binStart = roundedMin + i * binSize;
+      const binEnd = binStart + binSize;
+
+      return {
+        binStart,
+        binEnd,
+        xStart: binStart,
+        count: 0,
+      };
+    });
+
+    for (const { value, count } of data) {
+      if (typeof value !== 'number' || typeof count !== 'number') continue;
+      const binIndex = Math.max(
+        0,
+        Math.min(Math.floor((value - roundedMin) / binSize), binCount - 1)
+      );
+
+      bins[binIndex].count += count;
+    }
+
+    const getLabel = (start: number, end: number) => {
+      return `${start.toFixed(2)} – ${end.toFixed(2)}`;
     };
-  });
 
-  for (const { value, count } of data) {
-    if (typeof value !== 'number' || typeof count !== 'number') continue;
-    const binIndex = Math.max(
-      0,
-      Math.min(Math.floor((value - roundedMin) / binSize), binCount - 1)
-    );
-    bins[binIndex].count += count;
+    return bins.map(b => ({
+      binLabel: getLabel(b.binStart, b.binEnd),
+      xStart: b.xStart,
+      count: b.count,
+    }));
   }
-
-const getLabel = (start: number, end: number) => {
-  return `${start.toFixed(2)} – ${end.toFixed(2)}`;
-};
-
-  return bins.map(b => ({
-    binLabel: getLabel(b.binStart, b.binEnd),
-    xStart: b.xStart,
-    count: b.count,
-  }));
-}
 
   const rawData = histogramData?.data?.data || [];
   const countField = `count_${columnName}`;
@@ -156,6 +160,9 @@ const getLabel = (start: number, end: number) => {
   const specification = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     description: `Distribution of ${columnName}`,
+    title: `${columnName}`,
+    width: 300,
+    height: 180,
     data: { values: chartData },
     mark: 'bar',
     encoding: {
@@ -163,7 +170,8 @@ const getLabel = (start: number, end: number) => {
         field: 'binLabel',
         type: 'ordinal',
         title: columnName,
-        axis: { labelAngle: -45 },
+        axis: { labelAngle: -45,      labelFontSize: 8 // Adjust this value as needed
+        },
         sort: {
           op: 'min',
           field: 'xStart'
@@ -203,14 +211,16 @@ const getLabel = (start: number, end: number) => {
 
   return (
     <Box sx={{ height: '99%', width: '100%' }}>
-      <ResponsiveCardVegaLite
+      <VegaLite
         spec={specification}
         actions={false}
-        title={''}
-        maxHeight={300}
-        infoMessage={info}
-        showInfoMessage={shouldShowInfoMessage && !(histogramData?.loading || metaLoading)}
-        loading={histogramData?.loading || metaLoading}
+        // title={'Column'}
+        // maxHeight={300}
+        // infoMessage={info}
+        // showInfoMessage={shouldShowInfoMessage && !(histogramData?.loading || metaLoading)}
+        // loading={histogramData?.loading || metaLoading}
+        // showSettings={false}
+
       />
     </Box>
   );

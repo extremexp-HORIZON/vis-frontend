@@ -47,7 +47,7 @@ const ComparisonDataCharts = () => {
         const name = asset.name;
 
         if(!asset.source) continue;
-        
+
         if (!assetGroups[name]) {
           assetGroups[name] = [];
         }
