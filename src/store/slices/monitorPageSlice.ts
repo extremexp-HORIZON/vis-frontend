@@ -258,6 +258,7 @@ const initialState: IMonitoringPageSlice = {
 const pruneComparativeMetadata = (state: IMonitoringPageSlice) => {
   const selectedIds = new Set(state.workflowsTable.selectedWorkflows);
 
+  // Prune metaData
   for (const assetName in state.comparativeDataExploration.dataAssetsMetaData) {
     const workflowMeta = state.comparativeDataExploration.dataAssetsMetaData[assetName];
 
@@ -272,9 +273,24 @@ const pruneComparativeMetadata = (state: IMonitoringPageSlice) => {
     }
   }
 
+  // Prune controlPanel if asset is not in commonDataAssets
   for (const assetName in state.comparativeDataExploration.dataAssetsControlPanel) {
     if (!state.comparativeDataExploration.commonDataAssets[assetName]) {
       delete state.comparativeDataExploration.dataAssetsControlPanel[assetName];
+    }
+  }
+
+  for (const assetName in state.comparativeDataExploration.dataAssetsHistograms) {
+    const workflowHistograms = state.comparativeDataExploration.dataAssetsHistograms[assetName];
+
+    for (const workflowId in workflowHistograms) {
+      if (!selectedIds.has(workflowId)) {
+        delete workflowHistograms[workflowId];
+      }
+    }
+
+    if (Object.keys(workflowHistograms).length === 0) {
+      delete state.comparativeDataExploration.dataAssetsHistograms[assetName];
     }
   }
 };
