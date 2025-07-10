@@ -145,7 +145,7 @@ const getLabel = (start: number, end: number) => {
     chartData = Array.isArray(rawData) ? rawData
       .filter(d =>
         typeof d[columnName] !== 'undefined' &&
-      typeof d[countField] === 'number'
+        typeof d[countField] === 'number'
       )
       .map(d => ({
         binLabel: String(d[columnName]),

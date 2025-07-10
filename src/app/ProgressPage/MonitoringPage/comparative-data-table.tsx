@@ -12,7 +12,7 @@ import {
 import type { IMetaDataSummary } from '../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import Histogram from './comparative-data-histogram';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 export interface SummaryTableProps {
   summary: IMetaDataSummary[];
@@ -24,13 +24,22 @@ export interface SummaryTableProps {
 type StatKey = keyof IMetaDataSummary;
 
 const stats: { key: StatKey; label: string }[] = [
-  { key: 'min', label: 'Min' },
-  { key: 'max', label: 'Max' },
+  // { key: 'min', label: 'Min' },
+  // { key: 'max', label: 'Max' },
   { key: 'avg', label: 'Avg' },
   { key: 'std', label: 'Std' },
   { key: 'approx_unique', label: 'Unique' },
   { key: 'null_percentage', label: 'Null %' },
 ];
+
+const stickyCellSx = {
+  position: 'sticky',
+  left: 0,
+  zIndex: 999,
+  backgroundColor: 'background.paper',
+  fontWeight: 'bold',
+};
+
 
 const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps) => {
   const columnNames = useMemo(
@@ -56,7 +65,7 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
         <Table size="small">
           <TableHead>
             <TableRow>
-              {/* <TableCell /> */}
+              <TableCell sx={stickyCellSx}/>
               {columnNames.map(col => (
                 <TableCell key={col} align="center" sx={{ minWidth: 300, fontWeight: 'bold' }}>
                   {col}
@@ -68,7 +77,7 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
           <TableBody>
             {/* Histogram Row */}
             <TableRow>
-              {/* <TableCell/> */}
+              <TableCell sx={stickyCellSx}/>
               {columnNames.map(col => (
                 <TableCell key={col}>
                   <Box sx={{ height: 300, width: '100%' }}>
@@ -79,16 +88,16 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
             </TableRow>
 
             {/* Summary Stat Rows */}
-            {/* {stats.map(({ key, label }) => (
+            {stats.map(({ key, label }) => (
               <TableRow key={key}>
-                <TableCell sx={{ fontWeight: 'bold' }}>{label}</TableCell>
+                <TableCell sx={stickyCellSx}>{label}</TableCell>
                 {columnNames.map(col => (
                   <TableCell key={col} align="center">
                     {getStatValue(col, key)}
                   </TableCell>
                 ))}
               </TableRow>
-            ))} */}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -96,4 +105,4 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
   );
 };
 
-export default React.memo(SummaryTable);
+export default SummaryTable;
