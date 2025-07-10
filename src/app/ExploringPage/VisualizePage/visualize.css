@@ -1,0 +1,257 @@
+.leaflet-draw {
+  z-index: 1000;
+}
+
+.cluster {
+  background-clip: padding-box;
+  line-height: 25px;
+}
+
+.beautify-marker.cluster[data-badge]:after {
+  left: 70%;
+  bottom: 70%;
+  color: white;
+  background: rgba(84, 78, 78, 0.8);
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100vh;
+}
+
+.leaflet-interactive {
+  cursor: grab;
+}
+
+.leaflet-popup-content {
+  margin: 19px 19px 13px 10px;
+}
+
+#vis-control {
+  z-index: 999;
+  position: absolute;
+  width: 280px;
+  top: 10px;
+  left: 10px;
+  max-height: calc(100vh - 20px);
+  /* overflow: auto; */
+  padding: 20px;
+  opacity: 0.95;
+}
+
+.left-panel-group {
+  z-index: 999;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 450px;
+}
+
+.right-panel-group {
+  z-index: 999;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 450px;
+}
+
+#chart-container {
+  z-index: 999;
+  overflow: auto;
+  padding: 20px;
+  opacity: 0.95;
+}
+
+#stats-panel {
+  opacity: 0.95;
+  font-size: 0.9rem;
+}
+
+.bottom-panel-group {
+  z-index: 999;
+  position: absolute;
+  bottom: 10px;
+  right: 470px;
+}
+
+.filters {
+  margin-top: 0px;
+}
+
+/* .dimension-filter {
+   margin-bottom: 20px;
+  
+      &:last-child {
+        margin-bottom: 0;
+      }
+} */
+
+.filter-accordion-title {
+  font-weight: 600;
+}
+.ui.dropdown .menu > .item.dimension-filter {
+  /*  margin-bottom: 20px;
+  
+      &:last-child {
+        margin-bottom: 0;
+      }*/
+  padding-left: 0.7rem !important;
+}
+
+.item.dimension-filter > .content {
+  padding: 13px 13px 0px 15px !important;
+}
+
+.filter-accordion-title {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.sort.down.icon {
+  transform: rotate(-90deg);
+}
+
+.active.title.filter-accordion-title {
+  .sort.down.icon {
+    transform: rotate(0deg);
+    transform: translate(2px, -3px);
+  }
+}
+
+#vis-control i {
+  font-size: 1rem;
+}
+
+.remove-filters {
+  margin-top: 20px;
+  padding-left: 10px;
+  margin-bottom: 20px;
+}
+
+.remove-filter-dim-label {
+  margin-left: 7px;
+  font-weight: 600;
+}
+
+/* .remove-filter-value {
+} */
+
+#query-info-panel {
+  width: 220px;
+  opacity: 0.95;
+  font-size: 0.5rem;
+}
+
+#query-info-panel.expanded {
+  width: 600px;
+}
+
+.field-stats.ui.statistics .statistic > .value {
+  font-size: 0.9rem !important;
+}
+
+.field-stats.ui.statistics .statistic > .label {
+  font-size: 0.7rem !important;
+}
+
+.query-stats.ui.statistics .statistic > .value {
+  font-size: 0.9rem !important;
+}
+
+.query-stats.ui.statistics .statistic > .label {
+  font-size: 0.7rem !important;
+}
+
+/* Multiple progress bar */
+/* Multiple */
+.ui.multiple.progress {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  max-width: 100%;
+
+  .bar {
+    border-radius: 0rem;
+  }
+
+  .label {
+    font-size: 0.85rem;
+  }
+}
+
+.details-title {
+  border-bottom: solid black 1px;
+  padding-bottom: 1px;
+  font-weight: 600;
+  display: table;
+}
+
+.x-button {
+  float: right;
+  cursor: pointer;
+  position: relative;
+  right: 10px;
+}
+
+.x-button2 {
+  float: right;
+  cursor: pointer;
+  position: relative;
+  right: 10px;
+  top: -29px;
+}
+
+.column-value-chart-title {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  padding-top: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.cluster-title {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 600;
+  padding-bottom: 5px;
+  border-bottom: solid black 1px;
+  margin-bottom: 5px;
+}
+
+.cluster-details {
+  height: 25vh;
+  overflow-y: scroll;
+}
+
+.search-bar-ui {
+  z-index: 999;
+  position: absolute;
+  top: -1vh;
+  left: 43%;
+  max-height: 50vh;
+  padding: 20px;
+  opacity: 0.9;
+}
+
+.dropdown-description {
+  margin: auto;
+}
+.legend {
+  position: absolute;
+  right: 40px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.color-block {
+  width: 20px; /* Adjust width as needed */
+  height: 20px; /* Adjust height as needed */
+  display: inline-block;
+  margin-right: 5px;
+  border-radius: 25px;
+}
