@@ -46,6 +46,8 @@ const ComparisonDataCharts = () => {
       for (const asset of workflow.dataAssets) {
         const name = asset.name;
 
+        if(!asset.source) continue;
+        
         if (!assetGroups[name]) {
           assetGroups[name] = [];
         }
