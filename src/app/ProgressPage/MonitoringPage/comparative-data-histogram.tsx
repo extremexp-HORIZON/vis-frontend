@@ -63,45 +63,125 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
     );
   }, [meta]);
 
+function binData(
+  data: { value: number; count: number }[],
+  maxBinCount = 10
+): { binLabel: string; xStart: number; count: number }[] {
+  if (!Array.isArray(data) || data.length === 0) return [];
+
+  const values = data.map(d => d.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min;
+
+  if (range === 0) {
+    const rounded = parseFloat(min.toFixed(2));
+    return [
+      {
+        binLabel: `${rounded.toFixed(2)}`,
+        xStart: rounded,
+        count: data.reduce((acc, d) => acc + d.count, 0),
+      },
+    ];
+  }
+
+  const binCount = maxBinCount;
+  const binSize = range / binCount;
+  const roundedMin = Math.floor(min / binSize) * binSize;
+
+  const bins = Array.from({ length: binCount }, (_, i) => {
+    const binStart = roundedMin + i * binSize;
+    const binEnd = binStart + binSize;
+    return {
+      binStart,
+      binEnd,
+      xStart: binStart,
+      count: 0,
+    };
+  });
+
+  for (const { value, count } of data) {
+    if (typeof value !== 'number' || typeof count !== 'number') continue;
+    const binIndex = Math.max(
+      0,
+      Math.min(Math.floor((value - roundedMin) / binSize), binCount - 1)
+    );
+    bins[binIndex].count += count;
+  }
+
+const getLabel = (start: number, end: number) => {
+  return `${start.toFixed(2)} – ${end.toFixed(2)}`;
+};
+
+  return bins.map(b => ({
+    binLabel: getLabel(b.binStart, b.binEnd),
+    xStart: b.xStart,
+    count: b.count,
+  }));
+}
+
   const rawData = histogramData?.data?.data || [];
-  const valueField = columnName;
   const countField = `count_${columnName}`;
-  const transformedData = Array.isArray(rawData)
-    ? rawData.map(item => ({
-      value: item[valueField],
-      count: item[countField],
-    }))
-    : [];
+
+  const isNumericColumn = Array.isArray(rawData) &&
+  rawData.some(d => typeof d[columnName] === 'number');
+
+  let chartData: { binLabel: string; count: number }[] = [];
+
+  if (isNumericColumn) {
+    const numericData = rawData
+      .filter(d =>
+        typeof d[columnName] === 'number' &&
+        typeof d[countField] === 'number'
+      )
+      .map(d => ({
+        value: d[columnName],
+        count: d[countField],
+      }));
+
+    chartData = Array.isArray(numericData) ? binData(numericData) : [];
+
+  } else {
+    chartData = Array.isArray(rawData) ? rawData
+      .filter(d =>
+        typeof d[columnName] !== 'undefined' &&
+      typeof d[countField] === 'number'
+      )
+      .map(d => ({
+        binLabel: String(d[columnName]),
+        count: d[countField],
+      })) : [];
+  }
 
   const specification = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    description: `Histogram of ${columnName}`,
-    data: { values: transformedData },
+    description: `Distribution of ${columnName}`,
+    data: { values: chartData },
     mark: 'bar',
     encoding: {
       x: {
-        field: 'value',
-        type: 'nominal',
-        bin: {
-            maxbins: 10
-        },
-        axis: { labelAngle: -45, labelOverlap: true },
+        field: 'binLabel',
+        type: 'ordinal',
         title: columnName,
+        axis: { labelAngle: -45 },
+        sort: {
+          op: 'min',
+          field: 'xStart'
+        }
       },
       y: {
-        aggregate: 'sum',
         field: 'count',
         type: 'quantitative',
         title: 'Count',
       },
       tooltip: [
-        { field: 'value', type: 'nominal', title: columnName },
+        { field: 'binLabel', type: 'nominal', title: columnName },
         { field: 'count', type: 'quantitative', title: 'Count' },
       ],
     },
   };
 
-  const hasData = transformedData.length > 0;
+  const hasData = chartData.length > 0;
 
   const info = !hasData ? (
     <InfoMessage
@@ -126,7 +206,7 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
       <ResponsiveCardVegaLite
         spec={specification}
         actions={false}
-        title={'Histogram'}
+        title={''}
         maxHeight={300}
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage && !(histogramData?.loading || metaLoading)}
