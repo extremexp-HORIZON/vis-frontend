@@ -74,7 +74,7 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
             <TableRow>
               <TableCell sx={stickyCellSx}/>
               {selectedColumns.map(col => (
-                <TableCell key={col}>
+                <TableCell key={col} align="center">
                   <Box sx={{ height: 300, width: '100%' }}>
                     <Histogram columnName={col} dataset={dataset} workflowId={workflowId} />
                   </Box>
