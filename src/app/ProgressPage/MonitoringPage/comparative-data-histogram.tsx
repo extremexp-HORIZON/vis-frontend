@@ -176,7 +176,7 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
       x: {
         field: 'binLabel',
         type: 'ordinal',
-        title: columnName,
+        title: null,
         axis: {
           labelAngle: -45,
           labelFontSize: 8
