@@ -1,5 +1,4 @@
-import { Box } from '@mui/material';
-import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
+import { Box, Typography } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useEffect } from 'react';
@@ -8,7 +7,9 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import type { IAggregation } from '../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import { fetchComparisonData } from '../../../store/slices/monitorPageSlice';
-import { VegaLite, VisualizationSpec } from 'react-vega';
+import type { VisualizationSpec } from 'react-vega';
+import { VegaLite } from 'react-vega';
+import Loader from '../../../shared/components/loader';
 
 export interface IHistogramProps {
     columnName: string
@@ -160,7 +161,13 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
   const specification: VisualizationSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     description: `Distribution of ${columnName}`,
-    title: `${columnName}`,
+    title: {
+      text: columnName,
+      fontWeight: 'bold',
+      anchor: 'middle',
+      offset: 10,
+      fontSize: 14,
+    },
     width: 300,
     height: 180,
     data: { values: chartData },
@@ -170,9 +177,9 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
         field: 'binLabel',
         type: 'ordinal',
         title: columnName,
-        axis: { 
-          labelAngle: -45,      
-          labelFontSize: 8 // Adjust this value as needed
+        axis: {
+          labelAngle: -45,
+          labelFontSize: 8
         },
         sort: {
           op: 'min',
@@ -193,37 +200,66 @@ const Histogram = ({ columnName, dataset, workflowId }: IHistogramProps) => {
 
   const hasData = chartData.length > 0;
 
-  const info = !hasData ? (
-    <InfoMessage
-      message="No data available."
-      type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-      fullHeight
-    />
-  ) : (
-    <InfoMessage
-      message= {histogramData?.error || 'Error fetching the data.'}
-      type="info"
-      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-      fullHeight
-    />
-  );
-
-  const shouldShowInfoMessage = histogramData?.error !== null;
+  const shouldShowInfoMessage = histogramData?.error !== null || !hasData;
 
   return (
-    <Box sx={{ height: '99%', width: '100%' }}>
-      <VegaLite
-        spec={specification}
-        actions={false}
-        // title={'Column'}
-        // maxHeight={300}
-        // infoMessage={info}
-        // showInfoMessage={shouldShowInfoMessage && !(histogramData?.loading || metaLoading)}
-        // loading={histogramData?.loading || metaLoading}
-        // showSettings={false}
+    <Box sx={{ height: '99%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {(histogramData?.loading || metaLoading || shouldShowInfoMessage) && (
+        <Box sx={{ width: 300, mb: 1 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: 'bold',
+              textAlign: 'center',
+              fontSize: 14,
+            }}
+          >
+            {columnName}
+          </Typography>
+        </Box>
+      )}
 
-      />
+      {histogramData?.loading || metaLoading ? (
+        <Box
+          sx={{
+            height: 180,
+            width: 300,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #eee',
+          }}
+        >
+          <Loader />
+        </Box>
+      ) : shouldShowInfoMessage ? (
+        <Box
+          sx={{
+            height: 180,
+            width: 300,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #eee',
+          }}
+        >
+          <InfoMessage
+            message={
+              !hasData
+                ? 'No data available.'
+                : histogramData?.error || 'Error fetching the data.'
+            }
+            type="info"
+            icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+            fullHeight
+          />
+        </Box>
+      ) : (
+        <VegaLite
+          spec={specification}
+          actions={false}
+        />
+      )}
     </Box>
   );
 };

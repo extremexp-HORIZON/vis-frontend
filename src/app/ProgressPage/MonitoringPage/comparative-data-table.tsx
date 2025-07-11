@@ -3,7 +3,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   Paper,
   Box,
@@ -13,7 +12,8 @@ import type { IMetaDataSummary } from '../../../shared/models/dataexploration.mo
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import Histogram from './comparative-data-histogram';
 import { useMemo } from 'react';
-import { RootState, useAppSelector } from '../../../store/store';
+import type { RootState } from '../../../store/store';
+import { useAppSelector } from '../../../store/store';
 
 export interface SummaryTableProps {
   summary: IMetaDataSummary[];
@@ -46,11 +46,6 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
   const selectedColumns = useAppSelector(
     (state: RootState) =>
       state.monitorPage.comparativeDataExploration.dataAssetsControlPanel[dataset.name]?.selectedColumns ?? []
-  );
-
-  const columnNames = useMemo(
-    () => summary.map(col => col.column_name).filter((name): name is string => typeof name === 'string'),
-    [summary]
   );
 
   const getStatValue = (col: string, statKey: StatKey) => {

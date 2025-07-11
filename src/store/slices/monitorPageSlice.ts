@@ -463,6 +463,7 @@ export const monitoringPageSlice = createSlice({
       }
     ) => {
       const { assetName, selectedColumns } = action.payload;
+
       if (!state.comparativeDataExploration.dataAssetsControlPanel[assetName]) {
         state.comparativeDataExploration.dataAssetsControlPanel[assetName] = {
           commonColumns: [],

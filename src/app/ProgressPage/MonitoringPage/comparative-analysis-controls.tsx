@@ -20,7 +20,6 @@ import { GridTableRowsIcon } from '@mui/x-data-grid';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
-
 const ComparativeAnalysisControls = ()=> {
   const isMosaic = useAppSelector((state: RootState) => state.monitorPage.isMosaic);
   const selectedModelComparisonChart = useAppSelector((state: RootState) => state.monitorPage.selectedModelComparisonChart);
@@ -40,7 +39,6 @@ const ComparativeAnalysisControls = ()=> {
   const commonColumns = dataAssetsControlPanel?.commonColumns ?? [];
   const selectedColumns = dataAssetsControlPanel?.selectedColumns ?? [];
 
-
   const { workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage
   );
@@ -50,12 +48,11 @@ const ComparativeAnalysisControls = ()=> {
   const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
   const [isDatasetSelectorOpen, setDatasetSelector] = useState(false);
 
-    const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-      setColumnsAnchorEl(event.currentTarget);
-    };
-  
-    const handleClose = () => setColumnsAnchorEl(null);
-  
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setColumnsAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => setColumnsAnchorEl(null);
 
   const datasetSelectorClicked = (event: React.MouseEvent<HTMLElement>) => {
     setDatasetSelector(!isDatasetSelectorOpen);
@@ -133,7 +130,7 @@ const ComparativeAnalysisControls = ()=> {
                   <ViewColumnIcon />
                 </IconButton>
               </Tooltip>
-              
+
             </Box>
             <Popover
               id={'Datasets'}
@@ -188,17 +185,17 @@ const ComparativeAnalysisControls = ()=> {
               <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
                 {commonColumns.map(column => (
                   <ListItem
-                  key={column.name}
-                  disablePadding
-                  sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+                    key={column.name}
+                    disablePadding
+                    sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
                   >
-                    <ListItemButton 
+                    <ListItemButton
                       dense
                       onClick={() => {
                         if(!selectedDataset) return;
                         const updated = selectedColumns.includes(column.name)
-                        ? selectedColumns.filter(col => col !== column.name)
-                        : [...selectedColumns, column.name];
+                          ? selectedColumns.filter(col => col !== column.name)
+                          : [...selectedColumns, column.name];
 
                         dispatch(
                           setDataComparisonSelectedColumns({
@@ -224,7 +221,7 @@ const ComparativeAnalysisControls = ()=> {
                 ))}
               </List>
             </Popover>
-            
+
           </>
         )}
 
