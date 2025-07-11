@@ -153,7 +153,8 @@ const ComparisonDataCharts = () => {
       dispatch(setDataAssetsControlPanel({
         assetName,
         controlPanel: {
-          commonColumns
+          commonColumns,
+          selectedColumns: commonColumns.slice(0, 5).map(col => col.name)
         }
       }));
     });

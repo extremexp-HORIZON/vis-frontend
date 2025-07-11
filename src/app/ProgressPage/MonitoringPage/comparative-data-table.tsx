@@ -13,6 +13,7 @@ import type { IMetaDataSummary } from '../../../shared/models/dataexploration.mo
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import Histogram from './comparative-data-histogram';
 import { useMemo } from 'react';
+import { RootState, useAppSelector } from '../../../store/store';
 
 export interface SummaryTableProps {
   summary: IMetaDataSummary[];
@@ -41,6 +42,12 @@ const stickyCellSx = {
 };
 
 const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps) => {
+
+  const selectedColumns = useAppSelector(
+    (state: RootState) =>
+      state.monitorPage.comparativeDataExploration.dataAssetsControlPanel[dataset.name]?.selectedColumns ?? []
+  );
+
   const columnNames = useMemo(
     () => summary.map(col => col.column_name).filter((name): name is string => typeof name === 'string'),
     [summary]
@@ -66,7 +73,7 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
             {/* Histogram Row */}
             <TableRow>
               <TableCell sx={stickyCellSx}/>
-              {columnNames.map(col => (
+              {selectedColumns.map(col => (
                 <TableCell key={col}>
                   <Box sx={{ height: 300, width: '100%' }}>
                     <Histogram columnName={col} dataset={dataset} workflowId={workflowId} />
@@ -79,7 +86,7 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
             {stats.map(({ key, label }) => (
               <TableRow key={key}>
                 <TableCell sx={stickyCellSx}>{label}</TableCell>
-                {columnNames.map(col => (
+                {selectedColumns.map(col => (
                   <TableCell key={col} align="center">
                     {getStatValue(col, key)}
                   </TableCell>

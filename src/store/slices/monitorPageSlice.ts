@@ -60,6 +60,7 @@ export type DataAssetsHistograms = {
 export type DataAssetsControlPanel = {
   [assetName: string]: {
     commonColumns: VisualColumn[]
+    selectedColumns: string[]
   }
 }
 
@@ -433,6 +434,7 @@ export const monitoringPageSlice = createSlice({
         assetName: string;
         controlPanel: {
           commonColumns: VisualColumn[];
+          selectedColumns: string[]
         };
       };
     }) => {
@@ -450,6 +452,25 @@ export const monitoringPageSlice = createSlice({
     },
     setSelectedDataset: (state, action) => {
       state.comparativeDataExploration.selectedDataset = action.payload;
+    },
+    setDataComparisonSelectedColumns: (
+      state,
+      action: {
+        payload: {
+          assetName: string;
+          selectedColumns: string[];
+        };
+      }
+    ) => {
+      const { assetName, selectedColumns } = action.payload;
+      if (!state.comparativeDataExploration.dataAssetsControlPanel[assetName]) {
+        state.comparativeDataExploration.dataAssetsControlPanel[assetName] = {
+          commonColumns: [],
+          selectedColumns,
+        };
+      } else {
+        state.comparativeDataExploration.dataAssetsControlPanel[assetName].selectedColumns = selectedColumns;
+      }
     }
   },
   extraReducers: builder => {
@@ -827,5 +848,5 @@ export const fetchComparisonData = createAsyncThunk(
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel,
-  setExpandedGroup, setSelectedDataset
+  setExpandedGroup, setSelectedDataset, setDataComparisonSelectedColumns
 } = monitoringPageSlice.actions;
