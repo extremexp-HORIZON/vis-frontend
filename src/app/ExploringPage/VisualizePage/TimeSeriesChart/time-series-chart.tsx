@@ -20,6 +20,7 @@ import {
   triggerTimeSeriesUpdate,
 } from '../../../../store/slices/exploring/timeSeriesSlice';
 import { TimeSeriesVisualizer } from './time-series-visualizer';
+import { Forecasting } from '../Forecasting/forecasting';
 
 export interface IChartTSProps {
   dataset: IDataset;
@@ -100,8 +101,8 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
                 )}
               </Select>
             </FormControl>
-            {/* <Forecasting dataset={dataset} /> */}
           </Box>
+          <Forecasting dataset={dataset} />
         </Box>
 
         <Box

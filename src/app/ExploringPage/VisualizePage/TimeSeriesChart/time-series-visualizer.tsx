@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { IUnivariateDataPoint } from '../../../../shared/models/exploring/univariate-datapoint.model';
-// import {
-//   selectForecastingForm,
-//   selectIsInTrainStepper,
-//   selectPredictions,
-// } from '@/slices/forecastingSlice';
 import type { VisualizationSpec } from 'react-vega';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
+import { RootState, useAppSelector } from '../../../../store/store';
 
 export interface ITSVisualizerProps {
   data: IUnivariateDataPoint[] | null;
@@ -16,40 +12,40 @@ export interface ITSVisualizerProps {
 
 export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
   const { data, forecasting, measureCol } = props;
-  // const forecastingForm = useAppSelector(selectForecastingForm);
-  // const isInTrainStepper = useAppSelector(selectIsInTrainStepper);
-  // const predictions = useAppSelector(selectPredictions);
+  const { forecastingForm, isInTrainStepper, predictions } = useAppSelector(
+    (state: RootState) => state.forecasting,
+  );
 
   const [seriesData, setSeriesData] = useState<number[][] | null>(null);
-  // const [predictionSeriesData, setPredictionSeriesData] = useState<number[][]>(
-  //   [],
-  // );
+  const [predictionSeriesData, setPredictionSeriesData] = useState<number[][]>(
+    [],
+  );
 
   const getZones = () => {
-    // if (forecastingForm && data) {
-    //   const forecastingStartDate = data[0].timestamp;
-    //   const forecastingEndDate = data[data.length - 1].timestamp;
-    //   const forecastingDataSplit = forecastingForm.dataSplit;
-    //   if (isInTrainStepper) {
-    //     return [
-    //       {
-    //         value:
-    //           forecastingStartDate +
-    //           (forecastingEndDate - forecastingStartDate) *
-    //             (forecastingDataSplit[0] / 100),
-    //         color: '#4CAF50',
-    //       },
-    //       {
-    //         value:
-    //           forecastingStartDate +
-    //           (forecastingEndDate - forecastingStartDate) *
-    //             ((forecastingDataSplit[0] + forecastingDataSplit[1]) / 100),
-    //         color: '#FF6B6B',
-    //       },
-    //       { value: forecastingEndDate, color: '#536DFE' },
-    //     ];
-    //   }
-    // }
+    if (forecastingForm && data) {
+      const forecastingStartDate = data[0].timestamp;
+      const forecastingEndDate = data[data.length - 1].timestamp;
+      const forecastingDataSplit = forecastingForm.dataSplit;
+      if (isInTrainStepper) {
+        return [
+          {
+            value:
+              forecastingStartDate +
+              (forecastingEndDate - forecastingStartDate) *
+                (forecastingDataSplit[0] / 100),
+            color: '#4CAF50',
+          },
+          {
+            value:
+              forecastingStartDate +
+              (forecastingEndDate - forecastingStartDate) *
+                ((forecastingDataSplit[0] + forecastingDataSplit[1]) / 100),
+            color: '#FF6B6B',
+          },
+          { value: forecastingEndDate, color: '#536DFE' },
+        ];
+      }
+    }
     return null;
   };
 
@@ -64,15 +60,15 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
     }
   }, [data]);
 
-  // useEffect(() => {
-  //   if (predictions) {
-  //     const formattedPredictions = predictions.map(datapoint => [
-  //       datapoint.timestamp,
-  //       datapoint.value,
-  //     ]);
-  //     setPredictionSeriesData(formattedPredictions);
-  //   }
-  // }, [predictions]);
+  useEffect(() => {
+    if (predictions) {
+      const formattedPredictions = predictions.map(datapoint => [
+        datapoint.timestamp,
+        datapoint.value,
+      ]);
+      setPredictionSeriesData(formattedPredictions);
+    }
+  }, [predictions]);
 
   const vegaSeriesData = seriesData?.map(datapoint => ({
     timestamp: datapoint[0],
