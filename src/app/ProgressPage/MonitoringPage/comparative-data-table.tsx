@@ -48,6 +48,11 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
       state.monitorPage.comparativeDataExploration.dataAssetsControlPanel[dataset.name]?.selectedColumns ?? []
   );
 
+  const workflowColors = useAppSelector(
+    (state) => state.monitorPage.workflowsTable.workflowColors
+  );
+
+
   const getStatValue = (col: string, statKey: StatKey) => {
     const colSummary = summary.find(s => s.column_name === col);
     const value = colSummary?.[statKey];
@@ -70,8 +75,8 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
               <TableCell sx={stickyCellSx}/>
               {selectedColumns.map(col => (
                 <TableCell key={col} align="center">
-                  <Box sx={{ height: 300, width: '100%' }}>
-                    <Histogram columnName={col} dataset={dataset} workflowId={workflowId} />
+                  <Box sx={{ height: 220, width: '100%' }}>
+                    <Histogram columnName={col} dataset={dataset} workflowId={workflowId} color={workflowColors[workflowId]} />
                   </Box>
                 </TableCell>
               ))}
