@@ -19,7 +19,7 @@ export interface IHistogramProps {
 
 }
 
-const Histogram = ({ columnName, dataset, workflowId,color }: IHistogramProps) => {
+const Histogram = ({ columnName, dataset, workflowId, color }: IHistogramProps) => {
   const dispatch = useAppDispatch();
   const aggregationFunction: IAggregation = {
     column: columnName,
@@ -29,15 +29,10 @@ const Histogram = ({ columnName, dataset, workflowId,color }: IHistogramProps) =
     state.monitorPage.comparativeDataExploration.dataAssetsHistograms?.[dataset.name]?.[workflowId]?.[columnName]?.histogram
   );
 
-
   const meta = useAppSelector((state: RootState) =>
     state.monitorPage.comparativeDataExploration.dataAssetsMetaData?.[dataset.name]?.[workflowId]?.meta
   );
   const metaLoading = meta.loading;
-
-  
-  
-  
 
   useEffect(() => {
     const groupBy = [columnName];
@@ -178,21 +173,21 @@ const Histogram = ({ columnName, dataset, workflowId,color }: IHistogramProps) =
     width: 150,
     height: 180,
     data: { values: chartData },
-     mark: {
-    type: 'bar',
-    color: color || '#3f51b5', // fallback to default if not passed
-    size: 15
-  },
+    mark: {
+      type: 'bar',
+      color: color || '#3f51b5', // fallback to default if not passed
+      size: 15
+    },
     encoding: {
       x: {
         field: 'binLabel',
         type: 'ordinal',
         title: null,
-       axis: {
-    labels: false,   // 👈 hides labels
-    ticks: false,    // optional: hides tick marks
-    domain: false    // optional: hides the axis line
-  },
+        axis: {
+          labels: false,   // 👈 hides labels
+          ticks: false,    // optional: hides tick marks
+          domain: false    // optional: hides the axis line
+        },
 
         sort: {
           op: 'min',
