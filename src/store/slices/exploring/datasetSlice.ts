@@ -13,8 +13,7 @@ import type { IDataSource } from '../../../shared/models/dataexploration.model';
 import { setChartType, setGroupByCols, setMeasureCol } from './chartSlice';
 import { setViewRect, updateClusters } from './mapSlice';
 import type { AppStartListening } from '../../listenerMiddleware';
-import { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
-import { updateAnalysisResults } from './statsSlice';
+import { updateTimeSeries } from './timeSeriesSlice';
 
 interface exploringDatasetState {
   dataset: IDataset;
@@ -266,20 +265,13 @@ export const datasetUiListeners = (startAppListening: AppStartListening) => {
       const dataset = state.dataset;
       const datasetId = dataset.dataset.id;
 
-      if (datasetId && state.dataset.timeRange.from != 0) {
+      if (datasetId && state.dataset.timeRange.from !== 0) {
         // Check if timeRange.from is initial value to not trigger updates
-        const queryBody = {
-          categoricalFilters: state.dataset.categoricalFilters,
-          aggType: state.chart.aggType,
-          groupByCols: state.chart.groupByCols,
-          measureCol: state.chart.measureCol,
-          rect: state.map.drawnRect || state.map.viewRect,
-        };
 
         try {
           await dispatch(updateClusters(datasetId));
           if (state.map.drawnRect) {
-            // dispatch(updateTimeSeries());
+            dispatch(updateTimeSeries());
           }
         } catch (error) {
           console.error(
