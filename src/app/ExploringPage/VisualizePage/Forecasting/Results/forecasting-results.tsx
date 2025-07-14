@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -25,13 +26,14 @@ import {
   Loop,
 } from '@mui/icons-material';
 import { ForecastingResultsModal } from './forecasting-results-modal';
-import { IForecastingResults } from '../../../../../shared/models/exploring/forecasting-results.model';
+import type { IForecastingResults } from '../../../../../shared/models/exploring/forecasting-results.model';
 import {
   setPredictions,
   saveModel,
 } from '../../../../../store/slices/exploring/forecastingSlice';
+import type {
+  RootState } from '../../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../../store/store';
@@ -117,6 +119,7 @@ const Row: React.FC<RowProps> = ({
                           const evaluation =
                             forecastingResults.metrics &&
                             forecastingResults.metrics[resultName].evaluation;
+
                           return (
                             evaluation && (
                               <TableRow key={resultName}>
@@ -190,6 +193,7 @@ export const ForecastingResults = () => {
 
   const handlePredict = () => {
     const { time_interval, future_predictions } = forecastingForm;
+
     if (
       !timeSeries?.length ||
       !time_interval ||
@@ -217,6 +221,7 @@ export const ForecastingResults = () => {
       ...Array.from({ length: future_predictions }, (_, i) => {
         const nextTimestamp = startTime + (i + 1) * intervalInMs;
         const value = timeSeries[Math.max(timeSeries.length - 1 - i, 0)].value;
+
         return { timestamp: nextTimestamp, value };
       }),
     ];
@@ -226,6 +231,7 @@ export const ForecastingResults = () => {
 
   const handleClick = (type: string) => {
     const id = savedModels?.length > 0 ? savedModels.length + 1 : 1;
+
     dispatch(saveModel({ model_name: `${type}-${id}`, model_type: type }));
     handleSnackOpen();
   };

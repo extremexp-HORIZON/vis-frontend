@@ -14,8 +14,9 @@ import {
   FormControl,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import type {
+  AlgorithmName } from '../../../../../shared/models/exploring/forecasting.model';
 import {
-  AlgorithmName,
   IXGBoostIntervals,
   ILGBMIntervals,
   IXGBoostDefaultFT,
@@ -25,8 +26,9 @@ import {
   IStringParameters,
 } from '../../../../../shared/models/exploring/forecasting.model';
 import { setForecastingForm } from '../../../../../store/slices/exploring/forecastingSlice';
+import type {
+  RootState } from '../../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../../store/store';
@@ -93,9 +95,11 @@ export const ForecastingAlgSelectionModal = ({
         string,
         unknown
       >;
+
       if (!algoConfig || !Array.isArray(algoConfig[parameter])) return;
 
       const arrayCopy = [...(algoConfig[parameter] as number[])];
+
       arrayCopy[idx] = parseFloat(value);
       dispatch(
         setForecastingForm({
@@ -190,6 +194,7 @@ export const ForecastingAlgSelectionModal = ({
             {Object.keys(forecastingForm.algorithms[algorithmName] || {}).map(
               par => {
                 const algoConfig = forecastingForm.algorithms[algorithmName];
+
                 if (!algoConfig) return null;
 
                 // Use type assertion for property access

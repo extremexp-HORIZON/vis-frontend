@@ -20,8 +20,9 @@ import {
   setFrequency,
   triggerTimeSeriesUpdate,
 } from '../../../../../store/slices/exploring/timeSeriesSlice';
+import type {
+  RootState } from '../../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../../store/store';
@@ -36,6 +37,7 @@ export const ForecastingDataPrep = () => {
   const handleDataSplit = (vals: ChangeResult) => {
     const minValue = vals.minValue;
     const maxValue = vals.maxValue;
+
     dispatch(
       setForecastingForm({
         ...forecastingForm,
@@ -46,6 +48,7 @@ export const ForecastingDataPrep = () => {
 
   const handleTimeInterval = (value: string) => {
     let frequency = 900;
+
     switch (value) {
       case '15m':
         frequency = 900;
@@ -67,9 +70,11 @@ export const ForecastingDataPrep = () => {
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
+
     setPredefinedSplit(value);
 
     let minValue, maxValue;
+
     switch (value) {
       case 'balanced':
         minValue = 60;

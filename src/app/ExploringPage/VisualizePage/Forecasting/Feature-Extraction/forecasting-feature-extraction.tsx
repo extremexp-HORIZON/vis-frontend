@@ -6,10 +6,11 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { IDataset } from '../../../../../shared/models/exploring/dataset.model';
+import type { IDataset } from '../../../../../shared/models/exploring/dataset.model';
 import { setForecastingForm } from '../../../../../store/slices/exploring/forecastingSlice';
+import type {
+  RootState } from '../../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../../store/store';

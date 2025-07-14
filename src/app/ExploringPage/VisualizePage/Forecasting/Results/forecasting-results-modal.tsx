@@ -8,7 +8,8 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { RootState, useAppSelector } from '../../../../../store/store';
+import type { RootState } from '../../../../../store/store';
+import { useAppSelector } from '../../../../../store/store';
 import { Visibility as VisibilityIcon } from '@mui/icons-material';
 
 export const ForecastingResultsModal = () => {

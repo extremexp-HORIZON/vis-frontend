@@ -141,34 +141,34 @@ const SinglePoint = (props: {
         row &&
         row.length > 0 &&
         dataset.originalColumns && (
-          <CustomPopup
-            latlng={[selectedMarker.lat, selectedMarker.lng]}
-            onClose={() => {
-              setSelectedMarker(null);
-              // reset();
-            }}
-          >
-            <div>
-              {dataset.originalColumns.map((col, colIndex) => {
-                if (col.name === 'id') return null;
+        <CustomPopup
+          latlng={[selectedMarker.lat, selectedMarker.lng]}
+          onClose={() => {
+            setSelectedMarker(null);
+            // reset();
+          }}
+        >
+          <div>
+            {dataset.originalColumns.map((col, colIndex) => {
+              if (col.name === 'id') return null;
 
-                let val = row[colIndex];
+              let val = row[colIndex];
 
-                if (val == null) val = '';
+              if (val == null) val = '';
 
-                return (
-                  <div key={colIndex}>
-                    <span>
-                      <b>{col.name}: </b>
-                      {val.startsWith('http') ? <a href={val}>{val}</a> : val}
-                    </span>
-                    <br></br>
-                  </div>
-                );
-              })}
-            </div>
-          </CustomPopup>
-        )}
+              return (
+                <div key={colIndex}>
+                  <span>
+                    <b>{col.name}: </b>
+                    {val.startsWith('http') ? <a href={val}>{val}</a> : val}
+                  </span>
+                  <br></br>
+                </div>
+              );
+            })}
+          </div>
+        </CustomPopup>
+      )}
     </Marker>
   );
 };
@@ -235,9 +235,9 @@ export const Map = (props: IMapProps) => {
   const center: [number, number] =
     viewRect != null
       ? [
-          (viewRect.lat[0] + viewRect.lat[1]) / 2, // Midpoint of latitude
-          (viewRect.lon[0] + viewRect.lon[1]) / 2, // Midpoint of longitude
-        ]
+        (viewRect.lat[0] + viewRect.lat[1]) / 2, // Midpoint of latitude
+        (viewRect.lon[0] + viewRect.lon[1]) / 2, // Midpoint of longitude
+      ]
       : [51.505, -0.09];
 
   if (clusters) {
@@ -314,57 +314,57 @@ export const Map = (props: IMapProps) => {
                     cluster.geometry.coordinates[1] &&
                   selectedClusterMarker.lng ===
                     cluster.geometry.coordinates[0] && (
-                    <CustomPopup
-                      latlng={[
-                        cluster.geometry.coordinates[1],
-                        cluster.geometry.coordinates[0],
-                      ]}
-                      onClose={() => {
-                        setSelectedClusterMarker(null);
-                      }}
-                    >
+                  <CustomPopup
+                    latlng={[
+                      cluster.geometry.coordinates[1],
+                      cluster.geometry.coordinates[0],
+                    ]}
+                    onClose={() => {
+                      setSelectedClusterMarker(null);
+                    }}
+                  >
+                    <div>
                       <div>
-                        <div>
-                          <span>
-                            <b>{dataset.measure0}:</b>{' '}
-                            {cluster.properties[dataset.measure0!] &&
+                        <span>
+                          <b>{dataset.measure0}:</b>{' '}
+                          {cluster.properties[dataset.measure0!] &&
                               (
                                 cluster.properties[dataset.measure0!] as number
                               ).toFixed(4)}
-                          </span>
-                          <br></br>
-                        </div>
-                        <div>
-                          <span>
-                            <b>{dataset.measure1}:</b>{' '}
-                            {cluster.properties[dataset.measure1!] &&
+                        </span>
+                        <br></br>
+                      </div>
+                      <div>
+                        <span>
+                          <b>{dataset.measure1}:</b>{' '}
+                          {cluster.properties[dataset.measure1!] &&
                               (
                                 cluster.properties[dataset.measure1!] as number
                               ).toFixed(4)}
-                          </span>
-                          <br></br>
-                        </div>
-                        {dataset.dimensions &&
+                        </span>
+                        <br></br>
+                      </div>
+                      {dataset.dimensions &&
                           dataset.dimensions.map(dim => (
                             <div key={dim}>
                               <span>
                                 <b>{dim}:</b>{' '}
                                 {Array.isArray(cluster.properties[dim])
                                   ? // Check if there are more than 10 items
-                                    cluster.properties[dim].length > 10
+                                  cluster.properties[dim].length > 10
                                     ? // Join the first 10 items and add ellipsis
-                                      `${cluster.properties[dim].slice(0, 10).join(', ')}...`
+                                    `${cluster.properties[dim].slice(0, 10).join(', ')}...`
                                     : // Join all items if 10 or fewer
-                                      cluster.properties[dim].join(', ')
+                                    cluster.properties[dim].join(', ')
                                   : // Handle the case where it's not an array
-                                    cluster.properties[dim]}
+                                  cluster.properties[dim]}
                               </span>
                               <br />
                             </div>
                           ))}
-                      </div>
-                    </CustomPopup>
-                  )}
+                    </div>
+                  </CustomPopup>
+                )}
               </Marker>
             );
           })

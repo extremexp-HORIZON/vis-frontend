@@ -7,8 +7,9 @@ import {
   Box,
 } from '@mui/material';
 import { Launch as LaunchIcon, Close as CloseIcon } from '@mui/icons-material';
-import { IDataset } from '../../../../shared/models/exploring/dataset.model';
-import { RootState, useAppSelector } from '../../../../store/store';
+import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
 import { TimeSeriesVisualizer } from '../TimeSeriesChart/time-series-visualizer';
 import { ForecastingTrainStepper } from './Landing/forecastin-train-stepper';
 import { ForecastingModelSelection } from './Landing/forecasting-model-selection';

@@ -11,8 +11,9 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
+import type {
+  RootState } from '../../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../../store/store';

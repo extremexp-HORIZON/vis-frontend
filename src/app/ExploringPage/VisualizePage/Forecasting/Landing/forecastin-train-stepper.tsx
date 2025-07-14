@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Stepper, Step, StepLabel, Box } from '@mui/material';
-import { IDataset } from '../../../../../shared/models/exploring/dataset.model';
+import type { IDataset } from '../../../../../shared/models/exploring/dataset.model';
 import { IForecastingDefault } from '../../../../../shared/models/exploring/forecasting.model';
 import {
   setIsInTrainStepper,
@@ -9,8 +9,9 @@ import {
   setNewTrain,
   setPredictions,
 } from '../../../../../store/slices/exploring/forecastingSlice';
+import type {
+  RootState } from '../../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../../store/store';
@@ -108,6 +109,7 @@ export const ForecastingTrainStepper = ({
         Object.keys(forecastingForm.algorithms).length === 0 ||
         !forecastingForm.future_predictions
       );
+
     return false;
   };
 

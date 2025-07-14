@@ -13,15 +13,17 @@ import {
   Box,
 } from '@mui/material';
 import { ForecastingAlgSelectionModal } from './forecasting-alg-selection-modal';
+import type {
+  AlgorithmName } from '../../../../../shared/models/exploring/forecasting.model';
 import {
-  AlgorithmName,
   IXGBoostDefault,
   ILGBMDefault,
   ILinearRegressionDefault,
 } from '../../../../../shared/models/exploring/forecasting.model';
 import { setForecastingForm } from '../../../../../store/slices/exploring/forecastingSlice';
+import type {
+  RootState } from '../../../../../store/store';
 import {
-  RootState,
   useAppDispatch,
   useAppSelector,
 } from '../../../../../store/store';
@@ -52,6 +54,7 @@ export const ForecastingAlgSelection = () => {
         | typeof ILGBMDefault
         | typeof ILinearRegressionDefault
         | undefined;
+
       if (algName === 'XGBoost') defaults = IXGBoostDefault;
       else if (algName === 'LGBM') defaults = ILGBMDefault;
       else if (algName === 'LinearRegression')
@@ -70,6 +73,7 @@ export const ForecastingAlgSelection = () => {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = event.target.value;
+
     if (/^\d+$/.test(value) && +value >= 1 && +value <= 30) {
       setCustomNumber(+value);
       dispatch(
@@ -92,6 +96,7 @@ export const ForecastingAlgSelection = () => {
   const humanReadableDuration = (number: number) => {
     const intervals = ['15m', '30m', '1h', '6h'];
     const index = intervals.indexOf(forecastingForm.time_interval);
+
     if (index !== -1) {
       const totalMinutes =
         number * (index === 0 ? 15 : index === 1 ? 30 : index === 2 ? 60 : 360);
@@ -99,10 +104,12 @@ export const ForecastingAlgSelection = () => {
       const remainingMinutes = totalMinutes % (24 * 60);
       const hours = Math.floor(remainingMinutes / 60);
       const minutes = remainingMinutes % 60;
+
       return days > 0
         ? `${days}d ${hours}h ${minutes}m`
         : `${hours}h ${minutes}m`;
     }
+
     return '';
   };
 

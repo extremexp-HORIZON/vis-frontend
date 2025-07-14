@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import type { IUnivariateDataPoint } from '../../../../shared/models/exploring/univariate-datapoint.model';
 import type { VisualizationSpec } from 'react-vega';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
-import { RootState, useAppSelector } from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
 
 export interface ITSVisualizerProps {
   data: IUnivariateDataPoint[] | null;
@@ -26,6 +27,7 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
       const forecastingStartDate = data[0].timestamp;
       const forecastingEndDate = data[data.length - 1].timestamp;
       const forecastingDataSplit = forecastingForm.dataSplit;
+
       if (isInTrainStepper) {
         return [
           {
@@ -46,6 +48,7 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
         ];
       }
     }
+
     return null;
   };
 
@@ -66,6 +69,7 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
         datapoint.timestamp,
         datapoint.value,
       ]);
+
       setPredictionSeriesData(formattedPredictions);
     }
   }, [predictions]);

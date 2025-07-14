@@ -30,7 +30,7 @@ interface IOptionalFeatures {
 }
 /*  *************  */
 
-//Algorithms Interfaces
+// Algorithms Interfaces
 /*  *************  */
 interface IXGBoost {
   booster: 'gbtree' | 'gblinear' | 'dart';
@@ -74,7 +74,7 @@ export interface IModel {
 }
 /*  *************  */
 
-//Export Defaults
+// Export Defaults
 /*  *************  */
 export const IForecastingDefault: Readonly<IForecastingForm> = {
   startDate: null,
@@ -145,25 +145,25 @@ export const ILinearRegressionDefault: Readonly<ILinearRegression> = {
 export const IXGBoostIntervals = {
   booster: ['gbtree', 'gblinear', 'dart'],
   learning_rate: { min: 0, max: 1 },
-  max_depth: { min: 0, max: null }, //>0
-  min_child_weight: { min: 0, max: null }, //>0
-  gamma: { min: 0, max: null }, //>=0
-  lambda: { min: 0, max: null }, //>=0
-  alpha: { min: 0, max: null }, //>=0
+  max_depth: { min: 0, max: null }, // >0
+  min_child_weight: { min: 0, max: null }, // >0
+  gamma: { min: 0, max: null }, // >=0
+  lambda: { min: 0, max: null }, // >=0
+  alpha: { min: 0, max: null }, // >=0
   colsample_bytree: { min: 0, max: 1 },
-  n_estimators: { min: 0, max: 1 }, //>0
+  n_estimators: { min: 0, max: 1 }, // >0
 };
 
 export const ILGBMIntervals = {
   boosting_type: ['gbdt', 'dart', 'goss'],
   learning_rate: { min: 0, max: 1 },
-  max_depth: { min: 1, max: null }, //>=1
-  num_leaves: { min: 2, max: null }, //>=2
-  min_child_weight: { min: 0, max: null }, //>0
-  reg_alpha: { min: 0, max: 1 }, //>=0
-  reg_lambda: { min: 0, max: 1 }, //>=0
+  max_depth: { min: 1, max: null }, // >=1
+  num_leaves: { min: 2, max: null }, // >=2
+  min_child_weight: { min: 0, max: null }, // >0
+  reg_alpha: { min: 0, max: 1 }, // >=0
+  reg_lambda: { min: 0, max: 1 }, // >=0
   colsample_bytree: { min: 0, max: 1 },
-  n_estimators: { min: 0, max: 1 }, //>0
+  n_estimators: { min: 0, max: 1 }, // >0
 };
 
 export const IStringParameters = {

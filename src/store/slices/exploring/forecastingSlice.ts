@@ -1,13 +1,15 @@
 import { v4 as uuidV4 } from 'uuid';
 import { api } from '../../../app/api/api';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IForecastingResults } from '../../../shared/models/exploring/forecasting-results.model';
-import {
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import type { IForecastingResults } from '../../../shared/models/exploring/forecasting-results.model';
+import type {
   IForecastingForm,
-  IModel,
+  IModel } from '../../../shared/models/exploring/forecasting.model';
+import {
   IForecastingDefault,
 } from '../../../shared/models/exploring/forecasting.model';
-import { RootState } from '../../store';
+import type { RootState } from '../../store';
 
 interface ForecastingState {
   isInTrainStepper: boolean;
@@ -35,6 +37,7 @@ export const startTraining = createAsyncThunk(
     const state = thunkApi.getState() as RootState;
 
     const id = uuidV4();
+
     localStorage.setItem('id', id);
     const { data } = state.timeSeries;
     const { forecastingForm } = state.forecasting;
@@ -60,7 +63,9 @@ export const startTraining = createAsyncThunk(
     }
 
     const result = response.data;
+
     thunkApi.dispatch(setResults(result));
+
     return result;
   },
 );
