@@ -129,6 +129,12 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
   return (
     <Toolbar
       sx={{
+        minHeight: 48,
+        height: 48,
+        '@media (min-width:600px)': {
+          minHeight: 48,
+          height: 48,
+        },
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
         ...(numSelected > 0 &&
