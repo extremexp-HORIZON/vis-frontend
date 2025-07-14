@@ -17,6 +17,12 @@ import { BeautifyIcon } from '../../../../shared/utils/beautify-marker/leaflet-b
 import CustomPopup from './CustomPopup/custom-popup';
 import { HeatmapLayer } from './heatmap-layer';
 import { getRow } from '../../../../store/slices/exploring/datasetSlice';
+import { GeohashGridLayer } from './geohash-grid-layer';
+import { Box, IconButton } from '@mui/material';
+import {
+  Workspaces as WorkspacesIcon,
+  Grid4x4 as Grid4x4Icon,
+} from '@mui/icons-material';
 
 export interface IMapProps {
   id: string;
@@ -135,34 +141,34 @@ const SinglePoint = (props: {
         row &&
         row.length > 0 &&
         dataset.originalColumns && (
-        <CustomPopup
-          latlng={[selectedMarker.lat, selectedMarker.lng]}
-          onClose={() => {
-            setSelectedMarker(null);
-            // reset();
-          }}
-        >
-          <div>
-            {dataset.originalColumns.map((col, colIndex) => {
-              if (col.name === 'id') return null;
+          <CustomPopup
+            latlng={[selectedMarker.lat, selectedMarker.lng]}
+            onClose={() => {
+              setSelectedMarker(null);
+              // reset();
+            }}
+          >
+            <div>
+              {dataset.originalColumns.map((col, colIndex) => {
+                if (col.name === 'id') return null;
 
-              let val = row[colIndex];
+                let val = row[colIndex];
 
-              if (val == null) val = '';
+                if (val == null) val = '';
 
-              return (
-                <div key={colIndex}>
-                  <span>
-                    <b>{col.name}: </b>
-                    {val.startsWith('http') ? <a href={val}>{val}</a> : val}
-                  </span>
-                  <br></br>
-                </div>
-              );
-            })}
-          </div>
-        </CustomPopup>
-      )}
+                return (
+                  <div key={colIndex}>
+                    <span>
+                      <b>{col.name}: </b>
+                      {val.startsWith('http') ? <a href={val}>{val}</a> : val}
+                    </span>
+                    <br></br>
+                  </div>
+                );
+              })}
+            </div>
+          </CustomPopup>
+        )}
     </Marker>
   );
 };
@@ -182,6 +188,7 @@ export const Map = (props: IMapProps) => {
     lat: number;
     lng: number;
   } | null>(null);
+  const [showGeohashGrid, setShowGeohashGrid] = useState(false);
 
   const latitudeExtractor = useCallback(
     (r: [number, number, number?] | null) => (r && r[0] != null ? r[0] : 0),
@@ -228,9 +235,9 @@ export const Map = (props: IMapProps) => {
   const center: [number, number] =
     viewRect != null
       ? [
-        (viewRect.lat[0] + viewRect.lat[1]) / 2, // Midpoint of latitude
-        (viewRect.lon[0] + viewRect.lon[1]) / 2, // Midpoint of longitude
-      ]
+          (viewRect.lat[0] + viewRect.lat[1]) / 2, // Midpoint of latitude
+          (viewRect.lon[0] + viewRect.lon[1]) / 2, // Midpoint of longitude
+        ]
       : [51.505, -0.09];
 
   if (clusters) {
@@ -248,8 +255,22 @@ export const Map = (props: IMapProps) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapControl id={id} toggleClusterMap={toggleClusterMap} />
-        {clusterMap
-          ? clusters.map((cluster, index) => {
+        <Box
+          style={{ position: 'absolute', zIndex: 1000, right: 10, top: 220 }}
+        >
+          <IconButton
+            sx={{ backgroundColor: '#FFFFFF', borderRadius: 0, border: '2px solid rgba(0, 0, 0, 0.2)' }}
+            onClick={() => setShowGeohashGrid(g => !g)}
+            size="small"
+            disableRipple
+          >
+            {!showGeohashGrid ? <Grid4x4Icon /> : <WorkspacesIcon />}
+          </IconButton>
+        </Box>
+        {showGeohashGrid ? (
+          <GeohashGridLayer dataset={dataset} points={points} />
+        ) : clusterMap ? (
+          clusters.map((cluster, index) => {
             // every cluster point has coordinates
             // the point may be either a cluster or a single point
             const { totalCount, points, rsrp_rscp_rssi } = cluster.properties;
@@ -289,69 +310,66 @@ export const Map = (props: IMapProps) => {
                 }}
               >
                 {selectedClusterMarker &&
-                    selectedClusterMarker.lat ===
-                      cluster.geometry.coordinates[1] &&
-                    selectedClusterMarker.lng ===
-                      cluster.geometry.coordinates[0] && (
-                  <CustomPopup
-                    latlng={[
-                      cluster.geometry.coordinates[1],
-                      cluster.geometry.coordinates[0],
-                    ]}
-                    onClose={() => {
-                      setSelectedClusterMarker(null);
-                    }}
-                  >
-                    <div>
+                  selectedClusterMarker.lat ===
+                    cluster.geometry.coordinates[1] &&
+                  selectedClusterMarker.lng ===
+                    cluster.geometry.coordinates[0] && (
+                    <CustomPopup
+                      latlng={[
+                        cluster.geometry.coordinates[1],
+                        cluster.geometry.coordinates[0],
+                      ]}
+                      onClose={() => {
+                        setSelectedClusterMarker(null);
+                      }}
+                    >
                       <div>
-                        <span>
-                          <b>{dataset.measure0}:</b>{' '}
-                          {cluster.properties[dataset.measure0!] &&
-                                (
-                                  cluster.properties[
-                                    dataset.measure0!
-                                  ] as number
-                                ).toFixed(4)}
-                        </span>
-                        <br></br>
-                      </div>
-                      <div>
-                        <span>
-                          <b>{dataset.measure1}:</b>{' '}
-                          {cluster.properties[dataset.measure1!] &&
-                                (
-                                  cluster.properties[
-                                    dataset.measure1!
-                                  ] as number
-                                ).toFixed(4)}
-                        </span>
-                        <br></br>
-                      </div>
-                      {dataset.dimensions &&
-                            dataset.dimensions.map(dim => (
-                              <div key={dim}>
-                                <span>
-                                  <b>{dim}:</b>{' '}
-                                  {Array.isArray(cluster.properties[dim])
-                                    ? // Check if there are more than 10 items
+                        <div>
+                          <span>
+                            <b>{dataset.measure0}:</b>{' '}
+                            {cluster.properties[dataset.measure0!] &&
+                              (
+                                cluster.properties[dataset.measure0!] as number
+                              ).toFixed(4)}
+                          </span>
+                          <br></br>
+                        </div>
+                        <div>
+                          <span>
+                            <b>{dataset.measure1}:</b>{' '}
+                            {cluster.properties[dataset.measure1!] &&
+                              (
+                                cluster.properties[dataset.measure1!] as number
+                              ).toFixed(4)}
+                          </span>
+                          <br></br>
+                        </div>
+                        {dataset.dimensions &&
+                          dataset.dimensions.map(dim => (
+                            <div key={dim}>
+                              <span>
+                                <b>{dim}:</b>{' '}
+                                {Array.isArray(cluster.properties[dim])
+                                  ? // Check if there are more than 10 items
                                     cluster.properties[dim].length > 10
-                                      ? // Join the first 10 items and add ellipsis
+                                    ? // Join the first 10 items and add ellipsis
                                       `${cluster.properties[dim].slice(0, 10).join(', ')}...`
-                                      : // Join all items if 10 or fewer
+                                    : // Join all items if 10 or fewer
                                       cluster.properties[dim].join(', ')
-                                    : // Handle the case where it's not an array
+                                  : // Handle the case where it's not an array
                                     cluster.properties[dim]}
-                                </span>
-                                <br />
-                              </div>
-                            ))}
-                    </div>
-                  </CustomPopup>
-                )}
+                              </span>
+                              <br />
+                            </div>
+                          ))}
+                      </div>
+                    </CustomPopup>
+                  )}
               </Marker>
             );
           })
-          : points && (
+        ) : (
+          points && (
             <HeatmapLayer
               fitBoundsOnLoad
               points={points}
@@ -375,7 +393,8 @@ export const Map = (props: IMapProps) => {
                 1.0: '#FF0000',
               }}
             />
-          )}
+          )
+        )}
         <ZoomControl position="topright" />
         <MapSearch />
       </MapContainer>
