@@ -236,7 +236,7 @@ const Histogram = ({ columnName, dataset, workflowId,color }: IHistogramProps) =
         <Box
           sx={{
             height: 180,
-            width: 300,
+            width: 150,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -249,7 +249,7 @@ const Histogram = ({ columnName, dataset, workflowId,color }: IHistogramProps) =
         <Box
           sx={{
             height: 180,
-            width: 300,
+            width: 150,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
