@@ -52,7 +52,6 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
     (state) => state.monitorPage.workflowsTable.workflowColors
   );
 
-
   const getStatValue = (col: string, statKey: StatKey) => {
     const colSummary = summary.find(s => s.column_name === col);
     const value = colSummary?.[statKey];
