@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
@@ -36,6 +36,45 @@ const ComparisonDataCharts = () => {
   const filteredAssets = selectedDataset
     ? { [selectedDataset]: commonDataAssets[selectedDataset] }
     : {};
+
+  const scrollRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  useLayoutEffect(() => {
+    const containers = scrollRefs.current;
+  
+    if (containers.length === 0) return;
+  
+    let isSyncing = false;
+  
+    const handleScroll = (source: HTMLElement) => () => {
+      if (isSyncing) return;
+      isSyncing = true;
+    
+      const scrollLeft = source.scrollLeft;
+    
+      containers.forEach((el) => {
+        if (el && el !== source) {
+          el.scrollLeft = scrollLeft;
+        }
+      });
+    
+      isSyncing = false;
+    };
+  
+    containers.forEach((el) => {
+      if (el) {
+        el.addEventListener('scroll', handleScroll(el));
+      }
+    });
+  
+    return () => {
+      containers.forEach((el) => {
+        if (el) {
+          el.removeEventListener('scroll', handleScroll(el));
+        }
+      });
+    };
+  }, [filteredAssets, selectedDataset]);
 
   const getCommonDataAssets = () => {
     if (selectedWorkflowIds.length === 0) return {};
@@ -76,6 +115,8 @@ const ComparisonDataCharts = () => {
 
   useEffect(() => {
     const names = Object.keys(commonDataAssets);
+
+    if (selectedDataset && names.includes(selectedDataset)) return;
 
     if (names.length > 0) {
       dispatch(setSelectedDataset(names[0]));
@@ -161,17 +202,22 @@ const ComparisonDataCharts = () => {
   }, [filteredAssets, dataAssetsMetaData]);
 
   const renderCharts = selectedDataset && filteredAssets[selectedDataset]
-    ? filteredAssets[selectedDataset].map(({ workflowId, dataAsset }) => {
+    ? filteredAssets[selectedDataset].map(({ workflowId, dataAsset }, index) => {
       const meta = dataAssetsMetaData?.[selectedDataset]?.[workflowId]?.meta;
 
       const isLoading = meta?.loading;
       const hasError = meta?.error && !meta.loading;
       const summary = meta?.data?.summary || [];
 
+      const setScrollRef = (el: HTMLDivElement | null) => {
+        scrollRefs.current[index] = el;
+      };
+
+
       if (isLoading) {
         return (
           <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
-            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={400} showSettings={false}>
+            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={200} showSettings={false}>
               <Loader />
             </ResponsiveCardTable>
           </Grid>
@@ -181,7 +227,7 @@ const ComparisonDataCharts = () => {
       if (hasError || !summary.length) {
         return (
           <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
-            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={400} showSettings={false}>
+            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={200} showSettings={false}>
               <InfoMessage
                 message="No summary stats found for this workflow."
                 type="info"
@@ -195,8 +241,8 @@ const ComparisonDataCharts = () => {
 
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
-          <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={400} showSettings={false} noPadding={true}>
-            <SummaryTable summary={summary} dataset={dataAsset} workflowId={workflowId} />
+          <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={200} showSettings={false} noPadding={true}>
+            <SummaryTable dataset={dataAsset} workflowId={workflowId} scrollRef={setScrollRef} />
           </ResponsiveCardTable>
         </Grid>
       );

@@ -1,48 +1,18 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Paper,
-  Box,
-  Typography,
-} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { IMetaDataSummary } from '../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import Histogram from './comparative-data-histogram';
-import { useMemo } from 'react';
-import type { RootState } from '../../../store/store';
 import { useAppSelector } from '../../../store/store';
+import type { RootState } from '../../../store/store';
 
 export interface SummaryTableProps {
-  summary: IMetaDataSummary[];
   dataset: IDataAsset;
   workflowId: string;
   title?: string;
+  scrollRef?: (el: HTMLDivElement | null) => void;
 }
 
-type StatKey = keyof IMetaDataSummary;
-
-const stats: { key: StatKey; label: string }[] = [
-  // { key: 'min', label: 'Min' },
-  // { key: 'max', label: 'Max' },
-  { key: 'avg', label: 'Avg' },
-  { key: 'std', label: 'Std' },
-  { key: 'approx_unique', label: 'Unique' },
-  { key: 'null_percentage', label: 'Null %' },
-];
-
-const stickyCellSx = {
-  position: 'sticky',
-  left: 0,
-  zIndex: 999,
-  backgroundColor: 'background.paper',
-  fontWeight: 'bold',
-};
-
-const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps) => {
-
+const SummaryTable = ({ dataset, workflowId, title, scrollRef }: SummaryTableProps) => {
   const selectedColumns = useAppSelector(
     (state: RootState) =>
       state.monitorPage.comparativeDataExploration.dataAssetsControlPanel[dataset.name]?.selectedColumns ?? []
@@ -52,14 +22,6 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
     (state) => state.monitorPage.workflowsTable.workflowColors
   );
 
-
-  const getStatValue = (col: string, statKey: StatKey) => {
-    const colSummary = summary.find(s => s.column_name === col);
-    const value = colSummary?.[statKey];
-
-    return value != null ? Number(value).toFixed(3) : '—';
-  };
-
   return (
     <Box sx={{ width: '100%' }}>
       {title && (
@@ -67,35 +29,21 @@ const SummaryTable = ({ summary, dataset, workflowId, title }: SummaryTableProps
           {title}
         </Typography>
       )}
-      <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
-        <Table size="small">
-          <TableBody>
-            {/* Histogram Row */}
-            <TableRow>
-              <TableCell sx={stickyCellSx}/>
-              {selectedColumns.map(col => (
-                <TableCell key={col} align="center">
-                  <Box sx={{ height: 220, width: '100%' }}>
-                    <Histogram columnName={col} dataset={dataset} workflowId={workflowId} color={workflowColors[workflowId]} />
-                  </Box>
-                </TableCell>
-              ))}
-            </TableRow>
 
-            {/* Summary Stat Rows */}
-            {stats.map(({ key, label }) => (
-              <TableRow key={key}>
-                <TableCell sx={stickyCellSx}>{label}</TableCell>
-                {selectedColumns.map(col => (
-                  <TableCell key={col} align="center">
-                    {getStatValue(col, key)}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box ref={scrollRef} sx={{ p: 2, overflowX: 'auto' }}>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          {selectedColumns.map((col) => (
+            <Box key={col} sx={{ minWidth: 200, flexShrink: 0 }}>
+              <Histogram
+                columnName={col}
+                dataset={dataset}
+                workflowId={workflowId}
+                color={workflowColors[workflowId]}
+              />
+            </Box>
+          ))}
+        </Box>
+      </Box>
     </Box>
   );
 };

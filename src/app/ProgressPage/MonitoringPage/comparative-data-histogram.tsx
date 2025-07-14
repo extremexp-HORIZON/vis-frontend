@@ -218,7 +218,7 @@ const Histogram = ({ columnName, dataset, workflowId,color }: IHistogramProps) =
   return (
     <Box sx={{ height: '99%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {(histogramData?.loading || metaLoading || shouldShowInfoMessage) && (
-        <Box sx={{ width: 300, mb: 1 }}>
+        <Box sx={{ width: 150, mb: 1 }}>
           <Typography
             variant="subtitle2"
             sx={{
