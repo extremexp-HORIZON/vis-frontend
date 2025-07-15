@@ -197,10 +197,11 @@ const BarChartControlPanel = () => {
               onDelete={() => {
                 const updatedAggs = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
                   ?.filter(a => !(a.column === aggr.column && a.function === aggr.function)) || [];
-              
+
                 dispatch(setControls({ barAggregation: updatedAggs }));
-              
+
                 const remainingForColumn = updatedAggs.filter(a => a.column === aggr.column);
+
                 if (
                   selectedColumn === aggr.column &&
                   remainingForColumn.length === 0

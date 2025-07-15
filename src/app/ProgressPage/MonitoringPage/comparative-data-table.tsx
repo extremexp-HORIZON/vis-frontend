@@ -1,5 +1,4 @@
 import { Box, Typography } from '@mui/material';
-import type { IMetaDataSummary } from '../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 import Histogram from './comparative-data-histogram';
 import { useAppSelector } from '../../../store/store';

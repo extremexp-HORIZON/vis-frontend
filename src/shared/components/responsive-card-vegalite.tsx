@@ -377,7 +377,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     sx: {
                       width: 320,
                       maxHeight: 500,
-                      overflowY: 'auto',
+                      overflowY: 'hidden',
                       overflowX: 'hidden',
                       padding: 0,
                       borderRadius: '12px',
@@ -399,35 +399,42 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     icon={<SettingsSuggestIcon fontSize="small" />}
                     title="Chart Options"
                   />
-                  {controlPanel && (
-                    <>
-                      <Box sx={{ p: 2 }}>{controlPanel}</Box>
-                      <Divider sx={{ mt: 1, opacity: 0.6 }} />
-                    </>
-                  )}
-                  <Box sx={{ py: 1 }}>
-                    <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
-                      <ListItemIcon>
-                        <DownloadIcon fontSize="small" color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Download as PNG"
-                        secondary="Save chart as image"
-                        primaryTypographyProps={{ fontWeight: 500 }}
-                        secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                      />
-                    </MenuItem>
-                    <MenuItem onClick={handleDownloadData} sx={{ py: 1.5 }}>
-                      <ListItemIcon>
-                        <CodeIcon fontSize="small" color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Download Data as JSON"
-                        secondary="Export chart's underlying data"
-                        primaryTypographyProps={{ fontWeight: 500 }}
-                        secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                      />
-                    </MenuItem>
+                  <Box
+                    sx={{
+                      overflowY: 'auto',
+                      maxHeight: 400,
+                    }}
+                  >
+                    {controlPanel && (
+                      <>
+                        <Box sx={{ p: 2 }}>{controlPanel}</Box>
+                        <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                      </>
+                    )}
+                    <Box sx={{ py: 1 }}>
+                      <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
+                        <ListItemIcon>
+                          <DownloadIcon fontSize="small" color="primary" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Download as PNG"
+                          secondary="Save chart as image"
+                          primaryTypographyProps={{ fontWeight: 500 }}
+                          secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                        />
+                      </MenuItem>
+                      <MenuItem onClick={handleDownloadData} sx={{ py: 1.5 }}>
+                        <ListItemIcon>
+                          <CodeIcon fontSize="small" color="primary" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Download Data as JSON"
+                          secondary="Export chart's underlying data"
+                          primaryTypographyProps={{ fontWeight: 500 }}
+                          secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                        />
+                      </MenuItem>
+                    </Box>
                   </Box>
                 </Menu>
               </>
