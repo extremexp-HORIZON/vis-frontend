@@ -184,15 +184,15 @@ const Histogram = ({ columnName, dataset, workflowId, color }: IHistogramProps) 
         type: 'ordinal',
         title: null,
         axis: {
-          labels: false,   // 👈 hides labels
-          ticks: false,    // optional: hides tick marks
-          domain: false    // optional: hides the axis line
+          labels: false,
+          ticks: false,
+          domain: false
         },
 
-        sort: {
+        sort: isNumericColumn ? {
           op: 'min',
           field: 'xStart'
-        }
+        } : 'ascending'
       },
       y: {
         field: 'count',

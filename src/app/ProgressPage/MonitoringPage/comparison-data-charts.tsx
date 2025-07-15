@@ -41,32 +41,32 @@ const ComparisonDataCharts = () => {
 
   useLayoutEffect(() => {
     const containers = scrollRefs.current;
-  
+
     if (containers.length === 0) return;
-  
+
     let isSyncing = false;
-  
+
     const handleScroll = (source: HTMLElement) => () => {
       if (isSyncing) return;
       isSyncing = true;
-    
+
       const scrollLeft = source.scrollLeft;
-    
+
       containers.forEach((el) => {
         if (el && el !== source) {
           el.scrollLeft = scrollLeft;
         }
       });
-    
+
       isSyncing = false;
     };
-  
+
     containers.forEach((el) => {
       if (el) {
         el.addEventListener('scroll', handleScroll(el));
       }
     });
-  
+
     return () => {
       containers.forEach((el) => {
         if (el) {
@@ -213,11 +213,10 @@ const ComparisonDataCharts = () => {
         scrollRefs.current[index] = el;
       };
 
-
       if (isLoading) {
         return (
           <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
-            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={200} showSettings={false}>
+            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
               <Loader />
             </ResponsiveCardTable>
           </Grid>
@@ -227,7 +226,7 @@ const ComparisonDataCharts = () => {
       if (hasError || !summary.length) {
         return (
           <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
-            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={200} showSettings={false}>
+            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
               <InfoMessage
                 message="No summary stats found for this workflow."
                 type="info"
@@ -241,7 +240,7 @@ const ComparisonDataCharts = () => {
 
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
-          <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={200} showSettings={false} noPadding={true}>
+          <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false} noPadding={true}>
             <SummaryTable dataset={dataAsset} workflowId={workflowId} scrollRef={setScrollRef} />
           </ResponsiveCardTable>
         </Grid>
