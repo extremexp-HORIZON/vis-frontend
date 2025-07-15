@@ -6,6 +6,7 @@ import {
   FormControl,
   createTheme,
   ThemeProvider,
+  Chip,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
@@ -188,6 +189,30 @@ const BarChartControlPanel = () => {
             ))}
           </Select>
         </FormControl>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pt: 0.5 }}>
+          {(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || []).map(aggr => (
+            <Chip
+              key={`${aggr.function}-${aggr.column}`}
+              label={`${aggr.function.toLowerCase()}_${aggr.column}`}
+              onDelete={() => {
+                const updatedAggs = tab?.workflowTasks.dataExploration?.controlPanel.barAggregation
+                  ?.filter(a => !(a.column === aggr.column && a.function === aggr.function)) || [];
+              
+                dispatch(setControls({ barAggregation: updatedAggs }));
+              
+                const remainingForColumn = updatedAggs.filter(a => a.column === aggr.column);
+                if (
+                  selectedColumn === aggr.column &&
+                  remainingForColumn.length === 0
+                ) {
+                  dispatch(setControls({ selectedMeasureColumn: '' }));
+                }
+              }}
+              color="default"
+              size="small"
+            />
+          ))}
+        </Box>
       </Box>
     </ThemeProvider>
   );

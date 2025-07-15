@@ -120,7 +120,7 @@ const LineChart = () => {
 
     return {
       data: { values: longData },
-      mark: { type: 'line', tooltip: true },
+      mark: { type: 'line', tooltip: true, point: { size: 20} },
       encoding: {
         x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
         y: { field: 'value', type: 'quantitative', title: 'Value' },
