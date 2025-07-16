@@ -69,6 +69,7 @@ interface IMonitoringPageSlice {
         data: Record<string, string | number | boolean | null | undefined>[]
         options: string[]
         selected: string
+        selectedParams: string[]
       }
       workflowsTable: {
         order: 'asc' | 'desc'
@@ -185,7 +186,7 @@ const generateUniqueColor = (existingColors: Set<string>) => {
   return newColor;
 };
 const initialState: IMonitoringPageSlice = {
-  parallel: { data: [], options: [], selected: '' },
+  parallel: { data: [], options: [], selected: '', selectedParams: [] },
   workflowsTable: {
     order: 'asc',
     orderBy: 'id',

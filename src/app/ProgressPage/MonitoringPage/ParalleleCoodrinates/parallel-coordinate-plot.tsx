@@ -15,6 +15,13 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import type { IMetric } from '../../../../shared/models/experiment/metric.model';
 import type { ParallelDataItem } from '../../../../shared/types/parallel.types';
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Popover, Tooltip } from '@mui/material';
+import { SectionHeader } from '../../../../shared/components/responsive-card-table';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import { GridTableRowsIcon } from '@mui/x-data-grid';
+import PaletteIcon from '@mui/icons-material/Palette';
+import Grid3x3Icon from '@mui/icons-material/Grid3x3';
 
 const ParallelCoordinatePlot = () => {
   const { workflows } =
@@ -23,8 +30,27 @@ const ParallelCoordinatePlot = () => {
   const [parallelData, setParallelData] = useState<ParallelDataItem[]>([]);
   const foldArray = useRef<string[]>([]);
   const tooltipArray = useRef<{ [key: string]: string }[]>([]);
+  const [ColoranchorEl, setColorAnchorEl] = useState<null | HTMLElement>(null);
+  const [ParamsanchorEl, setParamsAnchorEl] = useState<null | HTMLElement>(null);
+  const selectedParams = parallel?.selectedParams ?? [];
 
   const dispatch = useAppDispatch();
+
+  const handleColorOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setColorAnchorEl(event.currentTarget);
+  };
+
+  const handleColorClose = () => setColorAnchorEl(null);
+
+  const colorOpen = Boolean(ColoranchorEl);
+
+  const handleParamsOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setParamsAnchorEl(event.currentTarget);
+  };
+
+  const handleParamsClose = () => setParamsAnchorEl(null);
+
+  const paramsOpen = Boolean(ParamsanchorEl);
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -94,13 +120,19 @@ const ParallelCoordinatePlot = () => {
           data,
           options,
           selected,
+          selectedParams: foldArray.current
         }),
       );
     }
   }, [workflows.data]);
 
-  const handleMetricSelection = (event: SelectChangeEvent) => {
-    dispatch(setParallel({ selected: event.target.value as string }));
+  const handleMetricSelection = (feature: string) => {
+    dispatch(setParallel({ selected: feature }));
+  };
+
+  const handleParamsSelesction = (params: string[]) => {
+    foldArray.current = params;
+    dispatch(setParallel({ selectedParams: params }));
   };
 
   const processedData = useMemo(() => {
@@ -137,33 +169,130 @@ const ParallelCoordinatePlot = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography/>
         <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5 }}>
-          <Typography fontSize={'0.8rem'}>Color by:</Typography>
-          <FormControl
-            sx={{ m: 1, minWidth: 120, maxHeight: 120 }}
-            size="small"
-          >
-            <Select
-              value={parallel.selected}
-              sx={{ fontSize: '0.8rem' }}
-              onChange={handleMetricSelection}
-              disabled={parallel.options.length === 0}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
-                  },
-                },
-              }}
-            >
-              {parallel.options.map(feature => (
-                <MenuItem key={`${feature}`} value={feature}>
-                  {feature}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Tooltip title="Parameters">
+            <IconButton onClick={handleParamsOpen}>
+              <Grid3x3Icon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Color By">
+            <IconButton onClick={handleColorOpen}>
+              <PaletteIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
+        <Popover
+          id='Parameters'
+          open={paramsOpen}
+          anchorEl={ParamsanchorEl}
+          onClose={handleParamsClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          PaperProps={{
+            elevation: 3,
+            sx: {
+              width: 300,
+              maxHeight: 500,
+              overflow: 'hidden',
+              padding: 0,
+              borderRadius: '12px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+              border: '1px solid rgba(0,0,0,0.04)',
+              mt: 1,
+              '& .MuiList-root': {
+                padding: 0,
+              }
+            },
+          }}
+        >
+          <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Parameters" />
+          <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
+            {Array.from(new Set(parallelData.flatMap(item => Object.keys(item)).filter(k => !['workflowId', 'selected', 'rating', ...parallel.options].includes(k))))
+              .map(param => (
+                <ListItem
+                  key={param}
+                  disablePadding
+                  sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+                >
+                  <ListItemButton
+                    dense
+                    onClick={() => {
+                      const updated = selectedParams.includes(param)
+                        ? selectedParams.filter(paramName => paramName !== param)
+                        : [...selectedParams, param];
+
+                      handleParamsSelesction(updated);
+
+                    }}
+                  >
+                    <ListItemIcon>
+                      {parallel.selectedParams?.includes(param) ? (
+                        <CheckBoxIcon color="primary" fontSize="small" />
+                      ) : (
+                        <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={param}
+                      primaryTypographyProps={{ fontSize: '0.95rem' }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+          </List>
+        </Popover>
+        <Popover
+          id='ColorBy'
+          open={colorOpen}
+          anchorEl={ColoranchorEl}
+          onClose={handleColorClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          PaperProps={{
+            elevation: 3,
+            sx: {
+              width: 300,
+              maxHeight: 500,
+              overflow: 'hidden',
+              padding: 0,
+              borderRadius: '12px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+              border: '1px solid rgba(0,0,0,0.04)',
+              mt: 1,
+              '& .MuiList-root': {
+                padding: 0,
+              }
+            },
+          }}
+        >
+          <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Metrics" />
+          <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
+            {parallel.options.map(feature => (
+              <ListItem
+                key={feature}
+                disablePadding
+                sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+              >
+                <ListItemButton
+                  dense
+                  onClick={() => {
+                    handleMetricSelection(feature);
+                  }}
+                >
+                  <ListItemIcon>
+                    {feature === parallel.selected ? (
+                      <CheckBoxIcon color="primary" fontSize="small" />
+                    ) : (
+                      <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                    )}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={feature}
+                    primaryTypographyProps={{ fontSize: '0.95rem' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Popover>
       </Box>
       {
         parallel.options.length > 0 ? (
