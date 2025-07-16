@@ -44,6 +44,24 @@ const ToggleControl = L.Control.extend({
       }
     });
 
+    // Prevent double-click and drag events from interfering with the map
+    L.DomEvent.on(container, 'dblclick', function (e) {
+      L.DomEvent.stopPropagation(e);
+      L.DomEvent.preventDefault(e);
+    });
+
+    L.DomEvent.on(container, 'mousedown', function (e) {
+      L.DomEvent.stopPropagation(e);
+    });
+
+    L.DomEvent.on(container, 'mouseup', function (e) {
+      L.DomEvent.stopPropagation(e);
+    });
+
+    L.DomEvent.on(container, 'mousemove', function (e) {
+      L.DomEvent.stopPropagation(e);
+    });
+
     return container;
   },
   onRemove: function () {},
@@ -76,6 +94,24 @@ const GeohashGridToggleControl = L.Control.extend({
       if (map._toggleGeohashGrid) {
         map._toggleGeohashGrid();
       }
+    });
+
+    // Prevent double-click and drag events from interfering with the map
+    L.DomEvent.on(container, 'dblclick', function (e) {
+      L.DomEvent.stopPropagation(e);
+      L.DomEvent.preventDefault(e);
+    });
+
+    L.DomEvent.on(container, 'mousedown', function (e) {
+      L.DomEvent.stopPropagation(e);
+    });
+
+    L.DomEvent.on(container, 'mouseup', function (e) {
+      L.DomEvent.stopPropagation(e);
+    });
+
+    L.DomEvent.on(container, 'mousemove', function (e) {
+      L.DomEvent.stopPropagation(e);
     });
 
     return container;

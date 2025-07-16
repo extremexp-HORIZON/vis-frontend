@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useMap } from 'react-leaflet';
+import L from 'leaflet';
 
 interface NominatimResult {
   display_name: string;
@@ -88,6 +89,47 @@ const MapSearch: React.FC = () => {
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  // Add Leaflet event handling to prevent map interactions
+  useEffect(() => {
+    if (!anchorRef.current) return;
+
+    const container = anchorRef.current;
+
+    // Only prevent events that interfere with map functionality
+    const preventDoubleClick = (e: Event) => {
+      L.DomEvent.stopPropagation(e);
+      L.DomEvent.preventDefault(e);
+    };
+
+    const preventDrag = (e: Event) => {
+      L.DomEvent.stopPropagation(e);
+      // Don't prevent default for mousedown/mouseup to allow text selection
+    };
+
+    const preventWheel = (e: Event) => {
+      L.DomEvent.stopPropagation(e);
+      L.DomEvent.preventDefault(e);
+    };
+
+    // Add event listeners using Leaflet's DomEvent
+    L.DomEvent.on(container, 'dblclick', preventDoubleClick);
+    L.DomEvent.on(container, 'mousedown', preventDrag);
+    L.DomEvent.on(container, 'mouseup', preventDrag);
+    L.DomEvent.on(container, 'mousemove', preventDrag);
+    L.DomEvent.on(container, 'wheel', preventWheel);
+    L.DomEvent.on(container, 'contextmenu', preventDoubleClick);
+
+    return () => {
+      // Clean up event listeners
+      L.DomEvent.off(container, 'dblclick', preventDoubleClick);
+      L.DomEvent.off(container, 'mousedown', preventDrag);
+      L.DomEvent.off(container, 'mouseup', preventDrag);
+      L.DomEvent.off(container, 'mousemove', preventDrag);
+      L.DomEvent.off(container, 'wheel', preventWheel);
+      L.DomEvent.off(container, 'contextmenu', preventDoubleClick);
     };
   }, []);
 
