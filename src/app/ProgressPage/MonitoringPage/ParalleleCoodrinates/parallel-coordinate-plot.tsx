@@ -263,7 +263,7 @@ const ParallelCoordinatePlot = () => {
             },
           }}
         >
-          <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Metrics" />
+          <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Color By" />
           <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
             {parallel.options.map(feature => (
               <ListItem
