@@ -216,9 +216,17 @@ const ParallelCoordinatePlot = () => {
                   <ListItemButton
                     dense
                     onClick={() => {
-                      const updated = selectedParams.includes(param)
-                        ? selectedParams.filter(paramName => paramName !== param)
-                        : [...selectedParams, param];
+                      const isSelected = selectedParams.includes(param);
+
+                      let updated: string[];
+                      if (isSelected) {
+                        if (selectedParams.length === 1) {
+                          return;
+                        }
+                        updated = selectedParams.filter(paramName => paramName !== param);
+                      } else {
+                        updated = [...selectedParams, param];
+                      }
 
                       handleParamsSelesction(updated);
 
