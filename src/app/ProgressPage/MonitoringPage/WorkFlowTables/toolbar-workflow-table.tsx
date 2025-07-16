@@ -255,7 +255,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 elevation: 3,
                 sx: {
                   width: 300,
-                  maxHeight: 500,
+                  maxHeight: 250,
                   overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
@@ -270,7 +270,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             >
               <SectionHeader icon={<TableRowsIcon fontSize="small" />} title="Visible Columns" />
 
-              <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
+              <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
                 {visibleTable === 'workflows'
                   ? workflowsTable.visibleColumns.slice(0, -1).map(column => (
                     <ListItem
@@ -355,7 +355,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 elevation: 3,
                 sx: {
                   width: 300,
-                  maxHeight: 500,
+                  maxHeight: 250,
                   overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
@@ -370,7 +370,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             >
               <SectionHeader icon={<CategoryIcon fontSize="small" />} title="Group By" />
 
-              <List sx={{ width: '100%', py: 0, maxHeight: 300, overflow: 'auto' }}>
+              <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
                 {groupByOptions?.map(option => (
                   <ListItem
                     key={option}

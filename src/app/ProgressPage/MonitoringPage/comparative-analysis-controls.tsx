@@ -167,7 +167,7 @@ const ComparativeAnalysisControls = ()=> {
                 elevation: 3,
                 sx: {
                   width: 300,
-                  maxHeight: 500,
+                  maxHeight: 250,
                   overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
@@ -182,7 +182,7 @@ const ComparativeAnalysisControls = ()=> {
             >
               <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Visible Columns" />
 
-              <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
+              <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
                 {commonColumns.map(column => (
                   <ListItem
                     key={column.name}

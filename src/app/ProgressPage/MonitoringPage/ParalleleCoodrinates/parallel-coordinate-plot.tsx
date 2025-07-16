@@ -191,7 +191,7 @@ const ParallelCoordinatePlot = () => {
             elevation: 3,
             sx: {
               width: 300,
-              maxHeight: 500,
+              maxHeight: 250,
               overflow: 'hidden',
               padding: 0,
               borderRadius: '12px',
@@ -205,7 +205,7 @@ const ParallelCoordinatePlot = () => {
           }}
         >
           <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Parameters" />
-          <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
+          <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
             {Array.from(new Set(parallelData.flatMap(item => Object.keys(item)).filter(k => !['workflowId', 'selected', 'rating', ...parallel.options].includes(k))))
               .map(param => (
                 <ListItem
@@ -250,7 +250,7 @@ const ParallelCoordinatePlot = () => {
             elevation: 3,
             sx: {
               width: 300,
-              maxHeight: 500,
+              maxHeight: 250,
               overflow: 'hidden',
               padding: 0,
               borderRadius: '12px',
@@ -264,7 +264,7 @@ const ParallelCoordinatePlot = () => {
           }}
         >
           <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Color By" />
-          <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
+          <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
             {parallel.options.map(feature => (
               <ListItem
                 key={feature}
