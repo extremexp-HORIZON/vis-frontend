@@ -283,7 +283,7 @@ const InstanceView = () => {
       </Box>
 
       {chartType === 'scatter' && (
-        <Box sx={{ height: '60%', minHeight: 400 }}>
+        <Box sx={{ height: point ? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
@@ -295,7 +295,7 @@ const InstanceView = () => {
       )}
 
       {chartType === 'datatable' && (
-        <Box sx={{ height: '60%', minHeight: 400 }}>
+        <Box sx={{ height: point ? '60%' : 'calc(100% - 64px)', minHeight: 400}}>
           <ResponsiveCardTable
             title="Instance Classification Table"
             onDownload={handleExportCsv}
