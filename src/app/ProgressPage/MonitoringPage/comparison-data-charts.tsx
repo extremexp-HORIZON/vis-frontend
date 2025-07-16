@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import {
@@ -8,13 +7,14 @@ import {
 } from '@mui/material';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, type CommonDataAssets } from '../../../store/slices/monitorPageSlice';
+import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, setSelectedDataset, type CommonDataAssets } from '../../../store/slices/monitorPageSlice';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import type { VisualColumn } from '../../../shared/models/dataexploration.model';
 import Loader from '../../../shared/components/loader';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import SummaryTable from './comparative-data-table';
 
-const ComparisonDataCharts: React.FC = () => {
+const ComparisonDataCharts = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
@@ -23,13 +23,58 @@ const ComparisonDataCharts: React.FC = () => {
   const experimentId = useAppSelector(
     (state: RootState) => state.progressPage.experiment.data?.id || '',
   );
+  const selectedDataset = useAppSelector(
+    (state: RootState) => state.monitorPage.comparativeDataExploration.selectedDataset
+  );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
   const isMosaic = useAppSelector(
     (state: RootState) => state.monitorPage.isMosaic,
   );
-  const { hoveredWorkflowId } = workflowsTable;
   const dispatch = useAppDispatch();
   const { commonDataAssets, dataAssetsMetaData } = comparativeDataExploration;
+
+  const filteredAssets = selectedDataset
+    ? { [selectedDataset]: commonDataAssets[selectedDataset] }
+    : {};
+
+  const scrollRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  useLayoutEffect(() => {
+    const containers = scrollRefs.current;
+
+    if (containers.length === 0) return;
+
+    let isSyncing = false;
+
+    const handleScroll = (source: HTMLElement) => () => {
+      if (isSyncing) return;
+      isSyncing = true;
+
+      const scrollLeft = source.scrollLeft;
+
+      containers.forEach((el) => {
+        if (el && el !== source) {
+          el.scrollLeft = scrollLeft;
+        }
+      });
+
+      isSyncing = false;
+    };
+
+    containers.forEach((el) => {
+      if (el) {
+        el.addEventListener('scroll', handleScroll(el));
+      }
+    });
+
+    return () => {
+      containers.forEach((el) => {
+        if (el) {
+          el.removeEventListener('scroll', handleScroll(el));
+        }
+      });
+    };
+  }, [filteredAssets, selectedDataset]);
 
   const getCommonDataAssets = () => {
     if (selectedWorkflowIds.length === 0) return {};
@@ -39,6 +84,8 @@ const ComparisonDataCharts: React.FC = () => {
     for (const workflow of selectedWorkflows) {
       for (const asset of workflow.dataAssets) {
         const name = asset.name;
+
+        if(!asset.source) continue;
 
         if (!assetGroups[name]) {
           assetGroups[name] = [];
@@ -67,43 +114,56 @@ const ComparisonDataCharts: React.FC = () => {
   }, [selectedWorkflowIds]);
 
   useEffect(() => {
-    if (!commonDataAssets) return;
+    const names = Object.keys(commonDataAssets);
 
-    Object.entries(commonDataAssets)
-      .flatMap(([assetName, assetList]) =>
-        assetList.forEach(({ workflowId, dataAsset }) => {
-          const alreadyFetched = dataAssetsMetaData?.[assetName]?.[workflowId]?.meta;
+    if (selectedDataset && names.includes(selectedDataset)) return;
 
-          if (
-            alreadyFetched?.loading ||
-            alreadyFetched?.data ||
-            alreadyFetched?.error === null
-          ) {
-            return;
-          }
-
-          dispatch(
-            fetchMetaData({
-              query: {
-                source: dataAsset?.source || '',
-                format: dataAsset?.format || '',
-                sourceType: dataAsset?.sourceType || '',
-                fileName: dataAsset?.name || ''
-              },
-              metadata: {
-                workflowId: workflowId,
-                queryCase: 'metaData',
-                assetName: dataAsset.name,
-              }
-            })
-          );
-        })
-      );
-
+    if (names.length > 0) {
+      dispatch(setSelectedDataset(names[0]));
+    } else {
+      dispatch(setSelectedDataset(null));
+    }
   }, [commonDataAssets]);
 
   useEffect(() => {
-    Object.entries(commonDataAssets).forEach(([assetName, assetList]) => {
+    if (!filteredAssets) return;
+
+    Object.entries(filteredAssets).forEach(([assetName, assetList]) => {
+      if (!Array.isArray(assetList)) return;
+      assetList.forEach(({ workflowId, dataAsset }) => {
+        const alreadyFetched = dataAssetsMetaData?.[assetName]?.[workflowId]?.meta;
+
+        if (
+          alreadyFetched?.loading ||
+        alreadyFetched?.data ||
+        alreadyFetched?.error
+        ) {
+          return;
+        }
+
+        dispatch(
+          fetchMetaData({
+            query: {
+              source: dataAsset?.source || '',
+              format: dataAsset?.format || '',
+              sourceType: dataAsset?.sourceType || '',
+              fileName: dataAsset?.name || ''
+            },
+            metadata: {
+              workflowId,
+              queryCase: 'metaData',
+              assetName: dataAsset.name,
+            }
+          })
+        );
+      });
+    });
+  }, [filteredAssets]);
+
+  useEffect(() => {
+    Object.entries(filteredAssets).forEach(([assetName, assetList]) => {
+      if (!Array.isArray(assetList) || assetList.length === 0) return;
+
       const metaList = assetList.map(({ workflowId }) =>
         dataAssetsMetaData?.[assetName]?.[workflowId]?.meta
       );
@@ -134,59 +194,75 @@ const ComparisonDataCharts: React.FC = () => {
       dispatch(setDataAssetsControlPanel({
         assetName,
         controlPanel: {
-          commonColumns
+          commonColumns,
+          selectedColumns: commonColumns.slice(0, 5).map(col => col.name)
         }
       }));
     });
-  }, [commonDataAssets, dataAssetsMetaData]);
+  }, [filteredAssets, dataAssetsMetaData]);
 
-  const renderCharts = Object.entries(commonDataAssets).map(([assetName, assetList]) => {
-    const metadataEntries = assetList.map(({ workflowId }) =>
-      dataAssetsMetaData?.[assetName]?.[workflowId]?.meta
-    );
-    const metadataLoading = metadataEntries.some(meta => meta?.loading);
-    const allMetadataFailed = metadataEntries.length > 0 && metadataEntries.every(meta => meta?.error && !meta?.loading);
+  const renderCharts = selectedDataset && filteredAssets[selectedDataset]
+    ? filteredAssets[selectedDataset].map(({ workflowId, dataAsset }, index) => {
+      const meta = dataAssetsMetaData?.[selectedDataset]?.[workflowId]?.meta;
 
-    if(metadataLoading) return (
-      <Grid item xs={isMosaic ? 6 : 12} key={assetName}>
-        <ResponsiveCardTable title={assetName} minHeight={400} showSettings={false}>
-          <Loader />
-        </ResponsiveCardTable>
-      </Grid>
-    );
+      const isLoading = meta?.loading;
+      const hasError = meta?.error && !meta.loading;
+      const summary = meta?.data?.summary || [];
 
-    if(allMetadataFailed) return (
-      <Grid item xs={isMosaic ? 6 : 12} key={assetName}>
-        <ResponsiveCardTable title={assetName} minHeight={400} showSettings={false}>
-          <InfoMessage
-            message="Failed to fetch metadata."
-            type="info"
-            icon={
-              <ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />
-            }
-            fullHeight
-          />
-        </ResponsiveCardTable>
-      </Grid>
-    );
+      const setScrollRef = (el: HTMLDivElement | null) => {
+        scrollRefs.current[index] = el;
+      };
 
-    return (
-      <Grid item xs={isMosaic ? 6 : 12} key={assetName}>
-        <ResponsiveCardTable title={assetName} minHeight={400} showSettings={false}>
-          <InfoMessage
-            message={assetList.map(a => `${a.workflowId}`).join('\n')}
-            type="info"
-            fullHeight
-          />
-        </ResponsiveCardTable>
-      </Grid>
-    );
-  });
+      if (isLoading) {
+        return (
+          <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
+            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
+              <Loader />
+            </ResponsiveCardTable>
+          </Grid>
+        );
+      }
+
+      if (hasError || !summary.length) {
+        return (
+          <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
+            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
+              <InfoMessage
+                message="No summary stats found for this workflow."
+                type="info"
+                icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+                fullHeight
+              />
+            </ResponsiveCardTable>
+          </Grid>
+        );
+      }
+
+      return (
+        <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
+          <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false} noPadding={true}>
+            <SummaryTable dataset={dataAsset} workflowId={workflowId} scrollRef={setScrollRef} />
+          </ResponsiveCardTable>
+        </Grid>
+      );
+    })
+    : [];
 
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (
       <InfoMessage
         message="Select Workflows to display comparisons over data."
+        type="info"
+        icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+        fullHeight
+      />
+    );
+  }
+
+  if (selectedDataset === null) {
+    return (
+      <InfoMessage
+        message="Select Dataset to display comparisons over data."
         type="info"
         icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
         fullHeight

@@ -6,6 +6,8 @@ import {
   FormControl,
   createTheme,
   ThemeProvider,
+  Chip,
+  Typography,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
@@ -188,6 +190,37 @@ const BarChartControlPanel = () => {
             ))}
           </Select>
         </FormControl>
+    {(tab?.workflowTasks.dataExploration?.controlPanel.barAggregation || []).length > 0 && (
+      <Box sx={{ mt: 1 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          Active Aggregations
+        </Typography>
+    
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          {tab?.workflowTasks.dataExploration?.controlPanel.barAggregation.map(aggr => (
+            <Chip
+              key={`${aggr.function}-${aggr.column}`}
+              label={`${aggr.function.toLowerCase()}_${aggr.column}`}
+              onDelete={() => {
+                const updatedAggs =
+                  tab.workflowTasks.dataExploration?.controlPanel.barAggregation.filter(
+                    a => !(a.column === aggr.column && a.function === aggr.function)
+                  );
+                
+                dispatch(setControls({ barAggregation: updatedAggs }));
+                
+                const remainingForColumn = updatedAggs?.filter(a => a.column === aggr.column);
+                if (selectedColumn === aggr.column && remainingForColumn?.length === 0) {
+                  dispatch(setControls({ selectedMeasureColumn: '' }));
+                }
+              }}
+              color="default"
+              size="small"
+            />
+          ))}
+        </Box>
+      </Box>
+    )}
       </Box>
     </ThemeProvider>
   );

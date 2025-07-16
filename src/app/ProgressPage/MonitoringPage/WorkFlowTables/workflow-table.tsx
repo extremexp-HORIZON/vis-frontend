@@ -689,7 +689,7 @@ export default function WorkflowTable() {
           />
         </Popover>
 
-        <div style={{ height: 'calc(100% - 63px)', width: '100%' }}>
+        <div style={{ height: 'calc(100% - 48px)', width: '100%' }}>
           <StyledDataGrid
             disableVirtualization
             density="compact"

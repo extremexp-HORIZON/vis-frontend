@@ -1,7 +1,7 @@
-import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, ListItemIcon, ListItemText, Menu, MenuItem, Select } from '@mui/material';
+import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Popover, Select, Tooltip } from '@mui/material';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { setComparativeModelInstanceControlPanel, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../store/slices/monitorPageSlice';
+import { setComparativeModelInstanceControlPanel, setDataComparisonSelectedColumns, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../store/slices/monitorPageSlice';
 import theme from '../../../mui-theme';
 import WindowRoundedIcon from '@mui/icons-material/WindowRounded';
 import RoundedCornerRoundedIcon from '@mui/icons-material/RoundedCornerRounded';
@@ -13,6 +13,12 @@ import { useState } from 'react';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import DownloadIcon from '@mui/icons-material/Download';
 import CodeIcon from '@mui/icons-material/Code';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import DatasetSelectorBar from './comparative-data-selector-bar';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import { GridTableRowsIcon } from '@mui/x-data-grid';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
 const ComparativeAnalysisControls = ()=> {
   const isMosaic = useAppSelector((state: RootState) => state.monitorPage.isMosaic);
@@ -20,10 +26,38 @@ const ComparativeAnalysisControls = ()=> {
   const showMisclassifiedOnly = useAppSelector((state: RootState) => state.monitorPage.showMisclassifiedOnly);
   const selectedComparisonTab = useAppSelector((state: RootState) => state.monitorPage.selectedComparisonTab);
   const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
+  const [columnsAnchorEl, setColumnsAnchorEl] = useState <null | HTMLElement>(null);
+  const open = Boolean(columnsAnchorEl);
   const comparativeModelInstanceControlPanel = useAppSelector((state: RootState) => state.monitorPage.comparativeModelInstanceControlPanel);
+  const selectedDataset = useAppSelector((state: RootState) => state.monitorPage.comparativeDataExploration.selectedDataset);
+  const dataAssetsControlPanel = useAppSelector(
+    (state: RootState) =>
+      selectedDataset
+        ? state.monitorPage.comparativeDataExploration.dataAssetsControlPanel[selectedDataset]
+        : undefined
+  );
+  const commonColumns = dataAssetsControlPanel?.commonColumns ?? [];
+  const selectedColumns = dataAssetsControlPanel?.selectedColumns ?? [];
+
+  const { workflowsTable } = useAppSelector(
+    (state: RootState) => state.monitorPage
+  );
+
   const menuOpen = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
+  const [isDatasetSelectorOpen, setDatasetSelector] = useState(false);
+
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setColumnsAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => setColumnsAnchorEl(null);
+
+  const datasetSelectorClicked = (event: React.MouseEvent<HTMLElement>) => {
+    setDatasetSelector(!isDatasetSelectorOpen);
+    !isDatasetSelectorOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
+  };
 
   const options1 = [
     { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon /> },
@@ -46,20 +80,9 @@ const ComparativeAnalysisControls = ()=> {
         alignItems="center"
         flexWrap="wrap"
         gap={2}
-        sx={{ p: 1 }}
+        sx={{ p: 2 }}
       >
-        {selectedComparisonTab === 1 && (
-          // <Card
-          //   variant="outlined"
-          //   sx={{
-          //     p: 1,
-          //     borderRadius: 2,
-          //     display: 'flex',
-          //     alignItems: 'center',
-          //     boxShadow: 1,
-          //     backgroundColor: theme.palette.customGrey.light,
-          //   }}
-          // >
+        {selectedComparisonTab === 1 ? (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {options1.map(option => (
               <Chip
@@ -94,7 +117,112 @@ const ComparativeAnalysisControls = ()=> {
               />
             ))}
           </Box>
-          // </Card>
+        ) : selectedComparisonTab === 2 && workflowsTable.selectedWorkflows.length > 0 && (
+          <>
+            <Box display="flex" flexWrap="wrap" gap={0.2}>
+              <Tooltip title="Select Dataset">
+                <IconButton onClick={datasetSelectorClicked}>
+                  <FilterListIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Columns">
+                <IconButton onClick={handleOpen}>
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
+
+            </Box>
+            <Popover
+              id={'Datasets'}
+              open={isDatasetSelectorOpen}
+              anchorEl={anchorEl}
+              onClose={() => setDatasetSelector(false)}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              PaperProps={{
+                sx: {
+                  width: '550px',
+                  p: 2,
+                  borderRadius: 1,
+                  boxShadow: 3
+                }
+              }}
+            >
+              <DatasetSelectorBar />
+            </Popover>
+            <Popover
+              id={'Columns'}
+              open={open}
+              anchorEl={columnsAnchorEl}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  width: 300,
+                  maxHeight: 500,
+                  overflow: 'hidden',
+                  padding: 0,
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  mt: 1,
+                  '& .MuiList-root': {
+                    padding: 0,
+                  }
+                },
+              }}
+            >
+              <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Visible Columns" />
+
+              <List sx={{ width: '100%', py: 0, maxHeight: 350, overflow: 'auto' }}>
+                {commonColumns.map(column => (
+                  <ListItem
+                    key={column.name}
+                    disablePadding
+                    sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+                  >
+                    <ListItemButton
+                      dense
+                      onClick={() => {
+                        if(!selectedDataset) return;
+                        const updated = selectedColumns.includes(column.name)
+                          ? selectedColumns.filter(col => col !== column.name)
+                          : [...selectedColumns, column.name];
+
+                        dispatch(
+                          setDataComparisonSelectedColumns({
+                            assetName: selectedDataset,
+                            selectedColumns: updated,
+                          }),
+                        );
+                      }}
+                    >
+                      <ListItemIcon>
+                        {selectedColumns.includes(column.name) ? (
+                          <CheckBoxIcon color="primary" fontSize="small" />
+                        ) : (
+                          <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                        )}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={column.name}
+                        primaryTypographyProps={{ fontSize: '0.95rem' }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Popover>
+
+          </>
         )}
 
         <Box
@@ -119,19 +247,10 @@ const ComparativeAnalysisControls = ()=> {
             />
           )}
 
-          {/* <Card
-            variant="outlined"
-            sx={{
-              p: 1,
-              borderRadius: 2,
-              display: 'flex',
-              alignItems: 'center',
-              boxShadow: 1,
-            }}
-          > */}
           <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
             <Button
               variant={isMosaic ? 'contained' : 'outlined'}
+              disabled={selectedComparisonTab === 2}
               color="primary"
               onClick={() => dispatch(setIsMosaic(true))}
             >
@@ -145,8 +264,6 @@ const ComparativeAnalysisControls = ()=> {
                 Stacked
             </Button>
           </ButtonGroup>
-          {/* </Card> */}
-
           {selectedModelComparisonChart === 'instanceView' && selectedComparisonTab === 1 && (
             <>
               <IconButton

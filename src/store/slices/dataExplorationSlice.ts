@@ -4,7 +4,7 @@ import type {
 import {
   createAsyncThunk,
 } from '@reduxjs/toolkit';
-import type { IWorkflowPage } from './workflowPageSlice';
+import { type IWorkflowPage } from './workflowPageSlice';
 import {
   AggregationFunction,
   type IDataExplorationMetaDataResponse,
@@ -44,7 +44,7 @@ export const dataExplorationReducers = (
         asyncState.error = null;
 
         if (queryCase === 'dataTable') {
-          const totalItems = action.payload.querySize || 0;
+          const totalItems = state.tab?.workflowTasks.dataExploration?.metaData.data?.totalItems || 0;
           const { pageSize } = task.controlPanel;
 
           task.controlPanel.queryItems = totalItems;

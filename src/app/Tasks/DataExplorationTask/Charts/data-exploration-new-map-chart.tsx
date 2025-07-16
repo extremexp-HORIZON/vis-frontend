@@ -69,7 +69,7 @@ const MapChart = () => {
           },
           columns,
           filters,
-          limit: 0,
+          // limit: 0,
         },
         metadata: {
           workflowId: tab?.workflowId || '',

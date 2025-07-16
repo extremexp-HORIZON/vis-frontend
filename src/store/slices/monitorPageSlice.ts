@@ -3,10 +3,10 @@ import type { CustomGridColDef } from '../../shared/types/table-types';
 import type { IMetric } from '../../shared/models/experiment/metric.model';
 import { api, experimentApi } from '../../app/api/api';
 import type { MetricFetchResult } from './workflowPageSlice';
-import type { ConfusionMatrixResult, TestInstance } from '../../shared/models/tasks/model-analysis.model';
+import { prepareDataExplorationResponse, type ConfusionMatrixResult, type TestInstance } from '../../shared/models/tasks/model-analysis.model';
 import type { AxiosError } from 'axios';
 import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
-import type { IDataExplorationMetaDataResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
+import type { IDataExplorationMetaDataResponse, IDataExplorationRequest, IDataExplorationResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
 
 export interface WorkflowTableRow {
   id: string;
@@ -41,10 +41,26 @@ export type DataAssetsMetaData = {
     }
   }
 }
+
+export type DataAssetsHistograms = {
+  [assetName: string]: {
+    [workflowId: string]: {
+        [columnName: string]: {
+          histogram: {
+          data: IDataExplorationResponse | null
+          loading: boolean
+          error: string | null
+        }
+      }
+    }
+  }
+}
+
 // only for bar charts
 export type DataAssetsControlPanel = {
   [assetName: string]: {
     commonColumns: VisualColumn[]
+    selectedColumns: string[]
   }
 }
 
@@ -128,6 +144,8 @@ interface IMonitoringPageSlice {
         commonDataAssets: CommonDataAssets
         dataAssetsMetaData: DataAssetsMetaData
         dataAssetsControlPanel: DataAssetsControlPanel
+        dataAssetsHistograms: DataAssetsHistograms
+        selectedDataset: string | null
       }
       comparativeModelInstanceControlPanel: {
          xAxisOption: string
@@ -227,7 +245,9 @@ const initialState: IMonitoringPageSlice = {
   comparativeDataExploration: {
     commonDataAssets: {},
     dataAssetsMetaData: {},
-    dataAssetsControlPanel: {}
+    dataAssetsControlPanel: {},
+    dataAssetsHistograms: {},
+    selectedDataset: null
   },
   comparativeModelInstanceControlPanel: {
     xAxisOption: '',
@@ -239,6 +259,7 @@ const initialState: IMonitoringPageSlice = {
 const pruneComparativeMetadata = (state: IMonitoringPageSlice) => {
   const selectedIds = new Set(state.workflowsTable.selectedWorkflows);
 
+  // Prune metaData
   for (const assetName in state.comparativeDataExploration.dataAssetsMetaData) {
     const workflowMeta = state.comparativeDataExploration.dataAssetsMetaData[assetName];
 
@@ -253,9 +274,24 @@ const pruneComparativeMetadata = (state: IMonitoringPageSlice) => {
     }
   }
 
+  // Prune controlPanel if asset is not in commonDataAssets
   for (const assetName in state.comparativeDataExploration.dataAssetsControlPanel) {
     if (!state.comparativeDataExploration.commonDataAssets[assetName]) {
       delete state.comparativeDataExploration.dataAssetsControlPanel[assetName];
+    }
+  }
+
+  for (const assetName in state.comparativeDataExploration.dataAssetsHistograms) {
+    const workflowHistograms = state.comparativeDataExploration.dataAssetsHistograms[assetName];
+
+    for (const workflowId in workflowHistograms) {
+      if (!selectedIds.has(workflowId)) {
+        delete workflowHistograms[workflowId];
+      }
+    }
+
+    if (Object.keys(workflowHistograms).length === 0) {
+      delete state.comparativeDataExploration.dataAssetsHistograms[assetName];
     }
   }
 };
@@ -398,6 +434,7 @@ export const monitoringPageSlice = createSlice({
         assetName: string;
         controlPanel: {
           commonColumns: VisualColumn[];
+          selectedColumns: string[]
         };
       };
     }) => {
@@ -411,6 +448,29 @@ export const monitoringPageSlice = createSlice({
         state.workflowsTable.expandedGroups = state.workflowsTable.expandedGroups.filter(id => id !== groupId);
       } else {
         state.workflowsTable.expandedGroups.push(groupId);
+      }
+    },
+    setSelectedDataset: (state, action) => {
+      state.comparativeDataExploration.selectedDataset = action.payload;
+    },
+    setDataComparisonSelectedColumns: (
+      state,
+      action: {
+        payload: {
+          assetName: string;
+          selectedColumns: string[];
+        };
+      }
+    ) => {
+      const { assetName, selectedColumns } = action.payload;
+
+      if (!state.comparativeDataExploration.dataAssetsControlPanel[assetName]) {
+        state.comparativeDataExploration.dataAssetsControlPanel[assetName] = {
+          commonColumns: [],
+          selectedColumns,
+        };
+      } else {
+        state.comparativeDataExploration.dataAssetsControlPanel[assetName].selectedColumns = selectedColumns;
       }
     }
   },
@@ -630,6 +690,73 @@ export const monitoringPageSlice = createSlice({
             error: 'Failed to fetch metadata',
           }
         };
+      })
+      .addCase(fetchComparisonData.fulfilled, (state, action) => {
+        const workflowId = action.meta.arg.metadata.workflowId;
+        const assetName = action.meta.arg.metadata?.assetName;
+        const columnName = action.meta.arg.metadata?.columnName;
+
+        if (!assetName || !columnName || !workflowId) return;
+
+        if (!state.comparativeDataExploration.dataAssetsHistograms[assetName]) {
+          state.comparativeDataExploration.dataAssetsHistograms[assetName] = {};
+        }
+
+        if (!state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId]) {
+          state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId] = {};
+        }
+
+        state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId][columnName] = {
+          histogram: {
+            data: prepareDataExplorationResponse(action.payload),
+            loading: false,
+            error: null
+          }
+        };
+      })
+
+      .addCase(fetchComparisonData.pending, (state, action) => {
+        const { workflowId, assetName, columnName } = action.meta.arg.metadata;
+
+        if (!assetName || !columnName || !workflowId) return;
+
+        if (!state.comparativeDataExploration.dataAssetsHistograms[assetName]) {
+          state.comparativeDataExploration.dataAssetsHistograms[assetName] = {};
+        }
+
+        if (!state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId]) {
+          state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId] = {};
+        }
+
+        state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId][columnName] = {
+          histogram: {
+            data: null,
+            loading: true,
+            error: null
+          }
+        };
+      })
+
+      .addCase(fetchComparisonData.rejected, (state, action) => {
+        const { workflowId, assetName, columnName } = action.meta.arg.metadata;
+
+        if (!assetName || !columnName || !workflowId) return;
+
+        if (!state.comparativeDataExploration.dataAssetsHistograms[assetName]) {
+          state.comparativeDataExploration.dataAssetsHistograms[assetName] = {};
+        }
+
+        if (!state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId]) {
+          state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId] = {};
+        }
+
+        state.comparativeDataExploration.dataAssetsHistograms[assetName][workflowId][columnName] = {
+          histogram: {
+            data: null,
+            loading: false,
+            error: 'Failed to fetch histogram',
+          }
+        };
       });
   }
 });
@@ -709,7 +836,18 @@ export const fetchMetaData = createAsyncThunk(
   },
 );
 
+export const fetchComparisonData = createAsyncThunk(
+  'monitoringPage/fetch_data',
+  async (payload: IDataExplorationRequest) => {
+    const requestUrl = 'data/fetch';
+
+    return api
+      .post<IDataExplorationResponse>(requestUrl, payload.query)
+      .then(response => response.data);
+  },
+);
+
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel,
-  setExpandedGroup
+  setExpandedGroup, setSelectedDataset, setDataComparisonSelectedColumns
 } = monitoringPageSlice.actions;
