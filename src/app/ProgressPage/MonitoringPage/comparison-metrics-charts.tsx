@@ -182,9 +182,9 @@ const ComparisonMetricsCharts: React.FC = () => {
     const xType = xField === 'timestamp' ? 'temporal' : 'ordinal';
 
     const xTitle = (() => {
-      if (!isLineChart) return isGrouped ? 'Workflow Group' : 'Workflow';
+      if (!isLineChart) return isGrouped ? workflowsTable.groupBy.join(", ") : 'Workflow';
       if (xField === 'timestamp') return 'Timestamp';
-      if (xField === 'step') return isGrouped ? 'Group Step' : 'Step';
+      if (xField === 'step') return isGrouped ? workflowsTable.groupBy.join(", ") : 'Step';
 
       return 'Workflow';
     })();
