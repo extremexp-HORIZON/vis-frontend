@@ -4,12 +4,16 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
-import { setDrawnRect, updateMapBounds } from '../../../../store/slices/exploring/mapSlice';
+import {
+  setDrawnRect,
+  updateMapBounds,
+} from '../../../../store/slices/exploring/mapSlice';
 import { useAppDispatch } from '../../../../store/store';
 
 declare module 'leaflet' {
   interface Map {
     _toggleClusterMap?: () => void;
+    _toggleGeohashGrid?: () => void;
   }
 }
 
@@ -22,8 +26,8 @@ const ToggleControl = L.Control.extend({
     );
 
     container.style.backgroundColor = 'white';
-    container.style.width = '34px';
-    container.style.height = '34px';
+    container.style.width = '30px';
+    container.style.height = '30px';
     container.style.display = 'flex';
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
@@ -45,24 +49,62 @@ const ToggleControl = L.Control.extend({
   onRemove: function () {},
 });
 
+// Custom control for toggling geohash grid view
+const GeohashGridToggleControl = L.Control.extend({
+  onAdd: function (map: L.Map) {
+    const container = L.DomUtil.create(
+      'div',
+      'leaflet-bar leaflet-control leaflet-control-custom',
+    );
+
+    container.style.backgroundColor = 'white';
+    container.style.width = '30px';
+    container.style.height = '30px';
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+    container.style.cursor = 'pointer';
+    container.style.borderRadius = '0';
+    container.style.border = '2px solid rgba(0, 0, 0, 0.2)';
+    container.title = 'Toggle geohash grid';
+    container.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+    `;
+    L.DomEvent.on(container, 'click', function (e) {
+      L.DomEvent.stopPropagation(e);
+      L.DomEvent.preventDefault(e);
+      if (map._toggleGeohashGrid) {
+        map._toggleGeohashGrid();
+      }
+    });
+
+    return container;
+  },
+  onRemove: function () {},
+});
+
 export const MapControl = ({
   id,
   toggleClusterMap,
+  toggleGeohashGrid,
 }: {
   id: string;
   toggleClusterMap: () => void;
+  toggleGeohashGrid: () => void;
 }) => {
   const map = useMap();
   const dispatch = useAppDispatch();
   const hasInitialized = useRef(false);
   const drawnItemsRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
   const toggleInstanceRef = useRef<L.Control | null>(null);
+  const geohashToggleInstanceRef = useRef<L.Control | null>(null);
 
   useEffect(() => {
     if (!map) return;
-    // Attach the toggleClusterMap function to the map instance for access in the control
+    // Attach the toggle functions to the map instance for access in the controls
     // (This avoids closure issues and repeated class creation)
     map._toggleClusterMap = toggleClusterMap;
+    map._toggleGeohashGrid = toggleGeohashGrid;
 
     function onCreated(e: L.LeafletEvent) {
       const event = e as L.DrawEvents.Created;
@@ -159,10 +201,17 @@ export const MapControl = ({
 
     legend.addTo(map);
 
-    // Add the toggle control only once
+    // Add the toggle controls only once
     if (!toggleInstanceRef.current) {
       toggleInstanceRef.current = new ToggleControl({ position: 'topright' });
       map.addControl(toggleInstanceRef.current);
+    }
+
+    if (!geohashToggleInstanceRef.current) {
+      geohashToggleInstanceRef.current = new GeohashGridToggleControl({
+        position: 'topright',
+      });
+      map.addControl(geohashToggleInstanceRef.current);
     }
 
     return () => {
@@ -176,9 +225,14 @@ export const MapControl = ({
         map.removeControl(toggleInstanceRef.current);
         toggleInstanceRef.current = null;
       }
+      if (geohashToggleInstanceRef.current) {
+        map.removeControl(geohashToggleInstanceRef.current);
+        geohashToggleInstanceRef.current = null;
+      }
       delete map._toggleClusterMap;
+      delete map._toggleGeohashGrid;
     };
-  }, [id, map, dispatch, toggleClusterMap]);
+  }, [id, map, dispatch, toggleClusterMap, toggleGeohashGrid]);
 
   return null;
 };

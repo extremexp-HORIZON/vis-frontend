@@ -18,11 +18,6 @@ import CustomPopup from './CustomPopup/custom-popup';
 import { HeatmapLayer } from './heatmap-layer';
 import { getRow } from '../../../../store/slices/exploring/datasetSlice';
 import { GeohashGridLayer } from './geohash-grid-layer';
-import { Box, IconButton } from '@mui/material';
-import {
-  Workspaces as WorkspacesIcon,
-  Grid4x4 as Grid4x4Icon,
-} from '@mui/icons-material';
 
 export interface IMapProps {
   id: string;
@@ -229,6 +224,10 @@ export const Map = (props: IMapProps) => {
   }, [clusters]);
 
   const toggleClusterMap = useCallback(() => setClusterMap(prev => !prev), []);
+  const toggleGeohashGrid = useCallback(
+    () => setShowGeohashGrid(prev => !prev),
+    [],
+  );
 
   let content: React.ReactNode;
 
@@ -254,19 +253,11 @@ export const Map = (props: IMapProps) => {
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapControl id={id} toggleClusterMap={toggleClusterMap} />
-        <Box
-          style={{ position: 'absolute', zIndex: 1000, right: 10, top: 220 }}
-        >
-          <IconButton
-            sx={{ backgroundColor: '#FFFFFF', borderRadius: 0, border: '2px solid rgba(0, 0, 0, 0.2)' }}
-            onClick={() => setShowGeohashGrid(g => !g)}
-            size="small"
-            disableRipple
-          >
-            {!showGeohashGrid ? <Grid4x4Icon /> : <WorkspacesIcon />}
-          </IconButton>
-        </Box>
+        <MapControl
+          id={id}
+          toggleClusterMap={toggleClusterMap}
+          toggleGeohashGrid={toggleGeohashGrid}
+        />
         {showGeohashGrid ? (
           <GeohashGridLayer dataset={dataset} points={points} />
         ) : clusterMap ? (
