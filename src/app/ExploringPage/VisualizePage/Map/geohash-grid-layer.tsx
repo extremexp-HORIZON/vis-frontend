@@ -3,6 +3,7 @@ import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import ngeohash from 'ngeohash';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
+import { generateRsrpColor } from '../../../../shared/utils/clusterUtils';
 
 // Map zoom level to geohash precision
 function getGeohashPrecision(zoom: number): number {
@@ -70,34 +71,6 @@ export const GeohashGridLayer = ({
 }: GeohashGridLayerProps) => {
   const map = useMap();
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
-
-  // Use the same color function as the map
-  const generateRsrpColor = (dataset: IDataset, rsrp_rscp_rssi: number) => {
-    if (
-      (dataset.measure0 === 'rsrp_rscp_rssi' ||
-        dataset.measure1 === 'rsrp_rscp_rssi') &&
-      rsrp_rscp_rssi != null
-    ) {
-      let val = rsrp_rscp_rssi;
-
-      if (val < 0) val = -val;
-      const min = 70;
-      const max = 100;
-
-      if (val < min) val = min;
-      if (val > max) val = max;
-      let percentage = ((val - min) * 100) / (max - min);
-
-      percentage = percentage / 100;
-      const hue0 = 120;
-      const hue1 = 0;
-      const hue = percentage * (hue1 - hue0) + hue0;
-
-      return 'hsl(' + hue + ', 100%, 70%)';
-    } else {
-      return 'rgba(212,62,42)';
-    }
-  };
 
   useEffect(() => {
     if (!map) return;

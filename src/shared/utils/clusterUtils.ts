@@ -1,5 +1,6 @@
 import Supercluster from 'supercluster';
 import { useEffect, useState } from 'react';
+import type { IDataset } from '../models/exploring/dataset.model';
 
 export const MAX_ZOOM = 18; // Define MAX_ZOOM as a constant
 
@@ -13,6 +14,48 @@ export type IPointType = [
   number | null,
   string[] | string[][],
 ];
+
+export const rsrpIntensityExtractor = (dataset: IDataset, rsrp_rscp_rssi: number) => {
+  if (
+    (dataset.measure0 === 'rsrp_rscp_rssi' ||
+      dataset.measure1 === 'rsrp_rscp_rssi') &&
+    rsrp_rscp_rssi != null
+  ) {
+    if (rsrp_rscp_rssi < 0) rsrp_rscp_rssi = -rsrp_rscp_rssi;
+    // rsrp is excellent(pure green color) when it is  bigger/equal to -70 and on cell edge(pure red color) when it is smaller/equal to -100
+    const min = 70;
+    const max = 100;
+
+    if (rsrp_rscp_rssi < min) rsrp_rscp_rssi = min;
+    if (rsrp_rscp_rssi > max) rsrp_rscp_rssi = max;
+    let percentage = ((rsrp_rscp_rssi - min) * 100) / (max - min);
+
+    percentage = percentage / 100;
+
+    return percentage;
+  } else {
+    return 1;
+  }
+};
+
+export const generateRsrpColor = (dataset: IDataset, rsrp_rscp_rssi: number) => {
+  if (
+    (dataset.measure0 === 'rsrp_rscp_rssi' ||
+      dataset.measure1 === 'rsrp_rscp_rssi') &&
+    rsrp_rscp_rssi != null
+  ) {
+    const percentage = rsrpIntensityExtractor(dataset, rsrp_rscp_rssi);
+    // hue0: the hue value of the color you want to get when the percentage is 0, value 120 is green
+    const hue0 = 120;
+    // hue1: the hue value of the color you want to get when the percentage is 1, value 0 is red
+    const hue1 = 0;
+    const hue = percentage * (hue1 - hue0) + hue0;
+
+    return 'hsl(' + hue + ', 100%, 70%)';
+  } else {
+    return 'rgba(212,62,42)';
+  }
+};
 
 export type ISuperclusterFeatureProperties = {
   totalCount: number;
