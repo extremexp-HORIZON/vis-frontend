@@ -267,7 +267,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
 
           {/* Actions (same as your original `action` prop) */}
           <Box
-            sx={{ display: 'flex', alignItems: 'center', gap: 1, marginLeft: 2 }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, marginLeft: 2 }}
           >
             {shouldShowControlsInHeader && (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>

@@ -344,7 +344,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
           </Box>
 
           {/* Actions */}
-          <>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, marginLeft: 2 }}>
             {showSettings && (
               <>
                 <IconButton
@@ -454,7 +454,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 <FullscreenIcon />
               </IconButton>
             </Tooltip>
-          </>
+          </Box>
         </Box>
         <CardContent
           sx={{
