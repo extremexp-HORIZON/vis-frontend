@@ -22,6 +22,7 @@ const LineChartControlPanel = () => {
   const controlPanel = tab?.workflowTasks.dataExploration?.controlPanel;
   const columns =
     tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || [];
+    console.log("Columns in LineChartControlPanel:", columns);
 
   const xAxis = controlPanel?.xAxis;
   const yAxis = controlPanel?.yAxis || [];
@@ -142,7 +143,7 @@ const LineChartControlPanel = () => {
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
             >
-              {columns.map(col => (
+              {columns.filter(col => col.type === 'BIGINT' || col.type === 'DOUBLE'|| col.type === 'FLOAT'|| col.type === 'INTEGER').map(col => (
                 <MenuItem key={col.name} value={col.name}>
                   <Checkbox
                     checked={yAxis.some(yCol => yCol.name === col.name)}

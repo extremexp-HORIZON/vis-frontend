@@ -44,7 +44,7 @@ export const dataExplorationReducers = (
         asyncState.error = null;
 
         if (queryCase === 'dataTable') {
-          const totalItems = state.tab?.workflowTasks.dataExploration?.metaData.data?.totalItems || 0;
+          const totalItems = state.tab?.workflowTasks.dataExploration?.dataTable.data?.totalItems || 0;
           const { pageSize } = task.controlPanel;
 
           task.controlPanel.queryItems = totalItems;
