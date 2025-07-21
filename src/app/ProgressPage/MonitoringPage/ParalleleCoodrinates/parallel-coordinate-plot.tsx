@@ -219,6 +219,7 @@ const ParallelCoordinatePlot = () => {
                       const isSelected = selectedParams.includes(param);
 
                       let updated: string[];
+
                       if (isSelected) {
                         if (selectedParams.length === 1) {
                           return;
