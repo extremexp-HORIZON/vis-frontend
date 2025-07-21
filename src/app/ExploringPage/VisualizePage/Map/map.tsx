@@ -20,6 +20,7 @@ import CustomPopup from './CustomPopup/custom-popup';
 import { HeatmapLayer } from './heatmap-layer';
 import { getRow } from '../../../../store/slices/exploring/datasetSlice';
 import { GeohashGridLayer } from './geohash-grid-layer';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 export interface IMapProps {
   id: string;
@@ -130,6 +131,13 @@ const SinglePoint = (props: {
 
 export const Map = (props: IMapProps) => {
   const { id, dataset } = props;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const geohash = searchParams.get('geohash');
+  const [selectedGeohash, setSelectedGeohash] = useState<string | null>(
+    geohash,
+  );
+
   //   const [map, setMap] = useState(null);
   const { clusters, viewRect, zoom } = useAppSelector(
     (state: RootState) => state.map,
@@ -184,10 +192,17 @@ export const Map = (props: IMapProps) => {
   }, [clusters]);
 
   const toggleClusterMap = useCallback(() => setClusterMap(prev => !prev), []);
-  const toggleGeohashGrid = useCallback(
-    () => setShowGeohashGrid(prev => !prev),
-    [],
-  );
+  const toggleGeohashGrid = useCallback(() => {
+    if (showGeohashGrid) {
+      resetGeohashSelection();
+    }
+    setShowGeohashGrid(prev => !prev);
+  }, [showGeohashGrid]);
+
+  const resetGeohashSelection = useCallback(() => {
+    setSelectedGeohash(null);
+    navigate('?');
+  }, []);
 
   let content: React.ReactNode;
 
@@ -218,8 +233,13 @@ export const Map = (props: IMapProps) => {
           toggleClusterMap={toggleClusterMap}
           toggleGeohashGrid={toggleGeohashGrid}
         />
-        {showGeohashGrid ? (
-          <GeohashGridLayer dataset={dataset} points={points} />
+        {showGeohashGrid || selectedGeohash !== null ? (
+          <GeohashGridLayer
+            dataset={dataset}
+            points={points}
+            selectedGeohash={selectedGeohash}
+            setSelectedGeohash={setSelectedGeohash}
+          />
         ) : clusterMap ? (
           clusters.map((cluster, index) => {
             // every cluster point has coordinates

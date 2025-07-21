@@ -4,51 +4,106 @@ import * as L from 'leaflet';
 import ngeohash from 'ngeohash';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import { generateRsrpColor } from '../../../../shared/utils/clusterUtils';
+import { useNavigate } from 'react-router-dom';
 
 // Map zoom level to geohash precision
 function getGeohashPrecision(zoom: number): number {
-  if (zoom >= 16) return 7;
-  if (zoom >= 14) return 6;
-  if (zoom >= 11) return 5;
-  if (zoom >= 8) return 4;
+  if (zoom >= 18) return 7;
+  if (zoom >= 17) return 6;
+  if (zoom >= 14) return 5;
+  if (zoom >= 12) return 4;
   if (zoom >= 6) return 3;
 
   return 2;
 }
 
-// Get all geohashes covering the bounding box at a given precision
-function getGeohashesInBbox(
-  south: number,
-  west: number,
-  north: number,
-  east: number,
-  precision: number,
-): string[] {
-  // Clamp to valid lat/lon
-  south = Math.max(-90, Math.min(90, south));
-  north = Math.max(-90, Math.min(90, north));
-  west = Math.max(-180, Math.min(180, west));
-  east = Math.max(-180, Math.min(180, east));
+function getZoomFromPrecision(precision: number): number {
+  if (precision >= 7) return 18;
+  if (precision === 6) return 17;
+  if (precision === 5) return 14;
+  if (precision === 4) return 12;
+  if (precision === 3) return 9;
+  if (precision === 2) return 7;
 
-  // Step size: get the size of a geohash cell at this precision
-  const center = [(south + north) / 2, (west + east) / 2];
-  const cell = ngeohash.decode_bbox(
-    ngeohash.encode(center[0], center[1], precision),
-  );
-  const latStep = Math.abs(cell[2] - cell[0]);
-  const lonStep = Math.abs(cell[3] - cell[1]);
+  return 5;
+}
 
-  const hashes = new Set<string>();
+// Get all child geohashes of a parent geohash
+function getChildGeohashes(parentGeohash: string): string[] {
+  const children: string[] = [];
+  const chars = '0123456789bcdefghjkmnpqrstuvwxyz';
 
-  for (let lat = south; lat < north + latStep; lat += latStep) {
-    for (let lon = west; lon < east + lonStep; lon += lonStep) {
-      const hash = ngeohash.encode(lat, lon, precision);
+  for (const char of chars) {
+    children.push(parentGeohash + char);
+  }
 
-      hashes.add(hash);
+  return children;
+}
+
+// Get parent geohash (one precision level lower)
+function getParentGeohash(geohash: string): string {
+  return geohash.slice(0, -1);
+}
+
+// Get siblings of a geohash (same parent, different last character)
+function getSiblingGeohashes(geohash: string): string[] {
+  const siblings: string[] = [];
+  const chars = '0123456789bcdefghjkmnpqrstuvwxyz';
+  const parent = getParentGeohash(geohash);
+
+  for (const char of chars) {
+    const sibling = parent + char;
+
+    if (sibling !== geohash) {
+      siblings.push(sibling);
     }
   }
 
-  return Array.from(hashes);
+  return siblings;
+}
+
+// Get hierarchical grid - bottom-up approach
+function getHierarchicalGrid(
+  selectedGeohash: string,
+): { geohash: string; level: 'context' | 'siblings' | 'children' }[] {
+  const grid: {
+    geohash: string;
+    level: 'context' | 'siblings' | 'children';
+  }[] = [];
+
+  if (!selectedGeohash) return grid;
+
+  // 1. Add children of selected geohash (highest precision - focus area)
+  const children = getChildGeohashes(selectedGeohash);
+
+  children.forEach(child => {
+    grid.push({ geohash: child, level: 'children' });
+  });
+
+  // 2. Add siblings of selected geohash (same precision - immediate context)
+  const siblings = getSiblingGeohashes(selectedGeohash);
+
+  siblings.forEach(sibling => {
+    grid.push({ geohash: sibling, level: 'siblings' });
+  });
+
+  // 3. Add broader context (lower precision levels)
+  let currentParent = getParentGeohash(selectedGeohash);
+  let contextLevel = 1;
+
+  // Add 2-3 levels of broader context
+  while (currentParent.length >= 2 && contextLevel <= 3) {
+    const parentSiblings = getSiblingGeohashes(currentParent);
+
+    parentSiblings.forEach(sibling => {
+      grid.push({ geohash: sibling, level: 'context' });
+    });
+
+    currentParent = getParentGeohash(currentParent);
+    contextLevel++;
+  }
+
+  return grid;
 }
 
 // Helper: check if a point is inside a bbox
@@ -63,15 +118,38 @@ function pointInBbox(
 export interface GeohashGridLayerProps {
   points: [number, number, (number | undefined)?][];
   dataset: IDataset;
+  selectedGeohash: string | null;
+  setSelectedGeohash: (geohash: string | null) => void;
 }
 
 export const GeohashGridLayer = ({
   points,
   dataset,
+  selectedGeohash,
+  setSelectedGeohash,
 }: GeohashGridLayerProps) => {
   const map = useMap();
+  const navigate = useNavigate();
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
 
+  // Zoom to selected geohash when it changes
+  useEffect(() => {
+    if (selectedGeohash) {
+      const center = ngeohash.decode(selectedGeohash);
+
+      const zoom = getZoomFromPrecision(selectedGeohash.length);
+
+      map.setView([center.latitude, center.longitude], zoom);
+    }
+  }, [selectedGeohash, map]);
+
+  // Handle rectangle click - navigate to child geohash
+  function handleRectClick(geohash: string): void {
+    setSelectedGeohash(geohash);
+    navigate(`?geohash=${geohash}`);
+  }
+
+  // Draw the grid based on selected geohash or default view
   useEffect(() => {
     if (!map) return;
 
@@ -80,23 +158,41 @@ export const GeohashGridLayer = ({
       if (layerGroupRef.current) {
         map.removeLayer(layerGroupRef.current);
       }
+
       const group = L.layerGroup();
 
       layerGroupRef.current = group;
 
-      const bounds = map.getBounds();
-      const zoom = map.getZoom();
-      const precision = getGeohashPrecision(zoom);
-      const hashes = getGeohashesInBbox(
-        bounds.getSouth(),
-        bounds.getWest(),
-        bounds.getNorth(),
-        bounds.getEast(),
-        precision,
-      );
+      let gridItems: {
+        geohash: string;
+        level: 'context' | 'siblings' | 'children';
+      }[] = [];
 
-      hashes.forEach(hash => {
-        const bbox = ngeohash.decode_bbox(hash); // [minLat, minLon, maxLat, maxLon]
+      if (selectedGeohash) {
+        // Use hierarchical grid approach
+        gridItems = getHierarchicalGrid(selectedGeohash);
+      } else {
+        // Initialize with a default geohash based on map center
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        const precision = getGeohashPrecision(zoom);
+        const defaultGeohash = ngeohash.encode(
+          center.lat,
+          center.lng,
+          precision,
+        );
+
+        setSelectedGeohash(defaultGeohash);
+        navigate(`?geohash=${defaultGeohash}`);
+
+        // Use hierarchical grid with the default geohash
+        gridItems = getHierarchicalGrid(defaultGeohash);
+      }
+
+      gridItems.forEach(item => {
+        const { geohash: hash, level } = item;
+        const bbox = ngeohash.decode_bbox(hash);
+
         // Find points in this bbox
         const cellPoints = points.filter(
           p =>
@@ -104,6 +200,7 @@ export const GeohashGridLayer = ({
             typeof p[1] === 'number' &&
             pointInBbox(p[0], p[1], bbox),
         );
+
         let avgRsrp: number | null = null;
 
         if (cellPoints.length > 0) {
@@ -117,32 +214,89 @@ export const GeohashGridLayer = ({
               validVals.length;
           }
         }
+
+        // Determine styling based on hierarchical level
+        let borderColor = '#3388ff';
+        let borderWeight = 1;
+        let opacity = 0.5;
+
+        if (level === 'children') {
+          // Children: blue, normal weight, normal opacity (focus area)
+          borderColor = '#3388ff';
+          borderWeight = 2;
+          opacity = 0.5;
+        } else if (level === 'siblings') {
+          // Siblings: orange, thicker border, lower opacity (immediate context)
+          // borderColor = '#ff6b35';
+          borderWeight = 1;
+          // opacity = 0.4;
+        } else if (level === 'context') {
+          // Context: light gray, thin border, very low opacity (broader context)
+          // borderColor = '#cccccc';
+          borderWeight = 0.5;
+          // opacity = 0.2;
+        }
+
         const fillColor =
           avgRsrp != null
             ? generateRsrpColor(dataset, avgRsrp)
             : 'rgba(200,200,200,0.2)';
+
         const rectBounds: [[number, number], [number, number]] = [
           [bbox[0], bbox[1]],
           [bbox[2], bbox[3]],
         ];
+
         const rect = L.rectangle(rectBounds, {
-          color: '#3388ff',
-          weight: 1,
+          color: borderColor,
+          weight: borderWeight,
           fill: true,
           fillColor,
-          fillOpacity: 0.5,
+          fillOpacity: opacity,
         });
+
+        rect.on('click', () => handleRectClick(hash));
 
         rect.addTo(group);
 
-        // Add label (center of cell)
-        const center = ngeohash.decode(hash);
-        const label = L.marker([center.latitude, center.longitude], {
+        // Add label (center of cell) - show only last character
+        // Calculate the actual center of the geohash cell bounds
+        const centerLat = (bbox[0] + bbox[2]) / 2;
+        const centerLon = (bbox[1] + bbox[3]) / 2;
+
+        // Calculate cell dimensions in pixels at current zoom level
+        const cellWidth =
+          Math.abs(bbox[3] - bbox[1]) *
+          111320 *
+          Math.cos((centerLat * Math.PI) / 180); // meters
+        const cellHeight = Math.abs(bbox[2] - bbox[0]) * 111320; // meters
+
+        // Convert to approximate pixels (rough estimation based on zoom)
+        const zoom = map.getZoom();
+        const metersPerPixel =
+          (156543.03392 * Math.cos((centerLat * Math.PI) / 180)) /
+          Math.pow(2, zoom);
+        const cellWidthPx = cellWidth / metersPerPixel;
+        const cellHeightPx = cellHeight / metersPerPixel;
+
+        // Calculate dynamic font size (between 8px and 24px)
+        const minFontSize = 8;
+        const maxFontSize = 24;
+        const fontSize = Math.max(
+          minFontSize,
+          Math.min(maxFontSize, Math.min(cellWidthPx, cellHeightPx) * 0.4),
+        );
+
+        // Calculate dynamic icon size based on cell size
+        const iconWidth = Math.max(20, Math.min(80, cellWidthPx * 0.8));
+        const iconHeight = Math.max(15, Math.min(40, cellHeightPx * 0.6));
+
+        const label = L.marker([centerLat, centerLon], {
           icon: L.divIcon({
             className: 'geohash-label',
-            html: `<div style="font-size:16px;color:#333;text-shadow:0 1px 2px #fff;">${hash}</div>`,
-            iconSize: [60, 20],
-            iconAnchor: [30, 10],
+            html: `<div style="font-size:${fontSize}px;color:#333;text-shadow:0 1px 2px #fff;text-align:center;line-height:${iconHeight}px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">${hash.slice(-1)}</div>`,
+            iconSize: [iconWidth, iconHeight],
+            iconAnchor: [iconWidth / 2, iconHeight / 2],
           }),
           interactive: false,
         });
@@ -154,16 +308,14 @@ export const GeohashGridLayer = ({
     }
 
     drawGrid();
-    map.on('moveend zoomend', drawGrid);
 
     return () => {
-      map.off('moveend zoomend', drawGrid);
       if (layerGroupRef.current) {
         map.removeLayer(layerGroupRef.current);
         layerGroupRef.current = null;
       }
     };
-  }, [map, points, dataset]);
+  }, [map, points, dataset, selectedGeohash]); // Only redraw when selectedGeohash changes
 
   return null;
 };
