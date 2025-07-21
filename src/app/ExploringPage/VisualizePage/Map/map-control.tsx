@@ -189,6 +189,7 @@ export const MapControl = ({
 
     if (!hasInitialized.current) {
       onMoveEnd();
+      hasInitialized.current = true;
     }
 
     const drawnItems = drawnItemsRef.current;

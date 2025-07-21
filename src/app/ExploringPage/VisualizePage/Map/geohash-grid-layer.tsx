@@ -136,10 +136,19 @@ export const GeohashGridLayer = ({
   useEffect(() => {
     if (selectedGeohash) {
       const center = ngeohash.decode(selectedGeohash);
+      const targetZoom = getZoomFromPrecision(selectedGeohash.length);
+      const currentCenter = map.getCenter();
+      const currentZoom = map.getZoom();
 
-      const zoom = getZoomFromPrecision(selectedGeohash.length);
+      // Only setView if the position or zoom has actually changed
+      const centerChanged =
+        Math.abs(center.latitude - currentCenter.lat) > 0.001 ||
+        Math.abs(center.longitude - currentCenter.lng) > 0.001;
+      const zoomChanged = Math.abs(targetZoom - currentZoom) > 0.1;
 
-      map.setView([center.latitude, center.longitude], zoom);
+      if (centerChanged || zoomChanged) {
+        map.setView([center.latitude, center.longitude], targetZoom);
+      }
     }
   }, [selectedGeohash, map]);
 
