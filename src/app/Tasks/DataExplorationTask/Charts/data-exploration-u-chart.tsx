@@ -33,7 +33,7 @@ const Uchart = () => {
         }),
       );
     }
-  }, [tab?.workflowTasks.dataExploration?.chart.data?.data, dispatch]);
+  }, [tab?.workflowTasks.dataExploration?.scatterChart.data?.data]);
 
   // Prepare VegaLite spec
   const spec = {
