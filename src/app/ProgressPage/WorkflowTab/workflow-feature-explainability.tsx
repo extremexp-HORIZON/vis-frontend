@@ -45,24 +45,16 @@ const FeatureExplainability = () => {
         spacing={2}
       >
         <Grid item xs={12}>
-          <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-            <FeatureImportancePlot />
-          </Box>
+          <FeatureImportancePlot />
         </Grid>
         <Grid item xs={isMosaic ? 6 : 12}>
-          <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-            <PdpPlot explanation_type="featureExplanation" />
-          </Box>
+          <PdpPlot explanation_type="featureExplanation" />
         </Grid>
         <Grid item xs={isMosaic ? 6 : 12}>
-          <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-            <AlePlot explanation_type="featureExplanation"/>
-          </Box>
+          <AlePlot explanation_type="featureExplanation"/>
         </Grid>
         <Grid item xs={12}>
-          <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-            <Contourplot explanation_type="featureExplanation"/>
-          </Box>
+          <Contourplot explanation_type="featureExplanation"/>
         </Grid>
       </Grid>
     </Box>
