@@ -98,7 +98,7 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
   };
 
 export type FeatureImportanceQuery = {
- 
+
 }
 
 export type FetchFeatureImportancePlotPayload = {

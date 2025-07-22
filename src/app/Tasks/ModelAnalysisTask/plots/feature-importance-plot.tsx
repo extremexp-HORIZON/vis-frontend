@@ -25,7 +25,7 @@ const FeatureImportancePlot = () => {
           metadata: {
             workflowId: tab.workflowId,
             experimentId,
-            
+
           },
         })
       );
@@ -35,7 +35,7 @@ const FeatureImportancePlot = () => {
   const getVegaliteData = () => {
     if (!rawData?.featureImportances) return [];
 
-    return rawData.featureImportances.slice(0,10).map(d => ({
+    return rawData.featureImportances.slice(0, 10).map(d => ({
       Feature: d.featureName,
       Importance: d.importanceScore,
     }));
