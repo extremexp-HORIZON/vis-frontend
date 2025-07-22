@@ -102,15 +102,16 @@ const getVegaliteData = (plmodel: IPlotModel | null) => {
 
   const data: { [key: string]: string | number }[] = [];
 
-  for (let yIdx = 0; yIdx < yVals.length; yIdx++) {
-    for (let xIdx = 0; xIdx < xVals.length; xIdx++) {
+  for (let xIdx = 0; xIdx < xVals.length; xIdx++) {
+    for (let yIdx = 0; yIdx < yVals.length; yIdx++) {
       data.push({
         [xName]: xVals[xIdx],
         [yName]: yVals[yIdx],
-        [zName]: zMatrix[yIdx][xIdx],
+        [zName]: zMatrix[xIdx][yIdx],
       });
     }
   }
+
   return data;
 };
 
