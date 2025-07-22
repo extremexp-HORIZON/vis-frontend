@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
+  Alert,
   Box,
   Paper,
   Table,
@@ -10,32 +11,26 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import {
+  getDataSourceList,
+  setDataSource,
+} from '../../store/slices/exploring/datasourceSlice';
+import { useEffect } from 'react';
+import Loader from '../../shared/components/loader';
+import { FileUpload } from '../../shared/components/file-upload';
 
 const ExploringPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const { dataSources, loading, error } = useAppSelector(
+    state => state.dataSource,
+  );
 
-  // Hardoced datasets until we find a proper dynamic way for it.
-  const datasets = [
-    {
-      id: 'holistic-p3-measurements-athens',
-      name: 'holistic-p3-measurements-athens',
-      dimensions: ['net_type', 'mcc_nr', 'mnc_nr', 'provider', 'eci_cid'],
-      objectCount: 99999,
-    },
-    {
-      id: 'p3-measurements-athens',
-      name: 'p3-measurements-athens',
-      dimensions: ['net_type', 'mcc_nr', 'mnc_nr', 'provider', 'eci_cid'],
-      objectCount: 99999,
-    },
-    {
-      id: 'patra',
-      name: 'patra',
-      dimensions: ['net_type', 'mcc_nr', 'mnc_nr', 'provider', 'eci_cid'],
-      objectCount: 48354,
-    },
-  ];
+  useEffect(() => {
+    dispatch(getDataSourceList());
+  }, [dispatch]);
 
   return (
     <Box
@@ -44,47 +39,75 @@ const ExploringPage = () => {
         flexDirection: 'column',
         height: '100%',
         alignItems: 'center',
+        justifyContent: 'center',
         p: 2,
       }}
     >
-      <Typography variant="h4" textAlign="center">
-        Available Datasets
-      </Typography>
-      <TableContainer component={Paper} sx={{ marginTop: 2, width: '80%' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Dimensions</TableCell>
-              <TableCell align="center">Object Count</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {datasets.map(dataset => (
-              <TableRow
-                key={`dataset-row-${dataset.id}`}
-                hover
-                sx={{ cursor: 'pointer' }}
-                onClick={() =>
-                  navigate(
-                    `${location.pathname.replace(/\/$/, '')}/visualize/${dataset.id}`,
-                  )
-                }
+      {loading.fetch ? (
+        <Loader />
+      ) : error.fetch ? (
+        <Alert severity="error" sx={{ width: '80%', margin: 'auto' }}>
+          {error.fetch}
+        </Alert>
+      ) : (
+        <>
+          {dataSources.length === 0 ? (
+            <Alert severity="info" sx={{ width: '80%' }}>
+              No data sources found. Please upload a data source.
+            </Alert>
+          ) : (
+            <>
+              <Typography variant="h4" textAlign="center">
+                Available Data Sources
+              </Typography>
+              <TableContainer
+                component={Paper}
+                sx={{ marginTop: 2, width: '80%' }}
               >
-                <TableCell sx={{ textAlign: 'center' }}>
-                  {dataset.name}
-                </TableCell>
-                <TableCell sx={{ textAlign: 'center' }}>
-                  {dataset.dimensions?.join(', ')}
-                </TableCell>
-                <TableCell sx={{ textAlign: 'center' }}>
-                  {dataset.objectCount}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">Name</TableCell>
+                      <TableCell align="center">Source</TableCell>
+                      {/* <TableCell align="center">Source Type</TableCell> */}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {dataSources.map(dataSource => (
+                      <TableRow
+                        key={`dataSource-row-${dataSource.fileName}`}
+                        hover
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          dispatch(setDataSource(dataSource));
+                          navigate(
+                            `${location.pathname.replace(/\/$/, '')}/visualize/${dataSource.fileName}`,
+                          );
+                        }}
+                      >
+                        <TableCell sx={{ textAlign: 'center' }}>
+                          {dataSource.fileName}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: 'center' }}>
+                          {dataSource.source}
+                        </TableCell>
+                        {/* <TableCell sx={{ textAlign: 'center' }}>
+                      {dataSource.sourceType}
+                    </TableCell> */}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          )}
+
+          {/* Upload Section */}
+          <Box sx={{ width: '40%', mt: 3 }}>
+            <FileUpload />
+          </Box>
+        </>
+      )}
     </Box>
   );
 };
