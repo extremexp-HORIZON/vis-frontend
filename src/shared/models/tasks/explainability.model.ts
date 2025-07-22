@@ -96,3 +96,22 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
       experimentId: ''
     },
   };
+
+export type FeatureImportanceQuery = {
+  model: string[]
+  target_column?: string
+  data: {
+    X_train: string;
+    Y_train: string;
+    X_test: string;
+    Y_test: string;
+  }
+}
+
+export type FetchFeatureImportancePlotPayload = {
+  query: FeatureImportanceQuery
+    metadata: {
+    workflowId: string
+    experimentId: string
+  }
+}

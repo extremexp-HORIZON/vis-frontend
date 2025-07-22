@@ -3,6 +3,7 @@ import PdpPlot from '../../Tasks/ModelAnalysisTask/plots/pdp-plot';
 import AlePlot from '../../Tasks/ModelAnalysisTask/plots/ale-plot';
 import { useState } from 'react';
 import Contourplot from '../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
+import FeatureImportancePlot from '../../Tasks/ModelAnalysisTask/plots/feature-importance-plot';
 
 const FeatureExplainability = () => {
   const [isMosaic, setIsMosaic] = useState(true);
@@ -43,6 +44,11 @@ const FeatureExplainability = () => {
         container
         spacing={2}
       >
+        <Grid item xs={12}>
+          <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
+            <FeatureImportancePlot />
+          </Box>
+        </Grid>
         <Grid item xs={isMosaic ? 6 : 12}>
           <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
             <PdpPlot explanation_type="featureExplanation" />

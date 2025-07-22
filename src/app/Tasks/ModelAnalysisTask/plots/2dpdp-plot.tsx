@@ -3,10 +3,9 @@ import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
-import theme from '../../../../mui-theme';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import {
-    Box,
+  Box,
   FormControl,
   InputLabel,
   MenuItem,
@@ -16,7 +15,7 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
-import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature, setSelectedFeatures2D } from '../../../../store/slices/explainabilitySlice';
+import { fetchModelAnalysisExplainabilityPlot, setSelectedFeatures2D } from '../../../../store/slices/explainabilitySlice';
 
 interface IContourplot {
   explanation_type: string
@@ -31,13 +30,11 @@ const Contourplot = (props: IContourplot) => {
   const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
     ? tab?.workflowTasks.modelAnalysis?.['2dpdp'].data?.hyperparameterList || null
     : tab?.workflowTasks.modelAnalysis?.['2dpdp'].data?.featureList || null;
-  console.log(tab?.workflowTasks.modelAnalysis?.['2dpdp'].data?.hyperparameterList)
   const plotModel = tab?.workflowTasks.modelAnalysis?.['2dpdp'];
   const { experimentId } = useParams();
 
   const feature1 = plotModel?.selectedFeature1 || '';
   const feature2 = plotModel?.selectedFeature2 || '';
-
 
   useEffect(() => {
     if (isTabInitialized && tab && experimentId) {
@@ -65,10 +62,10 @@ const Contourplot = (props: IContourplot) => {
     const updatedFeature2 = index === 2 ? newFeature : feature2;
 
     dispatch(
-        setSelectedFeatures2D({
-          feature1: updatedFeature1,
-          feature2: updatedFeature2,
-        })
+      setSelectedFeatures2D({
+        feature1: updatedFeature1,
+        feature2: updatedFeature2,
+      })
     );
 
     dispatch(
@@ -89,31 +86,31 @@ const Contourplot = (props: IContourplot) => {
     );
   };
 
-const getVegaliteData = (plmodel: IPlotModel | null) => {
-  if (!plmodel) return [];
+  const getVegaliteData = (plmodel: IPlotModel | null) => {
+    if (!plmodel) return [];
 
-  const xVals = plmodel.xAxis.axisValues;
-  const yVals = plmodel.yAxis.axisValues;
-  const zMatrix = plmodel.zAxis.axisValues.map(row => JSON.parse(row));
+    const xVals = plmodel.xAxis.axisValues;
+    const yVals = plmodel.yAxis.axisValues;
+    const zMatrix = plmodel.zAxis.axisValues.map(row => JSON.parse(row));
 
-  const xName = plmodel.xAxis.axisName;
-  const yName = plmodel.yAxis.axisName;
-  const zName = plmodel.zAxis.axisName || 'value';
+    const xName = plmodel.xAxis.axisName;
+    const yName = plmodel.yAxis.axisName;
+    const zName = plmodel.zAxis.axisName || 'value';
 
-  const data: { [key: string]: string | number }[] = [];
+    const data: { [key: string]: string | number }[] = [];
 
-  for (let xIdx = 0; xIdx < xVals.length; xIdx++) {
-    for (let yIdx = 0; yIdx < yVals.length; yIdx++) {
-      data.push({
-        [xName]: xVals[xIdx],
-        [yName]: yVals[yIdx],
-        [zName]: zMatrix[xIdx][yIdx],
-      });
+    for (let xIdx = 0; xIdx < xVals.length; xIdx++) {
+      for (let yIdx = 0; yIdx < yVals.length; yIdx++) {
+        data.push({
+          [xName]: xVals[xIdx],
+          [yName]: yVals[yIdx],
+          [zName]: zMatrix[xIdx][yIdx],
+        });
+      }
     }
-  }
 
-  return data;
-};
+    return data;
+  };
 
   const spec = {
     width: 'container',
@@ -152,7 +149,7 @@ const getVegaliteData = (plmodel: IPlotModel | null) => {
         const other = i === 1 ? feature2 : feature1;
 
         return (
-          <FormControl fullWidth key={i}>            
+          <FormControl fullWidth key={i}>
             <InputLabel id={`feature${i}-label`}>{explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}</InputLabel>
             <Select
               labelId={`feature${i}-label`}
@@ -160,16 +157,16 @@ const getVegaliteData = (plmodel: IPlotModel | null) => {
               label={explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}
               onChange={handleFeatureChange(i)}
               disabled={plotModel?.loading || !plotModel?.data}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 250,
-                      maxWidth: 300,
-                    },
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 250,
+                    maxWidth: 300,
                   },
-                }}
+                },
+              }}
             >
-              {featureOrHyperparameterList && featureOrHyperparameterList 
+              {featureOrHyperparameterList && featureOrHyperparameterList
                 .filter(f => f !== other)
                 .map(f => (
                   <MenuItem key={f} value={f}>

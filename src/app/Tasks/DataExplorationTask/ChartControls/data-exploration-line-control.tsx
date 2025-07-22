@@ -23,8 +23,6 @@ const LineChartControlPanel = () => {
   const columns =
     tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns || [];
 
-  console.log('Columns in LineChartControlPanel:', columns);
-
   const xAxis = controlPanel?.xAxis;
   const yAxis = controlPanel?.yAxis || [];
   const viewMode = useAppSelector(
