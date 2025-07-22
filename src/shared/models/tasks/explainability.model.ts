@@ -98,14 +98,7 @@ export const fetchExplainabilityPlotPayloadDefault: FetchExplainabilityPlotPaylo
   };
 
 export type FeatureImportanceQuery = {
-  model: string[]
-  target_column?: string
-  data: {
-    X_train: string;
-    Y_train: string;
-    X_test: string;
-    Y_test: string;
-  }
+ 
 }
 
 export type FetchFeatureImportancePlotPayload = {
