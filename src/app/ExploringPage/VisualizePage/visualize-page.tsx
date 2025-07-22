@@ -14,6 +14,7 @@ import Stats from './Stats/stats';
 import { VisControl } from './VisControl/vis-control';
 import { Chart } from './Chart/chart';
 import { TimeSeriesChart } from './TimeSeriesChart/time-series-chart';
+import { getDataSource } from '../../../store/slices/exploring/datasourceSlice';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -22,23 +23,28 @@ const VisualizePage = () => {
     (state: RootState) => state.dataset,
   );
   const { drawnRect } = useAppSelector((state: RootState) => state.map);
+  const {
+    dataSource,
+    loading: { fetch: dataSourceLoading },
+  } = useAppSelector((state: RootState) => state.dataSource);
 
   useEffect(() => {
-    if (datasetId) {
+    if (datasetId && !dataSource) {
+      dispatch(getDataSource({ datasetId }));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (datasetId && dataSource) {
       dispatch(
         postFileMeta({
-          body: {
-            sourceType: 'local',
-            format: 'rawvis',
-            source: `/opt/experiments/${datasetId}/dataset/${datasetId}.csv`,
-            fileName: datasetId,
-          },
+          body: dataSource,
         }),
       );
     }
-  }, [datasetId]);
+  }, [datasetId, dataSource]);
 
-  if (loading.postFileMeta || !datasetId) {
+  if (loading.postFileMeta || !datasetId || dataSourceLoading) {
     return <Loader />;
   }
 
