@@ -29,6 +29,11 @@ export const setSelectedFeature = createAction<{
   feature: string;
 }>('explainability/set_selected_feature');
 
+export const setSelectedFeatures2D = createAction<{
+  feature1: string;
+  feature2: string;
+}>('explainability/set_selected_features_2d');
+
 // Helpers
 const getTask = (state: IWorkflowPage, workflowId: string) =>
   state.tab?.workflowId === workflowId ? state.tab.workflowTasks.modelAnalysis : null;
@@ -62,10 +67,13 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
       if (task && plotType !== 'featureNames') {
         const section = task[plotType];
 
-        if ('selectedFeature' in section) {
-          section.selectedFeature = action.payload.features.feature1;
-        }
-        assignResult(section, action.payload);
+      if ('selectedFeature' in section) {
+        section.selectedFeature = action.payload.features.feature1;
+      } else if ('selectedFeature1' in section && 'selectedFeature2' in section) {
+        section.selectedFeature1 = action.payload.features.feature1;
+        section.selectedFeature2 = action.payload.features.feature2;
+      }        
+      assignResult(section, action.payload);
       }
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.rejected, (state, action) => {
@@ -86,6 +94,16 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
         if ('selectedFeature' in section) {
           section.selectedFeature = feature;
         }
+      }
+    })
+    .addCase(setSelectedFeatures2D, (state, action) => {
+      const task = state.tab?.workflowTasks.modelAnalysis;
+      const { feature1, feature2 } = action.payload;
+
+      const section = task?.['2dpdp'];
+      if (section && 'selectedFeature1' in section && 'selectedFeature2' in section) {
+        section.selectedFeature1 = feature1;
+        section.selectedFeature2 = feature2;
       }
     });
 };

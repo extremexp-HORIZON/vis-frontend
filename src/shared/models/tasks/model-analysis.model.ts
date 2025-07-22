@@ -53,6 +53,7 @@ export interface IModelAnalysis {
   featureNames: string[]
   pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
   ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
+  '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null;}
   counterfactuals: {
     data: IPlotModel | null
     loading: boolean
@@ -112,6 +113,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   featureNames: [],
   pdp: { data: null, loading: false, error: null, selectedFeature: null },
   ale: { data: null, loading: false, error: null, selectedFeature: null },
+  '2dpdp': { data: null, loading: false, error: null, selectedFeature1: null,  selectedFeature2: null},
   counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals: { data: null, loading: false, error: null },
   influenceFunctions: { data: null, loading: false, error: null },
