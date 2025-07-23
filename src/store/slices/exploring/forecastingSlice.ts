@@ -74,6 +74,9 @@ export const forecastingSlice = createSlice({
   name: 'forecasting',
   initialState,
   reducers: {
+    resetForecastingState: () => {
+      return initialState;
+    },
     deleteModel: (state, action: PayloadAction<string>) => {
       state.savedModels = state.savedModels.filter(
         model => model['model_name'] !== action.payload,
@@ -115,6 +118,7 @@ export const forecastingSlice = createSlice({
 });
 
 export const {
+  resetForecastingState,
   deleteModel,
   saveModel,
   setLoading,

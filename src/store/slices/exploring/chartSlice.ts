@@ -24,6 +24,9 @@ export const chartSlice = createSlice({
   name: 'chart',
   initialState,
   reducers: {
+    resetChartState: () => {
+      return initialState;
+    },
     setAggType: (state, action: PayloadAction<AggregateFunctionType>) => {
       state.aggType = action.payload;
     },
@@ -97,6 +100,7 @@ export const chartListeners = (startApplistening: AppStartListening) => {
 };
 
 export const {
+  resetChartState,
   setAggType,
   setChartType,
   setGroupByCols,

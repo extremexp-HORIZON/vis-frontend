@@ -158,10 +158,13 @@ export const dataSourceSlice = createSlice({
     );
   },
   reducers: {
+    resetDataSourceState: () => {
+      return initialState;
+    },
     setDataSource: (state, action: PayloadAction<IDataSource>) => {
       state.dataSource = action.payload;
     },
   },
 });
 
-export const { setDataSource } = dataSourceSlice.actions;
+export const { setDataSource, resetDataSourceState } = dataSourceSlice.actions;

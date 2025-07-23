@@ -121,6 +121,9 @@ export const mapSlice = createSlice({
   name: 'exploringMapSlice',
   initialState,
   reducers: {
+    resetMapState: () => {
+      return initialState;
+    },
     setZoom: (state, action: PayloadAction<number>) => {
       state.zoom = action.payload;
     },
@@ -254,6 +257,7 @@ export const mapListeners = (startAppListening: AppStartListening) => {
 };
 
 export const {
+  resetMapState,
   setZoom,
   setViewRect,
   setDrawnRect,

@@ -68,6 +68,9 @@ export const timeSeriesSlice = createSlice({
   name: 'timeSeries',
   initialState,
   reducers: {
+    resetTimeSeriesState: () => {
+      return initialState;
+    },
     setFrequency: (state, action: PayloadAction<number>) => {
       state.frequency = action.payload;
     },
@@ -107,6 +110,7 @@ export const timeSeriesListeners = (startAppListening: AppStartListening) => {
 };
 
 export const {
+  resetTimeSeriesState,
   setFrequency,
   setLoading,
   setMeasureCol,

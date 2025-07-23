@@ -160,6 +160,9 @@ export const datasetSlice = createSlice({
   name: 'exploringDatasetSlice',
   initialState,
   reducers: {
+    resetDatasetState: () => {
+      return initialState;
+    },
     setCategoricalFilters: (
       state,
       action: PayloadAction<Record<string, unknown>>,
@@ -284,5 +287,9 @@ export const datasetUiListeners = (startAppListening: AppStartListening) => {
   });
 };
 
-export const { setCategoricalFilters, setTimeRange, triggerDatasetUiUpdate } =
-  datasetSlice.actions;
+export const {
+  resetDatasetState,
+  setCategoricalFilters,
+  setTimeRange,
+  triggerDatasetUiUpdate,
+} = datasetSlice.actions;

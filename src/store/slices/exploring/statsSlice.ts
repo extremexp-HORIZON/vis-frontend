@@ -16,6 +16,9 @@ export const statsSlice = createSlice({
   name: 'stats',
   initialState,
   reducers: {
+    resetStatsState: () => {
+      return initialState;
+    },
     setRectStats: (state, action: PayloadAction<IRectStats>) => {
       state.rectStats = action.payload;
     },
@@ -34,5 +37,9 @@ export const statsSlice = createSlice({
   },
 });
 
-export const { setRectStats, setSeries, updateAnalysisResults } =
-  statsSlice.actions;
+export const {
+  resetStatsState,
+  setRectStats,
+  setSeries,
+  updateAnalysisResults,
+} = statsSlice.actions;
