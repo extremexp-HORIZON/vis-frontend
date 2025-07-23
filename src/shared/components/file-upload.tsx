@@ -15,9 +15,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { uploadDataSource } from '../../store/slices/exploring/datasourceSlice';
+import type { IDataSource } from '../models/dataexploration.model';
 
 interface FileUploadProps {
-  onUploadSuccess?: (dataset: any) => void;
+  onUploadSuccess?: (dataset: IDataSource) => void;
   onUploadError?: (error: string) => void;
 }
 
@@ -31,8 +32,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const acceptedFileTypes = ['.csv', '.json'];
-  const maxFileSize = 50 * 1024 * 1024; // 50MB
+  const acceptedFileTypes = ['.csv'];
+  const maxFileSize = 100 * 1024 * 1024; // 100MB
 
   const validateFile = (file: File): string | null => {
     // Check file type
