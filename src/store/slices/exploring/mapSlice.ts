@@ -20,6 +20,7 @@ interface MapState {
   clustersLoading: boolean;
   facets: IFacet;
   queryInfo: IQueryInfo | null;
+  selectedGeohash: string | null;
 }
 
 const initialState: MapState = {
@@ -30,6 +31,7 @@ const initialState: MapState = {
   clustersLoading: false,
   facets: {},
   queryInfo: null,
+  selectedGeohash: null,
 };
 
 export const updateClusters = createAsyncThunk(
@@ -156,6 +158,12 @@ export const mapSlice = createSlice({
     setQueryInfo: (state, action: PayloadAction<IQueryInfo | null>) => {
       state.queryInfo = action.payload;
     },
+    setSelectedGeohash: (state, action: PayloadAction<string | null>) => {
+      state.selectedGeohash = action.payload;
+    },
+    resetSelectedGeohash: state => {
+      state.selectedGeohash = null;
+    },
     updateMapBounds: (
       state,
       action: PayloadAction<{
@@ -185,8 +193,8 @@ export const mapSlice = createSlice({
       state.clustersLoading = false;
     });
     builder.addCase(updateClusters.rejected, (state, action) => {
-      console.log('rejected state', state);
-      console.log('Rejection reason:', action.error);
+      // Handle rejection silently or log to a proper logging service
+      state.clustersLoading = false;
     });
   },
 });
@@ -239,7 +247,7 @@ export const mapListeners = (startAppListening: AppStartListening) => {
           dispatch(updateTimeSeries());
         }
       } catch (error) {
-        console.error('Error executing query after setDrawnRect:', error);
+        // Handle error silently or log to a proper logging service
       }
     },
   });
@@ -252,5 +260,7 @@ export const {
   setClusters,
   setFacets,
   setQueryInfo,
+  setSelectedGeohash,
+  resetSelectedGeohash,
   updateMapBounds,
 } = mapSlice.actions;

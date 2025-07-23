@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   generateRsrpColor,
   MAX_ZOOM,
@@ -21,6 +21,10 @@ import { HeatmapLayer } from './heatmap-layer';
 import { getRow } from '../../../../store/slices/exploring/datasetSlice';
 import { GeohashGridLayer } from './geohash-grid-layer';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import {
+  setSelectedGeohash,
+  resetSelectedGeohash,
+} from '../../../../store/slices/exploring/mapSlice';
 
 export interface IMapProps {
   id: string;
@@ -134,12 +138,10 @@ export const Map = (props: IMapProps) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const geohash = searchParams.get('geohash');
-  const [selectedGeohash, setSelectedGeohash] = useState<string | null>(
-    geohash,
-  );
+  const dispatch = useAppDispatch();
 
   //   const [map, setMap] = useState(null);
-  const { clusters, viewRect, zoom } = useAppSelector(
+  const { clusters, viewRect, zoom, selectedGeohash } = useAppSelector(
     (state: RootState) => state.map,
   );
   const [clusterMap, setClusterMap] = useState<boolean>(true);
@@ -152,6 +154,13 @@ export const Map = (props: IMapProps) => {
     lng: number;
   } | null>(null);
   const [showGeohashGrid, setShowGeohashGrid] = useState(false);
+
+  // Initialize selectedGeohash from URL params
+  useEffect(() => {
+    if (geohash && geohash !== selectedGeohash) {
+      dispatch(setSelectedGeohash(geohash));
+    }
+  }, [geohash, selectedGeohash, dispatch]);
 
   const latitudeExtractor = useCallback(
     (r: [number, number, number?] | null) => (r && r[0] != null ? r[0] : 0),
@@ -197,12 +206,12 @@ export const Map = (props: IMapProps) => {
       resetGeohashSelection();
     }
     setShowGeohashGrid(prev => !prev);
-  }, [showGeohashGrid]);
+  }, [showGeohashGrid, dispatch]);
 
   const resetGeohashSelection = useCallback(() => {
-    setSelectedGeohash(null);
+    dispatch(resetSelectedGeohash());
     navigate('?');
-  }, []);
+  }, [dispatch, navigate]);
 
   let content: React.ReactNode;
 
@@ -238,7 +247,9 @@ export const Map = (props: IMapProps) => {
             dataset={dataset}
             points={points}
             selectedGeohash={selectedGeohash}
-            setSelectedGeohash={setSelectedGeohash}
+            setSelectedGeohash={(geohash: string | null) =>
+              dispatch(setSelectedGeohash(geohash))
+            }
           />
         ) : clusterMap ? (
           clusters.map((cluster, index) => {
