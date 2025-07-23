@@ -32,6 +32,9 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
   const { data, frequency, measureCol, loading } = useAppSelector(
     (state: RootState) => state.timeSeries,
   );
+  const { loading: { executeQuery: loadingExecuteQuery } } = useAppSelector(
+    (state: RootState) => state.dataset,
+  );
   const [frequencyData, setFrequencyData] = useState('15m');
 
   const handleTimeInterval = (value: string) => {
@@ -77,7 +80,7 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
 
   return (
     <Card sx={{ p: 2, mt: 1 }}>
-      {loading ? (
+      {loading || loadingExecuteQuery ? (
         <Loader />
       ) : (
         <>
