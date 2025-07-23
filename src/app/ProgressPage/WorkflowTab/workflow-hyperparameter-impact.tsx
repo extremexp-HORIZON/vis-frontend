@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Button, ButtonGroup, Grid } from '@mui/material';
 import PdpPlot from '../../Tasks/ModelAnalysisTask/plots/pdp-plot';
 import AlePlot from '../../Tasks/ModelAnalysisTask/plots/ale-plot';
+import Contourplot from '../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
 
 const HyperparameterImpact = () => {
   const [isMosaic, setIsMosaic] = useState(true);
@@ -43,14 +44,13 @@ const HyperparameterImpact = () => {
         spacing={2}
       >
         <Grid item xs={isMosaic ? 6 : 12}>
-          <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-            <PdpPlot explanation_type="hyperparameterExplanation" />
-          </Box>
+          <PdpPlot explanation_type="hyperparameterExplanation" />
         </Grid>
         <Grid item xs={isMosaic ? 6 : 12}>
-          <Box sx={{ minHeight: { md: 305, xl: 500 } }}>
-            <AlePlot explanation_type="hyperparameterExplanation" />
-          </Box>
+          <AlePlot explanation_type="hyperparameterExplanation" />
+        </Grid>
+        <Grid item xs={12}>
+          <Contourplot explanation_type="hyperparameterExplanation" />
         </Grid>
       </Grid>
     </Box>

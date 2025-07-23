@@ -44,7 +44,7 @@ export const dataExplorationReducers = (
         asyncState.error = null;
 
         if (queryCase === 'dataTable') {
-          const totalItems = state.tab?.workflowTasks.dataExploration?.metaData.data?.totalItems || 0;
+          const totalItems = state.tab?.workflowTasks.dataExploration?.dataTable.data?.totalItems || 0;
           const { pageSize } = task.controlPanel;
 
           task.controlPanel.queryItems = totalItems;
@@ -101,7 +101,7 @@ export const dataExplorationReducers = (
         ? [originalColumns[1]]
         : [originalColumns[0]].filter(Boolean);
 
-      task.controlPanel.yAxis = defaultYAxis;
+      // task.controlPanel.yAxis = defaultYAxis;
       task.controlPanel.yAxisScatter = defaultYAxis;
       task.controlPanel.timestampField = task.metaData.data?.timeColumn || null;
       task.controlPanel.orderBy =  null;
@@ -118,6 +118,7 @@ export const dataExplorationReducers = (
           function: AggregationFunction.COUNT
         });
         task.controlPanel.selectedMeasureColumn = numericColumn.name;
+        task.controlPanel.yAxis = [numericColumn];
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);

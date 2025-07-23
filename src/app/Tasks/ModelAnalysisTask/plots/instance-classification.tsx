@@ -40,7 +40,7 @@ const ControlPanel = ({
   options,
   plotData,
   useUmap,
-  setUseUmap
+  setUseUmap,
 }: ControlPanelProps) => {
   const handleAxisSelection =
     (axis: 'x' | 'y') => (e: { target: { value: string } }) => {
@@ -146,13 +146,14 @@ interface IInstanceClassification {
   showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
   hashRow: (row: TestInstance) => string
+  counterfactualPoints?: TestInstance[] | null
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
   const theme = useTheme();
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
-  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
+  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow, counterfactualPoints } = props;
   const [options, setOptions] = useState<string[]>([]);
   const [xAxisOption, setXAxisOption] = useState<string>('');
   const [yAxisOption, setYAxisOption] = useState<string>('');
@@ -173,17 +174,27 @@ const InstanceClassification = (props: IInstanceClassification) => {
   //   }
   //   return newData
   // }
-  const getVegaData = (data: TestInstance[]) => {
-    return data.map((originalRow: TestInstance) => {
-      const id = hashRow(originalRow);
-      const isMisclassified = originalRow.actual !== originalRow.predicted;
+  const getVegaData = (
+    mainData: TestInstance[],
+    counterfactuals?: TestInstance[] | null
+  ) => {
+    const base = mainData.map((row) => ({
+      ...row,
+      id: hashRow(row),
+      isMisclassified: row.actual !== row.predicted,
+      isCounterfactual: false,
+      pointType: 'Original',
+    }));
 
-      return {
-        ...originalRow,
-        isMisclassified,
-        id,
-      };
-    });
+    const cf = (counterfactuals ?? []).map((row, i) => ({
+      ...row,
+      id: `cf-${i}`,
+      isMisclassified: false,
+      isCounterfactual: true,
+      pointType: 'Counterfactual',
+    }));
+
+    return [...base, ...cf];
   };
 
   useEffect(() => {
@@ -262,7 +273,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
           height: 'container',
           autosize: { type: 'fit', contains: 'padding', resize: true },
           data: {
-            values: getVegaData(plotData?.data ?? []),
+            values: getVegaData(plotData?.data ?? [], counterfactualPoints),
           },
           params: [
             {
@@ -276,6 +287,10 @@ const InstanceClassification = (props: IInstanceClassification) => {
               },
               value: { isMisclassified: true }
 
+            },
+            {
+              name: 'selectedPoint',
+              value: point?.id ?? null
             },
             {
               name: 'panZoom',
@@ -298,29 +313,28 @@ const InstanceClassification = (props: IInstanceClassification) => {
               field: yAxisOption || 'yAxis default',
               type: yFieldType,
             },
-            color: showMisclassifiedOnly
-              ? {
-                field: 'isMisclassified',
-                type: 'nominal',
-                scale: {
+            color: {
+              condition: {
+                test: 'datum.isCounterfactual',
+                value: '#FFA500',
+              },
+              field: showMisclassifiedOnly ? 'isMisclassified' : 'predicted',
+              type: showMisclassifiedOnly ? 'nominal' : 'nominal',
+              scale: showMisclassifiedOnly
+                ? {
                   domain: [false, true],
                   range: ['#cccccc', '#ff0000'],
-                },
-                legend: {
-                  title: 'Misclassified',
-                  labelExpr: 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\'',
-                },
-              }
-              : {
-                field: 'predicted',
-                type: 'nominal',
-                scale: {
+                }
+                : {
                   range: ['#1f77b4', '#2ca02c'],
                 },
-                legend: {
-                  title: 'Predicted Class',
-                },
+              legend: {
+                title: showMisclassifiedOnly ? 'Misclassified' : 'Predicted Class',
+                labelExpr: showMisclassifiedOnly
+                  ? 'datum.label === \'true\' ? \'Misclassified\' : \'Correct\''
+                  : undefined,
               },
+            },
             opacity: showMisclassifiedOnly
               ? {
                 field: 'isMisclassified',
@@ -345,23 +359,22 @@ const InstanceClassification = (props: IInstanceClassification) => {
               {
                 value: 100,
               },
-            // stroke: {
-            //   condition: {
-            //     param: "highlight",
-            //     empty: false,
-            //     value: "black",
-            //   },
-            //   value: "transparent"
-            // },
-            // strokeWidth: {
-            //   condition: {
-            //     param: "highlight",
-            //     empty: false,
-            //     value: 2
-            //   },
-            //   value: 0
-            // },
+            stroke: {
+              condition: {
+                test: 'datum.id === selectedPoint',
+                value: 'black',
+              },
+              value: null,
+            },
+            strokeWidth: {
+              condition: {
+                test: 'datum.id === selectedPoint',
+                value: 2,
+              },
+              value: 0,
+            },
             tooltip: [
+              { field: 'pointType', type: 'nominal', title: 'Type' },
               { field: 'actual', type: 'nominal', title: 'Actual' },
               { field: 'predicted', type: 'nominal', title: 'Predicted' },
               { field: xAxisOption || 'xAxis default', type: 'quantitative', title: xAxisOption },

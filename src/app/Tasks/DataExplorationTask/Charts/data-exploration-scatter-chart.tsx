@@ -159,7 +159,7 @@ const ScatterChart = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
 
-  const chartData = (tab?.workflowTasks.dataExploration?.lineChart?.data?.data as ScatterChartDataRow[]) ?? [];
+  const chartData = (tab?.workflowTasks.dataExploration?.scatterChart?.data?.data as ScatterChartDataRow[]) ?? [];
   const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis;
   const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis;
   const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy;
