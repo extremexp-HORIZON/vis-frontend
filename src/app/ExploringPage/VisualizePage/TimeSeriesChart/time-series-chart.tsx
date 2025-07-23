@@ -21,6 +21,7 @@ import {
 } from '../../../../store/slices/exploring/timeSeriesSlice';
 import { TimeSeriesVisualizer } from './time-series-visualizer';
 import { Forecasting } from '../Forecasting/forecasting';
+import Loader from '../../../../shared/components/loader';
 
 export interface IChartTSProps {
   dataset: IDataset;
@@ -76,59 +77,69 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
 
   return (
     <Card sx={{ p: 2, mt: 1 }}>
-      <CardContent sx={{ pb: 1 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="body2">Time series data for</Typography>
-            <FormControl size="small" variant="standard">
-              <Select
-                labelId="measure-select-label"
-                value={measureCol || ''}
-                onChange={e => {
-                  dispatch(setMeasureCol(e.target.value));
-                  dispatch(triggerTimeSeriesUpdate());
-                }}
-              >
-                {dataset.measure0 && (
-                  <MenuItem value={dataset.measure0}>
-                    {dataset.measure0}
-                  </MenuItem>
-                )}
-                {dataset.measure1 && (
-                  <MenuItem value={dataset.measure1}>
-                    {dataset.measure1}
-                  </MenuItem>
-                )}
-              </Select>
-            </FormControl>
-          </Box>
-          <Forecasting dataset={dataset} />
-        </Box>
-
-        <Box
-          display="flex"
-          justifyContent="flex-end"
-          alignItems="center"
-          mt={2}
-          gap={2}
-        >
-          <Typography variant="body2">Freq.</Typography>
-          <FormControl size="small" variant="standard">
-            <Select
-              labelId="frequency-select-label"
-              value={frequencyData}
-              onChange={e => handleTimeInterval(e.target.value)}
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <CardContent sx={{ pb: 1 }}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
             >
-              <MenuItem value="15m">15m</MenuItem>
-              <MenuItem value="30m">30m</MenuItem>
-              <MenuItem value="1h">1h</MenuItem>
-              <MenuItem value="6h">6h</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-      </CardContent>
+              <Box display="flex" alignItems="center" gap={2}>
+                <Typography variant="body2">Time series data for</Typography>
+                <FormControl size="small" variant="standard">
+                  <Select
+                    labelId="measure-select-label"
+                    value={measureCol || ''}
+                    onChange={e => {
+                      dispatch(setMeasureCol(e.target.value));
+                      dispatch(triggerTimeSeriesUpdate());
+                    }}
+                  >
+                    {dataset.measure0 && (
+                      <MenuItem value={dataset.measure0}>
+                        {dataset.measure0}
+                      </MenuItem>
+                    )}
+                    {dataset.measure1 && (
+                      <MenuItem value={dataset.measure1}>
+                        {dataset.measure1}
+                      </MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Box>
+              <Forecasting dataset={dataset} />
+            </Box>
 
-      {!loading && <TimeSeriesVisualizer data={data} measureCol={measureCol} />}
+            <Box
+              display="flex"
+              justifyContent="flex-end"
+              alignItems="center"
+              mt={2}
+              gap={2}
+            >
+              <Typography variant="body2">Freq.</Typography>
+              <FormControl size="small" variant="standard">
+                <Select
+                  labelId="frequency-select-label"
+                  value={frequencyData}
+                  onChange={e => handleTimeInterval(e.target.value)}
+                >
+                  <MenuItem value="15m">15m</MenuItem>
+                  <MenuItem value="30m">30m</MenuItem>
+                  <MenuItem value="1h">1h</MenuItem>
+                  <MenuItem value="6h">6h</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </CardContent>
+
+          <TimeSeriesVisualizer data={data} measureCol={measureCol} />
+        </>
+      )}
     </Card>
   );
 };

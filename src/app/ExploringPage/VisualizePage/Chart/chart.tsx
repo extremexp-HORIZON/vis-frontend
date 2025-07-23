@@ -17,12 +17,8 @@ import {
 import React from 'react';
 import type { VisualizationSpec } from 'react-vega';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
-import type {
-  RootState } from '../../../../store/store';
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import { AggregateFunctionType } from '../../../../shared/models/exploring/enum/aggregate-function-type.model';
 import {
@@ -32,6 +28,7 @@ import {
   setMeasureCol,
   triggerChartUpdate,
 } from '../../../../store/slices/exploring/chartSlice';
+import Loader from '../../../../shared/components/loader';
 
 export interface IChartProps {
   dataset: IDataset;
@@ -44,6 +41,9 @@ export const Chart = (props: IChartProps) => {
   const { aggType, chartType, measureCol, groupByCols } = useAppSelector(
     (state: RootState) => state.chart,
   );
+  const {
+    loading: { executeQuery: loadingExecuteQuery },
+  } = useAppSelector((state: RootState) => state.dataset);
   const dispatch = useAppDispatch();
   const xAxisOptions = dimensions.map(dim => ({
     key: dim,
@@ -178,165 +178,147 @@ export const Chart = (props: IChartProps) => {
         bgcolor: 'white',
       }}
     >
-      <Stack direction="row" justifyContent="flex-end" spacing={1} mb={2}>
-        <IconButton
-          color={chartType === 'column' ? 'primary' : 'default'}
-          onClick={e => {
-            handleChartTypeChange('column');
-            handlePopoverOpen(e, 'Bar Chart');
-          }}
-          onMouseLeave={handlePopoverClose}
-        >
-          <BarChartIcon />
-        </IconButton>
-        <IconButton
-          color={chartType === 'line' ? 'primary' : 'default'}
-          onClick={e => {
-            handleChartTypeChange('line');
-            handlePopoverOpen(e, 'Line Chart');
-          }}
-          onMouseLeave={handlePopoverClose}
-        >
-          <ShowChartIcon />
-        </IconButton>
-        <IconButton
-          color={chartType === 'area' ? 'primary' : 'default'}
-          onClick={e => {
-            handleChartTypeChange('area');
-            handlePopoverOpen(e, 'Area Chart');
-          }}
-          onMouseLeave={handlePopoverClose}
-        >
-          <BubbleChartIcon />
-        </IconButton>
-        <IconButton
-          color={chartType === 'heatmap' ? 'primary' : 'default'}
-          onClick={e => {
-            handleChartTypeChange('heatmap');
-            handlePopoverOpen(e, 'Heatmap');
-          }}
-          onMouseLeave={handlePopoverClose}
-        >
-          <GridOnIcon />
-        </IconButton>
-        <Popover
-          open={Boolean(popoverAnchor)}
-          anchorEl={popoverAnchor}
-          onClose={handlePopoverClose}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          disableRestoreFocus
-        >
-          <Box sx={{ p: 1 }}>
-            <Typography variant="body2">{popoverText}</Typography>
-          </Box>
-        </Popover>
-      </Stack>
+      {loadingExecuteQuery ? (
+        <Loader />
+      ) : (
+        <>
+          <Stack direction="row" justifyContent="flex-end" spacing={1} mb={2}>
+            <IconButton
+              color={chartType === 'column' ? 'primary' : 'default'}
+              onClick={e => {
+                handleChartTypeChange('column');
+                handlePopoverOpen(e, 'Bar Chart');
+              }}
+              onMouseLeave={handlePopoverClose}
+            >
+              <BarChartIcon />
+            </IconButton>
+            <IconButton
+              color={chartType === 'line' ? 'primary' : 'default'}
+              onClick={e => {
+                handleChartTypeChange('line');
+                handlePopoverOpen(e, 'Line Chart');
+              }}
+              onMouseLeave={handlePopoverClose}
+            >
+              <ShowChartIcon />
+            </IconButton>
+            <IconButton
+              color={chartType === 'area' ? 'primary' : 'default'}
+              onClick={e => {
+                handleChartTypeChange('area');
+                handlePopoverOpen(e, 'Area Chart');
+              }}
+              onMouseLeave={handlePopoverClose}
+            >
+              <BubbleChartIcon />
+            </IconButton>
+            <IconButton
+              color={chartType === 'heatmap' ? 'primary' : 'default'}
+              onClick={e => {
+                handleChartTypeChange('heatmap');
+                handlePopoverOpen(e, 'Heatmap');
+              }}
+              onMouseLeave={handlePopoverClose}
+            >
+              <GridOnIcon />
+            </IconButton>
+            <Popover
+              open={Boolean(popoverAnchor)}
+              anchorEl={popoverAnchor}
+              onClose={handlePopoverClose}
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              disableRestoreFocus
+            >
+              <Box sx={{ p: 1 }}>
+                <Typography variant="body2">{popoverText}</Typography>
+              </Box>
+            </Popover>
+          </Stack>
 
-      {vegaSeriesData.length > 0 && (
-        <ResponsiveVegaLite
-          minWidth={100}
-          minHeight={100}
-          aspectRatio={1 / 0.75}
-          actions={false}
-          spec={spec}
-        />
-      )}
+          {vegaSeriesData.length > 0 && (
+            <ResponsiveVegaLite
+              minWidth={100}
+              minHeight={100}
+              aspectRatio={1 / 0.75}
+              actions={false}
+              spec={spec}
+            />
+          )}
 
-      <Stack
-        direction="row"
-        flexWrap="wrap"
-        alignItems="center"
-        justifyContent="center"
-        spacing={2}
-        mt={3}
-      >
-        {dataset.measure0 && (
-          <>
-            <Typography variant="caption" sx={{ mr: 1 }}>
-              Find
-            </Typography>
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <Select
-                labelId="agg-type-label"
-                value={aggType}
-                label="Aggregate"
-                onChange={e => {
-                  dispatch(setAggType(e.target.value as AggregateFunctionType));
-                  dispatch(triggerChartUpdate());
-                }}
-                variant="standard"
-              >
-                {aggTypeOptions.map(opt => (
-                  <MenuItem key={opt.value} value={opt.value}>
-                    {opt.text}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </>
-        )}
-
-        {dataset.measure0 && aggType !== AggregateFunctionType.COUNT && (
-          <>
-            <Typography variant="caption" sx={{ mx: 1 }}>
-              of
-            </Typography>
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <Select
-                labelId="measure-label"
-                value={measure!}
-                label="Measure"
-                onChange={e => {
-                  dispatch(setMeasureCol(e.target.value));
-                  dispatch(triggerChartUpdate());
-                }}
-                variant="standard"
-              >
-                {[dataset.measure0, dataset.measure1].map(m => (
-                  <MenuItem key={m} value={m!}>
-                    {m}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </>
-        )}
-
-        <Typography variant="caption" sx={{ mx: 1 }}>
-          per
-        </Typography>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <Select
-            labelId="xaxis-label"
-            value={xAxis || ''}
-            label="X axis"
-            onChange={e => {
-              dispatch(setGroupByCols([e.target.value]));
-              dispatch(triggerChartUpdate());
-            }}
-            variant="standard"
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+            mt={3}
           >
-            {xAxisOptions.map(opt => (
-              <MenuItem key={opt.value} value={opt.value}>
-                {opt.text}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            {dataset.measure0 && (
+              <>
+                <Typography variant="caption" sx={{ mr: 1 }}>
+                  Find
+                </Typography>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <Select
+                    labelId="agg-type-label"
+                    value={aggType}
+                    label="Aggregate"
+                    onChange={e => {
+                      dispatch(
+                        setAggType(e.target.value as AggregateFunctionType),
+                      );
+                      dispatch(triggerChartUpdate());
+                    }}
+                    variant="standard"
+                  >
+                    {aggTypeOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.text}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </>
+            )}
 
-        {chartType === 'heatmap' && (
-          <>
+            {dataset.measure0 && aggType !== AggregateFunctionType.COUNT && (
+              <>
+                <Typography variant="caption" sx={{ mx: 1 }}>
+                  of
+                </Typography>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <Select
+                    labelId="measure-label"
+                    value={measure!}
+                    label="Measure"
+                    onChange={e => {
+                      dispatch(setMeasureCol(e.target.value));
+                      dispatch(triggerChartUpdate());
+                    }}
+                    variant="standard"
+                  >
+                    {[dataset.measure0, dataset.measure1].map(m => (
+                      <MenuItem key={m} value={m!}>
+                        {m}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </>
+            )}
+
             <Typography variant="caption" sx={{ mx: 1 }}>
-              and
+              per
             </Typography>
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <Select
-                labelId="yaxis-label"
-                value={yAxis || ''}
-                label="Y axis"
+                labelId="xaxis-label"
+                value={xAxis || ''}
+                label="X axis"
                 onChange={e => {
-                  dispatch(setGroupByCols([xAxis!, e.target.value]));
+                  dispatch(setGroupByCols([e.target.value]));
                   dispatch(triggerChartUpdate());
                 }}
                 variant="standard"
@@ -348,9 +330,35 @@ export const Chart = (props: IChartProps) => {
                 ))}
               </Select>
             </FormControl>
-          </>
-        )}
-      </Stack>
+
+            {chartType === 'heatmap' && (
+              <>
+                <Typography variant="caption" sx={{ mx: 1 }}>
+                  and
+                </Typography>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <Select
+                    labelId="yaxis-label"
+                    value={yAxis || ''}
+                    label="Y axis"
+                    onChange={e => {
+                      dispatch(setGroupByCols([xAxis!, e.target.value]));
+                      dispatch(triggerChartUpdate());
+                    }}
+                    variant="standard"
+                  >
+                    {xAxisOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.text}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </>
+            )}
+          </Stack>
+        </>
+      )}
     </Box>
   );
 };
