@@ -26,7 +26,7 @@ export const fetchModelAnalysisExplainabilityPlot = createAsyncThunk(
 export const fetchModelAnalysisFeatureImportancePlot = createAsyncThunk(
   'explainability/fetch_feature_importance',
   async (payload: FetchFeatureImportancePlotPayload) => {
-    const requestUrl = 'explainability/feature-importance';
+    const requestUrl = `explainability/${payload.metadata.experimentId}/${payload.metadata.workflowId}/feature-importance`;
     const response = await api.post<IPlotModel>(requestUrl, payload.query);
 
     return response.data;
