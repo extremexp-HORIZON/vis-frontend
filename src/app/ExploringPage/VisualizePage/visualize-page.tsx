@@ -7,7 +7,10 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '../../../store/store';
-import { postFileMeta } from '../../../store/slices/exploring/datasetSlice';
+import {
+  postFileMeta,
+  resetDatasetState,
+} from '../../../store/slices/exploring/datasetSlice';
 import Loader from '../../../shared/components/loader';
 import { Map } from './Map/map';
 import Stats from './Stats/stats';
@@ -15,6 +18,10 @@ import { VisControl } from './VisControl/vis-control';
 import { Chart } from './Chart/chart';
 import { TimeSeriesChart } from './TimeSeriesChart/time-series-chart';
 import { getDataSource } from '../../../store/slices/exploring/datasourceSlice';
+import { resetChartState } from '../../../store/slices/exploring/chartSlice';
+import { resetMapState } from '../../../store/slices/exploring/mapSlice';
+import { resetStatsState } from '../../../store/slices/exploring/statsSlice';
+import { resetTimeSeriesState } from '../../../store/slices/exploring/timeSeriesSlice';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -32,6 +39,14 @@ const VisualizePage = () => {
     if (datasetId && !dataSource) {
       dispatch(getDataSource({ datasetId }));
     }
+
+    return () => {
+      dispatch(resetMapState());
+      dispatch(resetDatasetState());
+      dispatch(resetChartState());
+      dispatch(resetStatsState());
+      dispatch(resetTimeSeriesState());
+    };
   }, []);
 
   useEffect(() => {
