@@ -117,66 +117,66 @@ const Contourplot = (props: IContourplot) => {
   };
 
 
-const xField = plotModel?.data?.xAxis.axisName || 'x';
-const yField = plotModel?.data?.yAxis.axisName || 'y';
-const zField = plotModel?.data?.zAxis.axisName || 'value';
+  const xField = plotModel?.data?.xAxis.axisName || 'x';
+  const yField = plotModel?.data?.yAxis.axisName || 'y';
+  const zField = plotModel?.data?.zAxis.axisName || 'value';
 
-const xVals = plotModel?.data?.xAxis.axisValues ?? [];
-const yVals = plotModel?.data?.yAxis.axisValues ?? [];
+  const xVals = plotModel?.data?.xAxis.axisValues ?? [];
+  const yVals = plotModel?.data?.yAxis.axisValues ?? [];
 
-const xIsNumeric = isNumericArray(xVals);
-const yIsNumeric = isNumericArray(yVals);
+  const xIsNumeric = isNumericArray(xVals);
+  const yIsNumeric = isNumericArray(yVals);
 
-const transform = [];
-if (xIsNumeric) {
-  transform.push({
-    calculate: `toNumber(datum["${xField}"])`,
-    as: 'x_num',
-  });
-}
-if (yIsNumeric) {
-  transform.push({
-    calculate: `toNumber(datum["${yField}"])`,
-    as: 'y_num',
-  });
-}
+  const transform = [];
+  if (xIsNumeric) {
+    transform.push({
+      calculate: `toNumber(datum["${xField}"])`,
+      as: 'x_num',
+    });
+  }
+  if (yIsNumeric) {
+    transform.push({
+      calculate: `toNumber(datum["${yField}"])`,
+      as: 'y_num',
+    });
+  }
 
-const spec = {
-  width: 'container',
-  height: 'container',
-  autosize: { type: 'fit', contains: 'padding', resize: true },
-  data: {
-    values: getVegaliteData(plotModel?.data || null),
-  },
-  ...(transform.length > 0 && { transform }),
-  mark: {
-    type: 'rect',
-    tooltip: { content: 'data' },
-  },
-  encoding: {
-    x: {
-      field: xField,
-      type: 'ordinal',
-      ...(xIsNumeric && {
-        sort: { field: 'x_num', order: 'ascending' },
-      }),
+  const spec = {
+    width: 'container',
+    height: 'container',
+    autosize: { type: 'fit', contains: 'padding', resize: true },
+    data: {
+      values: getVegaliteData(plotModel?.data || null),
     },
-    y: {
-      field: yField,
-      type: 'ordinal',
-      ...(yIsNumeric && {
-        sort: { field: 'y_num', order: 'ascending' },
-      }),
+    ...(transform.length > 0 && { transform }),
+    mark: {
+      type: 'rect',
+      tooltip: { content: 'data' },
     },
-    color: {
-      field: zField,
-      type: 'quantitative',
+    encoding: {
+      x: {
+        field: xField,
+        type: 'ordinal',
+        ...(xIsNumeric && {
+          sort: { field: 'x_num', order: 'ascending' },
+        }),
+      },
+      y: {
+        field: yField,
+        type: 'ordinal',
+        ...(yIsNumeric && {
+          sort: { field: 'y_num', order: 'ascending' },
+        }),
+      },
+      color: {
+        field: zField,
+        type: 'quantitative',
+      },
     },
-  },
-  config: {
-    axis: { grid: true },
-  },
-};
+    config: {
+      axis: { grid: true },
+    },
+  };
 
   const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
