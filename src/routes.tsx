@@ -9,6 +9,7 @@ import LoginPage from './app/LoginPage/login-page';
 // import ProtectedRoute from './protected-route';
 import TokenAuthHandler from './token-auth-handler';
 import ProtectedRoute from './protected-route';
+import GamificationPage from './app/ProgressPage/GamificationPage/gamification-page';
 
 const routes = createBrowserRouter([
   {
@@ -36,6 +37,17 @@ const routes = createBrowserRouter([
       <ProtectedRoute>
         <ProgressPage>
           <MonitoringPage />
+        </ProgressPage>
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: '/:experimentId/gamification',
+    element: (
+      <ProtectedRoute>
+        <ProgressPage>
+          <GamificationPage />
         </ProgressPage>
       </ProtectedRoute>
     ),

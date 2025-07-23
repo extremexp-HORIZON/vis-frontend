@@ -5,7 +5,6 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
-// import _ from 'lodash';
 import { InputLabel, Switch, useMediaQuery, useTheme } from '@mui/material';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
@@ -15,7 +14,8 @@ import type { View, Item, ScenegraphEvent } from 'vega';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import Loader from '../../../../shared/components/loader';
-import { RootState, useAppSelector } from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -151,10 +151,9 @@ interface IInstanceClassification {
 
 const InstanceClassification = (props: IInstanceClassification) => {
   const theme = useTheme();
-    const { tab } = useAppSelector(
-      (state: RootState) => state.workflowPage,
-    );
-  
+  const { tab } = useAppSelector(
+    (state: RootState) => state.workflowPage,
+  );
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
@@ -171,84 +170,84 @@ const InstanceClassification = (props: IInstanceClassification) => {
     return 'nominal';
   };
 
-const getCounterfactualsData = (
-  tableContents: Record<string, { values: string[] }> | undefined,
-  point: { data: Record<string, any> } | null
-): TestInstance[] | null => {
-  if (!point || !tableContents) return null;
+  const getCounterfactualsData = (
+    tableContents: Record<string, { values: string[] }> | undefined,
+    point: { data: Record<string, any> } | null
+  ): TestInstance[] | null => {
+    if (!point || !tableContents) return null;
 
-  const columns = Object.keys(tableContents);
-  const baseRowIndex = 0;
-  const rowCount = tableContents[columns[0]]?.values.length || 0;
+    const columns = Object.keys(tableContents);
+    const baseRowIndex = 0;
+    const rowCount = tableContents[columns[0]]?.values.length || 0;
 
-  return Array.from({ length: rowCount - 1 }, (_, index) => {
-    const actualIndex = index + 1; // counterfactuals start from row 1
-    const row: Record<string, string> = {};
+    return Array.from({ length: rowCount - 1 }, (_, index) => {
+      const actualIndex = index + 1; // counterfactuals start from row 1
+      const row: Record<string, string> = {};
 
-    for (const key of columns) {
-      const baseValueStr = tableContents[key].values[baseRowIndex];
-      const cfValueStr = tableContents[key].values[actualIndex];
+      for (const key of columns) {
+        const baseValueStr = tableContents[key].values[baseRowIndex];
+        const cfValueStr = tableContents[key].values[actualIndex];
 
-      if (key === 'label') {
-        row['predicted'] = cfValueStr;
-        continue;
-      }
+        if (key === 'label') {
+          row['predicted'] = cfValueStr;
+          continue;
+        }
 
-      if (cfValueStr === '-') {
-        row[key] = baseValueStr;
-        continue;
-      }
+        if (cfValueStr === '-') {
+          row[key] = baseValueStr;
+          continue;
+        }
 
-      const baseValue = parseFloat(baseValueStr);
-      const delta = parseFloat(cfValueStr);
-      const isNumericDelta =
+        const baseValue = parseFloat(baseValueStr);
+        const delta = parseFloat(cfValueStr);
+        const isNumericDelta =
         !isNaN(baseValue) && !isNaN(delta) && /^[+-]?\d+(\.\d+)?$/.test(cfValueStr);
 
-      if (isNumericDelta) {
-        row[key] = String(baseValue + delta); // ensure string
-      } else {
-        row[key] = cfValueStr;
+        if (isNumericDelta) {
+          row[key] = String(baseValue + delta); // ensure string
+        } else {
+          row[key] = cfValueStr;
+        }
       }
-    }
 
-    return {
-      ...Object.fromEntries(
-        Object.entries(point.data).map(([k, v]) => [k, String(v)])
-      ),
-      ...row,
-      actual: String(point.data.actual),
-    } as TestInstance;
-  });
-};
+      return {
+        ...Object.fromEntries(
+          Object.entries(point.data).map(([k, v]) => [k, String(v)])
+        ),
+        ...row,
+        actual: String(point.data.actual),
+      } as TestInstance;
+    });
+  };
 
+  const getVegaData = (data: TestInstance[]) => {
+    const originalPoints = data.map((originalRow: TestInstance) => {
+      const id = hashRow(originalRow);
+      const isMisclassified = originalRow.actual !== originalRow.predicted;
 
-const getVegaData = (data: TestInstance[]) => {
-  const originalPoints = data.map((originalRow: TestInstance) => {
-    const id = hashRow(originalRow);
-    const isMisclassified = originalRow.actual !== originalRow.predicted;
+      return {
+        ...originalRow,
+        isMisclassified,
+        pointType: 'Original',
+        id,
+      };
+    });
 
-    return {
-      ...originalRow,
-      isMisclassified,
-      pointType: 'Original',
-      id,
-    };
-  });
+    const counterfactualPoints = getCounterfactualsData(
+      tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents,
+      point
+    )?.map((cfRow) => {
+      const id = hashRow(cfRow);
 
-  const counterfactualPoints = getCounterfactualsData(
-    tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents,
-    point
-  )?.map((cfRow) => {
-    const id = hashRow(cfRow);
-    return {
-      ...cfRow,
-      pointType: 'Counterfactual',
-      id,
-    };
-  }) ?? [];
+      return {
+        ...cfRow,
+        pointType: 'Counterfactual',
+        id,
+      };
+    }) ?? [];
 
-  return [...originalPoints, ...counterfactualPoints];
-};
+    return [...originalPoints, ...counterfactualPoints];
+  };
 
   useEffect(() => {
     if (plotData && plotData.data) {
@@ -366,7 +365,7 @@ const getVegaData = (data: TestInstance[]) => {
             },
             color: {
               condition: {
-                test: "datum.pointType === 'Counterfactual'",
+                test: 'datum.pointType === \'Counterfactual\'',
                 value: '#FFA500', // orange for counterfactuals
               },
               field: showMisclassifiedOnly ? 'isMisclassified' : 'predicted',
