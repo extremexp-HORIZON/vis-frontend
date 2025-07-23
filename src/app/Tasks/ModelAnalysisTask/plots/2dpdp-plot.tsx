@@ -112,35 +112,71 @@ const Contourplot = (props: IContourplot) => {
     return data;
   };
 
-  const spec = {
-    width: 'container',
-    height: 'container',
-    autosize: { type: 'fit', contains: 'padding', resize: true },
-    data: {
-      values: getVegaliteData(plotModel?.data || null),
-    },
-    mark: {
-      type: 'rect',
-      tooltip: { content: 'data' },
-    },
-    encoding: {
-      x: {
-        field: plotModel?.data?.xAxis.axisName || 'x',
-        type: 'ordinal',
-      },
-      y: {
-        field: plotModel?.data?.yAxis.axisName || 'y',
-        type: 'ordinal',
-      },
-      color: {
-        field: plotModel?.data?.zAxis.axisName || 'value',
-        type: 'quantitative',
-      },
-    },
-    config: {
-      axis: { grid: true },
-    },
+  const isNumericArray = (arr: string[] | number[]): boolean => {
+    return arr.every(val => !isNaN(Number(val)));
   };
+
+
+const xField = plotModel?.data?.xAxis.axisName || 'x';
+const yField = plotModel?.data?.yAxis.axisName || 'y';
+const zField = plotModel?.data?.zAxis.axisName || 'value';
+
+const xVals = plotModel?.data?.xAxis.axisValues ?? [];
+const yVals = plotModel?.data?.yAxis.axisValues ?? [];
+
+const xIsNumeric = isNumericArray(xVals);
+const yIsNumeric = isNumericArray(yVals);
+
+const transform = [];
+if (xIsNumeric) {
+  transform.push({
+    calculate: `toNumber(datum["${xField}"])`,
+    as: 'x_num',
+  });
+}
+if (yIsNumeric) {
+  transform.push({
+    calculate: `toNumber(datum["${yField}"])`,
+    as: 'y_num',
+  });
+}
+
+const spec = {
+  width: 'container',
+  height: 'container',
+  autosize: { type: 'fit', contains: 'padding', resize: true },
+  data: {
+    values: getVegaliteData(plotModel?.data || null),
+  },
+  ...(transform.length > 0 && { transform }),
+  mark: {
+    type: 'rect',
+    tooltip: { content: 'data' },
+  },
+  encoding: {
+    x: {
+      field: xField,
+      type: 'ordinal',
+      ...(xIsNumeric && {
+        sort: { field: 'x_num', order: 'ascending' },
+      }),
+    },
+    y: {
+      field: yField,
+      type: 'ordinal',
+      ...(yIsNumeric && {
+        sort: { field: 'y_num', order: 'ascending' },
+      }),
+    },
+    color: {
+      field: zField,
+      type: 'quantitative',
+    },
+  },
+  config: {
+    axis: { grid: true },
+  },
+};
 
   const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
