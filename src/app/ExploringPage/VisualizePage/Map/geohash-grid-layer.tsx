@@ -232,18 +232,18 @@ export const GeohashGridLayer = ({
         if (level === 'children') {
           // Children: blue, normal weight, normal opacity (focus area)
           borderColor = '#3388ff';
-          borderWeight = 2;
+          borderWeight = 3;
           opacity = 0.5;
         } else if (level === 'siblings') {
           // Siblings: orange, thicker border, lower opacity (immediate context)
           // borderColor = '#ff6b35';
           borderWeight = 1;
-          // opacity = 0.4;
+          // opacity = 0.3;
         } else if (level === 'context') {
           // Context: light gray, thin border, very low opacity (broader context)
           // borderColor = '#cccccc';
-          borderWeight = 0.5;
-          // opacity = 0.2;
+          borderWeight = 1;
+          // opacity = 0.1;
         }
 
         const fillColor =

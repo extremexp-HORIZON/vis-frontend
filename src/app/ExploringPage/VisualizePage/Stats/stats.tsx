@@ -9,11 +9,20 @@ import {
   MenuItem,
   Grid,
   Box,
+  TextField,
+  IconButton,
 } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
-import { type RootState, useAppSelector } from '../../../../store/store';
+import {
+  type RootState,
+  useAppSelector,
+  useAppDispatch,
+} from '../../../../store/store';
 import type { IRectStats } from '../../../../shared/models/exploring/rect-stats.model';
 import Loader from '../../../../shared/components/loader';
+import { setSelectedGeohash } from '../../../../store/slices/exploring/mapSlice';
+import { useNavigate } from 'react-router-dom';
 
 export interface IStatsPanelProps {
   dataset: IDataset;
@@ -26,6 +35,11 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
   const [anchorElFields, setAnchorElFields] = useState<null | HTMLElement>(
     null,
   );
+  const [geohashInput, setGeohashInput] = useState('');
+  const [isEditingGeohash, setIsEditingGeohash] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { rectStats } = useAppSelector((state: RootState) => state.stats);
   const { drawnRect, selectedGeohash } = useAppSelector(
     (state: RootState) => state.map,
@@ -65,6 +79,32 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
     setAnchorElFields(null);
   };
 
+  const handleGeohashEdit = () => {
+    setIsEditingGeohash(true);
+    setGeohashInput(selectedGeohash || '');
+  };
+
+  const handleGeohashSubmit = () => {
+    if (geohashInput.trim()) {
+      dispatch(setSelectedGeohash(geohashInput.trim()));
+      navigate(`?geohash=${geohashInput.trim()}`);
+    }
+    setIsEditingGeohash(false);
+  };
+
+  const handleGeohashCancel = () => {
+    setIsEditingGeohash(false);
+    setGeohashInput('');
+  };
+
+  const handleGeohashKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleGeohashSubmit();
+    } else if (event.key === 'Escape') {
+      handleGeohashCancel();
+    }
+  };
+
   return (
     <Card sx={{ gap: 1, borderRadius: 2, boxShadow: 2 }}>
       {loadingExecuteQuery ? (
@@ -82,22 +122,83 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
                 </Typography>
               }
               subheader={
-                <Typography
-                  variant="subtitle2"
-                  component="div"
-                  fontWeight={500}
-                  textAlign="center"
-                  sx={{
-                    fontStyle: 'italic',
-                    color: 'primary.main',
-                  }}
-                >
-                  {selectedGeohash
-                    ? `GeoHash: ${selectedGeohash}`
-                    : drawnRect
-                      ? 'Drawn Rectangle'
-                      : ''}
-                </Typography>
+                selectedGeohash ? (
+                  isEditingGeohash ? (
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="space-evenly"
+                      gap={1}
+                    >
+                      <TextField
+                        size="small"
+                        value={geohashInput}
+                        onChange={e => setGeohashInput(e.target.value)}
+                        onKeyDown={handleGeohashKeyPress}
+                        onBlur={handleGeohashSubmit}
+                        autoFocus
+                        sx={{
+                          '& .MuiInputBase-root': {
+                            fontSize: '0.875rem',
+                            fontStyle: 'italic',
+                            color: 'primary.main',
+                          },
+                        }}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={handleGeohashSubmit}
+                        sx={{ color: 'primary.main' }}
+                      >
+                        <CheckIcon />
+                      </IconButton>
+                    </Box>
+                  ) : (
+                    <Typography
+                      variant="subtitle2"
+                      component="div"
+                      fontWeight={500}
+                      textAlign="center"
+                      sx={{
+                        fontStyle: 'italic',
+                        color: 'primary.main',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        },
+                      }}
+                      onClick={handleGeohashEdit}
+                    >
+                      GeoHash: {selectedGeohash}
+                    </Typography>
+                  )
+                ) : drawnRect ? (
+                  <Typography
+                    variant="subtitle2"
+                    component="div"
+                    fontWeight={500}
+                    textAlign="center"
+                    sx={{
+                      fontStyle: 'italic',
+                      color: 'primary.main',
+                    }}
+                  >
+                    Drawn Rectangle
+                  </Typography>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    component="div"
+                    fontWeight={500}
+                    textAlign="center"
+                    sx={{
+                      fontStyle: 'italic',
+                      color: 'primary.main',
+                    }}
+                  >
+                    {''}
+                  </Typography>
+                )
               }
             />
             <CardContent>
