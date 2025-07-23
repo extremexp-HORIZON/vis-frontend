@@ -118,7 +118,7 @@ export const updateClusters = createAsyncThunk(
 );
 
 export const mapSlice = createSlice({
-  name: 'exploringMapSlice',
+  name: 'map',
   initialState,
   reducers: {
     resetMapState: () => {
