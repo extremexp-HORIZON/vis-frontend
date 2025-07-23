@@ -15,6 +15,8 @@ import Loader from '../../../../shared/components/loader';
 import { fetchModelAnalysisExplainabilityPlot } from '../../../../store/slices/explainabilitySlice';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -263,16 +265,15 @@ const CounterfactualsTable = (props: ITableComponent) => {
         { tab?.workflowTasks.modelAnalysis?.counterfactuals?.loading ? (
           // Loader when loading
           <Loader/>
-        ) :  tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotType === 'Error' ? (
+        ) :  tab?.workflowTasks.modelAnalysis?.counterfactuals?.error ? (
           // Display error message
-          <Box sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6" color="error">
-              { tab?.workflowTasks.modelAnalysis?.counterfactuals?.data.plotName || 'Error'}
-            </Typography>
-            <Typography variant="body2">
-              { tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.plotDescr}
-            </Typography>
-          </Box>
+          <InfoMessage
+            message="Error fetching counterfactuals."
+            type="info"
+            icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+            fullHeight
+          />
+          
         ) :  tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents ? (
           // Display table
           <StyledDataGrid

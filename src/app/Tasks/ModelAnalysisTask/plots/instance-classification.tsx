@@ -377,8 +377,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
               { field: 'pointType', type: 'nominal', title: 'Type' },
               { field: 'actual', type: 'nominal', title: 'Actual' },
               { field: 'predicted', type: 'nominal', title: 'Predicted' },
-              { field: xAxisOption || 'xAxis default', type: 'quantitative', title: xAxisOption },
-              { field: yAxisOption || 'yAxis default', type: 'quantitative', title: yAxisOption },
+              { field: xAxisOption || 'xAxis default', type: xFieldType, title: xAxisOption },
+              { field: yAxisOption || 'yAxis default', type: yFieldType, title: yAxisOption },
             ]
           },
         }}
