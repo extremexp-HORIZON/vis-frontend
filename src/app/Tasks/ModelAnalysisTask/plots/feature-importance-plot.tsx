@@ -21,18 +21,11 @@ const FeatureImportancePlot = () => {
     if (tab && experimentId && isTabInitialized) {
       dispatch(
         fetchModelAnalysisFeatureImportancePlot({
-          query: {
-            model: ['/opt/data/xtreme/mlflow/mlartifacts/359083425157694092/00c8701a7615473f9b199477657bfcf2/artifacts/explainability/model.pkl'],
-            data: {
-              X_train: '/opt/data/xtreme/mlflow/mlartifacts/359083425157694092/00c8701a7615473f9b199477657bfcf2/artifacts/explainability/X_train.csv',
-              Y_train: '/opt/data/xtreme/mlflow/mlartifacts/359083425157694092/00c8701a7615473f9b199477657bfcf2/artifacts/explainability/Y_train.csv',
-              X_test: '/opt/data/xtreme/mlflow/mlartifacts/359083425157694092/00c8701a7615473f9b199477657bfcf2/artifacts/explainability/X_test.csv',
-              Y_test: '/opt/data/xtreme/mlflow/mlartifacts/359083425157694092/00c8701a7615473f9b199477657bfcf2/artifacts/explainability/Y_test.csv'
-            }
-          },
+          query: {},
           metadata: {
             workflowId: tab.workflowId,
             experimentId,
+
           },
         })
       );
@@ -42,7 +35,7 @@ const FeatureImportancePlot = () => {
   const getVegaliteData = () => {
     if (!rawData?.featureImportances) return [];
 
-    return rawData.featureImportances.map(d => ({
+    return rawData.featureImportances.slice(0, 10).map(d => ({
       Feature: d.featureName,
       Importance: d.importanceScore,
     }));
