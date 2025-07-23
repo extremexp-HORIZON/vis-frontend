@@ -15,6 +15,7 @@ import type { View, Item, ScenegraphEvent } from 'vega';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import Loader from '../../../../shared/components/loader';
+import { RootState, useAppSelector } from '../../../../store/store';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -150,6 +151,10 @@ interface IInstanceClassification {
 
 const InstanceClassification = (props: IInstanceClassification) => {
   const theme = useTheme();
+    const { tab } = useAppSelector(
+      (state: RootState) => state.workflowPage,
+    );
+  
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
@@ -166,25 +171,84 @@ const InstanceClassification = (props: IInstanceClassification) => {
     return 'nominal';
   };
 
-  // const getVegaData = (data: any) => {
-  //   let newData: any[] = _.cloneDeep(data)
-  //   if (checkbox) {
-  //     newData = newData.filter(d => d.actual !== d.predicted)
-  //   }
-  //   return newData
-  // }
-  const getVegaData = (data: TestInstance[]) => {
-    return data.map((originalRow: TestInstance) => {
-      const id = hashRow(originalRow);
-      const isMisclassified = originalRow.actual !== originalRow.predicted;
+const getCounterfactualsData = (
+  tableContents: Record<string, { values: string[] }> | undefined,
+  point: { data: Record<string, any> } | null
+): TestInstance[] | null => {
+  if (!point || !tableContents) return null;
 
-      return {
-        ...originalRow,
-        isMisclassified,
-        id,
-      };
-    });
-  };
+  const columns = Object.keys(tableContents);
+  const baseRowIndex = 0;
+  const rowCount = tableContents[columns[0]]?.values.length || 0;
+
+  return Array.from({ length: rowCount - 1 }, (_, index) => {
+    const actualIndex = index + 1; // counterfactuals start from row 1
+    const row: Record<string, string> = {};
+
+    for (const key of columns) {
+      const baseValueStr = tableContents[key].values[baseRowIndex];
+      const cfValueStr = tableContents[key].values[actualIndex];
+
+      if (key === 'label') {
+        row['predicted'] = cfValueStr;
+        continue;
+      }
+
+      if (cfValueStr === '-') {
+        row[key] = baseValueStr;
+        continue;
+      }
+
+      const baseValue = parseFloat(baseValueStr);
+      const delta = parseFloat(cfValueStr);
+      const isNumericDelta =
+        !isNaN(baseValue) && !isNaN(delta) && /^[+-]?\d+(\.\d+)?$/.test(cfValueStr);
+
+      if (isNumericDelta) {
+        row[key] = String(baseValue + delta); // ensure string
+      } else {
+        row[key] = cfValueStr;
+      }
+    }
+
+    return {
+      ...Object.fromEntries(
+        Object.entries(point.data).map(([k, v]) => [k, String(v)])
+      ),
+      ...row,
+      actual: String(point.data.actual),
+    } as TestInstance;
+  });
+};
+
+
+const getVegaData = (data: TestInstance[]) => {
+  const originalPoints = data.map((originalRow: TestInstance) => {
+    const id = hashRow(originalRow);
+    const isMisclassified = originalRow.actual !== originalRow.predicted;
+
+    return {
+      ...originalRow,
+      isMisclassified,
+      pointType: 'Original',
+      id,
+    };
+  });
+
+  const counterfactualPoints = getCounterfactualsData(
+    tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents,
+    point
+  )?.map((cfRow) => {
+    const id = hashRow(cfRow);
+    return {
+      ...cfRow,
+      pointType: 'Counterfactual',
+      id,
+    };
+  }) ?? [];
+
+  return [...originalPoints, ...counterfactualPoints];
+};
 
   useEffect(() => {
     if (plotData && plotData.data) {
@@ -301,6 +365,10 @@ const InstanceClassification = (props: IInstanceClassification) => {
               type: yFieldType,
             },
             color: {
+              condition: {
+                test: "datum.pointType === 'Counterfactual'",
+                value: '#FFA500', // orange for counterfactuals
+              },
               field: showMisclassifiedOnly ? 'isMisclassified' : 'predicted',
               type: showMisclassifiedOnly ? 'nominal' : 'nominal',
               scale: showMisclassifiedOnly
