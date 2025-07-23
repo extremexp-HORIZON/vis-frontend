@@ -273,7 +273,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
             icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
             fullHeight
           />
-          
+
         ) :  tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents ? (
           // Display table
           <StyledDataGrid

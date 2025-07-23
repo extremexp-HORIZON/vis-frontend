@@ -146,14 +146,13 @@ interface IInstanceClassification {
   showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
   hashRow: (row: TestInstance) => string
-  counterfactualPoints?: TestInstance[] | null
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
   const theme = useTheme();
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
-  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow, counterfactualPoints } = props;
+  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
   const [options, setOptions] = useState<string[]>([]);
   const [xAxisOption, setXAxisOption] = useState<string>('');
   const [yAxisOption, setYAxisOption] = useState<string>('');
@@ -174,27 +173,17 @@ const InstanceClassification = (props: IInstanceClassification) => {
   //   }
   //   return newData
   // }
-  const getVegaData = (
-    mainData: TestInstance[],
-    counterfactuals?: TestInstance[] | null
-  ) => {
-    const base = mainData.map((row) => ({
-      ...row,
-      id: hashRow(row),
-      isMisclassified: row.actual !== row.predicted,
-      isCounterfactual: false,
-      pointType: 'Original',
-    }));
+  const getVegaData = (data: TestInstance[]) => {
+    return data.map((originalRow: TestInstance) => {
+      const id = hashRow(originalRow);
+      const isMisclassified = originalRow.actual !== originalRow.predicted;
 
-    const cf = (counterfactuals ?? []).map((row, i) => ({
-      ...row,
-      id: `cf-${i}`,
-      isMisclassified: false,
-      isCounterfactual: true,
-      pointType: 'Counterfactual',
-    }));
-
-    return [...base, ...cf];
+      return {
+        ...originalRow,
+        isMisclassified,
+        id,
+      };
+    });
   };
 
   useEffect(() => {
@@ -224,8 +213,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
         ) as TestInstance;
 
         setPoint({ id, data: cleanedData });
-      } else {
-        setPoint(null);
       }
     });
   };
@@ -273,7 +260,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
           height: 'container',
           autosize: { type: 'fit', contains: 'padding', resize: true },
           data: {
-            values: getVegaData(plotData?.data ?? [], counterfactualPoints),
+            values: getVegaData(plotData?.data ?? []),
           },
           params: [
             {
@@ -314,10 +301,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
               type: yFieldType,
             },
             color: {
-              condition: {
-                test: 'datum.isCounterfactual',
-                value: '#FFA500',
-              },
               field: showMisclassifiedOnly ? 'isMisclassified' : 'predicted',
               type: showMisclassifiedOnly ? 'nominal' : 'nominal',
               scale: showMisclassifiedOnly
