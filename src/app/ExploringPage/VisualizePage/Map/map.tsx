@@ -21,10 +21,7 @@ import { HeatmapLayer } from './heatmap-layer';
 import { getRow } from '../../../../store/slices/exploring/datasetSlice';
 import { GeohashGridLayer } from './geohash-grid-layer';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import {
-  setSelectedGeohash,
-  resetSelectedGeohash,
-} from '../../../../store/slices/exploring/mapSlice';
+import { setSelectedGeohash } from '../../../../store/slices/exploring/mapSlice';
 
 export interface IMapProps {
   id: string;
@@ -209,7 +206,7 @@ export const Map = (props: IMapProps) => {
   }, [showGeohashGrid, dispatch]);
 
   const resetGeohashSelection = useCallback(() => {
-    dispatch(resetSelectedGeohash());
+    dispatch(setSelectedGeohash(null));
     navigate('?');
   }, [dispatch, navigate]);
 

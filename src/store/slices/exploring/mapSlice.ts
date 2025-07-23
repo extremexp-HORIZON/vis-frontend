@@ -164,9 +164,6 @@ export const mapSlice = createSlice({
     setSelectedGeohash: (state, action: PayloadAction<string | null>) => {
       state.selectedGeohash = action.payload;
     },
-    resetSelectedGeohash: state => {
-      state.selectedGeohash = null;
-    },
     updateMapBounds: (
       state,
       action: PayloadAction<{
