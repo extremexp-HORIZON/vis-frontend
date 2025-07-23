@@ -26,6 +26,9 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
     null,
   );
   const { rectStats } = useAppSelector((state: RootState) => state.stats);
+  const { drawnRect, selectedGeohash } = useAppSelector(
+    (state: RootState) => state.map,
+  );
 
   const formatStat = (stat: number | null) =>
     stat !== null ? stat.toFixed(2) : 'N/A';
@@ -64,8 +67,26 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
         <CardHeader
           sx={{ backgroundColor: 'action.hover', pt: 2, pb: 1 }}
           title={
-            <Typography variant="h6" component="div">
+            <Typography variant="h6" component="div" textAlign="center">
               Statistics for <i>{rectStats.count}</i> measurements
+            </Typography>
+          }
+          subheader={
+            <Typography
+              variant="subtitle2"
+              component="div"
+              fontWeight={500}
+              textAlign="center"
+              sx={{
+                fontStyle: 'italic',
+                color: 'primary.main',
+              }}
+            >
+              {selectedGeohash
+                ? `GeoHash: ${selectedGeohash}`
+                : drawnRect
+                  ? 'Drawn Rectangle'
+                  : ''}
             </Typography>
           }
         />

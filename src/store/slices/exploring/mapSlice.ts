@@ -11,6 +11,7 @@ import { executeQuery } from './datasetSlice';
 import type { AppStartListening } from '../../listenerMiddleware';
 import { updateAnalysisResults } from './statsSlice';
 import { updateTimeSeries } from './timeSeriesSlice';
+import ngeohash from 'ngeohash';
 
 interface MapState {
   zoom: number;
@@ -251,6 +252,32 @@ export const mapListeners = (startAppListening: AppStartListening) => {
       }
     },
   });
+
+  startAppListening({
+    actionCreator: setSelectedGeohash,
+    effect: async (action, { dispatch, getState }) => {
+      // Set the drawnRect to the selectedGeohash bounds to show the stats and timeSeries for the geohash
+      const geohash = action.payload;
+      const state = getState() as RootState;
+      const { id } = state.dataset.dataset;
+
+      const bounds = geohash ? ngeohash.decode_bbox(geohash) : null;
+
+      dispatch(
+        setDrawnRect({
+          id: id || '',
+          bounds: bounds
+            ? {
+              south: bounds[0],
+              west: bounds[1],
+              north: bounds[2],
+              east: bounds[3],
+            }
+            : null,
+        }),
+      );
+    },
+  });
 };
 
 export const {
@@ -262,6 +289,5 @@ export const {
   setFacets,
   setQueryInfo,
   setSelectedGeohash,
-  resetSelectedGeohash,
   updateMapBounds,
 } = mapSlice.actions;
