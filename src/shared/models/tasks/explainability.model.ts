@@ -63,8 +63,8 @@ export type ExplainabilityQuery = {
   feature2?: string
   query?: string
   gcf_size?: number
-  cf_generator?: string
-  cluster_action_choice_algo?: string
+  cfGenerator?: string
+  clusterActionChoiceAlgo?: string
 }
 
 export const explainabilityQueryDefault: ExplainabilityQuery = {
@@ -74,8 +74,8 @@ export const explainabilityQueryDefault: ExplainabilityQuery = {
   feature2: '',
   query: '',
   gcf_size: 0,
-  cf_generator: '',
-  cluster_action_choice_algo: '',
+  cfGenerator: '',
+  clusterActionChoiceAlgo: '',
 };
 
 export type FetchExplainabilityPlotPayload = {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InstanceClassification from '../../Tasks/ModelAnalysisTask/plots/instance-classification';
 import type { RootState } from '../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
@@ -63,38 +63,6 @@ const InstanceView = () => {
     if(chartType !== 'datatable' && chartType !== 'scatter')
       dispatch(setControls({ chartType: 'datatable' }));
   }, []);
-
-  const counterfactualsData = useMemo(() => {
-    const tableContents = tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents;
-
-    if (!point || !tableContents) return null;
-
-    const rowCount = tableContents[Object.keys(tableContents)[0]]?.values.length || 0;
-
-    const rows = Array.from({ length: rowCount - 1 }, (_, rowIndex) => {
-      const actualIndex = rowIndex + 1; // skip first row
-
-      const row: Record<string, number | string> = {};
-
-      for (const [key, column] of Object.entries(tableContents)) {
-        const value = column.values[actualIndex];
-
-        if (key === 'label') {
-          row['predicted'] = value; // remap 'label' to 'predicted'
-        } else {
-          row[key] = value;
-        }
-      }
-
-      return {
-        ...point.data,
-        ...row,
-        actual: point.data.actual,
-      } as TestInstance;
-    });
-
-    return rows;
-  }, [point, tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents]);
 
   const baseColumns: GridColDef[] = Object.keys(rows[0] || {}).map(key => ({
     field: key,
@@ -322,7 +290,6 @@ const InstanceView = () => {
             setPoint={setPoint}
             showMisclassifiedOnly={showMisclassifiedOnly}
             hashRow={hashRow}
-            counterfactualPoints={counterfactualsData}
           />
         </Box>
       )}

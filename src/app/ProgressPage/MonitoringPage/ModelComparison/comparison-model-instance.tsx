@@ -9,6 +9,7 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useEffect } from 'react';
 import { fetchComparativeModelInstances, setComparativeModelInstanceControlPanel } from '../../../../store/slices/monitorPageSlice';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
+import { getClassColorMap } from '../../../../shared/utils/colorUtils';
 
 const ComparisonModelInstance = ({
   isMosaic,
@@ -32,20 +33,16 @@ const ComparisonModelInstance = ({
 
   const dispatch = useAppDispatch();
 
-  // TODO: fix palette colors
-  const chartPalette = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
-
   let classColorMap: Record<string, string> = {};
   const instance = Object.values(comparativeModelInstance).find(d => d?.data?.length)?.data;
 
   if (!showMisclassifiedOnly && instance?.length) {
-    const predictedValues = Array.from(new Set(instance.map(d => d.predicted))).slice(0, chartPalette.length);
+    const predictedValues = Array.from(
+      new Set(instance.map(d => String(d.predicted)))
+    );
 
-    classColorMap = predictedValues.reduce((acc, val, idx) => {
-      acc[String(val)] = chartPalette[idx % chartPalette.length];
 
-      return acc;
-    }, {} as Record<string, string>);
+    classColorMap = getClassColorMap(predictedValues);
   }
 
   useEffect(() => {

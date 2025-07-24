@@ -112,6 +112,35 @@ const Contourplot = (props: IContourplot) => {
     return data;
   };
 
+  const isNumericArray = (arr: string[] | number[]): boolean => {
+    return arr.every(val => !isNaN(Number(val)));
+  };
+
+  const xField = plotModel?.data?.xAxis.axisName || 'x';
+  const yField = plotModel?.data?.yAxis.axisName || 'y';
+  const zField = plotModel?.data?.zAxis.axisName || 'value';
+
+  const xVals = plotModel?.data?.xAxis.axisValues ?? [];
+  const yVals = plotModel?.data?.yAxis.axisValues ?? [];
+
+  const xIsNumeric = isNumericArray(xVals);
+  const yIsNumeric = isNumericArray(yVals);
+
+  const transform = [];
+
+  if (xIsNumeric) {
+    transform.push({
+      calculate: `toNumber(datum["${xField}"])`,
+      as: 'x_num',
+    });
+  }
+  if (yIsNumeric) {
+    transform.push({
+      calculate: `toNumber(datum["${yField}"])`,
+      as: 'y_num',
+    });
+  }
+
   const spec = {
     width: 'container',
     height: 'container',
@@ -119,21 +148,28 @@ const Contourplot = (props: IContourplot) => {
     data: {
       values: getVegaliteData(plotModel?.data || null),
     },
+    ...(transform.length > 0 && { transform }),
     mark: {
       type: 'rect',
       tooltip: { content: 'data' },
     },
     encoding: {
       x: {
-        field: plotModel?.data?.xAxis.axisName || 'x',
+        field: xField,
         type: 'ordinal',
+        ...(xIsNumeric && {
+          sort: { field: 'x_num', order: 'ascending' },
+        }),
       },
       y: {
-        field: plotModel?.data?.yAxis.axisName || 'y',
+        field: yField,
         type: 'ordinal',
+        ...(yIsNumeric && {
+          sort: { field: 'y_num', order: 'ascending' },
+        }),
       },
       color: {
-        field: plotModel?.data?.zAxis.axisName || 'value',
+        field: zField,
         type: 'quantitative',
       },
     },

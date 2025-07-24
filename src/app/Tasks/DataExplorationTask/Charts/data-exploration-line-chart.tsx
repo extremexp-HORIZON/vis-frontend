@@ -142,7 +142,7 @@ const LineChart = () => {
       data: {
         values: cloneDeep(data),
       },
-      mark: { type: 'line', tooltip: true },
+      mark: { type: 'line', tooltip: true, point: { size: 20 } },
       encoding: {
         x: {
           field: xAxis.name,

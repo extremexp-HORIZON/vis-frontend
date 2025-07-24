@@ -15,6 +15,7 @@ import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import type { RootState } from '../../store/store';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { setMenuOptions } from '../../store/slices/progressPageSlice';
+import ViewInArIcon from '@mui/icons-material/ViewInAr';
 
 const LeftMenu = () => {
   const { experimentId } = useParams();
@@ -30,6 +31,12 @@ const LeftMenu = () => {
       label: 'Monitoring',
       path: 'monitoring'
     },
+    {
+      icon: <ViewInArIcon />,
+      label: 'Gamification',
+      path: 'gamification'
+    },
+
     {
       icon: <LocationSearchingIcon />,
       label: 'Exploring',

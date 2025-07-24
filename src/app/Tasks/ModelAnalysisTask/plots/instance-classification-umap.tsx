@@ -10,6 +10,7 @@ import { fetchUmap } from '../../../../store/slices/dataExplorationSlice';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 import type { Item, ScenegraphEvent, View } from 'vega';
+import { getClassColorMap } from '../../../../shared/utils/colorUtils';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -132,7 +133,7 @@ interface Umapi {
 
 const InstanceClassificationUmap = (props: Umapi) => {
   const theme = useTheme();
-  const { setPoint, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props;
+  const { point, setPoint, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props;
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab);
   const raw = tab?.workflowTasks.modelAnalysis?.modelInstances.data;
   const parsedData = typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -158,9 +159,9 @@ const InstanceClassificationUmap = (props: Umapi) => {
       );
     }
   }, [raw, dispatch]);
-  const getVegaData = (data: TestInstance[]) => {
-    return data.map((originalRow: TestInstance) => {
-      const id = hashRow(originalRow);
+  const getVegaData = (data: unknown) => {
+    return Array.isArray(data) && data?.map((originalRow) => {
+      const id = hashRow(originalRow?.original);
       const isMisclassified = originalRow.actual !== originalRow.predicted;
 
       return {
@@ -180,11 +181,19 @@ const InstanceClassificationUmap = (props: Umapi) => {
     return {
       x: point[0],
       y: point[1],
+      original,
       actual,
       predicted,
       index,
     };
   });
+
+  const predictedValues = Array.from(
+    new Set(combinedPlotData.map((d) => String(d.predicted)))
+  );
+
+  const classColorMap = getClassColorMap(predictedValues);
+
 
   const handleNewView = (view: View) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
@@ -204,8 +213,6 @@ const InstanceClassificationUmap = (props: Umapi) => {
           // index: clickedIndex,
           },
         });
-      } else {
-        setPoint(null);
       }
     });
   };
@@ -242,6 +249,10 @@ const InstanceClassificationUmap = (props: Umapi) => {
             select: 'interval',
             bind: 'scales',
           },
+          {
+            name: 'selectedPoint',
+            value: point?.id ?? null
+          }
         ],
         mark: {
           type: 'point',
@@ -270,7 +281,8 @@ const InstanceClassificationUmap = (props: Umapi) => {
               field: 'predicted',
               type: 'nominal',
               scale: {
-                range: ['#1f77b4', '#2ca02c'],
+                  domain: Object.keys(classColorMap),
+                  range: Object.values(classColorMap),
               },
               legend: {
                 title: 'Predicted Class',
@@ -300,7 +312,20 @@ const InstanceClassificationUmap = (props: Umapi) => {
             {
               value: 100,
             },
-
+          stroke: {
+            condition: {
+              test: 'datum.id === selectedPoint',
+              value: 'black',
+            },
+            value: null,
+          },
+          strokeWidth: {
+            condition: {
+              test: 'datum.id === selectedPoint',
+              value: 2,
+            },
+            value: 0,
+          },
           tooltip: [
             { field: 'actual', type: 'nominal', title: 'Actual' },
             { field: 'predicted', type: 'nominal', title: 'Predicted' },

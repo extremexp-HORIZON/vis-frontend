@@ -5,7 +5,6 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
-// import _ from 'lodash';
 import { InputLabel, Switch, useMediaQuery, useTheme } from '@mui/material';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
@@ -15,6 +14,8 @@ import type { View, Item, ScenegraphEvent } from 'vega';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import Loader from '../../../../shared/components/loader';
+import { RootState, useAppSelector } from '../../../../store/store';
+import { getClassColorMap } from '../../../../shared/utils/colorUtils';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -146,14 +147,16 @@ interface IInstanceClassification {
   showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
   hashRow: (row: TestInstance) => string
-  counterfactualPoints?: TestInstance[] | null
 }
 
 const InstanceClassification = (props: IInstanceClassification) => {
   const theme = useTheme();
+  const { tab } = useAppSelector(
+    (state: RootState) => state.workflowPage,
+  );
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
-  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow, counterfactualPoints } = props;
+  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
   const [options, setOptions] = useState<string[]>([]);
   const [xAxisOption, setXAxisOption] = useState<string>('');
   const [yAxisOption, setYAxisOption] = useState<string>('');
@@ -167,34 +170,92 @@ const InstanceClassification = (props: IInstanceClassification) => {
     return 'nominal';
   };
 
-  // const getVegaData = (data: any) => {
-  //   let newData: any[] = _.cloneDeep(data)
-  //   if (checkbox) {
-  //     newData = newData.filter(d => d.actual !== d.predicted)
-  //   }
-  //   return newData
-  // }
-  const getVegaData = (
-    mainData: TestInstance[],
-    counterfactuals?: TestInstance[] | null
-  ) => {
-    const base = mainData.map((row) => ({
-      ...row,
-      id: hashRow(row),
-      isMisclassified: row.actual !== row.predicted,
-      isCounterfactual: false,
-      pointType: 'Original',
-    }));
+  let classColorMap: Record<string, string> = {};
 
-    const cf = (counterfactuals ?? []).map((row, i) => ({
-      ...row,
-      id: `cf-${i}`,
-      isMisclassified: false,
-      isCounterfactual: true,
-      pointType: 'Counterfactual',
-    }));
+  if (!showMisclassifiedOnly && plotData?.data?.length) {
+    const predictedValues = Array.from(new Set(plotData.data.map(d => String(d.predicted))));
 
-    return [...base, ...cf];
+    classColorMap = getClassColorMap(predictedValues);
+  }
+
+
+const getCounterfactualsData = (
+  tableContents: Record<string, { values: string[] }> | undefined,
+  point: { data: Record<string, any> } | null
+): TestInstance[] | null => {
+  if (!point || !tableContents) return null;
+
+    const columns = Object.keys(tableContents);
+    const baseRowIndex = 0;
+    const rowCount = tableContents[columns[0]]?.values.length || 0;
+
+    return Array.from({ length: rowCount - 1 }, (_, index) => {
+      const actualIndex = index + 1; // counterfactuals start from row 1
+      const row: Record<string, string> = {};
+
+      for (const key of columns) {
+        const baseValueStr = tableContents[key].values[baseRowIndex];
+        const cfValueStr = tableContents[key].values[actualIndex];
+
+        if (key === 'label') {
+          row['predicted'] = cfValueStr;
+          continue;
+        }
+
+        if (cfValueStr === '-') {
+          row[key] = baseValueStr;
+          continue;
+        }
+
+        const baseValue = parseFloat(baseValueStr);
+        const delta = parseFloat(cfValueStr);
+        const isNumericDelta =
+        !isNaN(baseValue) && !isNaN(delta) && /^[+-]?\d+(\.\d+)?$/.test(cfValueStr);
+
+        if (isNumericDelta) {
+          row[key] = String(baseValue + delta); // ensure string
+        } else {
+          row[key] = cfValueStr;
+        }
+      }
+
+      return {
+        ...Object.fromEntries(
+          Object.entries(point.data).map(([k, v]) => [k, String(v)])
+        ),
+        ...row,
+        actual: String(point.data.actual),
+      } as TestInstance;
+    });
+  };
+
+  const getVegaData = (data: TestInstance[]) => {
+    const originalPoints = data.map((originalRow: TestInstance) => {
+      const id = hashRow(originalRow);
+      const isMisclassified = originalRow.actual !== originalRow.predicted;
+
+      return {
+        ...originalRow,
+        isMisclassified,
+        pointType: 'Original',
+        id,
+      };
+    });
+
+    const counterfactualPoints = getCounterfactualsData(
+      tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents,
+      point
+    )?.map((cfRow) => {
+      const id = hashRow(cfRow);
+
+      return {
+        ...cfRow,
+        pointType: 'Counterfactual',
+        id,
+      };
+    }) ?? [];
+
+    return [...originalPoints, ...counterfactualPoints];
   };
 
   useEffect(() => {
@@ -224,8 +285,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
         ) as TestInstance;
 
         setPoint({ id, data: cleanedData });
-      } else {
-        setPoint(null);
       }
     });
   };
@@ -273,7 +332,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
           height: 'container',
           autosize: { type: 'fit', contains: 'padding', resize: true },
           data: {
-            values: getVegaData(plotData?.data ?? [], counterfactualPoints),
+            values: getVegaData(plotData?.data ?? []),
           },
           params: [
             {
@@ -315,8 +374,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
             },
             color: {
               condition: {
-                test: 'datum.isCounterfactual',
-                value: '#FFA500',
+                test: 'datum.pointType === \'Counterfactual\'',
+                value: '#FFA500', // orange for counterfactuals
               },
               field: showMisclassifiedOnly ? 'isMisclassified' : 'predicted',
               type: showMisclassifiedOnly ? 'nominal' : 'nominal',
@@ -326,7 +385,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
                   range: ['#cccccc', '#ff0000'],
                 }
                 : {
-                  range: ['#1f77b4', '#2ca02c'],
+                    domain: Object.keys(classColorMap),
+                    range: Object.values(classColorMap),
                 },
               legend: {
                 title: showMisclassifiedOnly ? 'Misclassified' : 'Predicted Class',
@@ -377,8 +437,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
               { field: 'pointType', type: 'nominal', title: 'Type' },
               { field: 'actual', type: 'nominal', title: 'Actual' },
               { field: 'predicted', type: 'nominal', title: 'Predicted' },
-              { field: xAxisOption || 'xAxis default', type: 'quantitative', title: xAxisOption },
-              { field: yAxisOption || 'yAxis default', type: 'quantitative', title: yAxisOption },
+              { field: xAxisOption || 'xAxis default', type: xFieldType, title: xAxisOption },
+              { field: yAxisOption || 'yAxis default', type: yFieldType, title: yAxisOption },
             ]
           },
         }}
