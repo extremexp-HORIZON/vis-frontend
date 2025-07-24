@@ -19,7 +19,7 @@ import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
 import FeatureExplainability from './workflow-feature-explainability';
 import SwitchAccessShortcutRoundedIcon from '@mui/icons-material/SwitchAccessShortcutRounded';
-import CGlanceExecution from '../../../deprecated/gloves-plot';
+import CGlanceExecution from './workflow-global-counterfactuals';
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(

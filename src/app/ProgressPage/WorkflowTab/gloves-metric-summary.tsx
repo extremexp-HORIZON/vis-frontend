@@ -1,9 +1,9 @@
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
-import WorkflowCard from "../shared/components/workflow-card"
+import WorkflowCard from "../../../shared/components/workflow-card"
 import GlovesTable from "./gloves-table"
-import ResponsiveCardTable from "../shared/components/responsive-card-table"
+import ResponsiveCardTable from "../../../shared/components/responsive-card-table"
 import { Stack, Card, LinearProgress } from "@mui/material"
 
 interface MetricSummaryProps {

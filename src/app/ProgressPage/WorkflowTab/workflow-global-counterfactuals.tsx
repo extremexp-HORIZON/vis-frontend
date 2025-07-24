@@ -16,17 +16,17 @@ import {
   CircularProgress,
   Divider,
 } from "@mui/material"
-import type { IWorkflowPageModel } from "../shared/models/workflow.tab.model"
-import WorkflowCard from "../shared/components/workflow-card"
+import type { IWorkflowPageModel } from "../../../shared/models/workflow.tab.model"
+import WorkflowCard from "../../../shared/components/workflow-card"
 import {
   explainabilityQueryDefault,
   fetchExplainabilityPlotPayloadDefault,
-} from "../shared/models/tasks/explainability.model"
-import GlovesScatter from "./gloves-scatter"
+} from "../../../shared/models/tasks/explainability.model"
+import GlovesScatter from "../../../deprecated/gloves-scatter"
 import GlovesMetricSummary from "./gloves-metric-summary"
-import { useAppDispatch, useAppSelector } from "../store/store"
-import { fetchAffected } from "../store/slices/modelAnalysisSlice"
-import { fetchModelAnalysisExplainabilityPlot } from "../store/slices/explainabilitySlice"
+import { useAppDispatch, useAppSelector } from "../../../store/store"
+import { fetchAffected } from "../../../store/slices/modelAnalysisSlice"
+import { fetchModelAnalysisExplainabilityPlot } from "../../../store/slices/explainabilitySlice"
 
 interface CGlanceExecutionProps {
   workflow: IWorkflowPageModel
