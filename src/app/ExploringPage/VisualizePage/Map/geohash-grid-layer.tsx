@@ -273,28 +273,19 @@ export const GeohashGridLayer = ({
         const centerLat = (bbox[0] + bbox[2]) / 2;
         const centerLon = (bbox[1] + bbox[3]) / 2;
 
-        // Calculate cell dimensions in pixels at current zoom level
-        const cellWidth =
-          Math.abs(bbox[3] - bbox[1]) *
-          111320 *
-          Math.cos((centerLat * Math.PI) / 180); // meters
-        const cellHeight = Math.abs(bbox[2] - bbox[0]) * 111320; // meters
+        // Get the actual pixel coordinates of cell corners
+        const topLeft = map.latLngToContainerPoint([bbox[2], bbox[1]]);
+        const bottomRight = map.latLngToContainerPoint([bbox[0], bbox[3]]);
 
-        // Convert to approximate pixels (rough estimation based on zoom)
+        // Calculate actual visual size in pixels
+        const cellWidthPx = Math.abs(bottomRight.x - topLeft.x);
+        const cellHeightPx = Math.abs(bottomRight.y - topLeft.y);
+
+        // Calculate dynamic font size based on cell size and zoom level
         const zoom = map.getZoom();
-        const metersPerPixel =
-          (156543.03392 * Math.cos((centerLat * Math.PI) / 180)) /
-          Math.pow(2, zoom);
-        const cellWidthPx = cellWidth / metersPerPixel;
-        const cellHeightPx = cellHeight / metersPerPixel;
-
-        // Calculate dynamic font size (between 8px and 24px)
-        const minFontSize = 8;
-        const maxFontSize = 24;
-        const fontSize = Math.max(
-          minFontSize,
-          Math.min(maxFontSize, Math.min(cellWidthPx, cellHeightPx) * 0.4),
-        );
+        const zoomFactor = Math.pow(1.2, zoom - 10); // Exponential growth with zoom
+        const cellSize = Math.min(cellWidthPx, cellHeightPx);
+        const fontSize = Math.max(6, Math.min(36, cellSize * 0.3 * zoomFactor));
 
         // Calculate dynamic icon size based on cell size
         const iconWidth = Math.max(20, Math.min(80, cellWidthPx * 0.8));
