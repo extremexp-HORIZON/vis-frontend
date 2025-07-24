@@ -45,7 +45,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
   );
 
   function convertToPythonStyleString(obj: TestInstance) {
-    const excludedKeys = ['isMisclassified', '_vgsid_','pointType'];
+    const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType'];
 
     return (
       '{' +
@@ -196,6 +196,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
         const currentValue = parseFloat(params.value);
+
         if (isNaN(referenceValue) || isNaN(currentValue)) {
           return params.value;
         }

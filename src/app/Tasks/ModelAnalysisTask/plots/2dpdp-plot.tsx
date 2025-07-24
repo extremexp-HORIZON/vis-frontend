@@ -116,7 +116,6 @@ const Contourplot = (props: IContourplot) => {
     return arr.every(val => !isNaN(Number(val)));
   };
 
-
   const xField = plotModel?.data?.xAxis.axisName || 'x';
   const yField = plotModel?.data?.yAxis.axisName || 'y';
   const zField = plotModel?.data?.zAxis.axisName || 'value';
@@ -128,6 +127,7 @@ const Contourplot = (props: IContourplot) => {
   const yIsNumeric = isNumericArray(yVals);
 
   const transform = [];
+
   if (xIsNumeric) {
     transform.push({
       calculate: `toNumber(datum["${xField}"])`,
