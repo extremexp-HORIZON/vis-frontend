@@ -21,7 +21,7 @@ import { HeatmapLayer } from './heatmap-layer';
 import { getRow } from '../../../../store/slices/exploring/datasetSlice';
 import { GeohashGridLayer } from './geohash-grid-layer';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { setSelectedGeohash } from '../../../../store/slices/exploring/mapSlice';
+import { setSelectedGeohash, updateMapBounds } from '../../../../store/slices/exploring/mapSlice';
 
 export interface IMapProps {
   id: string;
@@ -208,6 +208,17 @@ export const Map = (props: IMapProps) => {
   const resetGeohashSelection = useCallback(() => {
     dispatch(setSelectedGeohash(null));
     navigate('?');
+    // Call updateMapBounds to force updateClusters
+    dispatch(updateMapBounds({
+      id,
+      bounds: {
+        south: viewRect?.lat[0] ?? 0,
+        west: viewRect?.lon[0] ?? 0,
+        north: viewRect?.lat[1] ?? 0,
+        east: viewRect?.lon[1] ?? 0,
+      },
+      zoom,
+    }));
   }, [dispatch, navigate]);
 
   let content: React.ReactNode;

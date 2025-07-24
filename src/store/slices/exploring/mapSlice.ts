@@ -13,6 +13,35 @@ import { updateAnalysisResults } from './statsSlice';
 import { updateTimeSeries } from './timeSeriesSlice';
 import ngeohash from 'ngeohash';
 
+/**
+ * Query Blocking System
+ *
+ * This system prevents automatic query execution when a geohash is selected,
+ * allowing users to analyze specific geohash areas without interference from
+ * map interactions.
+ *
+ * How it works:
+ * 1. When setSelectedGeohash is called with a geohash, queryBlocked is set to true
+ * 2. All query listeners (updateMapBounds, setDrawnRect, triggerChartUpdate, etc.)
+ *    check queryBlocked before executing queries
+ * 3. When setSelectedGeohash is called with null, queryBlocked is set to false
+ *
+ * Manual control:
+ * - Use setQueryBlocked(true) to manually block queries
+ * - Use setQueryBlocked(false) to manually unblock queries
+ *
+ * Example usage:
+ * ```typescript
+ * // Block queries when entering geohash analysis mode
+ * dispatch(setSelectedGeohash('abc123'));
+ *
+ * // Manually unblock queries if needed
+ * dispatch(setQueryBlocked(false));
+ *
+ * // Unblock queries when exiting geohash analysis mode
+ * dispatch(setSelectedGeohash(null));
+ * ```
+ */
 interface MapState {
   zoom: number;
   viewRect: IRectangle | null;
@@ -22,6 +51,7 @@ interface MapState {
   facets: IFacet;
   queryInfo: IQueryInfo | null;
   selectedGeohash: string | null;
+  queryBlocked: boolean;
 }
 
 const initialState: MapState = {
@@ -33,6 +63,7 @@ const initialState: MapState = {
   facets: {},
   queryInfo: null,
   selectedGeohash: null,
+  queryBlocked: false,
 };
 
 export const updateClusters = createAsyncThunk(
@@ -163,7 +194,22 @@ export const mapSlice = createSlice({
       state.queryInfo = action.payload;
     },
     setSelectedGeohash: (state, action: PayloadAction<string | null>) => {
-      state.selectedGeohash = action.payload;
+      const newGeohash = action.payload;
+
+      state.selectedGeohash = newGeohash;
+
+      // Block queries when a geohash is selected
+      // This prevents automatic query execution during map interactions
+      // while a specific geohash is being analyzed
+      if (newGeohash) {
+        state.queryBlocked = true;
+      } else {
+        // Unblock queries when geohash is cleared
+        state.queryBlocked = false;
+      }
+    },
+    setQueryBlocked: (state, action: PayloadAction<boolean>) => {
+      state.queryBlocked = action.payload;
     },
     updateMapBounds: (
       state,
@@ -206,6 +252,12 @@ export const mapListeners = (startAppListening: AppStartListening) => {
     actionCreator: updateMapBounds,
     effect: async (action, listenerApi) => {
       const { id } = action.payload;
+      const state = listenerApi.getState() as RootState;
+
+      // Skip query execution if queries are blocked
+      if (state.map.queryBlocked) {
+        return;
+      }
 
       // Dispatch the updateClusters action
       await listenerApi.dispatch(updateClusters(id));
@@ -218,9 +270,15 @@ export const mapListeners = (startAppListening: AppStartListening) => {
     effect: async (action, { dispatch, getState }) => {
       const { id } = action.payload;
       const state = getState() as RootState;
-      const { zoom, drawnRect, viewRect } = state.map;
+      const { zoom, drawnRect, viewRect, queryBlocked, selectedGeohash } =
+        state.map;
       const { categoricalFilters, timeRange } = state.dataset;
       const { groupByCols, measureCol, aggType } = state.chart;
+
+      // Skip query execution if queries are blocked and this is not a geohash-related drawnRect
+      if (queryBlocked && !selectedGeohash) {
+        return;
+      }
 
       const queryBody = {
         rect: drawnRect || viewRect,
@@ -289,5 +347,6 @@ export const {
   setFacets,
   setQueryInfo,
   setSelectedGeohash,
+  setQueryBlocked,
   updateMapBounds,
 } = mapSlice.actions;
