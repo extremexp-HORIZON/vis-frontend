@@ -16,6 +16,7 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import Loader from '../../../../shared/components/loader';
 import { RootState, useAppSelector } from '../../../../store/store';
+import { getClassColorMap } from '../../../../shared/utils/colorUtils';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -170,6 +171,15 @@ const InstanceClassification = (props: IInstanceClassification) => {
 
     return 'nominal';
   };
+
+  let classColorMap: Record<string, string> = {};
+
+  if (!showMisclassifiedOnly && plotData?.data?.length) {
+    const predictedValues = Array.from(new Set(plotData.data.map(d => String(d.predicted))));
+
+    classColorMap = getClassColorMap(predictedValues);
+  }
+
 
 const getCounterfactualsData = (
   tableContents: Record<string, { values: string[] }> | undefined,
@@ -377,7 +387,8 @@ const getVegaData = (data: TestInstance[]) => {
                   range: ['#cccccc', '#ff0000'],
                 }
                 : {
-                  range: ['#1f77b4', '#2ca02c'],
+                    domain: Object.keys(classColorMap),
+                    range: Object.values(classColorMap),
                 },
               legend: {
                 title: showMisclassifiedOnly ? 'Misclassified' : 'Predicted Class',

@@ -10,6 +10,7 @@ import { fetchUmap } from '../../../../store/slices/dataExplorationSlice';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 import type { Item, ScenegraphEvent, View } from 'vega';
+import { getClassColorMap } from '../../../../shared/utils/colorUtils';
 
 interface ControlPanelProps {
   xAxisOption: string
@@ -187,6 +188,13 @@ const InstanceClassificationUmap = (props: Umapi) => {
     };
   });
 
+  const predictedValues = Array.from(
+    new Set(combinedPlotData.map((d) => String(d.predicted)))
+  );
+
+  const classColorMap = getClassColorMap(predictedValues);
+
+
   const handleNewView = (view: View) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
       if (item && item.datum?.isMisclassified) {
@@ -273,7 +281,8 @@ const InstanceClassificationUmap = (props: Umapi) => {
               field: 'predicted',
               type: 'nominal',
               scale: {
-                range: ['#1f77b4', '#2ca02c'],
+                  domain: Object.keys(classColorMap),
+                  range: Object.values(classColorMap),
               },
               legend: {
                 title: 'Predicted Class',
