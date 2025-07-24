@@ -103,91 +103,97 @@ const CGlanceExecution = () => {
   return (
     <>
       {/* Box container to arrange elements side by side */}
-      <Box
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="flex-start"
-        gap={2}
-        marginBottom={2}
-        marginTop={2}
-      >
-        {/* Dropdown for GCF Size */}
-        <Tooltip title="The number of actions to be generated in the end of the algorithm">
-          <FormControl>
-            <InputLabel id="gcf-size-select-label">
-              Number of CounterFactual Actions
-            </InputLabel>
-            <Select
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-              labelId="gcf-size-select-label"
-              input={<OutlinedInput label="Number of CounterFactual Actions" />}
-              value={gcfSize}
-              onChange={
-                null as unknown as (event: SelectChangeEvent<number>) => void
-              }
-            >
-              {Array.from({ length: 10 }, (_, i) => i + 1).map(value => (
-                <MenuItem key={value} value={value}>
-                  {value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
+     <Box
+  display="flex"
+  flexDirection="row"
+  alignItems="center"
+  justifyContent="flex-start"
+  gap={2}
+  marginBottom={2}
+  marginTop={2}
+  width="98%"
+  padding={1}
+>
+  {/* GCF Size Dropdown */}
+  <Tooltip title="The number of actions to be generated in the end of the algorithm" style={{ width: '100%' }}>
+    <Box flex={1}>
+      <FormControl fullWidth>
+        <InputLabel id="gcf-size-select-label">
+          Number of CounterFactual Actions
+        </InputLabel>
+        <Select
+          MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+          labelId="gcf-size-select-label"
+          input={<OutlinedInput label="Number of CounterFactual Actions" />}
+          value={gcfSize}
+          onChange={null as unknown as (event: SelectChangeEvent<number>) => void}
+        >
+          {Array.from({ length: 10 }, (_, i) => i + 1).map(value => (
+            <MenuItem key={value} value={value}>
+              {value}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
+  </Tooltip>
 
-        <Tooltip title="Methods that generate candidate counterfactual explanations">
-          <FormControl>
-            <InputLabel id="cf-method-select-label">
-              Local Counterfactual Method
-            </InputLabel>
-            <Select
-              labelId="cf-method-select-label"
-              input={<OutlinedInput label="Local Counterfactual Method" />}
-              value={cfMethod}
-              onChange={e => setCfMethod(e.target.value as string)}
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {availableCfMethods.map(method => (
-                <MenuItem key={method} value={method}>
-                  {method}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
+  {/* CF Method Dropdown */}
+  <Tooltip title="Methods that generate candidate counterfactual explanations" style={{ width: '100%' }}>
+    <Box flex={1}>
+      <FormControl fullWidth>
+        <InputLabel id="cf-method-select-label">
+          Local Counterfactual Method
+        </InputLabel>
+        <Select
+          labelId="cf-method-select-label"
+          input={<OutlinedInput label="Local Counterfactual Method" />}
+          value={cfMethod}
+          onChange={e => setCfMethod(e.target.value as string)}
+          MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+        >
+          {availableCfMethods.map(method => (
+            <MenuItem key={method} value={method}>
+              {method}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
+  </Tooltip>
 
-        {/* Action Choice Strategy Dropdown */}
-        <Tooltip title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria">
-          <FormControl>
-            <InputLabel id="action-choice-strategy-select-label">
-              Action Choice Strategy
-            </InputLabel>
-            <Select
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-              labelId="action-choice-strategy-select-label"
-              input={<OutlinedInput label="Action Choice Strategy" />}
-              value={actionChoiceStrategy}
-              onChange={e => setActionChoiceStrategy(e.target.value as string)}
-            >
-              {availableActionStrategies.map(strategy => (
-                <MenuItem key={strategy} value={strategy}>
-                  {strategy}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
-        <Button variant="contained" onClick={fetchData} color="primary">
-          Run
-        </Button>
-      </Box>
+  {/* Action Strategy Dropdown */}
+  <Tooltip title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria" style={{ width: '100%' }}>
+    <Box flex={1}>
+      <FormControl fullWidth>
+        <InputLabel id="action-choice-strategy-select-label">
+          Action Choice Strategy
+        </InputLabel>
+        <Select
+          MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}
+          labelId="action-choice-strategy-select-label"
+          input={<OutlinedInput label="Action Choice Strategy" />}
+          value={actionChoiceStrategy}
+          onChange={e => setActionChoiceStrategy(e.target.value as string)}
+        >
+          {availableActionStrategies.map(strategy => (
+            <MenuItem key={strategy} value={strategy}>
+              {strategy}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
+  </Tooltip>
+
+  {/* Run Button */}
+  <Box>
+    <Button variant="contained" onClick={fetchData} color="primary">
+      Run
+    </Button>
+  </Box>
+</Box>
+
       <Divider />
 
       {/* Advanced Options */}
