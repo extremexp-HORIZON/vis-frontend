@@ -18,6 +18,7 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
 import FeatureExplainability from './workflow-feature-explainability';
+import SwitchAccessShortcutRoundedIcon from '@mui/icons-material/SwitchAccessShortcutRounded';
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -167,6 +168,21 @@ const SelectedItemViewer = () => {
       </Box>
     );
   }
+
+  if (selectedItem?.type === 'global-counterfactuals') {
+    return (
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Header
+          title={'Global Counterfactuals'}
+          icon={<SwitchAccessShortcutRoundedIcon color="primary" />}
+        />
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
+          content
+        </Box>
+      </Box>
+    );
+  }
+
 
   return (
     <InfoMessage

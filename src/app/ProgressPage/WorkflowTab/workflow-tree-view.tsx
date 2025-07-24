@@ -29,6 +29,7 @@ import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
 import { useParams } from 'react-router-dom';
 import FolderIcon from '@mui/icons-material/Folder';
+import SwitchAccessShortcutRoundedIcon from '@mui/icons-material/SwitchAccessShortcutRounded';
 
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage);
@@ -1588,6 +1589,46 @@ export default function WorkflowTreeView() {
                       />
                       <Typography>
                       ML Hyperparameter Explanability
+                      </Typography>
+                    </Box>
+                  </Box>
+                }
+              />
+              <TreeItem2
+                itemId="global-counterfactuals"
+                label={
+                  <Box
+                    sx={{
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      bgcolor: 'transparent',
+                    }}
+                    onClick={e => {
+                      dispatch(setSelectedId('global-counterfactuals'));
+                      dispatch(
+                        setSelectedItem({
+                          type: 'global-counterfactuals',
+                        }),
+                      );
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexGrow: 1,
+                        flexWrap: 'wrap',
+                        minWidth: 0,
+                      }}
+                    >
+                      <SwitchAccessShortcutRoundedIcon
+                        fontSize="small"
+                        sx={{ mr: 1, color: theme.palette.primary.main }}
+                      />
+                      <Typography>
+                      Global Counterfactuals
                       </Typography>
                     </Box>
                   </Box>
