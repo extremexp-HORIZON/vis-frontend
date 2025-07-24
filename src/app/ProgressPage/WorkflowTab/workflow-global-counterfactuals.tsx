@@ -51,9 +51,9 @@ interface IValues {
 
 const CGlanceExecution = () => {
   const [gcfSizes, setGcfSizes] = useState<Map<string, number>>(new Map())
-  const availableCfMethods = useMemo(() => ["Dice", "CEM", "GCF"], [])
-  const availableActionStrategies = useMemo(() => ["max-eff", "min-cost"], [])
-  const [cfMethod, setCfMethod] = useState<string>("Dice") // Default cfMethod,
+  const availableCfMethods = useMemo(() => ["Dice", "NearestNeighbors", "RandomSampling"], [])
+  const availableActionStrategies = ["max-eff", "min-cost","mean-action"]
+    const [cfMethod, setCfMethod] = useState<string>("NearestNeighbors") // Default cfMethod,
   const [actionChoiceStrategy, setActionChoiceStrategy] =
     useState<string>("max-eff") // Default actionChoiceStrategy = useMemo(() => "max-eff", [])
   const [gcfSize, setGcfSize] = useState<number>(3) // Default size
@@ -73,8 +73,8 @@ const CGlanceExecution = () => {
             explanation_method: "global_counterfactuals",
 
             gcf_size: gcfSize,
-            cfGenerator: "Dice",
-            clusterActionChoiceAlgo: "max-eff",
+            cfGenerator: cfMethod,
+            clusterActionChoiceAlgo: actionChoiceStrategy,
           },
           metadata: {
             experimentId: "359083425157694092",
