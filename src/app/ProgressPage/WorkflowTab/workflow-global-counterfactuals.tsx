@@ -194,8 +194,13 @@ const CGlanceExecution = () => {
   </Box>
 </Box>
 
-      <Divider />
-
+      <Divider
+        sx={{
+          my: 0.5,
+          borderBottomWidth: 2,
+          borderColor: 'grey.300',
+        }}
+      />
       {/* Advanced Options */}
 
       <Box>

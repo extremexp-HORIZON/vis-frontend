@@ -111,7 +111,12 @@ const GlovesTable: React.FC<DataTableProps> = ({
       id: index + 1,
     } // Each row needs a unique ID
     keys.forEach(key => {
-      row[key] = data[key].values[index]
+      // row[key] = data[key].values[index]
+      const rawValue = data[key].values[index]
+const parsed = parseFloat(rawValue)
+row[key] = !isNaN(parsed) ? parseFloat(parsed.toFixed(2)) : rawValue
+      // row[key] = !isNaN(parsed) ? parseFloat(parsed.toFixed(3)) : rawValue
+
     })
 
     // Merge eff_cost_actions data if available
@@ -157,6 +162,7 @@ const GlovesTable: React.FC<DataTableProps> = ({
       rows={rows}
       columns={columns}
       pagination
+      hideFooter
       pageSizeOptions={[25, 50, 100]}
       checkboxSelection={false}
       disableRowSelectionOnClick={false}
