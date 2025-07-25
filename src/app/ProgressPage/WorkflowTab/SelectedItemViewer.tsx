@@ -19,6 +19,7 @@ import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
 import FeatureExplainability from './workflow-feature-explainability';
 import SwitchAccessShortcutRoundedIcon from '@mui/icons-material/SwitchAccessShortcutRounded';
+import CGlanceExecution from './workflow-global-counterfactuals';
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(
@@ -176,9 +177,7 @@ const SelectedItemViewer = () => {
           title={'Global Counterfactuals'}
           icon={<SwitchAccessShortcutRoundedIcon color="primary" />}
         />
-        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
-          content
-        </Box>
+       <CGlanceExecution/>
       </Box>
     );
   }
