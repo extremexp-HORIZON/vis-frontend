@@ -6,7 +6,7 @@ import {
   type IPointType,
 } from '../../../../shared/utils/clusterUtils';
 import { MapContainer, Marker, TileLayer, ZoomControl } from 'react-leaflet';
-import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
+import { defaultValue, type IDataset } from '../../../../shared/models/exploring/dataset.model';
 import type { ICluster } from '../../../../shared/models/exploring/cluster.model';
 import {
   type RootState,
@@ -154,7 +154,7 @@ export const Map = (props: IMapProps) => {
 
   // Initialize selectedGeohash from URL params
   useEffect(() => {
-    if (geohash && geohash !== selectedGeohash) {
+    if (dataset !== defaultValue && geohash && geohash !== selectedGeohash) {
       dispatch(setSelectedGeohash(geohash));
     }
   }, [geohash, selectedGeohash, dispatch]);
