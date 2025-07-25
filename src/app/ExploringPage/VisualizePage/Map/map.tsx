@@ -6,7 +6,11 @@ import {
   type IPointType,
 } from '../../../../shared/utils/clusterUtils';
 import { MapContainer, Marker, TileLayer, ZoomControl } from 'react-leaflet';
-import { defaultValue, type IDataset } from '../../../../shared/models/exploring/dataset.model';
+import {
+  defaultValue,
+  type MapLayer,
+  type IDataset,
+} from '../../../../shared/models/exploring/dataset.model';
 import type { ICluster } from '../../../../shared/models/exploring/cluster.model';
 import {
   type RootState,
@@ -21,7 +25,16 @@ import { HeatmapLayer } from './heatmap-layer';
 import { getRow } from '../../../../store/slices/exploring/datasetSlice';
 import { GeohashGridLayer } from './geohash-grid-layer';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { setSelectedGeohash } from '../../../../store/slices/exploring/mapSlice';
+import {
+  setMapLayer,
+  setSelectedGeohash,
+} from '../../../../store/slices/exploring/mapSlice';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import {
+  Album as HeatmapIcon,
+  GridView as GeohashIcon,
+  Spoke as ClusterIcon,
+} from '@mui/icons-material';
 
 export interface IMapProps {
   id: string;
@@ -136,12 +149,10 @@ export const Map = (props: IMapProps) => {
   const navigate = useNavigate();
   const geohash = searchParams.get('geohash');
   const dispatch = useAppDispatch();
-
-  //   const [map, setMap] = useState(null);
+  const mapLayer = useAppSelector((state: RootState) => state.map.mapLayer);
   const { clusters, viewRect, zoom, selectedGeohash } = useAppSelector(
     (state: RootState) => state.map,
   );
-  const [clusterMap, setClusterMap] = useState<boolean>(true);
   const [selectedClusterMarker, setSelectedClusterMarker] = useState<{
     lat: number;
     lng: number;
@@ -150,11 +161,11 @@ export const Map = (props: IMapProps) => {
     lat: number;
     lng: number;
   } | null>(null);
-  const [showGeohashGrid, setShowGeohashGrid] = useState(false);
 
   // Initialize selectedGeohash from URL params
   useEffect(() => {
     if (dataset !== defaultValue && geohash && geohash !== selectedGeohash) {
+      dispatch(setMapLayer('geohash'));
       dispatch(setSelectedGeohash(geohash));
     }
   }, [geohash, selectedGeohash, dispatch]);
@@ -197,18 +208,17 @@ export const Map = (props: IMapProps) => {
     return getPoints(clusters);
   }, [clusters]);
 
-  const toggleClusterMap = useCallback(() => setClusterMap(prev => !prev), []);
-  const toggleGeohashGrid = useCallback(() => {
-    if (showGeohashGrid) {
-      resetGeohashSelection();
-    }
-    setShowGeohashGrid(prev => !prev);
-  }, [showGeohashGrid, dispatch]);
-
   const resetGeohashSelection = useCallback(() => {
     dispatch(setSelectedGeohash(null));
     navigate('?');
   }, [dispatch, navigate]);
+
+  const toggleMapLayer = useCallback((layer: MapLayer) => {
+    if (layer !== 'geohash') {
+      resetGeohashSelection();
+    }
+    dispatch(setMapLayer(layer));
+  }, [dispatch, resetGeohashSelection]);
 
   let content: React.ReactNode;
 
@@ -234,21 +244,34 @@ export const Map = (props: IMapProps) => {
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapControl
-          id={id}
-          toggleClusterMap={toggleClusterMap}
-          toggleGeohashGrid={toggleGeohashGrid}
-        />
-        {showGeohashGrid || selectedGeohash !== null ? (
-          <GeohashGridLayer
-            dataset={dataset}
-            points={points}
-            selectedGeohash={selectedGeohash}
-            setSelectedGeohash={(geohash: string | null) =>
-              dispatch(setSelectedGeohash(geohash))
-            }
-          />
-        ) : clusterMap ? (
+        <ZoomControl position="topright" />
+        <MapControl id={id} />
+        <ToggleButtonGroup
+          exclusive
+          value={mapLayer}
+          orientation="vertical"
+          onChange={(_, value) => value && toggleMapLayer(value)}
+          sx={{
+            position: 'absolute',
+            top: 170,
+            right: 10,
+            zIndex: 1000,
+            backgroundColor: 'white',
+            border: '2px solid rgba(0,0,0,0.2)',
+            borderRadius: 2,
+          }}
+        >
+          <ToggleButton value="cluster" sx={{ width: 30, height: 30 }}>
+            <ClusterIcon />
+          </ToggleButton>
+          <ToggleButton value="heatmap" sx={{ width: 30, height: 30 }}>
+            <HeatmapIcon />
+          </ToggleButton>
+          <ToggleButton value="geohash" sx={{ width: 30, height: 30 }}>
+            <GeohashIcon />
+          </ToggleButton>
+        </ToggleButtonGroup>
+        {mapLayer === 'cluster' ? (
           clusters.map((cluster, index) => {
             // every cluster point has coordinates
             // the point may be either a cluster or a single point
@@ -347,7 +370,7 @@ export const Map = (props: IMapProps) => {
               </Marker>
             );
           })
-        ) : (
+        ) : mapLayer === 'heatmap' ? (
           points && (
             <HeatmapLayer
               fitBoundsOnLoad
@@ -373,8 +396,16 @@ export const Map = (props: IMapProps) => {
               }}
             />
           )
-        )}
-        <ZoomControl position="topright" />
+        ) : mapLayer === 'geohash' ? (
+          <GeohashGridLayer
+            dataset={dataset}
+            points={points}
+            selectedGeohash={selectedGeohash}
+            setSelectedGeohash={(geohash: string | null) =>
+              dispatch(setSelectedGeohash(geohash))
+            }
+          />
+        ) : null}
         <MapSearch />
       </MapContainer>
     );

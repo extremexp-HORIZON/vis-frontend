@@ -12,6 +12,7 @@ import type { AppStartListening } from '../../listenerMiddleware';
 import { updateAnalysisResults } from './statsSlice';
 import { updateTimeSeries } from './timeSeriesSlice';
 import ngeohash from 'ngeohash';
+import type { MapLayer } from '../../../shared/models/exploring/dataset.model';
 
 interface MapState {
   zoom: number;
@@ -22,6 +23,7 @@ interface MapState {
   facets: IFacet;
   queryInfo: IQueryInfo | null;
   selectedGeohash: string | null;
+  mapLayer: MapLayer;
 }
 
 const initialState: MapState = {
@@ -33,6 +35,7 @@ const initialState: MapState = {
   facets: {},
   queryInfo: null,
   selectedGeohash: null,
+  mapLayer: 'cluster',
 };
 
 export const updateClusters = createAsyncThunk(
@@ -181,6 +184,9 @@ export const mapSlice = createSlice({
         lon: [bounds.west, bounds.east],
       };
     },
+    setMapLayer: (state, action: PayloadAction<MapLayer>) => {
+      state.mapLayer = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(updateClusters.pending, state => {
@@ -290,4 +296,5 @@ export const {
   setQueryInfo,
   setSelectedGeohash,
   updateMapBounds,
+  setMapLayer,
 } = mapSlice.actions;

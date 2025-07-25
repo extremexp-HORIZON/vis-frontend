@@ -28,3 +28,5 @@ export interface IDataset {
 }
 
 export const defaultValue: Readonly<IDataset> = {};
+
+export type MapLayer = 'cluster' | 'heatmap' | 'geohash';
