@@ -1,3 +1,4 @@
+import type { RootState } from '../../store';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { api } from '../../../app/api/api';
@@ -27,7 +28,7 @@ interface exploringDatasetState {
     getRow: boolean;
     postFileMeta: boolean;
     executeQuery: boolean;
-    exeucuteTimeSeriesQuery: boolean;
+    executeTimeSeriesQuery: boolean;
   };
   error: {
     getDatasets: string | null;
@@ -35,7 +36,7 @@ interface exploringDatasetState {
     getRow: string | null;
     postFileMeta: string | null;
     executeQuery: string | null;
-    exeucuteTimeSeriesQuery: string | null;
+    executeTimeSeriesQuery: string | null;
   };
 }
 
@@ -51,7 +52,7 @@ const initialState: exploringDatasetState = {
     getRow: false,
     postFileMeta: false,
     executeQuery: false,
-    exeucuteTimeSeriesQuery: false,
+    executeTimeSeriesQuery: false,
   },
   error: {
     getDatasets: null,
@@ -59,7 +60,7 @@ const initialState: exploringDatasetState = {
     getRow: null,
     postFileMeta: null,
     executeQuery: null,
-    exeucuteTimeSeriesQuery: null,
+    executeTimeSeriesQuery: null,
   },
 };
 
@@ -113,16 +114,13 @@ export const executeQuery = createAsyncThunk<
   unknown,
   { id: string; body: unknown },
   { rejectValue: string }
->('api/executeQuery', async ({ id, body }, { rejectWithValue }) => {
+>('api/executeQuery', async ({ id, body }, { getState, rejectWithValue }) => {
   try {
+    const state = getState() as RootState;
+    const { dataSource } = state.dataSource;
     const response = await api.post('/data/fetch', {
       ...(body || {}),
-      dataSource: {
-        sourceType: 'local',
-        format: 'rawvis',
-        source: `/opt/experiments/${id}/dataset/${id}.csv`,
-        fileName: id,
-      },
+      dataSource,
       dataType: 'map',
     });
 
@@ -132,29 +130,29 @@ export const executeQuery = createAsyncThunk<
   }
 });
 
-// exeucuteTimeSeriesQuery
-export const exeucuteTimeSeriesQuery = createAsyncThunk<
+// executeTimeSeriesQuery
+export const executeTimeSeriesQuery = createAsyncThunk<
   unknown,
   { id: string; body: unknown },
   { rejectValue: string }
->('api/exeucuteTimeSeriesQuery', async ({ id, body }, { rejectWithValue }) => {
-  try {
-    const response = await api.post('/data/fetch', {
-      ...(body || {}),
-      dataSource: {
-        sourceType: 'local',
-        format: 'rawvis',
-        source: `/opt/experiments/${id}/dataset/${id}.csv`,
-        fileName: id,
-      },
-      dataType: 'timeseries',
-    });
+>(
+  'api/executeTimeSeriesQuery',
+  async ({ id, body }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const { dataSource } = state.dataSource;
+      const response = await api.post('/data/fetch', {
+        ...(body || {}),
+        dataSource,
+        dataType: 'timeseries',
+      });
 
-    return response.data;
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || error.message);
-  }
-});
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
 
 export const datasetSlice = createSlice({
   name: 'exploringDatasetSlice',
@@ -239,21 +237,21 @@ export const datasetSlice = createSlice({
         },
       );
 
-    // exeucuteTimeSeriesQuery
+    // executeTimeSeriesQuery
     builder
-      .addCase(exeucuteTimeSeriesQuery.pending, state => {
-        state.loading.exeucuteTimeSeriesQuery = true;
-        state.error.exeucuteTimeSeriesQuery = null;
+      .addCase(executeTimeSeriesQuery.pending, state => {
+        state.loading.executeTimeSeriesQuery = true;
+        state.error.executeTimeSeriesQuery = null;
       })
-      .addCase(exeucuteTimeSeriesQuery.fulfilled, state => {
-        state.loading.exeucuteTimeSeriesQuery = false;
-        // The result of exeucuteTimeSeriesQuery is not directly stored in the state, typically handled by other slices
+      .addCase(executeTimeSeriesQuery.fulfilled, state => {
+        state.loading.executeTimeSeriesQuery = false;
+        // The result of executeTimeSeriesQuery is not directly stored in the state, typically handled by other slices
       })
       .addCase(
-        exeucuteTimeSeriesQuery.rejected,
+        executeTimeSeriesQuery.rejected,
         (state, action: PayloadAction<string | undefined>) => {
-          state.loading.exeucuteTimeSeriesQuery = false;
-          state.error.exeucuteTimeSeriesQuery =
+          state.loading.executeTimeSeriesQuery = false;
+          state.error.executeTimeSeriesQuery =
             action.payload || 'Failed to execute time series query';
         },
       );

@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { IUnivariateDataPoint } from '../../../shared/models/exploring/univariate-datapoint.model';
 import type { RootState } from '../../store';
 import type { ITimeSeriesDataResponse } from '../../../shared/models/exploring/time-series-data-response.model';
-import { exeucuteTimeSeriesQuery } from './datasetSlice';
+import { executeTimeSeriesQuery } from './datasetSlice';
 import type { AppStartListening } from '../../listenerMiddleware';
 
 interface TimeSeriesState {
@@ -44,13 +44,13 @@ export const updateTimeSeries = createAsyncThunk(
       };
 
       const action = await thunkApi.dispatch(
-        exeucuteTimeSeriesQuery({
+        executeTimeSeriesQuery({
           id: datasetId,
           body: timeSeriesBody,
         }),
       );
 
-      if (exeucuteTimeSeriesQuery.fulfilled.match(action)) {
+      if (executeTimeSeriesQuery.fulfilled.match(action)) {
         const result = action.payload as ITimeSeriesDataResponse;
 
         return result.timeSeriesPoints;
