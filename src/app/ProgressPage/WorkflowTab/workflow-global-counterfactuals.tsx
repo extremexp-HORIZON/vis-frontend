@@ -246,7 +246,7 @@ const CGlanceExecution = () => {
                   ?.effCostActions
               }
             />
-            {/* <GlovesScatter
+            <GlovesScatter
                       data1={
                         tab?.workflowTasks?.modelAnalysis
                           ?.global_counterfactuals?.data?.affectedClusters
@@ -260,7 +260,7 @@ const CGlanceExecution = () => {
                         tab?.workflowTasks?.modelAnalysis
                           ?.global_counterfactuals?.data?.effCostActions
                       }
-                    /> */}
+                    />
           </Box>
         )}
       </Box>

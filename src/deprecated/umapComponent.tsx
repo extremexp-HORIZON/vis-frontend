@@ -71,7 +71,7 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
   )
 
   const api = axios.create({
-    baseURL: '/api', // Let Nginx handle the proxy
+    baseURL: '/api/data/', // Let Nginx handle the proxy
     withCredentials: true, // If authentication is needed
   });
   

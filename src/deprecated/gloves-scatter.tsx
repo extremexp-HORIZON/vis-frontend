@@ -11,14 +11,15 @@ import {
   Typography,
 } from "@mui/material"
 import UmapComponent from "./umapComponent"
+import ResponsiveCardVegaLite from "../shared/components/responsive-card-vegalite";
 
 interface DataField {
   values: any[]
 }
 
 interface GlovesScatterProps {
-  data1: Record<string, DataField>
-  data2: { appliedAffectedActions: Record<string, DataField> }
+  data1: any
+  data2:any
   actions: any // Define more specific type if known
   eff_cost_actions: any
 }
@@ -91,7 +92,7 @@ const GlovesScatter = ({
 
   const determineType = (field: string, data: string | any[]) => {
     if (!data.length || data[0][field] === undefined) return "nominal"
-    return typeof data[0][field] === "string" ? "quantitative" : "quantitative"
+    return typeof data[0][field] === "string" ? "nominal" : "quantitative"
   }
 
   // Vega-Lite specifications for both plots
@@ -369,16 +370,16 @@ const GlovesScatter = ({
       ) : (
         <div>
           {data1 && data2 && (
-            <VegaLite
-              spec={sharedLegendSpec(
+            <ResponsiveCardVegaLite spec={sharedLegendSpec(
                 transformData(data1),
                 transformData(data2.appliedAffectedActions),
-              )}
-              actions={false}
-            />
+              )}/>
+           
+          
           )}
           {data1 && (
-            <VegaLite spec={Colorspec(transformData(data1))} actions={false} />
+            
+            <ResponsiveCardVegaLite spec={Colorspec(transformData(data1))} />
           )}
         </div>
       )}
