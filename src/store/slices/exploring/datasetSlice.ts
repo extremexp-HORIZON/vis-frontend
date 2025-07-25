@@ -268,11 +268,6 @@ export const datasetUiListeners = (startAppListening: AppStartListening) => {
       const dataset = state.dataset;
       const datasetId = dataset.dataset.id;
 
-      // Skip query execution if queries are blocked
-      if (state.map.queryBlocked) {
-        return;
-      }
-
       if (datasetId && state.dataset.timeRange.from !== 0) {
         // Check if timeRange.from is initial value to not trigger updates
 
