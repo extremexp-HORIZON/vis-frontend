@@ -1,4 +1,4 @@
-import {useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
@@ -179,27 +179,27 @@ const CGlanceExecution = () => {
       />
       <Box padding={2}>
         <GlovesMetricSummary/>
-       {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data?.affectedClusters &&
+        {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data?.affectedClusters &&
  tab?.workflowTasks?.modelAnalysis?.affected?.data &&
  tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data?.actions &&
  tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data?.effCostActions ? (
-  <GlovesScatter
-    data1={
-      tab.workflowTasks.modelAnalysis.global_counterfactuals.data.affectedClusters
-    }
-    data2={tab.workflowTasks.modelAnalysis.affected.data}
-    actions={
-      tab.workflowTasks.modelAnalysis.global_counterfactuals.data.actions
-    }
-    eff_cost_actions={
-      tab.workflowTasks.modelAnalysis.global_counterfactuals.data.effCostActions
-    }
-  />
-) : (
-  <>
-   
-  </>
-)}
+            <GlovesScatter
+              data1={
+                tab.workflowTasks.modelAnalysis.global_counterfactuals.data.affectedClusters
+              }
+              data2={tab.workflowTasks.modelAnalysis.affected.data}
+              actions={
+                tab.workflowTasks.modelAnalysis.global_counterfactuals.data.actions
+              }
+              eff_cost_actions={
+                tab.workflowTasks.modelAnalysis.global_counterfactuals.data.effCostActions
+              }
+            />
+          ) : (
+            <>
+
+            </>
+          )}
 
       </Box>
 
