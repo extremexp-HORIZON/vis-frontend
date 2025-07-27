@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useEffect, useState, useMemo } from 'react';
-import { VegaLite } from 'react-vega';
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 

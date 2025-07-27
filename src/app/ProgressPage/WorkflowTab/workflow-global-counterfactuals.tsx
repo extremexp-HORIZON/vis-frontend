@@ -18,15 +18,8 @@ import { fetchAffected } from '../../../store/slices/modelAnalysisSlice';
 import { fetchModelAnalysisExplainabilityPlot } from '../../../store/slices/explainabilitySlice';
 import { useParams } from 'react-router-dom';
 
-interface IValues {
-  values: string[]
-  index: number
-  colour: string[]
-}
-
 const CGlanceExecution = () => {
   const { experimentId } = useParams();
-  const [gcfSizes, setGcfSizes] = useState<Map<string, number>>(new Map());
   const availableCfMethods = useMemo(
     () => ['Dice', 'NearestNeighbors', 'RandomSampling'],
     [],
@@ -36,8 +29,6 @@ const CGlanceExecution = () => {
   const [actionChoiceStrategy, setActionChoiceStrategy] =
     useState<string>('max-eff'); // Default actionChoiceStrategy = useMemo(() => "max-eff", [])
   const [gcfSize, setGcfSize] = useState<number>(3); // Default size
-  const [selectedFeature, setSelectedFeature] = useState<string[]>([]); // Start with empty array
-  const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(true); // To control the collapse state
   const tab = useAppSelector(state => state.workflowPage.tab);
 
   const dispatch = useAppDispatch();
@@ -72,7 +63,7 @@ const CGlanceExecution = () => {
       );
 
       console.log(
-        'Dispatched global_counterfactuals and affected successfully.',
+        'Dispached global_counterfactuals and affected successfully.',
       );
     } catch (error) {
       console.error('Error dispatching data:', error);

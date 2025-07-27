@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import type { VisualizationSpec } from 'react-vega';
-import { VegaLite } from 'react-vega';
 import {
   FormControl,
   InputLabel,
@@ -8,7 +7,6 @@ import {
   MenuItem,
   Box,
   Switch,
-  Typography,
 } from '@mui/material';
 import UmapComponent from './umapComponent';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
