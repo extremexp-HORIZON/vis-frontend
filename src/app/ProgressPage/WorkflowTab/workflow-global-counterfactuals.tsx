@@ -1,48 +1,22 @@
-import type React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import {useMemo, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
-  Typography,
   Select,
   MenuItem,
   Box,
   InputLabel,
   FormControl,
   OutlinedInput,
-  Collapse,
   Tooltip,
-  Paper,
-  CircularProgress,
   Divider,
 } from '@mui/material';
-import type { IWorkflowPageModel } from '../../../shared/models/workflow.tab.model';
-import WorkflowCard from '../../../shared/components/workflow-card';
-import {
-  explainabilityQueryDefault,
-  fetchExplainabilityPlotPayloadDefault,
-} from '../../../shared/models/tasks/explainability.model';
-import GlovesScatter from '../../../deprecated/gloves-scatter';
+import GlovesScatter from '../../Tasks/ModelAnalysisTask/plots/gloves-scatter';
 import GlovesMetricSummary from './gloves-metric-summary';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { fetchAffected } from '../../../store/slices/modelAnalysisSlice';
 import { fetchModelAnalysisExplainabilityPlot } from '../../../store/slices/explainabilitySlice';
 import { useParams } from 'react-router-dom';
-
-interface CGlanceExecutionProps {
-  workflow: IWorkflowPageModel
-  availableCfMethods: string[]
-  availableActionStrategies: string[]
-  availableFeatures: string[]
-  plotRequestMetadata: any
-}
-
-interface ApplyAffectedActionsResponse {
-  applied_affected_actions: Record<string, ITableContents>
-}
-interface ITableContents {
-  [key: string]: IValues
-}
 
 interface IValues {
   values: string[]
@@ -52,7 +26,6 @@ interface IValues {
 
 const CGlanceExecution = () => {
   const { experimentId } = useParams();
-
   const [gcfSizes, setGcfSizes] = useState<Map<string, number>>(new Map());
   const availableCfMethods = useMemo(() => ['Dice', 'NearestNeighbors', 'RandomSampling'], []);
   const availableActionStrategies = ['max-eff', 'min-cost', 'mean-action'];
@@ -206,6 +179,28 @@ const CGlanceExecution = () => {
       />
       <Box padding={2}>
         <GlovesMetricSummary/>
+       {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data?.affectedClusters &&
+ tab?.workflowTasks?.modelAnalysis?.affected?.data &&
+ tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data?.actions &&
+ tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data?.effCostActions ? (
+  <GlovesScatter
+    data1={
+      tab.workflowTasks.modelAnalysis.global_counterfactuals.data.affectedClusters
+    }
+    data2={tab.workflowTasks.modelAnalysis.affected.data}
+    actions={
+      tab.workflowTasks.modelAnalysis.global_counterfactuals.data.actions
+    }
+    eff_cost_actions={
+      tab.workflowTasks.modelAnalysis.global_counterfactuals.data.effCostActions
+    }
+  />
+) : (
+  <>
+   
+  </>
+)}
+
       </Box>
 
     </>
@@ -213,40 +208,3 @@ const CGlanceExecution = () => {
 };
 
 export default CGlanceExecution;
-
-// <Box padding={2}>
-//   <GlovesMetricSummary
-//     cost={
-//       tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-//         ?.TotalCost || 0
-//     }
-//     eff={
-//       tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-//         ?.TotalEffectiveness || 0
-//     }
-//     actions={
-//       tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-//         ?.actions
-//     }
-//     instances={undefined}
-//     eff_cost_actions={
-//       tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-//         ?.effCostActions
-//     }
-//   />
-//   <GlovesScatter
-//             data1={
-//               tab?.workflowTasks?.modelAnalysis
-//                 ?.global_counterfactuals?.data?.affectedClusters
-//             }
-//             data2={tab?.workflowTasks?.modelAnalysis?.affected.data}
-//             actions={
-//               tab?.workflowTasks?.modelAnalysis
-//                 ?.global_counterfactuals?.data?.actions
-//             }
-//             eff_cost_actions={
-//               tab?.workflowTasks?.modelAnalysis
-//                 ?.global_counterfactuals?.data?.effCostActions
-//             }
-//           />
-// </Box>

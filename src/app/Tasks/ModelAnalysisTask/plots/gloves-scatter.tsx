@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material"
 import UmapComponent from "./umapComponent"
-import ResponsiveCardVegaLite from "../shared/components/responsive-card-vegalite";
+import ResponsiveCardVegaLite from "../../../../shared/components/responsive-card-vegalite";
 
 interface DataField {
   values: any[]
