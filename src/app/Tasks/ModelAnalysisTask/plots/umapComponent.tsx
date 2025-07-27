@@ -175,8 +175,7 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
     createScatterData(umapResults.umap2),
   );
   const predictionSpec = (umapResult: number[][] | null, colorData: any[]) => ({
-    title: 'Affected Clusters',
-    description: 'UMAP plot colored by prediction values',
+
     width: 450,
     height: 450,
     data: {
@@ -229,7 +228,7 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
       {umapResults.umap1 && umapResults.umap2 && (
         <ResponsiveCardVegaLite spec={spec}/>
       )}
-      {umapResults.umap1 && <ResponsiveCardVegaLite spec={spec1} actions={false} />}
+      {umapResults.umap1 && <ResponsiveCardVegaLite spec={spec1} title={'Affected Clusters'} details={'UMAP plot colored by prediction values'} />}
     </div>
   );
 };
