@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useEffect, useState, useMemo } from 'react';
 import { VegaLite } from 'react-vega';
+import Loader from '../../../../shared/components/loader';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 
 interface DataField {
   values: any[]
@@ -222,12 +224,12 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
+      {loading && <Loader/>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {umapResults.umap1 && umapResults.umap2 && (
-        <VegaLite spec={spec} actions={false} />
+        <ResponsiveCardVegaLite spec={spec}/>
       )}
-      {umapResults.umap1 && <VegaLite spec={spec1} actions={false} />}
+      {umapResults.umap1 && <ResponsiveCardVegaLite spec={spec1} actions={false} />}
     </div>
   );
 };
