@@ -14,7 +14,8 @@ import type { View, Item, ScenegraphEvent } from 'vega';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import Loader from '../../../../shared/components/loader';
-import { RootState, useAppSelector } from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
 import { getClassColorMap } from '../../../../shared/utils/colorUtils';
 
 interface ControlPanelProps {
@@ -178,12 +179,11 @@ const InstanceClassification = (props: IInstanceClassification) => {
     classColorMap = getClassColorMap(predictedValues);
   }
 
-
-const getCounterfactualsData = (
-  tableContents: Record<string, { values: string[] }> | undefined,
-  point: { data: Record<string, any> } | null
-): TestInstance[] | null => {
-  if (!point || !tableContents) return null;
+  const getCounterfactualsData = (
+    tableContents: Record<string, { values: string[] }> | undefined,
+    point: { data: Record<string, any> } | null
+  ): TestInstance[] | null => {
+    if (!point || !tableContents) return null;
 
     const columns = Object.keys(tableContents);
     const baseRowIndex = 0;
@@ -385,8 +385,8 @@ const getCounterfactualsData = (
                   range: ['#cccccc', '#ff0000'],
                 }
                 : {
-                    domain: Object.keys(classColorMap),
-                    range: Object.values(classColorMap),
+                  domain: Object.keys(classColorMap),
+                  range: Object.values(classColorMap),
                 },
               legend: {
                 title: showMisclassifiedOnly ? 'Misclassified' : 'Predicted Class',

@@ -41,7 +41,6 @@ const ComparisonModelInstance = ({
       new Set(instance.map(d => String(d.predicted)))
     );
 
-
     classColorMap = getClassColorMap(predictedValues);
   }
 

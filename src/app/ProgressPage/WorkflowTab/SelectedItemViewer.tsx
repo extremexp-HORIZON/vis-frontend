@@ -177,14 +177,13 @@ const SelectedItemViewer = () => {
           title={'Global Counterfactuals'}
           icon={<SwitchAccessShortcutRoundedIcon color="primary" />}
         />
-                <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
+        <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>
 
-       <CGlanceExecution/>
-       </Box>
+          <CGlanceExecution/>
+        </Box>
       </Box>
     );
   }
-
 
   return (
     <InfoMessage

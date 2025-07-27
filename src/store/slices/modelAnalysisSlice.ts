@@ -15,7 +15,8 @@ interface LoadableSection<T = unknown> {
 export const fetchAffected = createAsyncThunk(
   'modelAnalysis/fetch_affected',
   async (payload: fetchAffectedRequest) => {
-const response = await api.get(`/explainability/affected`);
+    const response = await api.get('/explainability/affected');
+
     return response.data;
   }
 );
