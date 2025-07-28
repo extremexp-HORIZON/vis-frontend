@@ -375,7 +375,7 @@ const GlovesScatter = ({
         </Box>
       </Box>
       {dimensionalityReduction ? (
-        <Box textAlign="center" marginTop={3}>
+        <Box textAlign="center" >
           <UmapComponent data1={data1} data2={data2} colorField={colorField} />
         </Box>
       ) : (
