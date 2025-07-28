@@ -248,7 +248,7 @@ const CGlanceExecution = () => {
           borderColor: 'grey.300',
         }}
       />
-      <Box sx={{flexGrow: 1, p: 2}}>
+      <Box sx={{flexGrow: 1, p: 1, }}>
         {counterfactualsContent()}
       </Box>
     </Box>
