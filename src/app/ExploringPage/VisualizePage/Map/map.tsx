@@ -212,12 +212,15 @@ export const Map = (props: IMapProps) => {
     navigate('?');
   }, [dispatch, navigate]);
 
-  const toggleMapLayer = useCallback((layer: MapLayer) => {
-    if (layer !== 'geohash') {
-      resetGeohashSelection();
-    }
-    dispatch(setMapLayer(layer));
-  }, [dispatch, resetGeohashSelection]);
+  const toggleMapLayer = useCallback(
+    (layer: MapLayer) => {
+      if (layer !== 'geohash' && selectedGeohash != null) {
+        resetGeohashSelection();
+      }
+      dispatch(setMapLayer(layer));
+    },
+    [dispatch, resetGeohashSelection, selectedGeohash],
+  );
 
   let content: React.ReactNode;
 
@@ -277,8 +280,8 @@ export const Map = (props: IMapProps) => {
                 sx={{ width: 30, height: 30 }}
                 disabled={drawnRect != null}
               >
-              <GeohashIcon />
-            </ToggleButton>
+                <GeohashIcon />
+              </ToggleButton>
             </span>
           </Tooltip>
         </ToggleButtonGroup>
