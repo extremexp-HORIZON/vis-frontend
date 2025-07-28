@@ -194,7 +194,6 @@ const InstanceClassificationUmap = (props: Umapi) => {
 
   const classColorMap = getClassColorMap(predictedValues);
 
-
   const handleNewView = (view: View) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
       if (item && item.datum?.isMisclassified) {
@@ -281,8 +280,8 @@ const InstanceClassificationUmap = (props: Umapi) => {
               field: 'predicted',
               type: 'nominal',
               scale: {
-                  domain: Object.keys(classColorMap),
-                  range: Object.values(classColorMap),
+                domain: Object.keys(classColorMap),
+                range: Object.values(classColorMap),
               },
               legend: {
                 title: 'Predicted Class',

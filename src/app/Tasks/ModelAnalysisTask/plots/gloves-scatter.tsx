@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react"
-import type { VisualizationSpec } from "react-vega";
-import { VegaLite } from "react-vega"
+import { useState, useEffect } from 'react';
+import type { VisualizationSpec } from 'react-vega';
 import {
   FormControl,
   InputLabel,
@@ -8,17 +7,18 @@ import {
   MenuItem,
   Box,
   Switch,
-  Typography,
-} from "@mui/material"
-import UmapComponent from "./umapComponent"
+} from '@mui/material';
+import UmapComponent from './umapComponent';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 
 interface DataField {
   values: any[]
 }
 
 interface GlovesScatterProps {
-  data1: Record<string, DataField>
-  data2: { appliedAffectedActions: Record<string, DataField> }
+  data1: any
+  data2: any
   actions: any // Define more specific type if known
   eff_cost_actions: any
 }
@@ -30,115 +30,122 @@ const GlovesScatter = ({
 }: GlovesScatterProps) => {
   // Utility function to filter out unwanted fields for dropdown options only
   const isExcludedField = (field: string) => {
-    const excludedFields = ["index", "Cluster", "Chosen_Action"]
-    const actionPredictionRegex = /^Action\d+_Prediction$/
-    return excludedFields.includes(field) || actionPredictionRegex.test(field)
-  }
+    const excludedFields = ['index', 'Cluster', 'Chosen_Action'];
+    const actionPredictionRegex = /^Action\d+_Prediction$/;
+
+    return excludedFields.includes(field) || actionPredictionRegex.test(field);
+  };
 
   const getColorOptions = (clusters: {}) => {
-    if (!clusters) return []
+    if (!clusters) return [];
+
     return Object.keys(clusters).filter(field =>
       /^Action\d+_Prediction$/.test(field),
-    )
-  }
+    );
+  };
 
-  const [xAxis, setXAxis] = useState("")
-  const [yAxis, setYAxis] = useState("")
-  const [colorField, setColorField] = useState("")
-  const [colorOptions, setColorOptions] = useState<string[]>([])
-  const [options, setOptions] = useState<string[]>([])
-  const [dimensionalityReduction, setDimensionalityReduction] = useState(false)
+  const [xAxis, setXAxis] = useState('');
+  const [yAxis, setYAxis] = useState('');
+  const [colorField, setColorField] = useState('');
+  const [colorOptions, setColorOptions] = useState<string[]>([]);
+  const [options, setOptions] = useState<string[]>([]);
+  const [dimensionalityReduction, setDimensionalityReduction] = useState(false);
 
   // Extract options from the data for dropdowns (excluding certain fields)
   const getOptions = (clusters: {}) => {
-    if (!clusters) return []
-    return Object.keys(clusters).filter(field => !isExcludedField(field))
-  }
+    if (!clusters) return [];
+
+    return Object.keys(clusters).filter(field => !isExcludedField(field));
+  };
 
   // Update state whenever data1 or data2 changes
   useEffect(() => {
-    const options1 = getOptions(data1)
-    const options2 = getOptions(data2.appliedAffectedActions)
+    const options1 = getOptions(data1);
+    const options2 = getOptions(data2.appliedAffectedActions);
     const combinedOptions =
-      options1.length > options2.length ? options1 : options2
+      options1.length > options2.length ? options1 : options2;
 
-    setOptions(combinedOptions as string[])
-    setXAxis(combinedOptions[0] || "")
-    setYAxis(combinedOptions[1] || "")
-    setColorOptions(getColorOptions(data1))
+    setOptions(combinedOptions as string[]);
+    setXAxis(combinedOptions[0] || '');
+    setYAxis(combinedOptions[1] || '');
+    setColorOptions(getColorOptions(data1));
 
-    setColorField(getColorOptions(data1)[0] || "")
-  }, [data1, data2])
+    setColorField(getColorOptions(data1)[0] || '');
+  }, [data1, data2]);
 
   // Function to transform data for Vega-Lite, keeping all fields
   const transformData = (data: Record<string, DataField>) => {
-    const keys = Object.keys(data)
-    const length = data[keys[0]].values.length // Assume all fields have the same length
-    const result = []
+    const keys = Object.keys(data);
+    const length = data[keys[0]].values.length; // Assume all fields have the same length
+    const result = [];
 
     for (let i = 0; i < length; i++) {
-      const row: { [key: string]: any } = {}
+      const row: { [key: string]: any } = {};
+
       keys.forEach(key => {
-        row[key] = data[key].values[i]
-      })
-      result.push(row)
+        row[key] = data[key].values[i];
+      });
+      result.push(row);
     }
 
-    return result
-  }
+    return result;
+  };
 
   // Transform both data sets
 
   const determineType = (field: string, data: string | any[]) => {
-    if (!data.length || data[0][field] === undefined) return "nominal"
-    return typeof data[0][field] === "string" ? "quantitative" : "quantitative"
-  }
+    if (!data.length || data[0][field] === undefined) return 'nominal';
+
+    console.log('Field:', field, 'Data Type:', typeof data[0][field]);
+
+    return typeof data[0][field] === 'string' ? 'nominal' : 'quantitative';
+  };
 
   // Vega-Lite specifications for both plots
   const spec = (data: { id: string }[]) =>
     ({
-      description: "A scatter plot of affected clusters",
-      mark: "circle",
+      description: 'A scatter plot of affected clusters',
+      mark: 'circle',
       params: [
         {
-          name: "industry",
-          select: { type: "point", fields: ["Chosen_Action"] },
-          bind: "legend",
+          name: 'industry',
+          select: { type: 'point', fields: ['Chosen_Action'] },
+          bind: 'legend',
         },
       ],
       encoding: {
         x: { field: xAxis, type: determineType(xAxis, data) },
         y: { field: yAxis, type: determineType(yAxis, data) },
         color: {
-          field: "Chosen_Action",
-          type: "nominal",
-          title: "Chosen Action",
+          field: 'Chosen_Action',
+          type: 'nominal',
+          title: 'Chosen Action',
         },
         tooltip: [
-          { field: "Chosen_Action", type: "nominal", title: "Chosen Action" },
-          { field: xAxis, type: "nominal" },
-          { field: yAxis, type: "nominal" },
+          { field: 'Chosen_Action', type: 'nominal', title: 'Chosen Action' },
+          { field: xAxis, type: 'nominal' },
+          { field: yAxis, type: 'nominal' },
         ],
         opacity: {
-          condition: { param: "industry", value: 1 },
+          condition: { param: 'industry', value: 1 },
           value: 0.01,
         },
       },
       data: { values: data },
-    }) as VisualizationSpec
+    }) as VisualizationSpec;
 
   const Colorspec = (data: { id: string }[]) => {
     return {
-      description: "A scatter plot of affected clusters",
-      title: "Affected Clusters",
+      description: 'A scatter plot of affected clusters',
+      title: 'Affected Clusters',
       width: 450,
       height: 450,
-      mark: { type: "point", opacity: 0.8 },
+      mark: { type: 'point', opacity: 0.8 },
       params: [
         {
-          name: "industry",
-          select: { type: "point", fields: [colorField] },
-          bind: "legend",
+          name: 'industry',
+          select: { type: 'point', fields: [colorField] },
+          bind: 'legend',
         },
       ],
       encoding: {
@@ -146,133 +153,136 @@ const GlovesScatter = ({
         y: { field: yAxis, type: determineType(yAxis, data) },
         color: {
           field: colorField,
-          type: "nominal",
+          type: 'nominal',
           scale: {
-            domain: ["0", "1"], // Explicitly set 0 and 1 as the domain values
-            range: ["red", "green"], // Explicitly set red for 0 and green for 1
+            domain: ['0', '1'], // Explicitly set 0 and 1 as the domain values
+            range: ['red', 'green'], // Explicitly set red for 0 and green for 1
           },
-          title: "Prediction",
+          title: 'Prediction',
         },
         tooltip: [
-          { field: xAxis, type: "nominal" },
-          { field: yAxis, type: "nominal" },
-          { field: colorField, type: "nominal" },
+          { field: xAxis, type: 'nominal' },
+          { field: yAxis, type: 'nominal' },
+          { field: colorField, type: 'nominal' },
         ],
         opacity: {
-          condition: { param: "industry", value: 1 },
+          condition: { param: 'industry', value: 1 },
           value: 0.01,
         },
       },
       data: { values: data },
-    } as VisualizationSpec
-  }
+    } as VisualizationSpec;
+  };
 
   const getEffCostForColorField = (field: string) => {
-    const match = field.match(/^Action(\d+)_Prediction$/) // Extract the number from "ActionX_Prediction"
+    const match = field.match(/^Action(\d+)_Prediction$/); // Extract the number from "ActionX_Prediction"
+
     if (match) {
-      const actionNumber = match[1] // Extracted number as a string
-      return eff_cost_actions[actionNumber] // Return the corresponding eff_cost_action
+      const actionNumber = match[1]; // Extracted number as a string
+
+      return eff_cost_actions[actionNumber]; // Return the corresponding eff_cost_action
     }
-    return null // Return null if no match
-  }
+
+    return null; // Return null if no match
+  };
 
   // Fetch the corresponding eff_cost_actions for the selected colorField
-  const selectedEffCost = getEffCostForColorField(colorField)
+  const selectedEffCost = getEffCostForColorField(colorField);
 
   const sharedLegendSpec = (data1: any[], data2: any[]) =>
     ({
-      description: "Two scatter plots with a shared legend",
+      description: 'Two scatter plots with a shared legend',
       hconcat: [
         {
-          title: "Action Selection",
+          title: 'Action Selection',
           width: 450,
           height: 450,
           data: { values: data1 },
-          mark: { type: "point", opacity: 0.8 },
+          mark: { type: 'point', opacity: 0.8 },
           params: [
             {
-              name: "industry",
-              select: { type: "point", fields: ["Chosen_Action"] },
-              bind: "legend",
+              name: 'industry',
+              select: { type: 'point', fields: ['Chosen_Action'] },
+              bind: 'legend',
             },
           ],
           encoding: {
             x: { field: xAxis, type: determineType(xAxis, data1) },
             y: { field: yAxis, type: determineType(yAxis, data1) },
             color: {
-              field: "Chosen_Action",
-              type: "nominal",
-              title: "Chosen Action",
+              field: 'Chosen_Action',
+              type: 'nominal',
+              title: 'Chosen Action',
             },
             tooltip: [
               {
-                field: "Chosen_Action",
-                type: "nominal",
-                title: "Chosen Action",
+                field: 'Chosen_Action',
+                type: 'nominal',
+                title: 'Chosen Action',
               },
               { field: xAxis, type: determineType(xAxis, data1) },
               { field: yAxis, type: determineType(yAxis, data1) },
             ],
             opacity: {
-              condition: { param: "industry", value: 1 },
+              condition: { param: 'industry', value: 1 },
               value: 0.01,
             },
           },
         },
         {
-          title: "Post-Action Selection",
+          title: 'Post-Action Selection',
           data: { values: data2 },
           width: 450,
           height: 450,
-          mark: { type: "point", opacity: 0.8 },
+          mark: { type: 'point', opacity: 0.8 },
           params: [
             {
-              name: "industry",
-              select: { type: "point", fields: ["Chosen_Action"] },
-              bind: "legend",
+              name: 'industry',
+              select: { type: 'point', fields: ['Chosen_Action'] },
+              bind: 'legend',
             },
           ],
           encoding: {
             x: { field: xAxis, type: determineType(xAxis, data2) },
             y: { field: yAxis, type: determineType(yAxis, data2) },
             color: {
-              field: "Chosen_Action",
-              type: "nominal",
-              title: "Chosen Action",
+              field: 'Chosen_Action',
+              type: 'nominal',
+              title: 'Chosen Action',
             }, // Shared legend
             tooltip: [
               {
-                field: "Chosen_Action",
-                type: "nominal",
-                title: "Chosen Action",
+                field: 'Chosen_Action',
+                type: 'nominal',
+                title: 'Chosen Action',
               },
               { field: xAxis, type: determineType(xAxis, data2) },
               { field: yAxis, type: determineType(yAxis, data2) },
             ],
             opacity: {
-              condition: { param: "industry", value: 1 },
+              condition: { param: 'industry', value: 1 },
               value: 0.01,
             },
           },
         },
       ],
-    }) as VisualizationSpec
+    }) as VisualizationSpec;
 
   return (
     <>
       <Box
         className="panel"
         style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "20px",
-          flexWrap: "wrap",
-          marginTop: "20px",
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '20px',
+          flexWrap: 'wrap',
+          marginTop: '20px',
         }}
       >
         <FormControl
           variant="outlined"
-          style={{ minWidth: 200, marginRight: "20px" }}
+          style={{ minWidth: 200, marginRight: '20px' }}
           disabled={dimensionalityReduction}
         >
           <InputLabel>X-Axis</InputLabel>
@@ -299,7 +309,7 @@ const GlovesScatter = ({
 
         <FormControl
           variant="outlined"
-          style={{ minWidth: 200, marginRight: "20px" }}
+          style={{ minWidth: 200, marginRight: '20px' }}
           disabled={dimensionalityReduction}
         >
           <InputLabel>Y-Axis</InputLabel>
@@ -326,7 +336,7 @@ const GlovesScatter = ({
 
         <FormControl
           variant="outlined"
-          style={{ minWidth: 200, marginRight: "20px" }}
+          style={{ minWidth: 200, marginRight: '20px' }}
         >
           <InputLabel>Apply</InputLabel>
           <Select
@@ -344,18 +354,20 @@ const GlovesScatter = ({
           >
             {colorOptions.map(option => {
               // Extract the part before "_Prediction"
-              const displayText = option.replace(/_Prediction$/, "")
+              const displayText = option.replace(/_Prediction$/, '');
+
               return (
                 <MenuItem key={option} value={option}>
                   {displayText}
                 </MenuItem>
-              )
+              );
             })}
           </Select>
         </FormControl>
 
         <Box display="flex" alignItems="center">
-          <Typography>Enable Dimensionality Reduction</Typography>
+          <ReduceCapacityIcon />
+
           <Switch
             checked={dimensionalityReduction}
             onChange={() => setDimensionalityReduction(prev => !prev)}
@@ -369,21 +381,25 @@ const GlovesScatter = ({
       ) : (
         <div>
           {data1 && data2 && (
-            <VegaLite
-              spec={sharedLegendSpec(
-                transformData(data1),
-                transformData(data2.appliedAffectedActions),
-              )}
-              actions={false}
-            />
+            <>
+              <ResponsiveCardVegaLite
+                spec={spec(
+                  transformData(data1),
+
+                )}/>
+              <ResponsiveCardVegaLite
+                spec={spec(
+                  transformData(data2.appliedAffectedActions))}
+              />
+            </>
           )}
           {data1 && (
-            <VegaLite spec={Colorspec(transformData(data1))} actions={false} />
+            <ResponsiveCardVegaLite spec={Colorspec(transformData(data1))} />
           )}
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default GlovesScatter
+export default GlovesScatter;
