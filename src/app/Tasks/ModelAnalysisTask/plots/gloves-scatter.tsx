@@ -7,6 +7,7 @@ import {
   MenuItem,
   Box,
   Switch,
+  Grid,
 } from '@mui/material';
 import UmapComponent from './umapComponent';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
@@ -136,8 +137,7 @@ const GlovesScatter = ({
 
   const Colorspec = (data: { id: string }[]) => {
     return {
-      description: 'A scatter plot of affected clusters',
-      title: 'Affected Clusters',
+     
       width: 450,
       height: 450,
       mark: { type: 'point', opacity: 0.8 },
@@ -381,20 +381,35 @@ const GlovesScatter = ({
       ) : (
         <div>
           {data1 && data2 && (
-            <>
-              <ResponsiveCardVegaLite
-                spec={spec(
-                  transformData(data1),
+           <Grid container spacing={2}>
+  <Grid item xs={12} md={6}>
+    <ResponsiveCardVegaLite
+    actions={false}
+      title="Action Selection"
+      details="A scatter plot of affected clusters before action selection"
+      spec={spec(transformData(data1))}
+    />
+  </Grid>
 
-                )}/>
-              <ResponsiveCardVegaLite
-                spec={spec(
-                  transformData(data2.appliedAffectedActions))}
-              />
-            </>
+  <Grid item xs={12} md={6}>
+    <ResponsiveCardVegaLite
+        actions={false}
+
+      title="Post-Action Selection"
+      details="A scatter plot of affected clusters after action selection"
+      spec={spec(transformData(data2.appliedAffectedActions))}
+    />
+  </Grid>
+</Grid>
+
           )}
           {data1 && (
-            <ResponsiveCardVegaLite spec={Colorspec(transformData(data1))} />
+            <ResponsiveCardVegaLite
+                actions={false}
+
+            title= {"Affected Clusters"}
+            details={"A scatter plot of affected clusters"}
+             spec={Colorspec(transformData(data1))} />
           )}
         </div>
       )}

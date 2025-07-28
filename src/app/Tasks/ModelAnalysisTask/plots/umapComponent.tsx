@@ -225,9 +225,9 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
       {loading && <Loader/>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {umapResults.umap1 && umapResults.umap2 && (
-        <ResponsiveCardVegaLite spec={spec}/>
+        <ResponsiveCardVegaLite spec={spec} actions={false}/>
       )}
-      {umapResults.umap1 && <ResponsiveCardVegaLite spec={spec1} title={'Affected Clusters'} details={'UMAP plot colored by prediction values'} />}
+      {umapResults.umap1 && <ResponsiveCardVegaLite actions={false} spec={spec1} title={'Affected Clusters'} details={'UMAP plot colored by prediction values'} />}
     </div>
   );
 };
