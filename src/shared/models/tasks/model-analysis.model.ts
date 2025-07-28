@@ -65,6 +65,11 @@ export interface IModelAnalysis {
     loading: boolean
     error: string | null
   }
+  global_counterfactuals_control_panel: {
+    cfMethod: string
+    actionChoiceStrategy: string
+    gcfSize: number
+  }
   influenceFunctions: {
     data: IPlotModel | null
     loading: boolean
@@ -118,6 +123,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   featureImportance: { data: null, loading: false, error: null },
   counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals: { data: null, loading: false, error: null },
+  global_counterfactuals_control_panel: {cfMethod: 'Dice', actionChoiceStrategy: 'max-eff', gcfSize: 3},
   influenceFunctions: { data: null, loading: false, error: null },
   modelInstances: { data: null, loading: false, error: null },
   modelConfusionMatrix: { data: null, loading: false, error: null },

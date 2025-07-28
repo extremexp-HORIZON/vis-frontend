@@ -44,6 +44,11 @@ export const setSelectedFeatures2D = createAction<{
   feature2: string;
 }>('explainability/set_selected_features_2d');
 
+export const setGcfSize = createAction<number>('modelAnalysis/setGcfSize');
+export const setCfMethod = createAction<string>('modelAnalysis/setCfMethod');
+export const setActionChoiceStrategy = createAction<string>('modelAnalysis/setActionChoiceStrategy');
+
+
 // Helpers
 const getTask = (state: IWorkflowPage, workflowId: string) =>
   state.tab?.workflowId === workflowId ? state.tab.workflowTasks.modelAnalysis : null;
@@ -66,7 +71,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
       const task = getTask(state, action.meta.arg.metadata.workflowId);
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
 
-      if (task && plotType !== 'featureNames') {
+      if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
         task[plotType].loading = true;
       }
     })
@@ -74,7 +79,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
       const task = getTask(state, action.meta.arg.metadata.workflowId);
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
 
-      if (task && plotType !== 'featureNames') {
+      if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
         const section = task[plotType];
 
         if ('selectedFeature' in section) {
@@ -90,7 +95,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
       const task = getTask(state, action.meta.arg.metadata.workflowId);
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
 
-      if (task && plotType !== 'featureNames') {
+      if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
         assignError(task[plotType], 'Failed to fetch data');
       }
     })
@@ -137,6 +142,24 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
       if (task) {
         assignError(task.featureImportance, 'Failed to fetch feature importance data');
+      }
+    })
+    .addCase(setGcfSize, (state, action) => {
+      const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
+      if (modelAnalysis) {
+        modelAnalysis.global_counterfactuals_control_panel.gcfSize = action.payload;
+    }
+    })
+    .addCase(setCfMethod, (state, action) => {
+    const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
+    if (modelAnalysis) {
+      modelAnalysis.global_counterfactuals_control_panel.cfMethod = action.payload;
+    }
+    })
+    .addCase(setActionChoiceStrategy, (state, action) => {
+      const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
+      if (modelAnalysis) {
+        modelAnalysis.global_counterfactuals_control_panel.actionChoiceStrategy = action.payload;
       }
     });
 };
