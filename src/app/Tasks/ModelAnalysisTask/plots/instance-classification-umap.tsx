@@ -334,7 +334,6 @@ const InstanceClassificationUmap = (props: Umapi) => {
         },
       }}
       title={'Instance Classification Umap'}
-      actions={false}
       onNewView={handleNewView}
       infoMessage={info}
       showInfoMessage={shouldShowInfoMessage}
