@@ -77,7 +77,7 @@ export const updateClusters = createAsyncThunk(
 
     const requestTime = Date.now();
     const action = await thunkApi.dispatch(
-      executeQuery({ id: datasetId, body }),
+      executeQuery({ body }),
     );
 
     if (executeQuery.fulfilled.match(action)) {
@@ -222,7 +222,6 @@ export const mapListeners = (startAppListening: AppStartListening) => {
   startAppListening({
     actionCreator: setDrawnRect,
     effect: async (action, { dispatch, getState }) => {
-      const { id } = action.payload;
       const state = getState() as RootState;
       const { zoom, drawnRect, viewRect } = state.map;
       const { categoricalFilters, timeRange } = state.dataset;
@@ -240,7 +239,7 @@ export const mapListeners = (startAppListening: AppStartListening) => {
       };
 
       try {
-        const action2 = await dispatch(executeQuery({ id, body: queryBody }));
+        const action2 = await dispatch(executeQuery({ body: queryBody }));
 
         if (executeQuery.fulfilled.match(action2)) {
           const result = action2.payload as IVisQueryResults;

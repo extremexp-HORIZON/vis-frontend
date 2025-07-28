@@ -72,7 +72,7 @@ export const chartListeners = (startApplistening: AppStartListening) => {
 
         try {
           const action = await dispatch(
-            executeQuery({ id: datasetId, body: queryBody }),
+            executeQuery({ body: queryBody }),
           );
 
           if (executeQuery.fulfilled.match(action)) {

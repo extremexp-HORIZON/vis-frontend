@@ -112,16 +112,18 @@ export const postFileMeta = createAsyncThunk<
 // executeQuery
 export const executeQuery = createAsyncThunk<
   unknown,
-  { id: string; body: unknown },
+  { body: unknown },
   { rejectValue: string }
->('api/executeQuery', async ({ id, body }, { getState, rejectWithValue }) => {
+>('api/executeQuery', async ({ body }, { getState, rejectWithValue }) => {
   try {
     const state = getState() as RootState;
     const { dataSource } = state.dataSource;
+    const { dataset } = state.dataset;
     const response = await api.post('/data/fetch', {
       ...(body || {}),
       dataSource,
       dataType: 'map',
+      mapMetadata: dataset
     });
 
     return response.data;
@@ -133,18 +135,20 @@ export const executeQuery = createAsyncThunk<
 // executeTimeSeriesQuery
 export const executeTimeSeriesQuery = createAsyncThunk<
   unknown,
-  { id: string; body: unknown },
+  { body: unknown },
   { rejectValue: string }
 >(
   'api/executeTimeSeriesQuery',
-  async ({ id, body }, { getState, rejectWithValue }) => {
+  async ({ body }, { getState, rejectWithValue }) => {
     try {
       const state = getState() as RootState;
       const { dataSource } = state.dataSource;
+      const { dataset } = state.dataset;
       const response = await api.post('/data/fetch', {
         ...(body || {}),
         dataSource,
         dataType: 'timeseries',
+        mapMetadata: dataset,
       });
 
       return response.data;
@@ -155,7 +159,7 @@ export const executeTimeSeriesQuery = createAsyncThunk<
 );
 
 export const datasetSlice = createSlice({
-  name: 'exploringDatasetSlice',
+  name: 'datasetSlice',
   initialState,
   reducers: {
     resetDatasetState: () => {

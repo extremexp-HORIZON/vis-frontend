@@ -45,7 +45,6 @@ export const updateTimeSeries = createAsyncThunk(
 
       const action = await thunkApi.dispatch(
         executeTimeSeriesQuery({
-          id: datasetId,
           body: timeSeriesBody,
         }),
       );
