@@ -241,7 +241,7 @@ export const Chart = (props: IChartProps) => {
             <ResponsiveVegaLite
               minWidth={100}
               minHeight={100}
-              aspectRatio={1 / 0.75}
+              aspectRatio={1 / 0.5}
               actions={false}
               spec={spec}
             />
