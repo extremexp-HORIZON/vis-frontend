@@ -389,6 +389,7 @@ const GlovesScatter = ({
                   details="A scatter plot of affected clusters before action selection"
                   spec={spec(transformData(data1))}                
                   isStatic={false}
+                  maxHeight={400}
               />
               </Grid>
 
@@ -399,6 +400,7 @@ const GlovesScatter = ({
                   details="A scatter plot of affected clusters after action selection"
                   spec={spec(transformData(data2.appliedAffectedActions))}
                   isStatic={false}
+                  maxHeight={400}
               />
               </Grid>
             </Grid>
@@ -412,6 +414,7 @@ const GlovesScatter = ({
                 details={'A scatter plot of affected clusters'}
                 spec={Colorspec(transformData(data1))} 
                 isStatic={false}
+                maxHeight={400}
               />
             </Box>
           )}

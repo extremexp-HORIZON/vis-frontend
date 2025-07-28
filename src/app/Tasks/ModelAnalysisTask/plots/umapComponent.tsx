@@ -275,6 +275,7 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
               details="UMAP projection before action"
               spec={spec(createScatterData(umapResults.umap1))}
               isStatic={false}
+              maxHeight={400}
             />
           </Grid>
 
@@ -285,6 +286,7 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
               details="UMAP projection after action"
               spec={spec(createScatterData(umapResults.umap2))}
               isStatic={false}
+              maxHeight={400}
             />
           </Grid>
         </Grid>
@@ -297,6 +299,7 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
             title={'Affected Clusters'} 
             details={'UMAP plot colored by prediction values'}
             isStatic={false}
+            maxHeight={400}
           />
         </Box>
       }
