@@ -103,7 +103,7 @@ const GlovesScatter = ({
   };
 
   // Vega-Lite specifications for both plots
-  const spec = (data: { id: string }[]) =>
+  const spec = (data: Record<string, unknown>[]) =>
     ({
       description: 'A scatter plot of affected clusters',
       mark: 'circle',
@@ -133,9 +133,9 @@ const GlovesScatter = ({
         },
       },
       data: { values: data },
-    }) as VisualizationSpec;
+    });
 
-  const Colorspec = (data: { id: string }[]) => {
+  const Colorspec = (data: Record<string, unknown>[]) => {
     return {
 
       width: 450,
@@ -171,7 +171,7 @@ const GlovesScatter = ({
         },
       },
       data: { values: data },
-    } as VisualizationSpec;
+    };
   };
 
   const getEffCostForColorField = (field: string) => {
@@ -266,7 +266,7 @@ const GlovesScatter = ({
           },
         },
       ],
-    }) as VisualizationSpec;
+    });
 
   return (
     <>
