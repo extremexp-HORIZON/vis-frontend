@@ -29,7 +29,7 @@ import {
   setMapLayer,
   setSelectedGeohash,
 } from '../../../../store/slices/exploring/mapSlice';
-import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import {
   Album as HeatmapIcon,
   GridView as GeohashIcon,
@@ -150,9 +150,8 @@ export const Map = (props: IMapProps) => {
   const geohash = searchParams.get('geohash');
   const dispatch = useAppDispatch();
   const mapLayer = useAppSelector((state: RootState) => state.map.mapLayer);
-  const { clusters, viewRect, zoom, selectedGeohash } = useAppSelector(
-    (state: RootState) => state.map,
-  );
+  const { clusters, viewRect, zoom, selectedGeohash, drawnRect } =
+    useAppSelector((state: RootState) => state.map);
   const [selectedClusterMarker, setSelectedClusterMarker] = useState<{
     lat: number;
     lng: number;
@@ -261,15 +260,27 @@ export const Map = (props: IMapProps) => {
             borderRadius: 2,
           }}
         >
-          <ToggleButton value="cluster" sx={{ width: 30, height: 30 }}>
-            <ClusterIcon />
-          </ToggleButton>
-          <ToggleButton value="heatmap" sx={{ width: 30, height: 30 }}>
-            <HeatmapIcon />
-          </ToggleButton>
-          <ToggleButton value="geohash" sx={{ width: 30, height: 30 }}>
-            <GeohashIcon />
-          </ToggleButton>
+          <Tooltip title="Points" placement="left" arrow>
+            <ToggleButton value="cluster" sx={{ width: 30, height: 30 }}>
+              <ClusterIcon />
+            </ToggleButton>
+          </Tooltip>
+          <Tooltip title="Heatmap" placement="left" arrow>
+            <ToggleButton value="heatmap" sx={{ width: 30, height: 30 }}>
+              <HeatmapIcon />
+            </ToggleButton>
+          </Tooltip>
+          <Tooltip title="Geohash" placement="left" arrow>
+            <span>
+              <ToggleButton
+                value="geohash"
+                sx={{ width: 30, height: 30 }}
+                disabled={drawnRect != null}
+              >
+              <GeohashIcon />
+            </ToggleButton>
+            </span>
+          </Tooltip>
         </ToggleButtonGroup>
         {mapLayer === 'cluster' ? (
           clusters.map((cluster, index) => {
