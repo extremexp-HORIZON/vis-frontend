@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
@@ -33,47 +33,46 @@ const CGlanceExecution = () => {
 
   const tab = useAppSelector(state => state.workflowPage.tab);
   const globalCounterfactualsData = useAppSelector(
-      (state) =>
-        state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals
-    );
+    (state) =>
+      state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals
+  );
   const isLoading = globalCounterfactualsData?.loading === true;
 
   const dispatch = useAppDispatch();
 
-const hasFetchedOnce = useRef(false);
+  const hasFetchedOnce = useRef(false);
 
-useEffect(() => {
-  if (
-    hasFetchedOnce.current ||
+  useEffect(() => {
+    if (
+      hasFetchedOnce.current ||
     !cfMethod ||
     !actionChoiceStrategy ||
     !gcfSize ||
     !tab?.workflowId ||
     !experimentId
-  ) {
-    return;
-  }
+    ) {
+      return;
+    }
 
-  hasFetchedOnce.current = true;
+    hasFetchedOnce.current = true;
 
-  const runInitialFetch = async () => {
-    await fetchData();
-  };
+    const runInitialFetch = async () => {
+      await fetchData();
+    };
 
-  runInitialFetch();
-}, [cfMethod, actionChoiceStrategy, gcfSize, tab?.workflowId, experimentId]);
-
+    runInitialFetch();
+  }, [cfMethod, actionChoiceStrategy, gcfSize, tab?.workflowId, experimentId]);
 
   const counterfactualsContent = () => {
-    if(isLoading) return <Loader />
-    if(!globalCounterfactualsData?.data) 
+    if(isLoading) return <Loader />;
+    if(!globalCounterfactualsData?.data)
       return (
         <InfoMessage
           message="Please select a configuration."
           type="info"
           fullHeight
         />
-      )
+      );
     if (globalCounterfactualsData.error)
       return (
         <InfoMessage
@@ -81,38 +80,39 @@ useEffect(() => {
           type="info"
           fullHeight
         />
-      )
-      return (
-        <Box>
-          <GlovesMetricSummary />
-          {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-            ?.affectedClusters &&
+      );
+
+    return (
+      <Box>
+        <GlovesMetricSummary />
+        {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
+          ?.affectedClusters &&
           tab?.workflowTasks?.modelAnalysis?.affected?.data &&
           tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
             ?.actions &&
           tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
             ?.effCostActions ? (
-              <GlovesScatter
-                data1={
-                  tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                    .affectedClusters
-                }
-                data2={tab.workflowTasks.modelAnalysis.affected.data}
-                actions={
-                  tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                    .actions
-                }
-                eff_cost_actions={
-                  tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                    .effCostActions
-                }
-              />
-            ) : (
-              <></>
-            )}
-        </Box>
-      )
-  }
+            <GlovesScatter
+              data1={
+                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
+                  .affectedClusters
+              }
+              data2={tab.workflowTasks.modelAnalysis.affected.data}
+              actions={
+                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
+                  .actions
+              }
+              eff_cost_actions={
+                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
+                  .effCostActions
+              }
+            />
+          ) : (
+            <></>
+          )}
+      </Box>
+    );
+  };
 
   const fetchData = async () => {
     try {
@@ -152,7 +152,7 @@ useEffect(() => {
   };
 
   return (
-    <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Box container to arrange elements side by side */}
       <Box
         display="flex"
@@ -272,7 +272,7 @@ useEffect(() => {
           borderColor: 'grey.300',
         }}
       />
-      <Box sx={{flexGrow: 1, p: 1, }}>
+      <Box sx={{ flexGrow: 1, p: 1 }}>
         {counterfactualsContent()}
       </Box>
     </Box>

@@ -13,7 +13,6 @@ const GlovesMetricSummary: React.FC = () => {
       state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals
   );
 
-  console.log('Global Counterfactuals Data:', globalCounterfactualsData);
   const isLoading = globalCounterfactualsData?.loading === true;
 
   if (isLoading) {
@@ -41,7 +40,7 @@ const GlovesMetricSummary: React.FC = () => {
     );
   }
   const { TotalCost, TotalEffectiveness, actions, effCostActions } =
-    globalCounterfactualsData?.data!; // Use non-null assertion as we've checked for isLoading
+    globalCounterfactualsData?.data; // Use non-null assertion as we've checked for isLoading
 
   // Check if `actions` is a valid object
   if (!actions || typeof actions !== 'object') {

@@ -48,7 +48,6 @@ export const setGcfSize = createAction<number>('modelAnalysis/setGcfSize');
 export const setCfMethod = createAction<string>('modelAnalysis/setCfMethod');
 export const setActionChoiceStrategy = createAction<string>('modelAnalysis/setActionChoiceStrategy');
 
-
 // Helpers
 const getTask = (state: IWorkflowPage, workflowId: string) =>
   state.tab?.workflowId === workflowId ? state.tab.workflowTasks.modelAnalysis : null;
@@ -146,18 +145,21 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     })
     .addCase(setGcfSize, (state, action) => {
       const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
+
       if (modelAnalysis) {
         modelAnalysis.global_counterfactuals_control_panel.gcfSize = action.payload;
-    }
+      }
     })
     .addCase(setCfMethod, (state, action) => {
-    const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
-    if (modelAnalysis) {
-      modelAnalysis.global_counterfactuals_control_panel.cfMethod = action.payload;
-    }
+      const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
+
+      if (modelAnalysis) {
+        modelAnalysis.global_counterfactuals_control_panel.cfMethod = action.payload;
+      }
     })
     .addCase(setActionChoiceStrategy, (state, action) => {
       const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
+
       if (modelAnalysis) {
         modelAnalysis.global_counterfactuals_control_panel.actionChoiceStrategy = action.payload;
       }

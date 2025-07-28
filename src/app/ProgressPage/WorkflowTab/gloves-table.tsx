@@ -94,15 +94,16 @@ const GlovesTable: React.FC<DataTableProps> = ({
 
   // Create rows dynamically, including effectiveness and cost if available
   const numRows = data[keys[0]].values.length;
-  
+
   const rows: GridRowsProp = Array.from({ length: numRows }, (_, index) => {
     const row: { id: number; [key: string]: string | number } = {
       id: index + 1,
     };
-  
+
     keys.forEach(key => {
       const rawValue = data[key].values[index];
       const parsed = parseFloat(rawValue);
+
       row[key] = !isNaN(parsed) ? parseFloat(parsed.toFixed(2)) : rawValue;
     });
 

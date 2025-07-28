@@ -18,7 +18,6 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
 import FeatureExplainability from './workflow-feature-explainability';
-import SwitchAccessShortcutRoundedIcon from '@mui/icons-material/SwitchAccessShortcutRounded';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 
 import CGlanceExecution from './workflow-global-counterfactuals';

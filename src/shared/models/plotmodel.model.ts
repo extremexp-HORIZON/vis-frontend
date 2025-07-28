@@ -21,7 +21,7 @@ export interface IPlotModel {
     effCostActions: IEffCostActions;
   }
 
-  export interface ITableContents {
+export interface ITableContents {
     [key: string]: IValues
   }
 

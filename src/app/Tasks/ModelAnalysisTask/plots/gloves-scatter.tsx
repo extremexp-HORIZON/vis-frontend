@@ -96,8 +96,6 @@ const GlovesScatter = ({
   const determineType = (field: string, data: string | any[]) => {
     if (!data.length || data[0][field] === undefined) return 'nominal';
 
-    console.log('Field:', field, 'Data Type:', typeof data[0][field]);
-
     return typeof data[0][field] === 'string' ? 'nominal' : 'quantitative';
   };
 
@@ -374,11 +372,11 @@ const GlovesScatter = ({
         </Box>
       </Box>
       {dimensionalityReduction ? (
-        <Box  sx={{alignItems: 'center', justifyContent: 'center'}} >
+        <Box  sx={{ alignItems: 'center', justifyContent: 'center' }} >
           <UmapComponent data1={data1} data2={data2} colorField={colorField} />
         </Box>
       ) : (
-        <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {data1 && data2 && (
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -386,10 +384,10 @@ const GlovesScatter = ({
                   actions={false}
                   title="Action Selection"
                   details="A scatter plot of affected clusters before action selection"
-                  spec={spec(transformData(data1))}                
+                  spec={spec(transformData(data1))}
                   isStatic={false}
                   maxHeight={400}
-              />
+                />
               </Grid>
 
               <Grid item xs={12} md={6}>
@@ -400,7 +398,7 @@ const GlovesScatter = ({
                   spec={spec(transformData(data2.appliedAffectedActions))}
                   isStatic={false}
                   maxHeight={400}
-              />
+                />
               </Grid>
             </Grid>
 
@@ -411,7 +409,7 @@ const GlovesScatter = ({
                 actions={false}
                 title= {'Affected Clusters'}
                 details={'A scatter plot of affected clusters'}
-                spec={Colorspec(transformData(data1))} 
+                spec={Colorspec(transformData(data1))}
                 isStatic={false}
                 maxHeight={400}
               />

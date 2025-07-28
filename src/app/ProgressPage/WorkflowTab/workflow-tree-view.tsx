@@ -29,7 +29,6 @@ import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
 import { useParams } from 'react-router-dom';
 import FolderIcon from '@mui/icons-material/Folder';
-import SwitchAccessShortcutRoundedIcon from '@mui/icons-material/SwitchAccessShortcutRounded';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage);

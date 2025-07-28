@@ -252,20 +252,21 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
     umapResults.umap1,
     data1[colorField]?.values || [],
   );
-  // i want to parse float the data1[colorField]?.values)
-  if(loading) return <Loader />
 
-  if(error) 
+  // i want to parse float the data1[colorField]?.values)
+  if(loading) return <Loader />;
+
+  if(error)
     return(
       <InfoMessage
         message={error}
         type="info"
         fullHeight
       />
-    )
+    );
 
   return (
-    <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {umapResults.umap1 && umapResults.umap2 && (
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
@@ -293,10 +294,10 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
       )}
       {umapResults.umap1 &&
         <Box>
-          <ResponsiveCardVegaLite 
-            actions={false} 
-            spec={spec1} 
-            title={'Affected Clusters'} 
+          <ResponsiveCardVegaLite
+            actions={false}
+            spec={spec1}
+            title={'Affected Clusters'}
             details={'UMAP plot colored by prediction values'}
             isStatic={false}
             maxHeight={400}
