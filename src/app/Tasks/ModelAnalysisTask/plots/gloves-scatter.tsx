@@ -379,7 +379,7 @@ const GlovesScatter = ({
           <UmapComponent data1={data1} data2={data2} colorField={colorField} />
         </Box>
       ) : (
-        <div>
+        <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
           {data1 && data2 && (
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -387,31 +387,35 @@ const GlovesScatter = ({
                   actions={false}
                   title="Action Selection"
                   details="A scatter plot of affected clusters before action selection"
-                  spec={spec(transformData(data1))}
-                />
+                  spec={spec(transformData(data1))}                
+                  isStatic={false}
+              />
               </Grid>
 
               <Grid item xs={12} md={6}>
                 <ResponsiveCardVegaLite
                   actions={false}
-
                   title="Post-Action Selection"
                   details="A scatter plot of affected clusters after action selection"
                   spec={spec(transformData(data2.appliedAffectedActions))}
-                />
+                  isStatic={false}
+              />
               </Grid>
             </Grid>
 
           )}
           {data1 && (
-            <ResponsiveCardVegaLite
-              actions={false}
-
-              title= {'Affected Clusters'}
-              details={'A scatter plot of affected clusters'}
-              spec={Colorspec(transformData(data1))} />
+            <Box>
+              <ResponsiveCardVegaLite
+                actions={false}
+                title= {'Affected Clusters'}
+                details={'A scatter plot of affected clusters'}
+                spec={Colorspec(transformData(data1))} 
+                isStatic={false}
+              />
+            </Box>
           )}
-        </div>
+        </Box>
       )}
     </>
   );

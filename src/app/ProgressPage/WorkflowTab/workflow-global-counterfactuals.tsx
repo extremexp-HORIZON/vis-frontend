@@ -17,6 +17,8 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { fetchAffected } from '../../../store/slices/modelAnalysisSlice';
 import { fetchModelAnalysisExplainabilityPlot } from '../../../store/slices/explainabilitySlice';
 import { useParams } from 'react-router-dom';
+import Loader from '../../../shared/components/loader';
+import InfoMessage from '../../../shared/components/InfoMessage';
 
 const CGlanceExecution = () => {
   const { experimentId } = useParams();
@@ -30,8 +32,63 @@ const CGlanceExecution = () => {
     useState<string>('max-eff'); // Default actionChoiceStrategy = useMemo(() => "max-eff", [])
   const [gcfSize, setGcfSize] = useState<number>(3); // Default size
   const tab = useAppSelector(state => state.workflowPage.tab);
+  const globalCounterfactualsData = useAppSelector(
+      (state) =>
+        state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals
+    );
+  const isLoading = globalCounterfactualsData?.loading === true;
 
   const dispatch = useAppDispatch();
+
+  const counterfactualsContent = () => {
+    if(isLoading) return <Loader />
+    if(!globalCounterfactualsData?.data) 
+      return (
+        <InfoMessage
+          message="Please select a configuration."
+          type="info"
+          fullHeight
+        />
+      )
+    if (globalCounterfactualsData.error)
+      return (
+        <InfoMessage
+          message="Error loading global counterfactuals."
+          type="info"
+          fullHeight
+        />
+      )
+      return (
+        <Box>
+          <GlovesMetricSummary />
+          {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
+            ?.affectedClusters &&
+          tab?.workflowTasks?.modelAnalysis?.affected?.data &&
+          tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
+            ?.actions &&
+          tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
+            ?.effCostActions ? (
+              <GlovesScatter
+                data1={
+                  tab.workflowTasks.modelAnalysis.global_counterfactuals.data
+                    .affectedClusters
+                }
+                data2={tab.workflowTasks.modelAnalysis.affected.data}
+                actions={
+                  tab.workflowTasks.modelAnalysis.global_counterfactuals.data
+                    .actions
+                }
+                eff_cost_actions={
+                  tab.workflowTasks.modelAnalysis.global_counterfactuals.data
+                    .effCostActions
+                }
+              />
+            ) : (
+              <></>
+            )}
+        </Box>
+      )
+  }
 
   const fetchData = async () => {
     try {
@@ -71,7 +128,7 @@ const CGlanceExecution = () => {
   };
 
   return (
-    <>
+    <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
       {/* Box container to arrange elements side by side */}
       <Box
         display="flex"
@@ -79,8 +136,7 @@ const CGlanceExecution = () => {
         alignItems="center"
         justifyContent="flex-start"
         gap={2}
-        marginBottom={2}
-        marginTop={2}
+        marginBottom={1}
         width="98%"
         padding={1}
       >
@@ -192,35 +248,10 @@ const CGlanceExecution = () => {
           borderColor: 'grey.300',
         }}
       />
-      <Box padding={2}>
-        <GlovesMetricSummary />
-        {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-          ?.affectedClusters &&
-        tab?.workflowTasks?.modelAnalysis?.affected?.data &&
-        tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-          ?.actions &&
-        tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-          ?.effCostActions ? (
-            <GlovesScatter
-              data1={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .affectedClusters
-              }
-              data2={tab.workflowTasks.modelAnalysis.affected.data}
-              actions={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .actions
-              }
-              eff_cost_actions={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .effCostActions
-              }
-            />
-          ) : (
-            <></>
-          )}
+      <Box sx={{flexGrow: 1, p: 2}}>
+        {counterfactualsContent()}
       </Box>
-    </>
+    </Box>
   );
 };
 

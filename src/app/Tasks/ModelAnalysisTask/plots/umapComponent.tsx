@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useEffect, useState, useMemo } from 'react';
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import { Box } from '@mui/material';
 
 interface DataField {
   values: any[]
@@ -219,16 +221,36 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
     data1[colorField]?.values || [],
   );
   // i want to parse float the data1[colorField]?.values)
+  if(loading) return <Loader />
+
+  if(error) 
+    return(
+      <InfoMessage
+        message={error}
+        type="info"
+        fullHeight
+      />
+    )
 
   return (
-    <div>
-      {loading && <Loader/>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
       {umapResults.umap1 && umapResults.umap2 && (
-        <ResponsiveCardVegaLite spec={spec} actions={false}/>
+        <Box>
+        <ResponsiveCardVegaLite spec={spec} actions={false} isStatic={false} />
+        </Box>
       )}
-      {umapResults.umap1 && <ResponsiveCardVegaLite actions={false} spec={spec1} title={'Affected Clusters'} details={'UMAP plot colored by prediction values'} />}
-    </div>
+      {umapResults.umap1 &&
+        <Box>
+          <ResponsiveCardVegaLite 
+            actions={false} 
+            spec={spec1} 
+            title={'Affected Clusters'} 
+            details={'UMAP plot colored by prediction values'}
+            isStatic={false}
+          />
+        </Box>
+      }
+    </Box>
   );
 };
 
