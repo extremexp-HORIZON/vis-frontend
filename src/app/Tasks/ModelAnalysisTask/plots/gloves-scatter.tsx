@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import type { VisualizationSpec } from 'react-vega';
 import {
   FormControl,
   InputLabel,
@@ -375,7 +374,7 @@ const GlovesScatter = ({
         </Box>
       </Box>
       {dimensionalityReduction ? (
-        <Box textAlign="center" >
+        <Box  sx={{alignItems: 'center', justifyContent: 'center'}} >
           <UmapComponent data1={data1} data2={data2} colorField={colorField} />
         </Box>
       ) : (

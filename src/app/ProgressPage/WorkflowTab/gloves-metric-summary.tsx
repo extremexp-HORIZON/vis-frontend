@@ -33,11 +33,11 @@ const GlovesMetricSummary: React.FC = () => {
   }
   if (globalCounterfactualsData.error) {
     return (
-      <Box sx={{ padding: 2 }}>
-        <Typography color="error">
-          Error loading global counterfactuals: {globalCounterfactualsData.error}
-        </Typography>
-      </Box>
+      <InfoMessage
+        message="Error loading global counterfactuals."
+        type="info"
+        fullHeight
+      />
     );
   }
   const { TotalCost, TotalEffectiveness, actions, effCostActions } =
@@ -45,12 +45,22 @@ const GlovesMetricSummary: React.FC = () => {
 
   // Check if `actions` is a valid object
   if (!actions || typeof actions !== 'object') {
-    return <Typography>No actions data available.</Typography>;
+    return (
+      <InfoMessage
+        message="No actions data available."
+        type="info"
+        fullHeight
+      />
+    );
   }
 
   if (TotalCost == null || TotalEffectiveness == null) {
     return (
-      <Typography>No total cost or effectiveness data available.</Typography>
+      <InfoMessage
+        message="No total cost or effectiveness data available."
+        type="info"
+        fullHeight
+      />
     );
   }
 

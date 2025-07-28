@@ -16,12 +16,12 @@ export interface IPlotModel {
     tableContents: ITableContents;
     TotalCost: number;
     TotalEffectiveness: number;
-    actions: IAction;
+    actions: ITableContents;
     affectedClusters: IAffectedClusters;
     effCostActions: IEffCostActions;
   }
 
-  interface ITableContents {
+  export interface ITableContents {
     [key: string]: IValues
   }
 
@@ -46,7 +46,7 @@ export interface IClusterData {
 export interface IEffCostActions {
     [key: string]: {
       cost: number;
-      effectiveness: number;
+      eff: number;
       actions: Record<string, unknown>;
     };
   }
