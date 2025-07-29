@@ -19,6 +19,7 @@ import { fetchModelAnalysisExplainabilityPlot, setActionChoiceStrategy, setCfMet
 import { useParams } from 'react-router-dom';
 import Loader from '../../../shared/components/loader';
 import InfoMessage from '../../../shared/components/InfoMessage';
+import { logger } from '../../../shared/utils/logger';
 
 const CGlanceExecution = () => {
   const { experimentId } = useParams();
@@ -82,34 +83,28 @@ const CGlanceExecution = () => {
         />
       );
 
+      const globalData = tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data;
+      const affectedData = tab?.workflowTasks?.modelAnalysis?.affected?.data;
+
+      const hasAllData =
+        !!globalData?.affectedClusters &&
+        !!affectedData &&
+        !!globalData?.actions &&
+        !!globalData?.effCostActions;
+
+
+
     return (
       <Box>
         <GlovesMetricSummary />
-        {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-          ?.affectedClusters &&
-          tab?.workflowTasks?.modelAnalysis?.affected?.data &&
-          tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-            ?.actions &&
-          tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-            ?.effCostActions ? (
-            <GlovesScatter
-              data1={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .affectedClusters
-              }
-              data2={tab.workflowTasks.modelAnalysis.affected.data}
-              actions={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .actions
-              }
-              eff_cost_actions={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .effCostActions
-              }
-            />
-          ) : (
-            <></>
-          )}
+        {hasAllData && (
+          <GlovesScatter
+            data1={globalData.affectedClusters}
+            data2={affectedData}
+            actions={globalData.actions}
+            eff_cost_actions={globalData.effCostActions}
+          />
+        )}
       </Box>
     );
   };
@@ -143,11 +138,11 @@ const CGlanceExecution = () => {
         }),
       );
 
-      console.log(
+      logger.log(
         'Dispached global_counterfactuals and affected successfully.',
       );
     } catch (error) {
-      console.error('Error dispatching data:', error);
+      logger.log('Error dispatching data:', error);
     }
   };
 
@@ -155,14 +150,15 @@ const CGlanceExecution = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Box container to arrange elements side by side */}
       <Box
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="flex-start"
-        gap={2}
-        marginBottom={1}
-        width="98%"
-        padding={1}
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 2,
+          px: 2,
+          py: 1
+        }}
       >
         {/* GCF Size Dropdown */}
         <Tooltip

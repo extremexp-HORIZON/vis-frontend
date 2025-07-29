@@ -72,7 +72,7 @@ const GlovesMetricSummary: React.FC = () => {
         'Total Effectiveness: is the percentage of individuals that achieve the favorable outcome, if each one of the final actions is applied to the whole affected population. Total Cost: is calculated as the mean recourse cost of the whole set of final actions over the entire population.'
       }
     >
-      <Box sx={{ minWidth: '300px' }}>
+      <Box>
         <Stack direction="row" spacing={1} padding={1}>
           <Card
             sx={{
