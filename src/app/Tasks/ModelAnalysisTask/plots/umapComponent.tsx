@@ -4,6 +4,7 @@ import Loader from '../../../../shared/components/loader';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import { Box, Grid } from '@mui/material';
+import { logger } from '../../../../shared/utils/logger';
 
 interface DataField {
   values: any[]
@@ -16,7 +17,7 @@ interface UmapComponentProps {
 }
 
 const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
-  console.log('colorField', colorField);
+  logger.log('colorField', colorField);
   const [umapResults, setUmapResults] = useState<{
     umap1: number[][] | null
     umap2: number[][] | null
@@ -28,8 +29,6 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const chosenAction = data1.Chosen_Action.values;
-
-  data1[colorField].values;
 
   // Memoized column names filtering
   const columnNamesFiltered = useMemo(

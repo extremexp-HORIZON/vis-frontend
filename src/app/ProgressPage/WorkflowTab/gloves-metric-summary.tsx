@@ -4,7 +4,6 @@ import GlovesTable from './gloves-table';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import { Stack, Card, LinearProgress } from '@mui/material';
 import { useAppSelector } from '../../../store/store';
-import Loader from '../../../shared/components/loader';
 import InfoMessage from '../../../shared/components/InfoMessage';
 
 const GlovesMetricSummary: React.FC = () => {
@@ -13,34 +12,8 @@ const GlovesMetricSummary: React.FC = () => {
       state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals
   );
 
-  const isLoading = globalCounterfactualsData?.loading === true;
-
-  if (isLoading) {
-    return (
-      <Loader/>
-    );
-  }
-  if (!globalCounterfactualsData?.data) {
-    return (
-
-      <InfoMessage
-        message="Please select a configuration."
-        type="info"
-        fullHeight
-      />
-    );
-  }
-  if (globalCounterfactualsData.error) {
-    return (
-      <InfoMessage
-        message="Error loading global counterfactuals."
-        type="info"
-        fullHeight
-      />
-    );
-  }
   const { TotalCost, TotalEffectiveness, actions, effCostActions } =
-    globalCounterfactualsData?.data; // Use non-null assertion as we've checked for isLoading
+    globalCounterfactualsData?.data ?? {};
 
   // Check if `actions` is a valid object
   if (!actions || typeof actions !== 'object') {

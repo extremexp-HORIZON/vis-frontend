@@ -83,16 +83,14 @@ const CGlanceExecution = () => {
         />
       );
 
-      const globalData = tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data;
-      const affectedData = tab?.workflowTasks?.modelAnalysis?.affected?.data;
+    const globalData = tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data;
+    const affectedData = tab?.workflowTasks?.modelAnalysis?.affected?.data;
 
-      const hasAllData =
+    const hasAllData =
         !!globalData?.affectedClusters &&
         !!affectedData &&
         !!globalData?.actions &&
         !!globalData?.effCostActions;
-
-
 
     return (
       <Box>
@@ -151,10 +149,10 @@ const CGlanceExecution = () => {
       {/* Box container to arrange elements side by side */}
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "flex-start",
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
           gap: 2,
           px: 2,
           py: 1
