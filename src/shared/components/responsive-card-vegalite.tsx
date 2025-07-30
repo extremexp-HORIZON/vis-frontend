@@ -101,7 +101,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   title,
   minWidth = 100,
   minHeight = 100,
-  maxWidth = 2000,
+  maxWidth = 3000,
   maxHeight = 300,
   aspectRatio = 1,
   controlPanel,
