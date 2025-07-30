@@ -5,6 +5,7 @@ import { Box, styled, Typography } from '@mui/material';
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import type { IEffCostActions, ITableContents } from '../../../shared/models/plotmodel.model';
 import type { GridRenderCellParams } from '@mui/x-data-grid';
+import { CustomGridColDef } from '../../../shared/types/table-types';
 
 interface DataTableProps {
   title: string
@@ -118,14 +119,15 @@ const GlovesTable: React.FC<DataTableProps> = ({
 
   // Create columns dynamically
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'Action ID', flex: 0.5, minWidth: 100, align: 'center' }, // Add ID as the first column
-    { field: 'eff', headerName: 'Effectiveness (%)', flex: 1, minWidth: 150, align: 'center' },
-    { field: 'cost', headerName: 'Cost', flex: 1, minWidth: 100, align: 'center' },
+    { field: 'id', headerName: 'Action ID', flex: 0.5, minWidth: 100, align: 'center', headerAlign: 'center' }, // Add ID as the first column
+    { field: 'eff', headerName: 'Effectiveness (%)', flex: 1, minWidth: 150, align: 'center', headerAlign: 'center' },
+    { field: 'cost', headerName: 'Cost', flex: 1, minWidth: 100, align: 'center', headerAlign: 'center' },
     ...keys.map(key => ({
       field: key,
       headerName: key.replace(/_/g, ' '), // Format header names for better readability
       flex: 1,
       minWidth: 150,
+      headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
         const value = params.value;
         const numValue = parseFloat(value);
@@ -142,7 +144,7 @@ const GlovesTable: React.FC<DataTableProps> = ({
           </Box>
         );
       },
-    })),
+    } as GridColDef)),
   ];
 
   return (
