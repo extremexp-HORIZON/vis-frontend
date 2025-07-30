@@ -118,9 +118,9 @@ const GlovesTable: React.FC<DataTableProps> = ({
 
   // Create columns dynamically
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'Action ID', flex: 0.5, minWidth: 100 }, // Add ID as the first column
-    { field: 'eff', headerName: 'Effectiveness (%)', flex: 1, minWidth: 150 },
-    { field: 'cost', headerName: 'Cost', flex: 1, minWidth: 100 },
+    { field: 'id', headerName: 'Action ID', flex: 0.5, minWidth: 100, align: 'center' }, // Add ID as the first column
+    { field: 'eff', headerName: 'Effectiveness (%)', flex: 1, minWidth: 150, align: 'center' },
+    { field: 'cost', headerName: 'Cost', flex: 1, minWidth: 100, align: 'center' },
     ...keys.map(key => ({
       field: key,
       headerName: key.replace(/_/g, ' '), // Format header names for better readability
@@ -135,7 +135,7 @@ const GlovesTable: React.FC<DataTableProps> = ({
         const isNegative = !isNaN(numValue) && numValue < 0;
 
         return (
-          <Box display="flex" alignItems="center">
+          <Box display="flex" alignItems="center" justifyContent="center">
             <Typography variant="body2">{value}</Typography>
             {isPositive && <ArrowDropUp style={{ color: 'green' }} />}
             {isNegative && <ArrowDropDown style={{ color: 'red' }} />}
