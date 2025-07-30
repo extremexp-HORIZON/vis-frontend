@@ -29,7 +29,7 @@ const VisualizePage = () => {
   const { dataset, loading } = useAppSelector(
     (state: RootState) => state.dataset,
   );
-  const { drawnRect } = useAppSelector((state: RootState) => state.map);
+  const { drawnRect, selectedGeohash } = useAppSelector((state: RootState) => state.map);
   const {
     dataSource,
     loading: { fetch: dataSourceLoading },
@@ -90,7 +90,7 @@ const VisualizePage = () => {
         sx={{ p: 1, width: 1 / 4 }}
       >
         <Chart dataset={dataset} />
-        {drawnRect && <TimeSeriesChart dataset={dataset} />}
+        {(drawnRect || selectedGeohash.rect) && <TimeSeriesChart dataset={dataset} />}
       </Box>
     </>
   );

@@ -14,15 +14,21 @@ import { updateTimeSeries } from './timeSeriesSlice';
 import ngeohash from 'ngeohash';
 import type { MapLayer } from '../../../shared/models/exploring/dataset.model';
 
+export type ActiveRect = 'viewRect' | 'drawnRect' | 'selectedGeohash';
+
 interface MapState {
   zoom: number;
   viewRect: IRectangle | null;
   drawnRect: IRectangle | null;
+  activeRect: ActiveRect;
   clusters: ICluster[];
   clustersLoading: boolean;
   facets: IFacet;
   queryInfo: IQueryInfo | null;
-  selectedGeohash: string | null;
+  selectedGeohash: {
+    string: string | null;
+    rect: IRectangle | null;
+  };
   mapLayer: MapLayer;
 }
 
@@ -30,12 +36,62 @@ const initialState: MapState = {
   zoom: 14,
   viewRect: null,
   drawnRect: null,
+  activeRect: 'viewRect',
   clusters: [],
   clustersLoading: false,
   facets: {},
   queryInfo: null,
-  selectedGeohash: null,
+  selectedGeohash: {
+    string: null,
+    rect: null,
+  },
   mapLayer: 'cluster',
+};
+
+const handleRectUpdate = async (dispatch: any, state: RootState) => {
+  const { zoom, viewRect, selectedGeohash, activeRect, drawnRect } = state.map;
+  const { categoricalFilters, timeRange } = state.dataset;
+  const { groupByCols, measureCol, aggType } = state.chart;
+
+  let rectToUse: IRectangle | null;
+
+  if (activeRect === 'drawnRect') {
+    rectToUse = drawnRect;
+  } else if (activeRect === 'selectedGeohash') {
+    rectToUse = selectedGeohash.rect;
+  } else {
+    rectToUse = viewRect;
+  }
+
+  const queryBody = {
+    rect: rectToUse,
+    zoom,
+    categoricalFilters,
+    groupByCols,
+    measureCol,
+    aggType,
+    from: timeRange.from,
+    to: timeRange.to,
+  };
+
+  try {
+    const action2 = await dispatch(executeQuery({ body: queryBody }));
+
+    if (executeQuery.fulfilled.match(action2)) {
+      const result = action2.payload as IVisQueryResults;
+
+      dispatch(
+        updateAnalysisResults({
+          rectStats: result.rectStats,
+          series: result.series,
+        }),
+      );
+      dispatch(updateTimeSeries());
+    }
+  } catch (error) {
+    // Handle error silently or log to a proper logging service
+  }
+
 };
 
 export const updateClusters = createAsyncThunk(
@@ -43,24 +99,9 @@ export const updateClusters = createAsyncThunk(
   async (datasetId: string, thunkApi) => {
     const state = thunkApi.getState() as RootState;
 
-    const { zoom, viewRect, drawnRect } = state.map;
+    const { zoom, viewRect, drawnRect, selectedGeohash } = state.map;
     const { dataset, categoricalFilters, timeRange } = state.dataset;
     const { groupByCols, measureCol, aggType } = state.chart;
-
-    // Accessing dataset from the apiSlice's state
-    // const dataset = (await thunkApi.dispatch(apiSlice.endpoints.getDataset.initiate(datasetId))).data;
-    //   const dataset = (
-    //     await thunkApi.dispatch(
-    //       apiSlice.endpoints.postFileMeta.initiate({
-    //         body: {
-    //           sourceType: 'local',
-    //           format: 'rawvis',
-    //           source: `/opt/experiments/${datasetId}/dataset/${datasetId}.csv`,
-    //           fileName: datasetId,
-    //         },
-    //       }),
-    //     )
-    //   ).data;
 
     if (!viewRect || !dataset) return thunkApi.rejectWithValue('Missing data');
 
@@ -96,7 +137,8 @@ export const updateClusters = createAsyncThunk(
       };
 
       thunkApi.dispatch(setQueryInfo(queryInfo));
-      if (drawnRect == null) {
+      // if no rect is selected, update the analysis results
+      if (drawnRect == null && selectedGeohash.rect == null) {
         thunkApi.dispatch(
           updateAnalysisResults({
             rectStats: result.rectStats,
@@ -155,6 +197,7 @@ export const mapSlice = createSlice({
         } as IRectangle);
 
       state.drawnRect = drawnRect;
+      bounds ? state.activeRect = 'drawnRect' : state.selectedGeohash.rect ? state.activeRect = 'selectedGeohash' : state.activeRect = 'viewRect';
     },
     setClusters: (state, action: PayloadAction<ICluster[]>) => {
       state.clusters = action.payload;
@@ -166,7 +209,16 @@ export const mapSlice = createSlice({
       state.queryInfo = action.payload;
     },
     setSelectedGeohash: (state, action: PayloadAction<string | null>) => {
-      state.selectedGeohash = action.payload;
+      const bounds = action.payload ? ngeohash.decode_bbox(action.payload) : null;
+
+      state.selectedGeohash = {
+        string: action.payload,
+        rect: bounds ? {
+          lat: [bounds[0], bounds[2]],
+          lon: [bounds[1], bounds[3]],
+        } : null,
+      };
+      bounds ? state.activeRect = 'selectedGeohash' : state.drawnRect ? state.activeRect = 'drawnRect' : state.activeRect = 'viewRect';
     },
     updateMapBounds: (
       state,
@@ -186,6 +238,9 @@ export const mapSlice = createSlice({
     },
     setMapLayer: (state, action: PayloadAction<MapLayer>) => {
       state.mapLayer = action.payload;
+    },
+    setActiveRect: (state, action: PayloadAction<ActiveRect>) => {
+      state.activeRect = action.payload;
     },
   },
   extraReducers: builder => {
@@ -221,66 +276,20 @@ export const mapListeners = (startAppListening: AppStartListening) => {
   // setDrawnRectListener
   startAppListening({
     actionCreator: setDrawnRect,
-    effect: async (action, { dispatch, getState }) => {
+    effect: async (_, { dispatch, getState }) => {
       const state = getState() as RootState;
-      const { zoom, drawnRect, viewRect } = state.map;
-      const { categoricalFilters, timeRange } = state.dataset;
-      const { groupByCols, measureCol, aggType } = state.chart;
 
-      const queryBody = {
-        rect: drawnRect || viewRect,
-        zoom,
-        categoricalFilters,
-        groupByCols,
-        measureCol,
-        aggType,
-        from: timeRange.from,
-        to: timeRange.to,
-      };
-
-      try {
-        const action2 = await dispatch(executeQuery({ body: queryBody }));
-
-        if (executeQuery.fulfilled.match(action2)) {
-          const result = action2.payload as IVisQueryResults;
-
-          dispatch(
-            updateAnalysisResults({
-              rectStats: result.rectStats,
-              series: result.series,
-            }),
-          );
-          dispatch(updateTimeSeries());
-        }
-      } catch (error) {
-        // Handle error silently or log to a proper logging service
-      }
+      await handleRectUpdate(dispatch, state);
     },
   });
 
+  // setSelectedGeohashListener
   startAppListening({
     actionCreator: setSelectedGeohash,
-    effect: async (action, { dispatch, getState }) => {
-      // Set the drawnRect to the selectedGeohash bounds to show the stats and timeSeries for the geohash
-      const geohash = action.payload;
+    effect: async (_, { dispatch, getState }) => {
       const state = getState() as RootState;
-      const { id } = state.dataset.dataset;
 
-      const bounds = geohash ? ngeohash.decode_bbox(geohash) : null;
-
-      dispatch(
-        setDrawnRect({
-          id: id || '',
-          bounds: bounds
-            ? {
-              south: bounds[0],
-              west: bounds[1],
-              north: bounds[2],
-              east: bounds[3],
-            }
-            : null,
-        }),
-      );
+      await handleRectUpdate(dispatch, state);
     },
   });
 };
@@ -296,4 +305,5 @@ export const {
   setSelectedGeohash,
   updateMapBounds,
   setMapLayer,
+  setActiveRect,
 } = mapSlice.actions;

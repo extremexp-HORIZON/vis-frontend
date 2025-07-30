@@ -25,13 +25,13 @@ export const updateTimeSeries = createAsyncThunk(
   async (_, thunkApi) => {
     const state = thunkApi.getState() as RootState;
 
-    const { drawnRect } = state.map;
+    const { drawnRect, selectedGeohash } = state.map;
     const { frequency, measureCol } = state.timeSeries;
     const { timeRange, categoricalFilters } = state.dataset;
     // const datasetId = Object.keys(state.api.queries).find((key) => key.startsWith('getDataset('));
     const datasetId = state.dataset.dataset.id;
 
-    if (datasetId && drawnRect) {
+    if (datasetId && (drawnRect || selectedGeohash.rect)) {
       if (!measureCol)
         thunkApi.dispatch(setMeasureCol(state.chart.measureCol!));
       const timeSeriesBody = {
@@ -39,7 +39,7 @@ export const updateTimeSeries = createAsyncThunk(
         to: timeRange.to,
         measureCol: measureCol || state.chart.measureCol,
         frequency,
-        rect: drawnRect,
+        rect: drawnRect || selectedGeohash.rect, // prefer drawn rect over selected geohash
         categoricalFilters,
       };
 

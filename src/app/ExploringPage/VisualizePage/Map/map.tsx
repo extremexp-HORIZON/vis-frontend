@@ -163,7 +163,7 @@ export const Map = (props: IMapProps) => {
 
   // Initialize selectedGeohash from URL params
   useEffect(() => {
-    if (dataset !== defaultValue && geohash && geohash !== selectedGeohash) {
+    if (dataset !== defaultValue && geohash && geohash !== selectedGeohash.string) {
       dispatch(setMapLayer('geohash'));
       dispatch(setSelectedGeohash(geohash));
     }
@@ -414,7 +414,7 @@ export const Map = (props: IMapProps) => {
           <GeohashGridLayer
             dataset={dataset}
             points={points}
-            selectedGeohash={selectedGeohash}
+            selectedGeohash={selectedGeohash.string}
             setSelectedGeohash={(geohash: string | null) =>
               dispatch(setSelectedGeohash(geohash))
             }

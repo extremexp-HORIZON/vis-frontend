@@ -41,7 +41,7 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { rectStats } = useAppSelector((state: RootState) => state.stats);
-  const { drawnRect, selectedGeohash } = useAppSelector(
+  const { activeRect, selectedGeohash } = useAppSelector(
     (state: RootState) => state.map,
   );
   const {
@@ -81,7 +81,7 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
 
   const handleGeohashEdit = () => {
     setIsEditingGeohash(true);
-    setGeohashInput(selectedGeohash || '');
+    setGeohashInput(selectedGeohash.string || '');
   };
 
   const handleGeohashSubmit = () => {
@@ -122,7 +122,7 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
                 </Typography>
               }
               subheader={
-                selectedGeohash ? (
+                activeRect === 'selectedGeohash' ? (
                   isEditingGeohash ? (
                     <Box
                       display="flex"
@@ -169,10 +169,10 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
                       }}
                       onClick={handleGeohashEdit}
                     >
-                      GeoHash: {selectedGeohash}
+                      GeoHash: {selectedGeohash.string}
                     </Typography>
                   )
-                ) : drawnRect ? (
+                ) : activeRect === 'drawnRect' ? (
                   <Typography
                     variant="subtitle2"
                     component="div"
