@@ -181,7 +181,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
 
   const getCounterfactualsData = (
     tableContents: Record<string, { values: string[] }> | undefined,
-    point: { data: Record<string, any> } | null
+    point: { data: Record<string, unknown> } | null
   ): TestInstance[] | null => {
     if (!point || !tableContents) return null;
 

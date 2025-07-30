@@ -3,26 +3,14 @@ import type { GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, styled, Typography } from '@mui/material';
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
-
-interface DataObject {
-  [key: string]: {
-    index: number
-    values: string[]
-    colour: string | null
-  }
-}
-
-interface EffCostActions {
-  [key: string]: {
-    eff: number
-    cost: number
-  }
-}
+import type { IEffCostActions, ITableContents } from '../../../shared/models/plotmodel.model';
+import type { GridRenderCellParams } from '@mui/x-data-grid';
+import { CustomGridColDef } from '../../../shared/types/table-types';
 
 interface DataTableProps {
   title: string
-  data: DataObject
-  eff_cost_actions?: EffCostActions
+  data: ITableContents
+  eff_cost_actions?: IEffCostActions
 }
 
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
@@ -106,19 +94,18 @@ const GlovesTable: React.FC<DataTableProps> = ({
   const keys = Object.keys(data);
 
   // Create rows dynamically, including effectiveness and cost if available
-  const rows: GridRowsProp = data[keys[0]].values.map((_, index) => {
+  const numRows = data[keys[0]].values.length;
+
+  const rows: GridRowsProp = Array.from({ length: numRows }, (_, index) => {
     const row: { id: number; [key: string]: string | number } = {
       id: index + 1,
-    }; // Each row needs a unique ID
+    };
 
     keys.forEach(key => {
-      // row[key] = data[key].values[index]
       const rawValue = data[key].values[index];
       const parsed = parseFloat(rawValue);
 
       row[key] = !isNaN(parsed) ? parseFloat(parsed.toFixed(2)) : rawValue;
-      // row[key] = !isNaN(parsed) ? parseFloat(parsed.toFixed(3)) : rawValue
-
     });
 
     // Merge eff_cost_actions data if available
@@ -132,15 +119,16 @@ const GlovesTable: React.FC<DataTableProps> = ({
 
   // Create columns dynamically
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'Action ID', flex: 0.5, minWidth: 100 }, // Add ID as the first column
-    { field: 'eff', headerName: 'Effectiveness (%)', flex: 1, minWidth: 150 },
-    { field: 'cost', headerName: 'Cost', flex: 1, minWidth: 100 },
+    { field: 'id', headerName: 'Action ID', flex: 0.5, minWidth: 100, align: 'center', headerAlign: 'center' }, // Add ID as the first column
+    { field: 'eff', headerName: 'Effectiveness (%)', flex: 1, minWidth: 150, align: 'center', headerAlign: 'center' },
+    { field: 'cost', headerName: 'Cost', flex: 1, minWidth: 100, align: 'center', headerAlign: 'center' },
     ...keys.map(key => ({
       field: key,
       headerName: key.replace(/_/g, ' '), // Format header names for better readability
       flex: 1,
       minWidth: 150,
-      renderCell: params => {
+      headerAlign: 'center',
+      renderCell: (params: GridRenderCellParams) => {
         const value = params.value;
         const numValue = parseFloat(value);
 
@@ -149,14 +137,14 @@ const GlovesTable: React.FC<DataTableProps> = ({
         const isNegative = !isNaN(numValue) && numValue < 0;
 
         return (
-          <Box display="flex" alignItems="center">
+          <Box display="flex" alignItems="center" justifyContent="center">
             <Typography variant="body2">{value}</Typography>
             {isPositive && <ArrowDropUp style={{ color: 'green' }} />}
             {isNegative && <ArrowDropDown style={{ color: 'red' }} />}
           </Box>
         );
       },
-    })),
+    } as GridColDef)),
   ];
 
   return (

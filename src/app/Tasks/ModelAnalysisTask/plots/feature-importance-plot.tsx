@@ -32,14 +32,28 @@ const FeatureImportancePlot = () => {
     }
   }, [isTabInitialized]);
 
-  const getVegaliteData = () => {
-    if (!rawData?.featureImportances) return [];
+const getVegaliteData = () => {
+  if (!rawData?.featureImportances) return [];
 
-    return rawData.featureImportances.slice(0, 10).map(d => ({
-      Feature: d.featureName,
-      Importance: d.importanceScore,
-    }));
-  };
+  const missingImportance: string[] = [];
+
+  const filteredData = rawData.featureImportances.filter(d => {
+    if (typeof d.importanceScore !== 'number') {
+      missingImportance.push(d.featureName);
+      return false;
+    }
+    return true;
+  });
+
+  // if (missingImportance.length > 0) {
+  //   console.log('Features without importanceScore:', missingImportance);
+  // }
+
+  return filteredData.map(d => ({
+    Feature: d.featureName,
+    Importance: d.importanceScore!,
+  }));
+};
 
   const spec = {
     width: 'container',

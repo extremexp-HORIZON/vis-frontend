@@ -102,8 +102,8 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   children,
   onDownload,
   onFullScreen,
-  maxWidth = 2000,
-  maxHeight = 300,
+  maxWidth = 3000,
+  maxHeight,
   minHeight,
   additionalMenuItems,
   downloadLabel = 'Download as PNG',
@@ -205,6 +205,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
         sx={{
           maxWidth: maxWidth,
           minHeight: minHeight,
+          maxHeight: maxHeight,
           mx: 'auto',
           boxShadow: '0 4px 20px rgba(0,0,0,0.09)',
           height: '100%',

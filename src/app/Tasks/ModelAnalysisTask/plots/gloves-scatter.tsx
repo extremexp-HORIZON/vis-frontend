@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import type { VisualizationSpec } from 'react-vega';
 import {
   FormControl,
   InputLabel,
@@ -7,6 +6,7 @@ import {
   MenuItem,
   Box,
   Switch,
+  Grid,
 } from '@mui/material';
 import UmapComponent from './umapComponent';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
@@ -96,13 +96,11 @@ const GlovesScatter = ({
   const determineType = (field: string, data: string | any[]) => {
     if (!data.length || data[0][field] === undefined) return 'nominal';
 
-    console.log('Field:', field, 'Data Type:', typeof data[0][field]);
-
     return typeof data[0][field] === 'string' ? 'nominal' : 'quantitative';
   };
 
   // Vega-Lite specifications for both plots
-  const spec = (data: { id: string }[]) =>
+  const spec = (data: Record<string, unknown>[]) =>
     ({
       description: 'A scatter plot of affected clusters',
       mark: 'circle',
@@ -132,12 +130,11 @@ const GlovesScatter = ({
         },
       },
       data: { values: data },
-    }) as VisualizationSpec;
+    });
 
-  const Colorspec = (data: { id: string }[]) => {
+  const Colorspec = (data: Record<string, unknown>[]) => {
     return {
-      description: 'A scatter plot of affected clusters',
-      title: 'Affected Clusters',
+
       width: 450,
       height: 450,
       mark: { type: 'point', opacity: 0.8 },
@@ -171,7 +168,7 @@ const GlovesScatter = ({
         },
       },
       data: { values: data },
-    } as VisualizationSpec;
+    };
   };
 
   const getEffCostForColorField = (field: string) => {
@@ -266,7 +263,7 @@ const GlovesScatter = ({
           },
         },
       ],
-    }) as VisualizationSpec;
+    });
 
   return (
     <>
@@ -375,28 +372,50 @@ const GlovesScatter = ({
         </Box>
       </Box>
       {dimensionalityReduction ? (
-        <Box textAlign="center" marginTop={3}>
+        <Box  sx={{ alignItems: 'center', justifyContent: 'center' }} >
           <UmapComponent data1={data1} data2={data2} colorField={colorField} />
         </Box>
       ) : (
-        <div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {data1 && data2 && (
-            <>
-              <ResponsiveCardVegaLite
-                spec={spec(
-                  transformData(data1),
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <ResponsiveCardVegaLite
+                  actions={false}
+                  title="Action Selection"
+                  details="A scatter plot of affected clusters before action selection"
+                  spec={spec(transformData(data1))}
+                  isStatic={false}
+                  maxHeight={400}
+                />
+              </Grid>
 
-                )}/>
-              <ResponsiveCardVegaLite
-                spec={spec(
-                  transformData(data2.appliedAffectedActions))}
-              />
-            </>
+              <Grid item xs={12} md={6}>
+                <ResponsiveCardVegaLite
+                  actions={false}
+                  title="Post-Action Selection"
+                  details="A scatter plot of affected clusters after action selection"
+                  spec={spec(transformData(data2.appliedAffectedActions))}
+                  isStatic={false}
+                  maxHeight={400}
+                />
+              </Grid>
+            </Grid>
+
           )}
           {data1 && (
-            <ResponsiveCardVegaLite spec={Colorspec(transformData(data1))} />
+            <Box>
+              <ResponsiveCardVegaLite
+                actions={false}
+                title= {'Affected Clusters'}
+                details={'A scatter plot of affected clusters'}
+                spec={Colorspec(transformData(data1))}
+                isStatic={false}
+                maxHeight={400}
+              />
+            </Box>
           )}
-        </div>
+        </Box>
       )}
     </>
   );

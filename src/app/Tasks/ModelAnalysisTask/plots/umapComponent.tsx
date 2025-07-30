@@ -2,6 +2,9 @@ import axios from 'axios';
 import { useEffect, useState, useMemo } from 'react';
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import { Box, Grid } from '@mui/material';
+import { logger } from '../../../../shared/utils/logger';
 
 interface DataField {
   values: any[]
@@ -14,7 +17,7 @@ interface UmapComponentProps {
 }
 
 const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
-  console.log('colorField', colorField);
+  logger.log('colorField', colorField);
   const [umapResults, setUmapResults] = useState<{
     umap1: number[][] | null
     umap2: number[][] | null
@@ -26,8 +29,6 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const chosenAction = data1.Chosen_Action.values;
-
-  data1[colorField].values;
 
   // Memoized column names filtering
   const columnNamesFiltered = useMemo(
@@ -169,7 +170,7 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
     ],
   });
 
-  const spec = sharedLegendSpec(
+  const specShared = sharedLegendSpec(
     createScatterData(umapResults.umap1),
     createScatterData(umapResults.umap2),
   );
@@ -214,21 +215,95 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
     },
   });
 
+  const spec = (data: { x: number; y: number; action: string }[]) => ({
+    width: 450,
+    height: 450,
+    mark: { type: 'point', opacity: 0.8 },
+    params: [
+      {
+        name: 'industry',
+        select: { type: 'point', fields: ['action'] },
+        bind: 'legend',
+      },
+    ],
+    encoding: {
+      x: { field: 'x', type: 'quantitative', title: 'UMAP Dimension 1' },
+      y: { field: 'y', type: 'quantitative', title: 'UMAP Dimension 2' },
+      color: {
+        field: 'action',
+        type: 'nominal',
+        title: 'Chosen Action',
+      },
+      tooltip: [
+        { field: 'action', type: 'nominal', title: 'Chosen Action' },
+        { field: 'x', type: 'quantitative' },
+        { field: 'y', type: 'quantitative' },
+      ],
+      opacity: {
+        condition: { param: 'industry', value: 1 },
+        value: 0.01,
+      },
+    },
+    data: { values: data },
+  });
+
   const spec1 = predictionSpec(
     umapResults.umap1,
     data1[colorField]?.values || [],
   );
+
   // i want to parse float the data1[colorField]?.values)
+  if(loading) return <Loader />;
+
+  if(error)
+    return(
+      <InfoMessage
+        message={error}
+        type="info"
+        fullHeight
+      />
+    );
 
   return (
-    <div>
-      {loading && <Loader/>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {umapResults.umap1 && umapResults.umap2 && (
-        <ResponsiveCardVegaLite spec={spec}/>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <ResponsiveCardVegaLite
+              actions={false}
+              title="Action Selection"
+              details="UMAP projection before action"
+              spec={spec(createScatterData(umapResults.umap1))}
+              isStatic={false}
+              maxHeight={400}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <ResponsiveCardVegaLite
+              actions={false}
+              title="Post-Action Selection"
+              details="UMAP projection after action"
+              spec={spec(createScatterData(umapResults.umap2))}
+              isStatic={false}
+              maxHeight={400}
+            />
+          </Grid>
+        </Grid>
       )}
-      {umapResults.umap1 && <ResponsiveCardVegaLite spec={spec1} title={'Affected Clusters'} details={'UMAP plot colored by prediction values'} />}
-    </div>
+      {umapResults.umap1 &&
+        <Box>
+          <ResponsiveCardVegaLite
+            actions={false}
+            spec={spec1}
+            title={'Affected Clusters'}
+            details={'UMAP plot colored by prediction values'}
+            isStatic={false}
+            maxHeight={400}
+          />
+        </Box>
+      }
+    </Box>
   );
 };
 

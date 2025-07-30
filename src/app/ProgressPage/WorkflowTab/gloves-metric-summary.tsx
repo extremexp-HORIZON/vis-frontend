@@ -4,7 +4,6 @@ import GlovesTable from './gloves-table';
 import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
 import { Stack, Card, LinearProgress } from '@mui/material';
 import { useAppSelector } from '../../../store/store';
-import Loader from '../../../shared/components/loader';
 import InfoMessage from '../../../shared/components/InfoMessage';
 
 const GlovesMetricSummary: React.FC = () => {
@@ -13,44 +12,27 @@ const GlovesMetricSummary: React.FC = () => {
       state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals
   );
 
-  console.log('Global Counterfactuals Data:', globalCounterfactualsData);
-  const isLoading = globalCounterfactualsData?.loading === true;
+  const { TotalCost, TotalEffectiveness, actions, effCostActions } =
+    globalCounterfactualsData?.data ?? {};
 
-  if (isLoading) {
+  // Check if `actions` is a valid object
+  if (!actions || typeof actions !== 'object') {
     return (
-      <Loader/>
-    );
-  }
-  if (!globalCounterfactualsData?.data) {
-    return (
-
       <InfoMessage
-        message="Please select a configuration."
+        message="No actions data available."
         type="info"
         fullHeight
       />
     );
   }
-  if (globalCounterfactualsData.error) {
-    return (
-      <Box sx={{ padding: 2 }}>
-        <Typography color="error">
-          Error loading global counterfactuals: {globalCounterfactualsData.error}
-        </Typography>
-      </Box>
-    );
-  }
-  const { TotalCost, TotalEffectiveness, actions, effCostActions } =
-    globalCounterfactualsData?.data!; // Use non-null assertion as we've checked for isLoading
-
-  // Check if `actions` is a valid object
-  if (!actions || typeof actions !== 'object') {
-    return <Typography>No actions data available.</Typography>;
-  }
 
   if (TotalCost == null || TotalEffectiveness == null) {
     return (
-      <Typography>No total cost or effectiveness data available.</Typography>
+      <InfoMessage
+        message="No total cost or effectiveness data available."
+        type="info"
+        fullHeight
+      />
     );
   }
 
@@ -62,8 +44,11 @@ const GlovesMetricSummary: React.FC = () => {
       details={
         'Total Effectiveness: is the percentage of individuals that achieve the favorable outcome, if each one of the final actions is applied to the whole affected population. Total Cost: is calculated as the mean recourse cost of the whole set of final actions over the entire population.'
       }
+      minHeight={400}
+      maxHeight={400}
+      noPadding={true}
     >
-      <Box sx={{ minWidth: '300px' }}>
+      <Box>
         <Stack direction="row" spacing={1} padding={1}>
           <Card
             sx={{

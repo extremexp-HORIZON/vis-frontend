@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
@@ -15,8 +15,11 @@ import GlovesScatter from '../../Tasks/ModelAnalysisTask/plots/gloves-scatter';
 import GlovesMetricSummary from './gloves-metric-summary';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { fetchAffected } from '../../../store/slices/modelAnalysisSlice';
-import { fetchModelAnalysisExplainabilityPlot } from '../../../store/slices/explainabilitySlice';
+import { fetchModelAnalysisExplainabilityPlot, setActionChoiceStrategy, setCfMethod, setGcfSize } from '../../../store/slices/explainabilitySlice';
 import { useParams } from 'react-router-dom';
+import Loader from '../../../shared/components/loader';
+import InfoMessage from '../../../shared/components/InfoMessage';
+import { logger } from '../../../shared/utils/logger';
 
 const CGlanceExecution = () => {
   const { experimentId } = useParams();
@@ -25,13 +28,84 @@ const CGlanceExecution = () => {
     [],
   );
   const availableActionStrategies = ['max-eff', 'min-cost', 'mean-action'];
-  const [cfMethod, setCfMethod] = useState<string>('Dice'); // Default cfMethod,
-  const [actionChoiceStrategy, setActionChoiceStrategy] =
-    useState<string>('max-eff'); // Default actionChoiceStrategy = useMemo(() => "max-eff", [])
-  const [gcfSize, setGcfSize] = useState<number>(3); // Default size
+  const cfMethod = useAppSelector(state => state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals_control_panel.cfMethod);
+  const actionChoiceStrategy = useAppSelector(state => state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals_control_panel.actionChoiceStrategy);
+  const gcfSize = useAppSelector(state => state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals_control_panel.gcfSize);
+
   const tab = useAppSelector(state => state.workflowPage.tab);
+  const globalCounterfactualsData = useAppSelector(
+    (state) =>
+      state.workflowPage.tab?.workflowTasks?.modelAnalysis?.global_counterfactuals
+  );
+  const isLoading = globalCounterfactualsData?.loading === true;
 
   const dispatch = useAppDispatch();
+
+  const hasFetchedOnce = useRef(false);
+
+  useEffect(() => {
+    if (
+      hasFetchedOnce.current ||
+    !cfMethod ||
+    !actionChoiceStrategy ||
+    !gcfSize ||
+    !tab?.workflowId ||
+    !experimentId
+    ) {
+      return;
+    }
+
+    hasFetchedOnce.current = true;
+
+    const runInitialFetch = async () => {
+      await fetchData();
+    };
+
+    runInitialFetch();
+  }, [cfMethod, actionChoiceStrategy, gcfSize, tab?.workflowId, experimentId]);
+
+  const counterfactualsContent = () => {
+    if(isLoading) return <Loader />;
+    if(!globalCounterfactualsData?.data)
+      return (
+        <InfoMessage
+          message="Please select a configuration."
+          type="info"
+          fullHeight
+        />
+      );
+    if (globalCounterfactualsData.error)
+      return (
+        <InfoMessage
+          message="Error loading global counterfactuals."
+          type="info"
+          fullHeight
+        />
+      );
+
+    const globalData = tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data;
+    const affectedData = tab?.workflowTasks?.modelAnalysis?.affected?.data;
+
+    const hasAllData =
+        !!globalData?.affectedClusters &&
+        !!affectedData &&
+        !!globalData?.actions &&
+        !!globalData?.effCostActions;
+
+    return (
+      <Box>
+        <GlovesMetricSummary />
+        {hasAllData && (
+          <GlovesScatter
+            data1={globalData.affectedClusters}
+            data2={affectedData}
+            actions={globalData.actions}
+            eff_cost_actions={globalData.effCostActions}
+          />
+        )}
+      </Box>
+    );
+  };
 
   const fetchData = async () => {
     try {
@@ -62,27 +136,27 @@ const CGlanceExecution = () => {
         }),
       );
 
-      console.log(
+      logger.log(
         'Dispached global_counterfactuals and affected successfully.',
       );
     } catch (error) {
-      console.error('Error dispatching data:', error);
+      logger.log('Error dispatching data:', error);
     }
   };
 
   return (
-    <>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Box container to arrange elements side by side */}
       <Box
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="flex-start"
-        gap={2}
-        marginBottom={2}
-        marginTop={2}
-        width="98%"
-        padding={1}
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          gap: 2,
+          px: 2,
+          py: 1
+        }}
       >
         {/* GCF Size Dropdown */}
         <Tooltip
@@ -104,7 +178,7 @@ const CGlanceExecution = () => {
                 }
                 value={gcfSize}
                 onChange={(event: SelectChangeEvent<number | string>) =>
-                  setGcfSize(Number(event.target.value))
+                  dispatch(setGcfSize(Number(event.target.value)))
                 }
               >
                 {Array.from({ length: 10 }, (_, i) => i + 1).map(value => (
@@ -131,7 +205,7 @@ const CGlanceExecution = () => {
                 labelId="cf-method-select-label"
                 input={<OutlinedInput label="Local Counterfactual Method" />}
                 value={cfMethod}
-                onChange={e => setCfMethod(e.target.value as string)}
+                onChange={e => dispatch(setCfMethod(e.target.value as string))}
                 MenuProps={{
                   PaperProps: { style: { maxHeight: 224, width: 250 } },
                 }}
@@ -164,7 +238,7 @@ const CGlanceExecution = () => {
                 input={<OutlinedInput label="Action Choice Strategy" />}
                 value={actionChoiceStrategy}
                 onChange={e =>
-                  setActionChoiceStrategy(e.target.value as string)
+                  dispatch(setActionChoiceStrategy(e.target.value as string))
                 }
               >
                 {availableActionStrategies.map(strategy => (
@@ -192,35 +266,10 @@ const CGlanceExecution = () => {
           borderColor: 'grey.300',
         }}
       />
-      <Box padding={2}>
-        <GlovesMetricSummary />
-        {tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-          ?.affectedClusters &&
-        tab?.workflowTasks?.modelAnalysis?.affected?.data &&
-        tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-          ?.actions &&
-        tab?.workflowTasks?.modelAnalysis?.global_counterfactuals?.data
-          ?.effCostActions ? (
-            <GlovesScatter
-              data1={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .affectedClusters
-              }
-              data2={tab.workflowTasks.modelAnalysis.affected.data}
-              actions={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .actions
-              }
-              eff_cost_actions={
-                tab.workflowTasks.modelAnalysis.global_counterfactuals.data
-                  .effCostActions
-              }
-            />
-          ) : (
-            <></>
-          )}
+      <Box sx={{ flexGrow: 1, p: 1 }}>
+        {counterfactualsContent()}
       </Box>
-    </>
+    </Box>
   );
 };
 
