@@ -161,7 +161,7 @@ const SelectedItemViewer = () => {
     return (
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Header
-          title={'ML Hyperparameter Explainability'}
+          title={'Hyperparameter Explainability'}
           icon={<PermDataSettingIcon color="primary" />}
         />
         <Box sx={{ px: 3, py: 2, flexGrow: 1, overflow: 'auto' }}>

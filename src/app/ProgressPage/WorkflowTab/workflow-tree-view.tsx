@@ -1587,7 +1587,7 @@ export default function WorkflowTreeView() {
                         sx={{ mr: 1, color: theme.palette.primary.main }}
                       />
                       <Typography>
-                      ML Hyperparameter Explanability
+                      Hyperparameter Explanability
                       </Typography>
                     </Box>
                   </Box>
