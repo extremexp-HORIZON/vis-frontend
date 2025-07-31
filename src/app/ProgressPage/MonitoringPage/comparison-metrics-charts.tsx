@@ -9,7 +9,7 @@ import {
 import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { fetchWorkflowMetrics } from '../../../store/slices/monitorPageSlice';
+import { fetchWorkflowMetrics, setComparativeVisibleMetrics } from '../../../store/slices/monitorPageSlice';
 
 interface BaseMetric {
   id: string
@@ -29,6 +29,7 @@ const ComparisonMetricsCharts: React.FC = () => {
   const experimentId = useAppSelector(
     (state: RootState) => state.progressPage.experiment.data?.id || '',
   );
+  const comparativeVisibleMetrics = useAppSelector((state: RootState) => state.monitorPage.comparativeVisibleMetrics);
   const previousSelectedRef = useRef<string[]>([]);
   const hasFetchedOnInit = useRef(false);
 
@@ -53,6 +54,10 @@ const ComparisonMetricsCharts: React.FC = () => {
           dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
         }
       });
+
+      const allMetrics = workflowsTable.uniqueMetrics.filter(metric => metric !== 'rating');
+
+      dispatch(setComparativeVisibleMetrics(allMetrics));
 
       hasFetchedOnInit.current = true;
       previousSelectedRef.current = workflowsTable.selectedWorkflows;
@@ -93,6 +98,7 @@ const ComparisonMetricsCharts: React.FC = () => {
   if (workflowsTable.groupBy.length > 0) {
     workflowsTable.uniqueMetrics
       .filter(metric => metric !== 'rating')
+      .filter(metric => comparativeVisibleMetrics.includes(metric))
       .forEach(metricName => {
         groupedMetrics[metricName] = [];
 
@@ -124,31 +130,32 @@ const ComparisonMetricsCharts: React.FC = () => {
       const metrics = selectedWorkflowsMetrics?.data?.[workflowId] || [];
       const row = workflowsTable.filteredRows.find(r => r.id === workflowId);
 
-      metrics.forEach(({ name, seriesMetric }) => {
-        if (name === 'rating') return;
+      metrics.filter(({ name }) => name !== 'rating' && comparativeVisibleMetrics.includes(name))
+        .forEach(({ name, seriesMetric }) => {
+          if (name === 'rating') return;
 
-        seriesMetric.forEach(metric => {
-          if (typeof metric.value !== 'number' || isNaN(metric.value)) return;
+          seriesMetric.forEach(metric => {
+            if (typeof metric.value !== 'number' || isNaN(metric.value)) return;
 
-          const enriched: BaseMetric = {
-            id: workflowId,
-            name,
-            value: metric.value,
-            step: metric.step,
-            timestamp: normalizeTimestamp(metric.timestamp),
-          };
+            const enriched: BaseMetric = {
+              id: workflowId,
+              name,
+              value: metric.value,
+              step: metric.step,
+              timestamp: normalizeTimestamp(metric.timestamp),
+            };
 
-          workflowsTable.groupBy.forEach(groupKey => {
-            enriched[groupKey] = row?.[groupKey];
+            workflowsTable.groupBy.forEach(groupKey => {
+              enriched[groupKey] = row?.[groupKey];
+            });
+
+            if (!groupedMetrics[name]) {
+              groupedMetrics[name] = [];
+            }
+
+            groupedMetrics[name].push(enriched);
           });
-
-          if (!groupedMetrics[name]) {
-            groupedMetrics[name] = [];
-          }
-
-          groupedMetrics[name].push(enriched);
         });
-      });
     });
   }
 
@@ -289,6 +296,17 @@ const ComparisonMetricsCharts: React.FC = () => {
     return (
       <InfoMessage
         message="Select Workflows to display comparisons over metrics."
+        type="info"
+        icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+        fullHeight
+      />
+    );
+  }
+
+  if (comparativeVisibleMetrics.length === 0) {
+    return (
+      <InfoMessage
+        message="Select metrics to display."
         type="info"
         icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
         fullHeight

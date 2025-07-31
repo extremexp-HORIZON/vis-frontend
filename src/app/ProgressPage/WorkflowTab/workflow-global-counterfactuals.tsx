@@ -66,18 +66,19 @@ const CGlanceExecution = () => {
 
   const counterfactualsContent = () => {
     if(isLoading) return <Loader />;
-    if(!globalCounterfactualsData?.data)
+    if (globalCounterfactualsData?.error)
       return (
         <InfoMessage
-          message="Please select a configuration."
+          message="Error loading global counterfactuals."
           type="info"
           fullHeight
         />
       );
-    if (globalCounterfactualsData.error)
+
+    if(!globalCounterfactualsData?.data)
       return (
         <InfoMessage
-          message="Error loading global counterfactuals."
+          message="Please select a configuration."
           type="info"
           fullHeight
         />
