@@ -126,10 +126,16 @@ const Histogram = ({ columnName, dataset, workflowId, color }: IHistogramProps) 
       count: b.count,
     }));
   }
+  function normalizeColumnName(column: string): string {
+    if (!column) return '';
+
+    return column.replace(/-/g, '_');
+  }
 
   const rawData = histogramData?.data?.data || [];
-  const countField = `count_${columnName}`;
 
+  const normalizedColumnName = normalizeColumnName(columnName);
+  const countField = `count_${normalizedColumnName}`;
   const isNumericColumn = Array.isArray(rawData) &&
   rawData.some(d => typeof d[columnName] === 'number');
 

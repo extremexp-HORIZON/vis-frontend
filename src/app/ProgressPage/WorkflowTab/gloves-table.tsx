@@ -5,7 +5,6 @@ import { Box, styled, Typography } from '@mui/material';
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import type { IEffCostActions, ITableContents } from '../../../shared/models/plotmodel.model';
 import type { GridRenderCellParams } from '@mui/x-data-grid';
-import { CustomGridColDef } from '../../../shared/types/table-types';
 
 interface DataTableProps {
   title: string
