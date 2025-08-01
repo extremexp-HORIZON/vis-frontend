@@ -136,7 +136,7 @@ const MonitoringPage = () => {
                 bottomLeft: false,
                 topLeft: false,
               }}
-              maxWidth="80%"
+              maxWidth="50%"
               maxHeight="100%"
               style={{ height: '100%', position: 'relative' }}
               handleStyles={{
