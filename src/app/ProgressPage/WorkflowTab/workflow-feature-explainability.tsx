@@ -10,7 +10,7 @@ const FeatureExplainability = () => {
 
   return (
     <Box>
-      <Grid
+      {/* <Grid
         container
         justifyContent="flex-end" // Align to the right
         alignItems="center"
@@ -38,7 +38,7 @@ const FeatureExplainability = () => {
                Stacked
           </Button>
         </ButtonGroup>
-      </Grid>
+      </Grid> */}
 
       <Grid
         container
