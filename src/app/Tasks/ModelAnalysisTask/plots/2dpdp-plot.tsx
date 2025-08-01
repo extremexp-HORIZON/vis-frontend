@@ -101,11 +101,17 @@ const Contourplot = (props: IContourplot) => {
 
     for (let xIdx = 0; xIdx < xVals.length; xIdx++) {
       for (let yIdx = 0; yIdx < yVals.length; yIdx++) {
-        data.push({
-          [xName]: xVals[xIdx],
-          [yName]: yVals[yIdx],
-          [zName]: zMatrix[xIdx][yIdx],
-        });
+        explanation_type === 'featureExplanation' ?
+          data.push({
+            [xName]: xVals[xIdx],
+            [yName]: yVals[yIdx],
+            [zName]: zMatrix[xIdx][yIdx],
+          }) :
+          data.push({
+            [xName]: xVals[xIdx],
+            [yName]: yVals[yIdx],
+            [zName]: zMatrix[yIdx][xIdx],
+          }) 
       }
     }
 
