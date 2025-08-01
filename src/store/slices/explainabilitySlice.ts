@@ -47,6 +47,7 @@ export const setSelectedFeatures2D = createAction<{
 export const setGcfSize = createAction<number>('modelAnalysis/setGcfSize');
 export const setCfMethod = createAction<string>('modelAnalysis/setCfMethod');
 export const setActionChoiceStrategy = createAction<string>('modelAnalysis/setActionChoiceStrategy');
+export const clear2DPDPPlot = createAction('explainability/clear_2dpdp_plot');
 
 // Helpers
 const getTask = (state: IWorkflowPage, workflowId: string) =>
@@ -162,6 +163,19 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
       if (modelAnalysis) {
         modelAnalysis.global_counterfactuals_control_panel.actionChoiceStrategy = action.payload;
+      }
+    })
+    .addCase(clear2DPDPPlot, (state) => {
+      const modelAnalysis = state.tab?.workflowTasks?.modelAnalysis;
+
+      if (modelAnalysis && '2dpdp' in modelAnalysis) {
+        modelAnalysis['2dpdp'] = {
+          loading: false,
+          error: null,
+          data: null,
+          selectedFeature1: '',
+          selectedFeature2: '',
+        };
       }
     });
 };
