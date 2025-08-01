@@ -9,7 +9,7 @@ const HyperparameterImpact = () => {
 
   return (
     <Box>
-      <Grid
+      {/* <Grid
         container
         justifyContent="flex-end" // Align to the right
         alignItems="center"
@@ -37,7 +37,7 @@ const HyperparameterImpact = () => {
                  Stacked
           </Button>
         </ButtonGroup>
-      </Grid>
+      </Grid> */}
 
       <Grid
         container
