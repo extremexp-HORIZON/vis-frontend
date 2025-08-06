@@ -11,15 +11,15 @@ import {
   Tooltip,
   Divider,
 } from '@mui/material';
-import GlovesScatter from '../../Tasks/ModelAnalysisTask/plots/gloves-scatter';
+import GlovesScatter from '../../../Tasks/ModelAnalysisTask/plots/gloves-scatter';
 import GlovesMetricSummary from './gloves-metric-summary';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { fetchAffected } from '../../../store/slices/modelAnalysisSlice';
-import { fetchModelAnalysisExplainabilityPlot, setActionChoiceStrategy, setCfMethod, setGcfSize } from '../../../store/slices/explainabilitySlice';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { fetchAffected } from '../../../../store/slices/modelAnalysisSlice';
+import { fetchModelAnalysisExplainabilityPlot, setActionChoiceStrategy, setCfMethod, setGcfSize } from '../../../../store/slices/explainabilitySlice';
 import { useParams } from 'react-router-dom';
-import Loader from '../../../shared/components/loader';
-import InfoMessage from '../../../shared/components/InfoMessage';
-import { logger } from '../../../shared/utils/logger';
+import Loader from '../../../../shared/components/loader';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import { logger } from '../../../../shared/utils/logger';
 
 const CGlanceExecution = () => {
   const { experimentId } = useParams();

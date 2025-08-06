@@ -1,16 +1,16 @@
-import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
-import type { RootState } from '../../../store/store';
-import { useAppSelector } from '../../../store/store';
-import type { IMetric } from '../../../shared/models/experiment/metric.model';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
+import type { IMetric } from '../../../../shared/models/experiment/metric.model';
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import green from '@mui/material/colors/green';
 import red from '@mui/material/colors/red';
 import { useParams } from 'react-router-dom';
-import { DetailsCard, DetailsCardItem } from '../../../shared/components/details-card';
+import { DetailsCard, DetailsCardItem } from '../../../../shared/components/details-card';
 import { useMemo } from 'react';
-import { setCache } from '../../../shared/utils/localStorageCache';
+import { setCache } from '../../../../shared/utils/localStorageCache';
 import { useLocation } from 'react-router-dom';
 
 interface GroupMetrics {

@@ -1,13 +1,13 @@
 import { Grid } from '@mui/material';
-import type { RootState } from '../../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import Loader from '../../../../shared/components/loader';
-import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
-import InfoMessage from '../../../../shared/components/InfoMessage';
-import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import type { RootState } from '../../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../../store/store';
+import Loader from '../../../../../shared/components/loader';
+import ResponsiveCardTable from '../../../../../shared/components/responsive-card-table';
+import InfoMessage from '../../../../../shared/components/InfoMessage';
+import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useEffect } from 'react';
-import { fetchComparativeConfusionMatrix } from '../../../../store/slices/monitorPageSlice';
+import { fetchComparativeConfusionMatrix } from '../../../../../store/slices/monitorPageSlice';
 
 const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
   const { workflowsTable, comparativeModelConfusionMatrix } = useAppSelector(

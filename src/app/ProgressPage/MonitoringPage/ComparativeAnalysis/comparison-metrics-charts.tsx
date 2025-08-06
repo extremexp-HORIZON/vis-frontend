@@ -1,15 +1,15 @@
 import type React from 'react';
 import { useEffect, useRef } from 'react';
-import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
   Grid,
   Container,
 } from '@mui/material';
-import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
-import InfoMessage from '../../../shared/components/InfoMessage';
+import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { fetchWorkflowMetrics, setComparativeVisibleMetrics } from '../../../store/slices/monitorPageSlice';
+import { fetchWorkflowMetrics, setComparativeVisibleMetrics } from '../../../../store/slices/monitorPageSlice';
 
 interface BaseMetric {
   id: string

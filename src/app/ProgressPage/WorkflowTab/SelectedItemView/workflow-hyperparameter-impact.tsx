@@ -1,11 +1,10 @@
-import { Box, Button, ButtonGroup, Grid } from '@mui/material';
-import PdpPlot from '../../Tasks/ModelAnalysisTask/plots/pdp-plot';
-import AlePlot from '../../Tasks/ModelAnalysisTask/plots/ale-plot';
 import { useState } from 'react';
-import Contourplot from '../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
-import FeatureImportancePlot from '../../Tasks/ModelAnalysisTask/plots/feature-importance-plot';
+import { Box, Button, ButtonGroup, Grid } from '@mui/material';
+import PdpPlot from '../../../Tasks/ModelAnalysisTask/plots/pdp-plot';
+import AlePlot from '../../../Tasks/ModelAnalysisTask/plots/ale-plot';
+import Contourplot from '../../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
 
-const FeatureExplainability = () => {
+const HyperparameterImpact = () => {
   const [isMosaic, setIsMosaic] = useState(true);
 
   return (
@@ -28,14 +27,14 @@ const FeatureExplainability = () => {
             color="primary"
             onClick={() => setIsMosaic(true)}
           >
-                Mosaic
+                  Mosaic
           </Button>
           <Button
             variant={!isMosaic ? 'contained' : 'outlined'}
             color="primary"
             onClick={() => setIsMosaic(false)}
           >
-               Stacked
+                 Stacked
           </Button>
         </ButtonGroup>
       </Grid> */}
@@ -44,21 +43,19 @@ const FeatureExplainability = () => {
         container
         spacing={2}
       >
-        <Grid item xs={12}>
-          <FeatureImportancePlot />
+        <Grid item xs={isMosaic ? 6 : 12}>
+          <PdpPlot explanation_type="hyperparameterExplanation" />
         </Grid>
         <Grid item xs={isMosaic ? 6 : 12}>
-          <PdpPlot explanation_type="featureExplanation" />
-        </Grid>
-        <Grid item xs={isMosaic ? 6 : 12}>
-          <AlePlot explanation_type="featureExplanation"/>
+          <AlePlot explanation_type="hyperparameterExplanation" />
         </Grid>
         <Grid item xs={12}>
-          <Contourplot explanation_type="featureExplanation"/>
+          <Contourplot explanation_type="hyperparameterExplanation" />
         </Grid>
       </Grid>
     </Box>
   );
+
 };
 
-export default FeatureExplainability;
+export default HyperparameterImpact;

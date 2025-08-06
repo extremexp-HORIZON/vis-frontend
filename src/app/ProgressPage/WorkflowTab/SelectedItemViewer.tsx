@@ -1,26 +1,26 @@
 import { Typography, Box } from '@mui/material';
 import { useAppSelector } from '../../../store/store';
 import DataExplorationComponent from '../../Tasks/DataExplorationTask/ComponentContainer/DataExplorationComponent';
-import { WorkflowMetricChart } from './workflow-metric-chart';
-import WorkflowTaskOverview from './workflow-task-overview';
+import { WorkflowMetricChart } from './SelectedItemView/workflow-metric-chart';
+import WorkflowTaskOverview from './SelectedItemView/workflow-task-overview';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import WorkflowParameter from './workflow-parameter';
+import WorkflowParameter from './SelectedItemView/workflow-parameter';
 import DatasetIcon from '@mui/icons-material/Dataset';
 import Grid3x3Icon from '@mui/icons-material/Grid3x3';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import theme from '../../../mui-theme';
-import ModelDetails from './workflow-model-details';
-import InstanceView from './workflow-instance-view';
-import HyperparameterImpact from './workflow-hyperparameter-impact';
+import ModelDetails from './SelectedItemView/workflow-model-details';
+import InstanceView from './SelectedItemView/workflow-instance-view';
+import HyperparameterImpact from './SelectedItemView/workflow-hyperparameter-impact';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import InsightsIcon from '@mui/icons-material/Insights';
-import FeatureExplainability from './workflow-feature-explainability';
+import FeatureExplainability from './SelectedItemView/workflow-feature-explainability';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 
-import CGlanceExecution from './workflow-global-counterfactuals';
+import CGlanceExecution from './SelectedItemView/workflow-global-counterfactuals';
 
 const SelectedItemViewer = () => {
   const { selectedItem, selectedTask } = useAppSelector(

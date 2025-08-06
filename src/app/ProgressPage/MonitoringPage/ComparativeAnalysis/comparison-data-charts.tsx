@@ -1,18 +1,18 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
   Grid,
   Container,
 } from '@mui/material';
-import InfoMessage from '../../../shared/components/InfoMessage';
+import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, setSelectedDataset, type CommonDataAssets } from '../../../store/slices/monitorPageSlice';
-import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
-import type { VisualColumn } from '../../../shared/models/dataexploration.model';
-import Loader from '../../../shared/components/loader';
+import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, setSelectedDataset, type CommonDataAssets } from '../../../../store/slices/monitorPageSlice';
+import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
+import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
+import Loader from '../../../../shared/components/loader';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
-import SummaryTable from './comparative-data-table';
+import SummaryTable from './DataComparison/comparative-data-table';
 
 const ComparisonDataCharts = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(

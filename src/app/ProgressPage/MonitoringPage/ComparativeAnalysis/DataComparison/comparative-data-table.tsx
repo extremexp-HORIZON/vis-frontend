@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material';
-import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
+import type { IDataAsset } from '../../../../../shared/models/experiment/data-asset.model';
 import Histogram from './comparative-data-histogram';
-import { useAppSelector } from '../../../store/store';
-import type { RootState } from '../../../store/store';
+import { useAppSelector } from '../../../../../store/store';
+import type { RootState } from '../../../../../store/store';
 
 export interface SummaryTableProps {
   dataset: IDataAsset;

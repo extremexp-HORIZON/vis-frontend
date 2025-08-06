@@ -12,9 +12,9 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useRef, useState } from 'react';
-import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { setSelectedDataset } from '../../../store/slices/monitorPageSlice';
+import type { RootState } from '../../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../../store/store';
+import { setSelectedDataset } from '../../../../../store/slices/monitorPageSlice';
 
 export default function DatasetSelectorBar() {
   const dispatch = useAppDispatch();

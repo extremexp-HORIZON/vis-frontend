@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import InstanceClassification from '../../Tasks/ModelAnalysisTask/plots/instance-classification';
-import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import CounterfactualsTable from '../../Tasks/ModelAnalysisTask/tables/counterfactuals-table';
+import InstanceClassification from '../../../Tasks/ModelAnalysisTask/plots/instance-classification';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import CounterfactualsTable from '../../../Tasks/ModelAnalysisTask/tables/counterfactuals-table';
 import { useParams } from 'react-router-dom';
 import {
   ButtonGroup,
@@ -15,17 +15,17 @@ import {
   Stack,
   IconButton,
 } from '@mui/material';
-import { setControls } from '../../../store/slices/workflowPageSlice';
+import { setControls } from '../../../../store/slices/workflowPageSlice';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import TableChartIcon from '@mui/icons-material/TableChartSharp';
 import { DataGrid } from '@mui/x-data-grid';
-import InfoMessage from '../../../shared/components/InfoMessage';
-import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
-import Loader from '../../../shared/components/loader';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
+import Loader from '../../../../shared/components/loader';
 import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded';
-import { getLabelTestInstances } from '../../../store/slices/modelAnalysisSlice';
+import { getLabelTestInstances } from '../../../../store/slices/modelAnalysisSlice';
 import type { GridColDef } from '@mui/x-data-grid';
-import type { TestInstance } from '../../../shared/models/tasks/model-analysis.model';
+import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 import type { GridRenderCellParams } from '@mui/x-data-grid';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 

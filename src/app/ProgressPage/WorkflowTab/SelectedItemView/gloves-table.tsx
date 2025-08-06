@@ -3,7 +3,7 @@ import type { GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, styled, Typography } from '@mui/material';
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
-import type { IEffCostActions, ITableContents } from '../../../shared/models/plotmodel.model';
+import type { IEffCostActions, ITableContents } from '../../../../shared/models/plotmodel.model';
 import type { GridRenderCellParams } from '@mui/x-data-grid';
 
 interface DataTableProps {

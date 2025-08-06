@@ -1,9 +1,9 @@
 import { Box, Typography } from '@mui/material';
 import { CheckCircle as CheckCircleIcon, WarningAmberRounded as WarningAmberRoundedIcon, InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
-import type { RootState } from '../../../store/store';
-import { useAppSelector } from '../../../store/store';
-import { DetailsCard, DetailsCardItem } from '../../../shared/components/details-card';
-import UserInteractiveTask from '../../../deprecated/UserInteractiveTask/user-interactive-task';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
+import { DetailsCard, DetailsCardItem } from '../../../../shared/components/details-card';
+import UserInteractiveTask from '../../../../deprecated/UserInteractiveTask/user-interactive-task';
 const StatusIndicator = ({ completed }: {completed: boolean}) => (
   <Box
     sx={{

@@ -6,14 +6,14 @@ import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
 import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
 import ImageRoundedIcon from '@mui/icons-material/ImageRounded';
 import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded';
-import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
   setSelectedId,
   setSelectedTask,
-} from '../../../store/slices/workflowPageSlice';
+} from '../../../../store/slices/workflowPageSlice';
 
-import { setSelectedItem } from '../../../store/slices/workflowPageSlice';
+import { setSelectedItem } from '../../../../store/slices/workflowPageSlice';
 import InputIcon from '@mui/icons-material/Input';
 import OutputIcon from '@mui/icons-material/Output';
 import Grid3x3Icon from '@mui/icons-material/Grid3x3';
@@ -21,7 +21,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import CommitIcon from '@mui/icons-material/Commit';
-import theme from '../../../mui-theme';
+import theme from '../../../../mui-theme';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';

@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import GlovesTable from './gloves-table';
-import ResponsiveCardTable from '../../../shared/components/responsive-card-table';
+import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import { Stack, Card, LinearProgress } from '@mui/material';
-import { useAppSelector } from '../../../store/store';
-import InfoMessage from '../../../shared/components/InfoMessage';
+import { useAppSelector } from '../../../../store/store';
+import InfoMessage from '../../../../shared/components/InfoMessage';
 
 const GlovesMetricSummary: React.FC = () => {
   const globalCounterfactualsData = useAppSelector(
