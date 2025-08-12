@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
@@ -15,7 +15,7 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
-import { fetchModelAnalysisExplainabilityPlot, setSelectedFeatures2D } from '../../../../store/slices/explainabilitySlice';
+import { clear2DPDPPlot, fetchModelAnalysisExplainabilityPlot, setSelectedFeatures2D } from '../../../../store/slices/explainabilitySlice';
 
 interface IContourplot {
   explanation_type: string
@@ -36,7 +36,12 @@ const Contourplot = (props: IContourplot) => {
   const feature1 = plotModel?.selectedFeature1 || '';
   const feature2 = plotModel?.selectedFeature2 || '';
 
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
+
+    dispatch(clear2DPDPPlot());
+
     if (isTabInitialized && tab && experimentId) {
       dispatch(
         fetchModelAnalysisExplainabilityPlot({
@@ -53,6 +58,9 @@ const Contourplot = (props: IContourplot) => {
         }),
       );
     }
+
+    setHasInitialized(true);
+
   }, [isTabInitialized]);
 
   const handleFeatureChange = (index: number) => (e: { target: { value: string } }) => {
@@ -101,11 +109,17 @@ const Contourplot = (props: IContourplot) => {
 
     for (let xIdx = 0; xIdx < xVals.length; xIdx++) {
       for (let yIdx = 0; yIdx < yVals.length; yIdx++) {
-        data.push({
-          [xName]: xVals[xIdx],
-          [yName]: yVals[yIdx],
-          [zName]: zMatrix[xIdx][yIdx],
-        });
+        explanation_type === 'featureExplanation' ?
+          data.push({
+            [xName]: xVals[xIdx],
+            [yName]: yVals[yIdx],
+            [zName]: zMatrix[xIdx][yIdx],
+          }) :
+          data.push({
+            [xName]: xVals[xIdx],
+            [yName]: yVals[yIdx],
+            [zName]: zMatrix[yIdx][xIdx],
+          }) 
       }
     }
 
@@ -146,7 +160,7 @@ const Contourplot = (props: IContourplot) => {
     height: 'container',
     autosize: { type: 'fit', contains: 'padding', resize: true },
     data: {
-      values: getVegaliteData(plotModel?.data || null),
+      values: hasInitialized ? getVegaliteData(plotModel?.data || null) : [],
     },
     ...(transform.length > 0 && { transform }),
     mark: {
@@ -226,7 +240,7 @@ const Contourplot = (props: IContourplot) => {
     />
   );
 
-  const shouldShowLoading = !!plotModel?.loading;
+  const shouldShowLoading = !!plotModel?.loading || !hasInitialized;
   const shouldShowError = !!plotModel?.error;
 
   return (

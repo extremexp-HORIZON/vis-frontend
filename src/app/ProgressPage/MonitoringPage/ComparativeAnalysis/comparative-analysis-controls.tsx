@@ -1,12 +1,12 @@
 import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Popover, Select, Tooltip } from '@mui/material';
-import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { setComparativeModelInstanceControlPanel, setDataComparisonSelectedColumns, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../store/slices/monitorPageSlice';
-import theme from '../../../mui-theme';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { setComparativeModelInstanceControlPanel, setComparativeVisibleMetrics, setDataComparisonSelectedColumns, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../../store/slices/monitorPageSlice';
+import theme from '../../../../mui-theme';
 import WindowRoundedIcon from '@mui/icons-material/WindowRounded';
 import RoundedCornerRoundedIcon from '@mui/icons-material/RoundedCornerRounded';
 import BlurLinearIcon from '@mui/icons-material/BlurLinear';
-import { SectionHeader } from '../../../shared/components/responsive-card-table';
+import { SectionHeader } from '../../../../shared/components/responsive-card-table';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import { useState } from 'react';
@@ -14,7 +14,7 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import DownloadIcon from '@mui/icons-material/Download';
 import CodeIcon from '@mui/icons-material/Code';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import DatasetSelectorBar from './comparative-data-selector-bar';
+import DatasetSelectorBar from './DataComparison/comparative-data-selector-bar';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { GridTableRowsIcon } from '@mui/x-data-grid';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -25,9 +25,12 @@ const ComparativeAnalysisControls = ()=> {
   const selectedModelComparisonChart = useAppSelector((state: RootState) => state.monitorPage.selectedModelComparisonChart);
   const showMisclassifiedOnly = useAppSelector((state: RootState) => state.monitorPage.showMisclassifiedOnly);
   const selectedComparisonTab = useAppSelector((state: RootState) => state.monitorPage.selectedComparisonTab);
+  const comparativeVisibleMetrics = useAppSelector((state: RootState) => state.monitorPage.comparativeVisibleMetrics);
   const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
   const [columnsAnchorEl, setColumnsAnchorEl] = useState <null | HTMLElement>(null);
   const open = Boolean(columnsAnchorEl);
+  const [metricsAnchorEl, setMetricsAnchorEl] = useState<null | HTMLElement>(null);
+  const isMetricsMenuOpen = Boolean(metricsAnchorEl);
   const comparativeModelInstanceControlPanel = useAppSelector((state: RootState) => state.monitorPage.comparativeModelInstanceControlPanel);
   const selectedDataset = useAppSelector((state: RootState) => state.monitorPage.comparativeDataExploration.selectedDataset);
   const dataAssetsControlPanel = useAppSelector(
@@ -53,6 +56,14 @@ const ComparativeAnalysisControls = ()=> {
   };
 
   const handleClose = () => setColumnsAnchorEl(null);
+
+  const handleOpenMetricsMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setMetricsAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMetricsMenu = () => {
+    setMetricsAnchorEl(null);
+  };
 
   const datasetSelectorClicked = (event: React.MouseEvent<HTMLElement>) => {
     setDatasetSelector(!isDatasetSelectorOpen);
@@ -82,6 +93,60 @@ const ComparativeAnalysisControls = ()=> {
         gap={2}
         sx={{ p: 2 }}
       >
+        {selectedComparisonTab === 0 && (
+          <Box>
+            <Tooltip title="Select Metrics">
+              <IconButton onClick={handleOpenMetricsMenu}>
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
+            <Popover
+              open={isMetricsMenuOpen}
+              anchorEl={metricsAnchorEl}
+              onClose={handleCloseMetricsMenu}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{
+                sx: {
+                  width: 300,
+                  maxHeight: 250,
+                  overflow: 'hidden',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                },
+              }}
+            >
+              <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Visible Metrics" />
+              <List sx={{ maxHeight: 200, overflowY: 'auto', px: 1 }}>
+                {workflowsTable.uniqueMetrics
+                  .filter(metric => metric !== 'rating')
+                  .map((metricName) => (
+                    <ListItem key={metricName} dense disablePadding>
+                      <ListItemButton
+                        onClick={() => {
+                          const updated = comparativeVisibleMetrics.includes(metricName)
+                            ? comparativeVisibleMetrics.filter(m => m !== metricName)
+                            : [...comparativeVisibleMetrics, metricName];
+
+                          dispatch(setComparativeVisibleMetrics(updated));
+                        }}
+                      >
+                        <ListItemIcon>
+                          {comparativeVisibleMetrics.includes(metricName) ? (
+                            <CheckBoxIcon color="primary" fontSize="small" />
+                          ) : (
+                            <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText primary={metricName} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+              </List>
+            </Popover>
+          </Box>
+        )}
         {selectedComparisonTab === 1 ? (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {options1.map(option => (

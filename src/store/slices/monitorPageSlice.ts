@@ -123,6 +123,7 @@ interface IMonitoringPageSlice {
         loading: boolean
         error: string | null
       }
+      comparativeVisibleMetrics: string[]
       comparativeModelConfusionMatrix: {
         [workflowId: string]: {
           data: ConfusionMatrixResult | null
@@ -239,6 +240,7 @@ const initialState: IMonitoringPageSlice = {
     loading: false,
     error: null
   },
+  comparativeVisibleMetrics: [],
   comparativeModelConfusionMatrix: {},
   comparativeModelRocCurve: {},
   comparativeModelInstance: {},
@@ -473,6 +475,9 @@ export const monitoringPageSlice = createSlice({
       } else {
         state.comparativeDataExploration.dataAssetsControlPanel[assetName].selectedColumns = selectedColumns;
       }
+    },
+    setComparativeVisibleMetrics: (state, action) => {
+      state.comparativeVisibleMetrics = action.payload;
     }
   },
   extraReducers: builder => {
@@ -850,5 +855,5 @@ export const fetchComparisonData = createAsyncThunk(
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel,
-  setExpandedGroup, setSelectedDataset, setDataComparisonSelectedColumns
+  setExpandedGroup, setSelectedDataset, setDataComparisonSelectedColumns, setComparativeVisibleMetrics
 } = monitoringPageSlice.actions;

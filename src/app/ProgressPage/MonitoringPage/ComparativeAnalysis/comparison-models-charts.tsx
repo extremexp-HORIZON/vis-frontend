@@ -1,11 +1,11 @@
 import type React from 'react';
-import type { RootState } from '../../../store/store';
-import { useAppSelector } from '../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
 import {
   Grid,
   Container,
 } from '@mui/material';
-import InfoMessage from '../../../shared/components/InfoMessage';
+import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ComparisonModelConfusion from './ModelComparison/comparison-model-confusion';
 import ComparisonModelInstance from './ModelComparison/comparison-model-instance';

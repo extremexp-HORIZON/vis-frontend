@@ -11,15 +11,15 @@ import {
   Tooltip,
   Divider,
 } from '@mui/material';
-import GlovesScatter from '../../Tasks/ModelAnalysisTask/plots/gloves-scatter';
+import GlovesScatter from '../../../Tasks/ModelAnalysisTask/plots/gloves-scatter';
 import GlovesMetricSummary from './gloves-metric-summary';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { fetchAffected } from '../../../store/slices/modelAnalysisSlice';
-import { fetchModelAnalysisExplainabilityPlot, setActionChoiceStrategy, setCfMethod, setGcfSize } from '../../../store/slices/explainabilitySlice';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { fetchAffected } from '../../../../store/slices/modelAnalysisSlice';
+import { fetchModelAnalysisExplainabilityPlot, setActionChoiceStrategy, setCfMethod, setGcfSize } from '../../../../store/slices/explainabilitySlice';
 import { useParams } from 'react-router-dom';
-import Loader from '../../../shared/components/loader';
-import InfoMessage from '../../../shared/components/InfoMessage';
-import { logger } from '../../../shared/utils/logger';
+import Loader from '../../../../shared/components/loader';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import { logger } from '../../../../shared/utils/logger';
 
 const CGlanceExecution = () => {
   const { experimentId } = useParams();
@@ -66,18 +66,19 @@ const CGlanceExecution = () => {
 
   const counterfactualsContent = () => {
     if(isLoading) return <Loader />;
-    if(!globalCounterfactualsData?.data)
+    if (globalCounterfactualsData?.error)
       return (
         <InfoMessage
-          message="Please select a configuration."
+          message="Error loading global counterfactuals."
           type="info"
           fullHeight
         />
       );
-    if (globalCounterfactualsData.error)
+
+    if(!globalCounterfactualsData?.data)
       return (
         <InfoMessage
-          message="Error loading global counterfactuals."
+          message="Please select a configuration."
           type="info"
           fullHeight
         />

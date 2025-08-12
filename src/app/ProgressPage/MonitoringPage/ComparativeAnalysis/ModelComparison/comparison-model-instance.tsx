@@ -1,15 +1,15 @@
 import {  Box, Grid } from '@mui/material';
-import type { RootState } from '../../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import Loader from '../../../../shared/components/loader';
-import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
-import InfoMessage from '../../../../shared/components/InfoMessage';
-import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import type { RootState } from '../../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../../store/store';
+import Loader from '../../../../../shared/components/loader';
+import ResponsiveCardTable from '../../../../../shared/components/responsive-card-table';
+import InfoMessage from '../../../../../shared/components/InfoMessage';
+import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useEffect } from 'react';
-import { fetchComparativeModelInstances, setComparativeModelInstanceControlPanel } from '../../../../store/slices/monitorPageSlice';
-import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
-import { getClassColorMap } from '../../../../shared/utils/colorUtils';
+import { fetchComparativeModelInstances, setComparativeModelInstanceControlPanel } from '../../../../../store/slices/monitorPageSlice';
+import type { TestInstance } from '../../../../../shared/models/tasks/model-analysis.model';
+import { getClassColorMap } from '../../../../../shared/utils/colorUtils';
 
 const ComparisonModelInstance = ({
   isMosaic,

@@ -12,7 +12,7 @@ import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
 import { getCache } from '../../../shared/utils/localStorageCache';
 import { useLocation } from 'react-router-dom';
-import ComparativeAnalysis from './comparative-analysis';
+import ComparativeAnalysis from './ComparativeAnalysis/comparative-analysis';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
@@ -136,7 +136,7 @@ const MonitoringPage = () => {
                 bottomLeft: false,
                 topLeft: false,
               }}
-              maxWidth="80%"
+              maxWidth="50%"
               maxHeight="100%"
               style={{ height: '100%', position: 'relative' }}
               handleStyles={{

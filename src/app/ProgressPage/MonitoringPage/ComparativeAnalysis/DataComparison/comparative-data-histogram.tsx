@@ -1,15 +1,15 @@
 import { Box, Typography } from '@mui/material';
-import InfoMessage from '../../../shared/components/InfoMessage';
+import InfoMessage from '../../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useEffect } from 'react';
-import type { RootState } from '../../../store/store';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import type { IAggregation } from '../../../shared/models/dataexploration.model';
-import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
-import { fetchComparisonData } from '../../../store/slices/monitorPageSlice';
+import type { RootState } from '../../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../../store/store';
+import type { IAggregation } from '../../../../../shared/models/dataexploration.model';
+import type { IDataAsset } from '../../../../../shared/models/experiment/data-asset.model';
+import { fetchComparisonData } from '../../../../../store/slices/monitorPageSlice';
 import type { VisualizationSpec } from 'react-vega';
 import { VegaLite } from 'react-vega';
-import Loader from '../../../shared/components/loader';
+import Loader from '../../../../../shared/components/loader';
 
 export interface IHistogramProps {
     columnName: string
@@ -126,10 +126,16 @@ const Histogram = ({ columnName, dataset, workflowId, color }: IHistogramProps) 
       count: b.count,
     }));
   }
+  function normalizeColumnName(column: string): string {
+    if (!column) return '';
+
+    return column.replace(/-/g, '_');
+  }
 
   const rawData = histogramData?.data?.data || [];
-  const countField = `count_${columnName}`;
 
+  const normalizedColumnName = normalizeColumnName(columnName);
+  const countField = `count_${normalizedColumnName}`;
   const isNumericColumn = Array.isArray(rawData) &&
   rawData.some(d => typeof d[columnName] === 'number');
 

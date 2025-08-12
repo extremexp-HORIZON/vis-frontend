@@ -6,7 +6,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Paper } from '@mui/material';
 import { fetchWorkflowMetrics, initTab, resetWorkflowTab } from '../../../store/slices/workflowPageSlice';
 import { Resizable } from 're-resizable';
-import WorkflowTreeView from './workflow-tree-view';
+import WorkflowTreeView from './WorkflowTree/workflow-tree-view';
 import SelectedItemViewer from './SelectedItemViewer';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useTheme } from '@mui/material/styles';
@@ -14,7 +14,8 @@ import { isEqual } from 'lodash';
 import type { IRun } from '../../../shared/models/experiment/run.model';
 
 const WorkflowTab = () => {
-  const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage);
+  const { isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage);
+  const workflowMetrics = useAppSelector((state: RootState) => state.workflowPage.tab?.workflowMetrics);
   const { workflows } = useAppSelector((state: RootState) => state.progressPage);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -47,7 +48,7 @@ const WorkflowTab = () => {
   }, [workflows.data]);
 
   useEffect(() => {
-    const metricNames = tab?.workflowMetrics.data?.map((m) => m.name);
+    const metricNames = workflowMetrics?.data?.map((m) => m.name);
 
     if (experimentId && workflowId && metricNames && isTabInitialized) {
       dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));

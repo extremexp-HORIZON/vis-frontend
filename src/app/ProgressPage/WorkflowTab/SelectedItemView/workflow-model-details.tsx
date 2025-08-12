@@ -6,16 +6,16 @@ import {
 import {
   DetailsCard,
   DetailsCardItem,
-} from '../../../shared/components/details-card';
-import ConfusionMatrixPlot from '../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot';
-import RocCurvePlot from '../../Tasks/ModelAnalysisTask/plots/roc-curve-plot';
-import ClassificationReportTable from '../../Tasks/ModelAnalysisTask/tables/classification-report-table';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
+} from '../../../../shared/components/details-card';
+import ConfusionMatrixPlot from '../../../Tasks/ModelAnalysisTask/plots/confusion-matrix-plot';
+import RocCurvePlot from '../../../Tasks/ModelAnalysisTask/plots/roc-curve-plot';
+import ClassificationReportTable from '../../../Tasks/ModelAnalysisTask/tables/classification-report-table';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect } from 'react';
-import { fetchModelSummary } from '../../../store/slices/modelAnalysisSlice';
+import { fetchModelSummary } from '../../../../store/slices/modelAnalysisSlice';
 import { useParams } from 'react-router-dom';
 import { InfoOutlined } from '@mui/icons-material';
-import Loader from '../../../shared/components/loader';
+import Loader from '../../../../shared/components/loader';
 
 const LoadingOrEmpty = ({ loading, condition, message }: { loading: boolean; condition: boolean; message: string }) => {
   if (loading) {
