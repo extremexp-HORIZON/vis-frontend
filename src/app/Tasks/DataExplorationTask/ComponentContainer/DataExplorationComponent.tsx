@@ -39,7 +39,7 @@ const DataExplorationComponent = () => {
 
   useEffect(() => {
     if (!selectedDataset || !workflowId) return;
-    if (isImage) return; 
+    if (isImage) return;
     if (selectedDataset && workflowId) {
       dispatch(setControls({ ...dataExplorationDefault.controlPanel }));
       dispatch(
