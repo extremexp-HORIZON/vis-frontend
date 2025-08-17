@@ -38,6 +38,8 @@ const DataExplorationComponent = () => {
   const isImage = selectedDataset?.match(/\.(jpe?g|png|gif|webp|bmp|tiff?|svg)$/i);
 
   useEffect(() => {
+    if (!selectedDataset || !workflowId) return;
+    if (isImage) return; 
     if (selectedDataset && workflowId) {
       dispatch(setControls({ ...dataExplorationDefault.controlPanel }));
       dispatch(
