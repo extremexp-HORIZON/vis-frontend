@@ -119,7 +119,7 @@ const Contourplot = (props: IContourplot) => {
             [xName]: xVals[xIdx],
             [yName]: yVals[yIdx],
             [zName]: zMatrix[yIdx][xIdx],
-          }) 
+          });
       }
     }
 
