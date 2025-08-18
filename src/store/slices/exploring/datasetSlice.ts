@@ -90,8 +90,8 @@ export const postFileMeta = createAsyncThunk<
     const response = await api.post<IDataset>('/data/meta', body);
     const dataset = response.data;
 
-    dispatch(setGroupByCols([dataset.dimensions?.[0] ?? 'defaultDimension']));
-    dispatch(setMeasureCol(dataset.measure0 ?? 'defaultMeasure0'));
+    dispatch(setGroupByCols(dataset.dimensions?.length ? [dataset.dimensions[0]] : []));
+    dispatch(setMeasureCol(dataset.measure0 ?? ''));
     dispatch(
       setViewRect({
         lat: [dataset.queryYMin ?? 0, dataset.queryYMax ?? 0],
