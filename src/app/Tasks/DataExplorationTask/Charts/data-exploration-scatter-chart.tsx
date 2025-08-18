@@ -314,10 +314,10 @@ const ScatterChart = () => {
           />
         ) : (
           <Grid container spacing={2}>
-            
+
             {yAxis?.map(y => (
               <Grid item xs={12} key={y.name}>
-                
+
                 <ResponsiveCardVegaLite
                   spec={getSingleScatterSpec({
                     data: Array.isArray(chartData) ? chartData : [],
@@ -333,9 +333,9 @@ const ScatterChart = () => {
                   tab?.workflowTasks.dataExploration?.metaData?.loading
                   }
                   isStatic={false}
-                />        
+                />
               </Grid>
-            ))} 
+            ))}
           </Grid>
         )}
     </Box>
