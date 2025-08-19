@@ -90,7 +90,7 @@ const VisualizePage = () => {
         sx={{ p: 1, width: 1 / 4 }}
       >
         <Chart dataset={dataset} />
-        {(drawnRect || selectedGeohash.rect) && <TimeSeriesChart dataset={dataset} />}
+        {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && <TimeSeriesChart dataset={dataset} />}
       </Box>
     </>
   );

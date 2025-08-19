@@ -25,6 +25,7 @@ export interface IDataset {
   timeMin?: number;
   timeMax?: number;
   originalColumns?: VisualColumn[];
+  timeColumn?: string[];
 }
 
 export const defaultValue: Readonly<IDataset> = {};

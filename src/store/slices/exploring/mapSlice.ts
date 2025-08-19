@@ -50,7 +50,7 @@ const initialState: MapState = {
 
 const handleRectUpdate = async (dispatch: any, state: RootState) => {
   const { zoom, viewRect, selectedGeohash, activeRect, drawnRect } = state.map;
-  const { categoricalFilters, timeRange } = state.dataset;
+  const { categoricalFilters, timeRange, dataset } = state.dataset;
   const { groupByCols, measureCol, aggType } = state.chart;
 
   let rectToUse: IRectangle | null;
@@ -86,7 +86,9 @@ const handleRectUpdate = async (dispatch: any, state: RootState) => {
           series: result.series,
         }),
       );
-      dispatch(updateTimeSeries());
+      if (dataset.timeColumn) {
+        dispatch(updateTimeSeries());
+      }
     }
   } catch (error) {
     // Handle error silently or log to a proper logging service
