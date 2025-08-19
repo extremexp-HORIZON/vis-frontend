@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import type{ SelectChangeEvent } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 
 const LineChartControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -73,7 +73,7 @@ const LineChartControlPanel = () => {
     const requiredCols = [xAxis, ...validYAxis];
 
     const missingCols = requiredCols.filter(
-      reqCol => !currentSelected.find(sel => sel.name === reqCol?.name)
+      reqCol => !currentSelected.find(sel => sel.name === reqCol?.name),
     );
 
     if (missingCols.length > 0) {
@@ -81,7 +81,9 @@ const LineChartControlPanel = () => {
         ...currentSelected,
         ...missingCols.filter(Boolean), // Avoid null/undefined
       ];
-      const cleanedSelected = updatedSelected.filter(col => col?.name && col.type);
+      const cleanedSelected = updatedSelected.filter(
+        col => col?.name && col.type,
+      );
 
       dispatch(setControls({ selectedColumns: cleanedSelected }));
     }
@@ -90,7 +92,6 @@ const LineChartControlPanel = () => {
   return (
     columns.length > 0 && (
       <Box>
-
         <Box
           sx={{
             display: 'flex',
@@ -103,7 +104,7 @@ const LineChartControlPanel = () => {
             <InputLabel id="x-axis-select-label">
               <Box display="flex" alignItems="center" gap={1}>
                 <ShowChartIcon fontSize="small" />
-        X-Axis
+                X-Axis
               </Box>
             </InputLabel>
             <Select
@@ -128,7 +129,7 @@ const LineChartControlPanel = () => {
             <InputLabel id="y-axis-multi-select-label">
               <Box display="flex" alignItems="center" gap={1}>
                 <ShowChartIcon fontSize="small" />
-            Y-Axis
+                Y-Axis
               </Box>
             </InputLabel>
             <Select
@@ -142,17 +143,24 @@ const LineChartControlPanel = () => {
                 PaperProps: { style: { maxHeight: 224, width: 250 } },
               }}
             >
-              {columns.filter(col => col.type === 'BIGINT' || col.type === 'DOUBLE' || col.type === 'FLOAT' || col.type === 'INTEGER').map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  <Checkbox
-                    checked={yAxis.some(yCol => yCol.name === col.name)}
-                  />
-                  {col.name}
-                </MenuItem>
-              ))}
+              {columns
+                .filter(
+                  col =>
+                    col.type === 'BIGINT' ||
+                    col.type === 'DOUBLE' ||
+                    col.type === 'FLOAT' ||
+                    col.type === 'INTEGER',
+                )
+                .map(col => (
+                  <MenuItem key={col.name} value={col.name}>
+                    <Checkbox
+                      checked={yAxis.some(yCol => yCol.name === col.name)}
+                    />
+                    {col.name}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
-
         </Box>
         <Box
           sx={{
@@ -160,10 +168,9 @@ const LineChartControlPanel = () => {
             display: 'flex',
             gap: '1rem',
             flexDirection: 'row',
-            width: '100%'
+            width: '100%',
           }}
         >
-
           <ButtonGroup
             variant="contained"
             aria-label="view mode"
@@ -174,19 +181,18 @@ const LineChartControlPanel = () => {
               color={viewMode === 'overlay' ? 'primary' : 'inherit'}
               onClick={() => dispatch(setControls({ viewMode: 'overlay' }))}
             >
-             Overlay
+              Overlay
             </Button>
             <Button
               color={viewMode === 'stacked' ? 'primary' : 'inherit'}
               onClick={() => dispatch(setControls({ viewMode: 'stacked' }))}
-            //  disabled={yAxis.length < 2}
+              //  disabled={yAxis.length < 2}
             >
-             Stacked
+              Stacked
             </Button>
           </ButtonGroup>
         </Box>
       </Box>
-
     )
   );
 };

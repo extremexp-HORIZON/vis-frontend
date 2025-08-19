@@ -8,6 +8,8 @@ import { logger } from '../../../../shared/utils/logger';
 import Loader from '../../../../shared/components/loader';
 
 const ImageCard = () => {
+  const baseApi = 'http://localhost:8080/api/data/file?path=';
+
   const imageRef = useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -18,7 +20,7 @@ const ImageCard = () => {
   );
 
   const handleDownload = async () => {
-    if(!selectedImage?.source) return;
+    if (!selectedImage?.source) return;
     try {
       const response = await fetch(selectedImage?.source, { mode: 'cors' });
       const blob = await response.blob();
@@ -44,7 +46,9 @@ const ImageCard = () => {
       <InfoMessage
         message="Failed to load image. Please check the source or format."
         type="error"
-        icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+        icon={
+          <ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />
+        }
         fullHeight
       />
     );
@@ -85,11 +89,13 @@ const ImageCard = () => {
             }}
             ref={imageRef}
           >
-            {!loaded && (
-              <Loader/>
-            )}
+            {!loaded && <Loader />}
             <img
-              src={selectedImage.source}
+              src={
+                selectedImage.source.startsWith('/')
+                  ? `${baseApi}${encodeURIComponent(selectedImage.source)}`
+                  : selectedImage.source
+              }
               alt="Preview"
               onLoad={() => setLoaded(true)}
               onError={() => setHasError(true)}

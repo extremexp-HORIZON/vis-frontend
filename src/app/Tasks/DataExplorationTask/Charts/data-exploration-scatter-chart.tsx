@@ -10,7 +10,7 @@ import Uchart from './data-exploration-u-chart';
 import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
 
-type ScatterChartDataRow = Record<string, number | string | Date | null>;
+type ScatterChartDataRow = Record<string, number | string | Date | null>
 
 const getColumnType = (columnType: string, fieldName?: string) => {
   if (fieldName?.toLowerCase() === 'timestamp') return 'temporal';
@@ -23,13 +23,16 @@ const getColumnType = (columnType: string, fieldName?: string) => {
       return 'temporal';
     case 'STRING':
     default:
-      return 'ordinal';
+      return 'nominal'; // Changed from 'ordinal' to 'nominal' as it's often a better default for strings.
   }
 };
 
 const MAX_UNIQUE_VALUES = 50;
 
-const getUniqueValueCount = (data: ScatterChartDataRow[], field: string): number => {
+const getUniqueValueCount = (
+  data: ScatterChartDataRow[],
+  field: string,
+): number => {
   const values = new Set();
 
   data.forEach(row => values.add(row[field]));
@@ -37,8 +40,12 @@ const getUniqueValueCount = (data: ScatterChartDataRow[], field: string): number
   return values.size;
 };
 
-const isTooManyUniqueValues = (field: VisualColumn | undefined, data: ScatterChartDataRow[]) =>
-  field?.type === 'STRING' && getUniqueValueCount(data, field.name) > MAX_UNIQUE_VALUES;
+const isTooManyUniqueValues = (
+  field: VisualColumn | undefined,
+  data: ScatterChartDataRow[],
+) =>
+  field?.type === 'STRING' &&
+  getUniqueValueCount(data, field.name) > MAX_UNIQUE_VALUES;
 
 const getScatterChartOverlaySpec = ({
   data,
@@ -52,7 +59,9 @@ const getScatterChartOverlaySpec = ({
   colorBy?: VisualColumn
 }) => {
   const colorField = colorBy?.name;
-  const colorType = colorBy ? getColumnType(colorBy.type, colorBy.name) : undefined;
+  const colorType = colorBy
+    ? getColumnType(colorBy.type, colorBy.name)
+    : undefined;
 
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -63,35 +72,40 @@ const getScatterChartOverlaySpec = ({
     layer: yAxis.map(y => ({
       mark: 'point',
       encoding: {
-
         x: {
           field: xAxis.name,
           type: getColumnType(xAxis.type, xAxis.name),
           axis: {
             title: xAxis.name,
             labelLimit: 30,
-            labelOverlap: true
-          }
-
+            labelOverlap: 'auto',
+          },
         },
         y: {
           field: y.name,
           type: getColumnType(y.type, y.name),
-          // axis: { title: y.name },
-          title: 'Value'
+          axis: {
+            title: y.name,
+            labelOverlap: 'auto',
+          },
         },
-        ...(colorField && !isTooManyUniqueValues(colorBy, data) && {
+        ...(colorField &&
+          !isTooManyUniqueValues(colorBy, data) && {
           color: {
             field: colorField,
             type: colorType,
             legend: {
               title: colorField,
               labelLimit: 20,
-              symbolLimit: 50
-            },            scale: {
-              range: ['#d9f0a3', '#74c476', '#238b8d', '#084081']
-
-            }
+              symbolLimit: 50,
+              format: colorType === 'temporal' ? '%Y-%m-%d' : undefined, // Optional: Add date formatting
+            },
+            scale:
+                colorType === 'quantitative'
+                  ? {
+                    range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'],
+                  }
+                  : undefined, // Use default scale for non-quantitative fields
           },
         }),
         tooltip: [
@@ -116,7 +130,9 @@ const getSingleScatterSpec = ({
   colorBy?: VisualColumn
 }) => {
   const colorField = colorBy?.name;
-  const colorType = colorBy ? getColumnType(colorBy.type, colorBy.name) : undefined;
+  const colorType = colorBy
+    ? getColumnType(colorBy.type, colorBy.name)
+    : undefined;
 
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -126,22 +142,33 @@ const getSingleScatterSpec = ({
       x: {
         field: xAxis.name,
         type: getColumnType(xAxis.type, xAxis.name),
-        axis: { title: xAxis.name },
+        axis: {
+          title: xAxis.name,
+          labelOverlap: 'auto',
+        },
       },
       y: {
         field: y.name,
         type: getColumnType(y.type, y.name),
-        axis: { title: y.name },
-        // title:"Value"
+        axis: {
+          title: y.name,
+          labelOverlap: 'auto',
+        },
       },
       ...(colorField && {
         color: {
           field: colorField,
           type: colorType,
-          legend: { title: colorField },
-          scale: {
-            range: ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8']
-          }
+          legend: {
+            title: colorField,
+            format: colorType === 'temporal' ? '%Y-%m-%d' : undefined,
+          },
+          scale:
+            colorType === 'quantitative'
+              ? {
+                range: ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8'],
+              }
+              : undefined,
         },
       }),
       tooltip: [
@@ -159,16 +186,20 @@ const ScatterChart = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
 
-  const chartData = (tab?.workflowTasks.dataExploration?.scatterChart?.data?.data as ScatterChartDataRow[]) ?? [];
+  const chartData =
+    (tab?.workflowTasks.dataExploration?.scatterChart?.data
+      ?.data as ScatterChartDataRow[]) ?? [];
   const xAxis = tab?.workflowTasks.dataExploration?.controlPanel.xAxis;
   const yAxis = tab?.workflowTasks.dataExploration?.controlPanel.yAxis;
   const colorBy = tab?.workflowTasks?.dataExploration?.controlPanel?.colorBy;
-  const displayMode = tab?.workflowTasks.dataExploration?.controlPanel?.viewMode || 'overlay';
+  const displayMode =
+    tab?.workflowTasks.dataExploration?.controlPanel?.viewMode || 'overlay';
   const umap = tab?.workflowTasks.dataExploration?.controlPanel.umap;
 
   useEffect(() => {
     const filters = tab?.workflowTasks.dataExploration?.controlPanel.filters;
-    const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
+    const datasetId =
+      tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
     const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
     const cols = Array.from(
@@ -176,9 +207,12 @@ const ScatterChart = () => {
         [
           colorBy?.name,
           xAxis?.name,
-          ...(yAxis?.map((axis: VisualColumn) => axis.name) || [])
-        ].filter((name): name is string => typeof name === 'string' && name.trim() !== '')
-      )
+          ...(yAxis?.map((axis: VisualColumn) => axis.name) || []),
+        ].filter(
+          (name): name is string =>
+            typeof name === 'string' && name.trim() !== '',
+        ),
+      ),
     );
 
     if (!datasetId || !xAxis || !yAxis?.length) return;
@@ -190,7 +224,7 @@ const ScatterChart = () => {
             source: datasetId,
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
-            fileName: dataset?.name || ''
+            fileName: dataset?.name || '',
           },
           columns: cols,
           filters,
@@ -199,7 +233,7 @@ const ScatterChart = () => {
           workflowId: tab?.workflowId || '',
           queryCase: 'scatterChart',
         },
-      })
+      }),
     );
   }, [
     tab?.workflowTasks.dataExploration?.controlPanel.xAxis,
@@ -218,7 +252,8 @@ const ScatterChart = () => {
   let infoMessageText = '';
 
   if (!hasValidXAxis || !hasValidYAxis || !hasValidColorBy) {
-    infoMessageText = 'Please select x-Axis, y-Axis and color fields to display the chart.';
+    infoMessageText =
+      'Please select x-Axis, y-Axis and color fields to display the chart.';
   } else if (!hasData) {
     infoMessageText = 'No data available for the selected configuration.';
   }
@@ -232,15 +267,19 @@ const ScatterChart = () => {
     />
   );
 
-  const shouldShowInfoMessage = !hasValidXAxis || !hasValidYAxis || !hasValidColorBy || !hasData;
+  const shouldShowInfoMessage =
+    !hasValidXAxis || !hasValidYAxis || !hasValidColorBy || !hasData;
 
   return (
     <Box sx={{ height: '99%' }}>
+      {' '}
       {umap ? (
         <Uchart />
       ) : shouldShowInfoMessage &&
-      !(tab?.workflowTasks.dataExploration?.scatterChart?.loading
-        || tab?.workflowTasks.dataExploration?.metaData?.loading) ? (
+        !(
+          tab?.workflowTasks.dataExploration?.scatterChart?.loading ||
+          tab?.workflowTasks.dataExploration?.metaData?.loading
+        ) ? (
           <ResponsiveCardVegaLite
             spec={{}}
             title="Scatter Chart"
@@ -267,13 +306,18 @@ const ScatterChart = () => {
             showInfoMessage={false}
             maxHeight={500}
             aspectRatio={isSmallScreen ? 2.8 : 1.8}
-            loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
+            loading={
+              tab?.workflowTasks.dataExploration?.scatterChart?.loading ||
+            tab?.workflowTasks.dataExploration?.metaData?.loading
+            }
             minHeight={300}
           />
         ) : (
           <Grid container spacing={2}>
+
             {yAxis?.map(y => (
               <Grid item xs={12} key={y.name}>
+
                 <ResponsiveCardVegaLite
                   spec={getSingleScatterSpec({
                     data: Array.isArray(chartData) ? chartData : [],
@@ -284,7 +328,10 @@ const ScatterChart = () => {
                   title={y.name}
                   actions={false}
                   controlPanel={<ScatterChartControlPanel />}
-                  loading={tab?.workflowTasks.dataExploration?.scatterChart?.loading || tab?.workflowTasks.dataExploration?.metaData?.loading}
+                  loading={
+                    tab?.workflowTasks.dataExploration?.scatterChart?.loading ||
+                  tab?.workflowTasks.dataExploration?.metaData?.loading
+                  }
                   isStatic={false}
                 />
               </Grid>

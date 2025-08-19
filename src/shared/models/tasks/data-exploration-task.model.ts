@@ -58,6 +58,7 @@ export interface IDataExploration {
     queryItems: number
     totalPages: number
     timestampField: string[] | null
+    secondaryChartType: string
 
     // Line
     xAxis: VisualColumn
@@ -180,6 +181,7 @@ export const dataExplorationDefault: IDataExploration = {
     weightBy: 'None',
     radius: 25,
     orderBy: null,
+    secondaryChartType: '',
   },
 
   chart: {

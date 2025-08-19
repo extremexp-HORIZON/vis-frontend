@@ -16,9 +16,13 @@ import {
 } from '@mui/material';
 import { setControls } from '../../../../store/slices/workflowPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import type{ SelectChangeEvent } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import { ThemeProvider } from '@emotion/react';
+import PaletteIcon from '@mui/icons-material/Palette';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+
 const MapControls = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
@@ -29,8 +33,8 @@ const MapControls = () => {
   const stringColumns = selectedColumns.filter(col => col.type === 'STRING');
   const doubleColumns = selectedColumns.filter(col => col.type === 'DOUBLE');
 
-  const lat = tab?.workflowTasks?.dataExploration?.controlPanel.lat ;
-  const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon ;
+  const lat = tab?.workflowTasks?.dataExploration?.controlPanel.lat;
+  const lon = tab?.workflowTasks?.dataExploration?.controlPanel.lon;
   const colorByMap =
     tab?.workflowTasks?.dataExploration?.controlPanel.colorByMap || 'None';
   const segmentBy =
@@ -39,7 +43,10 @@ const MapControls = () => {
   //   tab?.workflowTasks?.dataExploration?.controlPanel.timestampField || '';
   // const useHeatmap =
   //   tab?.workflowTasks?.dataExploration?.controlPanel.heatmap || false;
-  const handleChange = (key: string, value: string | string[] | boolean | number) => {
+  const handleChange = (
+    key: string,
+    value: string | string[] | boolean | number,
+  ) => {
     dispatch(setControls({ [key]: value }));
   };
   const timestampField =
@@ -74,10 +81,17 @@ const MapControls = () => {
     <Box display="flex" flexDirection="column" gap={2}>
       <FormControl size="small">
         <Box display="flex" alignItems="center" gap={0.5}>
-          <TravelExploreIcon fontSize="small" /> {/* Replace or conditionally render icons if needed */}
+          <TravelExploreIcon fontSize="small" />{' '}
+          {/* Replace or conditionally render icons if needed */}
           <span style={{ fontSize: 14, fontWeight: 600 }}>{'Map Type'}</span>
         </Box>
-        <RadioGroup row aria-labelledby="type-label" name="maptpe" value={mapType} onChange={e => handleChange('mapType', e.target.value)}>
+        <RadioGroup
+          row
+          aria-labelledby="type-label"
+          name="maptpe"
+          value={mapType}
+          onChange={e => handleChange('mapType', e.target.value)}
+        >
           {options.map(({ value, label }) => (
             <FormControlLabel
               key={value}
@@ -139,17 +153,21 @@ const MapControls = () => {
       <Box display="flex" gap={2}>
         {/* Color By Selector */}
         {mapType === 'point' && (
-          <FormControl  fullWidth>
-            <InputLabel>Color By</InputLabel>
+          <FormControl fullWidth>
+            <InputLabel id="color by ">
+              <Box display="flex" alignItems="center" gap={1}>
+                <PaletteIcon fontSize="small" />
+                Color
+              </Box>
+            </InputLabel>
             <Select
               value={colorByMap}
               onChange={e => {
                 const value = e.target.value;
 
                 handleChange('colorByMap', value);
-
               }}
-              input={<OutlinedInput label="Color By" />}
+              input={<OutlinedInput label="Color-----" />}
               MenuProps={{
                 PaperProps: {
                   style: {
@@ -164,8 +182,8 @@ const MapControls = () => {
                 .filter(
                   col =>
                     col.name !== lat &&
-            col.name !== lon &&
-          !timestampField?.includes(col.name)
+                    col.name !== lon &&
+                    !timestampField?.includes(col.name),
                 )
                 .map(col => (
                   <MenuItem key={col.name} value={col.name}>
@@ -173,24 +191,24 @@ const MapControls = () => {
                   </MenuItem>
                 ))}
             </Select>
-
           </FormControl>
-
         )}
 
         {mapType === 'heatmap' && (
           <>
-            <FormControl  fullWidth>
+            <FormControl fullWidth>
               <InputLabel>Weight By</InputLabel>
               <Select
-                value={tab?.workflowTasks?.dataExploration?.controlPanel.weightBy || ''}
+                value={
+                  tab?.workflowTasks?.dataExploration?.controlPanel.weightBy ||
+                  ''
+                }
                 onChange={e => {
                   const value = e.target.value;
 
                   handleChange('weightBy', value);
 
                   // If colorByMap is set to something other than 'None', reset segmentBy
-
                 }}
                 input={<OutlinedInput label="Weight By" />}
                 MenuProps={{
@@ -203,27 +221,29 @@ const MapControls = () => {
                 }}
               >
                 <MenuItem value="None">None</MenuItem>
-                {doubleColumns.filter(
-                  col =>
-                    col.name !== lat &&
-            col.name !== lon).map(col => (
-                  <MenuItem key={col.name} value={col.name}>
-                    {col.name}
-                  </MenuItem>
-                ))}
+                {doubleColumns
+                  .filter(col => col.name !== lat && col.name !== lon)
+                  .map(col => (
+                    <MenuItem key={col.name} value={col.name}>
+                      {col.name}
+                    </MenuItem>
+                  ))}
               </Select>
-
             </FormControl>
             <FormControl fullWidth>
-
               <ThemeProvider theme={theme}>
-
-                <Typography gutterBottom>Radius</Typography>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <TrackChangesIcon fontSize="small" />
+                  <Typography gutterBottom>Radius</Typography>
+                </Box>
                 <Slider
-                  value={tab?.workflowTasks?.dataExploration?.controlPanel.radius }
-                  onChange={(e, newValue) => handleChange('radius', newValue as number)}
+                  value={
+                    tab?.workflowTasks?.dataExploration?.controlPanel.radius
+                  }
+                  onChange={(e, newValue) =>
+                    handleChange('radius', newValue as number)
+                  }
                   valueLabelDisplay="auto"
-
                   min={10}
                   step={1}
                   max={50}
@@ -231,7 +251,6 @@ const MapControls = () => {
               </ThemeProvider>
             </FormControl>
           </>
-
         )}
 
         {/* Segment By Selector */}
@@ -241,7 +260,12 @@ const MapControls = () => {
               fullWidth
               // disabled={timestampField === null || timestampField === ''}
             >
-              <InputLabel>Segment By</InputLabel>
+              <InputLabel id="color by ">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <PaletteIcon fontSize="small" />
+                  Segment
+                </Box>
+              </InputLabel>
               <Select
                 // disabled={true}
                 multiple
@@ -258,13 +282,19 @@ const MapControls = () => {
                   },
                 }}
               >
-                {stringColumns.filter(col => col.name !== lat && col.name !== lon &&
-          !timestampField?.includes(col.name)).map(col => (
-                  <MenuItem key={col.name} value={col.name}>
-                    <Checkbox checked={segmentBy.includes(col.name)} />
-                    <ListItemText primary={col.name} />
-                  </MenuItem>
-                ))}
+                {stringColumns
+                  .filter(
+                    col =>
+                      col.name !== lat &&
+                      col.name !== lon &&
+                      !timestampField?.includes(col.name),
+                  )
+                  .map(col => (
+                    <MenuItem key={col.name} value={col.name}>
+                      <Checkbox checked={segmentBy.includes(col.name)} />
+                      <ListItemText primary={col.name} />
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
             <FormControl
@@ -274,11 +304,21 @@ const MapControls = () => {
 
               // disabled={timestampField === null || timestampField === ''}
             >
-              <InputLabel>Order By</InputLabel>
+              <InputLabel
+                id="order-by"
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+              >
+                <AccessTimeIcon fontSize="small" />
+                <span>Order</span>
+              </InputLabel>
               <Select
-                value={tab?.workflowTasks.dataExploration?.controlPanel.orderBy || ''}
-                onChange={e => handleChange('orderBy', e.target.value as string)}
-                input={<OutlinedInput label="Order By" />}
+                value={
+                  tab?.workflowTasks.dataExploration?.controlPanel.orderBy || ''
+                }
+                onChange={e =>
+                  handleChange('orderBy', e.target.value as string)
+                }
+                input={<OutlinedInput label="Order-----" />}
                 MenuProps={{
                   PaperProps: {
                     style: {
@@ -295,10 +335,9 @@ const MapControls = () => {
                 ))}
               </Select>
             </FormControl>
-          </>) }
-
+          </>
+        )}
       </Box>
-
     </Box>
   );
 };
