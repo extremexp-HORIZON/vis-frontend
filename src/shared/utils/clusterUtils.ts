@@ -17,8 +17,8 @@ export type IPointType = [
 
 export const rsrpIntensityExtractor = (dataset: IDataset, rsrp_rscp_rssi: number) => {
   if (
-    (dataset.measure0 === 'rsrp_rscp_rssi' ||
-      dataset.measure1 === 'rsrp_rscp_rssi') &&
+    (dataset.measure0?.includes('rsrp') ||
+      dataset.measure1?.includes('rsrp')) &&
     rsrp_rscp_rssi != null
   ) {
     if (rsrp_rscp_rssi < 0) rsrp_rscp_rssi = -rsrp_rscp_rssi;
@@ -40,8 +40,8 @@ export const rsrpIntensityExtractor = (dataset: IDataset, rsrp_rscp_rssi: number
 
 export const generateRsrpColor = (dataset: IDataset, rsrp_rscp_rssi: number) => {
   if (
-    (dataset.measure0 === 'rsrp_rscp_rssi' ||
-      dataset.measure1 === 'rsrp_rscp_rssi') &&
+    (dataset.measure0?.includes('rsrp') ||
+      dataset.measure1?.includes('rsrp')) &&
     rsrp_rscp_rssi != null
   ) {
     const percentage = rsrpIntensityExtractor(dataset, rsrp_rscp_rssi);
