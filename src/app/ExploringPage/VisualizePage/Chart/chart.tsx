@@ -29,6 +29,7 @@ import {
   triggerChartUpdate,
 } from '../../../../store/slices/exploring/chartSlice';
 import Loader from '../../../../shared/components/loader';
+import { Zones } from '../Zones/zones';
 
 export interface IChartProps {
   dataset: IDataset;
@@ -182,59 +183,62 @@ export const Chart = (props: IChartProps) => {
         <Loader />
       ) : (
         <>
-          <Stack direction="row" justifyContent="flex-end" spacing={1} mb={2}>
-            <IconButton
-              color={chartType === 'column' ? 'primary' : 'default'}
-              onClick={e => {
-                handleChartTypeChange('column');
-                handlePopoverOpen(e, 'Bar Chart');
-              }}
-              onMouseLeave={handlePopoverClose}
-            >
-              <BarChartIcon />
-            </IconButton>
-            <IconButton
-              color={chartType === 'line' ? 'primary' : 'default'}
-              onClick={e => {
-                handleChartTypeChange('line');
-                handlePopoverOpen(e, 'Line Chart');
-              }}
-              onMouseLeave={handlePopoverClose}
-            >
-              <ShowChartIcon />
-            </IconButton>
-            <IconButton
-              color={chartType === 'area' ? 'primary' : 'default'}
-              onClick={e => {
-                handleChartTypeChange('area');
-                handlePopoverOpen(e, 'Area Chart');
-              }}
-              onMouseLeave={handlePopoverClose}
-            >
-              <BubbleChartIcon />
-            </IconButton>
-            <IconButton
-              color={chartType === 'heatmap' ? 'primary' : 'default'}
-              onClick={e => {
-                handleChartTypeChange('heatmap');
-                handlePopoverOpen(e, 'Heatmap');
-              }}
-              onMouseLeave={handlePopoverClose}
-            >
-              <GridOnIcon />
-            </IconButton>
-            <Popover
-              open={Boolean(popoverAnchor)}
-              anchorEl={popoverAnchor}
-              onClose={handlePopoverClose}
-              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-              transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-              disableRestoreFocus
-            >
-              <Box sx={{ p: 1 }}>
-                <Typography variant="body2">{popoverText}</Typography>
-              </Box>
-            </Popover>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+            <Zones dataset={dataset} />
+            <Stack direction="row" spacing={1}>
+              <IconButton
+                color={chartType === 'column' ? 'primary' : 'default'}
+                onClick={e => {
+                  handleChartTypeChange('column');
+                  handlePopoverOpen(e, 'Bar Chart');
+                }}
+                onMouseLeave={handlePopoverClose}
+              >
+                <BarChartIcon />
+              </IconButton>
+              <IconButton
+                color={chartType === 'line' ? 'primary' : 'default'}
+                onClick={e => {
+                  handleChartTypeChange('line');
+                  handlePopoverOpen(e, 'Line Chart');
+                }}
+                onMouseLeave={handlePopoverClose}
+              >
+                <ShowChartIcon />
+              </IconButton>
+              <IconButton
+                color={chartType === 'area' ? 'primary' : 'default'}
+                onClick={e => {
+                  handleChartTypeChange('area');
+                  handlePopoverOpen(e, 'Area Chart');
+                }}
+                onMouseLeave={handlePopoverClose}
+              >
+                <BubbleChartIcon />
+              </IconButton>
+              <IconButton
+                color={chartType === 'heatmap' ? 'primary' : 'default'}
+                onClick={e => {
+                  handleChartTypeChange('heatmap');
+                  handlePopoverOpen(e, 'Heatmap');
+                }}
+                onMouseLeave={handlePopoverClose}
+              >
+                <GridOnIcon />
+              </IconButton>
+              <Popover
+                open={Boolean(popoverAnchor)}
+                anchorEl={popoverAnchor}
+                onClose={handlePopoverClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                disableRestoreFocus
+              >
+                <Box sx={{ p: 1 }}>
+                  <Typography variant="body2">{popoverText}</Typography>
+                </Box>
+              </Popover>
+            </Stack>
           </Stack>
 
           {vegaSeriesData.length > 0 && (

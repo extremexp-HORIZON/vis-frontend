@@ -13,6 +13,7 @@ import { statsSlice } from './slices/exploring/statsSlice';
 import { timeSeriesSlice } from './slices/exploring/timeSeriesSlice';
 import { forecastingSlice } from './slices/exploring/forecastingSlice';
 import { dataSourceSlice } from './slices/exploring/datasourceSlice';
+import { zoneSlice } from './slices/exploring/zoneSlice';
 import { listenerMiddleware, startAppListening } from './listenerMiddleware';
 import { mapListeners } from './slices/exploring/mapSlice';
 import { datasetUiListeners } from './slices/exploring/datasetSlice';
@@ -32,6 +33,7 @@ export const store = configureStore({
     timeSeries: timeSeriesSlice.reducer,
     forecasting: forecastingSlice.reducer,
     dataSource: dataSourceSlice.reducer,
+    zone: zoneSlice.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
