@@ -255,7 +255,7 @@ export const Map = (props: IMapProps) => {
           onChange={(_, value) => value && toggleMapLayer(value)}
           sx={{
             position: 'absolute',
-            top: 170,
+            top: drawnRect == null ? 120 : 200,
             right: 10,
             zIndex: 1000,
             backgroundColor: 'white',

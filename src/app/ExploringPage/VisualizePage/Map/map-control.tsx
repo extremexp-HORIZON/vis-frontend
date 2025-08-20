@@ -8,6 +8,7 @@ import {
   setDrawnRect,
   updateMapBounds,
 } from '../../../../store/slices/exploring/mapSlice';
+import { postZone } from '../../../../store/slices/exploring/zoneSlice';
 import { useAppDispatch } from '../../../../store/store';
 
 export const MapControl = ({ id }: { id: string }) => {
@@ -73,6 +74,7 @@ export const MapControl = ({ id }: { id: string }) => {
 
     map.addLayer(drawnItems);
 
+    // Custom drawing control with separate save/clear functionality
     const drawControl = new L.Control.Draw({
       position: 'topright',
       draw: {
@@ -86,14 +88,132 @@ export const MapControl = ({ id }: { id: string }) => {
       edit: {
         featureGroup: drawnItems,
         edit: false,
-        remove: true,
+        remove: false, // Disable default remove control
       },
     });
 
     map.addControl(drawControl);
 
-    map.on(L.Draw.Event.CREATED, onCreated);
-    map.on(L.Draw.Event.DELETED, onDeleted);
+    // Custom save/clear control
+    const saveClearControl = new L.Control({ position: 'topright' });
+
+    saveClearControl.onAdd = function () {
+      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+
+      div.style.marginTop = '10px';
+      div.style.display = 'flex';
+      div.style.flexDirection = 'column';
+      div.style.gap = '2px';
+      div.style.display = 'none'; // Initially hidden
+
+      // Save button
+      const saveButton = L.DomUtil.create('a', 'leaflet-control-zoom-in', div);
+
+      saveButton.innerHTML = '💾';
+      saveButton.title = 'Save drawn rectangle as zone';
+      saveButton.style.width = '30px';
+      saveButton.style.height = '30px';
+      saveButton.style.lineHeight = '30px';
+      saveButton.style.textAlign = 'center';
+      saveButton.style.fontSize = '16px';
+      saveButton.style.cursor = 'pointer';
+      // saveButton.style.backgroundColor = '#4CAF50';
+      saveButton.style.color = 'white';
+      saveButton.style.border = 'none';
+      saveButton.style.borderRadius = '4px';
+
+      // Clear button
+      const clearButton = L.DomUtil.create('a', 'leaflet-control-zoom-out', div);
+
+      clearButton.innerHTML = '🗑️';
+      clearButton.title = 'Clear drawn rectangle';
+      clearButton.style.width = '30px';
+      clearButton.style.height = '30px';
+      clearButton.style.lineHeight = '30px';
+      clearButton.style.textAlign = 'center';
+      clearButton.style.fontSize = '16px';
+      clearButton.style.cursor = 'pointer';
+      // clearButton.style.backgroundColor = '#f44336';
+      clearButton.style.color = 'white';
+      clearButton.style.border = 'none';
+      clearButton.style.borderRadius = '4px';
+
+      // Function to show/hide the control based on drawn layers
+      const updateControlVisibility = () => {
+        const layers = drawnItems.getLayers();
+
+        div.style.display = layers.length > 0 ? 'flex' : 'none';
+      };
+
+      // Save functionality
+      saveButton.onclick = function () {
+        const layers = drawnItems.getLayers();
+
+        if (layers.length > 0) {
+          const layer = layers[0];
+
+          if ('getBounds' in layer && typeof layer.getBounds === 'function') {
+            const bounds = layer.getBounds();
+
+            // Create zone object from bounds
+            const zone = {
+              id: `zone_${Date.now()}`, // Generate unique ID or a uuid4()
+              fileName: id, // Use dataset ID as filename
+              name: `Drawn Zone ${new Date().toLocaleString()}`,
+              rectangle: {
+                lat: [bounds.getSouth(), bounds.getNorth()],
+                lon: [bounds.getWest(), bounds.getEast()],
+              },
+              // Add other zone properties as needed
+            };
+
+            // Dispatch postZone action
+            dispatch(postZone(zone));
+
+            // Keep the drawn rectangle visible (don't clear it)
+            // Zone saved successfully
+          }
+        }
+      };
+
+      // Clear functionality
+      clearButton.onclick = function () {
+        drawnItems.clearLayers();
+        dispatch(setDrawnRect({ id, bounds: null }));
+        updateControlVisibility(); // Hide the control after clearing
+      };
+
+      // Store the update function on the control for external access
+      (saveClearControl as L.Control & { updateVisibility?: () => void }).updateVisibility = updateControlVisibility;
+
+      return div;
+    };
+
+    map.addControl(saveClearControl);
+
+    // Create wrapper functions that show/hide the control
+    const onCreatedWrapper = (e: L.LeafletEvent) => {
+      onCreated(e);
+      // Show the save/clear control after drawing
+      const control = saveClearControl as L.Control & { updateVisibility?: () => void };
+
+      if (control.updateVisibility) {
+        control.updateVisibility();
+      }
+    };
+
+    const onDeletedWrapper = (e: L.LeafletEvent) => {
+      onDeleted(e);
+      // Hide the save/clear control after deletion
+      const control = saveClearControl as L.Control & { updateVisibility?: () => void };
+
+      if (control.updateVisibility) {
+        control.updateVisibility();
+      }
+    };
+
+    map.on(L.Draw.Event.CREATED, onCreatedWrapper);
+    map.on(L.Draw.Event.DELETED, onDeletedWrapper);
     map.on('moveend', onMoveEnd);
 
     const legend = new L.Control({ position: 'topright' });
@@ -118,12 +238,13 @@ export const MapControl = ({ id }: { id: string }) => {
     return () => {
       map.removeLayer(drawnItems);
       map.removeControl(drawControl);
-      map.off(L.Draw.Event.CREATED, onCreated);
-      map.off(L.Draw.Event.DELETED, onDeleted);
+      map.removeControl(saveClearControl);
+      map.off(L.Draw.Event.CREATED, onCreatedWrapper);
+      map.off(L.Draw.Event.DELETED, onDeletedWrapper);
       map.off('moveend', onMoveEnd);
       map.removeControl(legend);
     };
-  }, [id, map, dispatch]);
+  }, [map, id, dispatch]);
 
   return null;
 };
