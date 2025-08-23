@@ -177,7 +177,7 @@ export const dataExplorationDefault: IDataExploration = {
     pageSize: 100,
     queryItems: 0,
     totalPages: 0,
-    mapType: 'point',
+    mapType: 'heatmap',
     weightBy: 'None',
     radius: 25,
     orderBy: null,
