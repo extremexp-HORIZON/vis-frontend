@@ -157,7 +157,6 @@ export const MapControl = ({ id }: { id: string }) => {
 
             // Create zone object from bounds
             const zone = {
-              id: `zone_${Date.now()}`, // Generate unique ID or a uuid4()
               fileName: id, // Use dataset ID as filename
               name: `Drawn Zone ${new Date().toLocaleString()}`,
               rectangle: {
@@ -203,7 +202,7 @@ export const MapControl = ({ id }: { id: string }) => {
     };
 
     const onDeletedWrapper = (e: L.LeafletEvent) => {
-      onDeleted(e);
+      onDeleted();
       // Hide the save/clear control after deletion
       const control = saveClearControl as L.Control & { updateVisibility?: () => void };
 
