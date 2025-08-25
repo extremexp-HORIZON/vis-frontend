@@ -1,5 +1,5 @@
 import type { RootState } from '../../store';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { AnyAction, PayloadAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { ICluster } from '../../../shared/models/exploring/cluster.model';
 import type { IFacet } from '../../../shared/models/exploring/facet.model';
@@ -48,7 +48,7 @@ const initialState: MapState = {
   mapLayer: 'cluster',
 };
 
-const handleRectUpdate = async (dispatch: any, state: RootState) => {
+const handleRectUpdate = async (dispatch: ThunkDispatch<RootState, unknown, AnyAction>, state: RootState) => {
   const { zoom, viewRect, selectedGeohash, activeRect, drawnRect } = state.map;
   const { categoricalFilters, timeRange, dataset } = state.dataset;
   const { groupByCols, measureCol, aggType } = state.chart;

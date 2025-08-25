@@ -1,5 +1,5 @@
 import type { RootState } from '../../store';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { Dispatch, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { api } from '../../../app/api/api';
 import {
@@ -76,8 +76,11 @@ export const getRow = createAsyncThunk<
     );
 
     return response.data;
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || error.message);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
   }
 });
 
@@ -85,7 +88,7 @@ export const getRow = createAsyncThunk<
 export const postFileMeta = createAsyncThunk<
   IDataset,
   { body: IDataSource },
-  { rejectValue: string; dispatch: any }
+  { rejectValue: string; dispatch: Dispatch }
 >('api/postFileMeta', async ({ body }, { dispatch, rejectWithValue }) => {
   try {
     const response = await api.post<IDataset>('/data/meta', body);
@@ -105,10 +108,11 @@ export const postFileMeta = createAsyncThunk<
     dispatch(setTimeRange({ from: dataset.timeMin ?? 0, to: Date.now() }));
 
     return { ...dataset, id: body.fileName };
-  } catch (error: any) {
-    logger.error('Error on postFileMeta', error);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
 
-    return rejectWithValue(error.response?.data?.message || error.message);
+    return rejectWithValue(errorMessage);
   }
 });
 
@@ -130,8 +134,11 @@ export const executeQuery = createAsyncThunk<
     });
 
     return response.data;
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || error.message);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
   }
 });
 
@@ -155,8 +162,11 @@ export const executeTimeSeriesQuery = createAsyncThunk<
       });
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+
+      return rejectWithValue(errorMessage);
     }
   },
 );
