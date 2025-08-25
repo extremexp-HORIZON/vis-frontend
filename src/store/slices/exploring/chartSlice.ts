@@ -1,10 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { AggregateFunctionType } from '../../../shared/models/exploring/enum/aggregate-function-type.model';
 import type { AppStartListening } from '../../listenerMiddleware';
-import { shallowEqual } from 'react-redux';
 import { executeQuery, setCategoricalFilters } from './datasetSlice';
 import { updateAnalysisResults } from './statsSlice';
+import { shallowEqual } from 'react-redux';
 import type { IVisQueryResults } from '../../../shared/models/exploring/vis-query-results.model';
+import { logger } from '../../../shared/utils/logger';
 
 interface ChartState {
   groupByCols: string[];
@@ -67,13 +68,14 @@ export const chartListeners = (startApplistening: AppStartListening) => {
           aggType: state.chart.aggType,
           groupByCols: state.chart.groupByCols,
           measureCol: state.chart.measureCol,
-          rect: (state.map.drawnRect || state.map.selectedGeohash.rect) || state.map.viewRect,
+          rect:
+            state.map.drawnRect ||
+            state.map.selectedGeohash.rect ||
+            state.map.viewRect,
         };
 
         try {
-          const action = await dispatch(
-            executeQuery({ body: queryBody }),
-          );
+          const action = await dispatch(executeQuery({ body: queryBody }));
 
           if (executeQuery.fulfilled.match(action)) {
             const result = action.payload as IVisQueryResults;
@@ -89,7 +91,7 @@ export const chartListeners = (startApplistening: AppStartListening) => {
             }
           }
         } catch (error) {
-          console.error(
+          logger.error(
             'Error executing query after triggerChartUpdate:',
             error,
           );

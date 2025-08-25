@@ -15,6 +15,7 @@ import { setChartType, setGroupByCols, setMeasureCol } from './chartSlice';
 import { setViewRect, updateClusters } from './mapSlice';
 import type { AppStartListening } from '../../listenerMiddleware';
 import { updateTimeSeries } from './timeSeriesSlice';
+import { logger } from '../../../shared/utils/logger';
 
 interface exploringDatasetState {
   dataset: IDataset;
@@ -90,7 +91,9 @@ export const postFileMeta = createAsyncThunk<
     const response = await api.post<IDataset>('/data/meta', body);
     const dataset = response.data;
 
-    dispatch(setGroupByCols(dataset.dimensions?.length ? [dataset.dimensions[0]] : []));
+    dispatch(
+      setGroupByCols(dataset.dimensions?.length ? [dataset.dimensions[0]] : []),
+    );
     dispatch(setMeasureCol(dataset.measure0 ?? ''));
     dispatch(
       setViewRect({
@@ -103,7 +106,7 @@ export const postFileMeta = createAsyncThunk<
 
     return { ...dataset, id: body.fileName };
   } catch (error: any) {
-    console.error('Error on postFileMeta', error);
+    logger.error('Error on postFileMeta', error);
 
     return rejectWithValue(error.response?.data?.message || error.message);
   }
@@ -123,7 +126,7 @@ export const executeQuery = createAsyncThunk<
       ...(body || {}),
       dataSource,
       dataType: 'map',
-      mapMetadata: dataset
+      mapMetadata: dataset,
     });
 
     return response.data;
@@ -279,7 +282,7 @@ export const datasetUiListeners = (startAppListening: AppStartListening) => {
             dispatch(updateTimeSeries());
           }
         } catch (error) {
-          console.error(
+          logger.error(
             'Error executingQuery after triggerDatasetUiUpdate:',
             error,
           );

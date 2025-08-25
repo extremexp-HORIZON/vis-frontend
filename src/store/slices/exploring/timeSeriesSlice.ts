@@ -5,6 +5,7 @@ import type { RootState } from '../../store';
 import type { ITimeSeriesDataResponse } from '../../../shared/models/exploring/time-series-data-response.model';
 import { executeTimeSeriesQuery } from './datasetSlice';
 import type { AppStartListening } from '../../listenerMiddleware';
+import { logger } from '../../../shared/utils/logger';
 
 interface TimeSeriesState {
   data: IUnivariateDataPoint[] | null;
@@ -93,8 +94,8 @@ export const timeSeriesSlice = createSlice({
     });
     builder.addCase(updateTimeSeries.rejected, (state, action) => {
       state.loading = false;
-      console.log('rejected state', state);
-      console.log('Rejection reason:', action.error);
+      logger.error('rejected state', state);
+      logger.error('Rejection reason:', action.error);
     });
   },
 });

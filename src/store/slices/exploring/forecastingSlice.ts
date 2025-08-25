@@ -5,11 +5,11 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { IForecastingResults } from '../../../shared/models/exploring/forecasting-results.model';
 import type {
   IForecastingForm,
-  IModel } from '../../../shared/models/exploring/forecasting.model';
-import {
-  IForecastingDefault,
+  IModel,
 } from '../../../shared/models/exploring/forecasting.model';
+import { IForecastingDefault } from '../../../shared/models/exploring/forecasting.model';
 import type { RootState } from '../../store';
+import { logger } from '../../../shared/utils/logger';
 
 interface ForecastingState {
   isInTrainStepper: boolean;
@@ -106,13 +106,13 @@ export const forecastingSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(startTraining.pending, state =>
-      console.log('Started Training: ', state.forecastingForm),
+      logger.log('Started Training: ', state.forecastingForm),
     );
     builder.addCase(startTraining.fulfilled, state =>
-      console.log('Finished Training: ', state),
+      logger.log('Finished Training: ', state),
     );
     builder.addCase(startTraining.rejected, (state, action) =>
-      console.log('Error on Training: ', state, action.error),
+      logger.error('Error on Training: ', state, action.error),
     );
   },
 });
