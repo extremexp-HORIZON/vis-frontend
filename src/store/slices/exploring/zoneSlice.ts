@@ -1,7 +1,15 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { api } from '../../../app/api/api';
-import { defaultValue as zoneDefaultValue, type IZone } from '../../../shared/models/exploring/zone.model';
+import {
+  defaultValue as zoneDefaultValue,
+  type IZone,
+} from '../../../shared/models/exploring/zone.model';
+import {
+  showZoneDeleted,
+  showZoneError,
+  showZoneCreated,
+} from '../../../shared/utils/toast';
 
 interface exploringZoneState {
   zone: IZone;
@@ -43,31 +51,39 @@ const initialState: exploringZoneState = {
   },
 };
 
-export const getZones = createAsyncThunk<IZone[], void, { rejectValue: string }>(
-  'api/getZones',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await api.get<IZone[]>('/zones');
+export const getZones = createAsyncThunk<
+  IZone[],
+  void,
+  { rejectValue: string }
+>('api/getZones', async (_, { rejectWithValue }) => {
+  try {
+    const response = await api.get<IZone[]>('/zones');
 
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
-    }
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
   }
-);
+});
 
-export const getZonesByFileName = createAsyncThunk<IZone[], string, { rejectValue: string }>(
-  'api/getZonesByFileName',
-  async (fileName, { rejectWithValue }) => {
-    try {
-      const response = await api.get<IZone[]>(`/zones/file/${fileName}`);
+export const getZonesByFileName = createAsyncThunk<
+  IZone[],
+  string,
+  { rejectValue: string }
+>('api/getZonesByFileName', async (fileName, { rejectWithValue }) => {
+  try {
+    const response = await api.get<IZone[]>(`/zones/file/${fileName}`);
 
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
-    }
-  },
-);
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
+  }
+});
 
 export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
   'api/postZone',
@@ -76,22 +92,29 @@ export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
       const response = await api.post<IZone>('/zones', zone);
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+
+      return rejectWithValue(errorMessage);
     }
   },
 );
 
-export const deleteZone = createAsyncThunk<void, { fileName: string; id: string }, { rejectValue: string }>(
-  'api/deleteZone',
-  async ({ fileName, id }, { rejectWithValue }) => {
-    try {
-      await api.delete(`/zones/file/${fileName}/id/${id}`);
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
-    }
-  },
-);
+export const deleteZone = createAsyncThunk<
+  void,
+  { fileName: string; id: string },
+  { rejectValue: string }
+>('api/deleteZone', async ({ fileName, id }, { rejectWithValue }) => {
+  try {
+    await api.delete(`/zones/file/${fileName}/id/${id}`);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
+  }
+});
 
 export const zoneSlice = createSlice({
   name: 'zone',
@@ -107,10 +130,10 @@ export const zoneSlice = createSlice({
       return initialState;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // getZones
-      .addCase(getZones.pending, (state) => {
+      .addCase(getZones.pending, state => {
         state.loading.getZones = true;
       })
       .addCase(getZones.fulfilled, (state, action) => {
@@ -120,9 +143,10 @@ export const zoneSlice = createSlice({
       .addCase(getZones.rejected, (state, action) => {
         state.loading.getZones = false;
         state.error.getZones = action.payload || 'Failed to get zones';
+        showZoneError('load', action.payload || 'Failed to get zones');
       })
       // getZonesByFileName
-      .addCase(getZonesByFileName.pending, (state) => {
+      .addCase(getZonesByFileName.pending, state => {
         state.loading.getZones = true;
       })
       .addCase(getZonesByFileName.fulfilled, (state, action) => {
@@ -131,10 +155,15 @@ export const zoneSlice = createSlice({
       })
       .addCase(getZonesByFileName.rejected, (state, action) => {
         state.loading.getZones = false;
-        state.error.getZones = action.payload || 'Failed to get zones by file name';
+        state.error.getZones =
+          action.payload || 'Failed to get zones by file name';
+        showZoneError(
+          'load',
+          action.payload || 'Failed to get zones by file name',
+        );
       })
       // postZone
-      .addCase(postZone.pending, (state) => {
+      .addCase(postZone.pending, state => {
         state.loading.postZone = true;
       })
       .addCase(postZone.fulfilled, (state, action) => {
@@ -142,22 +171,28 @@ export const zoneSlice = createSlice({
         state.zone = action.payload;
         // state.zones.push(action.payload);
         state.modalOpen = true;
+        showZoneCreated();
       })
       .addCase(postZone.rejected, (state, action) => {
         state.loading.postZone = false;
         state.error.postZone = action.payload || 'Failed to post zone';
+        showZoneError('create', action.payload || 'Failed to post zone');
       })
       // deleteZone
-      .addCase(deleteZone.pending, (state) => {
+      .addCase(deleteZone.pending, state => {
         state.loading.deleteZone = true;
       })
       .addCase(deleteZone.fulfilled, (state, action) => {
         state.loading.deleteZone = false;
-        state.zones = state.zones.filter((zone) => zone.id !== action.meta.arg.id);
+        state.zones = state.zones.filter(
+          zone => zone.id !== action.meta.arg.id,
+        );
+        showZoneDeleted();
       })
       .addCase(deleteZone.rejected, (state, action) => {
         state.loading.deleteZone = false;
         state.error.deleteZone = action.payload || 'Failed to delete zone';
+        showZoneError('delete', action.payload || 'Failed to delete zone');
       });
   },
 });

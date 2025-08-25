@@ -13,9 +13,18 @@ import {
   TableContainer,
   TableHead,
 } from '@mui/material';
-import { Launch as LaunchIcon, Close as CloseIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Launch as LaunchIcon,
+  Close as CloseIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import { getZonesByFileName, setModalOpen, reset, deleteZone } from '../../../../store/slices/exploring/zoneSlice';
+import {
+  getZonesByFileName,
+  setModalOpen,
+  reset,
+  deleteZone,
+} from '../../../../store/slices/exploring/zoneSlice';
 import Loader from '../../../../shared/components/loader';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import { useEffect, useState } from 'react';
@@ -25,9 +34,13 @@ export interface IZonesProps {
 }
 
 export const Zones = ({ dataset }: IZonesProps) => {
-  const { modalOpen, zone, zones, loading, error } = useAppSelector((state) => state.zone);
+  const { modalOpen, zone, zones, loading, error } = useAppSelector(
+    state => state.zone,
+  );
   const dispatch = useAppDispatch();
-  const [highlightedZoneId, setHighlightedZoneId] = useState<string | null>(null);
+  const [highlightedZoneId, setHighlightedZoneId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (dataset.id && modalOpen) {
@@ -56,11 +69,21 @@ export const Zones = ({ dataset }: IZonesProps) => {
     }
   }, [zone?.id]);
 
+  const handleDeleteZone = (zoneId: string) => {
+    if (dataset.id) {
+      dispatch(deleteZone({ fileName: dataset.id, id: zoneId }));
+    }
+  };
+
+  const handleOpenZonesModal = () => {
+    dispatch(setModalOpen(true));
+  };
+
   return (
     <>
       {/* Zones Button */}
       <IconButton
-        onClick={() => dispatch(setModalOpen(true))}
+        onClick={handleOpenZonesModal}
         color="primary"
         size="small"
         sx={{ border: '1px solid', borderRadius: 1 }}
@@ -69,7 +92,12 @@ export const Zones = ({ dataset }: IZonesProps) => {
       </IconButton>
 
       {/* Zones Dialog */}
-      <Dialog open={modalOpen} onClose={() => dispatch(setModalOpen(false))} fullWidth maxWidth="xl">
+      <Dialog
+        open={modalOpen}
+        onClose={() => dispatch(setModalOpen(false))}
+        fullWidth
+        maxWidth="xl"
+      >
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <DialogTitle>Zones for {dataset.id}</DialogTitle>
           <IconButton onClick={() => dispatch(setModalOpen(false))}>
@@ -82,7 +110,9 @@ export const Zones = ({ dataset }: IZonesProps) => {
             {loading.getZones ? (
               <Loader />
             ) : error.getZones || error.deleteZone ? (
-              <Typography color="error">{error.getZones || error.deleteZone}</Typography>
+              <Typography color="error">
+                {error.getZones || error.deleteZone}
+              </Typography>
             ) : zones.length === 0 ? (
               <Typography>No zones found</Typography>
             ) : (
@@ -93,32 +123,52 @@ export const Zones = ({ dataset }: IZonesProps) => {
                       <TableCell sx={{ textAlign: 'center' }}>ID</TableCell>
                       <TableCell sx={{ textAlign: 'center' }}>Name</TableCell>
                       <TableCell sx={{ textAlign: 'center' }}>Type</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Description</TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>
+                        Description
+                      </TableCell>
                       <TableCell sx={{ textAlign: 'center' }}>Status</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Created At</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Heights</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Rectangle</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Actions</TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>
+                        Created At
+                      </TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>
+                        Heights
+                      </TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>
+                        Rectangle
+                      </TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>
+                        Actions
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {zones
                       .slice()
                       .sort((a, b) => {
-                        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                        const dateA = a.createdAt
+                          ? new Date(a.createdAt).getTime()
+                          : 0;
+                        const dateB = b.createdAt
+                          ? new Date(b.createdAt).getTime()
+                          : 0;
 
                         return dateB - dateA; // Most recent first
                       })
-                      .map((z) => (
+                      .map(z => (
                         <TableRow
                           key={z.id}
                           sx={{
-                            backgroundColor: highlightedZoneId === z.id ? 'lightblue' : 'white',
+                            backgroundColor:
+                              highlightedZoneId === z.id
+                                ? 'lightblue'
+                                : 'white',
                             transition: 'background-color 0.3s ease',
                             '&:hover': {
-                              backgroundColor: highlightedZoneId === z.id ? 'lightblue' : '#f5f5f5'
-                            }
+                              backgroundColor:
+                                highlightedZoneId === z.id
+                                  ? 'lightblue'
+                                  : '#f5f5f5',
+                            },
                           }}
                         >
                           <TableCell>{z.id}</TableCell>
@@ -126,13 +176,20 @@ export const Zones = ({ dataset }: IZonesProps) => {
                           <TableCell>{z.type}</TableCell>
                           <TableCell>{z.description}</TableCell>
                           <TableCell>{z.status}</TableCell>
-                          <TableCell>{z.createdAt ? new Date(z.createdAt).toLocaleString() : '-'}</TableCell>
+                          <TableCell>
+                            {z.createdAt
+                              ? new Date(z.createdAt).toLocaleString()
+                              : '-'}
+                          </TableCell>
                           <TableCell>{z.heights?.join(', ')}</TableCell>
                           <TableCell>
                             {z.rectangle ? (
                               <Box>
                                 <Typography>
-                                  <strong>lat:</strong> [{z.rectangle.lat?.join(', ')}], <strong>lon:</strong> [{z.rectangle.lon?.join(', ')}]
+                                  <strong>lat:</strong> [
+                                  {z.rectangle.lat?.join(', ')}],{' '}
+                                  <strong>lon:</strong> [
+                                  {z.rectangle.lon?.join(', ')}]
                                 </Typography>
                               </Box>
                             ) : (
@@ -140,7 +197,10 @@ export const Zones = ({ dataset }: IZonesProps) => {
                             )}
                           </TableCell>
                           <TableCell>
-                            <IconButton onClick={() => dispatch(deleteZone({ fileName: dataset.id!, id: z.id! }))} disabled={loading.deleteZone}>
+                            <IconButton
+                              onClick={() => handleDeleteZone(z.id!)}
+                              disabled={loading.deleteZone}
+                            >
                               <DeleteIcon />
                             </IconButton>
                           </TableCell>
