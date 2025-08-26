@@ -12,6 +12,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  Tooltip,
 } from '@mui/material';
 import {
   Launch as LaunchIcon,
@@ -26,6 +27,7 @@ import {
   deleteZone,
 } from '../../../../store/slices/exploring/zoneSlice';
 import Loader from '../../../../shared/components/loader';
+import { ConfirmationModal } from '../../../../shared/components/confirmation-modal';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import { useEffect, useState } from 'react';
 
@@ -41,6 +43,15 @@ export const Zones = ({ dataset }: IZonesProps) => {
   const [highlightedZoneId, setHighlightedZoneId] = useState<string | null>(
     null,
   );
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    open: boolean;
+    zoneId: string | null;
+    zoneName: string | null;
+  }>({
+    open: false,
+    zoneId: null,
+    zoneName: null,
+  });
 
   useEffect(() => {
     if (dataset.id && modalOpen) {
@@ -50,6 +61,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
     if (!modalOpen) {
       dispatch(reset());
       setHighlightedZoneId(null);
+      setDeleteConfirmation({ open: false, zoneId: null, zoneName: null });
     }
   }, [dataset.id, dispatch, modalOpen]);
 
@@ -69,10 +81,25 @@ export const Zones = ({ dataset }: IZonesProps) => {
     }
   }, [zone?.id]);
 
-  const handleDeleteZone = (zoneId: string) => {
-    if (dataset.id) {
-      dispatch(deleteZone({ fileName: dataset.id, id: zoneId }));
+  const handleDeleteClick = (zoneId: string, zoneName: string) => {
+    setDeleteConfirmation({
+      open: true,
+      zoneId,
+      zoneName,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmation.zoneId && dataset.id) {
+      dispatch(
+        deleteZone({ fileName: dataset.id, id: deleteConfirmation.zoneId }),
+      );
+      setDeleteConfirmation({ open: false, zoneId: null, zoneName: null });
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ open: false, zoneId: null, zoneName: null });
   };
 
   const handleOpenZonesModal = () => {
@@ -197,12 +224,21 @@ export const Zones = ({ dataset }: IZonesProps) => {
                             )}
                           </TableCell>
                           <TableCell>
-                            <IconButton
-                              onClick={() => handleDeleteZone(z.id!)}
-                              disabled={loading.deleteZone}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
+                            <Tooltip title="Delete" placement="top">
+                              <IconButton
+                                onClick={() =>
+                                  handleDeleteClick(
+                                    z.id!,
+                                    z.name || 'Unknown Zone',
+                                  )
+                                }
+                                disabled={loading.deleteZone}
+                                color="error"
+                                size="small"
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -213,6 +249,20 @@ export const Zones = ({ dataset }: IZonesProps) => {
           </Box>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        open={deleteConfirmation.open}
+        title="Delete Zone"
+        message={`Are you sure you want to delete zone with id: "${deleteConfirmation.zoneId}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmColor="error"
+        severity="warning"
+        loading={loading.deleteZone}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </>
   );
 };
