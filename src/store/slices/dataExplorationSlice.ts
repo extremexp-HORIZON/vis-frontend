@@ -89,6 +89,8 @@ export const dataExplorationReducers = (
       task.metaData.loading = false;
       task.metaData.error = null;
 
+      task.metaData.source = action.meta.arg.query?.source ?? null;
+
       task.controlPanel.selectedColumns = originalColumns?.slice(0, 5) ?? [];
 
       if (originalColumns[0]) {
@@ -143,6 +145,7 @@ export const dataExplorationReducers = (
       if (task) {
         task.metaData.loading = true;
         task.metaData.error = null;
+        task.metaData.source = action.meta.arg.query?.source ?? null;
       }
     })
     .addCase(fetchMetaData.rejected, (state, action) => {
@@ -153,6 +156,7 @@ export const dataExplorationReducers = (
       if (task) {
         task.metaData.loading = false;
         task.metaData.error = 'Failed to fetch metadata';
+        task.metaData.source = action.meta.arg.query?.source ?? null;
       }
     })
     .addCase(fetchUmap.fulfilled, (state, action) => {

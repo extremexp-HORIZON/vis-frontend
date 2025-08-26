@@ -19,6 +19,7 @@ const TableExpand: React.FC = () => {
   const tableRef = useRef<HTMLDivElement>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dateTimeColumn =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.find(
       col => col.type === 'LOCAL_DATE_TIME',
@@ -108,7 +109,8 @@ const TableExpand: React.FC = () => {
     const fetchData = async () => {
       if (
         !tab?.dataTaskTable.selectedItem?.data?.dataset?.source ||
-        columns.length === 0
+        columns.length === 0 ||
+        meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source
       ) {
         return;
       }
@@ -155,6 +157,7 @@ const TableExpand: React.FC = () => {
     columns,
     tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     tab?.workflowId,
+    meta?.source
   ]);
 
   // Export data to CSV

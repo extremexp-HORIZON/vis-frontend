@@ -182,6 +182,7 @@ const getSingleScatterSpec = ({
 
 const ScatterChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
+  const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
@@ -215,7 +216,7 @@ const ScatterChart = () => {
       ),
     );
 
-    if (!datasetId || !xAxis || !yAxis?.length) return;
+    if (!datasetId || !xAxis || !yAxis?.length || meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source) return;
 
     dispatch(
       fetchDataExplorationData({

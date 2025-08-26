@@ -9,6 +9,7 @@ import { fetchUmap } from '../../../../store/slices/dataExplorationSlice';
 
 const Uchart = () => {
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab);
+  const meta = tab?.workflowTasks.dataExploration?.metaData;
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const dispatch = useAppDispatch();
@@ -22,7 +23,7 @@ const Uchart = () => {
       const umapPayload = parsedData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) =>
         Object.values(row).map(val => parseFloat(val as string)),
       );
-
+      if (meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source) return;
       dispatch(
         fetchUmap({
           data: umapPayload.slice(0, 2000), // Limit to first 1000 rows

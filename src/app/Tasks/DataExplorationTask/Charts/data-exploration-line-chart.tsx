@@ -42,6 +42,7 @@ const getAxisEncoding = (type: string, name?: string) => {
 
 const LineChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
+  const meta = tab?.workflowTasks.dataExploration?.metaData;
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const dispatch = useAppDispatch();
@@ -62,7 +63,7 @@ const LineChart = () => {
       )
     );
 
-    if (!datasetId || !xAxis || !yAxis?.length) return;
+    if (!datasetId || !xAxis || !yAxis?.length || meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source) return;
 
     dispatch(
       fetchDataExplorationData({

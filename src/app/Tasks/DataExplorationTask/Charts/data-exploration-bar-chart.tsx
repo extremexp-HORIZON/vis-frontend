@@ -11,6 +11,7 @@ import { fetchDataExplorationData } from '../../../../store/slices/dataExplorati
 const BarChart = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
+  const meta = tab?.workflowTasks.dataExploration?.metaData;
   const theme = useTheme();
 
   const groupByCols = tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy ?? [];
@@ -38,7 +39,8 @@ const BarChart = () => {
     if (
       !datasetId ||
       !groupBy?.length ||
-      !aggregation?.length
+      !aggregation?.length ||
+      meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source
     ) {
       return; // Don't dispatch if missing dataset, groupBy, or aggregation
     }
