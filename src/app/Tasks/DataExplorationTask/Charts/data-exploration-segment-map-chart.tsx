@@ -20,6 +20,7 @@ const SegmentMapChart = () => {
   const [markerMap, setMarkerMap] = useState<Map<string, { start: L.CircleMarker, end: L.CircleMarker }>>(new Map());
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const meta = tab?.workflowTasks.dataExploration?.metaData;
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;
   const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon;
   const segmentBy = tab?.workflowTasks.dataExploration?.controlPanel.segmentBy || [];
@@ -38,7 +39,7 @@ const SegmentMapChart = () => {
     const datasetId = tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
     const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
-    if (!datasetId || !lat || !lon || !orderBy) return;
+    if (!datasetId || !lat || !lon || !orderBy || meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source) return;
 
     dispatch(fetchDataExplorationData({
       query: {

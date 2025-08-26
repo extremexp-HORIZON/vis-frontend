@@ -46,6 +46,7 @@ export interface IDataExploration {
     data: IDataExplorationMetaDataResponse | null
     loading: boolean
     error: string | null
+    source: string | null
   }
   controlPanel: {
     chartType: string
@@ -146,6 +147,7 @@ export const dataExplorationDefault: IDataExploration = {
     data: null,
     loading: false,
     error: null,
+    source: null
   },
   controlPanel: {
     chartType: 'datatable',

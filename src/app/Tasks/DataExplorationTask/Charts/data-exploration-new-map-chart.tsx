@@ -34,6 +34,7 @@ const MapChart = () => {
   };
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dispatch = useAppDispatch();
 
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;
@@ -54,7 +55,7 @@ const MapChart = () => {
       tab?.dataTaskTable.selectedItem?.data?.dataset?.source || '';
     const dataset = tab?.dataTaskTable.selectedItem?.data?.dataset;
 
-    if (!datasetId || !lat || !lon) return;
+    if (!datasetId || !lat || !lon || meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source) return;
 
     const columns = [lat, lon];
 
