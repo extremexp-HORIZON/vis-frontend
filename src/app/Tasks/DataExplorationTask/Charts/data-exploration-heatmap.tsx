@@ -68,7 +68,6 @@ const HeatMap = () => {
     tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat,
     tab?.dataTaskTable.selectedItem?.data?.dataset?.source,
     tab?.workflowTasks.dataExploration?.controlPanel.filters,
-    dispatch,
     tab?.workflowId,
   ]);
 

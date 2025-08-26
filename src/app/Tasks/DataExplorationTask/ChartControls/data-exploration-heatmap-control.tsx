@@ -138,7 +138,6 @@ const HeatMapControlPanel = () => {
               dispatch(
                 setControls({
                   selectedMeasureColumnHeat: newColumn,
-                  barAggregationHeat: currentAgg.filter(aggr => aggr.column !== newColumn),
                 })
               );
             }}
@@ -182,7 +181,6 @@ const HeatMapControlPanel = () => {
                 dispatch(
                   setControls({
                     barAggregationHeat: [
-                      ...currentAgg.filter(aggr => aggr.column !== selectedColumn),
                       {
                         column: selectedColumn,
                         function: value,
