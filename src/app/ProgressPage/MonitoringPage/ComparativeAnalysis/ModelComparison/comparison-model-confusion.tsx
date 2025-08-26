@@ -23,7 +23,9 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
   useEffect(() => {
     if (!experimentId) return;
     selectedWorkflowIds.forEach((runId) => {
-      dispatch(fetchComparativeConfusionMatrix({ experimentId, runId }));
+      const confusionMatrix = comparativeModelConfusionMatrix[runId]
+      if(!confusionMatrix?.data || confusionMatrix?.error)
+        dispatch(fetchComparativeConfusionMatrix({ experimentId, runId }));
     });
   }, [selectedWorkflowIds, experimentId]);
 

@@ -22,7 +22,9 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
   useEffect(() => {
     if (!experimentId) return;
     selectedWorkflowIds.forEach((runId) => {
-      dispatch(fetchComparativeRocCurve({ experimentId, runId }));
+      const rocCurve = comparativeModelRocCurve[runId]
+      if(!rocCurve?.data || rocCurve?.error)
+        dispatch(fetchComparativeRocCurve({ experimentId, runId }));
     });
   }, [selectedWorkflowIds, experimentId]);
 
