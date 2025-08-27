@@ -20,7 +20,7 @@ const RocCurvePlot = () => {
   >([]);
 
   useEffect(() => {
-    if (tab) {
+    if (tab && (!rocState?.data || rocState?.error)) {
       dispatch(fetchRocCurve({ experimentId: experimentId || '', runId: tab.workflowId || '' }));
     }
   }, [isTabInitialized]);

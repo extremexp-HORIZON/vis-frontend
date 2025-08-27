@@ -43,7 +43,7 @@ const ModelDetails = () => {
   const { experimentId } = useParams();
 
   useEffect(() => {
-    if (tab && experimentId) {
+    if (tab && experimentId && (!summary?.data || summary?.error)) {
       dispatch(fetchModelSummary({ experimentId, runId: tab.workflowId }));
     }
   }, [isTabInitialized]);
