@@ -9,13 +9,23 @@ import {
   updateMapBounds,
 } from '../../../../store/slices/exploring/mapSlice';
 import { postZone } from '../../../../store/slices/exploring/zoneSlice';
-import { useAppDispatch } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { useMapDrawing } from './useMapDrawing';
+import { reset as resetZone } from '../../../../store/slices/exploring/zoneSlice';
 
 export const MapControl = ({ id }: { id: string }) => {
   const map = useMap();
   const dispatch = useAppDispatch();
+  const { viewZone } = useAppSelector(state => state.zone);
   const hasInitialized = useRef(false);
-  const drawnItemsRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
+
+  // Use the custom hook for all drawing functionality
+  const {
+    drawnItemsRef,
+    addDrawnLayer,
+    clearDrawnItems,
+    setVisibilityChangeCallback,
+  } = useMapDrawing(map, id);
 
   useEffect(() => {
     if (!map) return;
@@ -24,12 +34,13 @@ export const MapControl = ({ id }: { id: string }) => {
       const event = e as L.DrawEvents.Created;
       const layer = event.layer;
 
-      drawnItems.clearLayers();
-      drawnItems.addLayer(layer);
+      // Use the hook's method to add the layer
+      addDrawnLayer(layer);
 
       if ('getBounds' in layer) {
         const bounds = layer.getBounds();
 
+        dispatch(resetZone());
         dispatch(
           setDrawnRect({
             id,
@@ -107,7 +118,7 @@ export const MapControl = ({ id }: { id: string }) => {
       div.style.display = 'none'; // Initially hidden
 
       // Save button
-      const saveButton = L.DomUtil.create('a', 'leaflet-control-zoom-in', div);
+      const saveButton = L.DomUtil.create('a', 'leaflet-control-save', div);
 
       saveButton.innerHTML = '💾';
       saveButton.title = 'Save drawn rectangle as zone';
@@ -122,8 +133,19 @@ export const MapControl = ({ id }: { id: string }) => {
       saveButton.style.border = 'none';
       saveButton.style.borderRadius = '4px';
 
+      // Disable saveButton if zone rectangle is drawn
+      if (viewZone?.id) {
+        saveButton.setAttribute('disabled', 'true');
+        saveButton.style.opacity = '0.5';
+        saveButton.style.pointerEvents = 'none';
+      } else {
+        saveButton.removeAttribute('disabled');
+        saveButton.style.opacity = '1';
+        saveButton.style.pointerEvents = 'auto';
+      }
+
       // Clear button
-      const clearButton = L.DomUtil.create('a', 'leaflet-control-zoom-out', div);
+      const clearButton = L.DomUtil.create('a', 'leaflet-control-clear', div);
 
       clearButton.innerHTML = '🗑️';
       clearButton.title = 'Clear drawn rectangle';
@@ -140,7 +162,8 @@ export const MapControl = ({ id }: { id: string }) => {
 
       // Function to show/hide the control based on drawn layers
       const updateControlVisibility = () => {
-        const layers = drawnItems.getLayers();
+        // Use the hook's drawnItemsRef instead of the local drawnItems variable
+        const layers = drawnItemsRef.current.getLayers();
 
         div.style.display = layers.length > 0 ? 'flex' : 'none';
       };
@@ -177,13 +200,22 @@ export const MapControl = ({ id }: { id: string }) => {
 
       // Clear functionality
       clearButton.onclick = function () {
-        drawnItems.clearLayers();
+        // Use the hook's clear method
+        clearDrawnItems();
         dispatch(setDrawnRect({ id, bounds: null }));
         updateControlVisibility(); // Hide the control after clearing
       };
 
       // Store the update function on the control for external access
-      (saveClearControl as L.Control & { updateVisibility?: () => void }).updateVisibility = updateControlVisibility;
+      (
+        saveClearControl as L.Control & { updateVisibility?: () => void }
+      ).updateVisibility = updateControlVisibility;
+
+      // Set up the visibility change callback from the hook
+      setVisibilityChangeCallback(updateControlVisibility);
+
+      // Initial visibility check
+      updateControlVisibility();
 
       return div;
     };
@@ -194,7 +226,9 @@ export const MapControl = ({ id }: { id: string }) => {
     const onCreatedWrapper = (e: L.LeafletEvent) => {
       onCreated(e);
       // Show the save/clear control after drawing
-      const control = saveClearControl as L.Control & { updateVisibility?: () => void };
+      const control = saveClearControl as L.Control & {
+        updateVisibility?: () => void;
+      };
 
       if (control.updateVisibility) {
         control.updateVisibility();
@@ -204,7 +238,9 @@ export const MapControl = ({ id }: { id: string }) => {
     const onDeletedWrapper = (e: L.LeafletEvent) => {
       onDeleted();
       // Hide the save/clear control after deletion
-      const control = saveClearControl as L.Control & { updateVisibility?: () => void };
+      const control = saveClearControl as L.Control & {
+        updateVisibility?: () => void;
+      };
 
       if (control.updateVisibility) {
         control.updateVisibility();
@@ -243,7 +279,7 @@ export const MapControl = ({ id }: { id: string }) => {
       map.off('moveend', onMoveEnd);
       map.removeControl(legend);
     };
-  }, [map, id, dispatch]);
+  }, [map, id, dispatch, addDrawnLayer, clearDrawnItems]);
 
   return null;
 };

@@ -118,14 +118,16 @@ export const Zones = ({ dataset }: IZonesProps) => {
   return (
     <>
       {/* Zones Button */}
-      <IconButton
-        onClick={handleOpenZonesModal}
-        color="primary"
-        size="small"
-        sx={{ border: '1px solid', borderRadius: 1 }}
-      >
-        <LaunchIcon />
-      </IconButton>
+      <Tooltip title="Zones" placement="top" arrow>
+        <IconButton
+          onClick={handleOpenZonesModal}
+          color="primary"
+          size="small"
+          sx={{ border: '1px solid', borderRadius: 1 }}
+        >
+          <LaunchIcon />
+        </IconButton>
+      </Tooltip>
 
       {/* Zones Dialog */}
       <Dialog

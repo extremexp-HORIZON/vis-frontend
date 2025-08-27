@@ -223,9 +223,9 @@ export const mapSlice = createSlice({
         string: action.payload,
         rect: bounds
           ? {
-              lat: [bounds[0], bounds[2]],
-              lon: [bounds[1], bounds[3]],
-            }
+            lat: [bounds[0], bounds[2]],
+            lon: [bounds[1], bounds[3]],
+          }
           : null,
       };
       bounds
