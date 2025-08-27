@@ -18,18 +18,20 @@ import {
   Launch as LaunchIcon,
   Close as CloseIcon,
   Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
   getZonesByFileName,
   setModalOpen,
-  reset,
   deleteZone,
+  setViewZone,
 } from '../../../../store/slices/exploring/zoneSlice';
 import Loader from '../../../../shared/components/loader';
 import { ConfirmationModal } from '../../../../shared/components/confirmation-modal';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import { useEffect, useState } from 'react';
+import type { IZone } from '../../../../shared/models/exploring/zone.model';
 
 export interface IZonesProps {
   dataset: IDataset;
@@ -59,7 +61,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
     }
 
     if (!modalOpen) {
-      dispatch(reset());
+      // dispatch(reset());
       setHighlightedZoneId(null);
       setDeleteConfirmation({ open: false, zoneId: null, zoneName: null });
     }
@@ -104,6 +106,13 @@ export const Zones = ({ dataset }: IZonesProps) => {
 
   const handleOpenZonesModal = () => {
     dispatch(setModalOpen(true));
+  };
+
+  const handleViewZone = (zone: IZone) => {
+    if (zone.id) {
+      dispatch(setViewZone(zone));
+      dispatch(setModalOpen(false));
+    }
   };
 
   return (
@@ -224,7 +233,17 @@ export const Zones = ({ dataset }: IZonesProps) => {
                             )}
                           </TableCell>
                           <TableCell>
-                            <Tooltip title="Delete" placement="top">
+                            <Tooltip title="View Zone" placement="right">
+                              <IconButton
+                                onClick={() => handleViewZone(z)}
+                                disabled={loading.getZone}
+                                color="primary"
+                                size="small"
+                              >
+                                <VisibilityIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete" placement="right">
                               <IconButton
                                 onClick={() =>
                                   handleDeleteClick(

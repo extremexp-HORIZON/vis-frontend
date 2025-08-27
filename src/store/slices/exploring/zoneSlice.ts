@@ -10,9 +10,12 @@ import {
   showZoneError,
   showZoneCreated,
 } from '../../../shared/utils/toast';
+import type { AppStartListening } from '../../listenerMiddleware';
+import { setDrawnRect } from './mapSlice';
 
 interface exploringZoneState {
   zone: IZone;
+  viewZone: IZone;
   zones: IZone[];
   modalOpen: boolean;
   loading: {
@@ -33,6 +36,7 @@ interface exploringZoneState {
 
 const initialState: exploringZoneState = {
   zone: zoneDefaultValue,
+  viewZone: zoneDefaultValue,
   zones: [],
   modalOpen: false,
   loading: {
@@ -123,6 +127,9 @@ export const zoneSlice = createSlice({
     setZone: (state, action: PayloadAction<IZone>) => {
       state.zone = action.payload;
     },
+    setViewZone: (state, action: PayloadAction<IZone>) => {
+      state.viewZone = action.payload;
+    },
     setModalOpen: (state, action: PayloadAction<boolean>) => {
       state.modalOpen = action.payload;
     },
@@ -197,4 +204,25 @@ export const zoneSlice = createSlice({
   },
 });
 
-export const { setZone, setModalOpen, reset } = zoneSlice.actions;
+export const zoneListeners = (startAppListening: AppStartListening) => {
+  // setViewZoneListener
+  startAppListening({
+    actionCreator: setViewZone,
+    effect: async (action, { dispatch }) => {
+      const { rectangle, fileName } = action.payload;
+
+      if (rectangle && fileName) {
+        const bounds = {
+          south: rectangle.lat[0],
+          west: rectangle.lon[0],
+          north: rectangle.lat[1],
+          east: rectangle.lon[1],
+        };
+
+        dispatch(setDrawnRect({ id: fileName, bounds }));
+      }
+    },
+  });
+};
+
+export const { setZone, setViewZone, setModalOpen, reset } = zoneSlice.actions;

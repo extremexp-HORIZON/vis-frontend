@@ -48,7 +48,10 @@ const initialState: MapState = {
   mapLayer: 'cluster',
 };
 
-const handleRectUpdate = async (dispatch: ThunkDispatch<RootState, unknown, AnyAction>, state: RootState) => {
+const handleRectUpdate = async (
+  dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+  state: RootState,
+) => {
   const { zoom, viewRect, selectedGeohash, activeRect, drawnRect } = state.map;
   const { categoricalFilters, timeRange, dataset } = state.dataset;
   const { groupByCols, measureCol, aggType } = state.chart;
@@ -93,7 +96,6 @@ const handleRectUpdate = async (dispatch: ThunkDispatch<RootState, unknown, AnyA
   } catch (error) {
     // Handle error silently or log to a proper logging service
   }
-
 };
 
 export const updateClusters = createAsyncThunk(
@@ -119,9 +121,7 @@ export const updateClusters = createAsyncThunk(
     };
 
     const requestTime = Date.now();
-    const action = await thunkApi.dispatch(
-      executeQuery({ body }),
-    );
+    const action = await thunkApi.dispatch(executeQuery({ body }));
 
     if (executeQuery.fulfilled.match(action)) {
       const result = action.payload as IVisQueryResults;
@@ -199,7 +199,11 @@ export const mapSlice = createSlice({
         } as IRectangle);
 
       state.drawnRect = drawnRect;
-      bounds ? state.activeRect = 'drawnRect' : state.selectedGeohash.rect ? state.activeRect = 'selectedGeohash' : state.activeRect = 'viewRect';
+      bounds
+        ? (state.activeRect = 'drawnRect')
+        : state.selectedGeohash.rect
+          ? (state.activeRect = 'selectedGeohash')
+          : (state.activeRect = 'viewRect');
     },
     setClusters: (state, action: PayloadAction<ICluster[]>) => {
       state.clusters = action.payload;
@@ -211,16 +215,24 @@ export const mapSlice = createSlice({
       state.queryInfo = action.payload;
     },
     setSelectedGeohash: (state, action: PayloadAction<string | null>) => {
-      const bounds = action.payload ? ngeohash.decode_bbox(action.payload) : null;
+      const bounds = action.payload
+        ? ngeohash.decode_bbox(action.payload)
+        : null;
 
       state.selectedGeohash = {
         string: action.payload,
-        rect: bounds ? {
-          lat: [bounds[0], bounds[2]],
-          lon: [bounds[1], bounds[3]],
-        } : null,
+        rect: bounds
+          ? {
+              lat: [bounds[0], bounds[2]],
+              lon: [bounds[1], bounds[3]],
+            }
+          : null,
       };
-      bounds ? state.activeRect = 'selectedGeohash' : state.drawnRect ? state.activeRect = 'drawnRect' : state.activeRect = 'viewRect';
+      bounds
+        ? (state.activeRect = 'selectedGeohash')
+        : state.drawnRect
+          ? (state.activeRect = 'drawnRect')
+          : (state.activeRect = 'viewRect');
     },
     updateMapBounds: (
       state,

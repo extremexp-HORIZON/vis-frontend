@@ -41,6 +41,7 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { rectStats } = useAppSelector((state: RootState) => state.stats);
+  const { viewZone } = useAppSelector((state: RootState) => state.zone);
   const { activeRect, selectedGeohash } = useAppSelector(
     (state: RootState) => state.map,
   );
@@ -183,7 +184,7 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
                       color: 'primary.main',
                     }}
                   >
-                    Drawn Rectangle
+                    {viewZone.id ? `Zone: ${viewZone.id}` : 'Drawn Rectangle'}
                   </Typography>
                 ) : (
                   <Typography

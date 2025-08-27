@@ -19,6 +19,7 @@ import { mapListeners } from './slices/exploring/mapSlice';
 import { datasetUiListeners } from './slices/exploring/datasetSlice';
 import { chartListeners } from './slices/exploring/chartSlice';
 import { timeSeriesListeners } from './slices/exploring/timeSeriesSlice';
+import { zoneListeners } from './slices/exploring/zoneSlice';
 
 export const store = configureStore({
   reducer: {
@@ -53,3 +54,4 @@ chartListeners(startAppListening);
 datasetUiListeners(startAppListening);
 mapListeners(startAppListening);
 timeSeriesListeners(startAppListening);
+zoneListeners(startAppListening);
