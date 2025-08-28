@@ -158,23 +158,44 @@ export const Zones = ({ dataset }: IZonesProps) => {
                 <Table>
                   <TableHead sx={{ backgroundColor: 'lightgray' }}>
                     <TableRow>
-                      <TableCell sx={{ textAlign: 'center' }}>ID</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Name</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Type</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
-                        Description
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
+                        ID
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>Status</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
+                        Name
+                      </TableCell>
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
+                        Type
+                      </TableCell>
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
                         Created At
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
+                        Geohashes
+                      </TableCell>
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
                         Heights
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
                         Rectangle
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell
+                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                      >
                         Actions
                       </TableCell>
                     </TableRow>
@@ -212,12 +233,25 @@ export const Zones = ({ dataset }: IZonesProps) => {
                           <TableCell>{z.id}</TableCell>
                           <TableCell>{z.name}</TableCell>
                           <TableCell>{z.type}</TableCell>
-                          <TableCell>{z.description}</TableCell>
-                          <TableCell>{z.status}</TableCell>
                           <TableCell>
                             {z.createdAt
                               ? new Date(z.createdAt).toLocaleString()
                               : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {z.geohashes ? (
+                              <Box>
+                                <Typography>
+                                  <strong>Precision:</strong>{' '}
+                                  {z.geohashes[0].length}
+                                </Typography>
+                                <Typography>
+                                  <strong>Total:</strong> {z.geohashes.length}
+                                </Typography>
+                              </Box>
+                            ) : (
+                              '-'
+                            )}
                           </TableCell>
                           <TableCell>{z.heights?.join(', ')}</TableCell>
                           <TableCell>

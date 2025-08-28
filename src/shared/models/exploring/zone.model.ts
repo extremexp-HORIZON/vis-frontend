@@ -9,6 +9,7 @@ export interface IZone {
   status?: string;
   createdAt?: string;
   heights?: number[];
+  geohashes?: string[];
   rectangle?: IRectangle;
 }
 

@@ -12,6 +12,7 @@ import {
 } from '../../../shared/utils/toast';
 import type { AppStartListening } from '../../listenerMiddleware';
 import { setDrawnRect } from './mapSlice';
+import ngeohash from 'ngeohash';
 
 interface exploringZoneState {
   zone: IZone;
@@ -93,7 +94,20 @@ export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
   'api/postZone',
   async (zone, { rejectWithValue }) => {
     try {
-      const response = await api.post<IZone>('/zones', zone);
+      const includedGeohashes = zone.rectangle
+        ? ngeohash.bboxes(
+          zone.rectangle.lat[0],
+          zone.rectangle.lon[0],
+          zone.rectangle.lat[1],
+          zone.rectangle.lon[1],
+          9,
+        )
+        : [];
+
+      const response = await api.post<IZone>('/zones', {
+        ...zone,
+        geohashes: includedGeohashes,
+      });
 
       return response.data;
     } catch (error: unknown) {
