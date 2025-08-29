@@ -16,6 +16,7 @@ import { setViewRect, updateClusters } from './mapSlice';
 import type { AppStartListening } from '../../listenerMiddleware';
 import { updateTimeSeries } from './timeSeriesSlice';
 import { logger } from '../../../shared/utils/logger';
+import type { IRectangle } from '../../../shared/models/exploring/rectangle.model';
 
 interface exploringDatasetState {
   dataset: IDataset;
@@ -83,6 +84,38 @@ export const getRow = createAsyncThunk<
     return rejectWithValue(errorMessage);
   }
 });
+
+export const fetchColumnsValues = createAsyncThunk<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Record<string, any>,
+  {
+    datasetId: string;
+    columnNames: string[];
+    rectangle: IRectangle | null;
+    latCol: string | null;
+    lonCol: string | null;
+  },
+  { rejectValue: string }
+>(
+  'api/getColumnsValues',
+  async ({ datasetId, columnNames, rectangle, latCol, lonCol }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/data/fetch/${datasetId}/columns`, {
+        rectangle,
+        columnNames,
+        latCol,
+        lonCol,
+      });
+
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+
+      return rejectWithValue(errorMessage);
+    }
+  },
+);
 
 // postFileMeta
 export const postFileMeta = createAsyncThunk<
