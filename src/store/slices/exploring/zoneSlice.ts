@@ -13,6 +13,8 @@ import {
 import type { AppStartListening } from '../../listenerMiddleware';
 import { setDrawnRect } from './mapSlice';
 import ngeohash from 'ngeohash';
+import type { RootState } from '../../store';
+import { fetchColumnsValues } from './datasetSlice';
 
 interface exploringZoneState {
   zone: IZone;
@@ -92,7 +94,9 @@ export const getZonesByFileName = createAsyncThunk<
 
 export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
   'api/postZone',
-  async (zone, { rejectWithValue }) => {
+  async (zone, { getState, dispatch, rejectWithValue }) => {
+    const { dataset } = getState() as RootState;
+
     try {
       const includedGeohashes = zone.rectangle
         ? ngeohash.bboxes(
@@ -104,9 +108,48 @@ export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
         )
         : [];
 
+      const selectedDataset = dataset.dataset;
+
+      let heights: number[] | undefined = undefined;
+
+      // Dynamically determine the altitude/height column name
+      const altitudeColumn = selectedDataset.originalColumns?.find(
+        column =>
+          column.name.toLowerCase() === 'height' ||
+          column.name.toLowerCase() === 'altitude',
+      )?.name;
+
+      if (altitudeColumn) {
+        const response = await dispatch(
+          fetchColumnsValues({
+            datasetId: selectedDataset.id!,
+            columnNames: [altitudeColumn],
+            rectangle: zone.rectangle!,
+            latCol:
+              selectedDataset.originalColumns?.find(column =>
+                column.name.toLowerCase().includes('lat'),
+              )?.name || null,
+            lonCol:
+              selectedDataset.originalColumns?.find(column =>
+                column.name.toLowerCase().includes('lon'),
+              )?.name || null,
+          }),
+        );
+
+        // Fix: response.payload may be string or object, and TS error if string
+        if (
+          response.payload &&
+          typeof response.payload === 'object' &&
+          altitudeColumn in response.payload
+        ) {
+          heights = (response.payload[altitudeColumn] as number[]) || [];
+        }
+      }
+
       const response = await api.post<IZone>('/zones', {
         ...zone,
         geohashes: includedGeohashes,
+        heights,
       });
 
       return response.data;

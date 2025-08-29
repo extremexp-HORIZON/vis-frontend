@@ -253,7 +253,23 @@ export const Zones = ({ dataset }: IZonesProps) => {
                               '-'
                             )}
                           </TableCell>
-                          <TableCell>{z.heights?.join(', ')}</TableCell>
+                          <TableCell>
+                            {z.heights && z.heights.length > 0 ? (() => {
+                              const sortedHeights = [...z.heights].sort((a, b) => a - b);
+
+                              return (
+                                <>
+                                  <span>
+                                    {z.heights.length} values
+                                    <br />
+                                    <strong>Min:</strong> {sortedHeights[0]}
+                                    <br />
+                                    <strong>Max:</strong> {sortedHeights[sortedHeights.length - 1]}
+                                  </span>
+                                </>
+                              );
+                            })() : '-'}
+                          </TableCell>
                           <TableCell>
                             {z.rectangle ? (
                               <Box>
