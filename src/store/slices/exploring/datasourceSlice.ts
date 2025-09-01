@@ -2,6 +2,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { api } from '../../../app/api/api';
 import type { IDataSource } from '../../../shared/models/dataexploration.model';
+import { showError, showSuccess } from '../../../shared/utils/toast';
 
 export interface IDataSourceState {
   dataSource: IDataSource | null;
@@ -113,6 +114,7 @@ export const dataSourceSlice = createSlice({
     builder.addCase(getDataSource.fulfilled, (state, action) => {
       state.loading.fetch = false;
       state.dataSource = action.payload;
+      showSuccess(`${action.payload.fileName} data source loaded!`);
     });
     builder.addCase(getDataSource.pending, state => {
       state.loading.fetch = true;
@@ -123,11 +125,13 @@ export const dataSourceSlice = createSlice({
       (state, action: PayloadAction<string | undefined>) => {
         state.loading.fetch = false;
         state.error.fetch = action.payload || 'Failed to fetch data source';
+        showError(action.payload || 'Failed to fetch data source');
       },
     );
     builder.addCase(getDataSourceList.fulfilled, (state, action) => {
       state.loading.fetch = false;
       state.dataSources = action.payload;
+      showSuccess(`${action.payload.length} data sources loaded!`);
     });
     builder.addCase(getDataSourceList.pending, state => {
       state.loading.fetch = true;
@@ -138,12 +142,14 @@ export const dataSourceSlice = createSlice({
       (state, action: PayloadAction<string | undefined>) => {
         state.loading.fetch = false;
         state.error.fetch = action.payload || 'Failed to fetch data sources';
+        showError(action.payload || 'Failed to fetch data sources');
       },
     );
     builder.addCase(uploadDataSource.fulfilled, (state, action) => {
       state.loading.upload = false;
       state.dataSource = action.payload;
       state.dataSources.push(action.payload);
+      showSuccess(`${action.payload.fileName} data source uploaded!`);
     });
     builder.addCase(uploadDataSource.pending, state => {
       state.loading.upload = true;
@@ -154,6 +160,7 @@ export const dataSourceSlice = createSlice({
       (state, action: PayloadAction<string | undefined>) => {
         state.loading.upload = false;
         state.error.upload = action.payload || 'Failed to upload data source';
+        showError(action.payload || 'Failed to upload data source');
       },
     );
   },

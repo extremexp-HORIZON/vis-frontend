@@ -5,11 +5,7 @@ import {
   defaultValue as zoneDefaultValue,
   type IZone,
 } from '../../../shared/models/exploring/zone.model';
-import {
-  showZoneDeleted,
-  showZoneError,
-  showZoneCreated,
-} from '../../../shared/utils/toast';
+import { showError, showSuccess } from '../../../shared/utils/toast';
 import type { AppStartListening } from '../../listenerMiddleware';
 import { setDrawnRect } from './mapSlice';
 import ngeohash from 'ngeohash';
@@ -207,7 +203,7 @@ export const zoneSlice = createSlice({
       .addCase(getZones.rejected, (state, action) => {
         state.loading.getZones = false;
         state.error.getZones = action.payload || 'Failed to get zones';
-        showZoneError('load', action.payload || 'Failed to get zones');
+        showError(action.payload || 'Failed to get zones');
       })
       // getZonesByFileName
       .addCase(getZonesByFileName.pending, state => {
@@ -221,10 +217,7 @@ export const zoneSlice = createSlice({
         state.loading.getZones = false;
         state.error.getZones =
           action.payload || 'Failed to get zones by file name';
-        showZoneError(
-          'load',
-          action.payload || 'Failed to get zones by file name',
-        );
+        showError(action.payload || 'Failed to get zones by file name');
       })
       // postZone
       .addCase(postZone.pending, state => {
@@ -235,12 +228,12 @@ export const zoneSlice = createSlice({
         state.zone = action.payload;
         // state.zones.push(action.payload);
         state.modalOpen = true;
-        showZoneCreated();
+        showSuccess('Zone created successfully!');
       })
       .addCase(postZone.rejected, (state, action) => {
         state.loading.postZone = false;
         state.error.postZone = action.payload || 'Failed to post zone';
-        showZoneError('create', action.payload || 'Failed to post zone');
+        showError(action.payload || 'Failed to post zone');
       })
       // deleteZone
       .addCase(deleteZone.pending, state => {
@@ -251,12 +244,12 @@ export const zoneSlice = createSlice({
         state.zones = state.zones.filter(
           zone => zone.id !== action.meta.arg.id,
         );
-        showZoneDeleted();
+        showSuccess('Zone deleted successfully!');
       })
       .addCase(deleteZone.rejected, (state, action) => {
         state.loading.deleteZone = false;
         state.error.deleteZone = action.payload || 'Failed to delete zone';
-        showZoneError('delete', action.payload || 'Failed to delete zone');
+        showError(action.payload || 'Failed to delete zone');
       });
   },
 });

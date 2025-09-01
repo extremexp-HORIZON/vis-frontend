@@ -17,6 +17,7 @@ import type { AppStartListening } from '../../listenerMiddleware';
 import { updateTimeSeries } from './timeSeriesSlice';
 import { logger } from '../../../shared/utils/logger';
 import type { IRectangle } from '../../../shared/models/exploring/rectangle.model';
+import { showError, showSuccess } from '../../../shared/utils/toast';
 
 interface exploringDatasetState {
   dataset: IDataset;
@@ -98,7 +99,10 @@ export const fetchColumnsValues = createAsyncThunk<
   { rejectValue: string }
 >(
   'api/getColumnsValues',
-  async ({ datasetId, columnNames, rectangle, latCol, lonCol }, { rejectWithValue }) => {
+  async (
+    { datasetId, columnNames, rectangle, latCol, lonCol },
+    { rejectWithValue },
+  ) => {
     try {
       const response = await api.post(`/data/fetch/${datasetId}/columns`, {
         rectangle,
@@ -241,6 +245,7 @@ export const datasetSlice = createSlice({
         (state, action: PayloadAction<string | undefined>) => {
           state.loading.getRow = false;
           state.error.getRow = action.payload || 'Failed to fetch row';
+          showError(action.payload || 'Failed to fetch row');
         },
       );
 
@@ -257,6 +262,7 @@ export const datasetSlice = createSlice({
           // You might want to add the new dataset to the datasets array or update it
           // For now, just set it as the selected dataset if applicable
           state.dataset = action.payload;
+          showSuccess(`${action.payload.id} metadata loaded!`);
         },
       )
       .addCase(
@@ -265,6 +271,7 @@ export const datasetSlice = createSlice({
           state.loading.postFileMeta = false;
           state.error.postFileMeta =
             action.payload || 'Failed to post file metadata';
+          showError(action.payload || 'Failed to post file metadata');
         },
       );
 
@@ -284,6 +291,7 @@ export const datasetSlice = createSlice({
           state.loading.executeQuery = false;
           state.error.executeQuery =
             action.payload || 'Failed to execute query';
+          showError(action.payload || 'Failed to execute query');
         },
       );
 
@@ -303,6 +311,7 @@ export const datasetSlice = createSlice({
           state.loading.executeTimeSeriesQuery = false;
           state.error.executeTimeSeriesQuery =
             action.payload || 'Failed to execute time series query';
+          showError(action.payload || 'Failed to execute time series query');
         },
       );
   },
