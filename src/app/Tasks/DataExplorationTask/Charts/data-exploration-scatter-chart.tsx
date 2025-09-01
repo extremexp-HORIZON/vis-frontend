@@ -148,7 +148,7 @@ const getScatterChartOverlaySpec = ({
 
       return {
         ...(transforms.length ? { transform: transforms } : {}),
-        mark: { type: 'circle' },
+        mark: 'point',
         encoding: {
           x: {
             field: xAxis.name,
