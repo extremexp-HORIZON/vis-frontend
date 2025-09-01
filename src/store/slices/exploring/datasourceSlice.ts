@@ -7,15 +7,15 @@ import { showError, showSuccess } from '../../../shared/utils/toast';
 export interface IDataSourceState {
   dataSource: IDataSource | null;
   dataSources: IDataSource[];
-  loading: { fetch: boolean; upload: boolean };
-  error: { fetch: string | null; upload: string | null };
+  loading: { fetch: boolean; upload: boolean; delete: boolean };
+  error: { fetch: string | null; upload: string | null; delete: string | null };
 }
 
 const initialState: IDataSourceState = {
   dataSource: null,
   dataSources: [],
-  loading: { fetch: false, upload: false },
-  error: { fetch: null, upload: null },
+  loading: { fetch: false, upload: false, delete: false },
+  error: { fetch: null, upload: null, delete: null },
 };
 
 export const getDataSource = createAsyncThunk<
@@ -42,6 +42,23 @@ export const getDataSourceList = createAsyncThunk<
 >('api/getDataSourceList', async (_, { rejectWithValue }) => {
   try {
     const response = await api.get<IDataSource[]>('/datasources');
+
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
+  }
+});
+
+export const deleteDataSource = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>('api/deleteDataSource', async (fileName, { rejectWithValue }) => {
+  try {
+    const response = await api.delete<string>(`/datasources/${fileName}`);
 
     return response.data;
   } catch (error: unknown) {
@@ -111,6 +128,7 @@ export const dataSourceSlice = createSlice({
   name: 'dataSource',
   initialState,
   extraReducers: builder => {
+    // Get Data Source
     builder.addCase(getDataSource.fulfilled, (state, action) => {
       state.loading.fetch = false;
       state.dataSource = action.payload;
@@ -128,6 +146,7 @@ export const dataSourceSlice = createSlice({
         showError(action.payload || 'Failed to fetch data source');
       },
     );
+    // Get Data Source List
     builder.addCase(getDataSourceList.fulfilled, (state, action) => {
       state.loading.fetch = false;
       state.dataSources = action.payload;
@@ -145,6 +164,7 @@ export const dataSourceSlice = createSlice({
         showError(action.payload || 'Failed to fetch data sources');
       },
     );
+    // Upload Data Source
     builder.addCase(uploadDataSource.fulfilled, (state, action) => {
       state.loading.upload = false;
       state.dataSource = action.payload;
@@ -163,6 +183,21 @@ export const dataSourceSlice = createSlice({
         showError(action.payload || 'Failed to upload data source');
       },
     );
+    // Delete Data Source
+    builder.addCase(deleteDataSource.fulfilled, (state, action) => {
+      state.loading.delete = false;
+      state.dataSources = state.dataSources.filter(dataSource => dataSource.fileName !== action.meta.arg);
+      showSuccess(`${action.meta.arg} data source deleted!`);
+    });
+    builder.addCase(deleteDataSource.pending, state => {
+      state.loading.delete = true;
+      state.error.delete = null;
+    });
+    builder.addCase(deleteDataSource.rejected, (state, action: PayloadAction<string | undefined>) => {
+      state.loading.delete = false;
+      state.error.delete = action.payload || 'Failed to delete data source';
+      showError(action.payload || 'Failed to delete data source');
+    });
   },
   reducers: {
     resetDataSourceState: () => {

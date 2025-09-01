@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Alert,
   Box,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -11,19 +12,32 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import {
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+} from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import {
+  deleteDataSource,
   getDataSourceList,
   setDataSource,
 } from '../../store/slices/exploring/datasourceSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Loader from '../../shared/components/loader';
 import { FileUpload } from '../../shared/components/file-upload';
+import { ConfirmationModal } from '../../shared/components/confirmation-modal';
 
 const ExploringPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    open: boolean;
+    fileName: string | null;
+  }>({
+    open: false,
+    fileName: null,
+  });
   const { dataSources, loading, error } = useAppSelector(
     state => state.dataSource,
   );
@@ -31,6 +45,33 @@ const ExploringPage = () => {
   useEffect(() => {
     dispatch(getDataSourceList());
   }, [dispatch]);
+
+  const handleViewClick = (fileName: string) => {
+    dispatch(
+      setDataSource(
+        dataSources.find(dataSource => dataSource.fileName === fileName)!,
+      ),
+    );
+    navigate(`${location.pathname.replace(/\/$/, '')}/visualize/${fileName}`);
+  };
+
+  const handleDeleteClick = (fileName: string) => {
+    setDeleteConfirmation({
+      open: true,
+      fileName,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmation.fileName) {
+      dispatch(deleteDataSource(deleteConfirmation.fileName));
+      setDeleteConfirmation({ open: false, fileName: null });
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ open: false, fileName: null });
+  };
 
   return (
     <Box
@@ -45,9 +86,9 @@ const ExploringPage = () => {
     >
       {loading.fetch ? (
         <Loader />
-      ) : error.fetch ? (
+      ) : error.fetch || error.delete ? (
         <Alert severity="error" sx={{ width: '80%', margin: 'auto' }}>
-          {error.fetch}
+          {error.fetch || error.delete}
         </Alert>
       ) : (
         <>
@@ -69,31 +110,36 @@ const ExploringPage = () => {
                     <TableRow>
                       <TableCell align="center">Name</TableCell>
                       <TableCell align="center">Source</TableCell>
-                      {/* <TableCell align="center">Source Type</TableCell> */}
+                      <TableCell align="center">Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {dataSources.map(dataSource => (
-                      <TableRow
-                        key={`dataSource-row-${dataSource.fileName}`}
-                        hover
-                        sx={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          dispatch(setDataSource(dataSource));
-                          navigate(
-                            `${location.pathname.replace(/\/$/, '')}/visualize/${dataSource.fileName}`,
-                          );
-                        }}
-                      >
+                      <TableRow key={`dataSource-row-${dataSource.fileName}`}>
                         <TableCell sx={{ textAlign: 'center' }}>
                           {dataSource.fileName}
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>
                           {dataSource.source}
                         </TableCell>
-                        {/* <TableCell sx={{ textAlign: 'center' }}>
-                      {dataSource.sourceType}
-                    </TableCell> */}
+                        <TableCell sx={{ textAlign: 'center' }}>
+                          <IconButton
+                            color="primary"
+                            size="small"
+                            onClick={() => handleViewClick(dataSource.fileName)}
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                          <IconButton
+                            color="error"
+                            size="small"
+                            onClick={() =>
+                              handleDeleteClick(dataSource.fileName)
+                            }
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -106,6 +152,19 @@ const ExploringPage = () => {
           <Box sx={{ width: '40%', mt: 3 }}>
             <FileUpload />
           </Box>
+
+          <ConfirmationModal
+            open={deleteConfirmation.open}
+            title="Delete Data Source"
+            message={`Are you sure you want to delete data source with id: "${deleteConfirmation.fileName}"?`}
+            confirmText="Delete"
+            cancelText="Cancel"
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+            confirmColor="error"
+            severity="warning"
+            loading={loading.delete}
+          />
         </>
       )}
     </Box>
