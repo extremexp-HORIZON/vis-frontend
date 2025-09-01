@@ -262,9 +262,9 @@ export const Zones = ({ dataset }: IZonesProps) => {
                                   <span>
                                     {z.heights.length} values
                                     <br />
-                                    <strong>Min:</strong> {sortedHeights[0]}
+                                    <strong>Min:</strong> {sortedHeights[0]}m
                                     <br />
-                                    <strong>Max:</strong> {sortedHeights[sortedHeights.length - 1]}
+                                    <strong>Max:</strong> {sortedHeights[sortedHeights.length - 1]}m
                                   </span>
                                 </>
                               );

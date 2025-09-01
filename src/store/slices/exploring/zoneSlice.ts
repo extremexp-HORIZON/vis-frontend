@@ -1,4 +1,4 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction, ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { api } from '../../../app/api/api';
 import {
@@ -9,8 +9,58 @@ import { showError, showSuccess } from '../../../shared/utils/toast';
 import type { AppStartListening } from '../../listenerMiddleware';
 import { setDrawnRect } from './mapSlice';
 import ngeohash from 'ngeohash';
-import type { RootState } from '../../store';
+import { type RootState } from '../../store';
 import { fetchColumnsValues } from './datasetSlice';
+import type { IDataset } from '../../../shared/models/exploring/dataset.model';
+import type { IRectangle } from '../../../shared/models/exploring/rectangle.model';
+
+/**
+ * Fetches height/altitude values for a dataset within a specified rectangle
+ * @param dataset - The dataset to fetch heights from
+ * @param rectangle - The geographical rectangle to filter data
+ * @param dispatch - Redux dispatch function
+ * @returns Promise<number[] | undefined> - Array of heights or undefined if no height column found
+ */
+export const fetchHeightsForDataset = async (
+  dataset: IDataset,
+  rectangle: IRectangle,
+  dispatch: ThunkDispatch<unknown, unknown, UnknownAction>,
+): Promise<number[] | undefined> => {
+  // Dynamically determine the altitude/height column name
+  const altitudeColumn = dataset.originalColumns?.find(
+    column =>
+      column.name.toLowerCase() === 'height' ||
+      column.name.toLowerCase() === 'altitude',
+  )?.name;
+
+  if (!altitudeColumn) {
+    return undefined;
+  }
+
+  const response = await dispatch(
+    fetchColumnsValues({
+      datasetId: dataset.id!,
+      columnNames: [altitudeColumn],
+      rectangle: rectangle,
+      latCol: dataset.originalColumns?.find(column =>
+        column.name.toLowerCase().includes('lat'),
+      )?.name,
+      lonCol: dataset.originalColumns?.find(column =>
+        column.name.toLowerCase().includes('lon'),
+      )?.name,
+    }),
+  );
+
+  if (
+    response.payload &&
+    typeof response.payload === 'object' &&
+    altitudeColumn in response.payload
+  ) {
+    return (response.payload[altitudeColumn] as number[]) || [];
+  }
+
+  return undefined;
+};
 
 interface exploringZoneState {
   zone: IZone;
@@ -104,41 +154,11 @@ export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
         )
         : [];
 
-      const selectedDataset = dataset.dataset;
-
-      let heights: number[] | undefined = undefined;
-
-      // Dynamically determine the altitude/height column name
-      const altitudeColumn = selectedDataset.originalColumns?.find(
-        column =>
-          column.name.toLowerCase() === 'height' ||
-          column.name.toLowerCase() === 'altitude',
-      )?.name;
-
-      if (altitudeColumn) {
-        const response = await dispatch(
-          fetchColumnsValues({
-            datasetId: selectedDataset.id!,
-            columnNames: [altitudeColumn],
-            rectangle: zone.rectangle,
-            latCol: selectedDataset.originalColumns?.find(column =>
-              column.name.toLowerCase().includes('lat'),
-            )?.name,
-            lonCol: selectedDataset.originalColumns?.find(column =>
-              column.name.toLowerCase().includes('lon'),
-            )?.name,
-          }),
-        );
-
-        // Fix: response.payload may be string or object, and TS error if string
-        if (
-          response.payload &&
-          typeof response.payload === 'object' &&
-          altitudeColumn in response.payload
-        ) {
-          heights = (response.payload[altitudeColumn] as number[]) || [];
-        }
-      }
+      const heights = await fetchHeightsForDataset(
+        dataset.dataset,
+        zone.rectangle!,
+        dispatch,
+      );
 
       const response = await api.post<IZone>('/zones', {
         ...zone,
