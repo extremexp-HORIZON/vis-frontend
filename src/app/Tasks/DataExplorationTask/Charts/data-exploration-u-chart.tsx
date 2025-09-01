@@ -23,6 +23,7 @@ const Uchart = () => {
       const umapPayload = parsedData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) =>
         Object.values(row).map(val => parseFloat(val as string)),
       );
+
       if (meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source) return;
       dispatch(
         fetchUmap({

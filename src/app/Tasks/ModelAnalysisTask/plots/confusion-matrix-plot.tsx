@@ -36,7 +36,7 @@ const ConfusionMatrixPlot = () => {
   };
 
   useEffect(() => {
-    if(tab && (!confusionMatrix?.data || confusionMatrix?.error) ) {
+    if(tab && (!confusionMatrix?.data || confusionMatrix?.error)) {
       dispatch(fetchConfusionMatrix({ experimentId: experimentId || '', runId: tab.workflowId || '' }));
     }
   }, [isTabInitialized]);

@@ -92,7 +92,8 @@ const ComparisonModelInstance = ({
   useEffect(() => {
     if (!experimentId) return;
     selectedWorkflowIds.forEach((runId) => {
-      const instances = comparativeModelInstance[runId]
+      const instances = comparativeModelInstance[runId];
+
       if(!instances?.data || instances?.error)
         dispatch(fetchComparativeModelInstances({ experimentId, runId }));
     });
