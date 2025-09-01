@@ -241,7 +241,7 @@ const ScatterChartControlPanel = () => {
             </Button>
           </ButtonGroup>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography
               variant="caption"
               sx={{
