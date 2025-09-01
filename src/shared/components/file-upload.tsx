@@ -9,6 +9,7 @@ import {
   CircularProgress,
   IconButton,
   Chip,
+  TextField,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,6 +31,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const { loading, error } = useAppSelector(state => state.dataSource);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [measure0, setMeasure0] = useState<string | null>(null);
+  const [measure1, setMeasure1] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const acceptedFileTypes = ['.csv'];
@@ -99,12 +102,17 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     }
   };
 
-  const handleUpload = async () => {
+  const handleUpload = async (measure0?: string, measure1?: string) => {
     if (!selectedFile) return;
 
     try {
       const result = await dispatch(
-        uploadDataSource({ file: selectedFile, format: 'rawvis' }),
+        uploadDataSource({
+          file: selectedFile,
+          format: 'rawvis',
+          measure0,
+          measure1,
+        }),
       ).unwrap();
 
       setSelectedFile(null);
@@ -193,6 +201,21 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 <Typography variant="body2" color="text.secondary">
                   {formatFileSize(selectedFile.size)}
                 </Typography>
+
+                <TextField
+                  size="small"
+                  label="Measure 0"
+                  value={measure0 || ''}
+                  onChange={e => setMeasure0(e.target.value)}
+                  onClick={e => e.stopPropagation()}
+                />
+                <TextField
+                  size="small"
+                  label="Measure 1"
+                  value={measure1 || ''}
+                  onChange={e => setMeasure1(e.target.value)}
+                  onClick={e => e.stopPropagation()}
+                />
               </Box>
               <IconButton
                 onClick={e => {
@@ -214,9 +237,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               variant="contained"
               onClick={e => {
                 e.stopPropagation();
-                handleUpload();
+                handleUpload(
+                  measure0 ? measure0 : undefined,
+                  measure1 ? measure1 : undefined,
+                );
               }}
-              disabled={loading.upload}
+              disabled={!measure0 || !measure1 || loading.upload}
               sx={{ mt: 2 }}
             >
               {loading.upload ? (

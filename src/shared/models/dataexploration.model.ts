@@ -38,6 +38,8 @@ export interface IDataSource {
   format: string
   sourceType: string
   fileName: string
+  measure0?: string
+  measure1?: string
 }
 
 export interface IDataExplorationQuery {
