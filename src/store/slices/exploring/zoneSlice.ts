@@ -120,15 +120,13 @@ export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
           fetchColumnsValues({
             datasetId: selectedDataset.id!,
             columnNames: [altitudeColumn],
-            rectangle: zone.rectangle!,
-            latCol:
-              selectedDataset.originalColumns?.find(column =>
-                column.name.toLowerCase().includes('lat'),
-              )?.name || null,
-            lonCol:
-              selectedDataset.originalColumns?.find(column =>
-                column.name.toLowerCase().includes('lon'),
-              )?.name || null,
+            rectangle: zone.rectangle,
+            latCol: selectedDataset.originalColumns?.find(column =>
+              column.name.toLowerCase().includes('lat'),
+            )?.name,
+            lonCol: selectedDataset.originalColumns?.find(column =>
+              column.name.toLowerCase().includes('lon'),
+            )?.name,
           }),
         );
 

@@ -92,9 +92,9 @@ export const fetchColumnsValues = createAsyncThunk<
   {
     datasetId: string;
     columnNames: string[];
-    rectangle: IRectangle | null;
-    latCol: string | null;
-    lonCol: string | null;
+    rectangle?: IRectangle;
+    latCol?: string;
+    lonCol?: string;
   },
   { rejectValue: string }
 >(
