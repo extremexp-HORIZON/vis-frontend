@@ -325,12 +325,10 @@ export const datasetUiListeners = (startAppListening: AppStartListening) => {
       const dataset = state.dataset;
       const datasetId = dataset.dataset.id;
 
-      if (datasetId && state.dataset.timeRange.from !== 0) {
-        // Check if timeRange.from is initial value to not trigger updates
-
+      if (datasetId) {
         try {
           await dispatch(updateClusters(datasetId));
-          if (state.map.drawnRect) {
+          if (dataset.dataset.timeColumn && state.map.drawnRect) {
             dispatch(updateTimeSeries());
           }
         } catch (error) {

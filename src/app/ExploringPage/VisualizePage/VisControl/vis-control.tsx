@@ -194,48 +194,52 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
         </Stack>
       )}
 
-      <Stack direction="row" gap={1} flexWrap="wrap">
-        <Typography variant="subtitle1" textAlign="start">
-          Time Range
-        </Typography>
-        {['All', '1M', '2W', '1W', '3D', '1D'].map((label, i) => (
-          <Button
-            key={i}
-            size="small"
-            variant={activeDate === i ? 'contained' : 'text'}
-            onClick={() => handleRangeListClick(i)}
-          >
-            {label}
-          </Button>
-        ))}
-      </Stack>
+      {dataset.timeColumn && (
+        <>
+          <Stack direction="row" gap={1} flexWrap="wrap">
+            <Typography variant="subtitle1" textAlign="start">
+              Time Range
+            </Typography>
+            {['All', '1M', '2W', '1W', '3D', '1D'].map((label, i) => (
+              <Button
+                key={i}
+                size="small"
+                variant={activeDate === i ? 'contained' : 'text'}
+                onClick={() => handleRangeListClick(i)}
+              >
+                {label}
+              </Button>
+            ))}
+          </Stack>
 
-      <Stack direction="row" justifyContent="space-evenly">
-        <DatePicker
-          label="Start date"
-          value={dateRange[0]}
-          onChange={newValue => handleDateChange([newValue, dateRange[1]])}
-          minDate={dayjs(dataset.timeMin!)}
-          maxDate={dayjs()}
-          slotProps={{
-            textField: {
-              size: 'small',
-            },
-          }}
-        />
-        <DatePicker
-          label="End date"
-          value={dateRange[1]}
-          onChange={newValue => handleDateChange([dateRange[0], newValue])}
-          minDate={dayjs(dataset.timeMin!)}
-          maxDate={dayjs()}
-          slotProps={{
-            textField: {
-              size: 'small',
-            },
-          }}
-        />
-      </Stack>
+          <Stack direction="row" justifyContent="space-evenly">
+            <DatePicker
+              label="Start date"
+              value={dateRange[0]}
+              onChange={newValue => handleDateChange([newValue, dateRange[1]])}
+              minDate={dayjs(dataset.timeMin!)}
+              maxDate={dayjs()}
+              slotProps={{
+                textField: {
+                  size: 'small',
+                },
+              }}
+            />
+            <DatePicker
+              label="End date"
+              value={dateRange[1]}
+              onChange={newValue => handleDateChange([dateRange[0], newValue])}
+              minDate={dayjs(dataset.timeMin!)}
+              maxDate={dayjs()}
+              slotProps={{
+                textField: {
+                  size: 'small',
+                },
+              }}
+            />
+          </Stack>
+        </>
+      )}
     </Card>
   );
 };

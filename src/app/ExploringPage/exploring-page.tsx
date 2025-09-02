@@ -110,6 +110,7 @@ const ExploringPage = () => {
                     <TableRow>
                       <TableCell align="center">Name</TableCell>
                       <TableCell align="center">Source</TableCell>
+                      <TableCell align="center">Measures</TableCell>
                       <TableCell align="center">Actions</TableCell>
                     </TableRow>
                   </TableHead>
@@ -121,6 +122,9 @@ const ExploringPage = () => {
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>
                           {dataSource.source}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: 'center' }}>
+                          {dataSource.measure0}, {dataSource.measure1}
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>
                           <IconButton
