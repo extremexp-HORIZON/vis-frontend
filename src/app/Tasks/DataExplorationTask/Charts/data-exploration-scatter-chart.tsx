@@ -153,7 +153,12 @@ const getScatterChartOverlaySpec = ({
           x: {
             field: xAxis.name,
             type: getColumnType(xAxis.type, xAxis.name),
-            axis: { title: xAxis.name, labelLimit: 30, labelOverlap: 'auto' },
+            axis: { 
+              title: xAxis.name, 
+              labelLimit: 100, 
+              labelOverlap: 'auto',
+              labelAngle: isFieldNumericLike(data, xAxis.name) ? 0 : -45
+            },
           },
           y: {
             field: yFieldForEncoding,
@@ -229,7 +234,12 @@ const getSingleScatterSpec = ({
       x: {
         field: xAxis.name,
         type: getColumnType(xAxis.type, xAxis.name),
-        axis: { title: xAxis.name, labelOverlap: 'auto' },
+        axis: { 
+          title: xAxis.name, 
+          labelOverlap: 'auto',
+          labelLimit: 100,
+          labelAngle: isFieldNumericLike(data, xAxis.name) ? 0 : -45
+        },
       },
       y: {
         field: y.name,

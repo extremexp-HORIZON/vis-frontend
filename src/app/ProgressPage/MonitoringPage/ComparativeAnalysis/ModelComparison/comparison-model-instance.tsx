@@ -206,6 +206,7 @@ const ComparisonModelInstance = ({
         x: {
           field: xAxisOption,
           type: inferFieldType(instanceState.data ?? [], xAxisOption),
+          axis: {labelAngle: inferFieldType(instanceState.data ?? [], xAxisOption) === 'nominal' ? -45 : 0, labelLimit: 100}
         },
         y: {
           field: yAxisOption,
