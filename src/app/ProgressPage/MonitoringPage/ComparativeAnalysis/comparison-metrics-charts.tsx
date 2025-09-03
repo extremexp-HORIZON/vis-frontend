@@ -50,8 +50,6 @@ const ComparisonMetricsCharts: React.FC = () => {
     return allMetrics.reduce((acc, curr) => acc.filter(m => curr.includes(m)));
   };
 
-
-
   // when we fetch workflows we need to clear the previous metrics and fetch new in case they are changed
   useEffect(() => {
     hasFetchedOnInit.current = false;
@@ -63,6 +61,7 @@ const ComparisonMetricsCharts: React.FC = () => {
       const commonMetrics = getCommonMetrics(workflowsTable.selectedWorkflows)
         .filter(m => m !== 'rating')
         .slice(0, 5);
+
       workflowsTable.selectedWorkflows.forEach(workflowId => {
 
         if (commonMetrics?.length) {
@@ -96,7 +95,6 @@ const ComparisonMetricsCharts: React.FC = () => {
         .filter(m => m !== 'rating')
         .filter(m => comparativeVisibleMetrics.includes(m));
 
-
       if (metricNames?.length) {
         dispatch(fetchWorkflowMetrics({ experimentId, workflowId, metricNames }));
       }
@@ -127,7 +125,6 @@ const ComparisonMetricsCharts: React.FC = () => {
 
     previousVisibleRef.current = curr;
   }, [comparativeVisibleMetrics]);
-
 
   const normalizeTimestamp = (timestamp: number | undefined): string | undefined => {
     if (timestamp == null) return undefined;

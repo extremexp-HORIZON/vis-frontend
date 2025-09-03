@@ -745,8 +745,8 @@ export default function WorkflowTreeView() {
 
                       {Object.entries(outputGrouped.folders).map(([folder, dsList], folderIndex) => (
                         <TreeItem2
-                          key={`input-folder-${id}-${folderIndex}`}
-                          itemId={`input-folder-${id}-${folderIndex}`}
+                          key={`output-folder-${id}-${folderIndex}`}
+                          itemId={`output-folder-${id}-${folderIndex}`}
                           slotProps={{
                             content: {
                               style: {
@@ -1280,8 +1280,8 @@ export default function WorkflowTreeView() {
 
                       {Object.entries(fallbackOutputGrouped.folders).map(([folder, dsList], folderIndex) => (
                         <TreeItem2
-                          key={`input-folder-${folderIndex}`}
-                          itemId={`input-folder-${folderIndex}`}
+                          key={`output-folder-${folderIndex}`}
+                          itemId={`output-folder-${folderIndex}`}
                           slotProps={{
                             content: {
                               style: {
