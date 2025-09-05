@@ -149,6 +149,14 @@ const LineChart = () => {
 
     return {
       data: { values: longData },
+      params: [
+        {
+          name: 'panZoom',
+          select: 'interval',
+          bind: 'scales',
+          clear: 'dblclick',
+        },
+      ],
       mark: { type: 'line', tooltip: true, point: { size: 20 } },
       encoding: {
         x: {
@@ -204,6 +212,14 @@ const LineChart = () => {
 
     return {
       data: { values },
+      params: [
+        {
+          name: 'panZoom',
+          select: 'interval',
+          bind: 'scales',
+          clear: 'dblclick',
+        },
+      ],
       mark: { type: 'line', tooltip: true, point: { size: 20 } },
       encoding: {
         x: {
