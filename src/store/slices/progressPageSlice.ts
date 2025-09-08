@@ -20,6 +20,7 @@ interface IProgressPage {
     data: IRun[]
     loading: boolean
     error: string | null
+    requested: boolean
   }
   progressBar: {
     total: number
@@ -46,7 +47,7 @@ workflowEvaluation: {
 const initialState: IProgressPage = {
   initialization: false,
   experiment: { data: null, loading: false, error: null },
-  workflows: { data: [], loading: false, error: null },
+  workflows: { data: [], loading: false, error: null, requested: false },
   progressBar: { total: 0, completed: 0, running: 0, failed: 0, progress: 0 },
   statusController: {
     data: '',
@@ -109,6 +110,7 @@ export const progressPageSlice = createSlice({
       })
       .addCase(fetchExperimentWorkflows.pending, state => {
         state.workflows.loading = true;
+        state.workflows.requested = true;
       })
       .addCase(fetchExperiment.pending, state => {
         state.experiment.loading = true;
