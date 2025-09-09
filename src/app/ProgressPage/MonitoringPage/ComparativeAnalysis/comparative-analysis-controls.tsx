@@ -89,9 +89,13 @@ const ComparativeAnalysisControls = ()=> {
       <Box
         display="flex"
         alignItems="center"
-        flexWrap="wrap"
-        gap={2}
-        sx={{ p: 2 }}
+        sx={{
+          p: 2,
+          minHeight: {xs: 16, lg: 40},
+          height: 'auto',
+          flexWrap: { xs: 'wrap', lg: 'nowrap' },
+          overflowX: 'auto',
+        }}
       >
         {selectedComparisonTab === 0 && (
           <Box>
@@ -294,7 +298,7 @@ const ComparativeAnalysisControls = ()=> {
           display="flex"
           alignItems="center"
           flexWrap="wrap"
-          gap={2}
+          gap={0.5}
           sx={{ ml: 'auto' }}
         >
 
