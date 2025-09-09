@@ -94,6 +94,47 @@ const Contourplot = (props: IContourplot) => {
     );
   };
 
+  // helper: bin edges for a sorted array of numeric centers
+  const computeBinEdges = (vals: number[]) => {
+    if (vals.length === 0) return [];
+    if (vals.length === 1) {
+      // single value: give it a 1-width bin around it
+      const v = vals[0];
+      return [v - 0.5, v + 0.5];
+    }
+    const edges: number[] = new Array(vals.length + 1);
+    // interior edges = midpoints
+    for (let i = 0; i < vals.length - 1; i++) {
+      edges[i + 1] = (vals[i] + vals[i + 1]) / 2;
+    }
+    // extrapolate first/last edges
+    const firstGap = vals[1] - vals[0];
+    const lastGap = vals[vals.length - 1] - vals[vals.length - 2];
+    edges[0] = vals[0] - firstGap / 2;
+    edges[vals.length] = vals[vals.length - 1] + lastGap / 2;
+    return edges;
+  };
+
+  const isNumericArray = (arr: (string | number)[]): boolean => {
+    return arr.length > 0 && arr.every(val => !isNaN(Number(val)));
+  };
+
+  const xField = plotModel?.data?.xAxis.axisName || 'x';
+  const yField = plotModel?.data?.yAxis.axisName || 'y';
+  const zField = plotModel?.data?.zAxis.axisName || 'value';
+
+  const xValsRaw = plotModel?.data?.xAxis.axisValues ?? [];
+  const yValsRaw = plotModel?.data?.yAxis.axisValues ?? [];
+
+  const xIsNumeric = isNumericArray(xValsRaw);
+  const yIsNumeric = isNumericArray(yValsRaw);
+
+  // numeric versions (if applicable)
+  const xValsNum = xIsNumeric ? xValsRaw.map(Number) : [];
+  const yValsNum = yIsNumeric ? yValsRaw.map(Number) : [];
+  const xEdges = xIsNumeric ? computeBinEdges(xValsNum) : [];
+  const yEdges = yIsNumeric ? computeBinEdges(yValsNum) : [];
+
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return [];
 
@@ -105,55 +146,37 @@ const Contourplot = (props: IContourplot) => {
     const yName = plmodel.yAxis.axisName;
     const zName = plmodel.zAxis.axisName || 'value';
 
-    const data: { [key: string]: string | number }[] = [];
+    const data: Record<string, string | number>[] = [];
 
     for (let xIdx = 0; xIdx < xVals.length; xIdx++) {
       for (let yIdx = 0; yIdx < yVals.length; yIdx++) {
-        explanation_type === 'featureExplanation' ?
-          data.push({
-            [xName]: xVals[xIdx],
-            [yName]: yVals[yIdx],
-            [zName]: zMatrix[xIdx][yIdx],
-          }) :
-          data.push({
-            [xName]: xVals[xIdx],
-            [yName]: yVals[yIdx],
-            [zName]: zMatrix[yIdx][xIdx],
-          });
+        const zVal =
+          explanation_type === 'featureExplanation'
+            ? zMatrix[xIdx][yIdx]
+            : zMatrix[yIdx][xIdx];
+
+        const row: Record<string, string | number> = {
+          [xName]: xVals[xIdx],
+          [yName]: yVals[yIdx],
+          [zName]: zVal,
+        };
+
+        // If numeric, include bin edges for quantitative rects
+        if (xIsNumeric) {
+          row['x0'] = xEdges[xIdx];
+          row['x1'] = xEdges[xIdx + 1];
+        }
+        if (yIsNumeric) {
+          row['y0'] = yEdges[yIdx];
+          row['y1'] = yEdges[yIdx + 1];
+        }
+
+        data.push(row);
       }
     }
 
     return data;
   };
-
-  const isNumericArray = (arr: string[] | number[]): boolean => {
-    return arr.every(val => !isNaN(Number(val)));
-  };
-
-  const xField = plotModel?.data?.xAxis.axisName || 'x';
-  const yField = plotModel?.data?.yAxis.axisName || 'y';
-  const zField = plotModel?.data?.zAxis.axisName || 'value';
-
-  const xVals = plotModel?.data?.xAxis.axisValues ?? [];
-  const yVals = plotModel?.data?.yAxis.axisValues ?? [];
-
-  const xIsNumeric = isNumericArray(xVals);
-  const yIsNumeric = isNumericArray(yVals);
-
-  const transform = [];
-
-  if (xIsNumeric) {
-    transform.push({
-      calculate: `toNumber(datum["${xField}"])`,
-      as: 'x_num',
-    });
-  }
-  if (yIsNumeric) {
-    transform.push({
-      calculate: `toNumber(datum["${yField}"])`,
-      as: 'y_num',
-    });
-  }
 
   const spec = {
     width: 'container',
@@ -162,30 +185,45 @@ const Contourplot = (props: IContourplot) => {
     data: {
       values: hasInitialized ? getVegaliteData(plotModel?.data || null) : [],
     },
-    ...(transform.length > 0 && { transform }),
     mark: {
       type: 'rect',
-      tooltip: { content: 'data' },
     },
     encoding: {
-      x: {
-        field: xField,
-        type: 'ordinal',
-        ...(xIsNumeric && {
-          sort: { field: 'x_num', order: 'ascending' },
-        }),
-      },
-      y: {
-        field: yField,
-        type: 'ordinal',
-        ...(yIsNumeric && {
-          sort: { field: 'y_num', order: 'ascending' },
-        }),
-      },
+      ...(xIsNumeric
+        ? {
+            x: { field: 'x0', type: 'quantitative', axis: { title: xField } },
+            x2: { field: 'x1' },
+          }
+        : {
+            x: {
+              field: xField,
+              type: 'ordinal',
+              sort: { field: xField, order: 'ascending' },
+              axis: { title: xField }
+            },
+          }),
+      ...(yIsNumeric
+        ? {
+            y: { field: 'y0', type: 'quantitative', axis: { title: yField } },
+            y2: { field: 'y1' },
+          }
+        : {
+            y: {
+              field: yField,
+              type: 'ordinal',
+              sort: { field: yField, order: 'ascending' },
+              axis: { title: yField }
+            },
+          }),
       color: {
         field: zField,
         type: 'quantitative',
       },
+      tooltip: [
+        { field: xField, title: xField },
+        { field: yField, title: yField },
+        { field: zField, title: zField },
+      ],
     },
     config: {
       axis: { grid: true },
