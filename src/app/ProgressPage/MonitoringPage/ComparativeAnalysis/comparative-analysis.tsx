@@ -22,9 +22,6 @@ const ComparativeAnalysis = () => {
     if (groupBy.length > 0 && selectedComparisonTab !== 0) {
       dispatch(setSelectedComparisonTab(0));
     }
-    if(selectedComparisonTab === 2) {
-      dispatch(setIsMosaic(false));
-    }
   }, [groupBy, selectedComparisonTab]);
 
   return (

@@ -315,24 +315,26 @@ const ComparativeAnalysisControls = ()=> {
               sx={{ ml: 0.5 }}
             />
           )}
+          {selectedComparisonTab !== 2 && (
+            <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
+              <Button
+                variant={isMosaic ? 'contained' : 'outlined'}
+                disabled={selectedComparisonTab === 2}
+                color="primary"
+                onClick={() => dispatch(setIsMosaic(true))}
+              >
+                  Mosaic
+              </Button>
+              <Button
+                variant={!isMosaic ? 'contained' : 'outlined'}
+                color="primary"
+                onClick={() => dispatch(setIsMosaic(false))}
+              >
+                  Stacked
+              </Button>
+            </ButtonGroup>
+          )}
 
-          <ButtonGroup variant="contained" aria-label="view mode" sx={{ height: '25px' }}>
-            <Button
-              variant={isMosaic ? 'contained' : 'outlined'}
-              disabled={selectedComparisonTab === 2}
-              color="primary"
-              onClick={() => dispatch(setIsMosaic(true))}
-            >
-                Mosaic
-            </Button>
-            <Button
-              variant={!isMosaic ? 'contained' : 'outlined'}
-              color="primary"
-              onClick={() => dispatch(setIsMosaic(false))}
-            >
-                Stacked
-            </Button>
-          </ButtonGroup>
           {selectedModelComparisonChart === 'instanceView' && selectedComparisonTab === 1 && (
             <>
               <IconButton
