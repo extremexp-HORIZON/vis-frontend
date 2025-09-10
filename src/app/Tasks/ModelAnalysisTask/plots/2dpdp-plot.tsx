@@ -94,26 +94,43 @@ const Contourplot = (props: IContourplot) => {
     );
   };
 
-  // helper: bin edges for a sorted array of numeric centers
-  const computeBinEdges = (vals: number[]) => {
+  const computeBinEdgesWithMinWidth = (vals: number[], minWidth: number) => {
     if (vals.length === 0) return [];
-    if (vals.length === 1) {
-      // single value: give it a 1-width bin around it
-      const v = vals[0];
-      return [v - 0.5, v + 0.5];
+    if (vals.length === 1) return [vals[0] - minWidth / 2, vals[0] + minWidth / 2];
+
+    // Ensure sorted (without mutating caller arrays)
+    const v = [...vals].sort((a, b) => a - b);
+
+    // Start from midpoint edges
+    const edges: number[] = new Array(v.length + 1);
+    for (let i = 0; i < v.length - 1; i++) edges[i + 1] = (v[i] + v[i + 1]) / 2;
+
+    const firstGap = v[1] - v[0];
+    const lastGap = v[v.length - 1] - v[v.length - 2];
+    edges[0] = v[0] - firstGap / 2;
+    edges[v.length] = v[v.length - 1] + lastGap / 2;
+
+    // Enforce minimum width per cell by expanding edges outward if needed
+    for (let i = 0; i < v.length; i++) {
+      const left = edges[i];
+      const right = edges[i + 1];
+      const width = right - left;
+      if (width < minWidth) {
+        const deficit = (minWidth - width) / 2;
+        edges[i] = left - deficit;
+        edges[i + 1] = right + deficit;
+      }
     }
-    const edges: number[] = new Array(vals.length + 1);
-    // interior edges = midpoints
-    for (let i = 0; i < vals.length - 1; i++) {
-      edges[i + 1] = (vals[i] + vals[i + 1]) / 2;
+
+    // Make edges non-decreasing (guard against any numerical overlap)
+    for (let i = 1; i < edges.length; i++) {
+      if (edges[i] < edges[i - 1]) edges[i] = edges[i - 1];
     }
-    // extrapolate first/last edges
-    const firstGap = vals[1] - vals[0];
-    const lastGap = vals[vals.length - 1] - vals[vals.length - 2];
-    edges[0] = vals[0] - firstGap / 2;
-    edges[vals.length] = vals[vals.length - 1] + lastGap / 2;
+
     return edges;
   };
+
+  const MIN_BIN_WIDTH = 0.5;
 
   const isNumericArray = (arr: (string | number)[]): boolean => {
     return arr.length > 0 && arr.every(val => !isNaN(Number(val)));
@@ -132,8 +149,8 @@ const Contourplot = (props: IContourplot) => {
   // numeric versions (if applicable)
   const xValsNum = xIsNumeric ? xValsRaw.map(Number) : [];
   const yValsNum = yIsNumeric ? yValsRaw.map(Number) : [];
-  const xEdges = xIsNumeric ? computeBinEdges(xValsNum) : [];
-  const yEdges = yIsNumeric ? computeBinEdges(yValsNum) : [];
+  const xEdges = xIsNumeric ? computeBinEdgesWithMinWidth(xValsNum, MIN_BIN_WIDTH)  : [];
+  const yEdges = yIsNumeric ? computeBinEdgesWithMinWidth(yValsNum, MIN_BIN_WIDTH)  : [];
 
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return [];
