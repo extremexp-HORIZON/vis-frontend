@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InstanceClassification from '../../../Tasks/ModelAnalysisTask/plots/instance-classification';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
@@ -28,6 +28,7 @@ import type { GridColDef } from '@mui/x-data-grid';
 import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
 import type { GridRenderCellParams } from '@mui/x-data-grid';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import PaginationComponent from '../../../../shared/components/pagination-control';
 
 const CustomNoRowsOverlay = () => {
   return (
@@ -55,6 +56,14 @@ const InstanceView = () => {
   const tableRef = useRef<HTMLDivElement>(null);
   const hasContent = true;
   const [showMisclassifiedOnly, setShowMisclassifiedOnly] = useState(false);
+
+  const PAGE_SIZE = 100;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const paginationModel = useMemo(() => ({
+    page: currentPage - 1,
+    pageSize: PAGE_SIZE,
+  }), [currentPage]);
 
   const [point, setPoint] = useState<{ id: string; data: TestInstance } | null>(null);
   const rows: TestInstance[] = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
@@ -129,6 +138,31 @@ const InstanceView = () => {
     ),
   };
   const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
+
+
+  const totalRows = showMisclassifiedOnly
+  ? rows.filter(r => r.actual !== r.predicted).length
+  : rows.length;
+
+  const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+
+  const setPage = (value: number) => {
+    const clampedPage = Math.max(1, Math.min(value, totalPages));
+    if (clampedPage !== currentPage)
+      setCurrentPage(clampedPage);
+  }
+
+  const handleMisclassifiedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShowMisclassifiedOnly(e.target.checked);
+    setCurrentPage(1);
+  }
+
+  const handlePaginationModelChange = useCallback((model: typeof paginationModel) => {
+    const newPage = model.page + 1;
+    if (newPage !== currentPage) {
+      setCurrentPage(newPage);
+    }
+  }, [currentPage]);
 
   const handleExportCsv = () => {
     return;
@@ -239,7 +273,7 @@ const InstanceView = () => {
           <Typography fontSize={'0.8rem'}>Show Misclassified Instances:</Typography>
           <Checkbox
             checked={showMisclassifiedOnly}
-            onChange={e => setShowMisclassifiedOnly(e.target.checked)}
+            onChange={handleMisclassifiedChange}
             disabled={
               tab?.workflowTasks.modelAnalysis?.modelInstances?.loading ||
               !tab?.workflowTasks.modelAnalysis?.modelInstances?.data
@@ -324,6 +358,7 @@ const InstanceView = () => {
                     height: '100%',
                     overflow: 'hidden', // Important to contain the scrolling
                     display: 'flex',
+                    flexDirection: 'column',
                   }}
                   ref={tableRef}
                 >
@@ -335,15 +370,10 @@ const InstanceView = () => {
                     ).map((row) => ({ id: hashRow(row), ...row }))}
                     columns={columns}
                     pagination
-                    pageSizeOptions={[25, 50, 100]}
-                    initialState={{
-                      pagination: {
-                        paginationModel: {
-                          pageSize: showMisclassifiedOnly ? 25 : 100,
-                          page: 0,
-                        },
-                      },
-                    }}
+                    hideFooter
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={handlePaginationModelChange}
+                    pageSizeOptions={[PAGE_SIZE]}
                     slots={{ noRowsOverlay: CustomNoRowsOverlay }}
                     rowSelectionModel={point ? [point.id] : []}
                     checkboxSelection={false}
@@ -375,6 +405,18 @@ const InstanceView = () => {
                       },
                     }}
                   />
+                  <Box
+                    mt={5}
+                    mb={2}
+                    sx={{ display: 'flex', justifyContent: 'right' }}
+                  >
+                    <PaginationComponent 
+                      totalPages={totalPages}  
+                      currentPage={currentPage}  
+                      setCurrentPage={setPage}
+                    />
+                  </Box>
+                  
                 </Box>
               ) : (
                 <InfoMessage

@@ -99,18 +99,28 @@ export const dataExplorationReducers = (
         task.controlPanel.colorBy = originalColumns[0];
       }
 
+      const isNumericType = (t: VisualColumn['type']) =>
+        t === 'INTEGER' || t === 'DOUBLE' || t === 'FLOAT' || t === 'BIGINT';
+
+      const xAxisCol = task.controlPanel.xAxis ?? null;
+      const numericColumns = originalColumns.filter((c: VisualColumn) => isNumericType(c.type));
+
+      let yAxisCol = numericColumns.find(column => column.name !== xAxisCol?.name) ?? null;
+
+      if (!yAxisCol) yAxisCol = numericColumns[0] ?? null;
+
+      task.controlPanel.yAxis = yAxisCol ? [yAxisCol] : [];
+
       const defaultYAxis = originalColumns.length > 1
         ? [originalColumns[1]]
         : [originalColumns[0]].filter(Boolean);
 
-      // task.controlPanel.yAxis = defaultYAxis;
+      //yAxisScatter is not used anymore
       task.controlPanel.yAxisScatter = defaultYAxis;
       task.controlPanel.timestampField = task.metaData.data?.timeColumn || null;
       task.controlPanel.orderBy =  null;
       const stringCols = originalColumns.filter((col: VisualColumn) => col.type === 'STRING');
-      const numericColumn = originalColumns.find((col: VisualColumn) =>
-        col.type === 'INTEGER' || col.type === 'DOUBLE' || col.type === 'FLOAT' || col.type === 'BIGINT'
-      );
+      const numericColumn = numericColumns[0] ?? null;
 
       if (stringCols[0]) task.controlPanel.barGroupBy = [stringCols[0].name];
 
@@ -120,7 +130,6 @@ export const dataExplorationReducers = (
           function: AggregationFunction.COUNT
         });
         task.controlPanel.selectedMeasureColumn = numericColumn.name;
-        task.controlPanel.yAxis = [numericColumn];
       }
 
       const heatmapGroupBy = stringCols.slice(0, 2).map(col => col.name);

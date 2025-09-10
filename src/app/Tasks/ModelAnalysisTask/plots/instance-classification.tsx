@@ -367,6 +367,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
             x: {
               field: xAxisOption || 'xAxis default',
               type: xFieldType,
+              axis: { labelAngle: xFieldType === 'nominal' ? -45 : 0, labelLimit: 100 }
             },
             y: {
               field: yAxisOption || 'yAxis default',

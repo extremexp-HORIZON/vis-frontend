@@ -26,18 +26,35 @@ const getColumnType = (columnType: string, fieldName?: string) => {
 
 type LineChartDataRow = Record<string, number | string | Date | null>;
 
-const getAxisEncoding = (type: string, name?: string) => {
-  const fieldType = getColumnType(type, name);
+const normalizeNumericString = (v: unknown): string | null => {
+  if (v == null) return null;
+  const s = String(v).trim();
+  if (!s) return null;
+  return s.replace(/,/g, '').replace(/%$/, '');
+};
 
-  return {
-    type: fieldType,
-    axis: {
-      labelAngle: fieldType === 'ordinal' ? -40 : 0,
-      labelColor: '#333',
-      titleColor: '#444',
-      labelOverlap: fieldType === 'ordinal' ? 'greedy' : undefined,
-    },
-  };
+const isNumericLikeValue = (v: unknown): boolean => {
+  const n = normalizeNumericString(v);
+  if (n == null) return false;
+  return /^[-+]?(\d+(\.\d*)?|\.\d+)(e[-+]?\d+)?$/i.test(n);
+};
+
+const isFieldNumericLike = (data: LineChartDataRow[], field: string): boolean => {
+  let seen = false;
+  for (const row of data) {
+    const v = row[field];
+    if (v == null || v === '') continue;
+    seen = true;
+    if (!isNumericLikeValue(v)) return false;
+  }
+  return seen;
+};
+
+const coerceIfNumericLike = (v: unknown): unknown => {
+  if (!isNumericLikeValue(v)) return v;
+  const n = normalizeNumericString(v)!;
+  const parsed = Number(n);
+  return Number.isFinite(parsed) ? parsed : v;
 };
 
 const LineChart = () => {
@@ -107,13 +124,24 @@ const LineChart = () => {
     yAxis: VisualColumn[]
   }) => {
     const xField = xAxis.name;
-    const longData: LineChartDataRow[] = [];
 
+    // Decide X type: respect meta unless values are numeric-like (and not temporal)
+    const xMetaType = getColumnType(xAxis.type, xAxis.name);
+    const xIsNumericLike = xMetaType !== 'temporal' && isFieldNumericLike(data, xField);
+    const xTypeForEncoding: 'quantitative' | 'temporal' | 'ordinal' =
+      (xIsNumericLike ? 'quantitative' : xMetaType);
+
+    // Build long data and coerce numeric-like for X and each Y
+    const longData: LineChartDataRow[] = [];
     data.forEach(row => {
+      const xVal = xIsNumericLike ? coerceIfNumericLike(row[xField]) : row[xField];
+
       yAxis.forEach(y => {
+        const yMetaType = getColumnType(y.type, y.name);
+        const yIsNumericLike = yMetaType !== 'temporal' && isNumericLikeValue(row[y.name]);
         longData.push({
-          [xField]: row[xField],
-          value: row[y.name],
+          [xField]: xVal,
+          value: yIsNumericLike ? coerceIfNumericLike(row[y.name]) as number : (row[y.name] as any),
           variable: y.name,
         });
       });
@@ -121,10 +149,31 @@ const LineChart = () => {
 
     return {
       data: { values: longData },
+      params: [
+        {
+          name: 'panZoom',
+          select: 'interval',
+          bind: 'scales',
+          clear: 'dblclick',
+        },
+      ],
       mark: { type: 'line', tooltip: true, point: { size: 20 } },
       encoding: {
-        x: { field: xField, ...getAxisEncoding(xAxis.type, xAxis.name) },
-        y: { field: 'value', type: 'quantitative', title: 'Value' },
+        x: {
+          field: xField,
+          type: xTypeForEncoding,
+          axis: {
+            labelAngle: xTypeForEncoding === 'ordinal' ? -45 : 0,
+            labelColor: '#333',
+            titleColor: '#444',
+            labelOverlap: xTypeForEncoding === 'ordinal' ? 'greedy' : undefined,
+          },
+        },
+        y: {
+          field: 'value',
+          type: 'quantitative',
+          title: 'Value',
+        },
         color: { field: 'variable', type: 'nominal', title: 'Metric' },
       },
     };
@@ -139,20 +188,59 @@ const LineChart = () => {
     xAxis: VisualColumn
     y: VisualColumn
   }) => {
+    const xField = xAxis.name;
+    const yField = y.name;
+
+    const xMetaType = getColumnType(xAxis.type, xAxis.name);
+    const yMetaType = getColumnType(y.type, y.name);
+
+    const xIsNumericLike = xMetaType !== 'temporal' && isFieldNumericLike(data, xField);
+    const yIsNumericLike = yMetaType !== 'temporal' && isFieldNumericLike(data, yField);
+
+    const xTypeForEncoding: 'quantitative' | 'temporal' | 'ordinal' =
+      (xIsNumericLike ? 'quantitative' : xMetaType);
+    const yTypeForEncoding: 'quantitative' | 'temporal' | 'ordinal' =
+      (yIsNumericLike ? 'quantitative' : yMetaType);
+
+    // Coerce values where needed
+    const values = cloneDeep(data).map(row => {
+      const copy = { ...row };
+      if (xIsNumericLike) copy[xField] = coerceIfNumericLike(copy[xField]) as number;
+      if (yIsNumericLike) copy[yField] = coerceIfNumericLike(copy[yField]) as number;
+      return copy;
+    });
+
     return {
-      data: {
-        values: cloneDeep(data),
-      },
+      data: { values },
+      params: [
+        {
+          name: 'panZoom',
+          select: 'interval',
+          bind: 'scales',
+          clear: 'dblclick',
+        },
+      ],
       mark: { type: 'line', tooltip: true, point: { size: 20 } },
       encoding: {
         x: {
-          field: xAxis.name,
-          ...getAxisEncoding(xAxis.type, xAxis.name),
+          field: xField,
+          type: xTypeForEncoding,
+          axis: {
+            labelAngle: xTypeForEncoding === 'ordinal' ? -45 : 0,
+            labelColor: '#333',
+            titleColor: '#444',
+            labelOverlap: xTypeForEncoding === 'ordinal' ? 'greedy' : undefined,
+          },
         },
         y: {
-          field: y.name,
-          ...getAxisEncoding(y.type, y.name),
-
+          field: yField,
+          type: yTypeForEncoding,
+          axis: {
+            labelAngle: yTypeForEncoding === 'ordinal' ? -45 : 0,
+            labelColor: '#333',
+            titleColor: '#444',
+            labelOverlap: yTypeForEncoding === 'ordinal' ? 'greedy' : undefined,
+          },
         },
       },
     };

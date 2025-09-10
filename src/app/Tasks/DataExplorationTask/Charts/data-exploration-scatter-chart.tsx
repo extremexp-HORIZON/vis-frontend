@@ -12,6 +12,12 @@ import { fetchDataExplorationData } from '../../../../store/slices/dataExplorati
 
 type ScatterChartDataRow = Record<string, number | string | Date | null>;
 
+interface CalculateTransform {
+  calculate: string;
+  as: string | undefined;
+}
+
+
 const normalizeNumericString = (v: unknown): string | null => {
   if (v == null) return null;
   const s = String(v).trim();
@@ -89,16 +95,27 @@ const getScatterChartOverlaySpec = ({
   yAxis: VisualColumn[]
   colorBy?: VisualColumn
 }) => {
+  interface CalculateTransform {
+    calculate: string;
+    as: string;
+  }
+
   const colorField = colorBy?.name;
   const colorTypeFromMeta = colorBy ? getColumnType(colorBy.type, colorBy.name) : undefined;
   const colorIsNumericLike = !!(colorField && isFieldNumericLike(data, colorField));
   const colorFieldForEncoding = colorIsNumericLike ? `${colorField}__num` : colorField;
 
+  const xMetaType = getColumnType(xAxis.type, xAxis.name);
+  const xIsNumericLike = isFieldNumericLike(data, xAxis.name);
+  const xTypeForEncoding: 'quantitative' | 'temporal' | 'nominal' =
+    (xIsNumericLike ? 'quantitative' : xMetaType) as 'quantitative' | 'temporal' | 'nominal';
+
   const ys = (yAxis ?? []).slice(0, 2);
+  const hasTwoSeries = ys.length === 2;
+  const seriesDomain = hasTwoSeries ? ys.map(y => y.name) : [];
 
   const isYNumericLike = (y: VisualColumn) => {
     const metaType = getColumnType(y.type, y.name);
-
     return metaType === 'quantitative' || isFieldNumericLike(data, y.name);
   };
 
@@ -128,16 +145,25 @@ const getScatterChartOverlaySpec = ({
     };
   };
 
+  const topLevelTransforms: CalculateTransform[] = [];
+  if (colorIsNumericLike) {
+    topLevelTransforms.push({
+      calculate: `toNumber(replace(replace(datum["${colorField}"], ",", ""), "%", ""))`,
+      as: colorFieldForEncoding!,
+    });
+  }
+  if (xIsNumericLike && xMetaType !== 'quantitative') {
+    topLevelTransforms.push({
+      calculate: `toNumber(replace(replace(datum["${xAxis.name}"], ",", ""), "%", ""))`,
+      as: xAxis.name,
+    });
+  }
+
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { values: cloneDeep(data) },
 
-    transform: colorIsNumericLike
-      ? [{
-        calculate: `toNumber(replace(replace(datum["${colorField}"], ",", ""), "%", ""))`,
-        as: colorFieldForEncoding,
-      }]
-      : undefined,
+    ...(topLevelTransforms.length ? { transform: topLevelTransforms } : {}),
 
     resolve: { scale: { y: 'independent' } },
 
@@ -146,14 +172,30 @@ const getScatterChartOverlaySpec = ({
     layer: ys.map((y, i) => {
       const { yFieldForEncoding, yType, transforms, axis } = yLayerProps(y, i);
 
+      // add a constant series label only when we need a legend
+      const seriesTransform = hasTwoSeries
+        ? [{ calculate: `"${y.name}"`, as: '__series' }]
+        : [];
+
       return {
-        ...(transforms.length ? { transform: transforms } : {}),
-        mark: 'point',
+        ...(transforms.length || seriesTransform.length
+          ? { transform: [...transforms, ...seriesTransform] }
+          : {}),
+        mark: {
+          type: 'point',
+          shape: i === 0 ? 'circle' : 'square',
+          filled: true,
+        },
         encoding: {
           x: {
             field: xAxis.name,
-            type: getColumnType(xAxis.type, xAxis.name),
-            axis: { title: xAxis.name, labelLimit: 30, labelOverlap: 'auto' },
+            type: xTypeForEncoding,
+            axis: {
+              title: xAxis.name,
+              labelLimit: 100,
+              labelOverlap: 'auto',
+              labelAngle: xIsNumericLike ? 0 : -45,
+            },
           },
           y: {
             field: yFieldForEncoding,
@@ -161,29 +203,43 @@ const getScatterChartOverlaySpec = ({
             axis,
           },
 
+          // shape legend only when there are two series
+          ...(hasTwoSeries && {
+            shape: {
+              field: '__series',
+              type: 'nominal',
+              legend: i === 0 ? { title: 'Series' } : null, // only on first layer
+              scale: {
+                domain: seriesDomain,          // [firstYName, secondYName]
+                range: ['circle', 'square'],   // first -> circle, second -> square
+              },
+            },
+          }),
+
           ...(colorField &&
             (!isTooManyUniqueValues(colorBy, data) || colorIsNumericLike) && {
-            color: {
-              field: colorFieldForEncoding!,
-              type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
-              legend: {
-                title: colorField,
-                labelLimit: 0,
-                symbolLimit: 50,
-                format:
+              color: {
+                field: colorFieldForEncoding!,
+                type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
+                legend: {
+                  title: colorField,
+                  labelLimit: 0,
+                  symbolLimit: 50,
+                  format:
                     !colorIsNumericLike && colorTypeFromMeta === 'temporal'
                       ? '%Y-%m-%d'
                       : undefined,
-              },
-              scale: colorIsNumericLike
-                ? { range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'] }
-                : (colorTypeFromMeta === 'quantitative'
+                },
+                scale: colorIsNumericLike
                   ? { range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'] }
-                  : undefined),
-            },
-          }),
+                  : (colorTypeFromMeta === 'quantitative'
+                    ? { range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'] }
+                    : undefined),
+              },
+            }),
           tooltip: [
-            { field: xAxis.name, type: getColumnType(xAxis.type, xAxis.name) },
+            ...(hasTwoSeries ? [{ field: '__series', type: 'nominal', title: 'Series' as const }] : []),
+            { field: xAxis.name, type: xTypeForEncoding },
             { field: yFieldForEncoding, type: yType, title: y.name },
             ...(colorField
               ? [{
@@ -215,25 +271,58 @@ const getSingleScatterSpec = ({
   const colorIsNumericLike = !!(colorField && isFieldNumericLike(data, colorField));
   const colorFieldForEncoding = colorField;
 
+  const xMetaType = getColumnType(xAxis.type, xAxis.name);
+  const xIsNumericLike = isFieldNumericLike(data, xAxis.name);
+  const xTypeForEncoding: 'quantitative' | 'temporal' | 'nominal' =
+    xIsNumericLike ? 'quantitative' : xMetaType;
+
+  const yMetaType = getColumnType(y.type, y.name);
+  const yIsNumericLike = isFieldNumericLike(data, y.name);
+  const yTypeForEncoding: 'quantitative' | 'temporal' | 'nominal' =
+    yIsNumericLike ? 'quantitative' : yMetaType;
+
+  const transforms: CalculateTransform[] = [];
+  if (colorIsNumericLike) {
+    transforms.push({
+      calculate: `toNumber(replace(replace(datum["${colorField}"], ",", ""), "%", ""))`,
+      as: colorFieldForEncoding,
+    });
+  }
+  if (xIsNumericLike && xMetaType !== 'quantitative') {
+    transforms.push({
+      calculate: `toNumber(replace(replace(datum["${xAxis.name}"], ",", ""), "%", ""))`,
+      as: xAxis.name,
+    });
+  }
+  if (yIsNumericLike && yMetaType !== 'quantitative') {
+    transforms.push({
+      calculate: `toNumber(replace(replace(datum["${y.name}"], ",", ""), "%", ""))`,
+      as: y.name,
+    });
+  }
+
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { values: cloneDeep(data) },
-    transform: colorIsNumericLike
-      ? [{
-        calculate: `toNumber(replace(replace(datum["${colorField}"], ",", ""), "%", ""))`,
-        as: colorFieldForEncoding,
-      }]
-      : undefined,
-    mark: 'point',
+    ...(transforms.length ? { transform: transforms } : {}),
+    mark: {
+      type: 'point',
+      filled: true
+    },
     encoding: {
       x: {
         field: xAxis.name,
-        type: getColumnType(xAxis.type, xAxis.name),
-        axis: { title: xAxis.name, labelOverlap: 'auto' },
+        type: xTypeForEncoding,
+        axis: {
+          title: xAxis.name,
+          labelOverlap: 'auto',
+          labelLimit: 100,
+          labelAngle: xIsNumericLike ? 0 : -45,
+        },
       },
       y: {
         field: y.name,
-        type: getColumnType(y.type, y.name),
+        type: yTypeForEncoding,
         axis: { title: y.name, labelOverlap: 'auto' },
       },
       ...(colorField && {
@@ -252,13 +341,14 @@ const getSingleScatterSpec = ({
         },
       }),
       tooltip: [
-        { field: xAxis.name, type: getColumnType(xAxis.type, xAxis.name) },
-        { field: y.name, type: getColumnType(y.type, y.name) },
+        { field: xAxis.name, type: xTypeForEncoding },
+        { field: y.name, type: yTypeForEncoding, title: y.name },
         ...(colorField
           ? [{
-            field: colorIsNumericLike ? colorFieldForEncoding! : colorField,
-            type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
-          }]
+              field: colorIsNumericLike ? colorFieldForEncoding! : colorField,
+              type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
+              title: colorField,
+            }]
           : []),
       ],
     },

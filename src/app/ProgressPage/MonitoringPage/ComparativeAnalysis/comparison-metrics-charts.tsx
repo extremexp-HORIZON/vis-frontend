@@ -10,6 +10,8 @@ import ResponsiveCardVegaLite from '../../../../shared/components/responsive-car
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchWorkflowMetrics, setComparativeVisibleMetrics } from '../../../../store/slices/monitorPageSlice';
+import Loader from '../../../../shared/components/loader';
+import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 
 interface BaseMetric {
   id: string
@@ -26,6 +28,10 @@ const ComparisonMetricsCharts: React.FC = () => {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
   );
+  const loadingByMetric = useAppSelector(
+    (state: RootState) => state.monitorPage.selectedWorkflowsMetrics.loadingByMetric
+  );
+
   const experimentId = useAppSelector(
     (state: RootState) => state.progressPage.experiment.data?.id || '',
   );
@@ -133,6 +139,13 @@ const ComparisonMetricsCharts: React.FC = () => {
     return isNaN(date.getTime()) ? undefined : date.toISOString();
   };
 
+  const isMetricPending = (metricName: string) => {
+  return workflowsTable.selectedWorkflows.some((wid) => {
+    const m = loadingByMetric?.[wid];
+    return m ? !!m[metricName] : false;
+  });
+};
+
   const groupedMetrics: Record<string, BaseMetric[]> = {};
 
   if (workflowsTable.groupBy.length > 0) {
@@ -200,6 +213,20 @@ const ComparisonMetricsCharts: React.FC = () => {
   }
 
   const renderCharts = Object.entries(groupedMetrics).map(([metricName, metricSeries]) => {
+    if (isMetricPending(metricName)) {
+      return (
+      <Grid
+        item
+        xs={isMosaic ? 6 : 12}
+        key={metricName}
+        sx={{ textAlign: 'left', width: '100%' }}
+      >
+          <ResponsiveCardTable title={metricName} minHeight={300} showSettings={false}>
+            <Loader />
+          </ResponsiveCardTable>
+      </Grid>
+      );
+    }
     const isGrouped = workflowsTable.groupBy.length > 0;
 
     // Determine if line chart is needed: any workflow with multiple values for this metric

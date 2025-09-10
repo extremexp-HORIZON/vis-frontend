@@ -132,8 +132,6 @@ const HeatMapControlPanel = () => {
             value={selectedColumn || ''}
             onChange={e => {
               const newColumn = e.target.value as string;
-              const currentAgg =
-                tab?.workflowTasks.dataExploration?.controlPanel.barAggregationHeat || [];
 
               dispatch(
                 setControls({
@@ -174,9 +172,6 @@ const HeatMapControlPanel = () => {
                 const value = event.target.value as AggregationFunction;
 
                 if (!selectedColumn) return;
-                const currentAgg =
-                  tab?.workflowTasks.dataExploration?.controlPanel
-                    .barAggregationHeat || [];
 
                 dispatch(
                   setControls({

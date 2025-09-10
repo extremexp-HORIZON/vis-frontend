@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import ColumnSelectionPanel from '../ChartControls/data-exploration-table-control';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
-import PaginationComponent from '../ChartControls/data-exploration-pagination-control';
+import PaginationComponent from '../../../../shared/components/pagination-control';
 import { setCurrentPage } from '../../../../store/slices/workflowPageSlice';
 import Loader from '../../../../shared/components/loader';
 import InfoMessage from '../../../../shared/components/InfoMessage';
@@ -19,6 +19,9 @@ const TableExpand: React.FC = () => {
   const tableRef = useRef<HTMLDivElement>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const currentPage = tab?.workflowTasks.dataExploration?.controlPanel?.currentPage || 1;
+  const totalPages = tab?.workflowTasks.dataExploration?.controlPanel?.totalPages || 1;
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dateTimeColumn =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.find(
@@ -160,6 +163,12 @@ const TableExpand: React.FC = () => {
     meta?.source
   ]);
 
+  const setPage = (value: number) => {
+    const clampedPage = Math.max(1, Math.min(value, totalPages));
+    if (clampedPage !== currentPage)
+      dispatch(setCurrentPage(value));
+  }
+
   // Export data to CSV
   const handleExportCsv = () => {
     if (!rows || rows.length === 0) return;
@@ -290,7 +299,11 @@ const TableExpand: React.FC = () => {
                 mb={2}
                 sx={{ display: 'flex', justifyContent: 'right' }}
               >
-                <PaginationComponent />
+                <PaginationComponent  
+                  currentPage={currentPage}  
+                  totalPages={totalPages}  
+                  setCurrentPage={setPage}
+                />
               </Box>
             </Box>
           ) : (

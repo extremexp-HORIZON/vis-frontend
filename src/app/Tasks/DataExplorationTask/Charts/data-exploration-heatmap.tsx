@@ -120,7 +120,7 @@ const HeatMap = () => {
         x: {
           field: groupByFields[0],
           type: 'nominal',
-          axis: { title: groupByFields[0] },
+          axis: { title: groupByFields[0], labelAngle: -45, labelLimit: 100 },
         },
         y: {
           field: groupByFields[1],

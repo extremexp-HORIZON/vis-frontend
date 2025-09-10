@@ -43,14 +43,14 @@ const ProgressPageLoading = () => {
     if (!experiment.loading && experiment.data) {
       setProgress(50);
     }
-    if (!workflows.loading && workflows.data.length > 0) {
+    if (!workflows.loading && workflows.requested) {
       setProgress(100);
     }
     if (
       !experiment.loading &&
       experiment.data &&
-      workflows.data.length > 0 &&
-      !workflows.loading
+      !workflows.loading && 
+      workflows.requested
     ) {
       setTimeout(() => {
         dispatch(setIntialization(true));
