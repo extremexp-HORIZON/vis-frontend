@@ -10,9 +10,8 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, setSelectedDataset, type CommonDataAssets } from '../../../../store/slices/monitorPageSlice';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
+import OverlayHistogram from './DataComparison/overlay-histogram';
 import Loader from '../../../../shared/components/loader';
-import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
-import SummaryTable from './DataComparison/comparative-data-table';
 
 const ComparisonDataCharts = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(
@@ -34,44 +33,43 @@ const ComparisonDataCharts = () => {
     ? { [selectedDataset]: commonDataAssets[selectedDataset] }
     : {};
 
-  const scrollRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const assetsForSelectedDataset =
+    selectedDataset && Array.isArray(filteredAssets[selectedDataset])
+      ? filteredAssets[selectedDataset]
+      : [];
 
-  useLayoutEffect(() => {
-    const containers = scrollRefs.current;
+  const selectedColumns = useAppSelector(
+    (state: RootState) =>
+      state.monitorPage.comparativeDataExploration
+        .dataAssetsControlPanel[selectedDataset || '']?.selectedColumns ?? []
+  );
 
-    if (containers.length === 0) return;
+  const workflowColors = useAppSelector(
+    (state) => state.monitorPage.workflowsTable.workflowColors
+  );
 
-    let isSyncing = false;
+  const { anyMetaLoading, anyMetaError } = useAppSelector((state: RootState) => {
+    const metaRoot =
+      state.monitorPage.comparativeDataExploration.dataAssetsMetaData ?? {};
 
-    const handleScroll = (source: HTMLElement) => () => {
-      if (isSyncing) return;
-      isSyncing = true;
+    if (!selectedDataset || assetsForSelectedDataset.length === 0) {
+      return { anyMetaLoading: false, anyMetaError: false };
+    }
 
-      const scrollLeft = source.scrollLeft;
+    let loading = false;
+    let error = false;
 
-      containers.forEach((el) => {
-        if (el && el !== source) {
-          el.scrollLeft = scrollLeft;
-        }
-      });
-
-      isSyncing = false;
-    };
-
-    containers.forEach((el) => {
-      if (el) {
-        el.addEventListener('scroll', handleScroll(el));
+    assetsForSelectedDataset.forEach(({ workflowId }) => {
+      const meta = metaRoot?.[selectedDataset]?.[workflowId]?.meta;
+      if (meta?.loading) {
+        loading = true;
+      } else if (meta?.error) {
+        error = true;
       }
     });
 
-    return () => {
-      containers.forEach((el) => {
-        if (el) {
-          el.removeEventListener('scroll', handleScroll(el));
-        }
-      });
-    };
-  }, [filteredAssets, selectedDataset]);
+    return { anyMetaLoading: loading, anyMetaError: error };
+  });
 
   const getCommonDataAssets = () => {
     if (selectedWorkflowIds.length === 0) return {};
@@ -132,8 +130,8 @@ const ComparisonDataCharts = () => {
 
         if (
           alreadyFetched?.loading ||
-        alreadyFetched?.data ||
-        alreadyFetched?.error
+          alreadyFetched?.data ||
+          alreadyFetched?.error
         ) {
           return;
         }
@@ -192,57 +190,35 @@ const ComparisonDataCharts = () => {
         assetName,
         controlPanel: {
           commonColumns,
-          selectedColumns: commonColumns.slice(0, 5).map(col => col.name)
+          selectedColumns: commonColumns.slice(0, 4).map(col => col.name)
         }
       }));
     });
   }, [filteredAssets, dataAssetsMetaData]);
 
-  const renderCharts = selectedDataset && filteredAssets[selectedDataset]
-    ? filteredAssets[selectedDataset].map(({ workflowId, dataAsset }, index) => {
-      const meta = dataAssetsMetaData?.[selectedDataset]?.[workflowId]?.meta;
-
-      const isLoading = meta?.loading;
-      const hasError = meta?.error && !meta.loading;
-      const summary = meta?.data?.summary || [];
-
-      const setScrollRef = (el: HTMLDivElement | null) => {
-        scrollRefs.current[index] = el;
-      };
-
-      if (isLoading) {
-        return (
-          <Grid item xs={6} key={workflowId}>
-            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
-              <Loader />
-            </ResponsiveCardTable>
-          </Grid>
-        );
-      }
-
-      if (hasError || !summary.length) {
-        return (
-          <Grid item xs={6} key={workflowId}>
-            <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
-              <InfoMessage
-                message="No summary stats found for this workflow."
-                type="info"
-                icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-                fullHeight
-              />
-            </ResponsiveCardTable>
-          </Grid>
-        );
-      }
-
-      return (
-        <Grid item xs={6} key={workflowId}>
-          <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false} noPadding={true}>
-            <SummaryTable dataset={dataAsset} workflowId={workflowId} scrollRef={setScrollRef} />
+  const renderCharts =
+    selectedDataset && assetsForSelectedDataset.length && selectedColumns.length
+      ? selectedColumns.map((col) => (
+        <Grid item xs={6} key={col}>
+          <ResponsiveCardTable
+            title={`${selectedDataset} — ${col}`}
+            minHeight={300}
+            showSettings={false}
+            noPadding
+            showFullScreenButton={false}
+          >
+            <OverlayHistogram
+              assetName={selectedDataset!}
+              columnName={col}
+              assets={assetsForSelectedDataset}
+              colorScale={(ids: string[]) => ({
+                domain: ids,
+                range: ids.map(id => workflowColors[id] || '#3f51b5'),
+              })}
+            />
           </ResponsiveCardTable>
         </Grid>
-      );
-    })
+      ))
     : [];
 
   if (workflowsTable.selectedWorkflows.length === 0) {
@@ -266,6 +242,24 @@ const ComparisonDataCharts = () => {
       />
     );
   }
+
+  if (anyMetaLoading) {
+    return (
+      <Loader />
+    );
+  }
+
+  if (anyMetaError) {
+    return (
+      <InfoMessage
+        message="Error fetching metadata for the selected dataset."
+        type="info"
+        icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+        fullHeight
+      />
+    );
+  }
+
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }} >
