@@ -6,8 +6,8 @@ import {
   Chip,
   Paper,
   Typography,
-  Divider,
-  Button
+  Button,
+  Divider
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { RootState } from '../../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../../store/store';
 import { setSelectedDataset } from '../../../../../store/slices/monitorPageSlice';
+import ClearAllIcon from '@mui/icons-material/ClearAll';
 
 export default function DatasetSelectorBar() {
   const dispatch = useAppDispatch();
@@ -59,7 +60,11 @@ export default function DatasetSelectorBar() {
   };
 
   const handleSelect = (dataset: string) => {
-    dispatch(setSelectedDataset(dataset));
+    if (dataset === selectedDataset) {
+      dispatch(setSelectedDataset(null));
+    } else {
+      dispatch(setSelectedDataset(dataset));
+    }
     setInputValue('');
     setShowSuggestions(false);
   };
@@ -138,7 +143,14 @@ export default function DatasetSelectorBar() {
   };
 
   const renderAvailableDatasets = () => {
-    const datasetsToShow = showAllDatasets ? datasetNames : datasetNames.slice(0, 5);
+    const base = showAllDatasets ? datasetNames : datasetNames.slice(0, 5);
+
+    // Ensure the selected dataset is visible even when showing only a subset
+    let datasetsToShow = base;
+    if (selectedDataset && !base.includes(selectedDataset)) {
+      datasetsToShow = [selectedDataset, ...base.filter(n => n !== selectedDataset).slice(0, 4)];
+    }
+
     const hasMore = datasetNames.length > 5;
 
     return (
@@ -147,16 +159,20 @@ export default function DatasetSelectorBar() {
           Available Datasets
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {datasetsToShow.map((name, i) => (
-            <Chip
-              key={i}
-              size="small"
-              label={name}
-              onClick={() => handleSelect(name)}
-              color="default"
-              clickable
-            />
-          ))}
+          {datasetsToShow.map((name, i) => {
+            const isActive = name === selectedDataset;
+            return (
+              <Chip
+                key={`${name}-${i}`}
+                size="small"
+                label={name}
+                onClick={() => handleSelect(name)}
+                clickable
+                variant={isActive ? 'filled' : 'outlined'}
+                color={isActive ? 'primary' : 'default'}
+              />
+            );
+          })}
           {hasMore && !showAllDatasets && (
             <Button
               size="small"
@@ -188,26 +204,29 @@ export default function DatasetSelectorBar() {
         {renderAvailableDatasets()}
 
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-            Type to search or click a dataset name
+          Type to search or click a dataset name
         </Typography>
 
-        <Divider sx={{ my: 2 }} />
+        { selectedDataset && <Divider sx={{ my: 2 }} /> }
       </Box>
-
-      {selectedDataset && (
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            Active Dataset
-          </Typography>
-          <Chip
-            label={selectedDataset}
-            onDelete={handleClear}
-            deleteIcon={<CloseIcon />}
-            color="default"
-            size="small"
-          />
-        </Box>
-      )}
+      {
+        selectedDataset && (
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}>
+            <Button
+              onClick={() => { handleClear() }}
+              variant="outlined"
+              color="primary"
+              size="small"
+              startIcon={<ClearAllIcon />}
+            >
+              Clear Dataset
+            </Button>
+          </Box>
+        )
+      }
     </Box>
   );
 }

@@ -12,7 +12,7 @@ import Loader from '../../../../shared/components/loader';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { logger } from '../../../../shared/utils/logger';
-import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
+import type { IFilter, VisualColumn } from '../../../../shared/models/dataexploration.model';
 import type { GridColDef, GridValidRowModel } from '@mui/x-data-grid';
 
 const TableExpand: React.FC = () => {
@@ -21,7 +21,7 @@ const TableExpand: React.FC = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const currentPage = tab?.workflowTasks.dataExploration?.controlPanel?.currentPage || 1;
   const totalPages = tab?.workflowTasks.dataExploration?.controlPanel?.totalPages || 1;
-
+  const filters = tab?.workflowTasks.dataExploration?.controlPanel?.filters || [];
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dateTimeColumn =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns?.find(
@@ -47,6 +47,8 @@ const TableExpand: React.FC = () => {
           }
         },
       ) : [];
+  const isEqual = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+  const prevFiltersRef = useRef<IFilter[]>([]);
 
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-scrollbarFiller': {
@@ -99,9 +101,6 @@ const TableExpand: React.FC = () => {
     },
   }));
 
-  useEffect(() => {
-    dispatch(setCurrentPage(1));
-  }, [tab?.workflowTasks.dataExploration?.controlPanel.filters]);
   // Get column information from the state
   const selectedColumns =
     tab?.workflowTasks.dataExploration?.controlPanel?.selectedColumns || [];
@@ -115,6 +114,17 @@ const TableExpand: React.FC = () => {
         columns.length === 0 ||
         meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source
       ) {
+        prevFiltersRef.current = filters;
+        return;
+      }
+      const filtersChanged = !isEqual(prevFiltersRef.current, filters);
+
+      prevFiltersRef.current = filters;
+
+      if (filtersChanged && currentPage !== 1) {
+        dispatch(
+          setCurrentPage(1)
+        );
         return;
       }
 
@@ -153,7 +163,6 @@ const TableExpand: React.FC = () => {
 
     fetchData();
   }, [
-    dispatch,
     tab?.workflowTasks.dataExploration?.controlPanel?.currentPage,
     tab?.workflowTasks.dataExploration?.controlPanel?.pageSize,
     tab?.workflowTasks.dataExploration?.controlPanel?.filters,

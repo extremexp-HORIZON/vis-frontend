@@ -27,9 +27,6 @@ const ComparisonDataCharts = () => {
     (state: RootState) => state.monitorPage.comparativeDataExploration.selectedDataset
   );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
-  const isMosaic = useAppSelector(
-    (state: RootState) => state.monitorPage.isMosaic,
-  );
   const dispatch = useAppDispatch();
   const { commonDataAssets, dataAssetsMetaData } = comparativeDataExploration;
 
@@ -215,7 +212,7 @@ const ComparisonDataCharts = () => {
 
       if (isLoading) {
         return (
-          <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
+          <Grid item xs={6} key={workflowId}>
             <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
               <Loader />
             </ResponsiveCardTable>
@@ -225,7 +222,7 @@ const ComparisonDataCharts = () => {
 
       if (hasError || !summary.length) {
         return (
-          <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
+          <Grid item xs={6} key={workflowId}>
             <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false}>
               <InfoMessage
                 message="No summary stats found for this workflow."
@@ -239,7 +236,7 @@ const ComparisonDataCharts = () => {
       }
 
       return (
-        <Grid item xs={isMosaic ? 6 : 12} key={workflowId}>
+        <Grid item xs={6} key={workflowId}>
           <ResponsiveCardTable title={`${selectedDataset} - ${workflowId}`} minHeight={300} showSettings={false} noPadding={true}>
             <SummaryTable dataset={dataAsset} workflowId={workflowId} scrollRef={setScrollRef} />
           </ResponsiveCardTable>

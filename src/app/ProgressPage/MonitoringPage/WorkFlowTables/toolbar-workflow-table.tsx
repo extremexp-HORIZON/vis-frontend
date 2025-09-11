@@ -407,7 +407,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
 
               {workflowsTable.groupBy.length > 0 && (
                 <Box sx={{
-                  p: 2,
+                  p: 1,
                   display: 'flex',
                   justifyContent: 'center',
                   borderTop: '1px solid rgba(0, 0, 0, 0.08)',
