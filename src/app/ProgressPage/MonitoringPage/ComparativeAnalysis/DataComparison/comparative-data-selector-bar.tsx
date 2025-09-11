@@ -147,6 +147,7 @@ export default function DatasetSelectorBar() {
 
     // Ensure the selected dataset is visible even when showing only a subset
     let datasetsToShow = base;
+
     if (selectedDataset && !base.includes(selectedDataset)) {
       datasetsToShow = [selectedDataset, ...base.filter(n => n !== selectedDataset).slice(0, 4)];
     }
@@ -161,6 +162,7 @@ export default function DatasetSelectorBar() {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
           {datasetsToShow.map((name, i) => {
             const isActive = name === selectedDataset;
+
             return (
               <Chip
                 key={`${name}-${i}`}
@@ -216,7 +218,7 @@ export default function DatasetSelectorBar() {
             justifyContent: 'center',
           }}>
             <Button
-              onClick={() => { handleClear() }}
+              onClick={() => { handleClear(); }}
               variant="outlined"
               color="primary"
               size="small"

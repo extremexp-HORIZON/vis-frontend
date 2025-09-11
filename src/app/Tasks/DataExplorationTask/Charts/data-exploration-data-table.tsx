@@ -115,6 +115,7 @@ const TableExpand: React.FC = () => {
         meta?.source !== tab?.dataTaskTable.selectedItem?.data?.dataset?.source
       ) {
         prevFiltersRef.current = filters;
+
         return;
       }
       const filtersChanged = !isEqual(prevFiltersRef.current, filters);
@@ -125,6 +126,7 @@ const TableExpand: React.FC = () => {
         dispatch(
           setCurrentPage(1)
         );
+
         return;
       }
 
@@ -174,9 +176,10 @@ const TableExpand: React.FC = () => {
 
   const setPage = (value: number) => {
     const clampedPage = Math.max(1, Math.min(value, totalPages));
+
     if (clampedPage !== currentPage)
       dispatch(setCurrentPage(value));
-  }
+  };
 
   // Export data to CSV
   const handleExportCsv = () => {
@@ -308,9 +311,9 @@ const TableExpand: React.FC = () => {
                 mb={2}
                 sx={{ display: 'flex', justifyContent: 'right' }}
               >
-                <PaginationComponent  
-                  currentPage={currentPage}  
-                  totalPages={totalPages}  
+                <PaginationComponent
+                  currentPage={currentPage}
+                  totalPages={totalPages}
                   setCurrentPage={setPage}
                 />
               </Box>

@@ -49,7 +49,7 @@ const ProgressPageLoading = () => {
     if (
       !experiment.loading &&
       experiment.data &&
-      !workflows.loading && 
+      !workflows.loading &&
       workflows.requested
     ) {
       setTimeout(() => {

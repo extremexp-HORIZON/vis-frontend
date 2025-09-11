@@ -17,7 +17,6 @@ interface CalculateTransform {
   as: string | undefined;
 }
 
-
 const normalizeNumericString = (v: unknown): string | null => {
   if (v == null) return null;
   const s = String(v).trim();
@@ -116,6 +115,7 @@ const getScatterChartOverlaySpec = ({
 
   const isYNumericLike = (y: VisualColumn) => {
     const metaType = getColumnType(y.type, y.name);
+
     return metaType === 'quantitative' || isFieldNumericLike(data, y.name);
   };
 
@@ -146,6 +146,7 @@ const getScatterChartOverlaySpec = ({
   };
 
   const topLevelTransforms: CalculateTransform[] = [];
+
   if (colorIsNumericLike) {
     topLevelTransforms.push({
       calculate: `toNumber(replace(replace(datum["${colorField}"], ",", ""), "%", ""))`,
@@ -218,25 +219,25 @@ const getScatterChartOverlaySpec = ({
 
           ...(colorField &&
             (!isTooManyUniqueValues(colorBy, data) || colorIsNumericLike) && {
-              color: {
-                field: colorFieldForEncoding!,
-                type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
-                legend: {
-                  title: colorField,
-                  labelLimit: 0,
-                  symbolLimit: 50,
-                  format:
+            color: {
+              field: colorFieldForEncoding!,
+              type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
+              legend: {
+                title: colorField,
+                labelLimit: 0,
+                symbolLimit: 50,
+                format:
                     !colorIsNumericLike && colorTypeFromMeta === 'temporal'
                       ? '%Y-%m-%d'
                       : undefined,
-                },
-                scale: colorIsNumericLike
-                  ? { range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'] }
-                  : (colorTypeFromMeta === 'quantitative'
-                    ? { range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'] }
-                    : undefined),
               },
-            }),
+              scale: colorIsNumericLike
+                ? { range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'] }
+                : (colorTypeFromMeta === 'quantitative'
+                  ? { range: ['#d9f0a3', '#74c476', '#238b8d', '#084081'] }
+                  : undefined),
+            },
+          }),
           tooltip: [
             ...(hasTwoSeries ? [{ field: '__series', type: 'nominal', title: 'Series' as const }] : []),
             { field: xAxis.name, type: xTypeForEncoding },
@@ -282,6 +283,7 @@ const getSingleScatterSpec = ({
     yIsNumericLike ? 'quantitative' : yMetaType;
 
   const transforms: CalculateTransform[] = [];
+
   if (colorIsNumericLike) {
     transforms.push({
       calculate: `toNumber(replace(replace(datum["${colorField}"], ",", ""), "%", ""))`,
@@ -345,10 +347,10 @@ const getSingleScatterSpec = ({
         { field: y.name, type: yTypeForEncoding, title: y.name },
         ...(colorField
           ? [{
-              field: colorIsNumericLike ? colorFieldForEncoding! : colorField,
-              type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
-              title: colorField,
-            }]
+            field: colorIsNumericLike ? colorFieldForEncoding! : colorField,
+            type: colorIsNumericLike ? 'quantitative' : colorTypeFromMeta,
+            title: colorField,
+          }]
           : []),
       ],
     },

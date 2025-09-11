@@ -115,7 +115,7 @@ export const dataExplorationReducers = (
         ? [originalColumns[1]]
         : [originalColumns[0]].filter(Boolean);
 
-      //yAxisScatter is not used anymore
+      // yAxisScatter is not used anymore
       task.controlPanel.yAxisScatter = defaultYAxis;
       task.controlPanel.timestampField = task.metaData.data?.timeColumn || null;
       task.controlPanel.orderBy =  null;

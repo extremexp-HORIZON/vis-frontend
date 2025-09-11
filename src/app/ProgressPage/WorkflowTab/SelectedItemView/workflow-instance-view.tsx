@@ -139,26 +139,27 @@ const InstanceView = () => {
   };
   const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
 
-
   const totalRows = showMisclassifiedOnly
-  ? rows.filter(r => r.actual !== r.predicted).length
-  : rows.length;
+    ? rows.filter(r => r.actual !== r.predicted).length
+    : rows.length;
 
   const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
 
   const setPage = (value: number) => {
     const clampedPage = Math.max(1, Math.min(value, totalPages));
+
     if (clampedPage !== currentPage)
       setCurrentPage(clampedPage);
-  }
+  };
 
   const handleMisclassifiedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setShowMisclassifiedOnly(e.target.checked);
     setCurrentPage(1);
-  }
+  };
 
   const handlePaginationModelChange = useCallback((model: typeof paginationModel) => {
     const newPage = model.page + 1;
+
     if (newPage !== currentPage) {
       setCurrentPage(newPage);
     }
@@ -410,13 +411,13 @@ const InstanceView = () => {
                     mb={2}
                     sx={{ display: 'flex', justifyContent: 'right' }}
                   >
-                    <PaginationComponent 
-                      totalPages={totalPages}  
-                      currentPage={currentPage}  
+                    <PaginationComponent
+                      totalPages={totalPages}
+                      currentPage={currentPage}
                       setCurrentPage={setPage}
                     />
                   </Box>
-                  
+
                 </Box>
               ) : (
                 <InfoMessage
