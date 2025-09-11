@@ -239,7 +239,6 @@ export const Chart = React.memo((props: IChartProps) => {
             alignItems="center"
             mb={2}
           >
-            <Zones dataset={dataset} />
             <Stack direction="row" spacing={1}>
               {onToggleFullscreen && (
                 <Tooltip
@@ -251,6 +250,9 @@ export const Chart = React.memo((props: IChartProps) => {
                   </IconButton>
                 </Tooltip>
               )}
+              <Zones dataset={dataset} />
+            </Stack>
+            <Stack direction="row" spacing={1}>
               <Tooltip title="Bar Chart" placement="top">
                 <IconButton
                   color={chartType === 'column' ? 'primary' : 'default'}

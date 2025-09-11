@@ -13,9 +13,9 @@ import {
   TableContainer,
   TableHead,
   Tooltip,
+  Button,
 } from '@mui/material';
 import {
-  Launch as LaunchIcon,
   Close as CloseIcon,
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
@@ -118,16 +118,15 @@ export const Zones = ({ dataset }: IZonesProps) => {
   return (
     <>
       {/* Zones Button */}
-      <Tooltip title="Zones" placement="top" arrow>
-        <IconButton
-          onClick={handleOpenZonesModal}
-          color="primary"
-          size="small"
-          sx={{ border: '1px solid', borderRadius: 1 }}
-        >
-          <LaunchIcon />
-        </IconButton>
-      </Tooltip>
+      <Button
+        variant="text"
+        color="primary"
+        size="medium"
+        onClick={handleOpenZonesModal}
+        sx={{ borderRadius: 1, textTransform: 'none' }}
+      >
+        Zones
+      </Button>
 
       {/* Zones Dialog */}
       <Dialog
@@ -254,21 +253,32 @@ export const Zones = ({ dataset }: IZonesProps) => {
                             )}
                           </TableCell>
                           <TableCell>
-                            {z.heights && z.heights.length > 0 ? (() => {
-                              const sortedHeights = [...z.heights].sort((a, b) => a - b);
+                            {z.heights && z.heights.length > 0
+                              ? (() => {
+                                const sortedHeights = [...z.heights].sort(
+                                  (a, b) => a - b,
+                                );
 
-                              return (
-                                <>
-                                  <span>
-                                    {z.heights.length} values
-                                    <br />
-                                    <strong>Min:</strong> {sortedHeights[0]}m
-                                    <br />
-                                    <strong>Max:</strong> {sortedHeights[sortedHeights.length - 1]}m
-                                  </span>
-                                </>
-                              );
-                            })() : '-'}
+                                return (
+                                  <>
+                                    <span>
+                                      {z.heights.length} values
+                                      <br />
+                                      <strong>Min:</strong> {sortedHeights[0]}
+                                        m
+                                      <br />
+                                      <strong>Max:</strong>{' '}
+                                      {
+                                        sortedHeights[
+                                          sortedHeights.length - 1
+                                        ]
+                                      }
+                                        m
+                                    </span>
+                                  </>
+                                );
+                              })()
+                              : '-'}
                           </TableCell>
                           <TableCell>
                             {z.rectangle ? (
