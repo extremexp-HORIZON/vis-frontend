@@ -140,11 +140,12 @@ const ComparisonMetricsCharts: React.FC = () => {
   };
 
   const isMetricPending = (metricName: string) => {
-  return workflowsTable.selectedWorkflows.some((wid) => {
-    const m = loadingByMetric?.[wid];
-    return m ? !!m[metricName] : false;
-  });
-};
+    return workflowsTable.selectedWorkflows.some((wid) => {
+      const m = loadingByMetric?.[wid];
+
+      return m ? !!m[metricName] : false;
+    });
+  };
 
   const groupedMetrics: Record<string, BaseMetric[]> = {};
 
@@ -215,16 +216,16 @@ const ComparisonMetricsCharts: React.FC = () => {
   const renderCharts = Object.entries(groupedMetrics).map(([metricName, metricSeries]) => {
     if (isMetricPending(metricName)) {
       return (
-      <Grid
-        item
-        xs={isMosaic ? 6 : 12}
-        key={metricName}
-        sx={{ textAlign: 'left', width: '100%' }}
-      >
+        <Grid
+          item
+          xs={isMosaic ? 6 : 12}
+          key={metricName}
+          sx={{ textAlign: 'left', width: '100%' }}
+        >
           <ResponsiveCardTable title={metricName} minHeight={300} showSettings={false}>
             <Loader />
           </ResponsiveCardTable>
-      </Grid>
+        </Grid>
       );
     }
     const isGrouped = workflowsTable.groupBy.length > 0;

@@ -1,6 +1,6 @@
 import { Pagination } from '@mui/material';
 
-const PaginationComponent = ({currentPage, totalPages, setCurrentPage}: {currentPage: number; totalPages: number; setCurrentPage: (value: number) => void}) => {
+const PaginationComponent = ({ currentPage, totalPages, setCurrentPage }: {currentPage: number; totalPages: number; setCurrentPage: (value: number) => void}) => {
 
   const handleChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     if (value !== currentPage) {

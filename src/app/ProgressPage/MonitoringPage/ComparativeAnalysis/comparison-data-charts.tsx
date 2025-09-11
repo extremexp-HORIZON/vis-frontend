@@ -61,6 +61,7 @@ const ComparisonDataCharts = () => {
 
     assetsForSelectedDataset.forEach(({ workflowId }) => {
       const meta = metaRoot?.[selectedDataset]?.[workflowId]?.meta;
+
       if (meta?.loading) {
         loading = true;
       } else if (meta?.error) {
@@ -219,7 +220,7 @@ const ComparisonDataCharts = () => {
           </ResponsiveCardTable>
         </Grid>
       ))
-    : [];
+      : [];
 
   if (workflowsTable.selectedWorkflows.length === 0) {
     return (
@@ -259,7 +260,6 @@ const ComparisonDataCharts = () => {
       />
     );
   }
-
 
   return (
     <Container maxWidth={false} sx={{ padding: 2 }} >

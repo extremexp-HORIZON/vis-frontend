@@ -26,7 +26,6 @@ type Row = {
   tooltipAll?: string;
 };
 
-
 const OverlayHistogram = ({
   assetName,
   columnName,
@@ -62,10 +61,12 @@ const OverlayHistogram = ({
     assets.forEach(({ workflowId, dataAsset }) => {
       const hist = slices[workflowId];
       const source = dataAsset?.source || '';
+
       if (!source) return;
 
       const meta = metas[workflowId];
       const metaReady = Boolean(meta?.data) && !meta?.loading && !meta?.error;
+
       if (!metaReady) return;
 
       const alreadyHasData =
@@ -134,6 +135,7 @@ const OverlayHistogram = ({
         (rawByWorkflow[wid] || []).forEach(d => {
           const label = d[columnName];
           const cnt = d[countField];
+
           if (typeof label !== 'undefined' && typeof cnt === 'number') {
             out.push({ binLabel: String(label), count: cnt, workflowId: wid });
           }
@@ -141,9 +143,11 @@ const OverlayHistogram = ({
       });
     } else {
       let min = Infinity, max = -Infinity;
+
       Object.values(rawByWorkflow).forEach(arr => {
         arr.forEach(d => {
           const v = d[columnName], c = d[countField];
+
           if (typeof v === 'number' && typeof c === 'number') {
             if (v < min) min = v;
             if (v > max) max = v;
@@ -161,8 +165,10 @@ const OverlayHistogram = ({
         } else {
           const size = range / N;
           const start0 = Math.floor(min / size) * size;
+
           bins = Array.from({ length: N }, (_, i) => {
             const s = start0 + i * size;
+
             return { start: s, end: s + size };
           });
         }
@@ -173,13 +179,16 @@ const OverlayHistogram = ({
         workflowIds.forEach(wid => {
           const arr = rawByWorkflow[wid] || [];
           const counts = bins.map(b => ({ ...b, count: 0 }));
+
           arr.forEach(d => {
             const v = d[columnName], c = d[countField];
+
             if (typeof v !== 'number' || typeof c !== 'number') return;
             if (bins.length === 1) {
               counts[0].count += c;
             } else {
               const idx = Math.max(0, Math.min(Math.floor((v - bins[0].start) / size), bins.length - 1));
+
               counts[idx].count += c;
             }
           });
@@ -196,20 +205,24 @@ const OverlayHistogram = ({
     }
 
     const perBin: Record<string, Record<string, number>> = {};
+
     out.forEach(r => {
       if (!perBin[r.binLabel]) perBin[r.binLabel] = {};
       perBin[r.binLabel][r.workflowId] = (perBin[r.binLabel][r.workflowId] || 0) + (r.count || 0);
     });
 
     const binTooltip: Record<string, string> = {};
-      Object.entries(perBin).forEach(([label, wfCounts]) => {
-        const lines = workflowIds.map(wid => `${wid}: ${wfCounts[wid] ?? 0}`);
-        binTooltip[label] = lines.join('\n');
+
+    Object.entries(perBin).forEach(([label, wfCounts]) => {
+      const lines = workflowIds.map(wid => `${wid}: ${wfCounts[wid] ?? 0}`);
+
+      binTooltip[label] = lines.join('\n');
     });
 
     out = out.map(r => ({ ...r, tooltipAll: binTooltip[r.binLabel] }));
 
     const hasData = out.length > 0;
+
     return { rows: out, isNumeric, anyLoading, anyError, hasData };
   }, [assets, slices, metas, columnName, workflowIds]);
 
@@ -228,10 +241,10 @@ const OverlayHistogram = ({
           field: 'workflowId',
           type: 'nominal',
           scale: { domain, range },
-          legend: { 
+          legend: {
             title: 'Workflow',
-            labelExpr: "length(datum.label) > 10 ? substring(datum.label, 0, 10) + '…' : datum.label"
-        }
+            labelExpr: 'length(datum.label) > 10 ? substring(datum.label, 0, 10) + \'…\' : datum.label'
+          }
         }
       }
     }));
@@ -261,28 +274,28 @@ const OverlayHistogram = ({
   }, [rows, isNumeric, workflowIds, colorScale, columnName]);
 
   return (
-      loading ? (
-          <Loader />
-        ) : showInfo ? (
-          <InfoMessage
-            message={!hasData ? 'No data available.' : 'Error fetching the data.'}
-            type="info"
-            icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-            fullHeight
-          />
-        ) : (
-            <Box
-                sx={{
-                    height: '100%',
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                <VegaLite spec={spec} actions={false} />
-            </Box>
-        )
+    loading ? (
+      <Loader />
+    ) : showInfo ? (
+      <InfoMessage
+        message={!hasData ? 'No data available.' : 'Error fetching the data.'}
+        type="info"
+        icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+        fullHeight
+      />
+    ) : (
+      <Box
+        sx={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <VegaLite spec={spec} actions={false} />
+      </Box>
+    )
   );
 };
 

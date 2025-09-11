@@ -122,7 +122,7 @@ interface IMonitoringPageSlice {
         data: {[key: string]: {name: string; seriesMetric: IMetric[]}[]}
         loading: boolean
         error: string | null
-        loadingByMetric: Record<string, Record<string, boolean>>; 
+        loadingByMetric: Record<string, Record<string, boolean>>;
       }
       comparativeVisibleMetrics: string[]
       comparativeModelConfusionMatrix: {
@@ -486,37 +486,37 @@ export const monitoringPageSlice = createSlice({
     builder.addCase(fetchWorkflowMetrics.fulfilled, (state, action) => {
       const { workflowId, metricNames } = action.meta.arg;
       const fetchedMetrics = action.payload;
-    
+
       if (!(workflowId in state.selectedWorkflowsMetrics.data)) {
         state.selectedWorkflowsMetrics.data[workflowId] = [];
       }
-    
+
       const currentMetrics = state.selectedWorkflowsMetrics.data[workflowId];
       const metricMap = new Map(currentMetrics.map(m => [m.name, m]));
-    
+
       for (const metric of fetchedMetrics) {
         metricMap.set(metric.name, {
           name: metric.name,
           seriesMetric: metric.data,
         });
       }
-    
+
       state.selectedWorkflowsMetrics.data[workflowId] = Array.from(metricMap.values());
-    
+
       if (!state.selectedWorkflowsMetrics.loadingByMetric[workflowId]) {
         state.selectedWorkflowsMetrics.loadingByMetric[workflowId] = {};
       }
       metricNames.forEach((name: string) => {
         state.selectedWorkflowsMetrics.loadingByMetric[workflowId][name] = false;
       });
-    
+
       state.selectedWorkflowsMetrics.loading = false;
       state.selectedWorkflowsMetrics.error = null;
     })
       .addCase(fetchWorkflowMetrics.pending, (state, action) => {
         state.selectedWorkflowsMetrics.loading = true;
         const { workflowId, metricNames } = action.meta.arg;
-      
+
         if (!state.selectedWorkflowsMetrics.loadingByMetric[workflowId]) {
           state.selectedWorkflowsMetrics.loadingByMetric[workflowId] = {};
         }
@@ -526,14 +526,14 @@ export const monitoringPageSlice = createSlice({
       })
       .addCase(fetchWorkflowMetrics.rejected, (state, action) => {
         const { workflowId, metricNames } = action.meta.arg;
-      
+
         if (!state.selectedWorkflowsMetrics.loadingByMetric[workflowId]) {
           state.selectedWorkflowsMetrics.loadingByMetric[workflowId] = {};
         }
         metricNames.forEach((name: string) => {
           state.selectedWorkflowsMetrics.loadingByMetric[workflowId][name] = false;
         });
-      
+
         state.selectedWorkflowsMetrics.loading = false;
         state.selectedWorkflowsMetrics.error =
           action.error.message || 'Error while fetching data';

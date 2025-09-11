@@ -103,10 +103,12 @@ const Contourplot = (props: IContourplot) => {
 
     // Start from midpoint edges
     const edges: number[] = new Array(v.length + 1);
+
     for (let i = 0; i < v.length - 1; i++) edges[i + 1] = (v[i] + v[i + 1]) / 2;
 
     const firstGap = v[1] - v[0];
     const lastGap = v[v.length - 1] - v[v.length - 2];
+
     edges[0] = v[0] - firstGap / 2;
     edges[v.length] = v[v.length - 1] + lastGap / 2;
 
@@ -115,8 +117,10 @@ const Contourplot = (props: IContourplot) => {
       const left = edges[i];
       const right = edges[i + 1];
       const width = right - left;
+
       if (width < minWidth) {
         const deficit = (minWidth - width) / 2;
+
         edges[i] = left - deficit;
         edges[i + 1] = right + deficit;
       }
@@ -208,30 +212,30 @@ const Contourplot = (props: IContourplot) => {
     encoding: {
       ...(xIsNumeric
         ? {
-            x: { field: 'x0', type: 'quantitative', axis: { title: xField } },
-            x2: { field: 'x1' },
-          }
+          x: { field: 'x0', type: 'quantitative', axis: { title: xField } },
+          x2: { field: 'x1' },
+        }
         : {
-            x: {
-              field: xField,
-              type: 'ordinal',
-              sort: { field: xField, order: 'ascending' },
-              axis: { title: xField }
-            },
-          }),
+          x: {
+            field: xField,
+            type: 'ordinal',
+            sort: { field: xField, order: 'ascending' },
+            axis: { title: xField }
+          },
+        }),
       ...(yIsNumeric
         ? {
-            y: { field: 'y0', type: 'quantitative', axis: { title: yField } },
-            y2: { field: 'y1' },
-          }
+          y: { field: 'y0', type: 'quantitative', axis: { title: yField } },
+          y2: { field: 'y1' },
+        }
         : {
-            y: {
-              field: yField,
-              type: 'ordinal',
-              sort: { field: yField, order: 'ascending' },
-              axis: { title: yField }
-            },
-          }),
+          y: {
+            field: yField,
+            type: 'ordinal',
+            sort: { field: yField, order: 'ascending' },
+            axis: { title: yField }
+          },
+        }),
       color: {
         field: zField,
         type: 'quantitative',

@@ -91,7 +91,7 @@ const ComparativeAnalysisControls = ()=> {
         alignItems="center"
         sx={{
           p: 2,
-          minHeight: {xs: 16, lg: 40},
+          minHeight: { xs: 16, lg: 40 },
           height: 'auto',
           flexWrap: { xs: 'wrap', lg: 'nowrap' },
           overflowX: 'auto',
