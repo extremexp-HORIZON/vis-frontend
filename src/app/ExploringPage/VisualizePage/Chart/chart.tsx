@@ -11,7 +11,7 @@ import {
   Stack,
   Typography,
   IconButton,
-  Popover,
+  Tooltip,
   Select,
   MenuItem,
   FormControl,
@@ -112,24 +112,6 @@ export const Chart = React.memo((props: IChartProps) => {
       value: s.value ?? 0,
     }));
   }
-
-  const [popoverAnchor, setPopoverAnchor] = React.useState<null | HTMLElement>(
-    null,
-  );
-  const [popoverText, setPopoverText] = React.useState<string>('');
-
-  const handlePopoverOpen = (
-    event: React.MouseEvent<HTMLElement>,
-    text: string,
-  ) => {
-    setPopoverAnchor(event.currentTarget);
-    setPopoverText(text);
-  };
-
-  const handlePopoverClose = () => {
-    setPopoverAnchor(null);
-    setPopoverText('');
-  };
 
   const handleChartTypeChange = (type: string) => {
     if (type !== chartType) {
@@ -260,72 +242,47 @@ export const Chart = React.memo((props: IChartProps) => {
             <Zones dataset={dataset} />
             <Stack direction="row" spacing={1}>
               {onToggleFullscreen && (
-                <IconButton
-                  color="default"
-                  onClick={e => {
-                    onToggleFullscreen();
-                    handlePopoverOpen(
-                      e,
-                      isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
-                    );
-                  }}
-                  onMouseLeave={handlePopoverClose}
+                <Tooltip
+                  title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+                  placement="top"
                 >
-                  {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-                </IconButton>
+                  <IconButton color="default" onClick={onToggleFullscreen}>
+                    {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                  </IconButton>
+                </Tooltip>
               )}
-              <IconButton
-                color={chartType === 'column' ? 'primary' : 'default'}
-                onClick={e => {
-                  handleChartTypeChange('column');
-                  handlePopoverOpen(e, 'Bar Chart');
-                }}
-                onMouseLeave={handlePopoverClose}
-              >
-                <BarChartIcon />
-              </IconButton>
-              <IconButton
-                color={chartType === 'line' ? 'primary' : 'default'}
-                onClick={e => {
-                  handleChartTypeChange('line');
-                  handlePopoverOpen(e, 'Line Chart');
-                }}
-                onMouseLeave={handlePopoverClose}
-              >
-                <ShowChartIcon />
-              </IconButton>
-              <IconButton
-                color={chartType === 'area' ? 'primary' : 'default'}
-                onClick={e => {
-                  handleChartTypeChange('area');
-                  handlePopoverOpen(e, 'Area Chart');
-                }}
-                onMouseLeave={handlePopoverClose}
-              >
-                <BubbleChartIcon />
-              </IconButton>
-              <IconButton
-                color={chartType === 'heatmap' ? 'primary' : 'default'}
-                onClick={e => {
-                  handleChartTypeChange('heatmap');
-                  handlePopoverOpen(e, 'Heatmap');
-                }}
-                onMouseLeave={handlePopoverClose}
-              >
-                <GridOnIcon />
-              </IconButton>
-              <Popover
-                open={Boolean(popoverAnchor)}
-                anchorEl={popoverAnchor}
-                onClose={handlePopoverClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                disableRestoreFocus
-              >
-                <Box sx={{ p: 1 }}>
-                  <Typography variant="body2">{popoverText}</Typography>
-                </Box>
-              </Popover>
+              <Tooltip title="Bar Chart" placement="top">
+                <IconButton
+                  color={chartType === 'column' ? 'primary' : 'default'}
+                  onClick={() => handleChartTypeChange('column')}
+                >
+                  <BarChartIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Line Chart" placement="top">
+                <IconButton
+                  color={chartType === 'line' ? 'primary' : 'default'}
+                  onClick={() => handleChartTypeChange('line')}
+                >
+                  <ShowChartIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Area Chart" placement="top">
+                <IconButton
+                  color={chartType === 'area' ? 'primary' : 'default'}
+                  onClick={() => handleChartTypeChange('area')}
+                >
+                  <BubbleChartIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Heatmap" placement="top">
+                <IconButton
+                  color={chartType === 'heatmap' ? 'primary' : 'default'}
+                  onClick={() => handleChartTypeChange('heatmap')}
+                >
+                  <GridOnIcon />
+                </IconButton>
+              </Tooltip>
             </Stack>
           </Stack>
 
