@@ -1,5 +1,5 @@
 import './visualize.css';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box } from '@mui/material';
 import {
@@ -26,10 +26,17 @@ import { resetTimeSeriesState } from '../../../store/slices/exploring/timeSeries
 const VisualizePage = () => {
   const { datasetId } = useParams();
   const dispatch = useAppDispatch();
+  const [isChartFullscreen, setIsChartFullscreen] = useState(false);
   const { dataset, loading } = useAppSelector(
     (state: RootState) => state.dataset,
   );
-  const { drawnRect, selectedGeohash } = useAppSelector((state: RootState) => state.map);
+
+  const toggleChartFullscreen = React.useCallback(() => {
+    setIsChartFullscreen(!isChartFullscreen);
+  }, [isChartFullscreen]);
+  const { drawnRect, selectedGeohash } = useAppSelector(
+    (state: RootState) => state.map,
+  );
   const {
     dataSource,
     loading: { fetch: dataSourceLoading },
@@ -82,16 +89,30 @@ const VisualizePage = () => {
       >
         <Stats dataset={dataset} />
       </Box>
-      <Box
-        position="absolute"
-        zIndex={999}
-        bottom={0}
-        right={0}
-        sx={{ p: 1, width: 1 / 4 }}
-      >
-        <Chart dataset={dataset} />
-        {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && <TimeSeriesChart dataset={dataset} />}
-      </Box>
+      {isChartFullscreen ? (
+        <Chart
+          dataset={dataset}
+          isFullscreen={isChartFullscreen}
+          onToggleFullscreen={toggleChartFullscreen}
+        />
+      ) : (
+        <Box
+          position="absolute"
+          zIndex={999}
+          bottom={0}
+          right={0}
+          sx={{ p: 1, width: 1 / 4 }}
+        >
+          <Chart
+            dataset={dataset}
+            isFullscreen={isChartFullscreen}
+            onToggleFullscreen={toggleChartFullscreen}
+          />
+          {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && (
+            <TimeSeriesChart dataset={dataset} />
+          )}
+        </Box>
+      )}
     </>
   );
 };

@@ -3,6 +3,8 @@ import {
   ShowChart as ShowChartIcon,
   BubbleChart as BubbleChartIcon,
   GridOn as GridOnIcon,
+  Fullscreen as FullscreenIcon,
+  FullscreenExit as FullscreenExitIcon,
 } from '@mui/icons-material';
 import {
   Box,
@@ -14,7 +16,7 @@ import {
   MenuItem,
   FormControl,
 } from '@mui/material';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { VisualizationSpec } from 'react-vega';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
 import type { RootState } from '../../../../store/store';
@@ -33,10 +35,12 @@ import { Zones } from '../Zones/zones';
 
 export interface IChartProps {
   dataset: IDataset;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
-export const Chart = (props: IChartProps) => {
-  const { dataset } = props;
+export const Chart = React.memo((props: IChartProps) => {
+  const { dataset, isFullscreen = false, onToggleFullscreen } = props;
   const dimensions = dataset.dimensions || [];
   const { series } = useAppSelector((state: RootState) => state.stats);
   const { aggType, chartType, measureCol, groupByCols } = useAppSelector(
@@ -46,6 +50,39 @@ export const Chart = (props: IChartProps) => {
     loading: { executeQuery: loadingExecuteQuery },
   } = useAppSelector((state: RootState) => state.dataset);
   const dispatch = useAppDispatch();
+
+  // State for viewport dimensions
+  const [viewportDimensions, setViewportDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  // Update viewport dimensions on resize with throttling
+  useEffect(() => {
+    // Only track viewport changes when in fullscreen mode
+    if (!isFullscreen) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    const handleResize = () => {
+      // Throttle resize events to prevent excessive re-renders
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setViewportDimensions({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      }, 100); // 100ms throttle
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isFullscreen]);
+
   const xAxisOptions = dimensions.map(dim => ({
     key: dim,
     value: dim,
@@ -60,7 +97,7 @@ export const Chart = (props: IChartProps) => {
     }),
   );
 
-  let vegaSeriesData: Record<string, any>[] = [];
+  let vegaSeriesData: Record<string, unknown>[] = [];
 
   if (chartType === 'heatmap') {
     vegaSeriesData = series?.map(groupedStat => ({
@@ -108,7 +145,9 @@ export const Chart = (props: IChartProps) => {
     }
   };
 
-  const getVegaMarkType = (chartType: string) => {
+  const getVegaMarkType = (
+    chartType: string,
+  ): { type: 'bar' | 'line' | 'area' | 'rect'; point?: boolean } => {
     switch (chartType) {
       case 'column':
         return { type: 'bar' };
@@ -139,8 +178,25 @@ export const Chart = (props: IChartProps) => {
         ? dataset.measure0
         : dataset.measure1;
 
+  // Calculate viewport-based dimensions with memoization
+  const chartDimensions = React.useMemo(() => {
+    if (isFullscreen) {
+      return {
+        minWidth: Math.floor(viewportDimensions.width * 0.6), // 60vw
+        minHeight: Math.floor(viewportDimensions.height * 0.4), // 40vh
+        maxHeight: Math.floor(viewportDimensions.height * 0.6), // 60vh
+      };
+    }
+
+    return {
+      minWidth: 100,
+      minHeight: 100,
+      maxHeight: 300,
+    };
+  }, [isFullscreen, viewportDimensions.width, viewportDimensions.height]);
+
   const spec: VisualizationSpec = {
-    mark: getVegaMarkType(chartType) as any, // Type assertion to fix type error
+    mark: getVegaMarkType(chartType),
     encoding:
       chartType === 'heatmap'
         ? {
@@ -177,15 +233,47 @@ export const Chart = (props: IChartProps) => {
         borderRadius: 2,
         p: 3,
         bgcolor: 'white',
+        ...(isFullscreen && {
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 999,
+          borderRadius: 0,
+          height: '80vh',
+          width: '80vw',
+          display: 'flex',
+          flexDirection: 'column',
+        }),
       }}
     >
       {loadingExecuteQuery ? (
         <Loader />
       ) : (
         <>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
             <Zones dataset={dataset} />
             <Stack direction="row" spacing={1}>
+              {onToggleFullscreen && (
+                <IconButton
+                  color="default"
+                  onClick={e => {
+                    onToggleFullscreen();
+                    handlePopoverOpen(
+                      e,
+                      isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
+                    );
+                  }}
+                  onMouseLeave={handlePopoverClose}
+                >
+                  {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                </IconButton>
+              )}
               <IconButton
                 color={chartType === 'column' ? 'primary' : 'default'}
                 onClick={e => {
@@ -242,13 +330,16 @@ export const Chart = (props: IChartProps) => {
           </Stack>
 
           {vegaSeriesData.length > 0 && (
-            <ResponsiveVegaLite
-              minWidth={100}
-              minHeight={100}
-              aspectRatio={1 / 0.5}
-              actions={false}
-              spec={spec}
-            />
+            <Box sx={{ flex: 1, minHeight: isFullscreen ? '60vh' : 'auto' }}>
+              <ResponsiveVegaLite
+                minWidth={chartDimensions.minWidth}
+                minHeight={chartDimensions.minHeight}
+                maxHeight={chartDimensions.maxHeight}
+                aspectRatio={isFullscreen ? 16 / 9 : 1 / 0.5}
+                actions={false}
+                spec={spec}
+              />
+            </Box>
           )}
 
           <Stack
@@ -365,4 +456,4 @@ export const Chart = (props: IChartProps) => {
       )}
     </Box>
   );
-};
+});
