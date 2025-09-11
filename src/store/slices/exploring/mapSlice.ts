@@ -33,7 +33,7 @@ interface MapState {
 }
 
 const initialState: MapState = {
-  zoom: 14,
+  zoom: 8,
   viewRect: null,
   drawnRect: null,
   activeRect: 'viewRect',
