@@ -103,7 +103,7 @@ const ExploringPage = () => {
               </Typography>
               <TableContainer
                 component={Paper}
-                sx={{ marginTop: 2, width: '80%' }}
+                sx={{ marginTop: 2, width: '80%', maxHeight: '60%' }}
               >
                 <Table>
                   <TableHead>
