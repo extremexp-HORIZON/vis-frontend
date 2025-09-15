@@ -249,6 +249,8 @@ export const Map = (props: IMapProps) => {
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxNativeZoom={18} // This will allow zooming beyond level 18 by scaling the available tiles, though with some quality degradation.
+          maxZoom={MAX_ZOOM}
         />
         <ZoomControl position="topright" />
         <MapControl id={id} />

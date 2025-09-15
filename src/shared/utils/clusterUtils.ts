@@ -2,7 +2,7 @@ import Supercluster from 'supercluster';
 import { useEffect, useState } from 'react';
 import type { IDataset } from '../models/exploring/dataset.model';
 
-export const MAX_ZOOM = 18; // Define MAX_ZOOM as a constant
+export const MAX_ZOOM = 20; // Define MAX_ZOOM as a constant
 
 // Defined IPointType according to what RawVis backend returns
 export type IPointType = [

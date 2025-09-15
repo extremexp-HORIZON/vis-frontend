@@ -3,27 +3,41 @@ import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import ngeohash from 'ngeohash';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
-import { generateRsrpColor } from '../../../../shared/utils/clusterUtils';
+import {
+  generateRsrpColor,
+  MAX_ZOOM,
+} from '../../../../shared/utils/clusterUtils';
 import { useNavigate } from 'react-router-dom';
 
 // Map zoom level to geohash precision
+// This function maps zoom levels to geohash precision levels, respecting MAX_ZOOM
 function getGeohashPrecision(zoom: number): number {
-  if (zoom >= 18) return 7;
-  if (zoom >= 17) return 6;
-  if (zoom >= 14) return 5;
-  if (zoom >= 12) return 4;
-  if (zoom >= 6) return 3;
+  // Clamp zoom to MAX_ZOOM to prevent issues with very high zoom levels
+  const clampedZoom = Math.min(zoom, MAX_ZOOM);
+
+  // Geohash precision mapping based on zoom levels
+  // Higher precision (more characters) for higher zoom levels
+  if (clampedZoom >= 20) return 9;
+  if (clampedZoom >= 19) return 8;
+  if (clampedZoom >= 18) return 7;
+  if (clampedZoom >= 17) return 6;
+  if (clampedZoom >= 14) return 5;
+  if (clampedZoom >= 12) return 4;
+  if (clampedZoom >= 6) return 3;
 
   return 2;
 }
 
+// Map geohash precision back to zoom level, respecting MAX_ZOOM
 function getZoomFromPrecision(precision: number): number {
-  if (precision >= 7) return 18;
-  if (precision === 6) return 17;
-  if (precision === 5) return 14;
-  if (precision === 4) return 12;
-  if (precision === 3) return 9;
-  if (precision === 2) return 7;
+  if (precision >= 9) return Math.min(20, MAX_ZOOM);
+  if (precision === 8) return Math.min(19, MAX_ZOOM);
+  if (precision === 7) return Math.min(18, MAX_ZOOM);
+  if (precision === 6) return Math.min(17, MAX_ZOOM);
+  if (precision === 5) return Math.min(14, MAX_ZOOM);
+  if (precision === 4) return Math.min(12, MAX_ZOOM);
+  if (precision === 3) return Math.min(9, MAX_ZOOM);
+  if (precision === 2) return Math.min(7, MAX_ZOOM);
 
   return 5;
 }
@@ -92,7 +106,7 @@ function getHierarchicalGrid(
   let contextLevel = 1;
 
   // Add 2-3 levels of broader context
-  while (currentParent.length >= 2 && contextLevel <= 3) {
+  while (currentParent.length >= 2 && contextLevel <= 6) {
     const parentSiblings = getSiblingGeohashes(currentParent);
 
     parentSiblings.forEach(sibling => {
@@ -282,7 +296,7 @@ export const GeohashGridLayer = ({
         const cellHeightPx = Math.abs(bottomRight.y - topLeft.y);
 
         // Calculate dynamic font size based on cell size and zoom level
-        const zoom = map.getZoom();
+        const zoom = Math.min(map.getZoom(), MAX_ZOOM);
         const zoomFactor = Math.pow(1.2, zoom - 10); // Exponential growth with zoom
         const cellSize = Math.min(cellWidthPx, cellHeightPx);
         const fontSize = Math.max(6, Math.min(36, cellSize * 0.3 * zoomFactor));
