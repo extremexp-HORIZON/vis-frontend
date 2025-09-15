@@ -56,7 +56,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
   });
 
   useEffect(() => {
-    if (dataset.id && modalOpen) {
+    if (dataset.id && modalOpen && zones.length === 0) {
       dispatch(getZonesByFileName(dataset.id));
     }
 
@@ -65,7 +65,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
       setHighlightedZoneId(null);
       setDeleteConfirmation({ open: false, zoneId: null, zoneName: null });
     }
-  }, [dataset.id, dispatch, modalOpen]);
+  }, [dataset.id, dispatch, modalOpen, zones.length]);
 
   // Effect to handle temporary highlighting when zone changes
   useEffect(() => {

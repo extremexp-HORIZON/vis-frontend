@@ -5,7 +5,7 @@ import {
   defaultValue as zoneDefaultValue,
   type IZone,
 } from '../../../shared/models/exploring/zone.model';
-import { showError, showSuccess } from '../../../shared/utils/toast';
+import { showError, showInfo, showSuccess } from '../../../shared/utils/toast';
 import type { AppStartListening } from '../../listenerMiddleware';
 import { setDrawnRect } from './mapSlice';
 import ngeohash from 'ngeohash';
@@ -240,6 +240,7 @@ export const zoneSlice = createSlice({
       // postZone
       .addCase(postZone.pending, state => {
         state.loading.postZone = true;
+        showInfo('Creating zone...');
       })
       .addCase(postZone.fulfilled, (state, action) => {
         state.loading.postZone = false;
