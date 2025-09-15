@@ -28,10 +28,12 @@ import {
   setVisibleTable,
   setWorkflowsTable,
   setGroupBy,
+  setSelectedSpaces,
 } from '../../../../store/slices/monitorPageSlice';
 import { useState } from 'react';
 import PivotTableChartRoundedIcon from '@mui/icons-material/PivotTableChartRounded';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import GrainIcon from '@mui/icons-material/Grain';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import TableRowsIcon from '@mui/icons-material/TableRows';
@@ -49,6 +51,8 @@ interface ToolBarWorkflowProps {
   filterClickedFunction: (event: React.MouseEvent<HTMLElement>) => void
   groupByOptions?: string[]
   showFilterButton?: boolean;
+  showSpaceButton?: boolean;
+  spaceOptions?: string[]
 }
 
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
@@ -60,13 +64,16 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     handleClickedFunction,
     filterClickedFunction,
     groupByOptions,
-    showFilterButton = false
+    showFilterButton = false,
+    showSpaceButton = false,
+    spaceOptions
   } = props;
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
     useAppSelector((state: RootState) => state.monitorPage);
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [anchorElGroup, setAnchorElGroup] = useState<null | HTMLElement>(null);
+  const [anchorElSpaces, setAnchorElSpaces] = useState<null | HTMLElement>(null);
 
   const handleGroupClick = (e: React.MouseEvent<HTMLElement>) =>
     setAnchorElGroup(e.currentTarget);
@@ -77,6 +84,12 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
   };
 
   const handleClose = () => setAnchorEl(null);
+
+  const handleSpaceOptionsOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElSpaces(event.currentTarget);
+  };
+
+  const handelSpaceOptionsClose = () => setAnchorElSpaces(null);
 
   const open = Boolean(anchorEl);
 
@@ -220,6 +233,14 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           }}
         >
           <Box sx={{ gap: 0.2, marginLeft: 'auto' }}>
+            {showSpaceButton && (
+              <Tooltip title="Spaces">
+                <IconButton onClick={handleSpaceOptionsOpen}>
+                  <GrainIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
             {showFilterButton && (
               <Tooltip title="Filter list">
                 <IconButton onClick={filterClickedFunction}>
@@ -245,6 +266,114 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 </IconButton>
               </Tooltip>
             )}
+            <Popover
+              open={Boolean(anchorElSpaces)}
+              anchorEl={anchorElSpaces}
+              onClose={handelSpaceOptionsClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  width: 300,
+                  maxHeight: 250,
+                  overflow: 'hidden',
+                  padding: 0,
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  mt: 1,
+                  '& .MuiList-root': {
+                    padding: 0,
+                  }
+                },
+              }}
+            >
+              <SectionHeader icon={<CategoryIcon fontSize="small" />} title="Spaces" />
+
+              <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
+                {spaceOptions?.map(option => (
+                  <ListItem
+                    key={option}
+                    disablePadding
+                    sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.04)' } }}
+                  >
+                    <ListItemButton
+                      onClick={() => {
+                        const spaces = visibleTable === 'workflows' ?
+                          workflowsTable.selectedSpaces.includes(option) ?
+                            workflowsTable.selectedSpaces.filter(p => p !== option)
+                            :
+                            [...workflowsTable.selectedSpaces, option]
+                          :
+                          scheduledTable.selectedSpaces.includes(option) ?
+                            scheduledTable.selectedSpaces.filter(p => p !== option)
+                            :  [...scheduledTable.selectedSpaces, option];
+
+                        dispatch(setSelectedSpaces(
+                          { spaces, table: visibleTable }
+                        ));
+                      }}
+                      dense
+                    >
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        {visibleTable === 'workflows' ? workflowsTable.selectedSpaces.includes(option) ? (
+                          <CheckBoxIcon color="primary" fontSize="small" />
+                        ) : (
+                          <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                        ) : scheduledTable.selectedSpaces.includes(option) ? (
+                          <CheckBoxIcon color="primary" fontSize="small" />
+                        ) : (
+                          <CheckBoxOutlineBlankIcon fontSize="small" color="action" />
+                        )
+                        }
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={option}
+                        primaryTypographyProps={{ fontSize: '0.95rem' }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+
+              {visibleTable === 'workflows' ? workflowsTable.selectedSpaces.length > 0 && (
+                <Box sx={{
+                  p: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                  background: '#f8f9fa'
+                }}>
+                  <Button
+                    onClick={() => dispatch(setSelectedSpaces({ spaces: [], table: visibleTable }))}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    startIcon={<ClearAllIcon />}
+                  >
+                    Clear Grouping
+                  </Button>
+                </Box>
+              ) : scheduledTable.selectedSpaces.length > 0 && (
+                <Box sx={{
+                  p: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                  background: '#f8f9fa'
+                }}>
+                  <Button
+                    onClick={() => dispatch(setSelectedSpaces({ spaces: [], table: visibleTable }))}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    startIcon={<ClearAllIcon />}
+                  >
+                    Clear Grouping
+                  </Button>
+                </Box>
+              )}
+            </Popover>
 
             <Popover
               open={open}

@@ -120,11 +120,11 @@ const OverlayHistogram = ({
         ? slices[wid]!.data!.data
         : [];
     });
-  
+
     const anyLoading = workflowIds.some(
       wid => Boolean(slices[wid]?.loading) || Boolean(metas[wid]?.loading)
     );
-  
+
     const anyError = workflowIds.some(
       wid => Boolean(slices[wid]?.error)
     );

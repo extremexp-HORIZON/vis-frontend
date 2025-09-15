@@ -36,6 +36,8 @@ export interface IRun {
   /** Optional: List of tasks associated with the run. */
   tasks?: ITask[];
 
+  space?: string;
+
   /** Additional metadata for the run. */
   tags: Record<string, string>;
 }
