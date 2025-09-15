@@ -288,7 +288,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 },
               }}
             >
-              <SectionHeader icon={<CategoryIcon fontSize="small" />} title="Spaces" />
+              <SectionHeader icon={<CategoryIcon fontSize="small" />} title="Visible Spaces" />
 
               <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
                 {spaceOptions?.map(option => (
