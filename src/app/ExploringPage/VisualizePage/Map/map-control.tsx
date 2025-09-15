@@ -11,7 +11,7 @@ import {
 import { postZone } from '../../../../store/slices/exploring/zoneSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useMapDrawing } from './useMapDrawing';
-import { reset as resetZone } from '../../../../store/slices/exploring/zoneSlice';
+import { resetZoneState } from '../../../../store/slices/exploring/zoneSlice';
 
 export const MapControl = ({ id }: { id: string }) => {
   const map = useMap();
@@ -40,7 +40,7 @@ export const MapControl = ({ id }: { id: string }) => {
       if ('getBounds' in layer) {
         const bounds = layer.getBounds();
 
-        dispatch(resetZone());
+        dispatch(resetZoneState());
         dispatch(
           setDrawnRect({
             id,

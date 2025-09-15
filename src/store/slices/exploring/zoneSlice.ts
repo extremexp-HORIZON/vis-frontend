@@ -204,7 +204,7 @@ export const zoneSlice = createSlice({
     setModalOpen: (state, action: PayloadAction<boolean>) => {
       state.modalOpen = action.payload;
     },
-    reset: () => {
+    resetZoneState: () => {
       return initialState;
     },
   },
@@ -294,4 +294,4 @@ export const zoneListeners = (startAppListening: AppStartListening) => {
   });
 };
 
-export const { setZone, setViewZone, setModalOpen, reset } = zoneSlice.actions;
+export const { setZone, setViewZone, setModalOpen, resetZoneState } = zoneSlice.actions;
