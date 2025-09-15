@@ -43,7 +43,9 @@ const ExploringPage = () => {
   );
 
   useEffect(() => {
-    dispatch(getDataSourceList());
+    if (dataSources.length === 0) {
+      dispatch(getDataSourceList());
+    }
   }, [dispatch]);
 
   const handleViewClick = (fileName: string) => {
