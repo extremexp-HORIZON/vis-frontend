@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { useAppSelector } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import L from 'leaflet';
+import { updateMapBounds } from '../../../../store/slices/exploring/mapSlice';
 
 export const useMapDrawing = (map: L.Map | null, id: string) => {
+  const dispatch = useAppDispatch();
   const drawnItemsRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
   const drawnRect = useAppSelector(state => state.map.drawnRect);
   const lastDrawnBounds = useRef<{
@@ -56,6 +58,18 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
 
     // Fit map to the rectangle bounds but with a buffer of 250px
     map.fitBounds(leafletBounds, { padding: [250, 250] });
+    const paddedBounds = map.getBounds();
+
+    dispatch(updateMapBounds({
+      id,
+      bounds: {
+        south: paddedBounds.getSouth(),
+        west: paddedBounds.getWest(),
+        north: paddedBounds.getNorth(),
+        east: paddedBounds.getEast(),
+      },
+      zoom: map.getZoom(),
+    }));
 
     // Notify parent component to update visibility
     if (onVisibilityChangeRef.current) {
