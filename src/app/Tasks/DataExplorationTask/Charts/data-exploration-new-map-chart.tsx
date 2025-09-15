@@ -71,6 +71,7 @@ const MapChart = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || '',
+            runId: tab?.workflowId || ''
           },
           columns,
           filters,

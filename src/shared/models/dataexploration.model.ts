@@ -38,6 +38,7 @@ export interface IDataSource {
   format: string
   sourceType: string
   fileName: string
+  runId: string
 }
 
 export interface IDataExplorationQuery {
@@ -65,6 +66,7 @@ export interface IMetaDataQuery{
   format: string
   sourceType: string
   fileName: string
+  runId: string
 }
 export interface IMetaDataRequest {
   query: IMetaDataQuery
@@ -132,6 +134,7 @@ export const defaultDataExplorationQuery: IDataExplorationQuery = {
     format: '',
     sourceType: '',
     fileName: '',
+    runId: 'dataCache',
   },
   // limit: 0,
   columns: [],

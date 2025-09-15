@@ -48,6 +48,7 @@ const SegmentMapChart = () => {
           format: dataset?.format || '',
           sourceType: dataset?.sourceType || '',
           fileName: dataset?.name || ''
+          , runId: tab?.workflowId || ''
         },
         columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         filters,

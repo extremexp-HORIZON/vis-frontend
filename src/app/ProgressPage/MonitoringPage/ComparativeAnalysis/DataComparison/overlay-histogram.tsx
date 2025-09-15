@@ -82,6 +82,7 @@ const OverlayHistogram = ({
               format: dataAsset?.format || '',
               sourceType: dataAsset?.sourceType || '',
               fileName: dataAsset?.name || '',
+              runId: workflowId || ''
             },
             groupBy: [columnName],
             aggregations: [agg],
