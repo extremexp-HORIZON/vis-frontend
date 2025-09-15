@@ -275,7 +275,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 elevation: 3,
                 sx: {
                   width: 300,
-                  maxHeight: 250,
+                  maxHeight: 300,
                   overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
@@ -351,7 +351,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                     size="small"
                     startIcon={<ClearAllIcon />}
                   >
-                    Clear Grouping
+                    Clear Selection
                   </Button>
                 </Box>
               ) : scheduledTable.selectedSpaces.length > 0 && (
@@ -369,7 +369,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                     size="small"
                     startIcon={<ClearAllIcon />}
                   >
-                    Clear Grouping
+                    Clear Selection
                   </Button>
                 </Box>
               )}
@@ -384,7 +384,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 elevation: 3,
                 sx: {
                   width: 300,
-                  maxHeight: 250,
+                  maxHeight: 300,
                   overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
@@ -484,7 +484,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 elevation: 3,
                 sx: {
                   width: 300,
-                  maxHeight: 250,
+                  maxHeight: 300,
                   overflow: 'hidden',
                   padding: 0,
                   borderRadius: '12px',
