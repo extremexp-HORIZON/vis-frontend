@@ -35,6 +35,7 @@ import {
   GridView as GeohashIcon,
   Spoke as ClusterIcon,
 } from '@mui/icons-material';
+import { LatLngBounds, type LatLngBoundsExpression } from 'leaflet';
 
 export interface IMapProps {
   id: string;
@@ -163,7 +164,11 @@ export const Map = (props: IMapProps) => {
 
   // Initialize selectedGeohash from URL params
   useEffect(() => {
-    if (dataset !== defaultValue && geohash && geohash !== selectedGeohash.string) {
+    if (
+      dataset !== defaultValue &&
+      geohash &&
+      geohash !== selectedGeohash.string
+    ) {
       dispatch(setMapLayer('geohash'));
       dispatch(setSelectedGeohash(geohash));
     }
@@ -224,19 +229,18 @@ export const Map = (props: IMapProps) => {
 
   let content: React.ReactNode;
 
-  const center: [number, number] =
-    viewRect != null
-      ? [
-        (viewRect.lat[0] + viewRect.lat[1]) / 2, // Midpoint of latitude
-        (viewRect.lon[0] + viewRect.lon[1]) / 2, // Midpoint of longitude
-      ]
-      : [51.505, -0.09];
+  const bounds = viewRect
+    ? new LatLngBounds(
+      [viewRect.lat[0], viewRect.lon[0]],
+      [viewRect.lat[1], viewRect.lon[1]],
+    )
+    : null;
 
   if (clusters) {
     content = (
       <MapContainer
-        center={center}
-        zoom={zoom}
+        bounds={bounds as LatLngBoundsExpression}
+        boundsOptions={{ padding: [200, 200] }}
         style={{ height: '100vh', width: '100%' }}
         scrollWheelZoom={true}
         zoomControl={false}
@@ -293,10 +297,16 @@ export const Map = (props: IMapProps) => {
 
             // Dynamically extract the measure value that matches dataset.measure0 or dataset.measure1
             const getMeasureValue = () => {
-              if (dataset.measure0 && cluster.properties[dataset.measure0] !== undefined) {
+              if (
+                dataset.measure0 &&
+                cluster.properties[dataset.measure0] !== undefined
+              ) {
                 return cluster.properties[dataset.measure0];
               }
-              if (dataset.measure1 && cluster.properties[dataset.measure1] !== undefined) {
+              if (
+                dataset.measure1 &&
+                cluster.properties[dataset.measure1] !== undefined
+              ) {
                 return cluster.properties[dataset.measure1];
               }
 
@@ -328,7 +338,9 @@ export const Map = (props: IMapProps) => {
                 icon={fetchIcon(
                   totalCount,
                   true,
-                  measureValue !== undefined ? generateRsrpColor(dataset, measureValue as number) : null,
+                  measureValue !== undefined
+                    ? generateRsrpColor(dataset, measureValue as number)
+                    : null,
                 )}
                 eventHandlers={{
                   click: () => {
@@ -357,9 +369,15 @@ export const Map = (props: IMapProps) => {
                       <div>
                         <span>
                           <b>{dataset.measure0}:</b>{' '}
-                          {dataset.measure0 && cluster.properties[dataset.measure0] !== undefined
-                            ? typeof cluster.properties[dataset.measure0] === 'number'
-                              ? (cluster.properties[dataset.measure0] as number).toFixed(4)
+                          {dataset.measure0 &&
+                            cluster.properties[dataset.measure0] !== undefined
+                            ? typeof cluster.properties[dataset.measure0] ===
+                                'number'
+                              ? (
+                                    cluster.properties[
+                                      dataset.measure0
+                                    ] as number
+                              ).toFixed(4)
                               : cluster.properties[dataset.measure0]
                             : 'N/A'}
                         </span>
@@ -368,9 +386,15 @@ export const Map = (props: IMapProps) => {
                       <div>
                         <span>
                           <b>{dataset.measure1}:</b>{' '}
-                          {dataset.measure1 && cluster.properties[dataset.measure1] !== undefined
-                            ? typeof cluster.properties[dataset.measure1] === 'number'
-                              ? (cluster.properties[dataset.measure1] as number).toFixed(4)
+                          {dataset.measure1 &&
+                            cluster.properties[dataset.measure1] !== undefined
+                            ? typeof cluster.properties[dataset.measure1] ===
+                                'number'
+                              ? (
+                                    cluster.properties[
+                                      dataset.measure1
+                                    ] as number
+                              ).toFixed(4)
                               : cluster.properties[dataset.measure1]
                             : 'N/A'}
                         </span>
