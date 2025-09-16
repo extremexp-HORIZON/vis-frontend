@@ -10,6 +10,7 @@ import type { IAggregation } from '../../../../../shared/models/dataexploration.
 import type { IDataAsset } from '../../../../../shared/models/experiment/data-asset.model';
 import type { VisualizationSpec } from 'react-vega';
 import { VegaLite } from 'react-vega';
+import { Handler } from 'vega-tooltip';
 
 export interface OverlayHistogramProps {
   assetName: string;
@@ -56,6 +57,11 @@ const OverlayHistogram = ({
   );
 
   const agg: IAggregation = { column: columnName, function: 'COUNT' };
+
+  const tooltipHandler = new Handler({
+    sanitize: (value: any) => String(value), // identity sanitizer
+  }).call;
+
 
   useEffect(() => {
     assets.forEach(({ workflowId, dataAsset }) => {
@@ -221,7 +227,7 @@ const OverlayHistogram = ({
     Object.entries(perBin).forEach(([label, wfCounts]) => {
       const lines = workflowIds.map(wid => `${wid}: ${wfCounts[wid] ?? 0}`);
 
-      binTooltip[label] = lines.join('\n');
+      binTooltip[label] = lines.join('<br>');
     });
 
     out = out.map(r => ({ ...r, tooltipAll: binTooltip[r.binLabel] }));
@@ -298,7 +304,7 @@ const OverlayHistogram = ({
           justifyContent: 'center'
         }}
       >
-        <VegaLite spec={spec} actions={false} />
+        <VegaLite spec={spec} actions={false} tooltip={tooltipHandler} />
       </Box>
     )
   );
