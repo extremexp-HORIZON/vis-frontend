@@ -103,10 +103,8 @@ function getHierarchicalGrid(
 
   // 3. Add broader context (lower precision levels)
   let currentParent = getParentGeohash(selectedGeohash);
-  let contextLevel = 1;
 
-  // Add 2-3 levels of broader context
-  while (currentParent.length >= 2 && contextLevel <= 6) {
+  while (currentParent.length >= 1) {
     const parentSiblings = getSiblingGeohashes(currentParent);
 
     parentSiblings.forEach(sibling => {
@@ -114,7 +112,6 @@ function getHierarchicalGrid(
     });
 
     currentParent = getParentGeohash(currentParent);
-    contextLevel++;
   }
 
   return grid;
