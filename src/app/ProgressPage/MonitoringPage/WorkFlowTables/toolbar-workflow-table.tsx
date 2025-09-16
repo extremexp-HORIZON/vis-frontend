@@ -236,7 +236,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
             {showSpaceButton && (
               <Tooltip title="Spaces">
                 <IconButton onClick={handleSpaceOptionsOpen}>
-                  <Badge color="primary" badgeContent={workflowsTable.selectedSpaces.length} invisible={workflowsTable.groupBy.length === 0}>
+                  <Badge color="primary" badgeContent={workflowsTable.selectedSpaces.length} invisible={workflowsTable.selectedSpaces.length === 0}>
                     <GrainIcon />
                   </Badge>
                 </IconButton>
