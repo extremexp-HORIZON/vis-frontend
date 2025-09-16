@@ -274,6 +274,30 @@ export default function WorkflowTable() {
     return { aggregatedRows, grouppedWorkflows };
   };
 
+  const getColumnsWithData = (rows: WorkflowTableRow[]): string[] => {
+    if (!rows.length) return [];
+
+    const columnsWithData = new Set<string>();
+
+    Object.keys(rows[0]).forEach(column => {
+      if (HIDDEN_INTERNAL_FIELDS.has(column) || column === 'id' || column === 'workflowId' || column === 'status' || column === 'action' || column === 'rating') {
+        columnsWithData.add(column);
+        return;
+      }
+
+      const hasData = rows.some(row => {
+        const value = row[column];
+        return value !== 'n/a' && value !== null && value !== undefined && value !== '';
+      });
+
+      if (hasData) {
+        columnsWithData.add(column);
+      }
+    });
+
+    return Array.from(columnsWithData);
+  };
+
   useEffect(() => {
     if(workflowsTable.initialized) {
       let counter = 0;
@@ -648,6 +672,33 @@ export default function WorkflowTable() {
       );
     }
   }, [workflows.data, workflowsTable.expandedGroups]);
+
+  useEffect(() => {
+    if (workflowsTable.initialized && workflowsTable.visibleRows.length > 0) {
+      const columnsWithData = getColumnsWithData(workflowsTable.visibleRows);
+
+      const newVisibilityModel = { ...workflowsTable.columnsVisibilityModel };
+
+      workflowsTable.columns.forEach(column => {
+        const shouldBeVisible = columnsWithData.includes(column.field) || 
+                               ['workflowId', 'status', 'action', 'rating'].includes(column.field);
+
+        newVisibilityModel[column.field] = shouldBeVisible;
+      });
+
+      const hasChanged = workflowsTable.columns.some(column => {
+        const currentVisibility = workflowsTable.columnsVisibilityModel[column.field] ?? true;
+        const newVisibility = newVisibilityModel[column.field] ?? true;
+        return currentVisibility !== newVisibility;
+      });
+
+      if (hasChanged) {
+        dispatch(setWorkflowsTable({ 
+          columnsVisibilityModel: newVisibilityModel 
+        }));
+      }
+    }
+  }, [workflowsTable.visibleRows, workflowsTable.initialized]);
 
   const hasVisibleParameterColumns = workflowsTable.visibleColumns.some(
     (col) =>
