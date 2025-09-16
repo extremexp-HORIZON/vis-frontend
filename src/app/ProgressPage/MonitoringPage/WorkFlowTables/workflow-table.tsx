@@ -347,13 +347,13 @@ export default function WorkflowTable() {
             case 'endsWith':
               return cellValue.endsWith(filterValue);
             case '>':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : true;
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : false;
             case '<':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : true;
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : false;
             case '>=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : true;
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : false;
             case '<=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : true;
+              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : false;
             default:
               return true;
           }
