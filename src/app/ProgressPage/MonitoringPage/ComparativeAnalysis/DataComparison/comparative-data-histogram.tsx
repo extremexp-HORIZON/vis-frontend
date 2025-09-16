@@ -49,13 +49,14 @@ const Histogram = ({ columnName, dataset, workflowId, color }: IHistogramProps) 
             source: datasetId,
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
-            fileName: dataset?.name || ''
+            fileName: dataset?.name || '',
+            runId: workflowId || ''
           },
           groupBy,
           aggregations: aggregation,
           filters: [],
           columns: groupBy,
-          limit: 100
+          limit: 1000
         },
         metadata: {
           workflowId: workflowId || '',

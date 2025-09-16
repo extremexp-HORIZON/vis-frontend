@@ -49,6 +49,7 @@ const DataExplorationComponent = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || ''
+            , runId: workflowId || ''
           },
           metadata: {
             workflowId: workflowId,

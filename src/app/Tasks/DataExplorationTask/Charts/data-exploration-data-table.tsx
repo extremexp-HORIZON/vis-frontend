@@ -145,6 +145,7 @@ const TableExpand: React.FC = () => {
                 format: dataset?.format || '',
                 sourceType: dataset?.sourceType || '',
                 fileName: dataset?.name || ''
+                , runId: tab.workflowId || 'dataCache'
               },
               columns: columns.map((col: VisualColumn) => col.name),
               filters:

@@ -407,6 +407,7 @@ const ScatterChart = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || '',
+            runId: tab?.workflowId || ''
           },
           columns: cols,
           filters,

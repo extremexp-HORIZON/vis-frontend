@@ -82,6 +82,7 @@ const OverlayHistogram = ({
               format: dataAsset?.format || '',
               sourceType: dataAsset?.sourceType || '',
               fileName: dataAsset?.name || '',
+              runId: workflowId || ''
             },
             groupBy: [columnName],
             aggregations: [agg],
@@ -113,16 +114,20 @@ const OverlayHistogram = ({
     const countField = `count_${normalized}`;
 
     const rawByWorkflow: Record<string, any[]> = {};
-    let anyLoading = false;
-    let anyError = false;
 
     workflowIds.forEach(wid => {
-      anyLoading ||= Boolean(slices[wid]?.loading) || Boolean(metas[wid]?.loading);
-      anyError ||= Boolean(slices[wid]?.error);
       rawByWorkflow[wid] = Array.isArray(slices[wid]?.data?.data)
         ? slices[wid]!.data!.data
         : [];
     });
+
+    const anyLoading = workflowIds.some(
+      wid => Boolean(slices[wid]?.loading) || Boolean(metas[wid]?.loading)
+    );
+
+    const anyError = workflowIds.some(
+      wid => Boolean(slices[wid]?.error)
+    );
 
     const isNumeric = Object.values(rawByWorkflow).some(arr =>
       arr.some(d => typeof d[columnName] === 'number')
@@ -226,7 +231,7 @@ const OverlayHistogram = ({
     return { rows: out, isNumeric, anyLoading, anyError, hasData };
   }, [assets, slices, metas, columnName, workflowIds]);
 
-  const loading = anyLoading && !hasData;
+  const loading = anyLoading;
   const showInfo = (!loading && (!hasData || anyError));
 
   const spec: VisualizationSpec = useMemo(() => {

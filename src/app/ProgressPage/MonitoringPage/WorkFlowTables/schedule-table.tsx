@@ -178,6 +178,8 @@ const CustomNoRowsOverlay = () => {
   );
 };
 
+const HIDDEN_INTERNAL_FIELDS = new Set(['space']);
+
 export default function ScheduleTable() {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
@@ -232,6 +234,7 @@ export default function ScheduleTable() {
           return {
             id: idCounter++,
             workflowId: workflow.name,
+            space: workflow.space,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
                 tasks?.find(task => task.name === variant)?.variant || 'n/a';
@@ -283,7 +286,7 @@ export default function ScheduleTable() {
       const columns: CustomGridColDef[] =
         infoRow
           ? Object.keys(infoRow)
-            .filter(key => key !== 'id')
+            .filter(key => key !== 'id' && !HIDDEN_INTERNAL_FIELDS.has(key))
             .map(key => ({
               field: key,
               headerName: key === 'action' ? '' : key.replace('_', ' '),
@@ -390,13 +393,27 @@ export default function ScheduleTable() {
     let counter = 0;
     let newRows = scheduledTable.rows;
 
+    if (Array.isArray(scheduledTable.selectedSpaces) && scheduledTable.selectedSpaces.length > 0) {
+      const selSpaces = new Set(
+        scheduledTable.selectedSpaces
+          .map(s => s?.trim().toLowerCase())
+          .filter(Boolean) as string[]
+      );
+
+      newRows = newRows.filter(row => {
+        const space = (row.space ?? '').toString().trim()
+          .toLowerCase();
+
+        return selSpaces.has(space);
+      });
+    }
+
     if(scheduledTable.filters.length > 0) {
       for (let i = 0; i < scheduledTable.filters.length; i++) {
         if (scheduledTable.filters[i].value !== '') {
           counter++;
         }
       }
-      // dispatch(setScheduledTable({ filtersCounter: counter }))
       newRows = scheduledTable.rows.filter(row => {
         return scheduledTable.filters.every(filter => {
           if (filter.value === '') return true;
@@ -436,7 +453,7 @@ export default function ScheduleTable() {
         filteredRows: newRows,
       }),
     );
-  }, [scheduledTable.filters]);
+  }, [scheduledTable.filters, scheduledTable.selectedSpaces]);
 
   return (
     <Box sx={{ height: '100%' }} >
@@ -451,6 +468,14 @@ export default function ScheduleTable() {
             tableName={'Scheduled Workflows'}
             handleClickedFunction={removeSelected}
             showFilterButton={true}
+            showSpaceButton={scheduledTable.rows.some(row => row.space && row.space.trim() !== '')}
+            spaceOptions={Array.from(
+              new Set(
+                scheduledTable.rows
+                  .map(row => row?.space?.trim())
+                  .filter((space): space is string => Boolean(space && space !== ''))
+              )
+            )}
           />
         </Box>
         <Popover

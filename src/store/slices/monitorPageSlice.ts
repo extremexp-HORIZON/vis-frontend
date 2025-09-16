@@ -7,10 +7,12 @@ import { prepareDataExplorationResponse, type ConfusionMatrixResult, type TestIn
 import type { AxiosError } from 'axios';
 import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
 import type { IDataExplorationMetaDataResponse, IDataExplorationRequest, IDataExplorationResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
+import { stateController } from './progressPageSlice';
 
 export interface WorkflowTableRow {
   id: string;
   workflowId: string;
+  space?: string;
   status?: string;
   isGroupSummary?: boolean;
   [key: string]: string | number | boolean | null | undefined;
@@ -19,6 +21,7 @@ export interface WorkflowTableRow {
 export interface ScheduleTableRow {
   id: number;
   workflowId: string;
+  space?: string;
   status?: string;
   [key: string]: string | number | boolean | null | undefined;
 }
@@ -96,6 +99,7 @@ interface IMonitoringPageSlice {
         uniqueParameters: string[]
         uniqueTasks: string[]
         initialized: boolean
+        selectedSpaces: string[]
       }
       scheduledTable: {
         order: 'asc' | 'desc'
@@ -112,6 +116,7 @@ interface IMonitoringPageSlice {
         columnsVisibilityModel: { [field: string]: boolean },
         uniqueParameters: string[]
         uniqueTasks: string[]
+        selectedSpaces: string[]
       }
       visibleTable: string
       selectedTab: number
@@ -214,6 +219,7 @@ const initialState: IMonitoringPageSlice = {
     uniqueParameters: [],
     uniqueTasks: [],
     initialized: false,
+    selectedSpaces: []
   },
   scheduledTable: {
     order: 'asc',
@@ -229,7 +235,8 @@ const initialState: IMonitoringPageSlice = {
     columns: [],
     columnsVisibilityModel: {},
     uniqueParameters: [],
-    uniqueTasks: []
+    uniqueTasks: [],
+    selectedSpaces: []
   },
   visibleTable: 'workflows',
   selectedTab: 0,
@@ -480,6 +487,15 @@ export const monitoringPageSlice = createSlice({
     },
     setComparativeVisibleMetrics: (state, action) => {
       state.comparativeVisibleMetrics = action.payload;
+    },
+    setSelectedSpaces: (state, action: {
+        payload: {
+          spaces: string[];
+          table: string;
+        };
+      }) => {
+      if(action.payload.table === 'workflows') state.workflowsTable.selectedSpaces = action.payload.spaces;
+      else state.scheduledTable.selectedSpaces = action.payload.spaces;
     }
   },
   extraReducers: builder => {
@@ -880,5 +896,5 @@ export const fetchComparisonData = createAsyncThunk(
 
 export const { setParallel, setWorkflowsTable, setScheduledTable, setVisibleTable, setSelectedTab, setSelectedComparisonTab, toggleWorkflowSelection, bulkToggleWorkflowSelection, setGroupBy,
   setHoveredWorkflow, updateWorkflowRatingLocally, setSelectedModelComparisonChart, setCommonDataAssets, setDataAssetsControlPanel, setIsMosaic, setShowMisclassifiedOnly, setComparativeModelInstanceControlPanel,
-  setExpandedGroup, setSelectedDataset, setDataComparisonSelectedColumns, setComparativeVisibleMetrics
+  setExpandedGroup, setSelectedDataset, setDataComparisonSelectedColumns, setComparativeVisibleMetrics, setSelectedSpaces
 } = monitoringPageSlice.actions;

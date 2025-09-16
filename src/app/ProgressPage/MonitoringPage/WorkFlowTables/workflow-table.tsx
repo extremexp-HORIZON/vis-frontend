@@ -19,7 +19,7 @@ import { Badge,  IconButton, Popover, styled } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
 import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
-import { debounce } from 'lodash';
+import { debounce, set } from 'lodash';
 import type { CustomGridColDef } from '../../../../shared/types/table-types';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import WorkflowRating from './workflow-rating';
@@ -135,6 +135,8 @@ const CustomNoRowsOverlay = () => {
     />
   );
 };
+
+const HIDDEN_INTERNAL_FIELDS = new Set(['space']);
 
 export default function WorkflowTable() {
   const { workflows } = useAppSelector(
@@ -272,6 +274,30 @@ export default function WorkflowTable() {
     return { aggregatedRows, grouppedWorkflows };
   };
 
+  const getColumnsWithData = (rows: WorkflowTableRow[]): string[] => {
+    if (!rows.length) return [];
+
+    const columnsWithData = new Set<string>();
+
+    Object.keys(rows[0]).forEach(column => {
+      if (HIDDEN_INTERNAL_FIELDS.has(column) || column === 'id' || column === 'workflowId' || column === 'status' || column === 'action' || column === 'rating') {
+        columnsWithData.add(column);
+        return;
+      }
+
+      const hasData = rows.some(row => {
+        const value = row[column];
+        return value !== 'n/a' && value !== null && value !== undefined && value !== '';
+      });
+
+      if (hasData) {
+        columnsWithData.add(column);
+      }
+    });
+
+    return Array.from(columnsWithData);
+  };
+
   useEffect(() => {
     if(workflowsTable.initialized) {
       let counter = 0;
@@ -283,6 +309,22 @@ export default function WorkflowTable() {
       }
 
       let filteredRows = workflowsTable.rows;
+
+      // spaces filter
+      if (Array.isArray(workflowsTable.selectedSpaces) && workflowsTable.selectedSpaces.length > 0) {
+        const selSpaces = new Set(
+          workflowsTable.selectedSpaces
+            .map(s => s?.trim().toLowerCase())
+            .filter(Boolean) as string[]
+        );
+
+        filteredRows = filteredRows.filter(row => {
+          const space = (row.space ?? '').toString().trim()
+            .toLowerCase();
+
+          return selSpaces.has(space);
+        });
+      }
 
       // Apply column filters
       filteredRows = filteredRows.filter(row => {
@@ -320,7 +362,7 @@ export default function WorkflowTable() {
 
       dispatch(setWorkflowsTable({ filteredRows, filtersCounter: counter }));
     }
-  }, [workflowsTable.filters, workflowsTable.rows, workflowsTable.rows]);
+  }, [workflowsTable.filters, workflowsTable.rows, workflowsTable.rows, workflowsTable.selectedSpaces]);
 
   useEffect(() => {
     if(workflowsTable.initialized) {
@@ -461,6 +503,7 @@ export default function WorkflowTable() {
           return {
             id: workflow.id,
             workflowId: workflow.id,
+            space: workflow.space,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
                 tasks?.find(task => task.name === variant)?.variant || 'n/a';
@@ -520,7 +563,7 @@ export default function WorkflowTable() {
       }
 
       const columns: CustomGridColDef[] = Object.keys(rows[0])
-        .filter(key => key !== 'id')
+        .filter(key => key !== 'id' && !HIDDEN_INTERNAL_FIELDS.has(key))
         .map(key => ({
           field: key,
           headerName: key === 'action' ? '' : key.replace('_', ' '),
@@ -630,6 +673,33 @@ export default function WorkflowTable() {
     }
   }, [workflows.data, workflowsTable.expandedGroups]);
 
+  useEffect(() => {
+    if (workflowsTable.initialized && workflowsTable.visibleRows.length > 0) {
+      const columnsWithData = getColumnsWithData(workflowsTable.visibleRows);
+
+      const newVisibilityModel = { ...workflowsTable.columnsVisibilityModel };
+
+      workflowsTable.columns.forEach(column => {
+        const shouldBeVisible = columnsWithData.includes(column.field) || 
+                               ['workflowId', 'status', 'action', 'rating'].includes(column.field);
+
+        newVisibilityModel[column.field] = shouldBeVisible;
+      });
+
+      const hasChanged = workflowsTable.columns.some(column => {
+        const currentVisibility = workflowsTable.columnsVisibilityModel[column.field] ?? true;
+        const newVisibility = newVisibilityModel[column.field] ?? true;
+        return currentVisibility !== newVisibility;
+      });
+
+      if (hasChanged) {
+        dispatch(setWorkflowsTable({ 
+          columnsVisibilityModel: newVisibilityModel 
+        }));
+      }
+    }
+  }, [workflowsTable.visibleRows, workflowsTable.initialized]);
+
   const hasVisibleParameterColumns = workflowsTable.visibleColumns.some(
     (col) =>
       workflowsTable.uniqueParameters.includes(col.field) &&
@@ -656,6 +726,14 @@ export default function WorkflowTable() {
             handleClickedFunction={handleLaunchCompletedTab}
             groupByOptions={Array.from(new Set([...workflowsTable.uniqueTasks, ...workflowsTable.uniqueParameters]))}
             showFilterButton={true}
+            showSpaceButton={workflowsTable.rows.some(row => row.space && row.space.trim() !== '')}
+            spaceOptions={Array.from(
+              new Set(
+                workflowsTable.rows
+                  .map(row => row?.space?.trim())
+                  .filter((space): space is string => Boolean(space && space !== ''))
+              )
+            )}
           />
         </Box>
         <Popover
