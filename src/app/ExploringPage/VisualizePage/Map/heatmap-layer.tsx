@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import 'leaflet.heat';
+import { MAX_ZOOM } from '../../../../shared/utils/clusterUtils';
 
 interface HeatmapLayerProps<T> {
   points: T[];
@@ -44,7 +45,7 @@ export const HeatmapLayer = <T, >({
         radius,
         blur,
         gradient,
-        maxZoom: 17,
+        maxZoom: MAX_ZOOM,
       })
       .addTo(map);
 

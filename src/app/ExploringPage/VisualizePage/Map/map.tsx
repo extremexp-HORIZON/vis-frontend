@@ -434,21 +434,15 @@ export const Map = (props: IMapProps) => {
               latitudeExtractor={latitudeExtractor}
               longitudeExtractor={longitudeExtractor}
               intensityExtractor={intensityExtractor}
-              radius={zoom}
-              // points={clusters.filter(c => c.properties.totalCount > 1)}
-              // latitudeExtractor={(r:ICluster) => r.geometry.coordinates[1]}
-              // longitudeExtractor={(r:ICluster) =>  r.geometry.coordinates[0]}
-              // intensityExtractor={(r:ICluster) => {
-              //   return rsrpIntensityExtractor(dataset, r.properties.rsrp_rscp_rssi);
-              // }}
+              radius={Math.min(Math.max(zoom * 1.5, 15), 40)}
               useLocalExtrema={false}
               gradient={{
-                0: '#00FFFF',
-                0.2: '#00FF00',
-                0.4: '#66FF33',
-                0.6: '#FFFF00',
-                0.8: '#FF6600',
-                1.0: '#FF0000',
+                0: '#00FFFF', // Cyan
+                0.2: '#00FF00', // Green
+                0.4: '#66FF33', // Light Green
+                0.6: '#FFFF00', // Yellow
+                0.8: '#FF6600', // Orange
+                1.0: '#FF0000', // Red
               }}
             />
           )
