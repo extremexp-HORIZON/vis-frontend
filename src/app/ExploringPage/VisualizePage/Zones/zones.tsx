@@ -32,19 +32,17 @@ import { ConfirmationModal } from '../../../../shared/components/confirmation-mo
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
 import { useEffect, useState } from 'react';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
+import { Prediction } from '../Prediction/prediction';
 
 export interface IZonesProps {
   dataset: IDataset;
 }
 
 export const Zones = ({ dataset }: IZonesProps) => {
-  const { modalOpen, zone, zones, loading, error } = useAppSelector(
+  const { modalOpen, viewZone, zones, loading, error } = useAppSelector(
     state => state.zone,
   );
   const dispatch = useAppDispatch();
-  const [highlightedZoneId, setHighlightedZoneId] = useState<string | null>(
-    null,
-  );
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     open: boolean;
     zoneId: string | null;
@@ -62,26 +60,9 @@ export const Zones = ({ dataset }: IZonesProps) => {
 
     if (!modalOpen) {
       // dispatch(reset());
-      setHighlightedZoneId(null);
       setDeleteConfirmation({ open: false, zoneId: null, zoneName: null });
     }
   }, [dataset.id, dispatch, modalOpen, zones.length]);
-
-  // Effect to handle temporary highlighting when zone changes
-  useEffect(() => {
-    if (zone?.id) {
-      // Set the highlighted zone
-      setHighlightedZoneId(zone.id);
-
-      // Clear the highlight after 3 seconds
-      const timer = setTimeout(() => {
-        setHighlightedZoneId(null);
-      }, 3000);
-
-      // Cleanup timer on unmount or when zone changes
-      return () => clearTimeout(timer);
-    }
-  }, [zone?.id]);
 
   const handleDeleteClick = (zoneId: string, zoneName: string) => {
     setDeleteConfirmation({
@@ -162,7 +143,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
                       >
                         ID
                       </TableCell>
-                      <TableCell
+                      {/* <TableCell
                         sx={{ textAlign: 'center', fontWeight: 'bold' }}
                       >
                         Name
@@ -171,7 +152,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
                         sx={{ textAlign: 'center', fontWeight: 'bold' }}
                       >
                         Type
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell
                         sx={{ textAlign: 'center', fontWeight: 'bold' }}
                       >
@@ -217,21 +198,17 @@ export const Zones = ({ dataset }: IZonesProps) => {
                           key={z.id}
                           sx={{
                             backgroundColor:
-                              highlightedZoneId === z.id
-                                ? 'lightblue'
-                                : 'white',
+                              viewZone?.id === z.id ? 'lightblue' : 'white',
                             transition: 'background-color 0.3s ease',
                             '&:hover': {
                               backgroundColor:
-                                highlightedZoneId === z.id
-                                  ? 'lightblue'
-                                  : '#f5f5f5',
+                                viewZone?.id === z.id ? 'lightblue' : '#f5f5f5',
                             },
                           }}
                         >
                           <TableCell>{z.id}</TableCell>
-                          <TableCell>{z.name}</TableCell>
-                          <TableCell>{z.type}</TableCell>
+                          {/* <TableCell>{z.name}</TableCell>
+                          <TableCell>{z.type}</TableCell> */}
                           <TableCell>
                             {z.createdAt
                               ? new Date(z.createdAt).toLocaleString()
@@ -294,8 +271,23 @@ export const Zones = ({ dataset }: IZonesProps) => {
                               '-'
                             )}
                           </TableCell>
-                          <TableCell>
-                            <Tooltip title="View Zone" placement="right">
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            <Tooltip
+                              title="View"
+                              placement="top"
+                              slotProps={{
+                                popper: {
+                                  modifiers: [
+                                    {
+                                      name: 'offset',
+                                      options: {
+                                        offset: [0, -14],
+                                      },
+                                    },
+                                  ],
+                                },
+                              }}
+                            >
                               <IconButton
                                 onClick={() => handleViewZone(z)}
                                 disabled={loading.getZone}
@@ -305,7 +297,23 @@ export const Zones = ({ dataset }: IZonesProps) => {
                                 <VisibilityIcon />
                               </IconButton>
                             </Tooltip>
-                            <Tooltip title="Delete" placement="right">
+                            {z && <Prediction zone={z} />}
+                            <Tooltip
+                              title="Delete"
+                              placement="top"
+                              slotProps={{
+                                popper: {
+                                  modifiers: [
+                                    {
+                                      name: 'offset',
+                                      options: {
+                                        offset: [0, -14],
+                                      },
+                                    },
+                                  ],
+                                },
+                              }}
+                            >
                               <IconButton
                                 onClick={() =>
                                   handleDeleteClick(

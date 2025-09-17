@@ -245,6 +245,7 @@ export const zoneSlice = createSlice({
       .addCase(postZone.fulfilled, (state, action) => {
         state.loading.postZone = false;
         state.zone = action.payload;
+        state.viewZone = action.payload;
         // state.zones.push(action.payload);
         state.modalOpen = true;
         showSuccess('Zone created successfully!');
