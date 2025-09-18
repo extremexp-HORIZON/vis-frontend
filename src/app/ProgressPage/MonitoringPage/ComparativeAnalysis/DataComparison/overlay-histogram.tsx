@@ -67,11 +67,11 @@ const OverlayHistogram = ({
         .split('<br>')
         .map(line => `<div>${sanitize(line)}</div>`)
         .join('');
-    
+      const wfTitle = workflowIds.length === 1 ? 'Workflow' : 'Workflows';
       return `
         <div style="white-space: normal; max-width: 600px;">
           <div><strong>${sanitize(columnName)}:</strong> ${sanitize(bin ?? '')}</div>
-          <div><strong>Workflows</strong></div>
+          <div><strong>${wfTitle}</strong></div>
           ${wfLines}
         </div>
       `;
