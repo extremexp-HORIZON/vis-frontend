@@ -14,7 +14,7 @@ const WorkflowParameter = () => {
 
   const filteredWorkflows = workflows.data
     ?.filter(w => w.status !== 'SCHEDULED')
-    .filter(w =>
+    ?.filter(w =>
       w.params?.find(
         param => param.name === selectedParam?.param?.name && param.value === selectedParam?.param?.value
       )

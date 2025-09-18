@@ -59,7 +59,23 @@ const OverlayHistogram = ({
   const agg: IAggregation = { column: columnName, function: 'COUNT' };
 
   const tooltipHandler = new Handler({
-    sanitize: (value: any) => String(value), // identity sanitizer
+    sanitize: (v: any) => String(v),
+    formatTooltip: (value: Record<string, any>, sanitize) => {
+      const bin = value[columnName] ?? value['binLabel'];
+      const wfRaw = value['Workflows'] ?? value['tooltipAll'] ?? '';
+      const wfLines = String(wfRaw)
+        .split('<br>')
+        .map(line => `<div>${sanitize(line)}</div>`)
+        .join('');
+    
+      return `
+        <div style="white-space: normal; max-width: 600px;">
+          <div><strong>${sanitize(columnName)}:</strong> ${sanitize(bin ?? '')}</div>
+          <div><strong>Workflows</strong></div>
+          ${wfLines}
+        </div>
+      `;
+    }
   }).call;
 
 
