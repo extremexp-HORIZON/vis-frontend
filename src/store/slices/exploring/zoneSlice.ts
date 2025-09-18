@@ -64,7 +64,6 @@ export const fetchHeightsForDataset = async (
 
 interface exploringZoneState {
   zone: IZone;
-  viewZone: IZone;
   zones: IZone[];
   modalOpen: boolean;
   loading: {
@@ -85,7 +84,6 @@ interface exploringZoneState {
 
 const initialState: exploringZoneState = {
   zone: zoneDefaultValue,
-  viewZone: zoneDefaultValue,
   zones: [],
   modalOpen: false,
   loading: {
@@ -198,9 +196,6 @@ export const zoneSlice = createSlice({
     setZone: (state, action: PayloadAction<IZone>) => {
       state.zone = action.payload;
     },
-    setViewZone: (state, action: PayloadAction<IZone>) => {
-      state.viewZone = action.payload;
-    },
     setModalOpen: (state, action: PayloadAction<boolean>) => {
       state.modalOpen = action.payload;
     },
@@ -245,7 +240,6 @@ export const zoneSlice = createSlice({
       .addCase(postZone.fulfilled, (state, action) => {
         state.loading.postZone = false;
         state.zone = action.payload;
-        state.viewZone = action.payload;
         // state.zones.push(action.payload);
         state.modalOpen = true;
         showSuccess('Zone created successfully!');
@@ -275,9 +269,9 @@ export const zoneSlice = createSlice({
 });
 
 export const zoneListeners = (startAppListening: AppStartListening) => {
-  // setViewZoneListener
+  // setZoneListener
   startAppListening({
-    actionCreator: setViewZone,
+    actionCreator: setZone,
     effect: async (action, { dispatch }) => {
       const { rectangle, fileName } = action.payload;
 
@@ -295,4 +289,4 @@ export const zoneListeners = (startAppListening: AppStartListening) => {
   });
 };
 
-export const { setZone, setViewZone, setModalOpen, resetZoneState } = zoneSlice.actions;
+export const { setZone, setModalOpen, resetZoneState } = zoneSlice.actions;

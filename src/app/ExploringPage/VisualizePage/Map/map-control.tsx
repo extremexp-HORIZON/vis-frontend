@@ -8,7 +8,7 @@ import {
   setDrawnRect,
   updateMapBounds,
 } from '../../../../store/slices/exploring/mapSlice';
-import { postZone } from '../../../../store/slices/exploring/zoneSlice';
+import { postZone, setZone } from '../../../../store/slices/exploring/zoneSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useMapDrawing } from './useMapDrawing';
 import { resetZoneState } from '../../../../store/slices/exploring/zoneSlice';
@@ -16,7 +16,7 @@ import { resetZoneState } from '../../../../store/slices/exploring/zoneSlice';
 export const MapControl = ({ id }: { id: string }) => {
   const map = useMap();
   const dispatch = useAppDispatch();
-  const { viewZone } = useAppSelector(state => state.zone);
+  const { zone } = useAppSelector(state => state.zone);
   const hasInitialized = useRef(false);
 
   // Use the custom hook for all drawing functionality
@@ -134,7 +134,7 @@ export const MapControl = ({ id }: { id: string }) => {
       saveButton.style.borderRadius = '4px';
 
       // Disable saveButton if zone rectangle is drawn
-      if (viewZone?.id) {
+      if (zone?.id) {
         saveButton.setAttribute('disabled', 'true');
         saveButton.style.opacity = '0.5';
         saveButton.style.pointerEvents = 'none';
@@ -203,6 +203,9 @@ export const MapControl = ({ id }: { id: string }) => {
         // Use the hook's clear method
         clearDrawnItems();
         dispatch(setDrawnRect({ id, bounds: null }));
+        if (zone?.id) {
+          dispatch(setZone({}));
+        }
         updateControlVisibility(); // Hide the control after clearing
       };
 

@@ -25,7 +25,7 @@ import {
   getZonesByFileName,
   setModalOpen,
   deleteZone,
-  setViewZone,
+  setZone,
 } from '../../../../store/slices/exploring/zoneSlice';
 import Loader from '../../../../shared/components/loader';
 import { ConfirmationModal } from '../../../../shared/components/confirmation-modal';
@@ -39,7 +39,7 @@ export interface IZonesProps {
 }
 
 export const Zones = ({ dataset }: IZonesProps) => {
-  const { modalOpen, viewZone, zones, loading, error } = useAppSelector(
+  const { modalOpen, zone, zones, loading, error } = useAppSelector(
     state => state.zone,
   );
   const dispatch = useAppDispatch();
@@ -89,9 +89,9 @@ export const Zones = ({ dataset }: IZonesProps) => {
     dispatch(setModalOpen(true));
   };
 
-  const handleViewZone = (zone: IZone) => {
-    if (zone.id) {
-      dispatch(setViewZone(zone));
+  const handleViewZone = (z: IZone) => {
+    if (z.id) {
+      dispatch(setZone(z));
       dispatch(setModalOpen(false));
     }
   };
@@ -198,11 +198,11 @@ export const Zones = ({ dataset }: IZonesProps) => {
                           key={z.id}
                           sx={{
                             backgroundColor:
-                              viewZone?.id === z.id ? 'lightblue' : 'white',
+                              zone?.id === z.id ? 'lightblue' : 'white',
                             transition: 'background-color 0.3s ease',
                             '&:hover': {
                               backgroundColor:
-                                viewZone?.id === z.id ? 'lightblue' : '#f5f5f5',
+                                zone?.id === z.id ? 'lightblue' : '#f5f5f5',
                             },
                           }}
                         >
