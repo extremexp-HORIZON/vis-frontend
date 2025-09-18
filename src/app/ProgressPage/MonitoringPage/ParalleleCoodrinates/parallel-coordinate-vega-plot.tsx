@@ -183,11 +183,24 @@ const ParallelCoordinateVega = ({
       offset: { scale: 'ord', value: columnName, mult: -1 },
     });
   }
-  const numericFilteredData = processedData.filter((row: ParallelDataItem & { selected: boolean }) => {
+const numericFilteredData = processedData
+  .filter((row: ParallelDataItem & { selected: boolean }) => {
     const key = progressParallel.selected;
     const val = Number(row[key]);
-
     return !isNaN(val);
+  })
+  .map((row) => {
+    const filled: any = { ...row };
+    for (const axis of columnNames) {
+      if (
+        filled[axis] === '' ||
+        filled[axis] == null ||
+        (typeof filled[axis] === 'number' && Number.isNaN(filled[axis]))
+      ) {
+        filled[axis] = 'n/a';
+      }
+    }
+    return filled;
   });
 
   return (
