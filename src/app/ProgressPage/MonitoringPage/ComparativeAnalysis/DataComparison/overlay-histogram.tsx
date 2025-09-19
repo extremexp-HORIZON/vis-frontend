@@ -58,16 +58,33 @@ const OverlayHistogram = ({
 
   const agg: IAggregation = { column: columnName, function: 'COUNT' };
 
+  // Create color mapping for tooltip
+  const colorMapping = useMemo(() => {
+    const { domain, range } = colorScale(workflowIds);
+    return Object.fromEntries(domain.map((id, index) => [id, range[index]]));
+  }, [workflowIds, colorScale]);
+
   const tooltipHandler = new Handler({
     sanitize: (v: any) => String(v),
     formatTooltip: (value: Record<string, any>, sanitize) => {
       const bin = value[columnName] ?? value['binLabel'];
       const wfRaw = value['Workflows'] ?? value['tooltipAll'] ?? '';
+      
+      // Parse workflow counts from the tooltip data
       const wfLines = String(wfRaw)
         .split('<br>')
-        .map(line => `<div>${sanitize(line)}</div>`)
+        .map(line => {
+          const [workflowId, count] = line.split(': ');
+          const color = colorMapping[workflowId] || '#999';
+          return `<div style="display: flex; align-items: center; margin: 2px 0;">
+            <span style="display: inline-block; width: 12px; height: 12px; background-color: ${color}; margin-right: 6px; border-radius: 2px;"></span>
+            <span>${sanitize(workflowId)}: ${sanitize(count || '0')}</span>
+          </div>`;
+        })
         .join('');
+      
       const wfTitle = workflowIds.length === 1 ? 'Workflow' : 'Workflows';
+      
       return `
         <div style="white-space: normal; max-width: 600px;">
           <div><strong>${sanitize(columnName)}:</strong> ${sanitize(bin ?? '')}</div>
@@ -77,7 +94,6 @@ const OverlayHistogram = ({
       `;
     }
   }).call;
-
 
   useEffect(() => {
     assets.forEach(({ workflowId, dataAsset }) => {
@@ -110,7 +126,7 @@ const OverlayHistogram = ({
             aggregations: [agg],
             filters: [],
             columns: [columnName],
-            limit: 1000,
+            limit: 10000,
           },
           metadata: {
             workflowId,
@@ -268,10 +284,7 @@ const OverlayHistogram = ({
           field: 'workflowId',
           type: 'nominal',
           scale: { domain, range },
-          legend: {
-            title: 'Workflow',
-            labelExpr: 'length(datum.label) > 10 ? substring(datum.label, 0, 10) + \'…\' : datum.label'
-          }
+          legend: null // Remove the legend
         }
       }
     }));
