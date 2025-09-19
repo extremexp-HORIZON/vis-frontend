@@ -224,7 +224,6 @@ const Contourplot = (props: IContourplot) => {
             type: 'ordinal',
             sort: { field: xField, order: 'ascending' },
             axis: { title: xField },
-            // scale: { paddingInner: 0, paddingOuter: 0 }
           },
         }),
       ...(yIsNumeric
@@ -238,7 +237,6 @@ const Contourplot = (props: IContourplot) => {
             type: 'ordinal',
             sort: { field: yField, order: 'ascending' },
             axis: { title: yField },
-            // scale: { paddingInner: 0, paddingOuter: 0 }
           },
         }),
       color: {
