@@ -202,13 +202,6 @@ const ComparisonDataCharts = () => {
     selectedDataset && assetsForSelectedDataset.length && selectedColumns.length
       ? selectedColumns.map((col) => (
         <Grid item xs={6} key={col}>
-          <ResponsiveCardTable
-            title={`${selectedDataset} — ${col}`}
-            minHeight={300}
-            showSettings={false}
-            noPadding
-            showFullScreenButton={false}
-          >
             <OverlayHistogram
               assetName={selectedDataset!}
               columnName={col}
@@ -218,7 +211,6 @@ const ComparisonDataCharts = () => {
                 range: ids.map(id => workflowColors[id] || '#3f51b5'),
               })}
             />
-          </ResponsiveCardTable>
         </Grid>
       ))
       : [];

@@ -11,6 +11,8 @@ import type { IDataAsset } from '../../../../../shared/models/experiment/data-as
 import type { VisualizationSpec } from 'react-vega';
 import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
+import ResponsiveCardTable from '../../../../../shared/components/responsive-card-table';
+import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 
 export interface OverlayHistogramProps {
   assetName: string;
@@ -272,12 +274,12 @@ const OverlayHistogram = ({
   const loading = anyLoading;
   const showInfo = (!loading && (!hasData || anyError));
 
-  const spec: VisualizationSpec = useMemo(() => {
+  const spec = useMemo(() => {
     const ids = workflowIds;
     const { domain, range } = colorScale(ids);
 
     const layers = ids.map(wid => ({
-      mark: { type: 'bar', opacity: 0.45, size: 15 },
+      mark: { type: 'bar', opacity: 0.45 },
       transform: [{ filter: { field: 'workflowId', equal: wid } }],
       encoding: {
         color: {
@@ -292,8 +294,6 @@ const OverlayHistogram = ({
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
       description: `Overlay distribution of ${columnName} across per-workflow datasets`,
-      width: 150,
-      height: 180,
       data: { values: rows },
       encoding: {
         x: {
@@ -301,7 +301,8 @@ const OverlayHistogram = ({
           type: 'ordinal',
           title: null,
           sort: isNumeric ? { field: 'xStart', op: 'min' } : 'ascending',
-          axis: { labels: false, ticks: false, domain: false }
+          axis: { labels: false, ticks: false, domain: false },
+          scale: { paddingInner: 0, paddingOuter: 0 }
         },
         y: { field: 'count', type: 'quantitative', title: 'Count' },
         tooltip: [
@@ -310,31 +311,45 @@ const OverlayHistogram = ({
         ]
       },
       layer: layers
-    } as VisualizationSpec;
+    };
   }, [rows, isNumeric, workflowIds, colorScale, columnName]);
 
   return (
     loading ? (
-      <Loader />
-    ) : showInfo ? (
-      <InfoMessage
-        message={!hasData ? 'No data available.' : 'Error fetching the data.'}
-        type="info"
-        icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-        fullHeight
-      />
-    ) : (
-      <Box
-        sx={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
+      <ResponsiveCardTable
+        title={`${assetName} — ${columnName}`}
+        minHeight={300}
+        showSettings={false}
+        noPadding
+        showFullScreenButton={false}
       >
-        <VegaLite spec={spec} actions={false} tooltip={tooltipHandler} />
-      </Box>
+        <Loader />
+      </ResponsiveCardTable>
+    ) : showInfo ? (
+      <ResponsiveCardTable
+        title={`${assetName} — ${columnName}`}
+        minHeight={300}
+        showSettings={false}
+        noPadding
+        showFullScreenButton={false}
+      >
+        <InfoMessage
+          message={!hasData ? 'No data available.' : 'Error fetching the data.'}
+          type="info"
+          icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+          fullHeight
+        />
+      </ResponsiveCardTable>
+    ) : (
+      <ResponsiveCardVegaLite
+        spec={spec}
+        actions={false}
+        isStatic={false}
+        title={`${assetName} — ${columnName}`}
+        sx={{ width: '100%', maxWidth: '100%' }}
+        showSettings={false}
+        tooltip={tooltipHandler}
+      />
     )
   );
 };

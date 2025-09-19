@@ -48,6 +48,7 @@ interface ResponsiveCardVegaLiteProps {
   loading?: boolean
   title?: string
   showSettings?: boolean;
+  tooltip?: Parameters<typeof VegaLite>[0]['tooltip'];
 }
 const SectionHeader = ({
   icon,
@@ -111,7 +112,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   details = null,
   loading = false,
   showSettings = true,
-
+  tooltip = undefined,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth);
@@ -500,6 +501,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   height: height, // Adjust height based on padding?!
                 }}
                 {...otherProps}
+                tooltip={tooltip}
               />
             )}
           </Box>
@@ -653,6 +655,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     : window.innerHeight * 0.7,
                 }}
                 {...otherProps}
+                tooltip={tooltip}
               />
             )
           ) : (
