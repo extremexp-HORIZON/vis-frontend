@@ -314,43 +314,28 @@ const OverlayHistogram = ({
     };
   }, [rows, isNumeric, workflowIds, colorScale, columnName]);
 
+  const loader = <Loader />
+
+  const errorMessage = 
+    <InfoMessage
+      message={!hasData ? 'No data available.' : 'Error fetching the data.'}
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />
+
   return (
-    loading ? (
-      <ResponsiveCardTable
-        title={`${assetName} — ${columnName}`}
-        minHeight={300}
-        showSettings={false}
-        noPadding
-        showFullScreenButton={false}
-      >
-        <Loader />
-      </ResponsiveCardTable>
-    ) : showInfo ? (
-      <ResponsiveCardTable
-        title={`${assetName} — ${columnName}`}
-        minHeight={300}
-        showSettings={false}
-        noPadding
-        showFullScreenButton={false}
-      >
-        <InfoMessage
-          message={!hasData ? 'No data available.' : 'Error fetching the data.'}
-          type="info"
-          icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-          fullHeight
-        />
-      </ResponsiveCardTable>
-    ) : (
       <ResponsiveCardVegaLite
         spec={spec}
         actions={false}
         isStatic={false}
         title={`${assetName} — ${columnName}`}
         sx={{ width: '100%', maxWidth: '100%' }}
+        showInfoMessage={loading || showInfo}
+        infoMessage={loading ? loader : showInfo ? errorMessage : <></>}
         showSettings={false}
         tooltip={tooltipHandler}
       />
-    )
   );
 };
 
