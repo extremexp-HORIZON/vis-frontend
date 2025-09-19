@@ -126,7 +126,7 @@ const OverlayHistogram = ({
             aggregations: [agg],
             filters: [],
             columns: [columnName],
-            limit: 10000,
+            // limit: 1,
           },
           metadata: {
             workflowId,
