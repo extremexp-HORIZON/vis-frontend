@@ -280,6 +280,14 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
   return (
     <>
+    <style>
+        {`
+          .vega-tooltip,
+          .vg-tooltip {
+            z-index: 2000 !important;
+          }
+        `}
+      </style>
       <Card
         sx={{
           maxWidth: maxWidth,
