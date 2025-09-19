@@ -156,6 +156,9 @@ const Contourplot = (props: IContourplot) => {
   const xEdges = xIsNumeric ? computeBinEdgesWithMinWidth(xValsNum, MIN_BIN_WIDTH)  : [];
   const yEdges = yIsNumeric ? computeBinEdgesWithMinWidth(yValsNum, MIN_BIN_WIDTH)  : [];
 
+  const xDomain = xIsNumeric && xEdges.length >= 2 ? [xEdges[0], xEdges[xEdges.length - 1]] : undefined;
+  const yDomain = yIsNumeric && yEdges.length >= 2 ? [yEdges[0], yEdges[yEdges.length - 1]] : undefined;
+
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return [];
 
@@ -212,7 +215,7 @@ const Contourplot = (props: IContourplot) => {
     encoding: {
       ...(xIsNumeric
         ? {
-          x: { field: 'x0', type: 'quantitative', axis: { title: xField } },
+          x: { field: 'x0', type: 'quantitative', axis: { title: xField }, scale: { domain: xDomain, nice: false, zero: false } },
           x2: { field: 'x1' },
         }
         : {
@@ -220,12 +223,13 @@ const Contourplot = (props: IContourplot) => {
             field: xField,
             type: 'ordinal',
             sort: { field: xField, order: 'ascending' },
-            axis: { title: xField }
+            axis: { title: xField },
+            // scale: { paddingInner: 0, paddingOuter: 0 }
           },
         }),
       ...(yIsNumeric
         ? {
-          y: { field: 'y0', type: 'quantitative', axis: { title: yField } },
+          y: { field: 'y0', type: 'quantitative', axis: { title: yField }, scale: { domain: yDomain, nice: false, zero: false } },
           y2: { field: 'y1' },
         }
         : {
@@ -233,7 +237,8 @@ const Contourplot = (props: IContourplot) => {
             field: yField,
             type: 'ordinal',
             sort: { field: yField, order: 'ascending' },
-            axis: { title: yField }
+            axis: { title: yField },
+            // scale: { paddingInner: 0, paddingOuter: 0 }
           },
         }),
       color: {
