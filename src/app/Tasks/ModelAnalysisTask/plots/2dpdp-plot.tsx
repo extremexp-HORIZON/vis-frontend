@@ -10,6 +10,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Button,
 } from '@mui/material';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
@@ -35,6 +36,8 @@ const Contourplot = (props: IContourplot) => {
 
   const feature1 = plotModel?.selectedFeature1 || '';
   const feature2 = plotModel?.selectedFeature2 || '';
+  const [pendingFeature1, setPendingFeature1] = useState(feature1);
+  const [pendingFeature2, setPendingFeature2] = useState(feature2);
 
   const [hasInitialized, setHasInitialized] = useState(false);
 
@@ -60,19 +63,24 @@ const Contourplot = (props: IContourplot) => {
     }
 
     setHasInitialized(true);
-
   }, [isTabInitialized]);
 
+  useEffect(() => {
+    setPendingFeature1(feature1);
+    setPendingFeature2(feature2);
+  }, [feature1, feature2]);
+
   const handleFeatureChange = (index: number) => (e: { target: { value: string } }) => {
-    const newFeature = e.target.value;
+    const newValue = e.target.value;
+    if (index === 1) setPendingFeature1(newValue);
+    else setPendingFeature2(newValue);
+  };
 
-    const updatedFeature1 = index === 1 ? newFeature : feature1;
-    const updatedFeature2 = index === 2 ? newFeature : feature2;
-
+  const handleApply = () => {
     dispatch(
       setSelectedFeatures2D({
-        feature1: updatedFeature1,
-        feature2: updatedFeature2,
+        feature1: pendingFeature1,
+        feature2: pendingFeature2,
       })
     );
 
@@ -82,8 +90,8 @@ const Contourplot = (props: IContourplot) => {
           ...explainabilityQueryDefault,
           explanation_type: 'featureExplanation',
           explanation_method: '2dpdp',
-          feature1: updatedFeature1,
-          feature2: updatedFeature2,
+          feature1: pendingFeature1,
+          feature2: pendingFeature2,
         },
         metadata: {
           workflowId: tab?.workflowId || '',
@@ -98,12 +106,10 @@ const Contourplot = (props: IContourplot) => {
     if (vals.length === 0) return [];
     if (vals.length === 1) return [vals[0] - minWidth / 2, vals[0] + minWidth / 2];
 
-    // Ensure sorted (without mutating caller arrays)
     const v = [...vals].sort((a, b) => a - b);
 
     // Start from midpoint edges
     const edges: number[] = new Array(v.length + 1);
-
     for (let i = 0; i < v.length - 1; i++) edges[i + 1] = (v[i] + v[i + 1]) / 2;
 
     const firstGap = v[1] - v[0];
@@ -112,25 +118,19 @@ const Contourplot = (props: IContourplot) => {
     edges[0] = v[0] - firstGap / 2;
     edges[v.length] = v[v.length - 1] + lastGap / 2;
 
-    // Enforce minimum width per cell by expanding edges outward if needed
     for (let i = 0; i < v.length; i++) {
       const left = edges[i];
       const right = edges[i + 1];
       const width = right - left;
-
       if (width < minWidth) {
         const deficit = (minWidth - width) / 2;
-
         edges[i] = left - deficit;
         edges[i + 1] = right + deficit;
       }
     }
-
-    // Make edges non-decreasing (guard against any numerical overlap)
     for (let i = 1; i < edges.length; i++) {
       if (edges[i] < edges[i - 1]) edges[i] = edges[i - 1];
     }
-
     return edges;
   };
 
@@ -150,7 +150,6 @@ const Contourplot = (props: IContourplot) => {
   const xIsNumeric = isNumericArray(xValsRaw);
   const yIsNumeric = isNumericArray(yValsRaw);
 
-  // numeric versions (if applicable)
   const xValsNum = xIsNumeric ? xValsRaw.map(Number) : [];
   const yValsNum = yIsNumeric ? yValsRaw.map(Number) : [];
   const xEdges = xIsNumeric ? computeBinEdgesWithMinWidth(xValsNum, MIN_BIN_WIDTH)  : [];
@@ -215,30 +214,32 @@ const Contourplot = (props: IContourplot) => {
     encoding: {
       ...(xIsNumeric
         ? {
-          x: { field: 'x0', type: 'quantitative', axis: { title: xField }, scale: { domain: xDomain, nice: false, zero: false } },
-          x2: { field: 'x1' },
-        }
+            x: { field: 'x0', type: 'quantitative', axis: { title: xField }, scale: { domain: xDomain, nice: false, zero: false } },
+            x2: { field: 'x1' },
+          }
         : {
-          x: {
-            field: xField,
-            type: 'ordinal',
-            sort: { field: xField, order: 'ascending' },
-            axis: { title: xField },
-          },
-        }),
+            x: {
+              field: xField,
+              type: 'ordinal',
+              sort: { field: xField, order: 'ascending' },
+              axis: { title: xField },
+              scale: { paddingInner: 0, paddingOuter: 0 },
+            },
+          }),
       ...(yIsNumeric
         ? {
-          y: { field: 'y0', type: 'quantitative', axis: { title: yField }, scale: { domain: yDomain, nice: false, zero: false } },
-          y2: { field: 'y1' },
-        }
+            y: { field: 'y0', type: 'quantitative', axis: { title: yField }, scale: { domain: yDomain, nice: false, zero: false } },
+            y2: { field: 'y1' },
+          }
         : {
-          y: {
-            field: yField,
-            type: 'ordinal',
-            sort: { field: yField, order: 'ascending' },
-            axis: { title: yField },
-          },
-        }),
+            y: {
+              field: yField,
+              type: 'ordinal',
+              sort: { field: yField, order: 'ascending' },
+              axis: { title: yField },
+              scale: { paddingInner: 0, paddingOuter: 0 },
+            },
+          }),
       color: {
         field: zField,
         type: 'quantitative',
@@ -254,44 +255,6 @@ const Contourplot = (props: IContourplot) => {
     },
   };
 
-  const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-      {[1, 2].map(i => {
-        const selected = i === 1 ? feature1 : feature2;
-        const other = i === 1 ? feature2 : feature1;
-
-        return (
-          <FormControl fullWidth key={i}>
-            <InputLabel id={`feature${i}-label`}>{explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}</InputLabel>
-            <Select
-              labelId={`feature${i}-label`}
-              value={selected}
-              label={explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}
-              onChange={handleFeatureChange(i)}
-              disabled={plotModel?.loading || !plotModel?.data}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 250,
-                    maxWidth: 300,
-                  },
-                },
-              }}
-            >
-              {featureOrHyperparameterList && featureOrHyperparameterList
-                .filter(f => f !== other)
-                .map(f => (
-                  <MenuItem key={f} value={f}>
-                    {f}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-        );
-      })}
-    </Box>
-  );
-
   const loading = <Loader />;
   const error = (
     <InfoMessage
@@ -304,6 +267,59 @@ const Contourplot = (props: IContourplot) => {
 
   const shouldShowLoading = !!plotModel?.loading || !hasInitialized;
   const shouldShowError = !!plotModel?.error;
+
+  const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+        {[1, 2].map(i => {
+          const selected = i === 1 ? pendingFeature1 : pendingFeature2;
+          const other = i === 1 ? pendingFeature2 : pendingFeature1;
+
+          return (
+            <FormControl fullWidth key={i}>
+              <InputLabel id={`feature${i}-label`}>{explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}</InputLabel>
+              <Select
+                labelId={`feature${i}-label`}
+                value={selected}
+                label={explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}
+                onChange={handleFeatureChange(i)}
+                disabled={plotModel?.loading || !plotModel?.data}
+                MenuProps={{
+                  PaperProps: {
+                    style: { maxHeight: 250, maxWidth: 300 },
+                  },
+                }}
+              >
+                {featureOrHyperparameterList
+                  .filter(f => f !== other)
+                  .map(f => (
+                    <MenuItem key={f} value={f}>
+                      {f}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          );
+        })}
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Button
+          variant="contained"
+          onClick={handleApply}
+          disabled={
+            plotModel?.loading ||
+            !plotModel?.data ||
+            !pendingFeature1 ||
+            !pendingFeature2 ||
+            (pendingFeature1 === feature1 && pendingFeature2 === feature2)
+          }
+        >
+          Fetch Data
+        </Button>
+      </Box>
+    </Box>
+  );
 
   return (
     <ResponsiveCardVegaLite
