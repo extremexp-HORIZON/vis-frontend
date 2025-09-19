@@ -148,7 +148,7 @@ export const postZone = createAsyncThunk<IZone, IZone, { rejectValue: string }>(
           zone.rectangle.lon[0],
           zone.rectangle.lat[1],
           zone.rectangle.lon[1],
-          9,
+          8,
         )
         : [];
 

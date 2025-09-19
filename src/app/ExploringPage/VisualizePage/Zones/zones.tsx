@@ -115,35 +115,54 @@ export const Zones = ({ dataset }: IZonesProps) => {
         onClose={() => dispatch(setModalOpen(false))}
         fullWidth
         maxWidth="xl"
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            bgcolor: '#ffffff',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          },
+        }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <DialogTitle>Zones for {dataset.id}</DialogTitle>
-          <IconButton onClick={() => dispatch(setModalOpen(false))}>
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+            px: 3,
+            py: 1.5,
+          }}
+        >
+          Zones for {dataset.id}
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={() => dispatch(setModalOpen(false))}
+            aria-label="close"
+          >
             <CloseIcon />
           </IconButton>
-        </Box>
+        </DialogTitle>
 
         <DialogContent dividers>
-          <Box>
-            {loading.getZones ? (
-              <Loader />
-            ) : error.getZones || error.deleteZone ? (
-              <Typography color="error">
-                {error.getZones || error.deleteZone}
-              </Typography>
-            ) : zones.length === 0 ? (
-              <Typography>No zones found</Typography>
-            ) : (
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead sx={{ backgroundColor: 'lightgray' }}>
-                    <TableRow>
-                      <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        ID
-                      </TableCell>
-                      {/* <TableCell
+          {loading.getZones ? (
+            <Loader />
+          ) : error.getZones || error.deleteZone ? (
+            <Typography color="error">
+              {error.getZones || error.deleteZone}
+            </Typography>
+          ) : zones.length === 0 ? (
+            <Typography>No zones found</Typography>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead sx={{ backgroundColor: 'lightgray' }}>
+                  <TableRow>
+                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      ID
+                    </TableCell>
+                    {/* <TableCell
                         sx={{ textAlign: 'center', fontWeight: 'bold' }}
                       >
                         Name
@@ -153,189 +172,175 @@ export const Zones = ({ dataset }: IZonesProps) => {
                       >
                         Type
                       </TableCell> */}
-                      <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        Created At
-                      </TableCell>
-                      <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        Geohashes
-                      </TableCell>
-                      <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        Heights
-                      </TableCell>
-                      <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        Rectangle
-                      </TableCell>
-                      <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        Actions
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {zones
-                      .slice()
-                      .sort((a, b) => {
-                        const dateA = a.createdAt
-                          ? new Date(a.createdAt).getTime()
-                          : 0;
-                        const dateB = b.createdAt
-                          ? new Date(b.createdAt).getTime()
-                          : 0;
+                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      Created At
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      Geohashes
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      Heights
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      Rectangle
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {zones
+                    .slice()
+                    .sort((a, b) => {
+                      const dateA = a.createdAt
+                        ? new Date(a.createdAt).getTime()
+                        : 0;
+                      const dateB = b.createdAt
+                        ? new Date(b.createdAt).getTime()
+                        : 0;
 
-                        return dateB - dateA; // Most recent first
-                      })
-                      .map(z => (
-                        <TableRow
-                          key={z.id}
-                          sx={{
+                      return dateB - dateA; // Most recent first
+                    })
+                    .map(z => (
+                      <TableRow
+                        key={z.id}
+                        sx={{
+                          backgroundColor:
+                            zone?.id === z.id ? 'lightblue' : 'white',
+                          transition: 'background-color 0.3s ease',
+                          '&:hover': {
                             backgroundColor:
-                              zone?.id === z.id ? 'lightblue' : 'white',
-                            transition: 'background-color 0.3s ease',
-                            '&:hover': {
-                              backgroundColor:
-                                zone?.id === z.id ? 'lightblue' : '#f5f5f5',
-                            },
-                          }}
-                        >
-                          <TableCell>{z.id}</TableCell>
-                          {/* <TableCell>{z.name}</TableCell>
+                              zone?.id === z.id ? 'lightblue' : '#f5f5f5',
+                          },
+                        }}
+                      >
+                        <TableCell>{z.id}</TableCell>
+                        {/* <TableCell>{z.name}</TableCell>
                           <TableCell>{z.type}</TableCell> */}
-                          <TableCell>
-                            {z.createdAt
-                              ? new Date(z.createdAt).toLocaleString()
-                              : '-'}
-                          </TableCell>
-                          <TableCell>
-                            {z.geohashes ? (
-                              <Box>
-                                <Typography>
-                                  <strong>Precision:</strong>{' '}
-                                  {z.geohashes[0].length}
-                                </Typography>
-                                <Typography>
-                                  <strong>Total:</strong> {z.geohashes.length}
-                                </Typography>
-                              </Box>
-                            ) : (
-                              '-'
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {z.heights && z.heights.length > 0
-                              ? (() => {
-                                const sortedHeights = [...z.heights].sort(
-                                  (a, b) => a - b,
-                                );
+                        <TableCell>
+                          {z.createdAt
+                            ? new Date(z.createdAt).toLocaleString()
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {z.geohashes ? (
+                            <Box>
+                              <Typography>
+                                <strong>Precision:</strong>{' '}
+                                {z.geohashes[0].length}
+                              </Typography>
+                              <Typography>
+                                <strong>Total:</strong> {z.geohashes.length}
+                              </Typography>
+                            </Box>
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {z.heights && z.heights.length > 0
+                            ? (() => {
+                              const sortedHeights = [...z.heights].sort(
+                                (a, b) => a - b,
+                              );
 
-                                return (
-                                  <>
-                                    <span>
-                                      {z.heights.length} values
-                                      <br />
-                                      <strong>Min:</strong> {sortedHeights[0]}
-                                        m
-                                      <br />
-                                      <strong>Max:</strong>{' '}
-                                      {
-                                        sortedHeights[
-                                          sortedHeights.length - 1
-                                        ]
-                                      }
-                                        m
-                                    </span>
-                                  </>
-                                );
-                              })()
-                              : '-'}
-                          </TableCell>
-                          <TableCell>
-                            {z.rectangle ? (
-                              <Box>
-                                <Typography>
-                                  <strong>lat:</strong> [
-                                  {z.rectangle.lat?.join(', ')}],{' '}
-                                  <strong>lon:</strong> [
-                                  {z.rectangle.lon?.join(', ')}]
-                                </Typography>
-                              </Box>
-                            ) : (
-                              '-'
-                            )}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: 'center' }}>
-                            <Tooltip
-                              title="View"
-                              placement="top"
-                              slotProps={{
-                                popper: {
-                                  modifiers: [
-                                    {
-                                      name: 'offset',
-                                      options: {
-                                        offset: [0, -14],
-                                      },
+                              return (
+                                <>
+                                  <span>
+                                    {z.heights.length} values
+                                    <br />
+                                    <strong>Min:</strong> {sortedHeights[0]}
+                                      m
+                                    <br />
+                                    <strong>Max:</strong>{' '}
+                                    {sortedHeights[sortedHeights.length - 1]}m
+                                  </span>
+                                </>
+                              );
+                            })()
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {z.rectangle ? (
+                            <Box>
+                              <Typography>
+                                <strong>lat:</strong> [
+                                {z.rectangle.lat?.join(', ')}],{' '}
+                                <strong>lon:</strong> [
+                                {z.rectangle.lon?.join(', ')}]
+                              </Typography>
+                            </Box>
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: 'center' }}>
+                          <Tooltip
+                            title="View"
+                            placement="top"
+                            slotProps={{
+                              popper: {
+                                modifiers: [
+                                  {
+                                    name: 'offset',
+                                    options: {
+                                      offset: [0, -14],
                                     },
-                                  ],
-                                },
-                              }}
+                                  },
+                                ],
+                              },
+                            }}
+                          >
+                            <IconButton
+                              onClick={() => handleViewZone(z)}
+                              disabled={loading.getZone}
+                              color="primary"
+                              size="small"
+                              aria-label="view zone"
                             >
-                              <IconButton
-                                onClick={() => handleViewZone(z)}
-                                disabled={loading.getZone}
-                                color="primary"
-                                size="small"
-                              >
-                                <VisibilityIcon />
-                              </IconButton>
-                            </Tooltip>
-                            {z && <Prediction zone={z} />}
-                            <Tooltip
-                              title="Delete"
-                              placement="top"
-                              slotProps={{
-                                popper: {
-                                  modifiers: [
-                                    {
-                                      name: 'offset',
-                                      options: {
-                                        offset: [0, -14],
-                                      },
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          {z && <Prediction zone={z} />}
+                          <Tooltip
+                            title="Delete"
+                            placement="top"
+                            slotProps={{
+                              popper: {
+                                modifiers: [
+                                  {
+                                    name: 'offset',
+                                    options: {
+                                      offset: [0, -14],
                                     },
-                                  ],
-                                },
-                              }}
+                                  },
+                                ],
+                              },
+                            }}
+                          >
+                            <IconButton
+                              onClick={() =>
+                                handleDeleteClick(
+                                  z.id!,
+                                  z.name || 'Unknown Zone',
+                                )
+                              }
+                              disabled={loading.deleteZone}
+                              color="error"
+                              size="small"
+                              aria-label="delete zone"
                             >
-                              <IconButton
-                                onClick={() =>
-                                  handleDeleteClick(
-                                    z.id!,
-                                    z.name || 'Unknown Zone',
-                                  )
-                                }
-                                disabled={loading.deleteZone}
-                                color="error"
-                                size="small"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </Box>
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </DialogContent>
       </Dialog>
 

@@ -15,7 +15,10 @@ import {
   Card,
   CardContent,
   Grid,
+  TextField,
+  DialogActions,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
 
@@ -24,9 +27,9 @@ export interface IPredictionProps {
 }
 
 export const Prediction = ({ zone }: IPredictionProps) => {
-  const { rectangle } = zone;
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [intervalsAmount, setIntervalsAmount] = useState(1);
   const [predictionResults, setPredictionResults] = useState<
     IPredictionResult[]
   >([]);
@@ -40,19 +43,61 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     setError(null);
   };
 
+  const handleExportToJSON = () => {
+    if (predictionResults.length === 0) {
+      return;
+    }
+
+    // Create the export data with metadata
+    const exportData = {
+      zoneId: zone.id,
+      geohashesCount: zone.geohashes?.length || 0,
+      intervalsAmount,
+      exportTimestamp: new Date().toISOString(),
+      results: predictionResults,
+    };
+
+    // Convert to JSON string with pretty formatting
+    const jsonString = JSON.stringify(exportData, null, 2);
+
+    // Create a blob with the JSON data
+    const blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Create a temporary URL for the blob
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary anchor element and trigger download
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `prediction-results-${zone.id}-${
+      new Date().toISOString()
+        .split('T')[0]
+    }.json`;
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   // Generate dummy prediction data
   const generateDummyPredictionData = (): IPredictionResult[] => {
     const results: IPredictionResult[] = [];
     const now = new Date();
 
-    for (let i = 0; i < 5; i++) {
-      results.push({
-        id: `prediction-${i + 1}`,
-        rsrp: Math.floor(Math.random() * 50) - 100, // Random RSRP between -100 and -50
-        timestamp: new Date(now.getTime() + i * 600000).toISOString(), // 10 minutes intervals
-        geohash: zone.geohashes?.[i] ?? '',
-      });
-    }
+    zone.geohashes?.forEach(geohash => {
+      for (let i = 0; i < intervalsAmount; i++) {
+        results.push({
+          id: `pred-${geohash}-${i + 1}`,
+          rsrp: Math.floor(Math.random() * 50) - 100, // Random RSRP between -100 and -50
+          timestamp: new Date(now.getTime() + i * 600000).toISOString(), // 10 minutes intervals
+          geohash: geohash,
+          height: Math.floor(Math.random() * 100),
+        });
+      }
+    });
 
     return results;
   };
@@ -101,20 +146,62 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         </IconButton>
       </Tooltip>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>
-          Prediction for zone: <em>{zone.id}</em>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="xl"
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            bgcolor: '#ffffff',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'linear-gradient(to right, #f8f9fa, #edf2f7)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+            px: 3,
+            py: 1.5,
+          }}
+        >
+          Prediction for zone: {zone.id}
+          <IconButton onClick={handleClose} color="inherit" aria-label="close">
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent
+          dividers
+          sx={{
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            maxHeight: '80vh',
+            overflow: 'auto',
+          }}
+        >
           <Typography variant="body1" gutterBottom>
-            Make a prediction for the rectangle
+            Included geohashes: {zone.geohashes?.length}
           </Typography>
 
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              <strong>lat:</strong> [{rectangle?.lat.join(', ')}],{' '}
-              <strong>lon:</strong> [{rectangle?.lon.join(', ')}]
+              10 minute intervals:
             </Typography>
+            <TextField
+              variant="outlined"
+              type="number"
+              inputProps={{ min: 1, max: 12 }} // up to 2 hours
+              value={intervalsAmount}
+              onChange={e => setIntervalsAmount(parseInt(e.target.value))}
+              size="small"
+              sx={{ width: 70 }}
+            />
           </Box>
 
           <Box sx={{ mb: 2 }}>
@@ -146,16 +233,19 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
           {predictionResults.length > 0 && (
             <Box>
-              <Typography variant="h6" gutterBottom>
-                Prediction Results
+              <Typography variant="h6" gutterBottom textAlign="center">
+                Results
               </Typography>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} justifyContent="center">
                 {predictionResults.map(result => (
-                  <Grid item xs={12} sm={6} md={4} key={result.id}>
-                    <Card variant="outlined">
+                  <Grid item key={result.id}>
+                    <Card
+                      variant="outlined"
+                      sx={{ width: 280, height: '100%' }}
+                    >
                       <CardContent>
-                        <Typography variant="subtitle2" gutterBottom>
-                          {result.id}
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>Geohash:</strong> {result.geohash}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           <strong>RSRP:</strong> {result.rsrp} dBm
@@ -165,7 +255,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                           {new Date(result.timestamp).toLocaleTimeString()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          <strong>Geohash:</strong> {result.geohash}
+                          <strong>Height:</strong> {result.height} m
                         </Typography>
                       </CardContent>
                     </Card>
@@ -175,6 +265,33 @@ export const Prediction = ({ zone }: IPredictionProps) => {
             </Box>
           )}
         </DialogContent>
+        <DialogActions
+          sx={{
+            p: 2,
+            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+            background: '#f8f9fa',
+          }}
+        >
+          <Button
+            onClick={handleClose}
+            color="primary"
+            variant="outlined"
+            aria-label="close"
+          >
+            Close
+          </Button>
+          {predictionResults.length > 0 && (
+            <Button
+              onClick={handleExportToJSON}
+              color="primary"
+              variant="contained"
+              aria-label="export"
+              disabled={predictionResults.length === 0}
+            >
+              Export JSON
+            </Button>
+          )}
+        </DialogActions>
       </Dialog>
     </>
   );

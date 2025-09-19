@@ -79,8 +79,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 2,
+          borderRadius: '12px',
+          bgcolor: '#ffffff',
           overflow: 'hidden',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
         },
       }}
     >
@@ -106,7 +108,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         >
           {title}
         </Typography>
-        <IconButton onClick={onCancel} size="small" sx={{ color: 'grey.600' }}>
+        <IconButton onClick={onCancel} size="small" sx={{ color: 'grey.600' }} aria-label="close">
           <CloseIcon />
         </IconButton>
       </DialogTitle>

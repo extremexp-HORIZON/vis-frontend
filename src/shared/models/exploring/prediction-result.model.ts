@@ -3,4 +3,5 @@ export interface IPredictionResult {
   rsrp: number;
   timestamp: string;
   geohash: string;
+  height: number;
 }
