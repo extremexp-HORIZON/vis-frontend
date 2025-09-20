@@ -315,7 +315,7 @@ const Contourplot = (props: IContourplot) => {
             (pendingFeature1 === feature1 && pendingFeature2 === feature2)
           }
         >
-          Fetch Data
+          Apply Selections
         </Button>
       </Box>
     </Box>
