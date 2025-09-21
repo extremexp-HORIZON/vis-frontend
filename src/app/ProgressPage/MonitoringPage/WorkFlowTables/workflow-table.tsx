@@ -282,11 +282,13 @@ export default function WorkflowTable() {
     Object.keys(rows[0]).forEach(column => {
       if (HIDDEN_INTERNAL_FIELDS.has(column) || column === 'id' || column === 'workflowId' || column === 'status' || column === 'action' || column === 'rating') {
         columnsWithData.add(column);
+
         return;
       }
 
       const hasData = rows.some(row => {
         const value = row[column];
+
         return value !== 'n/a' && value !== null && value !== undefined && value !== '';
       });
 
@@ -680,7 +682,7 @@ export default function WorkflowTable() {
       const newVisibilityModel = { ...workflowsTable.columnsVisibilityModel };
 
       workflowsTable.columns.forEach(column => {
-        const shouldBeVisible = columnsWithData.includes(column.field) || 
+        const shouldBeVisible = columnsWithData.includes(column.field) ||
                                ['workflowId', 'status', 'action', 'rating'].includes(column.field);
 
         newVisibilityModel[column.field] = shouldBeVisible;
@@ -689,12 +691,13 @@ export default function WorkflowTable() {
       const hasChanged = workflowsTable.columns.some(column => {
         const currentVisibility = workflowsTable.columnsVisibilityModel[column.field] ?? true;
         const newVisibility = newVisibilityModel[column.field] ?? true;
+
         return currentVisibility !== newVisibility;
       });
 
       if (hasChanged) {
-        dispatch(setWorkflowsTable({ 
-          columnsVisibilityModel: newVisibilityModel 
+        dispatch(setWorkflowsTable({
+          columnsVisibilityModel: newVisibilityModel
         }));
       }
     }

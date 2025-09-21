@@ -63,6 +63,7 @@ const OverlayHistogram = ({
   // Create color mapping for tooltip
   const colorMapping = useMemo(() => {
     const { domain, range } = colorScale(workflowIds);
+
     return Object.fromEntries(domain.map((id, index) => [id, range[index]]));
   }, [workflowIds, colorScale]);
 
@@ -71,22 +72,23 @@ const OverlayHistogram = ({
     formatTooltip: (value: Record<string, any>, sanitize) => {
       const bin = value[columnName] ?? value['binLabel'];
       const wfRaw = value['Workflows'] ?? value['tooltipAll'] ?? '';
-      
+
       // Parse workflow counts from the tooltip data
       const wfLines = String(wfRaw)
         .split('<br>')
         .map(line => {
           const [workflowId, count] = line.split(': ');
           const color = colorMapping[workflowId] || '#999';
+
           return `<div style="display: flex; align-items: center; margin: 2px 0;">
             <span style="display: inline-block; width: 12px; height: 12px; background-color: ${color}; margin-right: 6px; border-radius: 2px;"></span>
             <span>${sanitize(workflowId)}: ${sanitize(count || '0')}</span>
           </div>`;
         })
         .join('');
-      
+
       const wfTitle = workflowIds.length === 1 ? 'Workflow' : 'Workflows';
-      
+
       return `
         <div style="white-space: normal; max-width: 600px;">
           <div><strong>${sanitize(columnName)}:</strong> ${sanitize(bin ?? '')}</div>
@@ -314,28 +316,28 @@ const OverlayHistogram = ({
     };
   }, [rows, isNumeric, workflowIds, colorScale, columnName]);
 
-  const loader = <Loader />
+  const loader = <Loader />;
 
-  const errorMessage = 
+  const errorMessage =
     <InfoMessage
       message={!hasData ? 'No data available.' : 'Error fetching the data.'}
       type="info"
       icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
       fullHeight
-    />
+    />;
 
   return (
-      <ResponsiveCardVegaLite
-        spec={spec}
-        actions={false}
-        isStatic={false}
-        title={`${assetName} — ${columnName}`}
-        sx={{ width: '100%', maxWidth: '100%' }}
-        showInfoMessage={loading || showInfo}
-        infoMessage={loading ? loader : showInfo ? errorMessage : <></>}
-        showSettings={false}
-        tooltip={tooltipHandler}
-      />
+    <ResponsiveCardVegaLite
+      spec={spec}
+      actions={false}
+      isStatic={false}
+      title={`${assetName} — ${columnName}`}
+      sx={{ width: '100%', maxWidth: '100%' }}
+      showInfoMessage={loading || showInfo}
+      infoMessage={loading ? loader : showInfo ? errorMessage : <></>}
+      showSettings={false}
+      tooltip={tooltipHandler}
+    />
   );
 };
 

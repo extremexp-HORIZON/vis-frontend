@@ -72,6 +72,7 @@ const Contourplot = (props: IContourplot) => {
 
   const handleFeatureChange = (index: number) => (e: { target: { value: string } }) => {
     const newValue = e.target.value;
+
     if (index === 1) setPendingFeature1(newValue);
     else setPendingFeature2(newValue);
   };
@@ -110,6 +111,7 @@ const Contourplot = (props: IContourplot) => {
 
     // Start from midpoint edges
     const edges: number[] = new Array(v.length + 1);
+
     for (let i = 0; i < v.length - 1; i++) edges[i + 1] = (v[i] + v[i + 1]) / 2;
 
     const firstGap = v[1] - v[0];
@@ -122,8 +124,10 @@ const Contourplot = (props: IContourplot) => {
       const left = edges[i];
       const right = edges[i + 1];
       const width = right - left;
+
       if (width < minWidth) {
         const deficit = (minWidth - width) / 2;
+
         edges[i] = left - deficit;
         edges[i + 1] = right + deficit;
       }
@@ -131,6 +135,7 @@ const Contourplot = (props: IContourplot) => {
     for (let i = 1; i < edges.length; i++) {
       if (edges[i] < edges[i - 1]) edges[i] = edges[i - 1];
     }
+
     return edges;
   };
 
@@ -214,32 +219,32 @@ const Contourplot = (props: IContourplot) => {
     encoding: {
       ...(xIsNumeric
         ? {
-            x: { field: 'x0', type: 'quantitative', axis: { title: xField }, scale: { domain: xDomain, nice: false, zero: false } },
-            x2: { field: 'x1' },
-          }
+          x: { field: 'x0', type: 'quantitative', axis: { title: xField }, scale: { domain: xDomain, nice: false, zero: false } },
+          x2: { field: 'x1' },
+        }
         : {
-            x: {
-              field: xField,
-              type: 'ordinal',
-              sort: { field: xField, order: 'ascending' },
-              axis: { title: xField },
-              scale: { paddingInner: 0, paddingOuter: 0 },
-            },
-          }),
+          x: {
+            field: xField,
+            type: 'ordinal',
+            sort: { field: xField, order: 'ascending' },
+            axis: { title: xField },
+            scale: { paddingInner: 0, paddingOuter: 0 },
+          },
+        }),
       ...(yIsNumeric
         ? {
-            y: { field: 'y0', type: 'quantitative', axis: { title: yField }, scale: { domain: yDomain, nice: false, zero: false } },
-            y2: { field: 'y1' },
-          }
+          y: { field: 'y0', type: 'quantitative', axis: { title: yField }, scale: { domain: yDomain, nice: false, zero: false } },
+          y2: { field: 'y1' },
+        }
         : {
-            y: {
-              field: yField,
-              type: 'ordinal',
-              sort: { field: yField, order: 'ascending' },
-              axis: { title: yField },
-              scale: { paddingInner: 0, paddingOuter: 0 },
-            },
-          }),
+          y: {
+            field: yField,
+            type: 'ordinal',
+            sort: { field: yField, order: 'ascending' },
+            axis: { title: yField },
+            scale: { paddingInner: 0, paddingOuter: 0 },
+          },
+        }),
       color: {
         field: zField,
         type: 'quantitative',

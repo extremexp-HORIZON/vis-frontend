@@ -280,7 +280,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
   return (
     <>
-    <style>
+      <style>
         {`
           .vega-tooltip,
           .vg-tooltip {

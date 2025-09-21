@@ -202,15 +202,15 @@ const ComparisonDataCharts = () => {
     selectedDataset && assetsForSelectedDataset.length && selectedColumns.length
       ? selectedColumns.map((col) => (
         <Grid item xs={6} key={col}>
-            <OverlayHistogram
-              assetName={selectedDataset!}
-              columnName={col}
-              assets={assetsForSelectedDataset}
-              colorScale={(ids: string[]) => ({
-                domain: ids,
-                range: ids.map(id => workflowColors[id] || '#3f51b5'),
-              })}
-            />
+          <OverlayHistogram
+            assetName={selectedDataset!}
+            columnName={col}
+            assets={assetsForSelectedDataset}
+            colorScale={(ids: string[]) => ({
+              domain: ids,
+              range: ids.map(id => workflowColors[id] || '#3f51b5'),
+            })}
+          />
         </Grid>
       ))
       : [];
