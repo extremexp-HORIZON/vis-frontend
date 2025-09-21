@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react';
-import { Box } from '@mui/material';
 import InfoMessage from '../../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import Loader from '../../../../../shared/components/loader';
@@ -8,10 +7,7 @@ import type { RootState } from '../../../../../store/store';
 import { fetchComparisonData } from '../../../../../store/slices/monitorPageSlice';
 import type { IAggregation } from '../../../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../../../shared/models/experiment/data-asset.model';
-import type { VisualizationSpec } from 'react-vega';
-import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
-import ResponsiveCardTable from '../../../../../shared/components/responsive-card-table';
 import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 
 export interface OverlayHistogramProps {

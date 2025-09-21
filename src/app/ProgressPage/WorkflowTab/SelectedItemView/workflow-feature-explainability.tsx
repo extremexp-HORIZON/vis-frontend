@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import PdpPlot from '../../../Tasks/ModelAnalysisTask/plots/pdp-plot';
 import AlePlot from '../../../Tasks/ModelAnalysisTask/plots/ale-plot';
 import { useState } from 'react';

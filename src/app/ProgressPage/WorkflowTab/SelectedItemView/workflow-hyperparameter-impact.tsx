@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, ButtonGroup, Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import PdpPlot from '../../../Tasks/ModelAnalysisTask/plots/pdp-plot';
 import AlePlot from '../../../Tasks/ModelAnalysisTask/plots/ale-plot';
 import Contourplot from '../../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';

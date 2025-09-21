@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
@@ -8,7 +8,6 @@ import {
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, setSelectedDataset, type CommonDataAssets } from '../../../../store/slices/monitorPageSlice';
-import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
 import OverlayHistogram from './DataComparison/overlay-histogram';
 import Loader from '../../../../shared/components/loader';
