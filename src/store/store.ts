@@ -20,6 +20,7 @@ import { datasetUiListeners } from './slices/exploring/datasetSlice';
 import { chartListeners } from './slices/exploring/chartSlice';
 import { timeSeriesListeners } from './slices/exploring/timeSeriesSlice';
 import { zoneListeners } from './slices/exploring/zoneSlice';
+import { predictionSlice } from './slices/exploring/predictionSlice';
 
 export const store = configureStore({
   reducer: {
@@ -35,6 +36,7 @@ export const store = configureStore({
     forecasting: forecastingSlice.reducer,
     dataSource: dataSourceSlice.reducer,
     zone: zoneSlice.reducer,
+    prediction: predictionSlice.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

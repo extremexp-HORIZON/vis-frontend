@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { IPredictionResult } from '../../../../shared/models/exploring/prediction-result.model';
 import {
   Dialog,
@@ -21,6 +21,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
+import { setResults, setTimestamp, setZoneId } from '../../../../store/slices/exploring/predictionSlice';
+import { type RootState, useAppDispatch, useAppSelector } from '../../../../store/store';
 
 export interface IPredictionProps {
   zone: IZone;
@@ -34,6 +36,8 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     IPredictionResult[]
   >([]);
   const [error, setError] = useState<string | null>(null);
+  const { zoneId, results } = useAppSelector((state: RootState) => state.prediction);
+  const dispatch = useAppDispatch();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -87,6 +91,9 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     const results: IPredictionResult[] = [];
     const now = new Date();
 
+    zone.id && dispatch(setZoneId(zone.id));
+    dispatch(setTimestamp(now.toISOString()));
+
     zone.geohashes?.forEach(geohash => {
       for (let i = 0; i < intervalsAmount; i++) {
         results.push({
@@ -115,6 +122,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         const results = generateDummyPredictionData();
 
         setPredictionResults(results);
+        dispatch(setResults(results));
         setIsLoading(false);
       } catch (err) {
         setError('Failed to generate prediction results');
@@ -122,6 +130,12 @@ export const Prediction = ({ zone }: IPredictionProps) => {
       }
     }, delay);
   };
+
+  useEffect(() => {
+    if (zoneId === zone.id) {
+      setPredictionResults(results);
+    }
+  }, [zoneId]);
 
   return (
     <>

@@ -23,6 +23,7 @@ import { resetMapState } from '../../../store/slices/exploring/mapSlice';
 import { resetStatsState } from '../../../store/slices/exploring/statsSlice';
 import { resetTimeSeriesState } from '../../../store/slices/exploring/timeSeriesSlice';
 import { resetZoneState } from '../../../store/slices/exploring/zoneSlice';
+import { resetPredictionState } from '../../../store/slices/exploring/predictionSlice';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -55,6 +56,7 @@ const VisualizePage = () => {
       dispatch(resetStatsState());
       dispatch(resetTimeSeriesState());
       dispatch(resetZoneState());
+      dispatch(resetPredictionState());
     };
   }, []);
 
