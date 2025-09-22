@@ -33,6 +33,8 @@ import type { IDataset } from '../../../../shared/models/exploring/dataset.model
 import { useEffect, useState } from 'react';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import { Prediction } from '../Prediction/prediction';
+import { type RootState } from '../../../../store/store';
+import { setPredictions } from '../../../../store/slices/exploring/forecastingSlice';
 
 export interface IZonesProps {
   dataset: IDataset;
@@ -40,8 +42,9 @@ export interface IZonesProps {
 
 export const Zones = ({ dataset }: IZonesProps) => {
   const { modalOpen, zone, zones, loading, error } = useAppSelector(
-    state => state.zone,
+    (state: RootState) => state.zone,
   );
+  const { zoneId: predictionZoneId, results: predictionResults } = useAppSelector((state: RootState) => state.prediction);
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     open: boolean;
@@ -95,6 +98,12 @@ export const Zones = ({ dataset }: IZonesProps) => {
       dispatch(setModalOpen(false));
     }
   };
+
+  useEffect(() => {
+    if (predictionZoneId && zone.id === predictionZoneId) {
+      setPredictions(predictionResults);
+    }
+  }, [predictionZoneId, predictionResults]);
 
   return (
     <>
@@ -213,6 +222,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
                             backgroundColor:
                               zone?.id === z.id ? 'lightblue' : '#f5f5f5',
                           },
+                          border: predictionZoneId === z.id ? '2px solid #12da23' : 'none',
                         }}
                       >
                         <TableCell>{z.id}</TableCell>

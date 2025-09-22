@@ -131,6 +131,16 @@ export interface GeohashGridLayerProps {
   dataset: IDataset;
   selectedGeohash: string | null;
   setSelectedGeohash: (geohash: string | null) => void;
+  predictionData: Record<
+    string,
+    {
+      geohash: string;
+      rsrpSum: number;
+      rsrpCount: number;
+      heights: number[];
+      timestamp: string | null;
+    }
+  >;
 }
 
 export const GeohashGridLayer = ({
@@ -138,6 +148,7 @@ export const GeohashGridLayer = ({
   dataset,
   selectedGeohash,
   setSelectedGeohash,
+  predictionData,
 }: GeohashGridLayerProps) => {
   const map = useMap();
   const navigate = useNavigate();
@@ -212,6 +223,8 @@ export const GeohashGridLayer = ({
       gridItems.forEach(item => {
         const { geohash: hash, level } = item;
         const bbox = ngeohash.decode_bbox(hash);
+        const predData =
+          hash.length >= 8 ? predictionData[hash.substring(0, 8)] : null;
 
         // Find points in this bbox
         const cellPoints = points.filter(
@@ -270,10 +283,42 @@ export const GeohashGridLayer = ({
         const rect = L.rectangle(rectBounds, {
           color: borderColor,
           weight: borderWeight,
+          className: 'geohash-rectangle',
           fill: true,
-          fillColor,
+          fillColor: predData
+            ? generateRsrpColor(
+              dataset,
+              predData.rsrpSum / predData.rsrpCount,
+            )
+            : fillColor,
           fillOpacity: opacity,
         });
+
+        // Add tooltip
+        if (predData) {
+          const timeToNext =
+            predData.rsrpCount < 6
+              ? `${predData.rsrpCount * 10} mins`
+              : `${Math.floor(predData.rsrpCount / 6)}h${predData.rsrpCount % 6 > 0 ? ` ${predData.rsrpCount % 6 * 10}m` : ''}`;
+
+          rect.bindTooltip(
+            `
+              <div>
+                <div style="font-weight: bold; text-align: center;">Prediction Data</div>
+                <strong>Geohash:</strong> ${hash}<br/>
+                <strong>RSRP:</strong> ${(predData.rsrpSum / predData.rsrpCount)?.toFixed(2) || 'N/A'}<br/>
+                <strong>Heights:</strong> ${predData.heights.join(', ')}<br/>
+                <strong>Timestamp:</strong> ${new Date(predData.timestamp!).toLocaleTimeString()}<br/>
+                For the next ${timeToNext}
+              </div>
+            `,
+            {
+              permanent: false,
+              direction: 'top',
+            },
+          );
+        }
+        // TODO: Consider adding tooltip for non-prediction data
 
         rect.on('click', () => handleRectClick(hash));
 
@@ -326,7 +371,7 @@ export const GeohashGridLayer = ({
         layerGroupRef.current = null;
       }
     };
-  }, [map, points, dataset, selectedGeohash]); // Only redraw when selectedGeohash changes
+  }, [map, points, dataset, selectedGeohash, predictionData]); // Only redraw when selectedGeohash changes
 
   return null;
 };
