@@ -23,6 +23,8 @@ import type { IRectStats } from '../../../../shared/models/exploring/rect-stats.
 import Loader from '../../../../shared/components/loader';
 import { setSelectedGeohash } from '../../../../store/slices/exploring/mapSlice';
 import { useNavigate } from 'react-router-dom';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 export interface IStatsPanelProps {
   dataset: IDataset;
@@ -203,96 +205,117 @@ export const Stats = ({ dataset, pointCount }: IStatsPanelProps) => {
               }
             />
             <CardContent>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="subtitle2" fontWeight={500}>
-                  Statistics for field:
-                </Typography>
-                <Button variant="text" onClick={handleMenuOpen}>
-                  {measureOptions[selectedMeasure].label}
-                </Button>
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
-                  {measureOptions.map(opt => (
-                    <MenuItem
-                      key={opt.value}
-                      selected={selectedMeasure === opt.value}
-                      onClick={() => handleSelectMeasure(opt.value)}
+              {rectStats.count === 0 ? (
+                <InfoMessage
+                  message="No Data Available."
+                  type="info"
+                  icon={
+                    <ReportProblemRoundedIcon
+                      sx={{ fontSize: 40, color: 'info.main' }}
+                    />
+                  }
+                  fullHeight
+                />
+              ) : (
+                <>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Typography variant="subtitle2" fontWeight={500}>
+                      Statistics for field:
+                    </Typography>
+                    <Button variant="text" onClick={handleMenuOpen}>
+                      {measureOptions[selectedMeasure].label}
+                    </Button>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
                     >
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </Box>
+                      {measureOptions.map(opt => (
+                        <MenuItem
+                          key={opt.value}
+                          selected={selectedMeasure === opt.value}
+                          onClick={() => handleSelectMeasure(opt.value)}
+                        >
+                          {opt.label}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Box>
 
-              <Grid container spacing={1}>
-                <Stat
-                  label="Min"
-                  value={formatStat(
-                    rectStats[('min' + selectedMeasure) as keyof IRectStats],
-                  )}
-                />
-                <Stat
-                  label="Max"
-                  value={formatStat(
-                    rectStats[('max' + selectedMeasure) as keyof IRectStats],
-                  )}
-                />
-                <Stat
-                  label="Mean"
-                  value={formatStat(
-                    rectStats[('mean' + selectedMeasure) as keyof IRectStats],
-                  )}
-                />
-                <Stat
-                  label="SD"
-                  value={formatStat(
-                    rectStats[
-                      ('standardDeviation' +
-                        selectedMeasure) as keyof IRectStats
-                    ],
-                  )}
-                />
-                <Stat
-                  label="Var"
-                  value={formatStat(
-                    rectStats[
-                      ('variance' + selectedMeasure) as keyof IRectStats
-                    ],
-                  )}
-                />
-              </Grid>
+                  <Grid container spacing={1}>
+                    <Stat
+                      label="Min"
+                      value={formatStat(
+                        rectStats[
+                          ('min' + selectedMeasure) as keyof IRectStats
+                        ],
+                      )}
+                    />
+                    <Stat
+                      label="Max"
+                      value={formatStat(
+                        rectStats[
+                          ('max' + selectedMeasure) as keyof IRectStats
+                        ],
+                      )}
+                    />
+                    <Stat
+                      label="Mean"
+                      value={formatStat(
+                        rectStats[
+                          ('mean' + selectedMeasure) as keyof IRectStats
+                        ],
+                      )}
+                    />
+                    <Stat
+                      label="SD"
+                      value={formatStat(
+                        rectStats[
+                          ('standardDeviation' +
+                            selectedMeasure) as keyof IRectStats
+                        ],
+                      )}
+                    />
+                    <Stat
+                      label="Var"
+                      value={formatStat(
+                        rectStats[
+                          ('variance' + selectedMeasure) as keyof IRectStats
+                        ],
+                      )}
+                    />
+                  </Grid>
 
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="subtitle2" fontWeight={500}>
-                  Statistics between fields:
-                </Typography>
-                <Button variant="text" onClick={handleFieldsMenuOpen}>
-                  {`${dataset.measure0} ~ ${dataset.measure1}`}
-                </Button>
-                <Menu
-                  anchorEl={anchorElFields}
-                  open={Boolean(anchorElFields)}
-                  onClose={handleFieldsMenuClose}
-                >
-                  <MenuItem
-                    disabled
-                  >{`${dataset.measure0} ~ ${dataset.measure1}`}</MenuItem>
-                </Menu>
-              </Box>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Typography variant="subtitle2" fontWeight={500}>
+                      Statistics between fields:
+                    </Typography>
+                    <Button variant="text" onClick={handleFieldsMenuOpen}>
+                      {`${dataset.measure0} ~ ${dataset.measure1}`}
+                    </Button>
+                    <Menu
+                      anchorEl={anchorElFields}
+                      open={Boolean(anchorElFields)}
+                      onClose={handleFieldsMenuClose}
+                    >
+                      <MenuItem
+                        disabled
+                      >{`${dataset.measure0} ~ ${dataset.measure1}`}</MenuItem>
+                    </Menu>
+                  </Box>
 
-              <Grid container justifyContent="center" spacing={1}>
-                <Stat
-                  label="Pearson Correlation"
-                  value={formatStat(rectStats.pearsonCorrelation)}
-                />
-                <Stat
-                  label="Covariance"
-                  value={formatStat(rectStats.covariance)}
-                />
-              </Grid>
+                  <Grid container justifyContent="center" spacing={1}>
+                    <Stat
+                      label="Pearson Correlation"
+                      value={formatStat(rectStats.pearsonCorrelation)}
+                    />
+                    <Stat
+                      label="Covariance"
+                      value={formatStat(rectStats.covariance)}
+                    />
+                  </Grid>
+                </>
+              )}
             </CardContent>
           </>
         )

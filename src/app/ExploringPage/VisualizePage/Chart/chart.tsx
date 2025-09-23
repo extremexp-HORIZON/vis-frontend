@@ -32,6 +32,8 @@ import {
 } from '../../../../store/slices/exploring/chartSlice';
 import Loader from '../../../../shared/components/loader';
 import { Zones } from '../Zones/zones';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 export interface IChartProps {
   dataset: IDataset;
@@ -240,7 +242,7 @@ export const Chart = React.memo((props: IChartProps) => {
             mb={2}
           >
             <Stack direction="row" spacing={1}>
-              {onToggleFullscreen && (
+              {onToggleFullscreen && vegaSeriesData.length > 0 && (
                 <Tooltip
                   title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
                   placement="top"
@@ -252,151 +254,129 @@ export const Chart = React.memo((props: IChartProps) => {
               )}
               <Zones dataset={dataset} />
             </Stack>
-            <Stack direction="row" spacing={1}>
-              <Tooltip title="Bar Chart" placement="top">
-                <IconButton
-                  color={chartType === 'column' ? 'primary' : 'default'}
-                  onClick={() => handleChartTypeChange('column')}
-                >
-                  <BarChartIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Line Chart" placement="top">
-                <IconButton
-                  color={chartType === 'line' ? 'primary' : 'default'}
-                  onClick={() => handleChartTypeChange('line')}
-                >
-                  <ShowChartIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Area Chart" placement="top">
-                <IconButton
-                  color={chartType === 'area' ? 'primary' : 'default'}
-                  onClick={() => handleChartTypeChange('area')}
-                >
-                  <BubbleChartIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Heatmap" placement="top">
-                <IconButton
-                  color={chartType === 'heatmap' ? 'primary' : 'default'}
-                  onClick={() => handleChartTypeChange('heatmap')}
-                >
-                  <GridOnIcon />
-                </IconButton>
-              </Tooltip>
-            </Stack>
+            {vegaSeriesData.length > 0 && (
+              <Stack direction="row" spacing={1}>
+                <Tooltip title="Bar Chart" placement="top">
+                  <IconButton
+                    color={chartType === 'column' ? 'primary' : 'default'}
+                    onClick={() => handleChartTypeChange('column')}
+                  >
+                    <BarChartIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Line Chart" placement="top">
+                  <IconButton
+                    color={chartType === 'line' ? 'primary' : 'default'}
+                    onClick={() => handleChartTypeChange('line')}
+                  >
+                    <ShowChartIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Area Chart" placement="top">
+                  <IconButton
+                    color={chartType === 'area' ? 'primary' : 'default'}
+                    onClick={() => handleChartTypeChange('area')}
+                  >
+                    <BubbleChartIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Heatmap" placement="top">
+                  <IconButton
+                    color={chartType === 'heatmap' ? 'primary' : 'default'}
+                    onClick={() => handleChartTypeChange('heatmap')}
+                  >
+                    <GridOnIcon />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            )}
           </Stack>
 
-          {vegaSeriesData.length > 0 && (
-            <Box sx={{ flex: 1, minHeight: isFullscreen ? '60vh' : 'auto' }}>
-              <ResponsiveVegaLite
-                minWidth={chartDimensions.minWidth}
-                minHeight={chartDimensions.minHeight}
-                maxHeight={chartDimensions.maxHeight}
-                aspectRatio={isFullscreen ? 16 / 9 : 1 / 0.5}
-                actions={false}
-                spec={spec}
-              />
-            </Box>
-          )}
-
-          <Stack
-            direction="row"
-            flexWrap="wrap"
-            alignItems="center"
-            justifyContent="center"
-            spacing={2}
-            mt={3}
-          >
-            {dataset.measure0 && (
-              <>
-                <Typography variant="caption" sx={{ mr: 1 }}>
-                  Find
-                </Typography>
-                <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <Select
-                    labelId="agg-type-label"
-                    value={aggType}
-                    label="Aggregate"
-                    onChange={e => {
-                      dispatch(
-                        setAggType(e.target.value as AggregateFunctionType),
-                      );
-                      dispatch(triggerChartUpdate());
-                    }}
-                    variant="standard"
-                  >
-                    {aggTypeOptions.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.text}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </>
-            )}
-
-            {dataset.measure0 && aggType !== AggregateFunctionType.COUNT && (
-              <>
-                <Typography variant="caption" sx={{ mx: 1 }}>
-                  of
-                </Typography>
-                <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <Select
-                    labelId="measure-label"
-                    value={measure!}
-                    label="Measure"
-                    onChange={e => {
-                      dispatch(setMeasureCol(e.target.value));
-                      dispatch(triggerChartUpdate());
-                    }}
-                    variant="standard"
-                  >
-                    {[dataset.measure0, dataset.measure1].map(m => (
-                      <MenuItem key={m} value={m!}>
-                        {m}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </>
-            )}
-
-            <Typography variant="caption" sx={{ mx: 1 }}>
-              per
-            </Typography>
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <Select
-                labelId="xaxis-label"
-                value={xAxis || ''}
-                label="X axis"
-                onChange={e => {
-                  dispatch(setGroupByCols([e.target.value]));
-                  dispatch(triggerChartUpdate());
-                }}
-                variant="standard"
+          {vegaSeriesData.length > 0 ? (
+            <>
+              <Box sx={{ flex: 1, minHeight: isFullscreen ? '60vh' : 'auto' }}>
+                <ResponsiveVegaLite
+                  minWidth={chartDimensions.minWidth}
+                  minHeight={chartDimensions.minHeight}
+                  maxHeight={chartDimensions.maxHeight}
+                  aspectRatio={isFullscreen ? 16 / 9 : 1 / 0.5}
+                  actions={false}
+                  spec={spec}
+                />
+              </Box>
+              <Stack
+                direction="row"
+                flexWrap="wrap"
+                alignItems="center"
+                justifyContent="center"
+                spacing={2}
+                mt={3}
               >
-                {xAxisOptions.map(opt => (
-                  <MenuItem key={opt.value} value={opt.value}>
-                    {opt.text}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                {dataset.measure0 && (
+                  <>
+                    <Typography variant="caption" sx={{ mr: 1 }}>
+                      Find
+                    </Typography>
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                      <Select
+                        labelId="agg-type-label"
+                        value={aggType}
+                        label="Aggregate"
+                        onChange={e => {
+                          dispatch(
+                            setAggType(e.target.value as AggregateFunctionType),
+                          );
+                          dispatch(triggerChartUpdate());
+                        }}
+                        variant="standard"
+                      >
+                        {aggTypeOptions.map(opt => (
+                          <MenuItem key={opt.value} value={opt.value}>
+                            {opt.text}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
 
-            {chartType === 'heatmap' && (
-              <>
+                {dataset.measure0 &&
+                  aggType !== AggregateFunctionType.COUNT && (
+                  <>
+                    <Typography variant="caption" sx={{ mx: 1 }}>
+                        of
+                    </Typography>
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                      <Select
+                        labelId="measure-label"
+                        value={measure!}
+                        label="Measure"
+                        onChange={e => {
+                          dispatch(setMeasureCol(e.target.value));
+                          dispatch(triggerChartUpdate());
+                        }}
+                        variant="standard"
+                      >
+                        {[dataset.measure0, dataset.measure1].map(m => (
+                          <MenuItem key={m} value={m!}>
+                            {m}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
+
                 <Typography variant="caption" sx={{ mx: 1 }}>
-                  and
+                  per
                 </Typography>
                 <FormControl size="small" sx={{ minWidth: 120 }}>
                   <Select
-                    labelId="yaxis-label"
-                    value={yAxis || ''}
-                    label="Y axis"
+                    labelId="xaxis-label"
+                    value={xAxis || ''}
+                    label="X axis"
                     onChange={e => {
-                      dispatch(setGroupByCols([xAxis!, e.target.value]));
+                      dispatch(setGroupByCols([e.target.value]));
                       dispatch(triggerChartUpdate());
                     }}
                     variant="standard"
@@ -408,9 +388,46 @@ export const Chart = React.memo((props: IChartProps) => {
                     ))}
                   </Select>
                 </FormControl>
-              </>
-            )}
-          </Stack>
+
+                {chartType === 'heatmap' && (
+                  <>
+                    <Typography variant="caption" sx={{ mx: 1 }}>
+                      and
+                    </Typography>
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                      <Select
+                        labelId="yaxis-label"
+                        value={yAxis || ''}
+                        label="Y axis"
+                        onChange={e => {
+                          dispatch(setGroupByCols([xAxis!, e.target.value]));
+                          dispatch(triggerChartUpdate());
+                        }}
+                        variant="standard"
+                      >
+                        {xAxisOptions.map(opt => (
+                          <MenuItem key={opt.value} value={opt.value}>
+                            {opt.text}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
+              </Stack>
+            </>
+          ) : (
+            <InfoMessage
+              message="No Data Available."
+              type="info"
+              icon={
+                <ReportProblemRoundedIcon
+                  sx={{ fontSize: 40, color: 'info.main' }}
+                />
+              }
+              fullHeight
+            />
+          )}
         </>
       )}
     </Box>
