@@ -51,6 +51,7 @@ export const Chart = React.memo((props: IChartProps) => {
   const {
     loading: { executeQuery: loadingExecuteQuery },
   } = useAppSelector((state: RootState) => state.dataset);
+  const { mapLayer } = useAppSelector((state: RootState) => state.map);
   const dispatch = useAppDispatch();
 
   // State for viewport dimensions
@@ -252,7 +253,7 @@ export const Chart = React.memo((props: IChartProps) => {
                   </IconButton>
                 </Tooltip>
               )}
-              <Zones dataset={dataset} />
+              {mapLayer === 'geohash' && <Zones dataset={dataset} />}
             </Stack>
             {vegaSeriesData.length > 0 && (
               <Stack direction="row" spacing={1}>
