@@ -13,11 +13,13 @@ import {
   TableHead,
   Tooltip,
   Button,
+  Box,
 } from '@mui/material';
 import {
   Close as CloseIcon,
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
+  Download as DownloadIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
@@ -33,6 +35,7 @@ import { useEffect, useState } from 'react';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import { Prediction } from '../Prediction/prediction';
 import { type RootState } from '../../../../store/store';
+import { exportAllZonesToJSON } from '../../../../shared/utils/exportUtils';
 
 export interface IZonesProps {
   dataset: IDataset;
@@ -42,7 +45,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
   const { modalOpen, zone, zones, loading, error } = useAppSelector(
     (state: RootState) => state.zone,
   );
-  const { zoneIds: predictionZoneIds } =
+  const { zoneIds: predictionZoneIds, results: predictionResults, intervals } =
     useAppSelector((state: RootState) => state.prediction);
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
@@ -98,6 +101,10 @@ export const Zones = ({ dataset }: IZonesProps) => {
     }
   };
 
+  const handleExportAll = () => {
+    exportAllZonesToJSON(zones, predictionResults, intervals);
+  };
+
   return (
     <>
       {/* Zones Button */}
@@ -137,14 +144,30 @@ export const Zones = ({ dataset }: IZonesProps) => {
           }}
         >
           Zones for {dataset.id}
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={() => dispatch(setModalOpen(false))}
-            aria-label="close"
-          >
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title="Export All Predictions" placement="top">
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<DownloadIcon />}
+                onClick={handleExportAll}
+                disabled={
+                  zones.length === 0 ||
+                  Object.keys(predictionResults).length === 0
+                }
+              >
+                Export All
+              </Button>
+            </Tooltip>
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={() => dispatch(setModalOpen(false))}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </DialogTitle>
 
         <DialogContent dividers>
@@ -199,11 +222,11 @@ export const Zones = ({ dataset }: IZonesProps) => {
                         key={z.id}
                         sx={{
                           backgroundColor:
-                          z.id && predictionZoneIds.includes(z.id)
-                            ? theme => `${theme.palette.secondary.main}66`
-                            : zone?.id === z.id
-                              ? theme => `${theme.palette.primary.main}66`
-                              : 'white',
+                            z.id && predictionZoneIds.includes(z.id)
+                              ? theme => `${theme.palette.secondary.main}66`
+                              : zone?.id === z.id
+                                ? theme => `${theme.palette.primary.main}66`
+                                : 'white',
                         }}
                       >
                         <TableCell sx={{ textAlign: 'center' }}>
@@ -224,8 +247,8 @@ export const Zones = ({ dataset }: IZonesProps) => {
                               </Typography>
                               <Typography>
                                 <strong>Precision:</strong>{' '}
-                                {z.geohashes[0].length}{' '}
-                                <strong>Total:</strong> {z.geohashes.length}
+                                {z.geohashes[0].length} <strong>Total:</strong>{' '}
+                                {z.geohashes.length}
                               </Typography>
                             </>
                           ) : (

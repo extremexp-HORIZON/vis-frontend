@@ -6,12 +6,14 @@ interface predictionState {
   zoneIds: string[];
   results: Record<string, IPredictionResult[]>;
   timestamps: Record<string, string>;
+  intervals: Record<string, number>;
 }
 
 const initialState: predictionState = {
   zoneIds: [],
   results: {},
   timestamps: {},
+  intervals: {},
 };
 
 export const predictionSlice = createSlice({
@@ -36,10 +38,16 @@ export const predictionSlice = createSlice({
     removeTimestamp: (state, action: PayloadAction<string>) => {
       delete state.timestamps[action.payload];
     },
+    addIntervals: (state, action: PayloadAction<{zoneId: string, intervals: number}>) => {
+      state.intervals[action.payload.zoneId] = action.payload.intervals;
+    },
+    removeIntervals: (state, action: PayloadAction<string>) => {
+      delete state.intervals[action.payload];
+    },
     resetPredictionState: () => {
       return initialState;
     },
   }
 });
 
-export const { addResults, removeResults, addTimestamp, removeTimestamp, addZoneId, removeZoneId, resetPredictionState } = predictionSlice.actions;
+export const { addResults, removeResults, addTimestamp, removeTimestamp, addZoneId, removeZoneId, addIntervals, removeIntervals, resetPredictionState } = predictionSlice.actions;

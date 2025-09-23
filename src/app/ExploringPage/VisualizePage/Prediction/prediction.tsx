@@ -22,6 +22,7 @@ import {
   addResults,
   addTimestamp,
   addZoneId,
+  addIntervals,
 } from '../../../../store/slices/exploring/predictionSlice';
 import {
   type RootState,
@@ -29,6 +30,7 @@ import {
   useAppSelector,
 } from '../../../../store/store';
 import { setModalOpen as setZoneModalOpen } from '../../../../store/slices/exploring/zoneSlice';
+import { exportZoneToJSON } from '../../../../shared/utils/exportUtils';
 
 export interface IPredictionProps {
   zone: IZone;
@@ -55,7 +57,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     IPredictionResult[]
   >([]);
   const [error, setError] = useState<string | null>(null);
-  const { zoneIds, results } = useAppSelector(
+  const { zoneIds, results, intervals } = useAppSelector(
     (state: RootState) => state.prediction,
   );
   const dispatch = useAppDispatch();
@@ -69,42 +71,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   };
 
   const handleExportToJSON = () => {
-    if (predictionResults.length === 0) {
-      return;
-    }
-
-    // Create the export data with metadata
-    const exportData = {
-      zoneId: zone.id,
-      geohashesCount: zone.geohashes?.length || 0,
-      intervalsAmount,
-      exportTimestamp: new Date().toISOString(),
-      results: predictionResults,
-    };
-
-    // Convert to JSON string with pretty formatting
-    const jsonString = JSON.stringify(exportData, null, 2);
-
-    // Create a blob with the JSON data
-    const blob = new Blob([jsonString], { type: 'application/json' });
-
-    // Create a temporary URL for the blob
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary anchor element and trigger download
-    const link = document.createElement('a');
-
-    link.href = url;
-    link.download = `prediction-results-${zone.id}-${
-      new Date().toISOString()
-        .split('T')[0]
-    }.json`;
-    document.body.appendChild(link);
-    link.click();
-
-    // Clean up
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    exportZoneToJSON(zone, predictionResults, intervals[zone.id!]);
   };
 
   const handleView = () => {
@@ -120,6 +87,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     if (zone.id) {
       dispatch(addZoneId(zone.id));
       dispatch(addTimestamp({ zoneId: zone.id, timestamp: now.toISOString() }));
+      dispatch(addIntervals({ zoneId: zone.id, intervals: intervalsAmount }));
 
       zone.geohashes?.forEach(geohash => {
         for (let i = 0; i < intervalsAmount; i++) {
@@ -289,14 +257,14 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                   onClick={handleView}
                   color="primary"
                   variant="contained"
-                  aria-label="export"
+                  aria-label="view"
                 >
                   View
                 </Button>
                 <Button
                   onClick={handleExportToJSON}
-                  color="secondary"
-                  variant="contained"
+                  color="primary"
+                  variant="outlined"
                   aria-label="export"
                 >
                   Export
