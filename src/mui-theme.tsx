@@ -70,6 +70,17 @@ let theme = createTheme({
       color: '#0E1021',
     },
   },
+  components: {
+    MuiTableCell: {
+      styleOverrides: {
+        stickyHeader: {
+          backgroundColor: '#f5f5f5',
+          color: '#333',
+          borderBottom: '2px solid #ddd',
+        },
+      },
+    },
+  },
 });
 
 theme = responsiveFontSizes(theme, { factor: 2 });

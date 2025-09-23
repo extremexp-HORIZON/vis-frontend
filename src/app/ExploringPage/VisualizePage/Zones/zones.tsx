@@ -3,7 +3,6 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
-  Box,
   Typography,
   TableRow,
   Paper,
@@ -44,7 +43,8 @@ export const Zones = ({ dataset }: IZonesProps) => {
   const { modalOpen, zone, zones, loading, error } = useAppSelector(
     (state: RootState) => state.zone,
   );
-  const { zoneId: predictionZoneId, results: predictionResults } = useAppSelector((state: RootState) => state.prediction);
+  const { zoneId: predictionZoneId, results: predictionResults } =
+    useAppSelector((state: RootState) => state.prediction);
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     open: boolean;
@@ -164,23 +164,16 @@ export const Zones = ({ dataset }: IZonesProps) => {
           ) : zones.length === 0 ? (
             <Typography>No zones found</Typography>
           ) : (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead sx={{ backgroundColor: 'lightgray' }}>
+            <TableContainer
+              component={Paper}
+              sx={{ maxHeight: '60vh', overflow: 'auto' }}
+            >
+              <Table stickyHeader>
+                <TableHead>
                   <TableRow>
                     <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                       ID
                     </TableCell>
-                    {/* <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        Name
-                      </TableCell>
-                      <TableCell
-                        sx={{ textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        Type
-                      </TableCell> */}
                     <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                       Created At
                     </TableCell>
@@ -189,9 +182,6 @@ export const Zones = ({ dataset }: IZonesProps) => {
                     </TableCell>
                     <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                       Heights
-                    </TableCell>
-                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      Rectangle
                     </TableCell>
                     <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                       Actions
@@ -216,39 +206,40 @@ export const Zones = ({ dataset }: IZonesProps) => {
                         key={z.id}
                         sx={{
                           backgroundColor:
-                            zone?.id === z.id ? 'lightblue' : 'white',
-                          transition: 'background-color 0.3s ease',
-                          '&:hover': {
-                            backgroundColor:
-                              zone?.id === z.id ? 'lightblue' : '#f5f5f5',
-                          },
-                          border: predictionZoneId === z.id ? '2px solid #12da23' : 'none',
+                          z.id === predictionZoneId
+                            ? theme => `${theme.palette.secondary.main}66`
+                            : zone?.id === z.id
+                              ? theme => `${theme.palette.primary.main}66`
+                              : 'white',
                         }}
                       >
-                        <TableCell>{z.id}</TableCell>
-                        {/* <TableCell>{z.name}</TableCell>
-                          <TableCell>{z.type}</TableCell> */}
-                        <TableCell>
+                        <TableCell sx={{ textAlign: 'center' }}>
+                          {z.id}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: 'center' }}>
                           {z.createdAt
                             ? new Date(z.createdAt).toLocaleString()
                             : '-'}
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ textAlign: 'center' }}>
                           {z.geohashes ? (
-                            <Box>
+                            <>
+                              <Typography>
+                                <strong>Sample:</strong>{' '}
+                                {z.geohashes.slice(0, 5).join(', ')}
+                                {z.geohashes.length > 5 && '...'}
+                              </Typography>
                               <Typography>
                                 <strong>Precision:</strong>{' '}
-                                {z.geohashes[0].length}
-                              </Typography>
-                              <Typography>
+                                {z.geohashes[0].length}{' '}
                                 <strong>Total:</strong> {z.geohashes.length}
                               </Typography>
-                            </Box>
+                            </>
                           ) : (
                             '-'
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ textAlign: 'center' }}>
                           {z.heights && z.heights.length > 0
                             ? (() => {
                               const sortedHeights = [...z.heights].sort(
@@ -257,33 +248,20 @@ export const Zones = ({ dataset }: IZonesProps) => {
 
                               return (
                                 <>
-                                  <span>
+                                  <Typography>
                                     {z.heights.length} values
-                                    <br />
-                                    <strong>Min:</strong> {sortedHeights[0]}
-                                      m
-                                    <br />
+                                  </Typography>
+                                  <Typography>
+                                    <strong>Min:</strong> {sortedHeights[0]}m
+                                  </Typography>
+                                  <Typography>
                                     <strong>Max:</strong>{' '}
                                     {sortedHeights[sortedHeights.length - 1]}m
-                                  </span>
+                                  </Typography>
                                 </>
                               );
                             })()
                             : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {z.rectangle ? (
-                            <Box>
-                              <Typography>
-                                <strong>lat:</strong> [
-                                {z.rectangle.lat?.join(', ')}],{' '}
-                                <strong>lon:</strong> [
-                                {z.rectangle.lon?.join(', ')}]
-                              </Typography>
-                            </Box>
-                          ) : (
-                            '-'
-                          )}
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>
                           <Tooltip
