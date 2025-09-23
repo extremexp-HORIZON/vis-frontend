@@ -12,31 +12,52 @@ import {
   CircularProgress,
   LinearProgress,
   Alert,
-  Card,
-  CardContent,
-  Grid,
   TextField,
-  DialogActions,
+  MenuItem,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
-import { setResults, setTimestamp, setZoneId } from '../../../../store/slices/exploring/predictionSlice';
-import { type RootState, useAppDispatch, useAppSelector } from '../../../../store/store';
+import {
+  setResults,
+  setTimestamp,
+  setZoneId,
+} from '../../../../store/slices/exploring/predictionSlice';
+import {
+  type RootState,
+  useAppDispatch,
+  useAppSelector,
+} from '../../../../store/store';
+import { setModalOpen as setZoneModalOpen } from '../../../../store/slices/exploring/zoneSlice';
 
 export interface IPredictionProps {
   zone: IZone;
 }
 
+// Fixed intervals in 10 minutes
+const fixedIntervals = [
+  { text: '10mins', value: 1 },
+  { text: '30mins', value: 3 },
+  { text: '1h', value: 6 },
+  { text: '2h', value: 12 },
+  { text: '4h', value: 24 },
+  { text: '6h', value: 36 },
+  { text: '8h', value: 48 },
+];
+
 export const Prediction = ({ zone }: IPredictionProps) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [intervalsAmount, setIntervalsAmount] = useState(1);
+  const [intervalsAmount, setIntervalsAmount] = useState(
+    fixedIntervals[0].value,
+  );
   const [predictionResults, setPredictionResults] = useState<
     IPredictionResult[]
   >([]);
   const [error, setError] = useState<string | null>(null);
-  const { zoneId, results } = useAppSelector((state: RootState) => state.prediction);
+  const { zoneId, results } = useAppSelector(
+    (state: RootState) => state.prediction,
+  );
   const dispatch = useAppDispatch();
 
   const handleOpen = () => setOpen(true);
@@ -86,6 +107,11 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     URL.revokeObjectURL(url);
   };
 
+  const handleView = () => {
+    setOpen(false);
+    dispatch(setZoneModalOpen(false));
+  };
+
   // Generate dummy prediction data
   const generateDummyPredictionData = (): IPredictionResult[] => {
     const results: IPredictionResult[] = [];
@@ -133,9 +159,10 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
   useEffect(() => {
     if (zoneId === zone.id) {
+      dispatch(setZoneId(zone.id));
       setPredictionResults(results);
     }
-  }, [zoneId]);
+  }, [zoneId, zone]);
 
   return (
     <>
@@ -205,17 +232,22 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              10 minute intervals:
+              Interval:
             </Typography>
             <TextField
+              select
               variant="outlined"
-              type="number"
-              inputProps={{ min: 1, max: 12 }} // up to 2 hours
               value={intervalsAmount}
-              onChange={e => setIntervalsAmount(parseInt(e.target.value))}
+              onChange={e => setIntervalsAmount(Number(e.target.value))}
               size="small"
-              sx={{ width: 70 }}
-            />
+              sx={{ width: 120 }}
+            >
+              {fixedIntervals.map(option => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.text}
+                </MenuItem>
+              ))}
+            </TextField>
           </Box>
 
           <Box sx={{ mb: 2 }}>
@@ -246,66 +278,31 @@ export const Prediction = ({ zone }: IPredictionProps) => {
           )}
 
           {predictionResults.length > 0 && (
-            <Box>
+            <>
               <Typography variant="h6" gutterBottom textAlign="center">
                 Results
               </Typography>
-              <Grid container spacing={2} justifyContent="center">
-                {predictionResults.map(result => (
-                  <Grid item key={result.id}>
-                    <Card
-                      variant="outlined"
-                      sx={{ width: 280, height: '100%' }}
-                    >
-                      <CardContent>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Geohash:</strong> {result.geohash}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>RSRP:</strong> {result.rsrp} dBm
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Time:</strong>{' '}
-                          {new Date(result.timestamp).toLocaleTimeString()}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Height:</strong> {result.height} m
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  onClick={handleView}
+                  color="primary"
+                  variant="contained"
+                  aria-label="export"
+                >
+                  View
+                </Button>
+                <Button
+                  onClick={handleExportToJSON}
+                  color="secondary"
+                  variant="contained"
+                  aria-label="export"
+                >
+                  Export
+                </Button>
+              </Box>
+            </>
           )}
         </DialogContent>
-        <DialogActions
-          sx={{
-            p: 2,
-            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-            background: '#f8f9fa',
-          }}
-        >
-          <Button
-            onClick={handleClose}
-            color="primary"
-            variant="outlined"
-            aria-label="close"
-          >
-            Close
-          </Button>
-          {predictionResults.length > 0 && (
-            <Button
-              onClick={handleExportToJSON}
-              color="primary"
-              variant="contained"
-              aria-label="export"
-              disabled={predictionResults.length === 0}
-            >
-              Export JSON
-            </Button>
-          )}
-        </DialogActions>
       </Dialog>
     </>
   );

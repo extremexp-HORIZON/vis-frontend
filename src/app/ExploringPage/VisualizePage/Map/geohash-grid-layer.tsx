@@ -249,13 +249,12 @@ export const GeohashGridLayer = ({
         }
 
         // Determine styling based on hierarchical level
-        let borderColor = '#3388ff';
+        let borderColor = predData ? '#ff6b35' : '#3388ff';
         let borderWeight = 1;
         let opacity = 0.5;
 
         if (level === 'children') {
           // Children: blue, normal weight, normal opacity (focus area)
-          borderColor = '#3388ff';
           borderWeight = 3;
           opacity = 0.5;
         } else if (level === 'siblings') {
@@ -286,10 +285,7 @@ export const GeohashGridLayer = ({
           className: 'geohash-rectangle',
           fill: true,
           fillColor: predData
-            ? generateRsrpColor(
-              dataset,
-              predData.rsrpSum / predData.rsrpCount,
-            )
+            ? generateRsrpColor(dataset, predData.rsrpSum / predData.rsrpCount)
             : fillColor,
           fillOpacity: opacity,
         });
@@ -299,7 +295,7 @@ export const GeohashGridLayer = ({
           const timeToNext =
             predData.rsrpCount < 6
               ? `${predData.rsrpCount * 10} mins`
-              : `${Math.floor(predData.rsrpCount / 6)}h${predData.rsrpCount % 6 > 0 ? ` ${predData.rsrpCount % 6 * 10}m` : ''}`;
+              : `${Math.floor(predData.rsrpCount / 6)}h${predData.rsrpCount % 6 > 0 ? ` ${(predData.rsrpCount % 6) * 10}m` : ''}`;
 
           rect.bindTooltip(
             `
@@ -307,7 +303,7 @@ export const GeohashGridLayer = ({
                 <div style="font-weight: bold; text-align: center;">Prediction Data</div>
                 <strong>Geohash:</strong> ${hash}<br/>
                 <strong>RSRP:</strong> ${(predData.rsrpSum / predData.rsrpCount)?.toFixed(2) || 'N/A'}<br/>
-                <strong>Heights:</strong> ${predData.heights.join(', ')}<br/>
+                <strong>Heights:</strong> ${predData.heights.slice(0, 6).join(', ')}${predData.heights.length > 6 ? ', ...' : ''}<br/>
                 <strong>Timestamp:</strong> ${new Date(predData.timestamp!).toLocaleTimeString()}<br/>
                 For the next ${timeToNext}
               </div>
