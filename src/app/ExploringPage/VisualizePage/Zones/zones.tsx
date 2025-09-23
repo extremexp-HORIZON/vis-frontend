@@ -33,7 +33,6 @@ import { useEffect, useState } from 'react';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import { Prediction } from '../Prediction/prediction';
 import { type RootState } from '../../../../store/store';
-import { setPredictions } from '../../../../store/slices/exploring/forecastingSlice';
 
 export interface IZonesProps {
   dataset: IDataset;
@@ -43,7 +42,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
   const { modalOpen, zone, zones, loading, error } = useAppSelector(
     (state: RootState) => state.zone,
   );
-  const { zoneId: predictionZoneId, results: predictionResults } =
+  const { zoneIds: predictionZoneIds } =
     useAppSelector((state: RootState) => state.prediction);
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
@@ -98,12 +97,6 @@ export const Zones = ({ dataset }: IZonesProps) => {
       dispatch(setModalOpen(false));
     }
   };
-
-  useEffect(() => {
-    if (predictionZoneId && zone.id === predictionZoneId) {
-      setPredictions(predictionResults);
-    }
-  }, [predictionZoneId, predictionResults]);
 
   return (
     <>
@@ -206,7 +199,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
                         key={z.id}
                         sx={{
                           backgroundColor:
-                          z.id === predictionZoneId
+                          z.id && predictionZoneIds.includes(z.id)
                             ? theme => `${theme.palette.secondary.main}66`
                             : zone?.id === z.id
                               ? theme => `${theme.palette.primary.main}66`

@@ -19,9 +19,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
 import {
-  setResults,
-  setTimestamp,
-  setZoneId,
+  addResults,
+  addTimestamp,
+  addZoneId,
 } from '../../../../store/slices/exploring/predictionSlice';
 import {
   type RootState,
@@ -55,7 +55,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     IPredictionResult[]
   >([]);
   const [error, setError] = useState<string | null>(null);
-  const { zoneId, results } = useAppSelector(
+  const { zoneIds, results } = useAppSelector(
     (state: RootState) => state.prediction,
   );
   const dispatch = useAppDispatch();
@@ -117,20 +117,23 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     const results: IPredictionResult[] = [];
     const now = new Date();
 
-    zone.id && dispatch(setZoneId(zone.id));
-    dispatch(setTimestamp(now.toISOString()));
+    if (zone.id) {
+      dispatch(addZoneId(zone.id));
+      dispatch(addTimestamp({ zoneId: zone.id, timestamp: now.toISOString() }));
 
-    zone.geohashes?.forEach(geohash => {
-      for (let i = 0; i < intervalsAmount; i++) {
-        results.push({
-          id: `pred-${geohash}-${i + 1}`,
-          rsrp: Math.floor(Math.random() * 50) - 100, // Random RSRP between -100 and -50
-          timestamp: new Date(now.getTime() + i * 600000).toISOString(), // 10 minutes intervals
-          geohash: geohash,
-          height: Math.floor(Math.random() * 100),
-        });
-      }
-    });
+      zone.geohashes?.forEach(geohash => {
+        for (let i = 0; i < intervalsAmount; i++) {
+          results.push({
+            id: `pred-${geohash}-${i + 1}`,
+            zoneId: zone.id!,
+            rsrp: Math.floor(Math.random() * 50) - 100, // Random RSRP between -100 and -50
+            timestamp: new Date(now.getTime() + i * 600000).toISOString(), // 10 minutes intervals
+            geohash: geohash,
+            height: Math.floor(Math.random() * 100),
+          });
+        }
+      });
+    }
 
     return results;
   };
@@ -148,7 +151,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         const results = generateDummyPredictionData();
 
         setPredictionResults(results);
-        dispatch(setResults(results));
+        dispatch(addResults({ zoneId: zone.id!, results: results }));
         setIsLoading(false);
       } catch (err) {
         setError('Failed to generate prediction results');
@@ -158,11 +161,10 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   };
 
   useEffect(() => {
-    if (zoneId === zone.id) {
-      dispatch(setZoneId(zone.id));
-      setPredictionResults(results);
+    if (zone.id && zoneIds.includes(zone.id)) {
+      setPredictionResults(results[zone.id]);
     }
-  }, [zoneId, zone]);
+  }, [zone]);
 
   return (
     <>

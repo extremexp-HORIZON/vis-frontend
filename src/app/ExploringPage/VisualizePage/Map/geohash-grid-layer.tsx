@@ -132,9 +132,8 @@ export interface GeohashGridLayerProps {
   selectedGeohash: string | null;
   setSelectedGeohash: (geohash: string | null) => void;
   predictionData: Record<
-    string,
+    string, // geohash
     {
-      geohash: string;
       rsrpSum: number;
       rsrpCount: number;
       heights: number[];

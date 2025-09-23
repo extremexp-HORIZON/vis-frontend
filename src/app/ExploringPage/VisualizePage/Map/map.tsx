@@ -153,7 +153,7 @@ export const Map = (props: IMapProps) => {
   const mapLayer = useAppSelector((state: RootState) => state.map.mapLayer);
   const { clusters, viewRect, zoom, selectedGeohash, drawnRect } =
     useAppSelector((state: RootState) => state.map);
-  const { results, timestamp: predictionTimestamp } = useAppSelector(
+  const { results, timestamps: predictionTimestamps } = useAppSelector(
     (state: RootState) => state.prediction,
   );
   const [selectedClusterMarker, setSelectedClusterMarker] = useState<{
@@ -205,18 +205,18 @@ export const Map = (props: IMapProps) => {
   };
 
   const aggregatedPredictionData = useMemo(() => {
-    const aggregatedData = results.reduce(
+    const allResults = Object.values(results).flat();
+    const aggregatedData = allResults.reduce(
       (acc, current) => {
         const geohash = current.geohash;
 
         if (!acc[geohash]) {
           // Initialize the geohash entry
           acc[geohash] = {
-            geohash: geohash,
             rsrpSum: 0,
             rsrpCount: 0,
             heights: [],
-            timestamp: predictionTimestamp,
+            timestamp: predictionTimestamps[current.zoneId],
             // ... other fields
           };
         }
@@ -229,9 +229,8 @@ export const Map = (props: IMapProps) => {
         return acc;
       },
       {} as Record<
-        string,
+        string, // geohash
         {
-          geohash: string;
           rsrpSum: number;
           rsrpCount: number;
           heights: number[];
