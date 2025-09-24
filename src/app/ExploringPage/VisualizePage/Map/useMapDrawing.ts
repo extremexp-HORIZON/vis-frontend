@@ -45,6 +45,7 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
       color: '#ff7800',
       weight: 2,
       fillOpacity: 0.1,
+      interactive: false,
     });
 
     // Clear existing drawn items
@@ -60,16 +61,18 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
     map.fitBounds(leafletBounds, { padding: [250, 250] });
     const paddedBounds = map.getBounds();
 
-    dispatch(updateMapBounds({
-      id,
-      bounds: {
-        south: paddedBounds.getSouth(),
-        west: paddedBounds.getWest(),
-        north: paddedBounds.getNorth(),
-        east: paddedBounds.getEast(),
-      },
-      zoom: map.getZoom(),
-    }));
+    dispatch(
+      updateMapBounds({
+        id,
+        bounds: {
+          south: paddedBounds.getSouth(),
+          west: paddedBounds.getWest(),
+          north: paddedBounds.getNorth(),
+          east: paddedBounds.getEast(),
+        },
+        zoom: map.getZoom(),
+      }),
+    );
 
     // Notify parent component to update visibility
     if (onVisibilityChangeRef.current) {
