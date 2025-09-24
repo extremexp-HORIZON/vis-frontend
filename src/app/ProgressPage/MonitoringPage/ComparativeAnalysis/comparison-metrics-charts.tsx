@@ -270,6 +270,26 @@ const ComparisonMetricsCharts: React.FC = () => {
       color: workflowsTable.workflowColors[id] || '#000000',
     }));
 
+  const numericValues = metricSeries
+    .map(d => d.value)
+    .filter((v): v is number => typeof v === 'number' && !Number.isNaN(v));
+
+  const yMin = Math.min(...numericValues);
+  const yMax = Math.max(...numericValues);
+
+  const equalPadding = 0.05;
+
+  const yScale =
+    isLineChart
+      ? {
+          zero: false,
+          nice: false,
+          domain: [yMin - equalPadding, yMax + equalPadding],
+        }
+      : {
+          domain: [0, yMax * 1.05],
+      };
+
     const mark = isLineChart
       ? {
         type: 'line',
@@ -282,6 +302,14 @@ const ComparisonMetricsCharts: React.FC = () => {
 
     // Vega-Lite spec
     const chartSpec = {
+      params: isLineChart ? [
+        {
+        name: 'panZoom',
+        select: 'interval',
+        bind: 'scales',
+        clear: 'dblclick',
+        }
+      ] : [],
       mark,
       encoding: {
         x: {
@@ -296,12 +324,7 @@ const ComparisonMetricsCharts: React.FC = () => {
           field: 'value',
           type: 'quantitative',
           axis: { title: metricName },
-          scale: {
-            domain: [
-              0,
-              Math.max(...metricSeries.map(d => d.value)) * 1.05,
-            ],
-          },
+          scale: yScale,
         },
         color: {
           field: 'id',
