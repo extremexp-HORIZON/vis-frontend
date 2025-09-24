@@ -152,6 +152,7 @@ export const GeohashGridLayer = ({
   const map = useMap();
   const navigate = useNavigate();
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
+  const predictedGeohashes = Object.keys(predictionData);
 
   // Zoom to selected geohash when it changes
   useEffect(() => {
@@ -225,6 +226,7 @@ export const GeohashGridLayer = ({
         const predData =
           hash.length >= 8 ? predictionData[hash.substring(0, 8)] : null;
 
+        const ifPredicted = predictedGeohashes.find(geohash => hash.length >= 8 ? geohash === hash.substring(0, 8) : geohash.startsWith(hash));
         // Find points in this bbox
         const cellPoints = points.filter(
           p =>
@@ -248,7 +250,7 @@ export const GeohashGridLayer = ({
         }
 
         // Determine styling based on hierarchical level
-        let borderColor = predData ? '#ff6b35' : '#3388ff';
+        let borderColor = ifPredicted ? '#ff6b35' : '#3388ff';
         let borderWeight = 1;
         let opacity = 0.5;
 
