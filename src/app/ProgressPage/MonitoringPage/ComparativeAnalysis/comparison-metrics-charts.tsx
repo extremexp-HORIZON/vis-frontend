@@ -272,24 +272,24 @@ const ComparisonMetricsCharts: React.FC = () => {
       color: workflowsTable.workflowColors[id] || '#000000',
     }));
 
-  const numericValues = metricSeries
-    .map(d => d.value)
-    .filter((v): v is number => typeof v === 'number' && !Number.isNaN(v));
+    const numericValues = metricSeries
+      .map(d => d.value)
+      .filter((v): v is number => typeof v === 'number' && !Number.isNaN(v));
 
-  const yMin = Math.min(...numericValues);
-  const yMax = Math.max(...numericValues);
+    const yMin = Math.min(...numericValues);
+    const yMax = Math.max(...numericValues);
 
-  const equalPadding = 0.05;
+    const equalPadding = 0.05;
 
-  const yScale =
+    const yScale =
     isLineChart
       ? {
-          zero: false,
-          nice: false,
-          domain: [yMin - equalPadding, yMax + equalPadding],
-        }
+        zero: false,
+        nice: false,
+        domain: [yMin - equalPadding, yMax + equalPadding],
+      }
       : {
-          domain: [0, yMax * 1.05],
+        domain: [0, yMax * 1.05],
       };
 
     const mark = isLineChart
@@ -300,16 +300,16 @@ const ComparisonMetricsCharts: React.FC = () => {
           size: 20,
         },
       }
-      : {type: 'bar', tooltip: true};
+      : { type: 'bar', tooltip: true };
 
     // Vega-Lite spec
     const chartSpec = {
       params: isLineChart ? [
         {
-        name: 'panZoom',
-        select: 'interval',
-        bind: 'scales',
-        clear: 'dblclick',
+          name: 'panZoom',
+          select: 'interval',
+          bind: 'scales',
+          clear: 'dblclick',
         }
       ] : [],
       mark,
@@ -373,7 +373,7 @@ const ComparisonMetricsCharts: React.FC = () => {
       workflowsData: workflows.data,
       colorMapping: workflowsTable.workflowColors
     })
-    : undefined;
+      : undefined;
 
     return (
       <Grid

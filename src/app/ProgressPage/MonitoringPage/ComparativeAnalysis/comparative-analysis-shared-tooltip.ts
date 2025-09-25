@@ -19,7 +19,7 @@ export function createTooltipHandler(opts: {
 }) {
   const { metricName, metricSeries, isLineChart, xField, workflowsData, colorMapping = {} } = opts;
 
-    const toSeriesPointLike = (v: Record<string, any>): SeriesPoint => ({
+  const toSeriesPointLike = (v: Record<string, any>): SeriesPoint => ({
     id: v.id ?? v.Workflow ?? v.workflow ?? v.wf ?? '',
     value: v.value ?? v.Value ?? v.val ?? v.metric ?? undefined,
     step: v.step ?? v.Step,
@@ -27,7 +27,7 @@ export function createTooltipHandler(opts: {
     ...v,
   });
 
-    return new Handler({
+  return new Handler({
     sanitize: (v: any) => String(v),
     formatTooltip: (value: Record<string, any>, sanitize) => {
       const raw = toSeriesPointLike(value);
@@ -37,41 +37,44 @@ export function createTooltipHandler(opts: {
         : metricSeries.filter(d => d[xField] === raw[xField]);
 
       const paramNameSet = new Set<string>();
-      rows.forEach(d => {
+
+      rows.forEach(row => {
         const params = workflowsData.filter(workflow => workflow.id === raw.id)[0]?.params ?? [];
+
         params.forEach(p => paramNameSet.add(p.name));
       });
       const paramNames = Array.from(paramNameSet).sort();
 
-
       const header = isLineChart
-        && `<div><strong>${xField === 'step' ? 'Step' : 'Timestamp'}:</strong> ${sanitize(raw[xField])}</div>`
-      
+        && `<div><strong>${xField === 'step' ? 'Step' : 'Timestamp'}:</strong> ${sanitize(raw[xField])}</div>`;
+
       const headerCells = [
-        `<th style="text-align:left; padding:4px;">Workflow</th>`,
-        `<th style="text-align:right; padding:4px;">Value</th>`,
-        ...paramNames.map(n => `<th style="text-align:left; padding:4px;">${sanitize(n)}</th>`),
+        '<th style="text-align:left; padding:4px;">Workflow</th>',
+        '<th style="text-align:right; padding:4px;">Value</th>',
+        ...paramNames.map(param => `<th style="text-align:left; padding:4px;">${sanitize(param)}</th>`),
       ].join('');
 
-        const body = rows
-        .map(d => {
-          const run = workflowsData.filter(workflow => workflow.id === d.id)[0];
+      const body = rows
+        .map(row => {
+          const run = workflowsData.filter(workflow => workflow.id === row.id)[0];
           const params = run?.params ?? [];
-          console.log(params)
+
+          console.log(params);
           const pmap = new Map<string, string>(params.map(p => [p.name, p.value]));
-          console.log(pmap)
+
+          console.log(pmap);
           const paramTds = paramNames
             .map(n => `<td style="padding:4px; vertical-align:top;">${sanitize(pmap.get(n) ?? '')}</td>`)
             .join('');
 
-          const valueCell = d.value != null ? sanitize(Number(d.value).toFixed(4)) : '-';
-          const color = colorMapping[d.id]
+          const valueCell = row.value != null ? sanitize(Number(row.value).toFixed(4)) : '-';
+          const color = colorMapping[row.id];
 
           return `
             <tr>
               <td style="white-space:nowrap; vertical-align:top; padding:4px;">
                 <span style="display:inline-block;width:12px;height:12px;background-color:${sanitize(color)};border-radius:2px;margin-right:6px;"></span>
-                ${sanitize(d.id)}
+                ${sanitize(row.id)}
               </td>
               <td style="text-align:right; vertical-align:top; padding:4px;">
                 ${valueCell}

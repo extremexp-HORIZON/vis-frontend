@@ -9,7 +9,7 @@ import type { IAggregation } from '../../../../../shared/models/dataexploration.
 import type { IDataAsset } from '../../../../../shared/models/experiment/data-asset.model';
 import { Handler } from 'vega-tooltip';
 import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
-import { IRun } from '../../../../../shared/models/experiment/run.model';
+import type { IRun } from '../../../../../shared/models/experiment/run.model';
 
 export interface OverlayHistogramProps {
   assetName: string;
@@ -58,20 +58,22 @@ const OverlayHistogram = ({
   const agg: IAggregation = { column: columnName, function: 'COUNT' };
 
   const runs = useAppSelector((state: RootState) => state.progressPage.workflows.data);
-  
+
   const { runById, allParamNames } = useMemo(() => {
     const map = new Map<string, IRun>();
+
     runs.forEach(r => map.set(r.id, r));
-  
+
     const names = new Set<string>();
+
     workflowIds.forEach(wid => {
       const ps = map.get(wid)?.params ?? [];
+
       ps.forEach(p => names.add(p.name));
     });
-  
+
     return { runById: map, allParamNames: Array.from(names).sort() };
   }, [runs, workflowIds]);
-
 
   // Create color mapping for tooltip
   const colorMapping = useMemo(() => {
@@ -87,11 +89,12 @@ const OverlayHistogram = ({
 
       const rowsInBin = rows.filter(r => r.binLabel === bin);
       const countByWf = new Map<string, number>();
+
       rowsInBin.forEach(r => countByWf.set(r.workflowId, r.count));
 
       const headerCells = [
-        `<th style="text-align:left; padding:4px;">Workflow</th>`,
-        `<th style="text-align:right; padding:4px;">Count</th>`,
+        '<th style="text-align:left; padding:4px;">Workflow</th>',
+        '<th style="text-align:right; padding:4px;">Count</th>',
         ...allParamNames.map(
           n => `<th style="text-align:left; padding:4px;">${sanitize(n)}</th>`
         ),
@@ -121,7 +124,7 @@ const OverlayHistogram = ({
           </tr>
         `;
       }).join('');
-    
+
       return `
         <div style="white-space: normal;">
           <div><strong>${sanitize(columnName)}:</strong> ${sanitize(bin ?? '')}</div>

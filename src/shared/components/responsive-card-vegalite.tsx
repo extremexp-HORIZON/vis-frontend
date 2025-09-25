@@ -167,249 +167,266 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     };
   }, [updateSize]);
 
-useEffect(() => {
-  const container = containerRef.current ?? document.body;
+  useEffect(() => {
+    const container = containerRef.current ?? document.body;
 
-  const pickLiveTip = (): HTMLDivElement | null => {
-    const tips = document.querySelectorAll<HTMLDivElement>('.vega-tooltip, .vg-tooltip');
-    return tips.length ? tips[tips.length - 1] : null;
-  };
+    const pickLiveTip = (): HTMLDivElement | null => {
+      const tips = document.querySelectorAll<HTMLDivElement>('.vega-tooltip, .vg-tooltip');
 
-  const isTipVisible = (el: HTMLElement) => {
-    const cs = getComputedStyle(el);
-    if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
-    const r = el.getBoundingClientRect();
-    return r.width > 0 && r.height > 0;
-  };
-
-  // track pointer (for initial pinned position)
-  let lastMouseX = 0, lastMouseY = 0;
-  const onPointerMove = (e: PointerEvent) => {
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-    schedule(); // reclamp live tooltip
-  };
-
-  // clamp the live (hover) tooltip to viewport
-  const clampLive = () => {
-    const el = pickLiveTip();
-    if (!el) return;
-
-    el.style.position = 'fixed';
-    el.style.transform = 'none';
-    el.style.right = 'auto';
-    el.style.bottom = 'auto';
-    el.style.zIndex = '2000';
-    el.style.maxWidth = 'min(90vw, 800px)';
-    el.style.maxHeight = '80vh';
-    el.style.overflowX = 'auto';
-    el.style.overflowY = 'auto';
-
-    // keep words intact
-    el.style.whiteSpace = 'normal';
-    el.style.wordBreak = 'normal';
-    el.style.overflowWrap = 'normal';
-
-    const pad = 8;
-    const rect = el.getBoundingClientRect();
-    let left = rect.left;
-    let top = rect.top;
-
-    if (left < pad) left = pad;
-    else if (left + rect.width > window.innerWidth - pad)
-      left = Math.max(pad, window.innerWidth - pad - rect.width);
-
-    if (top < pad) top = pad;
-    else if (top + rect.height > window.innerHeight - pad)
-      top = Math.max(pad, window.innerHeight - pad - rect.height);
-
-    el.style.left = `${left}px`;
-    el.style.top = `${top}px`;
-  };
-
-  // pinned panel
-  const PINNED_CLASS = 'vega-tooltip-pinned';
-  let pinnedWrap: HTMLDivElement | null = null;
-
-  const closePinned = () => {
-    if (pinnedWrap) {
-      pinnedWrap.remove();
-      pinnedWrap = null;
-    }
-  };
-
-  // suppress re-pin briefly after close
-  let suppressUntil = 0;
-  const suppressFor = (ms: number) => { suppressUntil = performance.now() + ms; };
-
-  const pinNow = () => {
-    const src = pickLiveTip();
-    if (!src) return;
-    closePinned();
-
-    const wrap = document.createElement('div');
-    pinnedWrap = wrap;
-    wrap.className = PINNED_CLASS;
-    wrap.setAttribute('role', 'dialog');
-    wrap.style.position = 'fixed';
-
-    const pad = 10;
-    const maxW = Math.min(window.innerWidth - 2 * pad, 800);
-    const initLeft = Math.min(Math.max(pad, lastMouseX + 12), window.innerWidth - pad - maxW);
-    const initTop  = Math.min(Math.max(pad, lastMouseY + 12), window.innerHeight - pad - 200);
-
-    wrap.style.left = `${initLeft}px`;
-    wrap.style.top = `${initTop}px`;
-    wrap.style.zIndex = '2500';
-    wrap.style.maxWidth = 'min(90vw, 800px)';
-    wrap.style.maxHeight = '80vh';
-    wrap.style.overflow = 'auto';
-    wrap.style.background = 'white';
-    wrap.style.border = '1px solid rgba(0,0,0,0.15)';
-    wrap.style.borderRadius = '8px';
-    wrap.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-
-    // header + close (X only)
-    const head = document.createElement('div');
-    head.style.display = 'flex';
-    head.style.alignItems = 'center';
-    head.style.justifyContent = 'space-between';
-    head.style.gap = '8px';
-    head.style.padding = '8px 10px';
-    head.style.borderBottom = '1px solid rgba(0,0,0,0.08)';
-
-    const title = document.createElement('div');
-    title.textContent = 'Pinned tooltip';
-    title.style.fontWeight = '600';
-    title.style.fontSize = '12px';
-    title.style.color = '#1f2937';
-
-    const btn = document.createElement('button');
-    btn.textContent = '×';
-    btn.title = 'Close';
-    btn.style.cursor = 'pointer';
-    btn.style.border = 'none';
-    btn.style.background = 'transparent';
-    btn.style.fontSize = '18px';
-    btn.style.lineHeight = '1';
-    btn.style.padding = '2px 6px';
-
-    head.appendChild(title);
-    head.appendChild(btn);
-
-    // body (copy HTML; scrollable, no mid-word breaks)
-    const body = document.createElement('div');
-    body.style.padding = '10px';
-    body.style.whiteSpace = 'normal';
-    body.style.wordBreak = 'normal';
-    body.style.overflowWrap = 'normal';
-    body.style.overflowX = 'auto';
-    body.style.overflowY = 'auto';
-    body.innerHTML = src.innerHTML;
-
-    wrap.appendChild(head);
-    wrap.appendChild(body);
-    document.body.appendChild(wrap);
-
-    // close only via X (and suppress re-pin)
-    const onCloseClick = (e: MouseEvent) => {
-      e.stopPropagation(); // don't bubble to window click
-      e.preventDefault();
-      closePinned();
-      suppressFor(200);
+      return tips.length ? tips[tips.length - 1] : null;
     };
-    const onCloseDown = (e: MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-    };
-    btn.addEventListener('mousedown', onCloseDown);
-    btn.addEventListener('click', onCloseClick);
 
-    // drag to reposition (ignore clicks on the close button)
-    let dragging = false, dx = 0, dy = 0;
-    const onDown = (e: MouseEvent) => {
-      const inClose = (e.target as HTMLElement | null)?.closest('button') === btn;
-      if (inClose) return;
-      dragging = true;
-      const r = wrap.getBoundingClientRect();
-      dx = e.clientX - r.left;
-      dy = e.clientY - r.top;
-      e.preventDefault();
-      e.stopPropagation();
-    };
-    const onMove = (e: MouseEvent) => {
-      if (!dragging) return;
-      const r = wrap.getBoundingClientRect();
-      const w = r.width, h = r.height;
-      let x = e.clientX - dx;
-      let y = e.clientY - dy;
-      const pad = 10;
-      x = Math.max(pad, Math.min(window.innerWidth - pad - w, x));
-      y = Math.max(pad, Math.min(window.innerHeight - pad - h, y));
-      wrap.style.left = `${x}px`;
-      wrap.style.top = `${y}px`;
-    };
-    const onUp = () => { dragging = false; };
+    const isTipVisible = (el: HTMLElement) => {
+      const cs = getComputedStyle(el);
 
-    head.addEventListener('mousedown', onDown);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
+      const r = el.getBoundingClientRect();
 
-    // cleanup when node is removed
-    const obs = new MutationObserver(() => {
-      if (!document.body.contains(wrap)) {
-        window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('mouseup', onUp);
-        obs.disconnect();
+      return r.width > 0 && r.height > 0;
+    };
+
+    // track pointer (for initial pinned position)
+    let lastMouseX = 0, lastMouseY = 0;
+    const onPointerMove = (e: PointerEvent) => {
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      schedule(); // reclamp live tooltip
+    };
+
+    // clamp the live (hover) tooltip to viewport
+    const clampLive = () => {
+      const el = pickLiveTip();
+
+      if (!el) return;
+
+      el.style.position = 'fixed';
+      el.style.transform = 'none';
+      el.style.right = 'auto';
+      el.style.bottom = 'auto';
+      el.style.zIndex = '2000';
+      el.style.maxWidth = 'min(90vw, 800px)';
+      el.style.maxHeight = '80vh';
+      el.style.overflowX = 'auto';
+      el.style.overflowY = 'auto';
+
+      // keep words intact
+      el.style.whiteSpace = 'normal';
+      el.style.wordBreak = 'normal';
+      el.style.overflowWrap = 'normal';
+
+      const pad = 8;
+      const rect = el.getBoundingClientRect();
+      let left = rect.left;
+      let top = rect.top;
+
+      if (left < pad) left = pad;
+      else if (left + rect.width > window.innerWidth - pad)
+        left = Math.max(pad, window.innerWidth - pad - rect.width);
+
+      if (top < pad) top = pad;
+      else if (top + rect.height > window.innerHeight - pad)
+        top = Math.max(pad, window.innerHeight - pad - rect.height);
+
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
+    };
+
+    // pinned panel
+    const PINNED_CLASS = 'vega-tooltip-pinned';
+    let pinnedWrap: HTMLDivElement | null = null;
+
+    const closePinned = () => {
+      if (pinnedWrap) {
+        pinnedWrap.remove();
+        pinnedWrap = null;
       }
-    });
-    obs.observe(document.body, { childList: true, subtree: true });
-  };
+    };
 
-  // Pin ONLY if:
-  //  - click is inside the chart container
-  //  - a live tooltip exists and is visible at click time
-  const onWindowClick = (e: MouseEvent) => {
-    if (performance.now() < suppressUntil) return;
-    if (pinnedWrap && pinnedWrap.contains(e.target as Node)) return; // ignore clicks in pinned
-    if (!container.contains(e.target as Node)) return;               // only clicks in chart area
+    // suppress re-pin briefly after close
+    let suppressUntil = 0;
+    const suppressFor = (ms: number) => { suppressUntil = performance.now() + ms; };
 
-    const tip = pickLiveTip();
-    if (!tip || !isTipVisible(tip)) return;
+    const pinNow = () => {
+      const src = pickLiveTip();
 
-    pinNow();
-  };
+      if (!src) return;
+      closePinned();
 
-  // rAF throttle for clamp
-  let raf: number | null = null;
-  const schedule = () => {
-    if (raf != null) return;
-    raf = requestAnimationFrame(() => {
-      raf = null;
-      clampLive();
-    });
-  };
+      const wrap = document.createElement('div');
 
-  // re-clamp when Vega mutates tooltip DOM
-  const rootObserver = new MutationObserver(schedule);
-  rootObserver.observe(document.body, { childList: true, subtree: true });
+      pinnedWrap = wrap;
+      wrap.className = PINNED_CLASS;
+      wrap.setAttribute('role', 'dialog');
+      wrap.style.position = 'fixed';
 
-  window.addEventListener('pointermove', onPointerMove, { passive: true });
-  window.addEventListener('scroll', schedule, { passive: true });
-  window.addEventListener('resize', schedule, { passive: true });
-  window.addEventListener('click', onWindowClick); // bubble phase
+      const pad = 10;
+      const maxW = Math.min(window.innerWidth - 2 * pad, 800);
+      const initLeft = Math.min(Math.max(pad, lastMouseX + 12), window.innerWidth - pad - maxW);
+      const initTop  = Math.min(Math.max(pad, lastMouseY + 12), window.innerHeight - pad - 200);
 
-  schedule();
+      wrap.style.left = `${initLeft}px`;
+      wrap.style.top = `${initTop}px`;
+      wrap.style.zIndex = '2500';
+      wrap.style.maxWidth = 'min(90vw, 800px)';
+      wrap.style.maxHeight = '80vh';
+      wrap.style.overflow = 'auto';
+      wrap.style.background = 'white';
+      wrap.style.border = '1px solid rgba(0,0,0,0.15)';
+      wrap.style.borderRadius = '8px';
+      wrap.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
 
-  return () => {
-    window.removeEventListener('pointermove', onPointerMove);
-    window.removeEventListener('scroll', schedule);
-    window.removeEventListener('resize', schedule);
-    window.removeEventListener('click', onWindowClick);
-    rootObserver.disconnect();
-    if (raf != null) cancelAnimationFrame(raf);
-  };
-}, []);
+      // header + close (X only)
+      const head = document.createElement('div');
+
+      head.style.display = 'flex';
+      head.style.alignItems = 'center';
+      head.style.justifyContent = 'space-between';
+      head.style.gap = '8px';
+      head.style.padding = '8px 10px';
+      head.style.borderBottom = '1px solid rgba(0,0,0,0.08)';
+
+      const title = document.createElement('div');
+
+      title.textContent = 'Pinned tooltip';
+      title.style.fontWeight = '600';
+      title.style.fontSize = '12px';
+      title.style.color = '#1f2937';
+
+      const btn = document.createElement('button');
+
+      btn.textContent = '×';
+      btn.title = 'Close';
+      btn.style.cursor = 'pointer';
+      btn.style.border = 'none';
+      btn.style.background = 'transparent';
+      btn.style.fontSize = '18px';
+      btn.style.lineHeight = '1';
+      btn.style.padding = '2px 6px';
+
+      head.appendChild(title);
+      head.appendChild(btn);
+
+      // body (copy HTML; scrollable, no mid-word breaks)
+      const body = document.createElement('div');
+
+      body.style.padding = '10px';
+      body.style.whiteSpace = 'normal';
+      body.style.wordBreak = 'normal';
+      body.style.overflowWrap = 'normal';
+      body.style.overflowX = 'auto';
+      body.style.overflowY = 'auto';
+      body.innerHTML = src.innerHTML;
+
+      wrap.appendChild(head);
+      wrap.appendChild(body);
+      document.body.appendChild(wrap);
+
+      // close only via X (and suppress re-pin)
+      const onCloseClick = (e: MouseEvent) => {
+        e.stopPropagation(); // don't bubble to window click
+        e.preventDefault();
+        closePinned();
+        suppressFor(200);
+      };
+      const onCloseDown = (e: MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+      };
+
+      btn.addEventListener('mousedown', onCloseDown);
+      btn.addEventListener('click', onCloseClick);
+
+      // drag to reposition (ignore clicks on the close button)
+      let dragging = false, dx = 0, dy = 0;
+      const onDown = (e: MouseEvent) => {
+        const inClose = (e.target as HTMLElement | null)?.closest('button') === btn;
+
+        if (inClose) return;
+        dragging = true;
+        const r = wrap.getBoundingClientRect();
+
+        dx = e.clientX - r.left;
+        dy = e.clientY - r.top;
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      const onMove = (e: MouseEvent) => {
+        if (!dragging) return;
+        const r = wrap.getBoundingClientRect();
+        const w = r.width, h = r.height;
+        let x = e.clientX - dx;
+        let y = e.clientY - dy;
+        const pad = 10;
+
+        x = Math.max(pad, Math.min(window.innerWidth - pad - w, x));
+        y = Math.max(pad, Math.min(window.innerHeight - pad - h, y));
+        wrap.style.left = `${x}px`;
+        wrap.style.top = `${y}px`;
+      };
+      const onUp = () => { dragging = false; };
+
+      head.addEventListener('mousedown', onDown);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+
+      // cleanup when node is removed
+      const obs = new MutationObserver(() => {
+        if (!document.body.contains(wrap)) {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('mouseup', onUp);
+          obs.disconnect();
+        }
+      });
+
+      obs.observe(document.body, { childList: true, subtree: true });
+    };
+
+    // Pin ONLY if:
+    //  - click is inside the chart container
+    //  - a live tooltip exists and is visible at click time
+    const onWindowClick = (e: MouseEvent) => {
+      if (performance.now() < suppressUntil) return;
+      if (pinnedWrap && pinnedWrap.contains(e.target as Node)) return; // ignore clicks in pinned
+      if (!container.contains(e.target as Node)) return;               // only clicks in chart area
+
+      const tip = pickLiveTip();
+
+      if (!tip || !isTipVisible(tip)) return;
+
+      pinNow();
+    };
+
+    // rAF throttle for clamp
+    let raf: number | null = null;
+    const schedule = () => {
+      if (raf != null) return;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        clampLive();
+      });
+    };
+
+    // re-clamp when Vega mutates tooltip DOM
+    const rootObserver = new MutationObserver(schedule);
+
+    rootObserver.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    window.addEventListener('click', onWindowClick); // bubble phase
+
+    schedule();
+
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      window.removeEventListener('click', onWindowClick);
+      rootObserver.disconnect();
+      if (raf != null) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
