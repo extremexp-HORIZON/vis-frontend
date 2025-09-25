@@ -20,6 +20,7 @@ import {
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
   Download as DownloadIcon,
+  Dataset as DatasetIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
@@ -36,6 +37,7 @@ import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import { Prediction } from '../Prediction/prediction';
 import { type RootState } from '../../../../store/store';
 import { exportAllZonesToJSON } from '../../../../shared/utils/exportUtils';
+import { setPredictionDisplay } from '../../../../store/slices/exploring/predictionSlice';
 
 export interface IZonesProps {
   dataset: IDataset;
@@ -45,7 +47,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
   const { modalOpen, zone, zones, loading, error } = useAppSelector(
     (state: RootState) => state.zone,
   );
-  const { zoneIds: predictionZoneIds, results: predictionResults, intervals } =
+  const { zoneIds: predictionZoneIds, results: predictionResults, intervals, predictionDisplay } =
     useAppSelector((state: RootState) => state.prediction);
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
@@ -159,6 +161,17 @@ export const Zones = ({ dataset }: IZonesProps) => {
                 Export All
               </Button>
             </Tooltip>
+            {predictionDisplay && (
+              <Tooltip title="Exit Prediction Display" placement="top">
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={() => dispatch(setPredictionDisplay(false))}
+                >
+                  <DatasetIcon />
+                </IconButton>
+              </Tooltip>
+            )}
             <IconButton
               edge="end"
               color="inherit"

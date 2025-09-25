@@ -126,7 +126,7 @@ const ProgressPage = (props: ProgressPageProps) => {
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                rowGap: 2,
+                rowGap: location.pathname.includes('exploring/visualize') ? 0 : 2,
                 flexGrow: 1,
                 overflow: 'hidden', // Prevent overflow
                 width: '100%',

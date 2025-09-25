@@ -23,6 +23,7 @@ import {
   addTimestamp,
   addZoneId,
   addIntervals,
+  setPredictionDisplay,
 } from '../../../../store/slices/exploring/predictionSlice';
 import {
   type RootState,
@@ -121,6 +122,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     setIsLoading(true);
     setError(null);
     setPredictionResults([]);
+    dispatch(setPredictionDisplay(true));
 
     // Simulate API call with 3-5 second delay
     const delay = Math.random() * 2000 + 3000; // 3-5 seconds

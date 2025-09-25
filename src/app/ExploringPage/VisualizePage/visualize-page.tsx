@@ -1,7 +1,7 @@
 import './visualize.css';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import {
   type RootState,
   useAppDispatch,
@@ -32,10 +32,6 @@ const VisualizePage = () => {
   const { dataset, loading } = useAppSelector(
     (state: RootState) => state.dataset,
   );
-
-  const toggleChartFullscreen = React.useCallback(() => {
-    setIsChartFullscreen(!isChartFullscreen);
-  }, [isChartFullscreen]);
   const { drawnRect, selectedGeohash } = useAppSelector(
     (state: RootState) => state.map,
   );
@@ -43,6 +39,13 @@ const VisualizePage = () => {
     dataSource,
     loading: { fetch: dataSourceLoading },
   } = useAppSelector((state: RootState) => state.dataSource);
+  const { predictionDisplay } = useAppSelector(
+    (state: RootState) => state.prediction,
+  );
+
+  const toggleChartFullscreen = React.useCallback(() => {
+    setIsChartFullscreen(!isChartFullscreen);
+  }, [isChartFullscreen]);
 
   useEffect(() => {
     if (datasetId && !dataSource) {
@@ -76,10 +79,19 @@ const VisualizePage = () => {
 
   return (
     <>
+      {predictionDisplay && (
+        <Typography
+          variant="h6"
+          textAlign="center"
+          sx={{ backgroundColor: 'secondary.main' }}
+        >
+          Prediction Display
+        </Typography>
+      )}
       <Box
         position="absolute"
         zIndex={999}
-        top={0}
+        top={predictionDisplay ? 32 : 0}
         sx={{ p: 2, minWidth: 200 }}
       >
         <VisControl dataset={dataset} />
