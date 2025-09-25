@@ -1,12 +1,16 @@
+import ngeohash from 'ngeohash';
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import L from 'leaflet';
 import { updateMapBounds } from '../../../../store/slices/exploring/mapSlice';
 
 export const useMapDrawing = (map: L.Map | null, id: string) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const drawnItemsRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
   const drawnRect = useAppSelector(state => state.map.drawnRect);
+  const { selectedGeohash } = useAppSelector(state => state.map);
   const lastDrawnBounds = useRef<{
     south: number;
     west: number;
@@ -42,7 +46,7 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
     );
 
     const rectangle = L.rectangle(leafletBounds, {
-      color: '#ff7800',
+      color: '#3388ff',
       weight: 2,
       fillOpacity: 0.1,
       interactive: false,
@@ -73,6 +77,12 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
         zoom: map.getZoom(),
       }),
     );
+
+    if (selectedGeohash.rect) {
+      const ghash = ngeohash.encode(leafletBounds.getCenter().lat, leafletBounds.getCenter().lng, 8);
+
+      navigate(`?geohash=${ghash}`);
+    }
 
     // Notify parent component to update visibility
     if (onVisibilityChangeRef.current) {

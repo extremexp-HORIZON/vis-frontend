@@ -302,8 +302,13 @@ export const mapListeners = (startAppListening: AppStartListening) => {
     actionCreator: setSelectedGeohash,
     effect: async (_, { dispatch, getState }) => {
       const state = getState() as RootState;
+      const { zone } = state.zone;
 
-      await handleRectUpdate(dispatch, state);
+      if (zone.id) {
+        dispatch(setActiveRect('drawnRect'));
+      } else {
+        await handleRectUpdate(dispatch, state);
+      }
     },
   });
 };
