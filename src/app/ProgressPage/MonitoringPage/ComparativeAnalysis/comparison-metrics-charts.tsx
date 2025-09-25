@@ -12,6 +12,8 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchWorkflowMetrics, setComparativeVisibleMetrics } from '../../../../store/slices/monitorPageSlice';
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
+import { createTooltipHandler } from './comparative-analysis-shared-tooltip';
+import { tooltip } from 'leaflet';
 
 interface BaseMetric {
   id: string
@@ -298,7 +300,7 @@ const ComparisonMetricsCharts: React.FC = () => {
           size: 20,
         },
       }
-      : 'bar';
+      : {type: 'bar', tooltip: true};
 
     // Vega-Lite spec
     const chartSpec = {
@@ -363,6 +365,15 @@ const ComparisonMetricsCharts: React.FC = () => {
       },
       data: { values: metricSeries },
     };
+    const tooltipHandler = !isGrouped ? createTooltipHandler({
+      metricName,
+      metricSeries,
+      isLineChart,
+      xField: xField,
+      workflowsData: workflows.data,
+      colorMapping: workflowsTable.workflowColors
+    })
+    : undefined;
 
     return (
       <Grid
@@ -378,6 +389,7 @@ const ComparisonMetricsCharts: React.FC = () => {
           title={metricName}
           sx={{ width: '100%', maxWidth: '100%' }}
           showSettings={false}
+          tooltip={tooltipHandler}
         />
       </Grid>
     );

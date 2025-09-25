@@ -9,6 +9,7 @@ import type { IAggregation } from '../../../../../shared/models/dataexploration.
 import type { IDataAsset } from '../../../../../shared/models/experiment/data-asset.model';
 import { Handler } from 'vega-tooltip';
 import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
+import { IRun } from '../../../../../shared/models/experiment/run.model';
 
 export interface OverlayHistogramProps {
   assetName: string;
@@ -56,6 +57,22 @@ const OverlayHistogram = ({
 
   const agg: IAggregation = { column: columnName, function: 'COUNT' };
 
+  const runs = useAppSelector((state: RootState) => state.progressPage.workflows.data);
+  
+  const { runById, allParamNames } = useMemo(() => {
+    const map = new Map<string, IRun>();
+    runs.forEach(r => map.set(r.id, r));
+  
+    const names = new Set<string>();
+    workflowIds.forEach(wid => {
+      const ps = map.get(wid)?.params ?? [];
+      ps.forEach(p => names.add(p.name));
+    });
+  
+    return { runById: map, allParamNames: Array.from(names).sort() };
+  }, [runs, workflowIds]);
+
+
   // Create color mapping for tooltip
   const colorMapping = useMemo(() => {
     const { domain, range } = colorScale(workflowIds);
@@ -67,29 +84,51 @@ const OverlayHistogram = ({
     sanitize: (v: any) => String(v),
     formatTooltip: (value: Record<string, any>, sanitize) => {
       const bin = value[columnName] ?? value['binLabel'];
-      const wfRaw = value['Workflows'] ?? value['tooltipAll'] ?? '';
 
-      // Parse workflow counts from the tooltip data
-      const wfLines = String(wfRaw)
-        .split('<br>')
-        .map(line => {
-          const [workflowId, count] = line.split(': ');
-          const color = colorMapping[workflowId] || '#999';
+      const rowsInBin = rows.filter(r => r.binLabel === bin);
+      const countByWf = new Map<string, number>();
+      rowsInBin.forEach(r => countByWf.set(r.workflowId, r.count));
 
-          return `<div style="display: flex; align-items: center; margin: 2px 0;">
-            <span style="display: inline-block; width: 12px; height: 12px; background-color: ${color}; margin-right: 6px; border-radius: 2px;"></span>
-            <span>${sanitize(workflowId)}: ${sanitize(count || '0')}</span>
-          </div>`;
-        })
-        .join('');
+      const headerCells = [
+        `<th style="text-align:left; padding:4px;">Workflow</th>`,
+        `<th style="text-align:right; padding:4px;">Count</th>`,
+        ...allParamNames.map(
+          n => `<th style="text-align:left; padding:4px;">${sanitize(n)}</th>`
+        ),
+      ].join('');
 
-      const wfTitle = workflowIds.length === 1 ? 'Workflow' : 'Workflows';
+      const body = workflowIds.map(wid => {
+        const color = colorMapping[wid] || '#999';
+        const cnt = countByWf.get(wid) ?? 0;
 
+        const params = runById.get(wid)?.params ?? [];
+        const pmap = new Map<string, string>(params.map(p => [p.name, p.value]));
+
+        const paramTds = allParamNames
+          .map(n => `<td style="padding:4px; vertical-align:top;">${sanitize(pmap.get(n) ?? '')}</td>`)
+          .join('');
+
+        return `
+          <tr>
+            <td style="white-space:nowrap; vertical-align:top; padding:4px;">
+              <span style="display:inline-block;width:12px;height:12px;background-color:${sanitize(color)};border-radius:2px;margin-right:6px;"></span>
+              ${sanitize(wid)}
+            </td>
+            <td style="text-align:right; vertical-align:top; padding:4px;">
+              ${sanitize(cnt)}
+            </td>
+            ${paramTds}
+          </tr>
+        `;
+      }).join('');
+    
       return `
-        <div style="white-space: normal; max-width: 600px;">
+        <div style="white-space: normal;">
           <div><strong>${sanitize(columnName)}:</strong> ${sanitize(bin ?? '')}</div>
-          <div><strong>${wfTitle}</strong></div>
-          ${wfLines}
+          <table style="border-collapse:collapse; margin-top:6px; font-size:12px;">
+            <thead><tr>${headerCells}</tr></thead>
+            <tbody>${body}</tbody>
+          </table>
         </div>
       `;
     }
