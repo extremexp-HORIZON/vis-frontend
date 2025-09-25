@@ -47,6 +47,15 @@ const fixedIntervals = [
   { text: '8h', value: 48 },
 ];
 
+// Fixed heights
+const fixedHeights = [
+  { text: '10m', value: 10 },
+  { text: '20m', value: 20 },
+  { text: '30m', value: 30 },
+  { text: '40m', value: 40 },
+  { text: '50m', value: 50 },
+];
+
 export const Prediction = ({ zone }: IPredictionProps) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -91,14 +100,16 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
       zone.geohashes?.forEach(geohash => {
         for (let i = 0; i < intervalsAmount; i++) {
-          results.push({
-            id: `pred-${geohash}-${i + 1}`,
-            zoneId: zone.id!,
-            rsrp: Math.floor(Math.random() * 50) - 100, // Random RSRP between -100 and -50
-            timestamp: new Date(now.getTime() + i * 600000).toISOString(), // 10 minutes intervals
-            geohash: geohash,
-            height: Math.floor(Math.random() * 100),
-          });
+          for (let j = 0; j < fixedHeights.length; j++) {
+            results.push({
+              id: `pred-${geohash}-${i + 1}-${fixedHeights[j].value}`,
+              zoneId: zone.id!,
+              rsrp: Math.floor(Math.random() * 50) - 100, // Random RSRP between -100 and -50
+              timestamp: new Date(now.getTime() + i * 600000).toISOString(), // 10 minutes intervals
+              geohash: geohash,
+              height: fixedHeights[j].value,
+            });
+          }
         }
       });
     }
@@ -202,7 +213,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              Interval:
+              Time ahead
             </Typography>
             <TextField
               select
@@ -218,7 +229,13 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                 </MenuItem>
               ))}
             </TextField>
+            <Typography variant="body2" color="text.secondary">
+              for {fixedHeights.map(height => height.value).join(', ')} meters
+            </Typography>
           </Box>
+          <Typography variant="body2" gutterBottom sx={{ fontStyle: 'italic' }}>
+            (in 10 minute intervals)
+          </Typography>
 
           <Box sx={{ mb: 2 }}>
             <Button
