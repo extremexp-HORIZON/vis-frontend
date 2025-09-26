@@ -65,6 +65,43 @@ const coerceIfNumericLike = (v: unknown): unknown => {
   return Number.isFinite(parsed) ? parsed : v;
 };
 
+const getPaddedDomain = (vals: number[]): [number, number] => {
+  const finite = vals.filter(v => Number.isFinite(v));
+  if (finite.length === 0) return [0, 1]; // safe fallback
+
+  const min = Math.min(...finite);
+  const max = Math.max(...finite);
+  const range = max - min;
+
+  // If flat series, pad by magnitude (or at least 1) to avoid zero-height domain
+  const base = range === 0 ? Math.max(Math.abs(max), 1) : range;
+  const pad = base * 0.05;
+
+  return [min - pad, max + pad];
+};
+
+const getPaddedXDomain = (
+  vals: Array<number | string | Date | null | undefined>,
+  xType: 'quantitative' | 'temporal' | 'ordinal'
+): [number | Date, number | Date] | undefined => {
+  if (xType === 'ordinal') return undefined;
+
+  if (xType === 'quantitative') {
+    const nums = vals.map(v => Number(v)).filter(v => Number.isFinite(v));
+    return getPaddedDomain(nums);
+  }
+
+  const ts = vals
+    .map(v => (v == null ? NaN : new Date(v as any).getTime()))
+    .filter(v => Number.isFinite(v)) as number[];
+
+  const dom = getPaddedDomain(ts);
+  if (!dom) return undefined;
+
+  const [lo, hi] = dom;
+  return [new Date(lo), new Date(hi)];
+};
+
 const LineChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const meta = tab?.workflowTasks.dataExploration?.metaData;
@@ -158,6 +195,16 @@ const LineChart = () => {
       });
     });
 
+    const numericValues = longData
+      .map(d => Number(d.value))
+      .filter(v => Number.isFinite(v));
+    const yDomain = getPaddedDomain(numericValues);
+
+    const xVals = longData.map(d => d[xField]);
+    const xDomain = getPaddedXDomain(xVals, xTypeForEncoding);
+
+
+
     return {
       data: { values: longData },
       params: [
@@ -179,11 +226,13 @@ const LineChart = () => {
             titleColor: '#444',
             labelOverlap: xTypeForEncoding === 'ordinal' ? 'greedy' : undefined,
           },
+          scale: {domain: xDomain}
         },
         y: {
           field: 'value',
           type: 'quantitative',
           title: 'Value',
+          scale: { domain: yDomain },
         },
         color: { field: 'variable', type: 'nominal', title: 'Metric' },
       },
@@ -223,6 +272,13 @@ const LineChart = () => {
       return copy;
     });
 
+    const yNums = values.map(r => Number(r[yField])).filter(v => Number.isFinite(v));
+    const yDomain = getPaddedDomain(yNums);
+
+    const xVals = values.map(r => r[xField]);
+    const xDomain = getPaddedXDomain(xVals, xTypeForEncoding);
+
+
     return {
       data: { values },
       params: [
@@ -244,6 +300,7 @@ const LineChart = () => {
             titleColor: '#444',
             labelOverlap: xTypeForEncoding === 'ordinal' ? 'greedy' : undefined,
           },
+          scale: { domain: xDomain }
         },
         y: {
           field: yField,
@@ -254,6 +311,7 @@ const LineChart = () => {
             titleColor: '#444',
             labelOverlap: yTypeForEncoding === 'ordinal' ? 'greedy' : undefined,
           },
+          ...(yTypeForEncoding === 'quantitative' ? { scale: { domain: yDomain } } : {}),
         },
       },
     };
