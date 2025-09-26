@@ -39,11 +39,12 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
   }));
   const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1;
 
-  const values = metrics.map(d => d.value);
+    const values = metrics.map(d => d.value);
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
   const range = maxVal - minVal;
 
+  // If all values equal, pad based on magnitude (or 1 if zero)
   const base = range === 0 ? Math.max(Math.abs(maxVal), 1) : range;
   const pad = base * 0.05;
 
@@ -94,7 +95,6 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
         spec={chartSpec}
         actions={false}
         title={metrics[0].task ? `${metrics[0].task}／${metrics[0].metricName}` : metrics[0].metricName}
-        aspectRatio={isSmallScreen ? 4 : 2}
         maxHeight={500}
       />
     </Box>
