@@ -2,7 +2,7 @@ import type { Axis, Features } from './initialization.model';
 
 export interface IPlotModel {
     explainabilityType: 'featureExplanation' | 'hyperparameterExplanation';
-    explanationMethod: 'ale' | 'pdp' | '2dpdp' | 'counterfactuals' | 'influenceFunctions';
+    explanationMethod: 'ale' | 'pdp' | '2dpdp' | 'counterfactuals' | 'influenceFunctions' | 'segmentation';
     explainabilityModel: string;
     plotName: string;
     plotDescr: string;
@@ -19,6 +19,10 @@ export interface IPlotModel {
     actions: ITableContents;
     affectedClusters: IAffectedClusters;
     effCostActions: IEffCostActions;
+    features_table: ITableContents;
+    attributions_table: ITableContents;
+    features_table_columns: string[];
+    attributions_table_columns: string[];
   }
 
 export interface ITableContents {

@@ -55,6 +55,7 @@ export interface IModelAnalysis {
   ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
   '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null;}
   featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; }
+  segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; }
   counterfactuals: {
     data: IPlotModel | null
     loading: boolean
@@ -121,6 +122,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   ale: { data: null, loading: false, error: null, selectedFeature: null },
   '2dpdp': { data: null, loading: false, error: null, selectedFeature1: null,  selectedFeature2: null },
   featureImportance: { data: null, loading: false, error: null },
+  segmentation: { data: null, loading: false, error: null, selectedFeature: null, selectedTime: null },
   counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals_control_panel: { cfMethod: 'Dice', actionChoiceStrategy: 'max-eff', gcfSize: 3 },

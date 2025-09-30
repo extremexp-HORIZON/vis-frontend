@@ -39,6 +39,11 @@ export const setSelectedFeature = createAction<{
   feature: string;
 }>('explainability/set_selected_feature');
 
+export const setSelectedTime = createAction<{
+  plotType: keyof IModelAnalysis;
+  time: string;
+}>('explainability/set_selected_time');
+
 export const setSelectedFeatures2D = createAction<{
   feature1: string;
   feature2: string;
@@ -87,6 +92,10 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
         } else if ('selectedFeature1' in section && 'selectedFeature2' in section) {
           section.selectedFeature1 = action.payload.features.feature1;
           section.selectedFeature2 = action.payload.features.feature2;
+        }
+        if ('selectedTime' in section && !section.selectedTime) {
+          const times = action.payload.features_table?.time?.values ?? action.payload.attributions_table?.time?.values ?? [];
+          section.selectedTime = times.length ? String(times[0]) : null;
         }
         assignResult(section, action.payload);
       }
@@ -176,6 +185,17 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
           selectedFeature1: '',
           selectedFeature2: '',
         };
+      }
+    })
+    .addCase(setSelectedTime, (state, action) => {
+      const task = state.tab?.workflowTasks.modelAnalysis;
+      const { plotType, time } = action.payload;
+
+      if (task && plotType !== 'featureNames' && plotType in task) {
+        const section = task[plotType];
+        if ('selectedTime' in section) {
+          section.selectedTime = time;
+        }
       }
     });
 };

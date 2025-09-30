@@ -4,6 +4,7 @@ import AlePlot from '../../../Tasks/ModelAnalysisTask/plots/ale-plot';
 import { useState } from 'react';
 import Contourplot from '../../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
 import FeatureImportancePlot from '../../../Tasks/ModelAnalysisTask/plots/feature-importance-plot';
+import AttributionHeatmaps from '../../../Tasks/ModelAnalysisTask/plots/attribution-heatmap';
 
 const FeatureExplainability = () => {
   const [isMosaic, setIsMosaic] = useState(true);
@@ -56,6 +57,9 @@ const FeatureExplainability = () => {
         <Grid item xs={12}>
           <Contourplot explanation_type="featureExplanation"/>
         </Grid>
+        {/* <Grid item xs={12}>
+          <AttributionHeatmaps />
+        </Grid> */}
       </Grid>
     </Box>
   );
