@@ -51,7 +51,7 @@ workflowEvaluation: {
 
 const initialState: IProgressPage = {
   initialization: false,
-  experiments: {data: [], loading: false, error: null},
+  experiments: { data: [], loading: false, error: null },
   experiment: { data: null, loading: false, error: null },
   workflows: { data: [], loading: false, error: null, requested: false },
   progressBar: { total: 0, completed: 0, running: 0, failed: 0, progress: 0 },

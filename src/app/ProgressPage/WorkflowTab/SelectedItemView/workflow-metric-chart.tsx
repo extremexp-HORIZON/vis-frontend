@@ -39,7 +39,7 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
   }));
   const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1;
 
-    const values = metrics.map(d => d.value);
+  const values = metrics.map(d => d.value);
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
   const range = maxVal - minVal;
@@ -49,7 +49,6 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
   const pad = base * 0.05;
 
   const domain: [number, number] = [minVal - pad, maxVal + pad];
-
 
   const chartSpec = {
     mark: isSingleStep ? 'point'
