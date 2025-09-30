@@ -414,7 +414,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule, { passive: true });
-    window.addEventListener('click', onWindowClick); // bubble phase
+    //Disabled for now
+    // window.addEventListener('click', onWindowClick); // bubble phase
 
     schedule();
 

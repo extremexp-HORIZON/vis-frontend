@@ -67,6 +67,7 @@ const coerceIfNumericLike = (v: unknown): unknown => {
 
 const getPaddedDomain = (vals: number[]): [number, number] => {
   const finite = vals.filter(v => Number.isFinite(v));
+
   if (finite.length === 0) return [0, 1]; // safe fallback
 
   const min = Math.min(...finite);
@@ -88,6 +89,7 @@ const getPaddedXDomain = (
 
   if (xType === 'quantitative') {
     const nums = vals.map(v => Number(v)).filter(v => Number.isFinite(v));
+
     return getPaddedDomain(nums);
   }
 
@@ -96,9 +98,11 @@ const getPaddedXDomain = (
     .filter(v => Number.isFinite(v)) as number[];
 
   const dom = getPaddedDomain(ts);
+
   if (!dom) return undefined;
 
   const [lo, hi] = dom;
+
   return [new Date(lo), new Date(hi)];
 };
 
@@ -203,8 +207,6 @@ const LineChart = () => {
     const xVals = longData.map(d => d[xField]);
     const xDomain = getPaddedXDomain(xVals, xTypeForEncoding);
 
-
-
     return {
       data: { values: longData },
       params: [
@@ -226,7 +228,7 @@ const LineChart = () => {
             titleColor: '#444',
             labelOverlap: xTypeForEncoding === 'ordinal' ? 'greedy' : undefined,
           },
-          scale: {domain: xDomain}
+          scale: { domain: xDomain }
         },
         y: {
           field: 'value',
@@ -277,7 +279,6 @@ const LineChart = () => {
 
     const xVals = values.map(r => r[xField]);
     const xDomain = getPaddedXDomain(xVals, xTypeForEncoding);
-
 
     return {
       data: { values },
