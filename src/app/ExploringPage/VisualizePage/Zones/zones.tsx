@@ -38,6 +38,7 @@ import { Prediction } from '../Prediction/prediction';
 import { type RootState } from '../../../../store/store';
 import { exportAllZonesToJSON } from '../../../../shared/utils/exportUtils';
 import { setPredictionDisplay } from '../../../../store/slices/exploring/predictionSlice';
+import { setMapLayer } from '../../../../store/slices/exploring/mapSlice';
 
 export interface IZonesProps {
   dataset: IDataset;
@@ -49,6 +50,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
   );
   const { zoneIds: predictionZoneIds, results: predictionResults, intervals, predictionDisplay } =
     useAppSelector((state: RootState) => state.prediction);
+  const { mapLayer } = useAppSelector((state: RootState) => state.map);
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     open: boolean;
@@ -61,8 +63,13 @@ export const Zones = ({ dataset }: IZonesProps) => {
   });
 
   useEffect(() => {
-    if (dataset.id && modalOpen && zones.length === 0) {
-      dispatch(getZonesByFileName(dataset.id));
+    if (dataset.id && modalOpen) {
+      if (mapLayer !== 'geohash') {
+        dispatch(setMapLayer('geohash'));
+      }
+      if (zones.length === 0) {
+        dispatch(getZonesByFileName(dataset.id));
+      }
     }
 
     if (!modalOpen) {
