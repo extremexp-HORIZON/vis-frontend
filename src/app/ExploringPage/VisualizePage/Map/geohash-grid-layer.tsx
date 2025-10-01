@@ -173,16 +173,44 @@ export const GeohashGridLayer = ({
     }
   }, [selectedGeohash, map]);
 
-  // Auto-select first predicted geohash when entering prediction mode
+  // Auto-select most centered predicted geohash when entering prediction mode
   useEffect(() => {
     if (predictionDisplay && predictedGeohashes.length > 0) {
       // Check if we need to initialize or update the selection
       if (!selectedGeohash || !predictedGeohashes.includes(selectedGeohash)) {
         if (!hasInitializedPredictionGeohash.current) {
-          const firstPredicted = predictedGeohashes[0];
+          // Find the center geohash from all predicted geohashes
+          const geohashCenters = predictedGeohashes.map(geohash =>
+            ngeohash.decode(geohash),
+          );
 
-          setSelectedGeohash(firstPredicted);
-          navigate(`?geohash=${firstPredicted}`);
+          // Calculate the center point of all geohashes
+          const avgLat =
+            geohashCenters.reduce((sum, center) => sum + center.latitude, 0) /
+            geohashCenters.length;
+          const avgLng =
+            geohashCenters.reduce((sum, center) => sum + center.longitude, 0) /
+            geohashCenters.length;
+
+          // Find the geohash closest to this center point
+          let centerGeohash = predictedGeohashes[0];
+          let minDistance = Infinity;
+
+          predictedGeohashes.forEach(geohash => {
+            const geohashCenter = ngeohash.decode(geohash);
+            const distance = Math.sqrt(
+              Math.pow(geohashCenter.latitude - avgLat, 2) +
+                Math.pow(geohashCenter.longitude - avgLng, 2),
+            );
+
+            if (distance < minDistance) {
+              minDistance = distance;
+              centerGeohash = geohash;
+            }
+          });
+
+          setSelectedGeohash(centerGeohash);
+          navigate(`?geohash=${centerGeohash}`);
           hasInitializedPredictionGeohash.current = true;
         }
       }
@@ -196,6 +224,7 @@ export const GeohashGridLayer = ({
     selectedGeohash,
     setSelectedGeohash,
     navigate,
+    map,
   ]);
 
   // Handle rectangle click - navigate to child geohash
