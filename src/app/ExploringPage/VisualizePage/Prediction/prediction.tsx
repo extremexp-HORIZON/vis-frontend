@@ -67,7 +67,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     IPredictionResult[]
   >([]);
   const [error, setError] = useState<string | null>(null);
-  const { zoneIds, results, intervals } = useAppSelector(
+  const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
   );
   const dispatch = useAppDispatch();
@@ -87,6 +87,9 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const handleView = () => {
     setOpen(false);
     dispatch(setZoneModalOpen(false));
+    if (predictionResults.length > 0 && !predictionDisplay) {
+      dispatch(setPredictionDisplay(true));
+    }
   };
 
   // Generate dummy prediction data

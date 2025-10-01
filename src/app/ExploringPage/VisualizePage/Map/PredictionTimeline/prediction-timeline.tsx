@@ -194,7 +194,7 @@ export const PredictionTimeline = () => {
           </Typography>
         </Box>
 
-        <ThemeProvider theme={sliderTheme}>
+        {timeSlots.length > 1 && <ThemeProvider theme={sliderTheme}>
           <Slider
             value={selectedTimeIndex}
             min={0}
@@ -207,7 +207,7 @@ export const PredictionTimeline = () => {
             color="primary"
             sx={{ mb: 1 }}
           />
-        </ThemeProvider>
+        </ThemeProvider>}
 
         {/* Time Counter */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
