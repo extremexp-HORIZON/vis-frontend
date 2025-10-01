@@ -57,9 +57,9 @@ const FeatureExplainability = () => {
         <Grid item xs={12}>
           <Contourplot explanation_type="featureExplanation"/>
         </Grid>
-        {/* <Grid item xs={12}>
+        <Grid item xs={12}>
           <AttributionHeatmaps />
-        </Grid> */}
+        </Grid>
       </Grid>
     </Box>
   );

@@ -1,34 +1,26 @@
-// GeoHeatmaps.tsx
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Box, Grid, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useParams } from 'react-router-dom';
-import {
-  Box, Grid, FormControl, InputLabel, MenuItem, Select, Typography,
-} from '@mui/material';
-import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
-import InfoMessage from '../../../../shared/components/InfoMessage';
-import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
-import Loader from '../../../../shared/components/loader';
+
+import rawFixture from '../../../../shared/data/segmentation.json';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import type { IPlotModel, ITableContents } from '../../../../shared/models/plotmodel.model';
 import { fetchModelAnalysisExplainabilityPlot } from '../../../../store/slices/explainabilitySlice';
-import rawFixture from '../../../../shared/data/segmentation.json'
+
+import HeatMapLeaflet from '../../../../shared/components/HeatMapLeaflet';
+import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 
 type HeatPoint = { x: number; y: number; time: string | number; value: number };
 
-// ====== MODE TOGGLES ======
-const USE_FIXTURE = true;   // loads EXACT content from segmentation.json
-const USE_API = false;      // when ready, set true and uncomment the effect/handlers
-// ==========================
+const USE_FIXTURE = true;
+const USE_API = false;
 
-// ---- helpers: adapters & transforms ----
 const numeric = (v: unknown): number => (typeof v === 'number' ? v : Number(v));
 
-/** Map snake_case JSON (your file) -> IPlotModel (camelCase) */
 function adaptFixtureToPlotModel(json: any): IPlotModel {
-  // shallow field mapping
-  const pm: IPlotModel = {
+  return {
     explainabilityType: json.explainability_type,
     explanationMethod: json.explanation_method,
     explainabilityModel: json.explainability_model,
@@ -52,11 +44,10 @@ function adaptFixtureToPlotModel(json: any): IPlotModel {
     features_table_columns: json.features_table_columns ?? [],
     attributions_table_columns: json.attributions_table_columns ?? [],
   };
-  return pm;
 }
 
 const featureCandidates = (pl: IPlotModel | null) =>
-  pl?.features_table_columns?.filter(c => !['x','y','time'].includes(c)) ?? [];
+  pl?.features_table_columns?.filter(c => !['x', 'y', 'time'].includes(c)) ?? [];
 
 const distinctTimes = (table?: ITableContents) => {
   if (!table?.time?.values) return [];
@@ -88,141 +79,22 @@ const makeHeatmapValues = (
   return out;
 };
 
-// grid step estimation for nice square-ish tiles
-const median = (arr:number[]) => {
-  const s = [...arr].sort((a,b)=>a-b); const n = s.length;
-  return n ? (n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2) : 0;
-};
-const gridSteps = (values: {x:number;y:number}[]) => {
-  const xs = Array.from(new Set(values.map(d=>d.x))).sort((a,b)=>a-b);
-  const ys = Array.from(new Set(values.map(d=>d.y))).sort((a,b)=>a-b);
-  const dx = median(xs.slice(1).map((v,i)=>v - xs[i])) || 0.001;
-  const dy = median(ys.slice(1).map((v,i)=>v - ys[i])) || 0.001;
-  return { dx, dy };
-};
-
-const extent = (arr: number[]) =>
-  [Math.min(...arr), Math.max(...arr)] as [number, number];
-
-const niceTicks = (min: number, max: number, count = 6) => {
-  const step = (max - min) / Math.max(1, count - 1);
-  return Array.from({ length: count }, (_, i) => min + i * step);
-};
-
-// 4 decimals looks great for your coordinate span:
-const AXIS_FORMAT = ".4f";
-
-const buildSpec = (
-  values: { x:number; y:number; time:any; value:number }[],
-  label: string,
-  domain?: [number, number]
-) => {
-  if (!values.length) return { data: { values }, mark: "rect" } as any;
-
-  // bin size (keeps your heatmap grid)
-  const { dx, dy } = gridSteps(values);
-
-  // compute “nice” ticks from actual extents (NOT every bin edge)
-  const xs = values.map(d => d.x);
-  const ys = values.map(d => d.y);
-  const [minX, maxX] = extent(xs);
-  const [minY, maxY] = extent(ys);
-  const xTicks = niceTicks(minX, maxX, 6);
-  const yTicks = niceTicks(minY, maxY, 6);
-
-  const labelExpr = `format(datum.value, '${AXIS_FORMAT}')`;
-
-  return {
-    data: { values },
-    mark: { type: 'rect', tooltip: true, stroke: null },
-    encoding: {
-      x: {
-        field: 'x',
-        type: 'quantitative',
-        bin: { step: dx },
-        title: 'Longitude',
-        scale: { nice: true, zero: false },
-        axis: {
-          values: xTicks,
-          format: AXIS_FORMAT,
-          labelExpr,
-          labelOverlap: 'greedy',
-          labelBound: true,
-          labelFlush: true,
-          labelPadding: 4,
-          tickCount: xTicks.length,   // keep Vega from adding more ticks
-          tickSize: 3,
-          grid: true,
-          gridOpacity: 0.08,
-          domain: false
-        },
-      },
-      y: {
-        field: 'y',
-        type: 'quantitative',
-        bin: { step: dy },
-        title: 'Latitude',
-        scale: { nice: true, zero: false },
-        axis: {
-          values: yTicks,
-          format: AXIS_FORMAT,
-          labelExpr,
-          labelOverlap: 'greedy',
-          labelBound: true,
-          labelFlush: true,
-          labelPadding: 4,
-          tickCount: yTicks.length,
-          tickSize: 3,
-          grid: true,
-          gridOpacity: 0.08,
-          domain: false
-        },
-      },
-      color: {
-        field: 'value',
-        type: 'quantitative',
-        aggregate: 'mean',            // keep mean because we’re binning
-        title: label,
-        ...(domain ? { scale: { domain } } : {}), // classic palette
-      },
-      tooltip: [
-        { field: 'x', type: 'quantitative', bin: true, title: 'Lon (bin)' },
-        { field: 'y', type: 'quantitative', bin: true, title: 'Lat (bin)' },
-        { aggregate: 'mean', field: 'value', type: 'quantitative', title: 'Mean' },
-      ],
-    },
-    view: { stroke: null },
-    config: {
-      axis: {
-        labelFontSize: 10,
-        titleFontSize: 11,
-        tickColor: '#9ca3af',  // subtle
-        gridColor: '#9ca3af',
-      },
-      legend: { orient: 'right', gradientLength: 120 },
-    },
-  };
-};
-
 const AttributionHeatmaps: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tab, isTabInitialized } = useAppSelector((s: RootState) => s.workflowPage);
   const { experimentId } = useParams();
 
-  // slice reference kept for easy API switch
   const plotSlice = tab?.workflowTasks.modelAnalysis?.segmentation;
   // uncomment for api also must make the initialization
   //   const selectedFeature = plotSlice?.selectedFeature ?? '';
   //   const selectedTime = plotSlice?.selectedTime ?? '';
 
-  // ---- FIXTURE LOAD (exact content) ----
+  // Fixture (mock)
   const [fixtureModel] = useState<IPlotModel | null>(
     adaptFixtureToPlotModel(rawFixture as any)
   );
-  const fixtureError = null;
 
-
-  // ---- API FETCH (commented until you flip to API) ----
+  // API fetch (uncomment when ready)
   // useEffect(() => {
   //   if (!USE_API) return;
   //   if (!tab || !experimentId || !isTabInitialized) return;
@@ -238,7 +110,7 @@ const AttributionHeatmaps: React.FC = () => {
   //         queryCase: 'segmentation',
   //         experimentId,
   //       },
-  //     }),
+  //     })
   //   );
   // }, [dispatch, tab, experimentId, isTabInitialized]);
 
@@ -274,42 +146,18 @@ const AttributionHeatmaps: React.FC = () => {
     }
   }, [timeOptions, selectedTime]);
 
-  // values
-  const featuresHeatValues = useMemo(
-    () => makeHeatmapValues(plotModel?.features_table, selectedFeature, selectedTime),
+  // map points (lat=y, lon=x)
+  const featurePts = useMemo(
+    () => makeHeatmapValues(plotModel?.features_table, selectedFeature, selectedTime)
+      .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
     [plotModel, selectedFeature, selectedTime]
   );
-  const attributionsHeatValues = useMemo(
-    () => makeHeatmapValues(plotModel?.attributions_table, selectedFeature, selectedTime),
+  const attribPts = useMemo(
+    () => makeHeatmapValues(plotModel?.attributions_table, selectedFeature, selectedTime)
+      .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
     [plotModel, selectedFeature, selectedTime]
   );
 
-  const domainMinMax = (vals: number[]) =>
-  vals.length ? [Math.min(...vals), Math.max(...vals)] as [number, number] : undefined;
-
-  const featuresDomain = useMemo(
-  () => domainMinMax(featuresHeatValues.map(d => d.value)),
-  [featuresHeatValues]
-);
-const attributionsDomain = useMemo(
-  () => domainMinMax(attributionsHeatValues.map(d => d.value)),
-  [attributionsHeatValues]
-);
-
-
-const specFeatures = buildSpec(
-  featuresHeatValues,
-  selectedFeature || 'value',
-  featuresDomain
-);
-
-const specAttributions = buildSpec(
-  attributionsHeatValues,
-  selectedFeature || 'value',
-  attributionsDomain
-);
-
-  // control panel
   const controlPanel = (
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
       <FormControl fullWidth>
@@ -337,7 +185,7 @@ const specAttributions = buildSpec(
           MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
         >
           {timeOptions.length === 0
-            ? <MenuItem value=""><em>No time dimension</em></MenuItem>
+            ? <MenuItem value=""><em>No time</em></MenuItem>
             : timeOptions.map(t => <MenuItem key={`time-${t}`} value={t}>{t}</MenuItem>)
           }
         </Select>
@@ -345,51 +193,80 @@ const specAttributions = buildSpec(
     </Box>
   );
 
-  // messages
-  const loading = <Loader />;
-  const error = (
-    <InfoMessage
-      message={fixtureError ? `Fixture load failed: ${fixtureError}` : 'Error fetching segmentation heatmaps.'}
-      type="info"
-      icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-      fullHeight
-    />
-  );
+  // download helpers: find <canvas> inside card and export bug on download only points are visible
+  // const leftCardRef = useRef<HTMLDivElement | null>(null);
+  // const rightCardRef = useRef<HTMLDivElement | null>(null);
 
-  const shouldShowLoading = (USE_API && !!plotSlice?.loading) || (USE_FIXTURE && !fixtureModel && !fixtureError);
-  const shouldShowError = (USE_API && !!plotSlice?.error) || (USE_FIXTURE && !!fixtureError);
+  // const downloadCanvasPNG = (root: HTMLDivElement | null, filename: string) => {
+  //   if (!root) return;
+  //   const canvas = root.querySelector('canvas');
+  //   if (!canvas) return;
+  //   const link = document.createElement('a');
+  //   link.download = `${filename}_${new Date().toISOString().slice(0,10)}.png`;
+  //   link.href = canvas.toDataURL('image/png');
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   link.remove();
+  // };
+
+  // const onDownloadLeft = () => downloadCanvasPNG(leftCardRef.current, 'feature_heatmap');
+  // const onDownloadRight = () => downloadCanvasPNG(rightCardRef.current, 'attribution_heatmap');
 
   return (
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={2}>
+        {/* Feature (controlPanel passed here) */}
         <Grid item xs={12} md={6}>
-          <ResponsiveCardVegaLite
-            spec={specFeatures}
-            title='Feature'
-            details={plotModel?.plotDescr || null}
-            aspectRatio={1}
-            maxHeight={400}
-            controlPanel={controlPanel}
-            actions={false}
-            showInfoMessage={shouldShowLoading || shouldShowError}
-            infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
-            isStatic={false}
-          />
+          {/* <div ref={leftCardRef}> */}
+            <ResponsiveCardTable
+              title="Feature"
+              details={plotModel?.plotDescr || null}
+              controlPanel={controlPanel}
+              // onDownload={onDownloadLeft}
+              showDownloadButton
+              showFullScreenButton
+              minHeight={400}
+              noPadding
+            >
+              <HeatMapLeaflet
+                points={featurePts}
+                legendLabel="Feature"
+                radius={18}
+                blur={15}
+                maxZoom={18}
+                decimals={5}
+                minIntensity={0.35}
+                gamma={0.5}
+              />
+            </ResponsiveCardTable>
+          {/* </div> */}
         </Grid>
 
+        {/* Attribution (no duplicate control panel) */}
         <Grid item xs={12} md={6}>
-          <ResponsiveCardVegaLite
-            spec={specAttributions}
-            title='Attribution'
-            details={plotModel?.plotDescr || null}
-            aspectRatio={1}
-            maxHeight={400}
-            controlPanel={controlPanel}
-            actions={false}
-            showInfoMessage={shouldShowLoading || shouldShowError}
-            infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
-            isStatic={false}
-          />
+          {/* <div ref={rightCardRef}> */}
+            <ResponsiveCardTable
+              title="Attribution"
+              details={plotModel?.plotDescr || null}
+              // onDownload={onDownloadRight}
+              controlPanel={controlPanel}
+              showDownloadButton
+              showFullScreenButton
+              minHeight={400}
+              noPadding
+            >
+              <HeatMapLeaflet
+                points={attribPts}
+                legendLabel="Attribution"
+                radius={18}
+                blur={15}
+                maxZoom={18}
+                decimals={5}
+                minIntensity={0.35}
+                gamma={0.5}
+              />
+            </ResponsiveCardTable>
+          {/* </div> */}
         </Grid>
       </Grid>
     </Box>
