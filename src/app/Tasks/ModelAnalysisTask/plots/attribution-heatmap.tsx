@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Grid, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Box, Grid, FormControl, InputLabel, MenuItem, Select, Typography, Slider, createTheme } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useParams } from 'react-router-dom';
@@ -8,6 +8,8 @@ import rawFixture from '../../../../shared/data/segmentation.json';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import type { IPlotModel, ITableContents } from '../../../../shared/models/plotmodel.model';
 import { fetchModelAnalysisExplainabilityPlot } from '../../../../store/slices/explainabilitySlice';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import { ThemeProvider } from '@emotion/react';
 
 import HeatMapLeaflet from '../../../../shared/components/HeatMapLeaflet';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
@@ -18,6 +20,17 @@ const USE_FIXTURE = true;
 const USE_API = false;
 
 const numeric = (v: unknown): number => (typeof v === 'number' ? v : Number(v));
+
+  const theme = createTheme({
+    palette: {
+      primary: { main: '#1976d2' },
+      secondary: { main: '#dc004e' },
+    },
+    typography: {
+      fontFamily: 'Arial',
+      h6: { fontWeight: 600 },
+    },
+  });
 
 function adaptFixtureToPlotModel(json: any): IPlotModel {
   return {
@@ -145,6 +158,7 @@ const AttributionHeatmaps: React.FC = () => {
       setSelectedTime(timeOptions[0]);
     }
   }, [timeOptions, selectedTime]);
+  const [radius, setRadius] = useState<number>(18);
 
   // map points (lat=y, lon=x)
   const featurePts = useMemo(
@@ -190,6 +204,24 @@ const AttributionHeatmaps: React.FC = () => {
           }
         </Select>
       </FormControl>
+      <FormControl fullWidth disabled={!timeOptions.length || (!!plotSlice?.loading && USE_API)}>
+        <ThemeProvider theme={theme}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <TrackChangesIcon fontSize="small" />
+            <Typography gutterBottom>Radius</Typography>
+          </Box>
+          <Slider
+            value={radius}
+            onChange={(e, newValue) =>
+              setRadius(newValue as number)
+            }
+            valueLabelDisplay="auto"
+            min={10}
+            step={1}
+            max={50}
+          />
+          </ThemeProvider>
+      </FormControl>
     </Box>
   );
 
@@ -231,7 +263,7 @@ const AttributionHeatmaps: React.FC = () => {
               <HeatMapLeaflet
                 points={featurePts}
                 legendLabel={selectedFeature}
-                radius={18}
+                radius={radius}
                 blur={15}
                 maxZoom={18}
                 decimals={5}
@@ -258,7 +290,7 @@ const AttributionHeatmaps: React.FC = () => {
               <HeatMapLeaflet
                 points={attribPts}
                 legendLabel={selectedFeature}
-                radius={18}
+                radius={radius}
                 blur={15}
                 maxZoom={18}
                 decimals={5}
