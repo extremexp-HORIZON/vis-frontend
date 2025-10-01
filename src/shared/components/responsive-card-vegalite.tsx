@@ -426,6 +426,11 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       window.removeEventListener('click', onWindowClick);
       rootObserver.disconnect();
       if (raf != null) cancelAnimationFrame(raf);
+    
+      closePinned();
+    
+      document.querySelectorAll<HTMLDivElement>('.vega-tooltip-pinned')
+        .forEach(el => el.remove());
     };
   }, []);
 
