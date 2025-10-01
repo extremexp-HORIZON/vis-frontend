@@ -230,7 +230,7 @@ const AttributionHeatmaps: React.FC = () => {
             >
               <HeatMapLeaflet
                 points={featurePts}
-                legendLabel="Feature"
+                legendLabel={selectedFeature}
                 radius={18}
                 blur={15}
                 maxZoom={18}
@@ -257,7 +257,7 @@ const AttributionHeatmaps: React.FC = () => {
             >
               <HeatMapLeaflet
                 points={attribPts}
-                legendLabel="Attribution"
+                legendLabel={selectedFeature}
                 radius={18}
                 blur={15}
                 maxZoom={18}
