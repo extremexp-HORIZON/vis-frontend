@@ -8,6 +8,9 @@ interface predictionState {
   results: Record<string, IPredictionResult[]>;
   timestamps: Record<string, string>;
   intervals: Record<string, number>;
+  // Timeline control state
+  selectedTimeIndex: number; // 0-based index for 10-min intervals
+  selectedHeight: number | null; // selected height value (10, 20, 30, etc.)
 }
 
 const initialState: predictionState = {
@@ -16,6 +19,8 @@ const initialState: predictionState = {
   results: {},
   timestamps: {},
   intervals: {},
+  selectedTimeIndex: 0,
+  selectedHeight: null,
 };
 
 export const predictionSlice = createSlice({
@@ -58,6 +63,12 @@ export const predictionSlice = createSlice({
     removeIntervals: (state, action: PayloadAction<string>) => {
       delete state.intervals[action.payload];
     },
+    setSelectedTimeIndex: (state, action: PayloadAction<number>) => {
+      state.selectedTimeIndex = action.payload;
+    },
+    setSelectedHeight: (state, action: PayloadAction<number | null>) => {
+      state.selectedHeight = action.payload;
+    },
     resetPredictionState: () => {
       return initialState;
     },
@@ -74,5 +85,7 @@ export const {
   removeZoneId,
   addIntervals,
   removeIntervals,
+  setSelectedTimeIndex,
+  setSelectedHeight,
   resetPredictionState,
 } = predictionSlice.actions;

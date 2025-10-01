@@ -48,8 +48,12 @@ export const Zones = ({ dataset }: IZonesProps) => {
   const { modalOpen, zone, zones, loading, error } = useAppSelector(
     (state: RootState) => state.zone,
   );
-  const { zoneIds: predictionZoneIds, results: predictionResults, intervals, predictionDisplay } =
-    useAppSelector((state: RootState) => state.prediction);
+  const {
+    zoneIds: predictionZoneIds,
+    results: predictionResults,
+    intervals,
+    predictionDisplay,
+  } = useAppSelector((state: RootState) => state.prediction);
   const { mapLayer } = useAppSelector((state: RootState) => state.map);
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
@@ -168,12 +172,14 @@ export const Zones = ({ dataset }: IZonesProps) => {
                 Export All
               </Button>
             </Tooltip>
-            {predictionDisplay && (
-              <Tooltip title="Exit Prediction Display" placement="top">
+            {predictionZoneIds.length > 0 && (
+              <Tooltip title="Toggle Prediction Display" placement="top">
                 <IconButton
                   edge="end"
                   color="inherit"
-                  onClick={() => dispatch(setPredictionDisplay(false))}
+                  onClick={() =>
+                    dispatch(setPredictionDisplay(!predictionDisplay))
+                  }
                 >
                   <DatasetIcon />
                 </IconButton>

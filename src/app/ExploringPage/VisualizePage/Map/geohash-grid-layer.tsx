@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import ngeohash from 'ngeohash';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
+import type { IPredictionResult } from '../../../../shared/models/exploring/prediction-result.model';
 import {
   generateRsrpColor,
   MAX_ZOOM,
@@ -131,15 +132,8 @@ export interface GeohashGridLayerProps {
   dataset: IDataset;
   selectedGeohash: string | null;
   setSelectedGeohash: (geohash: string | null) => void;
-  predictionData: Record<
-    string, // geohash
-    {
-      rsrpSum: number;
-      rsrpCount: number;
-      heights: number[];
-      timestamp: string | null;
-    }
-  >;
+  predictionData: IPredictionResult[];
+  predictionDisplay: boolean;
 }
 
 export const GeohashGridLayer = ({
@@ -148,11 +142,16 @@ export const GeohashGridLayer = ({
   selectedGeohash,
   setSelectedGeohash,
   predictionData,
+  predictionDisplay,
 }: GeohashGridLayerProps) => {
   const map = useMap();
   const navigate = useNavigate();
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
-  const predictedGeohashes = Object.keys(predictionData);
+  const predictedGeohashes = useMemo(
+    () => [...new Set(predictionData.map(p => p.geohash))],
+    [predictionData],
+  );
+  const hasInitializedPredictionGeohash = useRef(false);
 
   // Zoom to selected geohash when it changes
   useEffect(() => {
@@ -173,6 +172,31 @@ export const GeohashGridLayer = ({
       }
     }
   }, [selectedGeohash, map]);
+
+  // Auto-select first predicted geohash when entering prediction mode
+  useEffect(() => {
+    if (predictionDisplay && predictedGeohashes.length > 0) {
+      // Check if we need to initialize or update the selection
+      if (!selectedGeohash || !predictedGeohashes.includes(selectedGeohash)) {
+        if (!hasInitializedPredictionGeohash.current) {
+          const firstPredicted = predictedGeohashes[0];
+
+          setSelectedGeohash(firstPredicted);
+          navigate(`?geohash=${firstPredicted}`);
+          hasInitializedPredictionGeohash.current = true;
+        }
+      }
+    } else {
+      // Reset flag when exiting prediction mode
+      hasInitializedPredictionGeohash.current = false;
+    }
+  }, [
+    predictionDisplay,
+    predictedGeohashes,
+    selectedGeohash,
+    setSelectedGeohash,
+    navigate,
+  ]);
 
   // Handle rectangle click - navigate to child geohash
   function handleRectClick(geohash: string): void {
@@ -196,37 +220,44 @@ export const GeohashGridLayer = ({
 
       let gridItems: {
         geohash: string;
-        level: 'context' | 'siblings' | 'children';
+        level: 'context' | 'siblings' | 'children' | 'prediction';
       }[] = [];
 
-      if (selectedGeohash) {
-        // Use hierarchical grid approach
-        gridItems = getHierarchicalGrid(selectedGeohash);
+      if (predictionDisplay && predictedGeohashes.length > 0) {
+        // ===== PREDICTION MODE =====
+        // Show ONLY the geohashes with prediction data (all length 8)
+        gridItems = predictedGeohashes.map(geohash => ({
+          geohash: geohash,
+          level: 'prediction', // New level type for predictions
+        }));
       } else {
-        // Initialize with a default geohash based on map center
-        const center = map.getCenter();
-        const zoom = map.getZoom();
-        const precision = getGeohashPrecision(zoom);
-        const defaultGeohash = ngeohash.encode(
-          center.lat,
-          center.lng,
-          precision,
-        );
+        if (selectedGeohash) {
+          // Use hierarchical grid approach
+          gridItems = getHierarchicalGrid(selectedGeohash);
+        } else {
+          // Initialize with a default geohash based on map center
+          const center = map.getCenter();
+          const zoom = map.getZoom();
+          const precision = getGeohashPrecision(zoom);
+          const defaultGeohash = ngeohash.encode(
+            center.lat,
+            center.lng,
+            precision,
+          );
 
-        setSelectedGeohash(defaultGeohash);
-        navigate(`?geohash=${defaultGeohash}`);
+          setSelectedGeohash(defaultGeohash);
+          navigate(`?geohash=${defaultGeohash}`);
 
-        // Use hierarchical grid with the default geohash
-        gridItems = getHierarchicalGrid(defaultGeohash);
+          // Use hierarchical grid with the default geohash
+          gridItems = getHierarchicalGrid(defaultGeohash);
+        }
       }
 
       gridItems.forEach(item => {
         const { geohash: hash, level } = item;
         const bbox = ngeohash.decode_bbox(hash);
-        const predData =
-          hash.length >= 8 ? predictionData[hash.substring(0, 8)] : null;
+        const predData = predictionData.find(p => p.geohash === hash);
 
-        const ifPredicted = predictedGeohashes.find(geohash => hash.length >= 8 ? geohash === hash.substring(0, 8) : geohash.startsWith(hash));
         // Find points in this bbox
         const cellPoints = points.filter(
           p =>
@@ -250,7 +281,7 @@ export const GeohashGridLayer = ({
         }
 
         // Determine styling based on hierarchical level
-        let borderColor = ifPredicted ? '#ff6b35' : '#3388ff';
+        let borderColor = '#3388ff';
         let borderWeight = 1;
         let opacity = 0.5;
 
@@ -268,6 +299,10 @@ export const GeohashGridLayer = ({
           // borderColor = '#cccccc';
           borderWeight = 1;
           // opacity = 0.1;
+        } else if (level === 'prediction') {
+          borderColor = '#ff6b35';
+          borderWeight = 2;
+          opacity = 0.7;
         }
 
         const fillColor =
@@ -285,28 +320,27 @@ export const GeohashGridLayer = ({
           weight: borderWeight,
           className: 'geohash-rectangle',
           fill: true,
-          fillColor: predData
-            ? generateRsrpColor(dataset, predData.rsrpSum / predData.rsrpCount)
-            : fillColor,
+          fillColor:
+            level === 'prediction' && predData
+              ? generateRsrpColor(dataset, predData.rsrp)
+              : fillColor,
           fillOpacity: opacity,
         });
 
         // Add tooltip
-        if (predData) {
-          const timeToNext =
-            predData.rsrpCount < 6
-              ? `${predData.rsrpCount * 10} mins`
-              : `${Math.floor(predData.rsrpCount / 6)}h${predData.rsrpCount % 6 > 0 ? ` ${(predData.rsrpCount % 6) * 10}m` : ''}`;
+        if (level === 'prediction' && predData) {
+          const timestamp = predData.timestamp
+            ? new Date(predData.timestamp).toLocaleTimeString()
+            : 'N/A';
 
           rect.bindTooltip(
             `
               <div>
                 <div style="font-weight: bold; text-align: center;">Prediction Data</div>
                 <strong>Geohash:</strong> ${hash}<br/>
-                <strong>RSRP:</strong> ${(predData.rsrpSum / predData.rsrpCount)?.toFixed(2) || 'N/A'}<br/>
-                <strong>Heights:</strong> ${predData.heights.slice(0, 6).join(', ')}${predData.heights.length > 6 ? ', ...' : ''}<br/>
-                <strong>Timestamp:</strong> ${new Date(predData.timestamp!).toLocaleTimeString()}<br/>
-                For the next ${timeToNext}
+                <strong>RSRP:</strong> ${predData.rsrp.toFixed(2)} dBm<br/>
+                <strong>Height:</strong> ${predData.height}m<br/>
+                <strong>Time:</strong> ${timestamp}
               </div>
             `,
             {
@@ -338,16 +372,29 @@ export const GeohashGridLayer = ({
         const zoom = Math.min(map.getZoom(), MAX_ZOOM);
         const zoomFactor = Math.pow(1.2, zoom - 10); // Exponential growth with zoom
         const cellSize = Math.min(cellWidthPx, cellHeightPx);
-        const fontSize = Math.max(6, Math.min(36, cellSize * 0.3 * zoomFactor));
+
+        // For prediction mode, use smaller font since we display full geohash (8 chars)
+        let fontSize: number;
+        let iconWidth: number;
+
+        if (level === 'prediction') {
+          // Smaller font for full geohash display
+          fontSize = Math.max(6, Math.min(14, cellSize * 0.12 * zoomFactor));
+          // Wider icon to accommodate 8 characters
+          iconWidth = Math.max(40, Math.min(120, cellWidthPx * 0.9));
+        } else {
+          // Normal font size for single character
+          fontSize = Math.max(6, Math.min(36, cellSize * 0.3 * zoomFactor));
+          iconWidth = Math.max(20, Math.min(80, cellWidthPx * 0.8));
+        }
 
         // Calculate dynamic icon size based on cell size
-        const iconWidth = Math.max(20, Math.min(80, cellWidthPx * 0.8));
         const iconHeight = Math.max(15, Math.min(40, cellHeightPx * 0.6));
 
         const label = L.marker([centerLat, centerLon], {
           icon: L.divIcon({
             className: 'geohash-label',
-            html: `<div style="font-size:${fontSize}px;color:#333;text-shadow:0 1px 2px #fff;text-align:center;line-height:${iconHeight}px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">${hash.slice(-1)}</div>`,
+            html: `<div style="font-size:${fontSize}px;color:#333;text-shadow:0 1px 2px #fff;text-align:center;line-height:${iconHeight}px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">${level === 'prediction' ? hash : hash.slice(-1)}</div>`,
             iconSize: [iconWidth, iconHeight],
             iconAnchor: [iconWidth / 2, iconHeight / 2],
           }),
@@ -368,7 +415,14 @@ export const GeohashGridLayer = ({
         layerGroupRef.current = null;
       }
     };
-  }, [map, points, dataset, selectedGeohash, predictionData]); // Only redraw when selectedGeohash changes
+  }, [
+    map,
+    points,
+    dataset,
+    selectedGeohash,
+    predictionData,
+    predictionDisplay,
+  ]); // Only redraw when selectedGeohash changes
 
   return null;
 };

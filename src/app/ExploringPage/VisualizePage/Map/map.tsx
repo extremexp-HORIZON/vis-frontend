@@ -153,9 +153,13 @@ export const Map = (props: IMapProps) => {
   const mapLayer = useAppSelector((state: RootState) => state.map.mapLayer);
   const { clusters, viewRect, zoom, selectedGeohash, drawnRect } =
     useAppSelector((state: RootState) => state.map);
-  const { results, timestamps: predictionTimestamps } = useAppSelector(
-    (state: RootState) => state.prediction,
-  );
+  const {
+    results,
+    timestamps: predictionTimestamps,
+    predictionDisplay,
+    selectedTimeIndex,
+    selectedHeight,
+  } = useAppSelector((state: RootState) => state.prediction);
   const [selectedClusterMarker, setSelectedClusterMarker] = useState<{
     lat: number;
     lng: number;
@@ -204,43 +208,43 @@ export const Map = (props: IMapProps) => {
     );
   };
 
-  const aggregatedPredictionData = useMemo(() => {
+  // Filter prediction data based on timeline selection
+  const filteredPredictionData = useMemo(() => {
+    if (!predictionDisplay || selectedHeight === null) {
+      return [];
+    }
+
     const allResults = Object.values(results).flat();
-    const aggregatedData = allResults.reduce(
-      (acc, current) => {
-        const geohash = current.geohash;
 
-        if (!acc[geohash]) {
-          // Initialize the geohash entry
-          acc[geohash] = {
-            rsrpSum: 0,
-            rsrpCount: 0,
-            heights: [],
-            timestamp: predictionTimestamps[current.zoneId],
-            // ... other fields
-          };
-        }
+    // Get the target timestamp based on selectedTimeIndex
+    const allZoneIds = Object.keys(results);
 
-        // Accumulate the data
-        acc[geohash].rsrpSum += current.rsrp;
-        acc[geohash].rsrpCount += 1;
-        acc[geohash].heights.push(current.height);
+    if (allZoneIds.length === 0) return [];
 
-        return acc;
-      },
-      {} as Record<
-        string, // geohash
-        {
-          rsrpSum: number;
-          rsrpCount: number;
-          heights: number[];
-          timestamp: string | null;
-        }
-      >,
+    const firstZoneId = allZoneIds[0]; // For now, handle single zone
+    const baseTimestamp = predictionTimestamps[firstZoneId];
+
+    if (!baseTimestamp) return [];
+
+    const targetTimestamp = new Date(
+      new Date(baseTimestamp).getTime() + selectedTimeIndex * 10 * 60 * 1000,
+    ).toISOString();
+
+    // Filter results by the selected timestamp AND height
+    const filtered = allResults.filter(
+      result =>
+        result.timestamp === targetTimestamp &&
+        result.height === selectedHeight,
     );
 
-    return aggregatedData;
-  }, [results]);
+    return filtered;
+  }, [
+    results,
+    predictionTimestamps,
+    selectedTimeIndex,
+    selectedHeight,
+    predictionDisplay,
+  ]);
 
   const points = useMemo(() => {
     if (!clusters) return [];
@@ -495,7 +499,8 @@ export const Map = (props: IMapProps) => {
             setSelectedGeohash={(geohash: string | null) =>
               dispatch(setSelectedGeohash(geohash))
             }
-            predictionData={aggregatedPredictionData}
+            predictionData={filteredPredictionData}
+            predictionDisplay={predictionDisplay}
           />
         ) : null}
         <MapSearch />

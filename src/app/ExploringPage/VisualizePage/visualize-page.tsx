@@ -24,6 +24,7 @@ import { resetStatsState } from '../../../store/slices/exploring/statsSlice';
 import { resetTimeSeriesState } from '../../../store/slices/exploring/timeSeriesSlice';
 import { resetZoneState } from '../../../store/slices/exploring/zoneSlice';
 import { resetPredictionState } from '../../../store/slices/exploring/predictionSlice';
+import { PredictionTimeline } from './Map/PredictionTimeline/prediction-timeline';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -105,6 +106,7 @@ const VisualizePage = () => {
       >
         <Stats dataset={dataset} />
       </Box>
+      {predictionDisplay && <PredictionTimeline />}
       {isChartFullscreen ? (
         <Chart
           dataset={dataset}
