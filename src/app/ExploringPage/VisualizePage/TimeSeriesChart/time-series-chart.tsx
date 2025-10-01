@@ -78,7 +78,7 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
     setFrequencyData(getTimeIntervalFromFrequency());
   }, [frequency]);
 
-  return (
+  return data && data.length > 0 && (
     <Card sx={{ p: 2, mt: 1 }}>
       {loading || loadingExecuteQuery ? (
         <Loader />
