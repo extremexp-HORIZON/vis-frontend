@@ -119,7 +119,7 @@ const VisualizePage = () => {
           zIndex={999}
           bottom={0}
           right={0}
-          sx={{ p: 1, width: 1 / 4 }}
+          sx={{ p: 1, minWidth: 311, maxWidth: 1 / 4 }}
         >
           <Chart
             dataset={dataset}
