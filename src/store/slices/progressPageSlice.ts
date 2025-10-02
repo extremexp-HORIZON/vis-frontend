@@ -83,7 +83,7 @@ export const progressPageSlice = createSlice({
     setMenuOptions: (state, action) => {
       state.menuOptions = action.payload;
     },
-    //dummy for now
+    // dummy for now
     setWorkflowsData: (state, action) => {
       state.workflows.data = action.payload;
     }

@@ -414,7 +414,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule, { passive: true });
-    //Disabled for now
+    // Disabled for now
     window.addEventListener('click', onWindowClick); // bubble phase
 
     schedule();
@@ -426,9 +426,9 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       window.removeEventListener('click', onWindowClick);
       rootObserver.disconnect();
       if (raf != null) cancelAnimationFrame(raf);
-    
+
       closePinned();
-    
+
       document.querySelectorAll<HTMLDivElement>('.vega-tooltip-pinned')
         .forEach(el => el.remove());
     };

@@ -21,16 +21,16 @@ const USE_API = false;
 
 const numeric = (v: unknown): number => (typeof v === 'number' ? v : Number(v));
 
-  const theme = createTheme({
-    palette: {
-      primary: { main: '#1976d2' },
-      secondary: { main: '#dc004e' },
-    },
-    typography: {
-      fontFamily: 'Arial',
-      h6: { fontWeight: 600 },
-    },
-  });
+const theme = createTheme({
+  palette: {
+    primary: { main: '#1976d2' },
+    secondary: { main: '#dc004e' },
+  },
+  typography: {
+    fontFamily: 'Arial',
+    h6: { fontWeight: 600 },
+  },
+});
 
 function adaptFixtureToPlotModel(json: any): IPlotModel {
   return {
@@ -66,6 +66,7 @@ const distinctTimes = (table?: ITableContents) => {
   if (!table?.time?.values) return [];
   const uniq = Array.from(new Set(table.time.values.map(v => String(v))));
   const allNumeric = uniq.every(u => !Number.isNaN(Number(u)));
+
   return uniq.sort((a, b) => (allNumeric ? Number(a) - Number(b) : a.localeCompare(b)));
 };
 
@@ -81,14 +82,18 @@ const makeHeatmapValues = (
   const vs = table[feature].values;
   const N = Math.min(xs.length, ys.length, ts.length, vs.length);
   const out: HeatPoint[] = [];
+
   for (let i = 0; i < N; i++) {
     const t = ts[i] as string | number;
+
     if (timeValue != null && String(t) !== String(timeValue)) continue;
     const x = numeric(xs[i]);
     const y = numeric(ys[i]);
     const v = numeric(vs[i]);
+
     if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(v)) out.push({ x, y, time: t, value: v });
   }
+
   return out;
 };
 
@@ -130,7 +135,7 @@ const AttributionHeatmaps: React.FC = () => {
   const plotModel: IPlotModel | null =
     USE_FIXTURE ? fixtureModel : (plotSlice?.data ?? null);
 
-  //handlers for redux instead of state
+  // handlers for redux instead of state
   // const handleFeatureChange = (val: string) => {
   //   setSelectedFeature(val);
   //   dispatch(setSelectedFeature({ plotType: 'segmentation', feature: val }));
@@ -141,10 +146,10 @@ const AttributionHeatmaps: React.FC = () => {
   //   dispatch(setSelectedTime({ plotType: 'segmentation', time: val }));
   // };
 
-
   // selections for now state
   const featureOptions = useMemo(() => featureCandidates(plotModel), [plotModel]);
   const [selectedFeature, setSelectedFeature] = useState<string>(featureOptions[0] || '');
+
   useEffect(() => {
     if (featureOptions.length && !selectedFeature) setSelectedFeature(featureOptions[0]);
   }, [featureOptions, selectedFeature]);
@@ -153,6 +158,7 @@ const AttributionHeatmaps: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     timeOptions.length ? timeOptions[0] : undefined
   );
+
   useEffect(() => {
     if (timeOptions.length && (!selectedTime || !timeOptions.includes(String(selectedTime)))) {
       setSelectedTime(timeOptions[0]);
@@ -220,7 +226,7 @@ const AttributionHeatmaps: React.FC = () => {
             step={1}
             max={50}
           />
-          </ThemeProvider>
+        </ThemeProvider>
       </FormControl>
     </Box>
   );
@@ -250,54 +256,54 @@ const AttributionHeatmaps: React.FC = () => {
         {/* Feature (controlPanel passed here) */}
         <Grid item xs={12} md={6}>
           {/* <div ref={leftCardRef}> */}
-            <ResponsiveCardTable
-              title="Feature"
-              details={plotModel?.plotDescr || null}
-              controlPanel={controlPanel}
-              // onDownload={onDownloadLeft}
-              showDownloadButton
-              showFullScreenButton
-              minHeight={400}
-              noPadding
-            >
-              <HeatMapLeaflet
-                points={featurePts}
-                legendLabel={selectedFeature}
-                radius={radius}
-                blur={15}
-                maxZoom={18}
-                decimals={5}
-                minIntensity={0.35}
-                gamma={0.5}
-              />
-            </ResponsiveCardTable>
+          <ResponsiveCardTable
+            title="Feature"
+            details={plotModel?.plotDescr || null}
+            controlPanel={controlPanel}
+            // onDownload={onDownloadLeft}
+            showDownloadButton
+            showFullScreenButton
+            minHeight={400}
+            noPadding
+          >
+            <HeatMapLeaflet
+              points={featurePts}
+              legendLabel={selectedFeature}
+              radius={radius}
+              blur={15}
+              maxZoom={18}
+              decimals={5}
+              minIntensity={0.35}
+              gamma={0.5}
+            />
+          </ResponsiveCardTable>
           {/* </div> */}
         </Grid>
 
         {/* Attribution (no duplicate control panel) */}
         <Grid item xs={12} md={6}>
           {/* <div ref={rightCardRef}> */}
-            <ResponsiveCardTable
-              title="Attribution"
-              details={plotModel?.plotDescr || null}
-              // onDownload={onDownloadRight}
-              controlPanel={controlPanel}
-              showDownloadButton
-              showFullScreenButton
-              minHeight={400}
-              noPadding
-            >
-              <HeatMapLeaflet
-                points={attribPts}
-                legendLabel={selectedFeature}
-                radius={radius}
-                blur={15}
-                maxZoom={18}
-                decimals={5}
-                minIntensity={0.35}
-                gamma={0.5}
-              />
-            </ResponsiveCardTable>
+          <ResponsiveCardTable
+            title="Attribution"
+            details={plotModel?.plotDescr || null}
+            // onDownload={onDownloadRight}
+            controlPanel={controlPanel}
+            showDownloadButton
+            showFullScreenButton
+            minHeight={400}
+            noPadding
+          >
+            <HeatMapLeaflet
+              points={attribPts}
+              legendLabel={selectedFeature}
+              radius={radius}
+              blur={15}
+              maxZoom={18}
+              decimals={5}
+              minIntensity={0.35}
+              gamma={0.5}
+            />
+          </ResponsiveCardTable>
           {/* </div> */}
         </Grid>
       </Grid>

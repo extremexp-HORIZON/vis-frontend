@@ -95,6 +95,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
         }
         if ('selectedTime' in section && !section.selectedTime) {
           const times = action.payload.features_table?.time?.values ?? action.payload.attributions_table?.time?.values ?? [];
+
           section.selectedTime = times.length ? String(times[0]) : null;
         }
         assignResult(section, action.payload);
@@ -193,6 +194,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
       if (task && plotType !== 'featureNames' && plotType in task) {
         const section = task[plotType];
+
         if ('selectedTime' in section) {
           section.selectedTime = time;
         }

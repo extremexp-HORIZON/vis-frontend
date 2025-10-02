@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
+import type {
+  SelectChangeEvent } from '@mui/material';
 import {
   Button,
   Stack,
@@ -18,7 +20,6 @@ import {
   ListItemText,
   TextField,
   FormControl,
-  SelectChangeEvent,
   InputLabel,
   Select,
   MenuItem,
@@ -47,7 +48,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import AddIcon from '@mui/icons-material/Add';
 import CreateIcon from '@mui/icons-material/Create';
-import { IRun } from '../../../../shared/models/experiment/run.model';
+import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
 
 interface ToolBarWorkflowProps {
@@ -99,31 +100,33 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           acc[param.name].add(param.value);
         });
       }
+
       return acc;
     },
     {}
   );
 
-  const [workflowName, setWorkflowName] = useState("");
+  const [workflowName, setWorkflowName] = useState('');
   const [selectedParams, setSelectedParams] = useState<Record<string, string>>({});
 
   const handleParamChange = (paramName: string) => (e: SelectChangeEvent<string>) => {
     const value = e.target.value;
+
     setSelectedParams((prev) => ({ ...prev, [paramName]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = Object.entries(selectedParams)
-      .filter(([, v]) => v !== "" && v !== undefined)
+      .filter(([, v]) => v !== '' && v !== undefined)
       .map(([name, value]) => ({ name, value }));
 
-    //for now create a new dummy scheduled workflow
+    // for now create a new dummy scheduled workflow
     const newRun: IRun = {
       id: workflowName.trim(),
       name: workflowName.trim(),
       experimentId: experiment.data?.id || '',
-      status: "SCHEDULED",
+      status: 'SCHEDULED',
       startTime: undefined,
       endTime: undefined,
       params,
@@ -132,13 +135,13 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
       tags: {},
     };
     const updatedWorkflows = workflows.data.concat(newRun);
+
     dispatch(setWorkflowsData(updatedWorkflows));
 
-    setWorkflowName("");
+    setWorkflowName('');
     setSelectedParams({});
     handleCreateWokrkflowClose();
   };
-
 
   const handleGroupClick = (e: React.MouseEvent<HTMLElement>) =>
     setAnchorElGroup(e.currentTarget);
@@ -304,8 +307,8 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           }}
         >
           <Box sx={{ gap: 0.2, marginLeft: 'auto' }}>
-            {/* <Tooltip title='Create new workflow'> */}
-              {/* <IconButton onClick={handleCreateWorkflowOpen}>
+            {/* <Tooltip title='Create new workflow'>
+              <IconButton onClick={handleCreateWorkflowOpen}>
                 <AddIcon />
               </IconButton>
             </Tooltip> */}
@@ -367,23 +370,23 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               }}
             >
               <SectionHeader icon={<CreateIcon fontSize="small" />} title="Create New Workflow" />
-              
-              <Box 
-                component="form" 
-                onSubmit={handleSubmit} 
+
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
                 sx={{
-                  p: 2, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: 2, 
-                  overflow: 'auto', 
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  overflow: 'auto',
                   maxHeight: 200
                 }}
               >
-                <TextField 
+                <TextField
                   fullWidth
                   size="small"
-                  label="Workflow name"
+                  label="workflow name"
                   value={workflowName}
                   onChange={(e) => setWorkflowName(e.target.value)}
                 />
@@ -391,7 +394,8 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 {Object.entries(uniqueParameters)
                   .map(([paramName, valuesSet]) => {
                     const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
-                    const selected = selectedParams[paramName] ?? "";
+                    const selected = selectedParams[paramName] ?? '';
+
                     return (
                       <FormControl key={paramName} size="small" fullWidth>
                         <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>

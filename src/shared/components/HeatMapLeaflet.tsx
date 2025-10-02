@@ -50,6 +50,7 @@ const createLegendControl = (position: L.ControlPosition = 'topright') => {
 
   (legend as any).onAdd = function () {
     const div = L.DomUtil.create('div', 'leaflet-legend');
+
     div.style.background = 'white';
     div.style.padding = '8px';
     div.style.borderRadius = '8px';
@@ -59,14 +60,17 @@ const createLegendControl = (position: L.ControlPosition = 'topright') => {
       <div class="legend-title" style="font-weight:600"></div>
       <div class="legend-range"></div>
     `;
+
     return div;
   };
 
   (legend as any).update = (label: string, min: number, max: number, decimals = 5) => {
     const container = (legend as any)._container as HTMLElement | undefined;
+
     if (!container) return;
     const title = container.querySelector('.legend-title') as HTMLElement | null;
     const range = container.querySelector('.legend-range') as HTMLElement | null;
+
     if (title) title.textContent = label;
     if (range) range.textContent = `min: ${min.toFixed(decimals)}  |  max: ${max.toFixed(decimals)}`;
   };
@@ -95,6 +99,7 @@ const scaleValuesTo01 = (vals: number[], minI = 0.35, gamma = 0.5) => {
   const scaled = vals.map(v => {
     const t = (v - min) / span;         // 0..1
     const boosted = Math.pow(t, gamma); // gamma < 1 boosts lows
+
     return Math.max(minI, boosted);     // floor for visibility
   });
 
@@ -128,6 +133,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     const { scaled, min, max } = scaleValuesTo01(vals, minIntensity, gamma);
     const heat: [number, number, number][] = points.map((p, i) => [p.lat, p.lon, scaled[i]]);
     const b = points.length ? L.latLngBounds(points.map(p => [p.lat, p.lon] as [number, number])) : null;
+
     return { heatData: heat, vMin: min, vMax: max, bounds: b };
   }, [points, minIntensity, gamma]);
 
@@ -143,8 +149,10 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     // title badge (use class-style control to satisfy TS)
     if (title) {
       const badge = new L.Control({ position: 'topleft' });
+
       (badge as any).onAdd = function () {
         const div = L.DomUtil.create('div', 'leaflet-badge');
+
         div.style.background = 'rgba(255,255,255,0.9)';
         div.style.padding = '4px 8px';
         div.style.borderRadius = '6px';
@@ -152,6 +160,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
         div.style.fontWeight = '600';
         div.style.boxShadow = '0 0 4px rgba(0,0,0,0.15)';
         div.textContent = title!;
+
         return div;
       };
       badge.addTo(mapRef.current);
@@ -169,6 +178,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   // update heat layer + legend + fit bounds when inputs change
   useEffect(() => {
     const m = mapRef.current;
+
     if (!m) return;
 
     // heat
@@ -190,6 +200,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       legendRef.current = null;
     }
     const lg = createLegendControl('topright');
+
     lg.addTo(m);
     lg.update(legendLabel, vMin, vMax, decimals);
     legendRef.current = lg;
