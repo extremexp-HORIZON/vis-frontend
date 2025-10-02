@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import InfoMessage from '../../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import Loader from '../../../../../shared/components/loader';
@@ -10,6 +10,7 @@ import type { IDataAsset } from '../../../../../shared/models/experiment/data-as
 import { Handler } from 'vega-tooltip';
 import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 import type { IRun } from '../../../../../shared/models/experiment/run.model';
+import { fetchDataExplorationData } from '../../../../../store/slices/dataExplorationSlice';
 
 export interface OverlayHistogramProps {
   assetName: string;
@@ -137,50 +138,52 @@ const OverlayHistogram = ({
     }
   }).call;
 
-  useEffect(() => {
-    assets.forEach(({ workflowId, dataAsset }) => {
+  
+useEffect(() => {
+  const pendingFetches = assets
+    .filter(({ workflowId, dataAsset }) => {
       const hist = slices[workflowId];
-      const source = dataAsset?.source || '';
-
-      if (!source) return;
-
+      const source = dataAsset?.source;
       const meta = metas[workflowId];
       const metaReady = Boolean(meta?.data) && !meta?.loading && !meta?.error;
+      const alreadyHasData = Array.isArray(hist?.data?.data) && hist!.data!.data.length > 0;
+      
+      return source && metaReady && !hist?.loading && !alreadyHasData;
+    })
+    .map(({ workflowId, dataAsset }) => ({
+      workflowId,
+      query: {
+        dataSource: {
+          source: dataAsset.source,
+          format: dataAsset?.format || '',
+          sourceType: dataAsset?.sourceType || '',
+          fileName: dataAsset?.name || '',
+          runId: workflowId || ''
+        },
+        groupBy: [columnName],
+        aggregations: [agg],
+        filters: [],
+        columns: [columnName],
+      }
+    }));
 
-      if (!metaReady) return;
-
-      const alreadyHasData =
-        Array.isArray(hist?.data?.data) && hist!.data!.data.length > 0;
-
-      if (hist?.loading || alreadyHasData) return;
-
-      dispatch(
-        fetchComparisonData({
-          query: {
-            dataSource: {
-              source,
-              format: dataAsset?.format || '',
-              sourceType: dataAsset?.sourceType || '',
-              fileName: dataAsset?.name || '',
-              runId: workflowId || ''
-            },
-            groupBy: [columnName],
-            aggregations: [agg],
-            filters: [],
-            columns: [columnName],
-            // limit: 1,
-          },
+  if (pendingFetches.length > 0) {
+    // Dispatch all fetches at once
+    Promise.all(
+      pendingFetches.map(({ workflowId, query }) =>
+        dispatch(fetchComparisonData({
+          query,
           metadata: {
             workflowId,
             queryCase: 'barChart',
             assetName,
             columnName,
           },
-        })
-      );
-    });
-  }, [assetName, columnName, assets, metas, slices]);
-
+        }))
+      )
+    );
+  }
+}, [assetName, columnName, assets, metas, slices]);
   const norm = (s: string) => (s || '').replace(/-/g, '_');
 
   const {

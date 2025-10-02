@@ -304,11 +304,11 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           }}
         >
           <Box sx={{ gap: 0.2, marginLeft: 'auto' }}>
-            {/* <Tooltip title='Create new workflow'> */}
-              {/* <IconButton onClick={handleCreateWorkflowOpen}>
+             {/* <Tooltip title='Create new workflow'> 
+               <IconButton onClick={handleCreateWorkflowOpen}>
                 <AddIcon />
               </IconButton>
-            </Tooltip> */}
+            </Tooltip>  */}
             {showSpaceButton && (
               <Tooltip title="Spaces">
                 <IconButton onClick={handleSpaceOptionsOpen}>
