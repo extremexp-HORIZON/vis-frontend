@@ -158,6 +158,7 @@ export const Map = (props: IMapProps) => {
     predictionDisplay,
     selectedTimeIndex,
     selectedHeight,
+    selectedZoneId,
   } = useAppSelector((state: RootState) => state.prediction);
 
   const [selectedClusterMarker, setSelectedClusterMarker] = useState<{
@@ -210,17 +211,17 @@ export const Map = (props: IMapProps) => {
 
   // Filter prediction data based on timeline selection
   const filteredPredictionData = useMemo(() => {
-    if (!predictionDisplay || selectedHeight === null) {
+    if (!predictionDisplay || selectedHeight === null || !selectedZoneId) {
       return [];
     }
 
-    const allResults = Object.values(results).flat();
+    const zoneResults = results[selectedZoneId];
 
-    if (allResults.length === 0) return [];
+    if (!zoneResults || zoneResults.length === 0) return [];
 
-    // Get all unique timestamps from prediction data and sort them
+    // Get unique timestamps from selected zone's prediction data and sort them
     const uniqueTimestamps = [
-      ...new Set(allResults.map(result => result.timestamp)),
+      ...new Set(zoneResults.map(result => result.timestamp)),
     ];
     const sortedTimestamps = uniqueTimestamps.sort(
       (a, b) => new Date(a).getTime() - new Date(b).getTime(),
@@ -232,14 +233,20 @@ export const Map = (props: IMapProps) => {
     if (!targetTimestamp) return [];
 
     // Filter results by the selected timestamp and height
-    const filtered = allResults.filter(
+    const filtered = zoneResults.filter(
       result =>
         result.timestamp === targetTimestamp &&
         result.height === selectedHeight,
     );
 
     return filtered;
-  }, [results, selectedTimeIndex, selectedHeight, predictionDisplay]);
+  }, [
+    results,
+    selectedTimeIndex,
+    selectedHeight,
+    selectedZoneId,
+    predictionDisplay,
+  ]);
 
   const points = useMemo(() => {
     if (!clusters) return [];
@@ -294,43 +301,45 @@ export const Map = (props: IMapProps) => {
         />
         <ZoomControl position="topright" />
         <MapControl id={id} />
-        {!predictionDisplay && <ToggleButtonGroup
-          exclusive
-          value={mapLayer}
-          orientation="vertical"
-          onChange={(_, value) => value && toggleMapLayer(value)}
-          sx={{
-            position: 'absolute',
-            top: drawnRect == null ? 120 : 200,
-            right: 10,
-            zIndex: 1000,
-            backgroundColor: 'white',
-            border: '2px solid rgba(0,0,0,0.2)',
-            borderRadius: 2,
-          }}
-        >
-          <Tooltip title="Points" placement="left" arrow>
-            <ToggleButton value="cluster" sx={{ width: 30, height: 30 }}>
-              <ClusterIcon />
-            </ToggleButton>
-          </Tooltip>
-          <Tooltip title="Heatmap" placement="left" arrow>
-            <ToggleButton value="heatmap" sx={{ width: 30, height: 30 }}>
-              <HeatmapIcon />
-            </ToggleButton>
-          </Tooltip>
-          <Tooltip title="Geohash" placement="left" arrow>
-            <span>
-              <ToggleButton
-                value="geohash"
-                sx={{ width: 30, height: 30 }}
-                disabled={drawnRect != null}
-              >
-                <GeohashIcon />
+        {!predictionDisplay && (
+          <ToggleButtonGroup
+            exclusive
+            value={mapLayer}
+            orientation="vertical"
+            onChange={(_, value) => value && toggleMapLayer(value)}
+            sx={{
+              position: 'absolute',
+              top: drawnRect == null ? 120 : 200,
+              right: 10,
+              zIndex: 1000,
+              backgroundColor: 'white',
+              border: '2px solid rgba(0,0,0,0.2)',
+              borderRadius: 2,
+            }}
+          >
+            <Tooltip title="Points" placement="left" arrow>
+              <ToggleButton value="cluster" sx={{ width: 30, height: 30 }}>
+                <ClusterIcon />
               </ToggleButton>
-            </span>
-          </Tooltip>
-        </ToggleButtonGroup>}
+            </Tooltip>
+            <Tooltip title="Heatmap" placement="left" arrow>
+              <ToggleButton value="heatmap" sx={{ width: 30, height: 30 }}>
+                <HeatmapIcon />
+              </ToggleButton>
+            </Tooltip>
+            <Tooltip title="Geohash" placement="left" arrow>
+              <span>
+                <ToggleButton
+                  value="geohash"
+                  sx={{ width: 30, height: 30 }}
+                  disabled={drawnRect != null}
+                >
+                  <GeohashIcon />
+                </ToggleButton>
+              </span>
+            </Tooltip>
+          </ToggleButtonGroup>
+        )}
         {mapLayer === 'cluster' ? (
           clusters.map((cluster, index) => {
             // every cluster point has coordinates

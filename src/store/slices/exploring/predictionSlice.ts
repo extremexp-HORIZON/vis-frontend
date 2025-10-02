@@ -11,6 +11,7 @@ interface predictionState {
   // Timeline control state
   selectedTimeIndex: number; // 0-based index for 10-min intervals
   selectedHeight: number | null; // selected height value (10, 20, 30, etc.)
+  selectedZoneId: string | null; // selected zone for timeline display
 }
 
 const initialState: predictionState = {
@@ -21,6 +22,7 @@ const initialState: predictionState = {
   intervals: {},
   selectedTimeIndex: 0,
   selectedHeight: null,
+  selectedZoneId: null,
 };
 
 export const predictionSlice = createSlice({
@@ -69,6 +71,9 @@ export const predictionSlice = createSlice({
     setSelectedHeight: (state, action: PayloadAction<number | null>) => {
       state.selectedHeight = action.payload;
     },
+    setSelectedZoneId: (state, action: PayloadAction<string | null>) => {
+      state.selectedZoneId = action.payload;
+    },
     resetPredictionState: () => {
       return initialState;
     },
@@ -87,5 +92,6 @@ export const {
   removeIntervals,
   setSelectedTimeIndex,
   setSelectedHeight,
+  setSelectedZoneId,
   resetPredictionState,
 } = predictionSlice.actions;

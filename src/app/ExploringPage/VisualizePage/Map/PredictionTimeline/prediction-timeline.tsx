@@ -8,6 +8,11 @@ import {
   Paper,
   ThemeProvider,
   createTheme,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  type SelectChangeEvent,
 } from '@mui/material';
 import {
   type RootState,
@@ -17,6 +22,7 @@ import {
 import {
   setSelectedTimeIndex,
   setSelectedHeight,
+  setSelectedZoneId,
 } from '../../../../../store/slices/exploring/predictionSlice';
 
 export const PredictionTimeline = () => {
@@ -25,6 +31,7 @@ export const PredictionTimeline = () => {
     results,
     selectedTimeIndex,
     selectedHeight,
+    selectedZoneId,
     predictionDisplay,
   } = useAppSelector((state: RootState) => state.prediction);
 
@@ -48,15 +55,17 @@ export const PredictionTimeline = () => {
     return Array.from(heights).sort((a, b) => a - b);
   }, [results]);
 
-  // Calculate available time slots based on actual prediction data timestamps
+  // Calculate available time slots based on selected zone's prediction data
   const timeSlots = useMemo(() => {
-    const allResults = Object.values(results).flat();
+    if (!selectedZoneId || !results[selectedZoneId]) return [];
 
-    if (allResults.length === 0) return [];
+    const zoneResults = results[selectedZoneId];
 
-    // Extract all unique timestamps from the actual prediction data
+    if (zoneResults.length === 0) return [];
+
+    // Extract unique timestamps from the selected zone's prediction data
     const uniqueTimestamps = [
-      ...new Set(allResults.map(result => result.timestamp)),
+      ...new Set(zoneResults.map(result => result.timestamp)),
     ];
 
     // Sort timestamps chronologically
@@ -65,7 +74,22 @@ export const PredictionTimeline = () => {
     );
 
     return sortedTimestamps;
+  }, [results, selectedZoneId]);
+
+  // Get available zones
+  const availableZones = useMemo(() => {
+    return Object.keys(results).map(zoneId => ({
+      id: zoneId,
+      name: `Zone ${zoneId.slice(-8)}`, // Show last 8 characters of zone ID
+    }));
   }, [results]);
+
+  // Initialize selected zone when data becomes available
+  useEffect(() => {
+    if (availableZones.length > 0 && !selectedZoneId) {
+      dispatch(setSelectedZoneId(availableZones[0].id));
+    }
+  }, [availableZones, selectedZoneId, dispatch]);
 
   // Initialize selected height when data becomes available
   useEffect(() => {
@@ -87,6 +111,15 @@ export const PredictionTimeline = () => {
     if (newHeight !== null) {
       dispatch(setSelectedHeight(newHeight));
     }
+  };
+
+  // Handle zone selection change
+  const handleZoneChange = (event: SelectChangeEvent<string>) => {
+    const newZoneId = event.target.value;
+
+    dispatch(setSelectedZoneId(newZoneId));
+    // Reset time index when changing zones
+    dispatch(setSelectedTimeIndex(0));
   };
 
   // Format timestamp for display
@@ -116,6 +149,7 @@ export const PredictionTimeline = () => {
   // Don't render if not in prediction display mode or no data
   if (
     !predictionDisplay ||
+    availableZones.length === 0 ||
     timeSlots.length === 0 ||
     availableHeights.length === 0
   ) {
@@ -139,6 +173,31 @@ export const PredictionTimeline = () => {
         maxWidth: 800,
       }}
     >
+      {/* Zone Selector */}
+      {availableZones.length > 1 && <Box sx={{ mb: 2 }}>
+        <Typography
+          variant="caption"
+          textAlign="center"
+          sx={{ fontWeight: 'bold', mb: 0.5, display: 'block' }}
+        >
+          Zone
+        </Typography>
+        <FormControl fullWidth size="small">
+          <InputLabel>Select Zone</InputLabel>
+          <Select
+            value={selectedZoneId || ''}
+            onChange={handleZoneChange}
+            label="Select Zone"
+          >
+            {availableZones.map(zone => (
+              <MenuItem key={zone.id} value={zone.id}>
+                {zone.id}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>}
+
       {/* Height Selector */}
       <Box sx={{ mb: 2 }}>
         <Typography
@@ -212,8 +271,8 @@ export const PredictionTimeline = () => {
             {selectedTimeIndex + 1} / {timeSlots.length}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {Object.keys(results).length} zone
-            {Object.keys(results).length !== 1 ? 's' : ''}
+            {availableZones.length} zone{availableZones.length !== 1 ? 's' : ''}{' '}
+            available
           </Typography>
         </Box>
       </Box>

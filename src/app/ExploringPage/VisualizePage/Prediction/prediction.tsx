@@ -24,6 +24,8 @@ import {
   addZoneId,
   addIntervals,
   setPredictionDisplay,
+  setSelectedZoneId,
+  setSelectedTimeIndex,
 } from '../../../../store/slices/exploring/predictionSlice';
 import {
   type RootState,
@@ -94,8 +96,15 @@ export const Prediction = ({ zone }: IPredictionProps) => {
       dispatch(setDrawnRect({ id: dataset.id, bounds: null }));
     }
 
-    if (predictionResults.length > 0 && !predictionDisplay) {
-      dispatch(setPredictionDisplay(true));
+    if (predictionResults.length > 0) {
+      // Set this zone as the selected zone for timeline display
+      if (zone.id) {
+        dispatch(setSelectedZoneId(zone.id));
+        dispatch(setSelectedTimeIndex(0));
+      }
+      if (!predictionDisplay) {
+        dispatch(setPredictionDisplay(true));
+      }
     }
   };
 
