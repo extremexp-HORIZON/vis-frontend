@@ -1,7 +1,7 @@
 import './visualize.css';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import {
   type RootState,
   useAppDispatch,
@@ -23,8 +23,9 @@ import { resetMapState } from '../../../store/slices/exploring/mapSlice';
 import { resetStatsState } from '../../../store/slices/exploring/statsSlice';
 import { resetTimeSeriesState } from '../../../store/slices/exploring/timeSeriesSlice';
 import { resetZoneState } from '../../../store/slices/exploring/zoneSlice';
-import { resetPredictionState } from '../../../store/slices/exploring/predictionSlice';
+import { resetPredictionState, setPredictionDisplay } from '../../../store/slices/exploring/predictionSlice';
 import { PredictionTimeline } from './Map/PredictionTimeline/prediction-timeline';
+import CloseIcon from '@mui/icons-material/Close';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -81,13 +82,25 @@ const VisualizePage = () => {
   return (
     <>
       {predictionDisplay && (
-        <Typography
-          variant="h6"
-          textAlign="center"
-          sx={{ backgroundColor: 'secondary.main' }}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'secondary.main',
+            position: 'relative',
+          }}
         >
-          Prediction Display
-        </Typography>
+          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <Typography variant="h6" textAlign="center">
+              Prediction Display
+            </Typography>
+          </Box>
+          <Box sx={{ position: 'absolute', right: 16 }}>
+            <Button onClick={() => dispatch(setPredictionDisplay(false))}>
+              <CloseIcon />
+            </Button>
+          </Box>
+        </Box>
       )}
       <Box
         position="absolute"
