@@ -21,6 +21,7 @@ import {
   Visibility as VisibilityIcon,
   Download as DownloadIcon,
   Dataset as DatasetIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
@@ -37,7 +38,10 @@ import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import { Prediction } from '../Prediction/prediction';
 import { type RootState } from '../../../../store/store';
 import { exportAllZonesToJSON } from '../../../../shared/utils/exportUtils';
-import { setPredictionDisplay } from '../../../../store/slices/exploring/predictionSlice';
+import {
+  setPredictionDisplay,
+  resetPredictionState,
+} from '../../../../store/slices/exploring/predictionSlice';
 import { setMapLayer } from '../../../../store/slices/exploring/mapSlice';
 
 export interface IZonesProps {
@@ -118,6 +122,10 @@ export const Zones = ({ dataset }: IZonesProps) => {
     exportAllZonesToJSON(zones, predictionResults, intervals);
   };
 
+  const handleRemovePredictions = () => {
+    dispatch(resetPredictionState());
+  };
+
   return (
     <>
       {/* Zones Button */}
@@ -172,6 +180,19 @@ export const Zones = ({ dataset }: IZonesProps) => {
                 Export All
               </Button>
             </Tooltip>
+            {Object.keys(predictionResults).length > 0 && (
+              <Tooltip title="Remove All Predictions" placement="top">
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<ClearIcon />}
+                  onClick={handleRemovePredictions}
+                  color="error"
+                >
+                  Remove Predictions
+                </Button>
+              </Tooltip>
+            )}
             {predictionZoneIds.length > 0 && (
               <Tooltip title="Toggle Prediction Display" placement="top">
                 <IconButton

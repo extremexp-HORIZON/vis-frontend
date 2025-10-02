@@ -32,6 +32,7 @@ import {
 } from '../../../../store/store';
 import { setModalOpen as setZoneModalOpen } from '../../../../store/slices/exploring/zoneSlice';
 import { exportZoneToJSON } from '../../../../shared/utils/exportUtils';
+import { setDrawnRect } from '../../../../store/slices/exploring/mapSlice';
 
 export interface IPredictionProps {
   zone: IZone;
@@ -70,13 +71,13 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
   );
+  const { dataset } = useAppSelector((state: RootState) => state.dataset);
   const dispatch = useAppDispatch();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     setIsLoading(false);
-    setPredictionResults([]);
     setError(null);
   };
 
@@ -87,6 +88,12 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const handleView = () => {
     setOpen(false);
     dispatch(setZoneModalOpen(false));
+
+    // Clear drawn rectangle for better prediction visibility
+    if (dataset.id) {
+      dispatch(setDrawnRect({ id: dataset.id, bounds: null }));
+    }
+
     if (predictionResults.length > 0 && !predictionDisplay) {
       dispatch(setPredictionDisplay(true));
     }

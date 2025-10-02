@@ -259,27 +259,25 @@ export const GeohashGridLayer = ({
           geohash: geohash,
           level: 'prediction', // New level type for predictions
         }));
+      } else if (selectedGeohash) {
+        // Use hierarchical grid approach
+        gridItems = getHierarchicalGrid(selectedGeohash);
       } else {
-        if (selectedGeohash) {
-          // Use hierarchical grid approach
-          gridItems = getHierarchicalGrid(selectedGeohash);
-        } else {
-          // Initialize with a default geohash based on map center
-          const center = map.getCenter();
-          const zoom = map.getZoom();
-          const precision = getGeohashPrecision(zoom);
-          const defaultGeohash = ngeohash.encode(
-            center.lat,
-            center.lng,
-            precision,
-          );
+        // Initialize with a default geohash based on map center
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        const precision = getGeohashPrecision(zoom);
+        const defaultGeohash = ngeohash.encode(
+          center.lat,
+          center.lng,
+          precision,
+        );
 
-          setSelectedGeohash(defaultGeohash);
-          navigate(`?geohash=${defaultGeohash}`);
+        setSelectedGeohash(defaultGeohash);
+        navigate(`?geohash=${defaultGeohash}`);
 
-          // Use hierarchical grid with the default geohash
-          gridItems = getHierarchicalGrid(defaultGeohash);
-        }
+        // Use hierarchical grid with the default geohash
+        gridItems = getHierarchicalGrid(defaultGeohash);
       }
 
       gridItems.forEach(item => {
@@ -331,7 +329,6 @@ export const GeohashGridLayer = ({
         } else if (level === 'prediction') {
           borderColor = '#ff6b35';
           borderWeight = 2;
-          opacity = 0.7;
         }
 
         const fillColor =

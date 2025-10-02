@@ -23,8 +23,6 @@ export const PredictionTimeline = () => {
   const dispatch = useAppDispatch();
   const {
     results,
-    timestamps,
-    intervals,
     selectedTimeIndex,
     selectedHeight,
     predictionDisplay,
@@ -50,31 +48,24 @@ export const PredictionTimeline = () => {
     return Array.from(heights).sort((a, b) => a - b);
   }, [results]);
 
-  // Calculate available time slots based on intervals
+  // Calculate available time slots based on actual prediction data timestamps
   const timeSlots = useMemo(() => {
-    const allZoneIds = Object.keys(results);
+    const allResults = Object.values(results).flat();
 
-    if (allZoneIds.length === 0) return [];
+    if (allResults.length === 0) return [];
 
-    // For now, use the first zone's data (can be extended for multi-zone)
-    const firstZoneId = allZoneIds[0];
-    const baseTimestamp = timestamps[firstZoneId];
-    const intervalCount = intervals[firstZoneId] || 0;
+    // Extract all unique timestamps from the actual prediction data
+    const uniqueTimestamps = [
+      ...new Set(allResults.map(result => result.timestamp)),
+    ];
 
-    if (!baseTimestamp) return [];
+    // Sort timestamps chronologically
+    const sortedTimestamps = uniqueTimestamps.sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    );
 
-    const slots: string[] = [];
-
-    for (let i = 0; i < intervalCount; i++) {
-      const timestamp = new Date(
-        new Date(baseTimestamp).getTime() + i * 10 * 60 * 1000,
-      ).toISOString();
-
-      slots.push(timestamp);
-    }
-
-    return slots;
-  }, [results, timestamps, intervals]);
+    return sortedTimestamps;
+  }, [results]);
 
   // Initialize selected height when data becomes available
   useEffect(() => {
@@ -182,7 +173,11 @@ export const PredictionTimeline = () => {
             mb: 1,
           }}
         >
-          <Typography variant="caption" textAlign="center" sx={{ fontWeight: 'bold' }}>
+          <Typography
+            variant="caption"
+            textAlign="center"
+            sx={{ fontWeight: 'bold' }}
+          >
             Time
             <Typography
               variant="body2"
@@ -194,25 +189,31 @@ export const PredictionTimeline = () => {
           </Typography>
         </Box>
 
-        {timeSlots.length > 1 && <ThemeProvider theme={sliderTheme}>
-          <Slider
-            value={selectedTimeIndex}
-            min={0}
-            max={Math.max(0, timeSlots.length - 1)}
-            step={1}
-            marks={generateMarks()}
-            onChange={handleTimeChange}
-            valueLabelDisplay="auto"
-            valueLabelFormat={value => formatTimestamp(timeSlots[value])}
-            color="primary"
-            sx={{ mb: 1 }}
-          />
-        </ThemeProvider>}
+        {timeSlots.length > 1 && (
+          <ThemeProvider theme={sliderTheme}>
+            <Slider
+              value={selectedTimeIndex}
+              min={0}
+              max={Math.max(0, timeSlots.length - 1)}
+              step={1}
+              marks={generateMarks()}
+              onChange={handleTimeChange}
+              valueLabelDisplay="auto"
+              valueLabelFormat={value => formatTimestamp(timeSlots[value])}
+              color="primary"
+              sx={{ mb: 1 }}
+            />
+          </ThemeProvider>
+        )}
 
-        {/* Time Counter */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+        {/* Time Counter and Zone Info */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
           <Typography variant="caption">
             {selectedTimeIndex + 1} / {timeSlots.length}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {Object.keys(results).length} zone
+            {Object.keys(results).length !== 1 ? 's' : ''}
           </Typography>
         </Box>
       </Box>

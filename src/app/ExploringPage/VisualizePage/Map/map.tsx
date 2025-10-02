@@ -155,11 +155,11 @@ export const Map = (props: IMapProps) => {
     useAppSelector((state: RootState) => state.map);
   const {
     results,
-    timestamps: predictionTimestamps,
     predictionDisplay,
     selectedTimeIndex,
     selectedHeight,
   } = useAppSelector((state: RootState) => state.prediction);
+
   const [selectedClusterMarker, setSelectedClusterMarker] = useState<{
     lat: number;
     lng: number;
@@ -216,21 +216,22 @@ export const Map = (props: IMapProps) => {
 
     const allResults = Object.values(results).flat();
 
+    if (allResults.length === 0) return [];
+
+    // Get all unique timestamps from prediction data and sort them
+    const uniqueTimestamps = [
+      ...new Set(allResults.map(result => result.timestamp)),
+    ];
+    const sortedTimestamps = uniqueTimestamps.sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    );
+
     // Get the target timestamp based on selectedTimeIndex
-    const allZoneIds = Object.keys(results);
+    const targetTimestamp = sortedTimestamps[selectedTimeIndex];
 
-    if (allZoneIds.length === 0) return [];
+    if (!targetTimestamp) return [];
 
-    const firstZoneId = allZoneIds[0]; // For now, handle single zone
-    const baseTimestamp = predictionTimestamps[firstZoneId];
-
-    if (!baseTimestamp) return [];
-
-    const targetTimestamp = new Date(
-      new Date(baseTimestamp).getTime() + selectedTimeIndex * 10 * 60 * 1000,
-    ).toISOString();
-
-    // Filter results by the selected timestamp AND height
+    // Filter results by the selected timestamp and height
     const filtered = allResults.filter(
       result =>
         result.timestamp === targetTimestamp &&
@@ -238,13 +239,7 @@ export const Map = (props: IMapProps) => {
     );
 
     return filtered;
-  }, [
-    results,
-    predictionTimestamps,
-    selectedTimeIndex,
-    selectedHeight,
-    predictionDisplay,
-  ]);
+  }, [results, selectedTimeIndex, selectedHeight, predictionDisplay]);
 
   const points = useMemo(() => {
     if (!clusters) return [];
@@ -299,7 +294,7 @@ export const Map = (props: IMapProps) => {
         />
         <ZoomControl position="topright" />
         <MapControl id={id} />
-        <ToggleButtonGroup
+        {!predictionDisplay && <ToggleButtonGroup
           exclusive
           value={mapLayer}
           orientation="vertical"
@@ -335,7 +330,7 @@ export const Map = (props: IMapProps) => {
               </ToggleButton>
             </span>
           </Tooltip>
-        </ToggleButtonGroup>
+        </ToggleButtonGroup>}
         {mapLayer === 'cluster' ? (
           clusters.map((cluster, index) => {
             // every cluster point has coordinates

@@ -79,7 +79,11 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
     );
 
     if (selectedGeohash.rect) {
-      const ghash = ngeohash.encode(leafletBounds.getCenter().lat, leafletBounds.getCenter().lng, 8);
+      const ghash = ngeohash.encode(
+        leafletBounds.getCenter().lat,
+        leafletBounds.getCenter().lng,
+        8,
+      );
 
       navigate(`?geohash=${ghash}`);
     }
@@ -134,8 +138,11 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
         north: drawnRect.lat[1],
         east: drawnRect.lon[1],
       });
+    } else if (!drawnRect && map) {
+      // Clear drawn items when drawnRect becomes null
+      clearDrawnItems();
     }
-  }, [drawnRect, map]);
+  }, [drawnRect, map, clearDrawnItems]);
 
   return {
     drawnItemsRef,
