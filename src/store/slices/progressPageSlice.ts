@@ -82,6 +82,10 @@ export const progressPageSlice = createSlice({
     },
     setMenuOptions: (state, action) => {
       state.menuOptions = action.payload;
+    },
+    //dummy for now
+    setWorkflowsData: (state, action) => {
+      state.workflows.data = action.payload;
     }
   },
   extraReducers: builder => {
@@ -280,7 +284,8 @@ export const fetchUserEvaluation = createAsyncThunk(
 export const {
   setProgressBarData,
   setIntialization,
-  setMenuOptions
+  setMenuOptions,
+  setWorkflowsData
 } = progressPageSlice.actions;
 
 export default progressPageSlice.reducer;
