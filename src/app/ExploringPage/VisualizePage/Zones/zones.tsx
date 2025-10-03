@@ -20,7 +20,6 @@ import {
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
   Download as DownloadIcon,
-  Dataset as DatasetIcon,
   Clear as ClearIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
@@ -39,8 +38,9 @@ import { Prediction } from '../Prediction/prediction';
 import { type RootState } from '../../../../store/store';
 import { exportAllZonesToJSON } from '../../../../shared/utils/exportUtils';
 import {
-  setPredictionDisplay,
   resetPredictionState,
+  setSelectedZoneId,
+  setSelectedTimeIndex,
 } from '../../../../store/slices/exploring/predictionSlice';
 import { setMapLayer } from '../../../../store/slices/exploring/mapSlice';
 
@@ -114,6 +114,10 @@ export const Zones = ({ dataset }: IZonesProps) => {
   const handleViewZone = (z: IZone) => {
     if (z.id) {
       dispatch(setZone(z));
+      if (predictionDisplay) {
+        dispatch(setSelectedZoneId(z.id));
+        dispatch(setSelectedTimeIndex(0));
+      }
       dispatch(setModalOpen(false));
     }
   };
@@ -191,19 +195,6 @@ export const Zones = ({ dataset }: IZonesProps) => {
                 >
                   Remove Predictions
                 </Button>
-              </Tooltip>
-            )}
-            {predictionZoneIds.length > 0 && (
-              <Tooltip title="Toggle Prediction Display" placement="top">
-                <IconButton
-                  edge="end"
-                  color="inherit"
-                  onClick={() =>
-                    dispatch(setPredictionDisplay(!predictionDisplay))
-                  }
-                >
-                  <DatasetIcon />
-                </IconButton>
               </Tooltip>
             )}
             <IconButton
