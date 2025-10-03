@@ -1,6 +1,9 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import type { IPredictionResult } from '../../../shared/models/exploring/prediction-result.model';
+import type { AppStartListening } from '../../listenerMiddleware';
+import type { RootState } from '../../store';
+import { setZone } from './zoneSlice';
 
 interface predictionState {
   predictionDisplay: boolean;
@@ -79,6 +82,23 @@ export const predictionSlice = createSlice({
     },
   },
 });
+
+export const predictionListeners = (startAppListening: AppStartListening) => {
+  // setSelectedZoneIdListener
+  startAppListening({
+    actionCreator: setSelectedZoneId,
+    effect: async (action, { dispatch, getState }) => {
+      const state = getState() as RootState;
+      const { zones } = state.zone;
+
+      const zone = zones.find(zone => zone.id === action.payload);
+
+      if (zone) {
+        dispatch(setZone(zone));
+      }
+    },
+  });
+};
 
 export const {
   setPredictionDisplay,

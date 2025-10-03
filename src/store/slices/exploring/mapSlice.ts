@@ -303,8 +303,9 @@ export const mapListeners = (startAppListening: AppStartListening) => {
     effect: async (_, { dispatch, getState }) => {
       const state = getState() as RootState;
       const { zone } = state.zone;
+      const { predictionDisplay } = state.prediction;
 
-      if (zone.id) {
+      if (zone.id && predictionDisplay) {
         dispatch(setActiveRect('drawnRect'));
       } else {
         await handleRectUpdate(dispatch, state);

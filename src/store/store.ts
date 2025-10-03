@@ -21,6 +21,7 @@ import { chartListeners } from './slices/exploring/chartSlice';
 import { timeSeriesListeners } from './slices/exploring/timeSeriesSlice';
 import { zoneListeners } from './slices/exploring/zoneSlice';
 import { predictionSlice } from './slices/exploring/predictionSlice';
+import { predictionListeners } from './slices/exploring/predictionSlice';
 
 export const store = configureStore({
   reducer: {
@@ -57,3 +58,4 @@ datasetUiListeners(startAppListening);
 mapListeners(startAppListening);
 timeSeriesListeners(startAppListening);
 zoneListeners(startAppListening);
+predictionListeners(startAppListening);
