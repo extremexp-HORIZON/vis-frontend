@@ -31,7 +31,6 @@ import {
   triggerChartUpdate,
 } from '../../../../store/slices/exploring/chartSlice';
 import Loader from '../../../../shared/components/loader';
-import { Zones } from '../Zones/zones';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
@@ -252,7 +251,6 @@ export const Chart = React.memo((props: IChartProps) => {
                   </IconButton>
                 </Tooltip>
               )}
-              <Zones dataset={dataset} />
             </Stack>
             {vegaSeriesData.length > 0 && (
               <Stack direction="row" spacing={1}>
