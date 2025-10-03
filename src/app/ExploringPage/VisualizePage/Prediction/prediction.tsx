@@ -34,7 +34,6 @@ import {
 } from '../../../../store/store';
 import { setModalOpen as setZoneModalOpen } from '../../../../store/slices/exploring/zoneSlice';
 import { exportZoneToJSON } from '../../../../shared/utils/exportUtils';
-import { setDrawnRect } from '../../../../store/slices/exploring/mapSlice';
 
 export interface IPredictionProps {
   zone: IZone;
@@ -73,7 +72,6 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
   );
-  const { dataset } = useAppSelector((state: RootState) => state.dataset);
   const dispatch = useAppDispatch();
 
   const handleOpen = () => setOpen(true);
@@ -90,11 +88,6 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const handleView = () => {
     setOpen(false);
     dispatch(setZoneModalOpen(false));
-
-    // Clear drawn rectangle for better prediction visibility
-    if (dataset.id) {
-      dispatch(setDrawnRect({ id: dataset.id, bounds: null }));
-    }
 
     if (predictionResults.length > 0) {
       // Set this zone as the selected zone for timeline display
@@ -228,64 +221,77 @@ export const Prediction = ({ zone }: IPredictionProps) => {
             overflow: 'auto',
           }}
         >
-          <Typography variant="body1" gutterBottom>
-            Included geohashes: {zone.geohashes?.length}
-          </Typography>
-
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              Time ahead
-            </Typography>
-            <TextField
-              select
-              variant="outlined"
-              value={intervalsAmount}
-              onChange={e => setIntervalsAmount(Number(e.target.value))}
-              size="small"
-              sx={{ width: 120 }}
-            >
-              {fixedIntervals.map(option => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.text}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Typography variant="body2" color="text.secondary">
-              for {fixedHeights.map(height => height.value).join(', ')} meters
-            </Typography>
-          </Box>
-          <Typography variant="body2" gutterBottom sx={{ fontStyle: 'italic' }}>
-            (in 10 minute intervals)
-          </Typography>
-
-          <Box sx={{ mb: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handlePredict}
-              disabled={isLoading}
-              startIcon={isLoading ? <CircularProgress size={20} /> : null}
-            >
-              {isLoading ? 'Predicting...' : 'Predict'}
-            </Button>
-          </Box>
-
-          {isLoading && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Generating prediction results...
+          {predictionResults.length === 0 ? (
+            <>
+              <Typography variant="body1" gutterBottom>
+                Included geohashes: {zone.geohashes?.length}
               </Typography>
-              <LinearProgress />
-            </Box>
-          )}
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+              <Box
+                sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Time ahead
+                </Typography>
+                <TextField
+                  select
+                  variant="outlined"
+                  value={intervalsAmount}
+                  onChange={e => setIntervalsAmount(Number(e.target.value))}
+                  size="small"
+                  sx={{ width: 120 }}
+                >
+                  {fixedIntervals.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.text}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <Typography variant="body2" color="text.secondary">
+                  for {fixedHeights.map(height => height.value).join(', ')}{' '}
+                  meters
+                </Typography>
+              </Box>
+              <Typography
+                variant="body2"
+                gutterBottom
+                sx={{ fontStyle: 'italic' }}
+              >
+                (in 10 minute intervals)
+              </Typography>
 
-          {predictionResults.length > 0 && (
+              <Box sx={{ mb: 2 }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handlePredict}
+                  disabled={isLoading}
+                  startIcon={isLoading ? <CircularProgress size={20} /> : null}
+                >
+                  {isLoading ? 'Predicting...' : 'Predict'}
+                </Button>
+              </Box>
+
+              {isLoading && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Generating prediction results...
+                  </Typography>
+                  <LinearProgress />
+                </Box>
+              )}
+
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+            </>
+          ) : (
             <>
               <Typography variant="h6" gutterBottom textAlign="center">
                 Results
