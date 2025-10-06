@@ -38,7 +38,7 @@ export default function WorkflowTreeView() {
   const hasExplainability = useMemo(() => {
     const tasks = tab?.workflowConfiguration.tasks;
 
-    if (!tasks) return false;
+    if (!tasks) return true;
 
     return tasks.some(t => typeof t.name === 'string' && /explainability/i.test(t.name));
   }, [tab?.workflowConfiguration.tasks]);
