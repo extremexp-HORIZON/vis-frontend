@@ -6,7 +6,7 @@ import ComparisonMetricsCharts from './comparison-metrics-charts';
 import ComparisonModelsCharts from './comparison-models-charts';
 import ComparisonDataCharts from './comparison-data-charts';
 import ComparativeAnalysisControls from './comparative-analysis-controls';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 const ComparativeAnalysis = () => {
   const { selectedComparisonTab } = useAppSelector(
@@ -15,8 +15,18 @@ const ComparativeAnalysis = () => {
   const groupBy = useAppSelector(
     (state: RootState) => state.monitorPage.workflowsTable.groupBy,
   );
-
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
+  
   const dispatch = useAppDispatch();
+
+  const hasExplainability = useMemo(() => {
+    if(workflows.data.every(workflow => !workflow.tasks)) return true;
+
+    return workflows.data.some(workflow => workflow.tasks?.some(t => typeof t.name === 'string' && /explainability/i.test(t.name)));
+  }, [workflows]);
+
 
   useEffect(() => {
     if (groupBy.length > 0 && selectedComparisonTab !== 0) {
@@ -48,7 +58,7 @@ const ComparativeAnalysis = () => {
 
           <Tab
             label="Models Insights"
-            disabled={groupBy.length > 0}
+            disabled={groupBy.length > 0 || !hasExplainability}
           />
 
           <Tab
