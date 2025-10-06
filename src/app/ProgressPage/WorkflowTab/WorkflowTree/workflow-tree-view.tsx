@@ -1,5 +1,5 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem2 } from '@mui/x-tree-view/TreeItem2';
 import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
@@ -34,7 +34,21 @@ export default function WorkflowTreeView() {
   const { tab } = useAppSelector((state: RootState) => state.workflowPage);
   const dispatch = useAppDispatch();
   const [workflowExpanded, setWorkflowExpanded] = useState(true);
-  const [modelExpanded, setModelExpanded] = useState(true);
+  // const [modelExpanded, setModelExpanded] = useState(true);
+  const hasExplainability = useMemo(() => {
+    const tasks = tab?.workflowConfiguration.tasks;
+
+    if (!tasks) return false;
+
+    return tasks.some(t => typeof t.name === 'string' && /explainability/i.test(t.name));
+  }, [tab?.workflowConfiguration.tasks]);
+
+  const [modelExpanded, setModelExpanded] = useState<boolean>(hasExplainability);
+
+  // keep expanded state in sync: stay closed when not available, open when available
+  useEffect(() => {
+    setModelExpanded(hasExplainability);
+  }, [hasExplainability]);
   const workflowId = tab?.workflowId;
   const { experimentId } = useParams();
 
@@ -1372,7 +1386,9 @@ export default function WorkflowTreeView() {
         }}
       >
         <AccordionSummary
+          disabled={!hasExplainability}
           onClick={(e) => e.stopPropagation()}
+
           sx={{ borderBottom: '1px solid #ccc', pointerEvents: 'none' }}
         >
           <Box
@@ -1396,14 +1412,21 @@ export default function WorkflowTreeView() {
               }}
             >
               <PsychologyAltRoundedIcon color="primary" />
-              <Typography fontWeight={600}>Model Insights</Typography>
+              <Typography
+                fontWeight={600}
+                sx={{
+                  color: hasExplainability ? 'inherit' : theme.palette.text.disabled,
+                }}
+              >
+                Model Insights
+              </Typography>
             </Box>
 
             {/* Right-side icon */}
             <Box
               onClick={(e) => {
                 e.stopPropagation();
-                setModelExpanded((prev) => !prev);
+                if (hasExplainability) setModelExpanded((prev) => !prev);
               }}
               sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
             >
