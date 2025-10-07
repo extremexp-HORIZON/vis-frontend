@@ -115,7 +115,7 @@ const ExperimentControls = () => {
     dispatch(
       stateController({
         experimentId: experimentId || '',
-        runId: workflowId || '',
+        runId: null,
         action: 'kill',
       })
     );
