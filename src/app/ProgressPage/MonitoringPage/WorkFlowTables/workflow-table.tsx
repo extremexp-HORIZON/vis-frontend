@@ -27,6 +27,8 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { logger } from '../../../../shared/utils/logger';
 import type { WorkflowTableRow } from '../../../../store/slices/monitorPageSlice';
+import { setWorkflowsData, stateController } from '../../../../store/slices/progressPageSlice';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 export interface Data {
   [key: string]: string | number | boolean | null | undefined;
@@ -34,12 +36,66 @@ export interface Data {
 
 // WorkflowActions
 
+
 const WorkflowActions = (props: {
   currentStatus: string
   workflowId: string,
   experimentId: string | undefined,
 }) => {
   const { currentStatus, workflowId, experimentId } = props;
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
+  const dispatch = useAppDispatch();
+
+  const handlePausePlay = () => {
+    if(currentStatus === 'PAUSED') {
+      const updatedWorkflows = workflows.data?.map(workflow =>
+        workflow.id === workflowId
+          ? { ...workflow, status: 'RUNNING' }
+          : workflow
+      );
+      dispatch(setWorkflowsData(updatedWorkflows));
+      dispatch(
+        stateController({
+          experimentId: null,
+          runId: workflowId,
+          action: 'resume',
+        })
+      );
+    } else {
+      const updatedWorkflows = workflows.data?.map(workflow =>
+        workflow.id === workflowId
+          ? { ...workflow, status: 'PAUSED' }
+          : workflow
+      );
+    
+      dispatch(setWorkflowsData(updatedWorkflows));
+      dispatch(
+        stateController({
+          experimentId: null,
+          runId: workflowId,
+          action: 'pause',
+        })
+      );
+    }
+  }
+
+  const handleStop = () => {
+    const updatedWorkflows = workflows.data?.map(workflow =>
+      workflow.id === workflowId
+        ? { ...workflow, status: 'KILLED' }
+        : workflow
+    );
+    dispatch(setWorkflowsData(updatedWorkflows));
+    dispatch(
+      stateController({
+        experimentId: null,
+        runId: workflowId,
+        action: 'kill',
+      })
+    );
+  }
 
   return (
     <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
@@ -57,14 +113,19 @@ const WorkflowActions = (props: {
           </Badge>
         </IconButton>
       </Link>
-      {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && (
+      {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && currentStatus !== 'KILLED' && (
         <>
-          <IconButton onClick={() => logger.log('Pause clicked')} >
-            <PauseIcon
-              style={{ cursor: 'pointer', color: theme.palette.primary.main }}
-            />
+          <IconButton onClick={handlePausePlay} >
+            { currentStatus === 'PAUSED' ? (
+              <PlayArrowIcon style={{ cursor: 'pointer', color: theme.palette.primary.main }} />
+            ) : (
+              <PauseIcon
+                style={{ cursor: 'pointer', color: theme.palette.primary.main }}
+              />
+            )
+            }
           </IconButton>
-          <IconButton onClick={() => logger.log('Stop clicked')}>
+          <IconButton onClick={handleStop}>
             <StopIcon
               style={{ cursor: 'pointer', color: theme.palette.primary.main }}
             />

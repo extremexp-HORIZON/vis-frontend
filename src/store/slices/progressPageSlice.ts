@@ -46,7 +46,8 @@ interface IProgressPage {
 workflowEvaluation: {
   loading: boolean
   error: string | null
-}
+},
+experimentState: 'pause' | 'kill' | null
 }
 
 const initialState: IProgressPage = {
@@ -67,7 +68,8 @@ const initialState: IProgressPage = {
   workflowEvaluation: {
     loading: false,
     error: null
-  }
+  },
+  experimentState: null
 };
 
 export const progressPageSlice = createSlice({
@@ -86,6 +88,9 @@ export const progressPageSlice = createSlice({
     // dummy for now
     setWorkflowsData: (state, action) => {
       state.workflows.data = action.payload;
+    },
+    setExperimentState: (state, action) => {
+      state.experimentState = action.payload;
     }
   },
   extraReducers: builder => {
@@ -259,7 +264,7 @@ export const workflowsReordering = createAsyncThunk(
 // TODO: create this once state changes done
 export const stateController = createAsyncThunk(
   'progressPage/state_controller',
-  async (payload: { experimentId: string; runId: string; action: string }) => {
+  async (payload: { experimentId: string | null; runId: string | null; action: string }) => {
     return experimentApi
       .post<string>('/life-cycle', payload)
       .then(response => response.data);
@@ -285,7 +290,8 @@ export const {
   setProgressBarData,
   setIntialization,
   setMenuOptions,
-  setWorkflowsData
+  setWorkflowsData,
+  setExperimentState
 } = progressPageSlice.actions;
 
 export default progressPageSlice.reducer;
