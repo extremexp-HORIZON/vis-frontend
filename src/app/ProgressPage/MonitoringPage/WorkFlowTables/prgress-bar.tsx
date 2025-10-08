@@ -10,7 +10,7 @@ export default function ProgressBar({ workflowStatus, workflowId } : {workflowSt
   let progressValue;
   const workflow = workflows.data.find(workflow => workflow.id === workflowId);
 
-  if (workflowStatus === 'COMPLETED' || workflowStatus === 'FAILED') {
+  if (workflowStatus === 'COMPLETED' || workflowStatus === 'FAILED' || workflowStatus === 'KILLED') {
     progressValue = 100;
   } else {
     if (workflow?.tasks == null) {
@@ -21,7 +21,7 @@ export default function ProgressBar({ workflowStatus, workflowId } : {workflowSt
       progressValue = (completedTasks / workflow?.tasks.length) * 100;
     }
   }
-  const color = workflowStatus === 'COMPLETED' ? 'success' : workflowStatus === 'RUNNING' ? 'primary' : workflowStatus === 'PENDING_INPUT' ? 'warning' : 'error';
+  const color = workflowStatus === 'COMPLETED' ? 'success' : workflowStatus === 'RUNNING' ? 'primary' : workflowStatus === 'PENDING_INPUT' || workflowStatus === 'PAUSED'? 'warning' : 'error';
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', flexDirection: 'column', height: '100%' }}>
