@@ -18,4 +18,6 @@ export interface IExperiment {
 
     /** Additional metadata as key-value pairs. */
     tags: Record<string, string>;
+
+    status: string
   }

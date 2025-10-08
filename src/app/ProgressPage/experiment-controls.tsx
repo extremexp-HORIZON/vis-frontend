@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from '../../store/store';
 import Rating from '@mui/material/Rating';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useEffect, useState } from 'react';
-import { fetchUserEvaluation, setExperimentState, setProgressBarData, stateController } from '../../store/slices/progressPageSlice';
+import { fetchUserEvaluation, setExperimentStatus, setProgressBarData, stateController } from '../../store/slices/progressPageSlice';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
@@ -23,7 +23,7 @@ const ExperimentControls = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const workflowId = searchParams.get('workflowId');
-  const { progressBar, workflows, experimentState } = useAppSelector(
+  const { progressBar, workflows, experiment } = useAppSelector(
     (state: RootState) => state.progressPage
   );
   const { experimentId } = useParams();
@@ -89,8 +89,8 @@ const ExperimentControls = () => {
     setPolling(false);
   };
     const handlePausePlay = () => {
-      if (experimentState === 'pause') {
-        dispatch(setExperimentState(null));
+      if (experiment?.data?.status === 'paused') {
+        dispatch(setExperimentStatus('resumed'));
         dispatch(
           stateController({
             experimentId: experimentId || '',
@@ -99,7 +99,7 @@ const ExperimentControls = () => {
           })
         );
       } else {
-        dispatch(setExperimentState('pause'));
+        dispatch(setExperimentStatus('paused'));
         dispatch(
           stateController({
             experimentId: experimentId || '',
@@ -111,7 +111,7 @@ const ExperimentControls = () => {
     };
 
   const handleStop = () => {
-    dispatch(setExperimentState('kill'));
+    dispatch(setExperimentStatus('killed'));
     dispatch(
       stateController({
         experimentId: experimentId || '',
@@ -178,10 +178,10 @@ const ExperimentControls = () => {
             <Box className={'progress-page-bar'} sx={{ flex: 1, pr: 2 }}>
               <ProgressPageBar />
             </Box>
-            { progressBar.progress !== 100 && experimentState !=='kill' && (
+            { progressBar.progress !== 100 && experiment?.data?.status !=='killed' && (
               <Box className={'progress-page-actions'} >
                 <IconButton onClick={handlePausePlay} color="primary">
-                  {experimentState === 'pause' ? (
+                  {experiment?.data?.status === 'paused' ? (
                     <PlayArrowIcon fontSize="large" />
                   ) : (
                     <PauseIcon fontSize="large" />
@@ -283,10 +283,10 @@ const ExperimentControls = () => {
                   {`${Math.round(progressBar.progress)}%`}
                 </Box>
               </Box>
-              { progressBar.progress !== 100 && experimentState !=='kill' && (
+              { progressBar.progress !== 100 && experiment?.data?.status !=='killed' && (
                 <Box className={'progress-page-actions'} >
                   <IconButton onClick={handlePausePlay} color="primary">
-                    {experimentState === 'pause' ? (
+                    {experiment?.data?.status === 'paused' ? (
                       <PlayArrowIcon fontSize="large" />
                     ) : (
                       <PauseIcon fontSize="large" />

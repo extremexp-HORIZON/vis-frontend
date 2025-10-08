@@ -8,10 +8,12 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
 import Chip from '@mui/material/Chip';
+import ErrorIcon from '@mui/icons-material/Error';
+
 
 const ProgressPageBar = () => {
   const { experimentId } = useParams();
-  const { progressBar } = useAppSelector((state: RootState) => state.progressPage);
+  const { progressBar, experiment } = useAppSelector((state: RootState) => state.progressPage);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -66,6 +68,24 @@ const ProgressPageBar = () => {
               {`${progressBar.progress}%`}
             </Typography>
           </Box>
+          { experiment.data?.status === 'killed' &&
+            <Box sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              backgroundColor: theme.palette.background.paper,
+              gap: 1
+            }}>
+              <ErrorIcon fontSize="small" color="error" />
+              <Typography
+                variant="body2"
+                fontWeight="medium"
+                sx={{ mr: 0.5 }}
+                color="error"
+              >
+                killed
+              </Typography>
+            </Box>
+          }
         </Box>
 
         {matches && (

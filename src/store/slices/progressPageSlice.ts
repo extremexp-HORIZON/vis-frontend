@@ -47,7 +47,6 @@ workflowEvaluation: {
   loading: boolean
   error: string | null
 },
-experimentState: 'pause' | 'kill' | null
 }
 
 const initialState: IProgressPage = {
@@ -69,7 +68,6 @@ const initialState: IProgressPage = {
     loading: false,
     error: null
   },
-  experimentState: null
 };
 
 export const progressPageSlice = createSlice({
@@ -89,8 +87,9 @@ export const progressPageSlice = createSlice({
     setWorkflowsData: (state, action) => {
       state.workflows.data = action.payload;
     },
-    setExperimentState: (state, action) => {
-      state.experimentState = action.payload;
+    setExperimentStatus: (state, action) => {
+      if(state.experiment.data)
+        state.experiment.data.status = action.payload;
     }
   },
   extraReducers: builder => {
@@ -291,7 +290,7 @@ export const {
   setIntialization,
   setMenuOptions,
   setWorkflowsData,
-  setExperimentState
+  setExperimentStatus
 } = progressPageSlice.actions;
 
 export default progressPageSlice.reducer;
