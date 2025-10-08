@@ -73,13 +73,12 @@ const ProgressPageBar = () => {
               display: 'inline-flex',
               alignItems: 'center',
               backgroundColor: theme.palette.background.paper,
-              gap: 1
+              gap: 0.5
             }}>
               <ErrorIcon fontSize="small" color="error" />
               <Typography
                 variant="body2"
                 fontWeight="medium"
-                sx={{ mr: 0.5 }}
                 color="error"
               >
                 killed
