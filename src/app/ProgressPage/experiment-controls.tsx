@@ -88,27 +88,27 @@ const ExperimentControls = () => {
     setLocalRating(null);
     setPolling(false);
   };
-    const handlePausePlay = () => {
-      if (experiment?.data?.status === 'paused') {
-        dispatch(setExperimentStatus('resumed'));
-        dispatch(
-          stateController({
-            experimentId: experimentId || '',
-            runId: null,
-            action: 'resume',
-          })
-        );
-      } else {
-        dispatch(setExperimentStatus('paused'));
-        dispatch(
-          stateController({
-            experimentId: experimentId || '',
-            runId: null,
-            action: 'pause',
-          })
-        );
-      }
-    };
+  const handlePausePlay = () => {
+    if (experiment?.data?.status === 'paused') {
+      dispatch(setExperimentStatus('resumed'));
+      dispatch(
+        stateController({
+          experimentId: experimentId || '',
+          runId: null,
+          action: 'resume',
+        })
+      );
+    } else {
+      dispatch(setExperimentStatus('paused'));
+      dispatch(
+        stateController({
+          experimentId: experimentId || '',
+          runId: null,
+          action: 'pause',
+        })
+      );
+    }
+  };
 
   const handleStop = () => {
     dispatch(setExperimentStatus('killed'));
@@ -120,7 +120,6 @@ const ExperimentControls = () => {
       })
     );
   };
-
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -178,7 +177,7 @@ const ExperimentControls = () => {
             <Box className={'progress-page-bar'} sx={{ flex: 1, pr: 2 }}>
               <ProgressPageBar />
             </Box>
-            { progressBar.progress !== 100 && experiment?.data?.status !=='killed' && (
+            { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
               <Box className={'progress-page-actions'} >
                 <IconButton onClick={handlePausePlay} color="primary">
                   {experiment?.data?.status === 'paused' ? (
@@ -283,7 +282,7 @@ const ExperimentControls = () => {
                   {`${Math.round(progressBar.progress)}%`}
                 </Box>
               </Box>
-              { progressBar.progress !== 100 && experiment?.data?.status !=='killed' && (
+              { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
                 <Box className={'progress-page-actions'} >
                   <IconButton onClick={handlePausePlay} color="primary">
                     {experiment?.data?.status === 'paused' ? (

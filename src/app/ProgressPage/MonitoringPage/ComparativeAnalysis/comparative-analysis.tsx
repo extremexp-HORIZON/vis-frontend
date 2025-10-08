@@ -18,7 +18,7 @@ const ComparativeAnalysis = () => {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
   );
-  
+
   const dispatch = useAppDispatch();
 
   const hasExplainability = useMemo(() => {
@@ -26,7 +26,6 @@ const ComparativeAnalysis = () => {
 
     return workflows.data.some(workflow => workflow.tasks?.some(t => typeof t.name === 'string' && /explainability/i.test(t.name)));
   }, [workflows]);
-
 
   useEffect(() => {
     if (groupBy.length > 0 && selectedComparisonTab !== 0) {

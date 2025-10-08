@@ -36,7 +36,6 @@ export interface Data {
 
 // WorkflowActions
 
-
 const WorkflowActions = (props: {
   currentStatus: string
   workflowId: string,
@@ -55,6 +54,7 @@ const WorkflowActions = (props: {
           ? { ...workflow, status: 'RUNNING' }
           : workflow
       );
+
       dispatch(setWorkflowsData(updatedWorkflows));
       dispatch(
         stateController({
@@ -69,7 +69,7 @@ const WorkflowActions = (props: {
           ? { ...workflow, status: 'PAUSED' }
           : workflow
       );
-    
+
       dispatch(setWorkflowsData(updatedWorkflows));
       dispatch(
         stateController({
@@ -79,7 +79,7 @@ const WorkflowActions = (props: {
         })
       );
     }
-  }
+  };
 
   const handleStop = () => {
     const updatedWorkflows = workflows.data?.map(workflow =>
@@ -87,6 +87,7 @@ const WorkflowActions = (props: {
         ? { ...workflow, status: 'KILLED' }
         : workflow
     );
+
     dispatch(setWorkflowsData(updatedWorkflows));
     dispatch(
       stateController({
@@ -95,7 +96,7 @@ const WorkflowActions = (props: {
         action: 'kill',
       })
     );
-  }
+  };
 
   return (
     <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>

@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom';
 import Chip from '@mui/material/Chip';
 import ErrorIcon from '@mui/icons-material/Error';
 
-
 const ProgressPageBar = () => {
   const { experimentId } = useParams();
   const { progressBar, experiment } = useAppSelector((state: RootState) => state.progressPage);
@@ -63,7 +62,7 @@ const ProgressPageBar = () => {
             <Typography
               variant="body2"
               fontWeight="bold"
-              color="secondary"
+              color= {experiment?.data?.status === 'killed' ? "error" : "secondary"}
             >
               {`${progressBar.progress}%`}
             </Typography>
@@ -115,7 +114,8 @@ const ProgressPageBar = () => {
             borderRadius: 10,
             backgroundColor: grey[300],
             '& .MuiLinearProgress-bar': {
-              background:
+              background: experiment?.data?.status === 'killed' ?
+                'linear-gradient(90deg, #d17b0f, #b32d00)' :
                 theme => theme.palette.customGradient.main,
             },
           }}
