@@ -81,7 +81,6 @@ const AttributionHeatmaps: React.FC = () => {
   const selectedFeature = plotSlice?.selectedFeature ?? '';
   const selectedTime = plotSlice?.selectedTime ?? '';
 
-  // API fetch (uncomment when ready)
   useEffect(() => {
     if (!tab || !experimentId || !isTabInitialized) return;
     dispatch(
@@ -179,25 +178,6 @@ const AttributionHeatmaps: React.FC = () => {
     </Box>
   );
 
-  // download helpers: find <canvas> inside card and export, bug on download only points are visible
-  // const leftCardRef = useRef<HTMLDivElement | null>(null);
-  // const rightCardRef = useRef<HTMLDivElement | null>(null);
-
-  // const downloadCanvasPNG = (root: HTMLDivElement | null, filename: string) => {
-  //   if (!root) return;
-  //   const canvas = root.querySelector('canvas');
-  //   if (!canvas) return;
-  //   const link = document.createElement('a');
-  //   link.download = `${filename}_${new Date().toISOString().slice(0,10)}.png`;
-  //   link.href = canvas.toDataURL('image/png');
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   link.remove();
-  // };
-
-  // const onDownloadLeft = () => downloadCanvasPNG(leftCardRef.current, 'feature_heatmap');
-  // const onDownloadRight = () => downloadCanvasPNG(rightCardRef.current, 'attribution_heatmap');
-
   const loading = (
     <Loader />
   );
@@ -244,12 +224,10 @@ const AttributionHeatmaps: React.FC = () => {
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
-          {/* <div ref={leftCardRef}> */}
           <ResponsiveCardTable
             title="Feature"
             details={plotModel?.plotDescr || null}
             controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
-            // onDownload={onDownloadLeft}
             showDownloadButton
             showFullScreenButton
             minHeight={400}
@@ -262,14 +240,11 @@ const AttributionHeatmaps: React.FC = () => {
               featureHeatmap
             }
           </ResponsiveCardTable>
-          {/* </div> */}
         </Grid>
         <Grid item xs={12} md={6}>
-          {/* <div ref={rightCardRef}> */}
           <ResponsiveCardTable
             title="Attribution"
             details={plotModel?.plotDescr || null}
-            // onDownload={onDownloadRight}
             controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
             showDownloadButton
             showFullScreenButton
@@ -283,7 +258,6 @@ const AttributionHeatmaps: React.FC = () => {
               attributionHeatmap
             }
           </ResponsiveCardTable>
-          {/* </div> */}
         </Grid>
       </Grid>
     </Box>
