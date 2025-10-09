@@ -88,13 +88,22 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
         const section = task[plotType];
 
         if ('selectedFeature' in section) {
-          section.selectedFeature = action.payload.features.feature1;
+          const feature = action.payload?.features?.feature1 ??
+            action.payload?.featuresTableColumns?.find(
+              (c: string) => !['x', 'y', 'time'].includes(c)
+            ) ??
+            action.payload?.attributionsTableColumns?.find(
+              (c: string) => !['x', 'y', 'time'].includes(c)
+            ) ??
+          null;
+
+          section.selectedFeature = feature;
         } else if ('selectedFeature1' in section && 'selectedFeature2' in section) {
           section.selectedFeature1 = action.payload.features.feature1;
           section.selectedFeature2 = action.payload.features.feature2;
         }
         if ('selectedTime' in section && !section.selectedTime) {
-          const times = action.payload.features_table?.time?.values ?? action.payload.attributions_table?.time?.values ?? [];
+          const times = action.payload.featuresTable?.time?.values ?? action.payload.attributionsTable?.time?.values ?? [];
 
           section.selectedTime = times.length ? String(times[0]) : null;
         }

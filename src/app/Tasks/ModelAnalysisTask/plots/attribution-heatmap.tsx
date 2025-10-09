@@ -4,20 +4,20 @@ import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useParams } from 'react-router-dom';
 
-import rawFixture from '../../../../shared/data/segmentation.json';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import type { IPlotModel, ITableContents } from '../../../../shared/models/plotmodel.model';
-import { fetchModelAnalysisExplainabilityPlot } from '../../../../store/slices/explainabilitySlice';
+import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature, setSelectedTime } from '../../../../store/slices/explainabilitySlice';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import { ThemeProvider } from '@emotion/react';
 
 import HeatMapLeaflet from '../../../../shared/components/HeatMapLeaflet';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
+import Loader from '../../../../shared/components/loader';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+
 
 type HeatPoint = { x: number; y: number; time: string | number; value: number };
-
-const USE_FIXTURE = true;
-const USE_API = false;
 
 const numeric = (v: unknown): number => (typeof v === 'number' ? v : Number(v));
 
@@ -32,35 +32,10 @@ const theme = createTheme({
   },
 });
 
-function adaptFixtureToPlotModel(json: any): IPlotModel {
-  return {
-    explainabilityType: json.explainability_type,
-    explanationMethod: json.explanation_method,
-    explainabilityModel: json.explainability_model,
-    plotName: json.plot_name,
-    plotDescr: json.plot_descr,
-    plotType: json.plot_type,
-    features: json.features,
-    featureList: json.feature_list ?? [],
-    hyperparameterList: json.hyperparameter_list ?? [],
-    xAxis: json.xAxis,
-    yAxis: json.yAxis,
-    zAxis: json.zAxis,
-    tableContents: json.table_contents ?? {},
-    TotalCost: json.TotalCost ?? 0,
-    TotalEffectiveness: json.TotalEffectiveness ?? 0,
-    actions: json.actions ?? {},
-    affectedClusters: json.affected_clusters ?? {},
-    effCostActions: json.eff_cost_actions ?? {},
-    features_table: json.features_table,
-    attributions_table: json.attributions_table,
-    features_table_columns: json.features_table_columns ?? [],
-    attributions_table_columns: json.attributions_table_columns ?? [],
-  };
-}
-
 const featureCandidates = (pl: IPlotModel | null) =>
-  pl?.features_table_columns?.filter(c => !['x', 'y', 'time'].includes(c)) ?? [];
+  pl?.featuresTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ??
+  pl?.attributionsTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ??
+  [];
 
 const distinctTimes = (table?: ITableContents) => {
   if (!table?.time?.values) return [];
@@ -103,77 +78,50 @@ const AttributionHeatmaps: React.FC = () => {
   const { experimentId } = useParams();
 
   const plotSlice = tab?.workflowTasks.modelAnalysis?.segmentation;
-  // uncomment for api also must make the initialization
-  //   const selectedFeature = plotSlice?.selectedFeature ?? '';
-  //   const selectedTime = plotSlice?.selectedTime ?? '';
-
-  // Fixture (mock)
-  const [fixtureModel] = useState<IPlotModel | null>(
-    adaptFixtureToPlotModel(rawFixture as any)
-  );
+  const selectedFeature = plotSlice?.selectedFeature ?? '';
+  const selectedTime = plotSlice?.selectedTime ?? '';
 
   // API fetch (uncomment when ready)
-  // useEffect(() => {
-  //   if (!USE_API) return;
-  //   if (!tab || !experimentId || !isTabInitialized) return;
-  //   dispatch(
-  //     fetchModelAnalysisExplainabilityPlot({
-  //       query: {
-  //         ...explainabilityQueryDefault,
-  //         explanation_type: 'featureExplanation',
-  //         explanation_method: 'segmentation',
-  //       },
-  //       metadata: {
-  //         workflowId: tab.workflowId,
-  //         queryCase: 'segmentation',
-  //         experimentId,
-  //       },
-  //     })
-  //   );
-  // }, [dispatch, tab, experimentId, isTabInitialized]);
+  useEffect(() => {
+    if (!tab || !experimentId || !isTabInitialized) return;
+    dispatch(
+      fetchModelAnalysisExplainabilityPlot({
+        query: {
+          ...explainabilityQueryDefault,
+          explanation_type: 'featureExplanation',
+          explanation_method: 'segmentation',
+        },
+        metadata: {
+          workflowId: tab.workflowId,
+          queryCase: 'segmentation',
+          experimentId,
+        },
+      })
+    );
+  }, [isTabInitialized]);
 
-  const plotModel: IPlotModel | null =
-    USE_FIXTURE ? fixtureModel : (plotSlice?.data ?? null);
+  const plotModel: IPlotModel | null = plotSlice?.data ?? null;
 
-  // handlers for redux instead of state
-  // const handleFeatureChange = (val: string) => {
-  //   setSelectedFeature(val);
-  //   dispatch(setSelectedFeature({ plotType: 'segmentation', feature: val }));
-  // };
+  const handleFeatureChange = (val: string) => {
+    dispatch(setSelectedFeature({ plotType: 'segmentation', feature: val }));
+  };
 
-  // const handleTimeChange = (val: string) => {
-  //   setSelectedTime(val);
-  //   dispatch(setSelectedTime({ plotType: 'segmentation', time: val }));
-  // };
+  const handleTimeChange = (val: string) => {
+    dispatch(setSelectedTime({ plotType: 'segmentation', time: val }));
+  };
 
-  // selections for now state
   const featureOptions = useMemo(() => featureCandidates(plotModel), [plotModel]);
-  const [selectedFeature, setSelectedFeature] = useState<string>(featureOptions[0] || '');
-
-  useEffect(() => {
-    if (featureOptions.length && !selectedFeature) setSelectedFeature(featureOptions[0]);
-  }, [featureOptions, selectedFeature]);
-
-  const timeOptions = useMemo(() => distinctTimes(plotModel?.features_table), [plotModel]);
-  const [selectedTime, setSelectedTime] = useState<string | undefined>(
-    timeOptions.length ? timeOptions[0] : undefined
-  );
-
-  useEffect(() => {
-    if (timeOptions.length && (!selectedTime || !timeOptions.includes(String(selectedTime)))) {
-      setSelectedTime(timeOptions[0]);
-    }
-  }, [timeOptions, selectedTime]);
+  const timeOptions = useMemo(() => distinctTimes(plotModel?.featuresTable), [plotModel]);
   const [radius, setRadius] = useState<number>(18);
 
   // map points (lat=y, lon=x)
   const featurePts = useMemo(
-    () => makeHeatmapValues(plotModel?.features_table, selectedFeature, selectedTime)
+    () => makeHeatmapValues(plotModel?.featuresTable, selectedFeature, selectedTime)
       .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
     [plotModel, selectedFeature, selectedTime]
   );
   const attribPts = useMemo(
-    () => makeHeatmapValues(plotModel?.attributions_table, selectedFeature, selectedTime)
+    () => makeHeatmapValues(plotModel?.attributionsTable, selectedFeature, selectedTime)
       .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
     [plotModel, selectedFeature, selectedTime]
   );
@@ -186,21 +134,21 @@ const AttributionHeatmaps: React.FC = () => {
           labelId="feature-select-label"
           label="Feature"
           value={selectedFeature || ''}
-          onChange={e => setSelectedFeature(e.target.value)}
+          onChange={e => handleFeatureChange(e.target.value)}
           MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
-          disabled={!featureOptions.length || (!!plotSlice?.loading && USE_API)}
+          disabled={!featureOptions.length || !!plotSlice?.loading}
         >
           {featureOptions.map(f => (<MenuItem key={`feature-${f}`} value={f}>{f}</MenuItem>))}
         </Select>
       </FormControl>
 
-      <FormControl fullWidth disabled={!timeOptions.length || (!!plotSlice?.loading && USE_API)}>
+      <FormControl fullWidth disabled={!timeOptions.length || !!plotSlice?.loading}>
         <InputLabel id="time-select-label">Time</InputLabel>
         <Select
           labelId="time-select-label"
           label="Time"
           value={selectedTime ?? ''}
-          onChange={e => setSelectedTime(e.target.value)}
+          onChange={e => handleTimeChange(e.target.value)}
           displayEmpty
           MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
         >
@@ -210,7 +158,7 @@ const AttributionHeatmaps: React.FC = () => {
           }
         </Select>
       </FormControl>
-      <FormControl fullWidth disabled={!timeOptions.length || (!!plotSlice?.loading && USE_API)}>
+      <FormControl fullWidth disabled={!timeOptions.length || !!plotSlice?.loading}>
         <ThemeProvider theme={theme}>
           <Box display="flex" alignItems="center" gap={1}>
             <TrackChangesIcon fontSize="small" />
@@ -231,7 +179,7 @@ const AttributionHeatmaps: React.FC = () => {
     </Box>
   );
 
-  // download helpers: find <canvas> inside card and export bug on download only points are visible
+  // download helpers: find <canvas> inside card and export, bug on download only points are visible
   // const leftCardRef = useRef<HTMLDivElement | null>(null);
   // const rightCardRef = useRef<HTMLDivElement | null>(null);
 
@@ -250,59 +198,90 @@ const AttributionHeatmaps: React.FC = () => {
   // const onDownloadLeft = () => downloadCanvasPNG(leftCardRef.current, 'feature_heatmap');
   // const onDownloadRight = () => downloadCanvasPNG(rightCardRef.current, 'attribution_heatmap');
 
+  const loading = (
+    <Loader />
+  );
+
+  const error = (
+    <InfoMessage
+      message="Error fetching plot."
+      type="info"
+      icon={
+        <ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />
+      }
+      fullHeight
+    />
+  );
+
+  const featureHeatmap = (
+    <HeatMapLeaflet
+      points={featurePts}
+      legendLabel={selectedFeature}
+      radius={radius}
+      blur={15}
+      maxZoom={18}
+      decimals={5}
+      minIntensity={0.35}
+      gamma={0.5}
+    />
+  );
+
+  const attributionHeatmap = (
+    <HeatMapLeaflet
+      points={attribPts}
+      legendLabel={selectedFeature}
+      radius={radius}
+      blur={15}
+      maxZoom={18}
+      decimals={5}
+      minIntensity={0.35}
+      gamma={0.5}
+    />
+  );
+  
+
   return (
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={2}>
-        {/* Feature (controlPanel passed here) */}
         <Grid item xs={12} md={6}>
           {/* <div ref={leftCardRef}> */}
           <ResponsiveCardTable
             title="Feature"
             details={plotModel?.plotDescr || null}
-            controlPanel={controlPanel}
+            controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
             // onDownload={onDownloadLeft}
             showDownloadButton
             showFullScreenButton
             minHeight={400}
             noPadding
           >
-            <HeatMapLeaflet
-              points={featurePts}
-              legendLabel={selectedFeature}
-              radius={radius}
-              blur={15}
-              maxZoom={18}
-              decimals={5}
-              minIntensity={0.35}
-              gamma={0.5}
-            />
+            {plotSlice?.loading ? 
+              loading :
+              plotSlice?.error || !plotSlice?.data ?
+              error :
+              featureHeatmap
+            }
           </ResponsiveCardTable>
           {/* </div> */}
         </Grid>
-
-        {/* Attribution (no duplicate control panel) */}
         <Grid item xs={12} md={6}>
           {/* <div ref={rightCardRef}> */}
           <ResponsiveCardTable
             title="Attribution"
             details={plotModel?.plotDescr || null}
             // onDownload={onDownloadRight}
-            controlPanel={controlPanel}
+            controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
             showDownloadButton
             showFullScreenButton
             minHeight={400}
             noPadding
           >
-            <HeatMapLeaflet
-              points={attribPts}
-              legendLabel={selectedFeature}
-              radius={radius}
-              blur={15}
-              maxZoom={18}
-              decimals={5}
-              minIntensity={0.35}
-              gamma={0.5}
-            />
+            {plotSlice?.loading ? 
+              loading :
+              plotSlice?.error || !plotSlice?.data ?
+              error :
+              attributionHeatmap
+            }
           </ResponsiveCardTable>
           {/* </div> */}
         </Grid>

@@ -19,10 +19,10 @@ export interface IPlotModel {
     actions: ITableContents;
     affectedClusters: IAffectedClusters;
     effCostActions: IEffCostActions;
-    features_table: ITableContents;
-    attributions_table: ITableContents;
-    features_table_columns: string[];
-    attributions_table_columns: string[];
+    featuresTable: ITableContents;
+    attributionsTable: ITableContents;
+    featuresTableColumns: string[];
+    attributionsTableColumns: string[];
   }
 
 export interface ITableContents {
