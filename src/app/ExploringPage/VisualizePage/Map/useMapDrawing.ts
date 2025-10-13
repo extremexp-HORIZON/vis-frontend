@@ -1,12 +1,10 @@
 import ngeohash from 'ngeohash';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
 import L from 'leaflet';
-import { updateMapBounds } from '../../../../store/slices/exploring/mapSlice';
 
 export const useMapDrawing = (map: L.Map | null, id: string) => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const drawnItemsRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
   const drawnRect = useAppSelector(state => state.map.drawnRect);
@@ -63,20 +61,6 @@ export const useMapDrawing = (map: L.Map | null, id: string) => {
 
     // Fit map to the rectangle bounds but with a buffer of 250px
     map.fitBounds(leafletBounds, { padding: [250, 250] });
-    const paddedBounds = map.getBounds();
-
-    dispatch(
-      updateMapBounds({
-        id,
-        bounds: {
-          south: paddedBounds.getSouth(),
-          west: paddedBounds.getWest(),
-          north: paddedBounds.getNorth(),
-          east: paddedBounds.getEast(),
-        },
-        zoom: map.getZoom(),
-      }),
-    );
 
     if (selectedGeohash.rect) {
       const ghash = ngeohash.encode(
