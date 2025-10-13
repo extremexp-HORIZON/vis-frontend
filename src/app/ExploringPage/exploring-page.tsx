@@ -24,7 +24,7 @@ import {
 } from '../../store/slices/exploring/datasourceSlice';
 import { useEffect, useState } from 'react';
 import Loader from '../../shared/components/loader';
-import { FileUpload } from '../../shared/components/file-upload';
+import { DataSourceFileUpload } from './data-source-file-upload';
 import { ConfirmationModal } from '../../shared/components/confirmation-modal';
 
 const ExploringPage = () => {
@@ -156,7 +156,7 @@ const ExploringPage = () => {
 
           {/* Upload Section */}
           <Box sx={{ width: '40%', mt: 3 }}>
-            <FileUpload />
+            <DataSourceFileUpload />
           </Box>
 
           <ConfirmationModal
