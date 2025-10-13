@@ -16,7 +16,6 @@ import Loader from '../../../../shared/components/loader';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
-
 type HeatPoint = { x: number; y: number; time: string | number; value: number };
 
 const numeric = (v: unknown): number => (typeof v === 'number' ? v : Number(v));
@@ -218,7 +217,6 @@ const AttributionHeatmaps: React.FC = () => {
       gamma={0.5}
     />
   );
-  
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -233,11 +231,11 @@ const AttributionHeatmaps: React.FC = () => {
             minHeight={400}
             noPadding
           >
-            {plotSlice?.loading ? 
+            {plotSlice?.loading ?
               loading :
               plotSlice?.error || !plotSlice?.data ?
-              error :
-              featureHeatmap
+                error :
+                featureHeatmap
             }
           </ResponsiveCardTable>
         </Grid>
@@ -251,11 +249,11 @@ const AttributionHeatmaps: React.FC = () => {
             minHeight={400}
             noPadding
           >
-            {plotSlice?.loading ? 
+            {plotSlice?.loading ?
               loading :
               plotSlice?.error || !plotSlice?.data ?
-              error :
-              attributionHeatmap
+                error :
+                attributionHeatmap
             }
           </ResponsiveCardTable>
         </Grid>

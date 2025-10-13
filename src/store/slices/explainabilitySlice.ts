@@ -33,6 +33,16 @@ export const fetchModelAnalysisFeatureImportancePlot = createAsyncThunk(
   }
 );
 
+export const fetchModelAnalysisShapPlot = createAsyncThunk(
+  'explainability/fetch_shap_plot',
+  async (payload: FetchFeatureImportancePlotPayload) => {
+    const requestUrl = `explainability/${payload.metadata.experimentId}/${payload.metadata.workflowId}/feature-importance`;
+    const response = await api.post<IPlotModel>(requestUrl, payload.query);
+
+    return response.data;
+  }
+);
+
 // Action
 export const setSelectedFeature = createAction<{
   plotType: keyof IModelAnalysis;
@@ -161,6 +171,28 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
       if (task) {
         assignError(task.featureImportance, 'Failed to fetch feature importance data');
+      }
+    })
+    .addCase(fetchModelAnalysisShapPlot.pending, (state, action) => {
+      const task = getTask(state, action.meta.arg.metadata.workflowId);
+
+      if (task) {
+        task.shapValues.loading = true;
+        task.shapValues.error = null;
+      }
+    })
+    .addCase(fetchModelAnalysisShapPlot.fulfilled, (state, action) => {
+      const task = getTask(state, action.meta.arg.metadata.workflowId);
+
+      if (task) {
+        assignResult(task.shapValues, action.payload);
+      }
+    })
+    .addCase(fetchModelAnalysisShapPlot.rejected, (state, action) => {
+      const task = getTask(state, action.meta.arg.metadata.workflowId);
+
+      if (task) {
+        assignError(task.shapValues, 'Failed to fetch feature importance data');
       }
     })
     .addCase(setGcfSize, (state, action) => {

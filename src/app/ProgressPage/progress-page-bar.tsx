@@ -62,7 +62,7 @@ const ProgressPageBar = () => {
             <Typography
               variant="body2"
               fontWeight="bold"
-              color= {experiment?.data?.status === 'killed' ? "error" : "secondary"}
+              color= {experiment?.data?.status === 'killed' ? 'error' : 'secondary'}
             >
               {`${progressBar.progress}%`}
             </Typography>
