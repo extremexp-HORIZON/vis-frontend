@@ -89,12 +89,12 @@ export const predictionListeners = (startAppListening: AppStartListening) => {
     actionCreator: setSelectedZoneId,
     effect: async (action, { dispatch, getState }) => {
       const state = getState() as RootState;
-      const { zones } = state.zone;
+      const { zone, zones } = state.zone;
 
-      const zone = zones.find(zone => zone.id === action.payload);
+      const aux = zones.find(zone => zone.id === action.payload);
 
-      if (zone) {
-        dispatch(setZone(zone));
+      if (aux && zone.id !== aux.id) {
+        dispatch(setZone(aux));
       }
     },
   });
