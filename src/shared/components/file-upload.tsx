@@ -14,29 +14,46 @@ import {
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { uploadDataSource } from '../../store/slices/exploring/datasourceSlice';
-import type { IDataSource } from '../models/dataexploration.model';
 
-interface FileUploadProps {
-  onUploadSuccess?: (dataset: IDataSource) => void;
-  onUploadError?: (error: string) => void;
+export interface AdditionalField {
+  name: string;
+  label: string;
+  required?: boolean;
+  placeholder?: string;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({
+export interface UploadParams {
+  file: File;
+  additionalFields?: Record<string, string>;
+}
+
+interface FileUploadProps<T = unknown> {
+  onUpload: (params: UploadParams) => Promise<T>;
+  onUploadSuccess?: (result: T) => void;
+  onUploadError?: (error: string) => void;
+  acceptedFileTypes?: string[];
+  maxFileSize?: number;
+  additionalFields?: AdditionalField[];
+  title?: string;
+  description?: string;
+}
+
+export const FileUpload = <T = unknown, >({
+  onUpload,
   onUploadSuccess,
   onUploadError,
-}) => {
-  const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector(state => state.dataSource);
+  acceptedFileTypes = ['.csv'],
+  maxFileSize = 100 * 1024 * 1024, // 100MB
+  additionalFields = [],
+  title = 'Upload Dataset',
+  description = 'Drag and drop your file here, or click to browse',
+}: FileUploadProps<T>) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [measure0, setMeasure0] = useState<string | null>(null);
-  const [measure1, setMeasure1] = useState<string | null>(null);
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const acceptedFileTypes = ['.csv'];
-  const maxFileSize = 100 * 1024 * 1024; // 100MB
 
   const validateFile = (file: File): string | null => {
     // Check file type
@@ -102,23 +119,45 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     }
   };
 
-  const handleUpload = async (measure0?: string, measure1?: string) => {
+  const handleUpload = async () => {
     if (!selectedFile) return;
 
+    // Validate required fields
+    const missingFields = additionalFields
+      .filter(field => field.required && !fieldValues[field.name])
+      .map(field => field.label);
+
+    if (missingFields.length > 0) {
+      const errorMsg = `Please fill in required fields: ${missingFields.join(', ')}`;
+
+      setUploadError(errorMsg);
+
+      onUploadError?.(errorMsg);
+
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
     try {
-      const result = await dispatch(
-        uploadDataSource({
-          file: selectedFile,
-          format: 'rawvis',
-          measure0,
-          measure1,
-        }),
-      ).unwrap();
+      const result = await onUpload({
+        file: selectedFile,
+        additionalFields:
+          Object.keys(fieldValues).length > 0 ? fieldValues : undefined,
+      });
 
       setSelectedFile(null);
+      setFieldValues({});
       onUploadSuccess?.(result);
     } catch (error) {
-      onUploadError?.(error as string);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+
+      setUploadError(errorMsg);
+
+      onUploadError?.(errorMsg);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -178,10 +217,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               sx={{ fontSize: 48, color: 'primary.main', mb: 2 }}
             />
             <Typography variant="h6" gutterBottom>
-              Upload Dataset
+              {title}
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              Drag and drop your file here, or click to browse
+              {description}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               Supported formats: {acceptedFileTypes.join(', ')} (Max size:{' '}
@@ -202,20 +241,24 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                   {formatFileSize(selectedFile.size)}
                 </Typography>
 
-                <TextField
-                  size="small"
-                  label="Measure 0"
-                  value={measure0 || ''}
-                  onChange={e => setMeasure0(e.target.value)}
-                  onClick={e => e.stopPropagation()}
-                />
-                <TextField
-                  size="small"
-                  label="Measure 1"
-                  value={measure1 || ''}
-                  onChange={e => setMeasure1(e.target.value)}
-                  onClick={e => e.stopPropagation()}
-                />
+                {additionalFields.map(field => (
+                  <TextField
+                    key={field.name}
+                    size="small"
+                    label={field.label}
+                    placeholder={field.placeholder}
+                    value={fieldValues[field.name] || ''}
+                    onChange={e =>
+                      setFieldValues(prev => ({
+                        ...prev,
+                        [field.name]: e.target.value,
+                      }))
+                    }
+                    onClick={e => e.stopPropagation()}
+                    required={field.required}
+                    sx={{ m: 1 }}
+                  />
+                ))}
               </Box>
               <IconButton
                 onClick={e => {
@@ -237,15 +280,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               variant="contained"
               onClick={e => {
                 e.stopPropagation();
-                handleUpload(
-                  measure0 ? measure0 : undefined,
-                  measure1 ? measure1 : undefined,
-                );
+                handleUpload();
               }}
-              disabled={!measure0 || !measure1 || loading.upload}
+              disabled={isUploading}
               sx={{ mt: 2 }}
             >
-              {loading.upload ? (
+              {isUploading ? (
                 <>
                   <CircularProgress size={16} sx={{ mr: 1 }} />
                   Uploading...
@@ -258,9 +298,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         )}
       </Paper>
 
-      {error.upload && (
+      {uploadError && (
         <Alert severity="error" sx={{ mt: 2 }}>
-          {error.upload}
+          {uploadError}
         </Alert>
       )}
     </Box>
