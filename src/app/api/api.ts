@@ -16,6 +16,11 @@ export const authApi = axios.create({
   withCredentials: true,
 });
 
+export const eusomeApi = axios.create({
+  baseURL: '/eusome',
+  withCredentials: true,
+});
+
 api.interceptors.request.use(config => {
   const token = getToken();
 
@@ -51,6 +56,30 @@ experimentApi.interceptors.request.use(config => {
 });
 
 experimentApi.interceptors.response.use(
+  response => response,
+  error => {
+    // Handle 401 errors globally
+    if (error.response && error.response.status === 401) {
+      // Clear token and redirect to login
+      localStorage.removeItem('auth_token');
+      // Consider using history.push or similar for navigation
+    }
+
+    return Promise.reject(error);
+  },
+);
+
+eusomeApi.interceptors.request.use(config => {
+  const token = getToken();
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+eusomeApi.interceptors.response.use(
   response => response,
   error => {
     // Handle 401 errors globally

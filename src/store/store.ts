@@ -22,6 +22,7 @@ import { timeSeriesListeners } from './slices/exploring/timeSeriesSlice';
 import { zoneListeners } from './slices/exploring/zoneSlice';
 import { predictionSlice } from './slices/exploring/predictionSlice';
 import { predictionListeners } from './slices/exploring/predictionSlice';
+import { eusomeSlice } from './slices/exploring/eusomeSlice';
 
 export const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ export const store = configureStore({
     dataSource: dataSourceSlice.reducer,
     zone: zoneSlice.reducer,
     prediction: predictionSlice.reducer,
+    eusome: eusomeSlice.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
