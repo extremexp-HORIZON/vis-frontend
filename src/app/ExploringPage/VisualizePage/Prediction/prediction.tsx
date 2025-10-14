@@ -34,6 +34,7 @@ import {
 } from '../../../../store/store';
 import { setModalOpen as setZoneModalOpen } from '../../../../store/slices/exploring/zoneSlice';
 import { exportZoneToJSON } from '../../../../shared/utils/exportUtils';
+import { PredictionModels } from './models';
 
 export interface IPredictionProps {
   zone: IZone;
@@ -221,6 +222,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
             overflow: 'auto',
           }}
         >
+          <PredictionModels />
           {predictionResults.length === 0 ? (
             <>
               <Typography variant="body1" gutterBottom>
