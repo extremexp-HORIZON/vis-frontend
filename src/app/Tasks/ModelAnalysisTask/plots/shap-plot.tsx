@@ -38,7 +38,7 @@ const ShapPlot = () => {
     const missingImportance: string[] = [];
 
     const filteredData = rawData.featureImportances.filter(d => {
-      if (typeof d.importanceScore !== 'number') {
+      if (typeof d.importanceScore !== 'number' || d.importanceScore < 0.01) {
         missingImportance.push(d.featureName);
 
         return false;
