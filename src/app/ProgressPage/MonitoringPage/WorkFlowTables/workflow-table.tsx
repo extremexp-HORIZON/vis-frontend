@@ -15,7 +15,7 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredW
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useRef, useState } from 'react';
-import { Badge,  IconButton, Popover, styled } from '@mui/material';
+import { Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, SelectChangeEvent, styled, TextField, Tooltip } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
 import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
@@ -29,6 +29,9 @@ import { logger } from '../../../../shared/utils/logger';
 import type { WorkflowTableRow } from '../../../../store/slices/monitorPageSlice';
 import { setWorkflowsData, stateController } from '../../../../store/slices/progressPageSlice';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ControlPointDuplicateIcon from '@mui/icons-material/ControlPointDuplicate';
+import { IRun } from '../../../../shared/models/experiment/run.model';
+import { SectionHeader } from '../../../../shared/components/responsive-card-table';
 
 export interface Data {
   [key: string]: string | number | boolean | null | undefined;
@@ -46,6 +49,84 @@ const WorkflowActions = (props: {
     (state: RootState) => state.progressPage,
   );
   const dispatch = useAppDispatch();
+  const [anchorElCreateWorkflow, setAnchorElCreateWorkflow] = useState<null | HTMLElement>(null);
+
+  const uniqueParameters = workflows.data.reduce(
+    (acc: Record<string, Set<string>>, workflow) => {
+      if (workflow.params) {
+        workflow.params.forEach(param => {
+          if (!acc[param.name]) {
+            acc[param.name] = new Set();
+          }
+          acc[param.name].add(param.value);
+        });
+      }
+
+      return acc;
+    },
+    {}
+  );
+
+  const [workflowName, setWorkflowName] = useState('');
+  const [selectedParams, setSelectedParams] = useState<Record<string, string>>({});
+
+  const currentWorkflow = workflows.data?.find(w => w.id === workflowId);
+
+  useEffect(() => {
+    if (anchorElCreateWorkflow && currentWorkflow) {
+      const initialParams =
+        (currentWorkflow.params ?? []).reduce((acc, p) => {
+          acc[p.name] = String(p.value ?? '');
+          return acc;
+        }, {} as Record<string, string>);
+
+      setSelectedParams(initialParams);
+
+      const baseName = currentWorkflow.name?.trim() || currentWorkflow.id;
+      setWorkflowName(baseName ? `${baseName} (copy)` : '');
+    }
+  }, [anchorElCreateWorkflow]);
+
+
+  const handleCreateWorkflowOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElCreateWorkflow(event.currentTarget);
+  };
+
+  const handleCreateWokrkflowClose = () => setAnchorElCreateWorkflow(null);
+  
+
+  const handleParamChange = (paramName: string) => (e: SelectChangeEvent<string>) => {
+    const value = e.target.value;
+
+    setSelectedParams((prev) => ({ ...prev, [paramName]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = Object.entries(selectedParams)
+      .filter(([, v]) => v !== '' && v !== undefined)
+      .map(([name, value]) => ({ name, value }));
+
+    // for now create a new dummy scheduled workflow
+    const newRun: IRun = {
+      id: workflowName.trim(),
+      name: workflowName.trim(),
+      experimentId: experimentId || '',
+      status: 'SCHEDULED',
+      startTime: undefined,
+      endTime: undefined,
+      params,
+      metrics: [],
+      dataAssets: [],
+      tags: {},
+    };
+    const updatedWorkflows = workflows.data.concat(newRun);
+
+    dispatch(setWorkflowsData(updatedWorkflows));
+
+    handleCreateWokrkflowClose();
+  };
+  
 
   const handlePausePlay = () => {
     if(currentStatus === 'PAUSED') {
@@ -103,16 +184,18 @@ const WorkflowActions = (props: {
       <Link
         to={`/${experimentId}/workflow?workflowId=${workflowId}`}
       >
-        <IconButton>
-          <Badge color="warning" badgeContent="" variant="dot" invisible={currentStatus !== 'PENDING_INPUT'}>
-            <LaunchIcon
-              style={{
-                cursor: 'pointer',
-                color: theme.palette.primary.main,
-              }}
-            />
-          </Badge>
-        </IconButton>
+        <Tooltip title="Open">
+          <IconButton>
+            <Badge color="warning" badgeContent="" variant="dot" invisible={currentStatus !== 'PENDING_INPUT'}>
+              <LaunchIcon
+                style={{
+                  cursor: 'pointer',
+                  color: theme.palette.primary.main,
+                }}
+              />
+            </Badge>
+          </IconButton>
+        </Tooltip>
       </Link>
       {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && currentStatus !== 'KILLED' && (
         <>
@@ -133,6 +216,94 @@ const WorkflowActions = (props: {
           </IconButton>
         </>
       )}
+      { currentStatus === 'COMPLETED' &&
+        <Tooltip title="Duplicate">
+          <IconButton onClick={handleCreateWorkflowOpen}>
+            <ControlPointDuplicateIcon
+              style={{ cursor: 'pointer', color: theme.palette.primary.main }}
+            />
+          </IconButton>
+        </Tooltip>
+      }
+      <Popover
+        open={Boolean(anchorElCreateWorkflow)}
+        anchorEl={anchorElCreateWorkflow}
+        onClose={handleCreateWokrkflowClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        PaperProps={{
+          elevation: 3,
+          sx: {
+            width: 300,
+            maxHeight: 300,
+            overflow: 'hidden',
+            padding: 0,
+            borderRadius: '12px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+            border: '1px solid rgba(0,0,0,0.04)',
+            mt: 1,
+            '& .MuiList-root': {
+              padding: 0,
+            }
+          },
+        }}
+      >
+        <SectionHeader icon={<ControlPointDuplicateIcon fontSize="small" />} title="Create New Workflow" />
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            overflow: 'auto',
+            maxHeight: 200
+          }}
+        >
+          <TextField
+            fullWidth
+            size="small"
+            label="workflow name"
+            value={workflowName}
+            onChange={(e) => setWorkflowName(e.target.value)}
+          />
+
+            {Object.entries(uniqueParameters)
+              .map(([paramName, valuesSet]) => {
+                const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
+                const selected = selectedParams[paramName] ?? '';
+
+                return (
+                  <FormControl key={paramName} size="small" fullWidth>
+                    <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
+                    <Select
+                      labelId={`${paramName}-label`}
+                      label={paramName}
+                      value={selected}
+                      onChange={handleParamChange(paramName)}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {values.map((v) => (
+                        <MenuItem key={v} value={v}>
+                          {v}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+              );
+            })}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!workflowName.trim()}
+            >
+              Create
+            </Button>
+          </Box>
+        </Popover>
     </span>
   );
 };

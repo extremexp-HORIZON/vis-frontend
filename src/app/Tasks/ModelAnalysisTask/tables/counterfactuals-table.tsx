@@ -6,7 +6,7 @@ import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
-import { Tab, Tabs } from '@mui/material';
+import { IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -17,6 +17,10 @@ import type { TestInstance } from '../../../../shared/models/tasks/model-analysi
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import BuildIcon from '@mui/icons-material/Build';
+import { IRun } from '../../../../shared/models/experiment/run.model';
+import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
+import { PanoramaSharp } from '@mui/icons-material';
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -42,6 +46,9 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const [activeTab, setActiveTab] = useState(0); // activeTab,setA
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,
+  );
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage,
   );
 
   function convertToPythonStyleString(obj: TestInstance) {
@@ -184,7 +191,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
     tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents || {},
   );
 
-  const columns: GridColDef[] = Object.entries(filteredTableContents).map(([key, column]) => {
+  const baseColumns: GridColDef[] = Object.entries(filteredTableContents).map(([key, column]) => {
     const referenceValue = parseFloat(column.values[0]);
 
     return {
@@ -228,6 +235,88 @@ const CounterfactualsTable = (props: ITableComponent) => {
       },
     };
   });
+
+  const isNumericLike = (v: unknown) => {
+    if (v === null || v === undefined) return false;
+    const n = Number(v);
+    return !isNaN(n) && isFinite(n);
+  };
+
+  const handleReconfigure = (row: any) => {
+    console.log(row)
+    const currentWorkflow = workflows?.data?.find(
+      (workflow) => workflow.id === tab?.workflowId
+    );
+    if (!currentWorkflow) return;
+
+    const updatedParams = (currentWorkflow.params ?? []).map((p) => {
+      const rowValue = row?.[p.name];
+
+      if (rowValue === undefined || rowValue === null || rowValue === '-') return p;
+
+      const pVal = p.value;
+
+      const trimmed = String(rowValue).trim();
+
+      if (isNumericLike(trimmed) && isNumericLike(pVal)) {
+        const tableNumber = Number(trimmed);
+        const baseNumber = Number(pVal);
+        const next = baseNumber + tableNumber;
+        return { ...p, value: String(next) };
+      }
+
+      return { ...p, value: String(rowValue) };
+    });
+
+    // for now create a new dummy scheduled workflow
+    const newRun: IRun = {
+      id: `${tab?.workflowName} (copy ${String(row?.id)})`.trim(),
+      name: `${tab?.workflowName} (copy ${String(row?.id)})`.trim(),
+      experimentId: experimentId || '',
+      status: 'SCHEDULED',
+      startTime: undefined,
+      endTime: undefined,
+      params: updatedParams,
+      metrics: [],
+      dataAssets: [],
+      tags: {},
+    };
+    const updatedWorkflows = workflows.data.concat(newRun);
+    
+    dispatch(setWorkflowsData(updatedWorkflows));
+  }
+
+  const actionColumn: GridColDef = {
+    field: 'action',
+    headerName: 'actions',
+    headerAlign: 'center',
+    align: 'center',
+    sortable: false,
+    filterable: false,
+    headerClassName: 'datagrid-header-fixed',
+    minWidth: 100,
+    renderCell: (params: GridRenderCellParams) => (
+      <Box
+        onClick={(e) => e.stopPropagation()}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        height="100%"
+      >
+        <Tooltip title="Reconfigure">
+          <IconButton
+            onClick={() => {handleReconfigure(params.row)}}
+          >
+            <BuildIcon fontSize="small" color="primary" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+  };
+  
+
+  const columns =  activeTab === 0 ? baseColumns : [...baseColumns, actionColumn];
 
   const rowCount =
     filteredTableContents[Object.keys(filteredTableContents)[0]]?.values
