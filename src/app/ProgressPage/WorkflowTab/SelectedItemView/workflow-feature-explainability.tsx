@@ -46,9 +46,9 @@ const FeatureExplainability = () => {
         container
         spacing={2}
       >
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <ShapPlot />
-        </Grid>
+        </Grid> */}
         <Grid item xs={12}>
           <FeatureImportancePlot />
         </Grid>
@@ -61,9 +61,9 @@ const FeatureExplainability = () => {
         <Grid item xs={12}>
           <Contourplot explanation_type="featureExplanation"/>
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <AttributionHeatmaps />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Box>
   );
