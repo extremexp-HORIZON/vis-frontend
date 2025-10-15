@@ -4,8 +4,15 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '../../../../store/store';
-import { listModels, trainModel } from '../../../../store/slices/exploring/eusomeSlice';
-import { defaultTrainingConfig, type ModelInfo } from '../../../../shared/models/eusome-api.model';
+import {
+  listModels,
+  listProcessedData,
+  trainModel,
+} from '../../../../store/slices/exploring/eusomeSlice';
+import {
+  defaultTrainingConfig,
+  type ModelInfo,
+} from '../../../../shared/models/eusome-api.model';
 import {
   Box,
   Button,
@@ -16,17 +23,28 @@ import {
   TableHead,
   TableRow,
   Typography,
+  TableContainer,
 } from '@mui/material';
 import Loader from '../../../../shared/components/loader';
 
-export const PredictionModels = () => {
+interface PredictionModelsProps {
+  onModelSelect?: (modelFilename: string) => void;
+  selectedModel?: string | null;
+}
+
+export const PredictionModels = ({
+  onModelSelect,
+  selectedModel,
+}: PredictionModelsProps) => {
   const dispatch = useAppDispatch();
   const {
     modelsList,
     loading: { listModels: loadingListModels },
+    processedDataList,
   } = useAppSelector((state: RootState) => state.eusome);
   const { dataset } = useAppSelector((state: RootState) => state.dataset);
   const [availableModels, setModels] = useState<ModelInfo[]>([]);
+  const [filename, setFilename] = useState<string>('');
 
   useEffect(() => {
     if (!modelsList) {
@@ -41,9 +59,28 @@ export const PredictionModels = () => {
     }
   }, [dataset, modelsList]);
 
+  useEffect(() => {
+    if (!processedDataList) {
+      dispatch(listProcessedData());
+    } else {
+      let processedFilename = processedDataList.processed_files.find(pFile =>
+        pFile.filename.includes(dataset?.id || ''),
+      );
+
+      if (processedFilename) {
+        setFilename(processedFilename.filename);
+      }
+    }
+  }, [processedDataList]);
+
   const handleTrainModel = () => {
-    // TODO: Add file selection
-    dispatch(trainModel({ file: new File([], 'model.csv'), trainingConfig: defaultTrainingConfig }));
+    dispatch(trainModel({ ...defaultTrainingConfig, filename }));
+  };
+
+  const handleModelClick = (modelFilename: string) => {
+    if (onModelSelect) {
+      onModelSelect(modelFilename);
+    }
   };
 
   return loadingListModels ? (
@@ -70,37 +107,70 @@ export const PredictionModels = () => {
             {' '}
             Available Models{' '}
           </Typography>
-          <Table
-            size="small"
-            stickyHeader
-            sx={{ border: '1px solid rgba(0, 0, 0, 0.08)' }}
-          >
-            <TableHead>
-              <TableRow>
-                <TableCell>Model Name</TableCell>
-                {/* <TableCell>Model Path</TableCell> */}
-                <TableCell>Timestamp</TableCell>
-                {/* <TableCell>Performance</TableCell> */}
-                <TableCell>Features Count</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {availableModels?.map((model: ModelInfo) => (
-                <TableRow key={model.model_filename}>
-                  <TableCell>{model.model_filename}</TableCell>
-                  {/* <TableCell>{model.model_path}</TableCell> */}
-                  <TableCell>{model.timestamp}</TableCell>
-                  {/* <TableCell>{model.performance}</TableCell> */}
-                  <TableCell>{model.features_count}</TableCell>
+          <TableContainer>
+            <Table
+              size="small"
+              stickyHeader
+              sx={{ border: '1px solid rgba(0, 0, 0, 0.08)' }}
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Model Name</TableCell>
+                  <TableCell>Timestamp</TableCell>
+                  <TableCell>Features Count</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {availableModels?.map((model: ModelInfo) => (
+                  <TableRow
+                    key={model.model_filename}
+                    onClick={() => handleModelClick(model.model_filename)}
+                    sx={{
+                      cursor: 'pointer',
+                      backgroundColor:
+                        selectedModel === model.model_filename
+                          ? 'action.selected'
+                          : 'inherit',
+                      '&:hover': {
+                        backgroundColor: 'action.hover',
+                      },
+                    }}
+                  >
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight:
+                            selectedModel === model.model_filename
+                              ? 'bold'
+                              : 'normal',
+                          color:
+                            selectedModel === model.model_filename
+                              ? 'primary.main'
+                              : 'inherit',
+                        }}
+                      >
+                        {model.model_filename}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{model.timestamp}</TableCell>
+                    <TableCell>{model.features_count}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </>
       ) : (
         <>
-          <Typography variant="h6" textAlign="center">No available models found</Typography>
-          <Button variant="contained" color="primary" onClick={handleTrainModel}>
+          <Typography variant="h6" textAlign="center">
+            No available models found
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleTrainModel}
+          >
             Train a new model
           </Button>
         </>
