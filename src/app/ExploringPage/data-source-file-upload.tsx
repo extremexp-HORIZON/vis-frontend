@@ -3,11 +3,13 @@ import { useCallback } from 'react';
 import { useAppDispatch } from '../../store/store';
 import { uploadDataSource } from '../../store/slices/exploring/datasourceSlice';
 import type { IDataSource } from '../../shared/models/dataexploration.model';
+import { uploadData } from '../../store/slices/exploring/eusomeSlice';
 import {
   FileUpload,
   type AdditionalField,
   type UploadParams,
 } from '../../shared/components/file-upload';
+import { defaultColumnMapping } from '../../shared/models/eusome-api.model';
 
 interface DataSourceFileUploadProps {
   onUploadSuccess?: (dataset: IDataSource) => void;
@@ -21,6 +23,24 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
   const dispatch = useAppDispatch();
 
   const additionalFields: AdditionalField[] = [
+    {
+      name: 'target',
+      label: 'Target',
+      required: true,
+      placeholder: 'Enter target column name',
+    },
+    {
+      name: 'latitude',
+      label: 'Latitude',
+      required: true,
+      placeholder: 'Enter latitude column name',
+    },
+    {
+      name: 'longitude',
+      label: 'Longitude',
+      required: true,
+      placeholder: 'Enter longitude column name',
+    },
     {
       name: 'measure0',
       label: 'Measure 0',
@@ -37,6 +57,18 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
 
   const handleUpload = useCallback(
     async (params: UploadParams): Promise<IDataSource> => {
+      await dispatch(
+        uploadData({
+          file: params.file,
+          columnMapping: {
+            ...defaultColumnMapping,
+            target: params.additionalFields?.target || '',
+            latitude: params.additionalFields?.latitude || '',
+            longitude: params.additionalFields?.longitude || '',
+          },
+        }),
+      ).unwrap();
+
       const result = await dispatch(
         uploadDataSource({
           file: params.file,
