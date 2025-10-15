@@ -14,6 +14,10 @@ import {
   Alert,
   TextField,
   MenuItem,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
@@ -70,6 +74,10 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     IPredictionResult[]
   >([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Wizard state
+  const [activeStep, setActiveStep] = useState(0);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
   );
@@ -80,7 +88,35 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     setOpen(false);
     setIsLoading(false);
     setError(null);
+    // Reset wizard state
+    setActiveStep(0);
+    setSelectedModel(null);
   };
+
+  // Wizard navigation functions
+  const handleNext = () => {
+    setActiveStep(prev => prev + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep(prev => prev - 1);
+  };
+
+  const handleModelSelect = (modelFilename: string) => {
+    setSelectedModel(modelFilename);
+  };
+
+  // Stepper steps
+  const steps = [
+    {
+      label: 'Select Model',
+      description: 'Choose a trained model for prediction',
+    },
+    {
+      label: 'Configure Prediction',
+      description: 'Set prediction parameters and run prediction',
+    },
+  ];
 
   const handleExportToJSON = () => {
     exportZoneToJSON(zone, predictionResults, intervals[zone.id!]);
@@ -215,109 +251,167 @@ export const Prediction = ({ zone }: IPredictionProps) => {
           dividers
           sx={{
             p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
             maxHeight: '80vh',
             overflow: 'auto',
           }}
         >
-          <PredictionModels />
-          {predictionResults.length === 0 ? (
-            <>
-              <Typography variant="body1" gutterBottom>
-                Included geohashes: {zone.geohashes?.length}
-              </Typography>
-
-              <Box
-                sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  Time ahead
-                </Typography>
-                <TextField
-                  select
-                  variant="outlined"
-                  value={intervalsAmount}
-                  onChange={e => setIntervalsAmount(Number(e.target.value))}
-                  size="small"
-                  sx={{ width: 120 }}
-                >
-                  {fixedIntervals.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.text}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <Typography variant="body2" color="text.secondary">
-                  for {fixedHeights.map(height => height.value).join(', ')}{' '}
-                  meters
-                </Typography>
-              </Box>
-              <Typography
-                variant="body2"
-                gutterBottom
-                sx={{ fontStyle: 'italic' }}
-              >
-                (in 10 minute intervals)
-              </Typography>
-
-              <Box sx={{ mb: 2 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handlePredict}
-                  disabled={isLoading}
-                  startIcon={isLoading ? <CircularProgress size={20} /> : null}
-                >
-                  {isLoading ? 'Predicting...' : 'Predict'}
-                </Button>
-              </Box>
-
-              {isLoading && (
-                <Box sx={{ mb: 2 }}>
+          <Stepper activeStep={activeStep} orientation="vertical">
+            {steps.map((step, index) => (
+              <Step key={step.label}>
+                <StepLabel>{step.label}</StepLabel>
+                <StepContent>
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    gutterBottom
+                    sx={{ mb: 2 }}
                   >
-                    Generating prediction results...
+                    {step.description}
                   </Typography>
-                  <LinearProgress />
-                </Box>
-              )}
 
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
-            </>
-          ) : (
-            <>
-              <Typography variant="h6" gutterBottom textAlign="center">
-                Results
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  onClick={handleView}
-                  color="primary"
-                  variant="contained"
-                  aria-label="view"
-                >
-                  View
-                </Button>
-                <Button
-                  onClick={handleExportToJSON}
-                  color="primary"
-                  variant="outlined"
-                  aria-label="export"
-                >
-                  Export
-                </Button>
-              </Box>
-            </>
-          )}
+                  {/* Step 1: Model Selection */}
+                  {index === 0 && (
+                    <Box>
+                      <PredictionModels
+                        onModelSelect={handleModelSelect}
+                        selectedModel={selectedModel}
+                      />
+                      <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                        <Button
+                          variant="contained"
+                          onClick={handleNext}
+                          disabled={!selectedModel}
+                        >
+                          Next
+                        </Button>
+                        <Button onClick={handleClose}>Cancel</Button>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Step 2: Prediction Configuration */}
+                  {index === 1 && (
+                    <Box>
+                      <Typography variant="body1" gutterBottom>
+                        Selected Model: {selectedModel}
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        Included geohashes: {zone.geohashes?.length}
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          mb: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Time ahead
+                        </Typography>
+                        <TextField
+                          select
+                          variant="outlined"
+                          value={intervalsAmount}
+                          onChange={e =>
+                            setIntervalsAmount(Number(e.target.value))
+                          }
+                          size="small"
+                          sx={{ width: 120 }}
+                        >
+                          {fixedIntervals.map(option => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.text}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                        <Typography variant="body2" color="text.secondary">
+                          for{' '}
+                          {fixedHeights.map(height => height.value).join(', ')}{' '}
+                          meters
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        gutterBottom
+                        sx={{ fontStyle: 'italic' }}
+                      >
+                        (in 10 minute intervals)
+                      </Typography>
+
+                      <Box sx={{ mb: 2 }}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handlePredict}
+                          disabled={isLoading}
+                          startIcon={
+                            isLoading ? <CircularProgress size={20} /> : null
+                          }
+                        >
+                          {isLoading ? 'Predicting...' : 'Predict'}
+                        </Button>
+                      </Box>
+
+                      {isLoading && (
+                        <Box sx={{ mb: 2 }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Generating prediction results...
+                          </Typography>
+                          <LinearProgress />
+                        </Box>
+                      )}
+
+                      {error && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                          {error}
+                        </Alert>
+                      )}
+
+                      {predictionResults.length > 0 && (
+                        <Box sx={{ mt: 2 }}>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            textAlign="center"
+                          >
+                            Results
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                              onClick={handleView}
+                              color="primary"
+                              variant="contained"
+                              aria-label="view"
+                            >
+                              View
+                            </Button>
+                            <Button
+                              onClick={handleExportToJSON}
+                              color="primary"
+                              variant="outlined"
+                              aria-label="export"
+                            >
+                              Export
+                            </Button>
+                          </Box>
+                        </Box>
+                      )}
+
+                      <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                        <Button onClick={handleBack}>Back</Button>
+                        <Button onClick={handleClose}>Close</Button>
+                      </Box>
+                    </Box>
+                  )}
+                </StepContent>
+              </Step>
+            ))}
+          </Stepper>
         </DialogContent>
       </Dialog>
     </>

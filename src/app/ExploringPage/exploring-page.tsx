@@ -26,7 +26,7 @@ import { useEffect, useState } from 'react';
 import Loader from '../../shared/components/loader';
 import { DataSourceFileUpload } from './data-source-file-upload';
 import { ConfirmationModal } from '../../shared/components/confirmation-modal';
-import { listModels } from '../../store/slices/exploring/eusomeSlice';
+import { listModels, listProcessedData } from '../../store/slices/exploring/eusomeSlice';
 
 const ExploringPage = () => {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ const ExploringPage = () => {
   const { dataSources, loading, error } = useAppSelector(
     state => state.dataSource,
   );
-  const { modelsList } = useAppSelector(state => state.eusome);
+  const { modelsList, processedDataList } = useAppSelector(state => state.eusome);
 
   useEffect(() => {
     if (dataSources.length === 0) {
@@ -50,6 +50,9 @@ const ExploringPage = () => {
     }
     if (!modelsList) {
       dispatch(listModels());
+    }
+    if (!processedDataList) {
+      dispatch(listProcessedData());
     }
   }, [dispatch]);
 
