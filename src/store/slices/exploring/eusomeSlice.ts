@@ -18,6 +18,7 @@ import {
   type InferenceInput,
 } from '../../../shared/models/eusome-api.model';
 import { showError, showSuccess } from '../../../shared/utils/toast';
+import type { AppStartListening } from '../../listenerMiddleware';
 
 // =============================================================================
 // State Interface
@@ -609,6 +610,16 @@ export const eusomeSlice = createSlice({
 // =============================================================================
 // Exports
 // =============================================================================
+
+export const eusomeApiListeners = (startAppListening: AppStartListening) => {
+  // trainModelListener
+  startAppListening({
+    actionCreator: trainModel.fulfilled,
+    effect: async (_, listenerApi) => {
+      await listenerApi.dispatch(listModels());
+    },
+  });
+};
 
 export const {
   resetEusomeState,
