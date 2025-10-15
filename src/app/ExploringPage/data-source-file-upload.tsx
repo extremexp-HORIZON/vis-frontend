@@ -9,7 +9,10 @@ import {
   type AdditionalField,
   type UploadParams,
 } from '../../shared/components/file-upload';
-import { defaultColumnMapping } from '../../shared/models/eusome-api.model';
+import {
+  defaultAugmentationOptions,
+  defaultColumnMapping,
+} from '../../shared/models/eusome-api.model';
 
 interface DataSourceFileUploadProps {
   onUploadSuccess?: (dataset: IDataSource) => void;
@@ -65,6 +68,11 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
             target: params.additionalFields?.target || '',
             latitude: params.additionalFields?.latitude || '',
             longitude: params.additionalFields?.longitude || '',
+          },
+          // temporary disable augmentation
+          augmentationOptions: {
+            ...defaultAugmentationOptions,
+            enable_augmentation: false,
           },
         }),
       ).unwrap();
