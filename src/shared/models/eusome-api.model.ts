@@ -67,18 +67,26 @@ export const defaultAugmentationOptions: AugmentationOptions = {
 // Train Model Endpoint (/train_model)
 // =============================================================================
 
+export interface Hyperparameters {
+  n_estimators?: number;
+  learning_rate?: number;
+  max_depth?: number;
+  [key: string]: unknown; // Allow additional hyperparameters
+}
+
 export interface TrainingConfig {
+  filename: string; // Processed CSV filename from /upload_data
   model_name: string; // e.g., "XGBRegressor"
   target_column: string;
   feature_columns: string[] | null;
   n_splits: number;
-  hyperparameters: Record<string, unknown>;
+  hyperparameters: Hyperparameters;
   custom_model_name: string | null;
 }
 
 export interface TrainModelRequest {
-  file: File; // Processed CSV file from /upload_data
-  config_json?: string; // JSON stringified TrainingConfig
+  filename: string; // Processed CSV filename from /upload_data
+  trainingConfig?: TrainingConfig;
 }
 
 export interface TrainModelResponse {
@@ -87,12 +95,19 @@ export interface TrainModelResponse {
 }
 
 // Default training configuration
+export const defaultHyperparameters: Hyperparameters = {
+  n_estimators: 200,
+  learning_rate: 0.03,
+  max_depth: 7,
+};
+
 export const defaultTrainingConfig: TrainingConfig = {
+  filename: '',
   model_name: 'XGBRegressor',
   target_column: 'rsrp_rscp_rssi',
   feature_columns: null,
   n_splits: 5,
-  hyperparameters: {},
+  hyperparameters: defaultHyperparameters,
   custom_model_name: null,
 };
 

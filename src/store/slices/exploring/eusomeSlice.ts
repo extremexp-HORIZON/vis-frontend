@@ -154,7 +154,7 @@ export const uploadData = createAsyncThunk<
 // =============================================================================
 
 export interface TrainModelParams {
-  file: File;
+  filename: string; // Processed CSV filename from /upload_data
   trainingConfig?: TrainingConfig;
 }
 
@@ -164,22 +164,26 @@ export const trainModel = createAsyncThunk<
   { rejectValue: string }
 >(
   'eusome/trainModel',
-  async ({ file, trainingConfig }, { rejectWithValue }) => {
+  async ({ filename, trainingConfig }, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
-
-      formData.append('file', file);
-
-      if (trainingConfig) {
-        formData.append('config_json', JSON.stringify(trainingConfig));
-      }
+      // Create the training config with the filename and defaults
+      const config: TrainingConfig = {
+        filename,
+        model_name: 'XGBRegressor',
+        target_column: 'rsrp_rscp_rssi',
+        feature_columns: null,
+        n_splits: 5,
+        hyperparameters: {},
+        custom_model_name: null,
+        ...trainingConfig,
+      };
 
       const response = await eusomeApi.post<TrainModelResponse>(
         '/train_model',
-        formData,
+        config,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
           },
         },
       );
