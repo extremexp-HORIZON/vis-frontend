@@ -56,7 +56,8 @@ const HeatMap = () => {
           groupBy,
           aggregations: aggregation,
           filters,
-          columns: cols
+          columns: cols,
+          limit: 10000
         },
         metadata: {
           workflowId: tab?.workflowId || '',

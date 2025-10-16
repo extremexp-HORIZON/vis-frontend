@@ -411,6 +411,7 @@ const ScatterChart = () => {
           },
           columns: cols,
           filters,
+          limit: 10000
         },
         metadata: {
           workflowId: tab?.workflowId || '',

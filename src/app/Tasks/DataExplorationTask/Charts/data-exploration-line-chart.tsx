@@ -102,7 +102,7 @@ const LineChart = () => {
           },
           columns: cols,
           filters,
-          // limit: 5000,
+          limit: 10000,
         },
         metadata: {
           workflowId: tab?.workflowId || '',
