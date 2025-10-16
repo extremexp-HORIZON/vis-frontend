@@ -356,7 +356,14 @@ export const GeohashGridLayer = ({
         // Add tooltip
         if (level === 'prediction' && predData) {
           const timestamp = predData.timestamp
-            ? new Date(predData.timestamp).toLocaleTimeString()
+            ? new Date(predData.timestamp).toLocaleTimeString([], {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            })
             : 'N/A';
 
           rect.bindTooltip(
@@ -366,7 +373,7 @@ export const GeohashGridLayer = ({
                 <strong>Geohash:</strong> ${hash}<br/>
                 <strong>RSRP:</strong> ${predData.rsrp.toFixed(2)} dBm<br/>
                 <strong>Height:</strong> ${predData.height}m<br/>
-                <strong>Time:</strong> ${timestamp}
+                <strong>Timestamp:</strong> ${timestamp}
               </div>
             `,
             {

@@ -416,6 +416,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                             Start Time
                           </Typography>
                           <DateTimePicker
+                            ampm={false}
                             value={predictionTimestamp}
                             onChange={newValue =>
                               setPredictionTimestamp(newValue)

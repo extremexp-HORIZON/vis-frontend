@@ -123,11 +123,22 @@ export const PredictionTimeline = () => {
   };
 
   // Format timestamp for display
-  const formatTimestamp = (timestamp: string) => {
+  const formatTimestamp = (timestamp: string, hourOnly: boolean = false) => {
     if (!timestamp) return '';
     const date = new Date(timestamp);
 
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (hourOnly) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    return date.toLocaleTimeString([], {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
   };
 
   // Generate marks for the slider
@@ -139,7 +150,7 @@ export const PredictionTimeline = () => {
       value: index,
       label:
         index === 0 || index === timeSlots.length - 1
-          ? formatTimestamp(timeSlots[index])
+          ? formatTimestamp(timeSlots[index], true)
           : '', // Empty label for intermediate marks
     }));
 
@@ -237,7 +248,7 @@ export const PredictionTimeline = () => {
             textAlign="center"
             sx={{ fontWeight: 'bold' }}
           >
-            Time
+            Timestamp
             <Typography
               variant="body2"
               color="primary"
