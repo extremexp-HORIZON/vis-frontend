@@ -157,18 +157,24 @@ export interface LocationPaths {
 }
 
 export interface InferenceInput {
-  geohash: string;
+  geohashes: string[];
   radio_timestamp: string; // ISO 8601 format
+  time_intervals: number;
   requested_heights: number[];
   model_filename: string | null;
+  training_csv_filename: string | null;
   location_paths: LocationPaths | null;
 }
 
-export interface PredictionResponse {
+export interface SinglePrediction {
   geohash: string;
   radio_timestamp: string;
   predicted_rsrp_at_heights: Array<Record<string, number | null>>;
   location_data_used: Record<string, unknown>;
+}
+
+export interface PredictionResponse {
+  predictions: SinglePrediction[];
   model_used: string;
 }
 
@@ -188,10 +194,12 @@ export const defaultLocationPaths: LocationPaths = {
 
 // Default inference input
 export const defaultInferenceInput: InferenceInput = {
-  geohash: 'swbbqkwr',
+  geohashes: ['swbbqkwr'],
   radio_timestamp: '2019-05-31T17:30:49+00:00',
+  time_intervals: 1,
   requested_heights: [10.0, 30.0, 60.0, 100.0],
   model_filename: 'AthensModelXGB_20251001_134924.pkl',
+  training_csv_filename: null,
   location_paths: defaultLocationPaths,
 };
 

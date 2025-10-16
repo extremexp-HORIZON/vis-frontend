@@ -92,7 +92,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
   );
-  const { loading: eusomeLoading } = useAppSelector(
+  const { loading: eusomeLoading, processedDataList } = useAppSelector(
     (state: RootState) => state.eusome,
   );
   const dispatch = useAppDispatch();
@@ -174,13 +174,18 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     dispatch(setPredictionDisplay(true));
 
     try {
-      // Create inference input for each geohash
+      // Create inference input for all geohashes
       const inferenceInput: InferenceInput = {
         ...defaultInferenceInput,
-        geohash: zone.geohashes[0], // Use first geohash for now
+        geohashes: zone.geohashes,
         radio_timestamp: predictionTimestamp.toISOString(),
+        time_intervals: intervalsAmount,
         requested_heights: fixedHeights.map(h => h.value),
         model_filename: selectedModel,
+        training_csv_filename:
+          processedDataList?.processed_files.find(d =>
+            d.filename.includes(zone.fileName || ''),
+          )?.filename || null,
       };
 
       // Dispatch the EUSOME predict action
@@ -191,8 +196,6 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         const convertedResults = convertEusomePredictionToInternal(
           result.payload,
           zone.id!,
-          zone.geohashes,
-          intervalsAmount,
         );
 
         setPredictionResults(convertedResults);
@@ -222,32 +225,28 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const convertEusomePredictionToInternal = (
     eusomeResponse: PredictionResponse,
     zoneId: string,
-    geohashes: string[],
-    intervals: number,
   ): IPredictionResult[] => {
     const results: IPredictionResult[] = [];
-    const baseTime = predictionTimestamp
-      ? predictionTimestamp.toDate()
-      : new Date();
 
-    // For now, we'll create results based on the EUSOME response structure
-    // This will need to be adjusted based on the actual API response format
-    geohashes.forEach(geohash => {
-      for (let i = 0; i < intervals; i++) {
-        for (let j = 0; j < fixedHeights.length; j++) {
+    // Process each prediction in the response
+    eusomeResponse.predictions.forEach((prediction, predictionIndex) => {
+      // For each height in the prediction
+      prediction.predicted_rsrp_at_heights.forEach(
+        (heightData, heightIndex) => {
+          const height =
+            heightData.height_m || fixedHeights[heightIndex]?.value || 0;
+          const rsrp = heightData.predicted_rsrp_dbm || 0;
+
           results.push({
-            id: `pred-${geohash}-${i + 1}-${fixedHeights[j].value}`,
+            id: `pred-${prediction.geohash}-${predictionIndex + 1}-${height}`,
             zoneId: zoneId,
-            rsrp:
-              eusomeResponse.predicted_rsrp_at_heights[j][
-                'predicted_rsrp_dbm'
-              ] || 0,
-            timestamp: new Date(baseTime.getTime() + i * 600000).toISOString(),
-            geohash: geohash,
-            height: fixedHeights[j].value,
+            rsrp: rsrp,
+            timestamp: prediction.radio_timestamp,
+            geohash: prediction.geohash,
+            height: height,
           });
-        }
-      }
+        },
+      );
     });
 
     return results;
