@@ -89,7 +89,7 @@ const Contourplot = (props: IContourplot) => {
       fetchModelAnalysisExplainabilityPlot({
         query: {
           ...explainabilityQueryDefault,
-          explanation_type: 'featureExplanation',
+          explanation_type: explanation_type,
           explanation_method: '2dpdp',
           feature1: pendingFeature1,
           feature2: pendingFeature2,
