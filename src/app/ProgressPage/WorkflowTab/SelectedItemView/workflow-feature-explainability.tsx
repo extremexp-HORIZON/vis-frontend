@@ -12,7 +12,7 @@ const FeatureExplainability = () => {
 
   return (
     <Box>
-     <Grid
+      <Grid
         container
         spacing={2}
       >

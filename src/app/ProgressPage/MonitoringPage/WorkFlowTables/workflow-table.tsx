@@ -15,7 +15,8 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredW
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useRef, useState } from 'react';
-import { Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, SelectChangeEvent, styled, TextField, Tooltip } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
+import { Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, styled, TextField, Tooltip } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
 import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
@@ -30,7 +31,7 @@ import type { WorkflowTableRow } from '../../../../store/slices/monitorPageSlice
 import { setWorkflowsData, stateController } from '../../../../store/slices/progressPageSlice';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ControlPointDuplicateIcon from '@mui/icons-material/ControlPointDuplicate';
-import { IRun } from '../../../../shared/models/experiment/run.model';
+import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { SectionHeader } from '../../../../shared/components/responsive-card-table';
 
 export interface Data {
@@ -77,23 +78,23 @@ const WorkflowActions = (props: {
       const initialParams =
         (currentWorkflow.params ?? []).reduce((acc, p) => {
           acc[p.name] = String(p.value ?? '');
+
           return acc;
         }, {} as Record<string, string>);
 
       setSelectedParams(initialParams);
 
       const baseName = currentWorkflow.name?.trim() || currentWorkflow.id;
+
       setWorkflowName(baseName ? `${baseName} (copy)` : '');
     }
   }, [anchorElCreateWorkflow]);
-
 
   const handleCreateWorkflowOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElCreateWorkflow(event.currentTarget);
   };
 
   const handleCreateWokrkflowClose = () => setAnchorElCreateWorkflow(null);
-  
 
   const handleParamChange = (paramName: string) => (e: SelectChangeEvent<string>) => {
     const value = e.target.value;
@@ -126,7 +127,6 @@ const WorkflowActions = (props: {
 
     handleCreateWokrkflowClose();
   };
-  
 
   const handlePausePlay = () => {
     if(currentStatus === 'PAUSED') {
@@ -269,41 +269,41 @@ const WorkflowActions = (props: {
             onChange={(e) => setWorkflowName(e.target.value)}
           />
 
-            {Object.entries(uniqueParameters)
-              .map(([paramName, valuesSet]) => {
-                const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
-                const selected = selectedParams[paramName] ?? '';
+          {Object.entries(uniqueParameters)
+            .map(([paramName, valuesSet]) => {
+              const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
+              const selected = selectedParams[paramName] ?? '';
 
-                return (
-                  <FormControl key={paramName} size="small" fullWidth>
-                    <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
-                    <Select
-                      labelId={`${paramName}-label`}
-                      label={paramName}
-                      value={selected}
-                      onChange={handleParamChange(paramName)}
-                    >
-                      <MenuItem value="">
-                        <em>None</em>
+              return (
+                <FormControl key={paramName} size="small" fullWidth>
+                  <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
+                  <Select
+                    labelId={`${paramName}-label`}
+                    label={paramName}
+                    value={selected}
+                    onChange={handleParamChange(paramName)}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    {values.map((v) => (
+                      <MenuItem key={v} value={v}>
+                        {v}
                       </MenuItem>
-                      {values.map((v) => (
-                        <MenuItem key={v} value={v}>
-                          {v}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                    ))}
+                  </Select>
+                </FormControl>
               );
             })}
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!workflowName.trim()}
-            >
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!workflowName.trim()}
+          >
               Create
-            </Button>
-          </Box>
-        </Popover>
+          </Button>
+        </Box>
+      </Popover>
     </span>
   );
 };

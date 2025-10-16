@@ -158,7 +158,6 @@ const LineChart = () => {
       });
     });
 
-
     return {
       data: { values: longData },
       params: [

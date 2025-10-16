@@ -18,7 +18,7 @@ import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import BuildIcon from '@mui/icons-material/Build';
-import { IRun } from '../../../../shared/models/experiment/run.model';
+import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
 import { PanoramaSharp } from '@mui/icons-material';
 
@@ -239,14 +239,16 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const isNumericLike = (v: unknown) => {
     if (v === null || v === undefined) return false;
     const n = Number(v);
+
     return !isNaN(n) && isFinite(n);
   };
 
   const handleReconfigure = (row: any) => {
-    console.log(row)
+    console.log(row);
     const currentWorkflow = workflows?.data?.find(
       (workflow) => workflow.id === tab?.workflowId
     );
+
     if (!currentWorkflow) return;
 
     const updatedParams = (currentWorkflow.params ?? []).map((p) => {
@@ -262,6 +264,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
         const tableNumber = Number(trimmed);
         const baseNumber = Number(pVal);
         const next = baseNumber + tableNumber;
+
         return { ...p, value: String(next) };
       }
 
@@ -282,9 +285,9 @@ const CounterfactualsTable = (props: ITableComponent) => {
       tags: {},
     };
     const updatedWorkflows = workflows.data.concat(newRun);
-    
+
     dispatch(setWorkflowsData(updatedWorkflows));
-  }
+  };
 
   const actionColumn: GridColDef = {
     field: 'action',
@@ -306,7 +309,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
       >
         <Tooltip title="Reconfigure">
           <IconButton
-            onClick={() => {handleReconfigure(params.row)}}
+            onClick={() => { handleReconfigure(params.row); }}
           >
             <BuildIcon fontSize="small" color="primary" />
           </IconButton>
@@ -314,7 +317,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
       </Box>
     ),
   };
-  
 
   const columns =  activeTab === 0 ? baseColumns : [...baseColumns, actionColumn];
 
