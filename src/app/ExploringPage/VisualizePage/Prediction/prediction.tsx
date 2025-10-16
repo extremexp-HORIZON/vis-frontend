@@ -18,6 +18,10 @@ import {
   Step,
   StepLabel,
 } from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import CloseIcon from '@mui/icons-material/Close';
 import type { IZone } from '../../../../shared/models/exploring/zone.model';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
@@ -82,6 +86,9 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   // Wizard state
   const [activeStep, setActiveStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [predictionTimestamp, setPredictionTimestamp] = useState<Dayjs | null>(
+    dayjs().add(1, 'hour'), // Default to 1 hour from now
+  );
   const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
   );
@@ -97,6 +104,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     // Reset wizard state
     setActiveStep(0);
     setSelectedModel(null);
+    setPredictionTimestamp(dayjs().add(1, 'hour'));
   };
 
   // Wizard navigation functions
@@ -155,17 +163,22 @@ export const Prediction = ({ zone }: IPredictionProps) => {
       return;
     }
 
+    if (!predictionTimestamp) {
+      setError('Please select a prediction timestamp');
+
+      return;
+    }
+
     setError(null);
     setPredictionResults([]);
     dispatch(setPredictionDisplay(true));
 
     try {
       // Create inference input for each geohash
-      const now = new Date();
       const inferenceInput: InferenceInput = {
         ...defaultInferenceInput,
         geohash: zone.geohashes[0], // Use first geohash for now
-        radio_timestamp: now.toISOString(),
+        radio_timestamp: predictionTimestamp.toISOString(),
         requested_heights: fixedHeights.map(h => h.value),
         model_filename: selectedModel,
       };
@@ -185,7 +198,10 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         setPredictionResults(convertedResults);
         dispatch(addZoneId(zone.id!));
         dispatch(
-          addTimestamp({ zoneId: zone.id!, timestamp: now.toISOString() }),
+          addTimestamp({
+            zoneId: zone.id!,
+            timestamp: predictionTimestamp.toISOString(),
+          }),
         );
         dispatch(
           addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }),
@@ -210,7 +226,9 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     intervals: number,
   ): IPredictionResult[] => {
     const results: IPredictionResult[] = [];
-    const now = new Date();
+    const baseTime = predictionTimestamp
+      ? predictionTimestamp.toDate()
+      : new Date();
 
     // For now, we'll create results based on the EUSOME response structure
     // This will need to be adjusted based on the actual API response format
@@ -224,7 +242,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
               eusomeResponse.predicted_rsrp_at_heights[j][
                 'predicted_rsrp_dbm'
               ] || 0,
-            timestamp: new Date(now.getTime() + i * 600000).toISOString(),
+            timestamp: new Date(baseTime.getTime() + i * 600000).toISOString(),
             geohash: geohash,
             height: fixedHeights[j].value,
           });
@@ -306,209 +324,420 @@ export const Prediction = ({ zone }: IPredictionProps) => {
             overflow: 'auto',
           }}
         >
-          <Stepper activeStep={activeStep} orientation="horizontal">
-            {steps.map((step, index) => (
-              <Step key={step.label}>
-                <StepLabel>{step.label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Stepper activeStep={activeStep} orientation="horizontal">
+              {steps.map((step, index) => (
+                <Step key={step.label}>
+                  <StepLabel>{step.label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
 
-          {/* Step Content */}
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {steps[activeStep]?.description}
-            </Typography>
+            {/* Step Content */}
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {steps[activeStep]?.description}
+              </Typography>
 
-            {/* Step 1: Model Selection */}
-            {activeStep === 0 && (
-              <Box>
-                <PredictionModels
-                  onModelSelect={handleModelSelect}
-                  selectedModel={selectedModel}
-                />
-                <Box
-                  sx={{
-                    mt: 2,
-                    display: 'flex',
-                    gap: 1,
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Button onClick={handleClose}>Cancel</Button>
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    disabled={!selectedModel}
+              {/* Step 1: Model Selection */}
+              {activeStep === 0 && (
+                <Box>
+                  <PredictionModels
+                    onModelSelect={handleModelSelect}
+                    selectedModel={selectedModel}
+                  />
+                  <Box
+                    sx={{
+                      mt: 2,
+                      display: 'flex',
+                      gap: 1,
+                      justifyContent: 'space-between',
+                    }}
                   >
-                    Next
-                  </Button>
-                </Box>
-              </Box>
-            )}
-
-            {/* Step 2: Prediction Configuration */}
-            {activeStep === 1 && (
-              <Box>
-                <Typography variant="body1" gutterBottom>
-                  Selected Model: {selectedModel}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Included geohashes: {zone.geohashes?.length}
-                </Typography>
-
-                <Box
-                  sx={{
-                    mb: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Time ahead
-                  </Typography>
-                  <TextField
-                    select
-                    variant="outlined"
-                    value={intervalsAmount}
-                    onChange={e => setIntervalsAmount(Number(e.target.value))}
-                    size="small"
-                    sx={{ width: 120 }}
-                  >
-                    {fixedIntervals.map(option => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.text}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <Typography
-                    variant="body2"
-                    gutterBottom
-                    sx={{ fontStyle: 'italic' }}
-                  >
-                    (in 10 minute intervals)
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    for {fixedHeights.map(height => height.value).join(', ')}{' '}
-                    meters
-                  </Typography>
-                </Box>
-
-                {error && (
-                  <Alert severity="error" sx={{ mb: 2 }}>
-                    {error}
-                  </Alert>
-                )}
-
-                {eusomeLoading.predict && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      gutterBottom
-                    >
-                      Generating prediction results...
-                    </Typography>
-                    <LinearProgress />
-                  </Box>
-                )}
-
-                <Box
-                  sx={{
-                    mt: 2,
-                    display: 'flex',
-                    gap: 1,
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Button onClick={handleBack}>Back</Button>
-                  {predictionResults.length === 0 ? (
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button
                       variant="contained"
-                      color="primary"
-                      onClick={handlePredict}
-                      disabled={eusomeLoading.predict}
-                      startIcon={
-                        eusomeLoading.predict ? (
-                          <CircularProgress size={20} />
-                        ) : null
-                      }
+                      onClick={handleNext}
+                      disabled={!selectedModel}
                     >
-                      {eusomeLoading.predict ? 'Predicting...' : 'Predict'}
-                    </Button>
-                  ) : (
-                    <Button variant="contained" onClick={handleNext}>
                       Next
                     </Button>
-                  )}
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              )}
 
-            {/* Step 3: Results */}
-            {activeStep === 2 && (
-              <Box>
-                <Typography variant="h6" gutterBottom textAlign="center">
-                  Prediction Results
-                </Typography>
-
-                <Typography variant="body1" gutterBottom>
-                  Selected Model: {selectedModel}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Included geohashes: {zone.geohashes?.length}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Time intervals: {intervalsAmount} × 10 minutes
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Heights: {fixedHeights.map(height => height.value).join(', ')}{' '}
-                  meters
-                </Typography>
-
-                {predictionResults.length > 0 && (
-                  <Box sx={{ mt: 3 }}>
-                    <Typography variant="h6" gutterBottom textAlign="center">
-                      Results ({predictionResults.length} predictions)
-                    </Typography>
-                    <Box
-                      sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}
+              {/* Step 2: Prediction Configuration */}
+              {activeStep === 1 && (
+                <Box>
+                  {/* Model Info Card */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      mb: 3,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 2,
+                      backgroundColor: '#f8f9fa',
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      color="primary"
+                      gutterBottom
                     >
-                      <Button
-                        onClick={handleView}
-                        color="primary"
-                        variant="contained"
-                        aria-label="view"
+                      Selected Model
+                    </Typography>
+                    <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
+                      {selectedModel}
+                    </Typography>
+                  </Box>
+
+                  {/* Configuration Grid */}
+                  <Box sx={{ display: 'grid', gap: 3, mb: 3 }}>
+                    {/* Time Configuration */}
+                    <Box
+                      sx={{
+                        p: 2,
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        backgroundColor: '#fff',
+                      }}
+                    >
+                      <Typography variant="subtitle2" gutterBottom>
+                        ⏰ Prediction Timing
+                      </Typography>
+                      <Box
+                        sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}
                       >
-                        View
-                      </Button>
-                      <Button
-                        onClick={handleExportToJSON}
-                        color="primary"
-                        variant="outlined"
-                        aria-label="export"
+                        <Box sx={{ flex: 1 }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 1 }}
+                          >
+                            Start Time
+                          </Typography>
+                          <DateTimePicker
+                            value={predictionTimestamp}
+                            onChange={newValue =>
+                              setPredictionTimestamp(newValue)
+                            }
+                            minDateTime={dayjs()}
+                            slotProps={{
+                              textField: {
+                                size: 'small',
+                                fullWidth: true,
+                                helperText: 'When should predictions begin?',
+                              },
+                            }}
+                          />
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 1 }}
+                          >
+                            Time Ahead
+                          </Typography>
+                          <TextField
+                            select
+                            variant="outlined"
+                            value={intervalsAmount}
+                            onChange={e =>
+                              setIntervalsAmount(Number(e.target.value))
+                            }
+                            size="small"
+                            fullWidth
+                            helperText="How far ahead to predict?"
+                          >
+                            {fixedIntervals.map(option => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.text}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Box>
+                      </Box>
+                    </Box>
+
+                    {/* Location & Parameters */}
+                    <Box
+                      sx={{
+                        p: 2,
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        backgroundColor: '#fff',
+                      }}
+                    >
+                      <Typography variant="subtitle2" gutterBottom>
+                        📍 Location & Parameters
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: 2,
+                        }}
                       >
-                        Export
-                      </Button>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Geohashes
+                          </Typography>
+                          <Typography variant="h6" color="primary">
+                            {zone.geohashes?.length || 0}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Heights (meters)
+                          </Typography>
+                          <Typography variant="body2">
+                            {fixedHeights
+                              .map(height => height.value)
+                              .join(', ')}
+                          </Typography>
+                        </Box>
+                      </Box>
                     </Box>
                   </Box>
-                )}
 
-                <Box
-                  sx={{
-                    mt: 3,
-                    display: 'flex',
-                    gap: 1,
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Button onClick={handleBack}>Back</Button>
-                  <Button onClick={handleClose}>Close</Button>
+                  {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                      {error}
+                    </Alert>
+                  )}
+
+                  {eusomeLoading.predict && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
+                        Generating prediction results...
+                      </Typography>
+                      <LinearProgress />
+                    </Box>
+                  )}
+
+                  <Box
+                    sx={{
+                      mt: 2,
+                      display: 'flex',
+                      gap: 1,
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Button onClick={handleBack}>Back</Button>
+                    {predictionResults.length === 0 ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handlePredict}
+                        disabled={eusomeLoading.predict}
+                        startIcon={
+                          eusomeLoading.predict ? (
+                            <CircularProgress size={20} />
+                          ) : null
+                        }
+                      >
+                        {eusomeLoading.predict ? 'Predicting...' : 'Predict'}
+                      </Button>
+                    ) : (
+                      <Button variant="contained" onClick={handleNext}>
+                        Next
+                      </Button>
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-            )}
-          </Box>
+              )}
+
+              {/* Step 3: Results */}
+              {activeStep === 2 && (
+                <Box>
+                  {/* Success Header */}
+                  <Box
+                    sx={{
+                      textAlign: 'center',
+                      mb: 4,
+                      p: 3,
+                      backgroundColor: '#e8f5e8',
+                      borderRadius: 2,
+                      border: '1px solid #4caf50',
+                    }}
+                  >
+                    <Typography variant="h5" color="success.main" gutterBottom>
+                      Prediction Complete!
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {predictionResults.length} predictions generated
+                      successfully
+                    </Typography>
+                  </Box>
+
+                  {/* Results Summary Cards */}
+                  <Box sx={{ display: 'grid', gap: 2, mb: 4 }}>
+                    <Box
+                      sx={{
+                        p: 2,
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        backgroundColor: '#fff',
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        color="primary"
+                        gutterBottom
+                      >
+                        📊 Prediction Summary
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, 1fr)',
+                          gap: 2,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Model
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ wordBreak: 'break-all' }}
+                          >
+                            {selectedModel?.split('_').slice(0, 2)
+                              .join('_')}...
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Start Time
+                          </Typography>
+                          <Typography variant="body2">
+                            {predictionTimestamp?.format('MMM DD, HH:mm')}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Time Ahead
+                          </Typography>
+                          <Typography variant="body2">
+                            {intervalsAmount} × 10 minutes
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            Locations
+                          </Typography>
+                          <Typography variant="body2">
+                            {zone.geohashes?.length} geohashes
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        p: 2,
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        backgroundColor: '#fff',
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        color="primary"
+                        gutterBottom
+                      >
+                        📈 Prediction Details
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="h4" color="primary">
+                            {predictionResults.length}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Total Predictions
+                          </Typography>
+                        </Box>
+                        <Box sx={{ textAlign: 'right' }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Heights: {fixedHeights.map(h => h.value).join(', ')}
+                            m
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {fixedHeights.length} heights ×{' '}
+                            {zone.geohashes?.length} locations ×{' '}
+                            {intervalsAmount} intervals
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  {/* Action Buttons */}
+                  {predictionResults.length > 0 && (
+                    <Box
+                      sx={{
+                        p: 3,
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: 2,
+                        textAlign: 'center',
+                      }}
+                    >
+                      <Typography variant="h6" gutterBottom>
+                        What would you like to do next?
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 2,
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Button
+                          onClick={handleView}
+                          color="primary"
+                          variant="contained"
+                          size="large"
+                        >
+                          View Results
+                        </Button>
+                        <Button
+                          onClick={handleExportToJSON}
+                          color="primary"
+                          variant="outlined"
+                          size="large"
+                        >
+                          Export Data
+                        </Button>
+                      </Box>
+                    </Box>
+                  )}
+
+                  <Box
+                    sx={{
+                      mt: 3,
+                      display: 'flex',
+                      gap: 1,
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Button onClick={handleBack}>Back</Button>
+                    <Button onClick={handleClose}>Close</Button>
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </LocalizationProvider>
         </DialogContent>
       </Dialog>
     </>
