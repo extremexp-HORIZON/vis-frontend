@@ -46,6 +46,7 @@ const WorkflowParameter = () => {
   };
 
   const maxCount = Math.max(...paramValueCounts.map(d => d.count));
+  const maxLenght = Math.max(...paramValueCounts.map(d => d.value.length));
 
   return (
     <DetailsCard title="Parameter Details">
@@ -70,7 +71,7 @@ const WorkflowParameter = () => {
       <Box mt={1}>
         {paramValueCounts.map(({ value, count }) => (
           <Box key={value} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Box sx={{ width: 60 }}>
+            <Box sx={{ width: maxLenght * 10 }}>
               <Typography variant="body2">{value}</Typography>
             </Box>
             <Box sx={{ flexGrow: 1, mx: 1 }}>
