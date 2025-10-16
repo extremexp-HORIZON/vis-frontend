@@ -54,8 +54,8 @@ const Contourplot = (props: IContourplot) => {
             explanation_method: '2dpdp',
           },
           metadata: {
-            workflowId: tab.workflowId,
-            experimentId,
+            workflowId: tab?.workflowId || '',
+            experimentId: experimentId || '',
             queryCase: '2dpdp',
           },
         }),
