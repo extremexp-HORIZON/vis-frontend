@@ -160,10 +160,10 @@ const CGlanceExecution = () => {
         }}
       >
         {/* GCF Size Dropdown */}
-        <Tooltip
+        {/* <Tooltip
           title="The number of actions to be generated in the end of the algorithm"
           style={{ width: '100%' }}
-        >
+        > */}
           <Box flex={1}>
             <FormControl fullWidth>
               <InputLabel id="gcf-size-select-label">
@@ -190,13 +190,13 @@ const CGlanceExecution = () => {
               </Select>
             </FormControl>
           </Box>
-        </Tooltip>
+        {/* </Tooltip> */}
 
         {/* CF Method Dropdown */}
-        <Tooltip
+        {/* <Tooltip
           title="Methods that generate candidate counterfactual explanations"
           style={{ width: '100%' }}
-        >
+        > */}
           <Box flex={1}>
             <FormControl fullWidth>
               <InputLabel id="cf-method-select-label">
@@ -219,13 +219,13 @@ const CGlanceExecution = () => {
               </Select>
             </FormControl>
           </Box>
-        </Tooltip>
+        {/* </Tooltip> */}
 
         {/* Action Strategy Dropdown */}
-        <Tooltip
+        {/* <Tooltip
           title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria"
           style={{ width: '100%' }}
-        >
+        > */}
           <Box flex={1}>
             <FormControl fullWidth>
               <InputLabel id="action-choice-strategy-select-label">
@@ -250,7 +250,7 @@ const CGlanceExecution = () => {
               </Select>
             </FormControl>
           </Box>
-        </Tooltip>
+        {/* </Tooltip> */}
 
         {/* Run Button */}
         <Box>

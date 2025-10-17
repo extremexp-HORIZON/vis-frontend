@@ -112,8 +112,8 @@ const GlovesScatter = ({
         },
       ],
       encoding: {
-        x: { field: xAxis, type: determineType(xAxis, data) },
-        y: { field: yAxis, type: determineType(yAxis, data) },
+        x: { field: xAxis, type: determineType(xAxis, data), axis: { labels: false } },
+        y: { field: yAxis, type: determineType(yAxis, data), axis: { labels: false } },
         color: {
           field: 'Chosen_Action',
           type: 'nominal',
@@ -146,8 +146,8 @@ const GlovesScatter = ({
         },
       ],
       encoding: {
-        x: { field: xAxis, type: determineType(xAxis, data) },
-        y: { field: yAxis, type: determineType(yAxis, data) },
+        x: { field: xAxis, type: determineType(xAxis, data), axis: { labels: false } },
+        y: { field: yAxis, type: determineType(yAxis, data), axis: { labels: false } },
         color: {
           field: colorField,
           type: 'nominal',
