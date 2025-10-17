@@ -89,9 +89,10 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
         const section = task[plotType] as LoadableSection<IPlotModel>;
+
         section.loading = true;
         section.error = null;
-        section.latestRequestId = action.meta.requestId; 
+        section.latestRequestId = action.meta.requestId;
       }
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.fulfilled, (state, action) => {
@@ -132,6 +133,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
         const section = task[plotType] as LoadableSection;
+
         if (section.latestRequestId && section.latestRequestId !== action.meta.requestId) return;
 
         assignError(task[plotType], 'Failed to fetch data');
