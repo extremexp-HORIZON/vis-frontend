@@ -10,6 +10,7 @@ interface LoadableSection<T = unknown> {
   data?: T;
   loading: boolean;
   error: string | null;
+  latestRequestId?: string;
 }
 
 // Thunk
@@ -87,7 +88,10 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
-        task[plotType].loading = true;
+        const section = task[plotType] as LoadableSection<IPlotModel>;
+        section.loading = true;
+        section.error = null;
+        section.latestRequestId = action.meta.requestId; 
       }
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.fulfilled, (state, action) => {
@@ -95,7 +99,9 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
-        const section = task[plotType];
+        const section = task[plotType] as LoadableSection<IPlotModel>;
+
+        if (section.latestRequestId && section.latestRequestId !== action.meta.requestId) return;
 
         if ('selectedFeature' in section) {
           const feature = action.payload?.features?.feature1 ??
@@ -125,6 +131,9 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
       const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
+        const section = task[plotType] as LoadableSection;
+        if (section.latestRequestId && section.latestRequestId !== action.meta.requestId) return;
+
         assignError(task[plotType], 'Failed to fetch data');
       }
     })
@@ -226,6 +235,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
           data: null,
           selectedFeature1: '',
           selectedFeature2: '',
+          latestRequestId: undefined
         };
       }
     })

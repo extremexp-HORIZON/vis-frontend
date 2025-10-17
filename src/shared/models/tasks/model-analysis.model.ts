@@ -51,12 +51,12 @@ export const handleMultiTimeSeriesData = (payload : IDataExplorationResponse) =>
 
 export interface IModelAnalysis {
   featureNames: string[]
-  pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
-  ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
-  '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null;}
+  pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; }
+  ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; }
+  '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null; latestRequestId?: string; }
   featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; }
   shapValues: { data: IPlotModel | null; loading: boolean; error: string | null; }
-  segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; }
+  segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; latestRequestId?: string; }
   counterfactuals: {
     data: IPlotModel | null
     loading: boolean
@@ -66,6 +66,7 @@ export interface IModelAnalysis {
     data: IPlotModel | null
     loading: boolean
     error: string | null
+    latestRequestId?: string
   }
   global_counterfactuals_control_panel: {
     cfMethod: string
