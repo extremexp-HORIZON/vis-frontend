@@ -194,6 +194,12 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const baseColumns: GridColDef[] = Object.entries(filteredTableContents).map(([key, column]) => {
     const referenceValue = parseFloat(column.values[0]);
 
+    // Reusable formatter for numbers: up to 3 decimals, but avoid trailing zeros if possible
+    const numberFormatter = new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+    });
+
     return {
       field: key,
       headerName: key,
@@ -202,10 +208,12 @@ const CounterfactualsTable = (props: ITableComponent) => {
       headerAlign: 'center',
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        const currentValue = parseFloat(params.value);
+        const raw = params.value;
+        const currentValue = parseFloat(String(raw));
 
+        // If either value isn't numeric, render the raw value
         if (isNaN(referenceValue) || isNaN(currentValue)) {
-          return params.value;
+          return <Typography variant="body2">{String(raw)}</Typography>;
         }
 
         let icon = null;
@@ -226,9 +234,11 @@ const CounterfactualsTable = (props: ITableComponent) => {
           );
         }
 
+        const formatted = numberFormatter.format(currentValue);
+
         return (
           <Box display="flex" alignItems="center" justifyContent="center">
-            <Typography variant="body2">{params.value}</Typography>
+            <Typography variant="body2">{formatted}</Typography>
             {icon}
           </Box>
         );
