@@ -215,6 +215,34 @@ export const PredictionModels = ({
               </Card>
             ))}
           </Box>
+
+          {/* Train New Model Button */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              p: 2,
+              backgroundColor: '#f8f9fa',
+              borderRadius: 2,
+              border: '1px solid #e0e0e0',
+            }}
+          >
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleTrainModel}
+              disabled={!filename || trainingModel}
+              startIcon={
+                trainingModel ? <CircularProgress size={10} /> : null
+              }
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+              }}
+            >
+              {trainingModel ? 'Training New Model...' : 'Train New Model'}
+            </Button>
+          </Box>
         </>
       ) : (
         <Card
