@@ -77,7 +77,7 @@ export const explainabilityQueryDefault: ExplainabilityQuery = {
   gcf_size: 0,
   cfGenerator: '',
   clusterActionChoiceAlgo: '',
-  instance_index: 0
+  instance_index: 13
 };
 
 export type FetchExplainabilityPlotPayload = {
