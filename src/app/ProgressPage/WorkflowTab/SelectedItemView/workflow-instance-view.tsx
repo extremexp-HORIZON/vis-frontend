@@ -395,7 +395,7 @@ const InstanceView = () => {
                     onPaginationModelChange={handlePaginationModelChange}
                     pageSizeOptions={[PAGE_SIZE]}
                     slots={{ noRowsOverlay: CustomNoRowsOverlay }}
-                    rowSelectionModel={point ? [point.id] : []}
+                    rowSelectionModel={point ? [point.id] : shapPoint ? [shapPoint.id] : []}
                     checkboxSelection={false}
                     disableRowSelectionOnClick={false}
                     sx={{

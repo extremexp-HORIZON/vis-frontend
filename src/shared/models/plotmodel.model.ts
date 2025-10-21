@@ -24,7 +24,7 @@ export interface IPlotModel {
     attributionsTable: ITableContents;
     featuresTableColumns: string[];
     attributionsTableColumns: string[];
-    shapContributions: ShapContributions;
+    shapContributions: ShapContributions[];
   }
 
 export interface ITableContents {

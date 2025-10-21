@@ -112,7 +112,7 @@ export type FetchFeatureImportancePlotPayload = {
 }
 
 export type ShapContributions = {
-  feature_name: number
-  feature_value: number
-  shap_value: number
+  featureName: number
+  featureValue: number
+  shapValue: number
 }
