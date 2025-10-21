@@ -4,8 +4,16 @@ import { useEffect } from "react";
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../store/slices/explainabilitySlice";
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import { Box } from "@mui/material";
+import ClosableCardTable from "../../../../shared/components/closable-card-table";
+import { TestInstance } from "../../../../shared/models/tasks/model-analysis.model";
 
-const ShapPlot = () => {
+interface ShpaPlotProps {
+    shapPoint: TestInstance
+    onClose: () => void
+}
+
+const ShapPlot = (shapPlotProps: ShpaPlotProps) => {
+    const {shapPoint, onClose} = shapPlotProps;
     const { tab, isTabInitialized } = useAppSelector(
         (state: RootState) => state.workflowPage,
       );
@@ -36,8 +44,16 @@ const ShapPlot = () => {
       console.log(plotModel?.data);
       
       return (
-        <Box>
-            shap
+        <Box sx={{height: '100%'}}>
+            <ClosableCardTable
+                details={ tab?.workflowTasks.modelAnalysis?.shap?.data?.plotDescr}
+                title={'shap values'}
+                onClose={onClose}
+                noPadding={true}
+            >
+                shap
+            </ClosableCardTable>
+
         </Box>
       );
 }

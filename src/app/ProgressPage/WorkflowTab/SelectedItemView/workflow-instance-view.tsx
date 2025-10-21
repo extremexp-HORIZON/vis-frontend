@@ -463,7 +463,10 @@ const InstanceView = () => {
       ) : null}
       {shapPoint && workflow && (
         <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
-        <ShapPlot />
+          <ShapPlot 
+            shapPoint={shapPoint.data}
+            onClose={() => setShapPoint(null)}
+          />
         </Box>
       )}
     </>
