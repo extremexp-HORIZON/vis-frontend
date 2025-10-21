@@ -132,7 +132,7 @@ export const modelAnalysisReducers = (builder: ActionReducerMapBuilder<IWorkflow
 
       if (task) {
         const data = Array.isArray(action.payload)
-          ? action.payload.map((instance, index) => ({ ...instance, id: index }))
+          ? action.payload.map((instance, index) => ({ ...instance, instanceId: index }))
           : action.payload;
 
         assignResult(task.modelInstances, data);

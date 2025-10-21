@@ -25,7 +25,7 @@ export interface ConfusionMatrixResult {
 }
 
 export type TestInstance = {
-  id: number;
+  instanceId: number;
 } & Record<string, string | number | boolean | null>;
 
 

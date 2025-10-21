@@ -30,6 +30,7 @@ const ShapPlot = (shapPlotProps: ShpaPlotProps) => {
                 ...explainabilityQueryDefault,
                 explanation_type: 'featureExplanation',
                 explanation_method: 'shap',
+                instance_index: shapPoint.instanceId
               },
               metadata: {
                 workflowId: tab.workflowId,
@@ -42,7 +43,7 @@ const ShapPlot = (shapPlotProps: ShpaPlotProps) => {
       }, [isTabInitialized]);
 
       console.log(plotModel?.data);
-      console.log(shapPoint.id)
+      console.log(shapPoint.instanceId)
       
       return (
         <Box sx={{height: '100%'}}>
