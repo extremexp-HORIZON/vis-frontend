@@ -75,7 +75,7 @@ const ProgressPage = (props: ProgressPageProps) => {
 
   useEffect(() => {
     if (workflows.data && workflows.data.length > 0) {
-      workflows.data.every(workflow => workflow.status === 'COMPLETED' || workflow.status === 'FAILED' || workflow.status === 'KILLED') &&
+      workflows.data?.every(workflow => workflow.status === 'COMPLETED' || workflow.status === 'FAILED' || workflow.status === 'KILLED') &&
         intervalId.current &&
         clearInterval(intervalId.current);
     }
