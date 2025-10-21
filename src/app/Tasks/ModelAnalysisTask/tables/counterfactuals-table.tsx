@@ -52,7 +52,7 @@ const CounterfactualsTable = (props: ITableComponent) => {
   );
 
   function convertToPythonStyleString(obj: TestInstance) {
-    const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType'];
+    const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType', 'instanceId'];
 
     return (
       '{' +
