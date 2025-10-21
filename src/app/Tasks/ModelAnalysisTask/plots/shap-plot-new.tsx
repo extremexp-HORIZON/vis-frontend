@@ -42,6 +42,7 @@ const ShapPlot = (shapPlotProps: ShpaPlotProps) => {
       }, [isTabInitialized]);
 
       console.log(plotModel?.data);
+      console.log(shapPoint.id)
       
       return (
         <Box sx={{height: '100%'}}>

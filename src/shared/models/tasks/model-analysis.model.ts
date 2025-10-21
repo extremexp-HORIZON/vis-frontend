@@ -24,7 +24,10 @@ export interface ConfusionMatrixResult {
   matrix: number[][];
 }
 
-export type TestInstance = Record<string, string | number | boolean | null>;
+export type TestInstance = {
+  id: number;
+} & Record<string, string | number | boolean | null>;
+
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,

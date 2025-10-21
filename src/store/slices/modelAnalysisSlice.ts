@@ -130,7 +130,13 @@ export const modelAnalysisReducers = (builder: ActionReducerMapBuilder<IWorkflow
     .addCase(getLabelTestInstances.fulfilled, (state, action) => {
       const task = state.tab?.workflowTasks.modelAnalysis;
 
-      if (task) assignResult(task.modelInstances, action.payload);
+      if (task) {
+        const data = Array.isArray(action.payload)
+          ? action.payload.map((instance, index) => ({ ...instance, id: index }))
+          : action.payload;
+
+        assignResult(task.modelInstances, data);
+      }
     })
     .addCase(getLabelTestInstances.rejected, (state) => {
       const task = state.tab?.workflowTasks.modelAnalysis;
