@@ -65,6 +65,7 @@ export type ExplainabilityQuery = {
   gcf_size?: number
   cfGenerator?: string
   clusterActionChoiceAlgo?: string
+  instance_index?: number
 }
 
 export const explainabilityQueryDefault: ExplainabilityQuery = {
@@ -107,4 +108,10 @@ export type FetchFeatureImportancePlotPayload = {
     workflowId: string
     experimentId: string
   }
+}
+
+export type ShapContributions = {
+  feature_name: number
+  feature_value: number
+  shap_value: number
 }

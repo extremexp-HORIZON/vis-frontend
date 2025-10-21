@@ -1,8 +1,9 @@
 import type { Axis, Features } from './initialization.model';
+import { ShapContributions } from './tasks/explainability.model';
 
 export interface IPlotModel {
     explainabilityType: 'featureExplanation' | 'hyperparameterExplanation';
-    explanationMethod: 'ale' | 'pdp' | '2dpdp' | 'counterfactuals' | 'influenceFunctions' | 'segmentation';
+    explanationMethod: 'ale' | 'pdp' | '2dpdp' | 'counterfactuals' | 'influenceFunctions' | 'segmentation' | 'shap';
     explainabilityModel: string;
     plotName: string;
     plotDescr: string;
@@ -23,6 +24,7 @@ export interface IPlotModel {
     attributionsTable: ITableContents;
     featuresTableColumns: string[];
     attributionsTableColumns: string[];
+    shapContributions: ShapContributions;
   }
 
 export interface ITableContents {

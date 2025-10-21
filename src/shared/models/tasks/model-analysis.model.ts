@@ -55,6 +55,7 @@ export interface IModelAnalysis {
   ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; }
   '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null; latestRequestId?: string; }
   featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; }
+  shap: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
   shapValues: { data: IPlotModel | null; loading: boolean; error: string | null; }
   segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; latestRequestId?: string; }
   counterfactuals: {
@@ -124,6 +125,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   ale: { data: null, loading: false, error: null, selectedFeature: null },
   '2dpdp': { data: null, loading: false, error: null, selectedFeature1: null,  selectedFeature2: null },
   featureImportance: { data: null, loading: false, error: null },
+  shap: { data: null, loading: false, error: null },
   shapValues: { data: null, loading: false, error: null },
   segmentation: { data: null, loading: false, error: null, selectedFeature: null, selectedTime: null },
   counterfactuals: { data: null, loading: false, error: null },
