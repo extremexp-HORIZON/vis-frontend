@@ -5,7 +5,6 @@ import { useState } from 'react';
 import Contourplot from '../../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
 import FeatureImportancePlot from '../../../Tasks/ModelAnalysisTask/plots/feature-importance-plot';
 import AttributionHeatmaps from '../../../Tasks/ModelAnalysisTask/plots/attribution-heatmap';
-import ShapPlot from '../../../Tasks/ModelAnalysisTask/plots/shap-plot-new';
 
 const FeatureExplainability = () => {
   const [isMosaic, setIsMosaic] = useState(true);
@@ -16,10 +15,6 @@ const FeatureExplainability = () => {
         container
         spacing={2}
       >
-        <Grid item xs={12}>
-          <ShapPlot />
-        </Grid>
-
         {/* <Grid item xs={12}>
           <ShapPlot />
         </Grid> */}

@@ -29,6 +29,8 @@ import type { TestInstance } from '../../../../shared/models/tasks/model-analysi
 import type { GridRenderCellParams } from '@mui/x-data-grid';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import PaginationComponent from '../../../../shared/components/pagination-control';
+import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import ShapPlot from '../../../Tasks/ModelAnalysisTask/plots/shap-plot-new';
 
 const CustomNoRowsOverlay = () => {
   return (
@@ -66,6 +68,7 @@ const InstanceView = () => {
   }), [currentPage]);
 
   const [point, setPoint] = useState<{ id: string; data: TestInstance } | null>(null);
+  const [shapPoint, setShapPoint] = useState<{ id: string; data: TestInstance } | null>(null)
   const rows: TestInstance[] = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
 
   useEffect(() => {
@@ -123,21 +126,37 @@ const InstanceView = () => {
         width="100%"
         height="100%"
       >
-        <Tooltip title="Explanations">
-          <IconButton
-            onClick={() => {
-              const { id, ...data } = params.row;
+        {showMisclassifiedOnly &&
+          <Tooltip title="Explanations">
+            <IconButton
+              onClick={() => {
+                const { id, ...data } = params.row;
 
-              setPoint({ id, data });
-            }}
+                setPoint({ id, data });
+                setShapPoint(null);
+              }}
+            >
+              <PsychologyAltRoundedIcon fontSize="small" color="primary" />
+            </IconButton>
+          </Tooltip>
+        }
+        <Tooltip title="Shap Values">
+          <IconButton
+              onClick={() => {
+                const { id, ...data } = params.row;
+
+                setShapPoint({ id, data });
+                setPoint(null);
+              }}
           >
-            <PsychologyAltRoundedIcon fontSize="small" color="primary" />
+            <ScienceOutlinedIcon fontSize="small" color="primary" />
           </IconButton>
+
         </Tooltip>
       </Box>
     ),
   };
-  const columns: GridColDef[] = showMisclassifiedOnly ? [...baseColumns, actionColumn] : baseColumns;
+  const columns: GridColDef[] = [...baseColumns, actionColumn];
 
   const totalRows = showMisclassifiedOnly
     ? rows.filter(r => r.actual !== r.predicted).length
@@ -318,7 +337,7 @@ const InstanceView = () => {
       </Box>
 
       {chartType === 'scatter' && (
-        <Box sx={{ height: point ? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: point || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
@@ -330,7 +349,7 @@ const InstanceView = () => {
       )}
 
       {chartType === 'datatable' && (
-        <Box sx={{ height: point ? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: point || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
             onDownload={handleExportCsv}
@@ -442,6 +461,11 @@ const InstanceView = () => {
           />
         </Box>
       ) : null}
+      {shapPoint && workflow && (
+        <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
+        <ShapPlot />
+        </Box>
+      )}
     </>
   );
 };
