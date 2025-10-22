@@ -196,7 +196,7 @@ const MapControls = () => {
 
         {mapType === 'heatmap' && (
           <>
-            <FormControl sx={{width: '50%'}}>
+            <FormControl sx={{ width: '50%' }}>
               <InputLabel>Weight By</InputLabel>
               <Select
                 value={
@@ -230,7 +230,7 @@ const MapControls = () => {
                   ))}
               </Select>
             </FormControl>
-            <FormControl sx={{width: '40%'}}>
+            <FormControl sx={{ width: '40%' }}>
               <ThemeProvider theme={theme}>
                 <Box display="flex" alignItems="center" gap={1}>
                   <TrackChangesIcon fontSize="small" />

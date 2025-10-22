@@ -68,7 +68,7 @@ const InstanceView = () => {
   }), [currentPage]);
 
   const [point, setPoint] = useState<{ id: string; data: TestInstance } | null>(null);
-  const [shapPoint, setShapPoint] = useState<{ id: string; data: TestInstance } | null>(null)
+  const [shapPoint, setShapPoint] = useState<{ id: string; data: TestInstance } | null>(null);
   const rows: TestInstance[] = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
 
   useEffect(() => {
@@ -80,10 +80,11 @@ const InstanceView = () => {
     id: string;
     data: TestInstance;
 }
-): Boolean => {
-    if(point?.data?.predicted !== point?.data?.actual) return true
+  ): Boolean => {
+    if(point?.data?.predicted !== point?.data?.actual) return true;
+
     return false;
-  }
+  };
 
   const baseColumns: GridColDef[] = Object.keys(rows[0] || {}).map(key => ({
     field: key,
@@ -151,12 +152,12 @@ const InstanceView = () => {
         }
         <Tooltip title="Shap Values">
           <IconButton
-              onClick={() => {
-                const { id, ...data } = params.row;
+            onClick={() => {
+              const { id, ...data } = params.row;
 
-                setShapPoint({ id, data });
-                setPoint(null);
-              }}
+              setShapPoint({ id, data });
+              setPoint(null);
+            }}
           >
             <ScienceOutlinedIcon fontSize="small" color="primary" />
           </IconButton>
@@ -346,7 +347,7 @@ const InstanceView = () => {
       </Box>
 
       {chartType === 'scatter' && (
-        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) || shapPoint ? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
@@ -359,7 +360,7 @@ const InstanceView = () => {
       )}
 
       {chartType === 'datatable' && (
-        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) || shapPoint ? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
             onDownload={handleExportCsv}
@@ -473,7 +474,7 @@ const InstanceView = () => {
       ) : null}
       {shapPoint && workflow && (
         <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
-          <InstanceShapPlot 
+          <InstanceShapPlot
             shapPoint={shapPoint.data}
             onClose={() => setShapPoint(null)}
           />
