@@ -284,7 +284,6 @@ const InstanceClassification = (props: IInstanceClassification) => {
         const cleanedData = Object.fromEntries(
           Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
         ) as TestInstance;
-        console.log(cleanedData)
         setPoint({ id, data: cleanedData });
         setShapPoint(null);
       }
