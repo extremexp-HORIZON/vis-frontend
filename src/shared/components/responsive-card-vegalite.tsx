@@ -287,7 +287,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
       const title = document.createElement('div');
 
-      title.textContent = 'Pinned tooltip';
+      title.textContent = '';
       title.style.fontWeight = '600';
       title.style.fontSize = '12px';
       title.style.color = '#1f2937';

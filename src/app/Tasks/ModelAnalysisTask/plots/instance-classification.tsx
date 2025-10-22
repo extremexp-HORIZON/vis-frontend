@@ -147,6 +147,7 @@ interface IInstanceClassification {
   point: { id: string; data: TestInstance } | null
   showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
+  setShapPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
   hashRow: (row: TestInstance) => string
 }
 
@@ -157,7 +158,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
   );
 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
-  const { plotData, setPoint, point, showMisclassifiedOnly, hashRow } = props;
+  const { plotData, setPoint, setShapPoint, point, showMisclassifiedOnly, hashRow } = props;
   const [options, setOptions] = useState<string[]>([]);
   const [xAxisOption, setXAxisOption] = useState<string>('');
   const [yAxisOption, setYAxisOption] = useState<string>('');
@@ -225,6 +226,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
         ),
         ...row,
         actual: String(point.data.actual),
+        instanceId: point.data.instanceId
       } as TestInstance;
     });
   };
@@ -242,7 +244,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
       };
     });
 
-    const counterfactualPoints = getCounterfactualsData(
+    const counterfactualPoints = showMisclassifiedOnly ? getCounterfactualsData(
       tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents,
       point
     )?.map((cfRow) => {
@@ -253,7 +255,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
         pointType: 'Counterfactual',
         id,
       };
-    }) ?? [];
+    }) ?? [] : [];
 
     return [...originalPoints, ...counterfactualPoints];
   };
@@ -277,14 +279,16 @@ const InstanceClassification = (props: IInstanceClassification) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
       const datum = item?.datum as (Partial<TestInstance> & { id: string; isMisclassified?: boolean }) | undefined;
 
-      if (datum?.isMisclassified) {
+      if (datum) {
         const { id, ...dataWithoutId } = datum;
+        if(datum?.isMisclassified) {
+          const cleanedData = Object.fromEntries(
+            Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
+          ) as TestInstance;
 
-        const cleanedData = Object.fromEntries(
-          Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
-        ) as TestInstance;
-
-        setPoint({ id, data: cleanedData });
+          setPoint({ id, data: cleanedData });
+        }
+        setShapPoint(null);
       }
     });
   };
@@ -321,6 +325,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
         point={point}
         showMisclassifiedOnly={showMisclassifiedOnly}
         setPoint={setPoint}
+        setShapPoint={setShapPoint}
         hashRow={hashRow}
         useUmap={useUmap}
         setuseUmap={setUseUmap }
@@ -443,7 +448,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
             ]
           },
         }}
-
+        
         title={'Instance Classification Chart'}
         actions={false}
         controlPanel={
@@ -463,7 +468,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
         infoMessage={info}
         showInfoMessage={shouldShowInfoMessage}
         aspectRatio={isSmallScreen ? 2.8 : 1.8}
-        maxHeight={480}
+        maxHeight={1200}
         isStatic={true}
       />
     )

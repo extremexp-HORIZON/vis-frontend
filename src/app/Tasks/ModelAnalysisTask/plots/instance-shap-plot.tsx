@@ -19,7 +19,7 @@ interface ShpaPlotProps {
 }
 
 const fmtVal = (v: unknown) => {
-  if (v === null || v === undefined) return "—";
+  if (v === null || v === undefined) return 0; //if no featureValue is retured it means is 0
   if (typeof v === "number") {
     // compact numeric formatting without trailing zeros noise
     const abs = Math.abs(v);

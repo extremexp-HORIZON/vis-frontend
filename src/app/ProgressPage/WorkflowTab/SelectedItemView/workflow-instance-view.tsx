@@ -156,7 +156,7 @@ const InstanceView = () => {
       </Box>
     ),
   };
-  const columns: GridColDef[] = [...baseColumns, actionColumn];
+  const columns: GridColDef[] = baseColumns ? [...baseColumns, actionColumn] : baseColumns;
 
   const totalRows = showMisclassifiedOnly
     ? rows.filter(r => r.actual !== r.predicted).length
@@ -337,11 +337,12 @@ const InstanceView = () => {
       </Box>
 
       {chartType === 'scatter' && (
-        <Box sx={{ height: point || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: (point && showMisclassifiedOnly) || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
             setPoint={setPoint}
+            setShapPoint={setShapPoint}
             showMisclassifiedOnly={showMisclassifiedOnly}
             hashRow={hashRow}
           />
@@ -349,7 +350,7 @@ const InstanceView = () => {
       )}
 
       {chartType === 'datatable' && (
-        <Box sx={{ height: point || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: (point && showMisclassifiedOnly) || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
             onDownload={handleExportCsv}
@@ -449,7 +450,7 @@ const InstanceView = () => {
           </ResponsiveCardTable>
         </Box>
       )}
-      {point && workflow ? (
+      {point && workflow && showMisclassifiedOnly ? (
         <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
           <CounterfactualsTable
             key={'counterfactuals-table'}
