@@ -30,7 +30,7 @@ import type { GridRenderCellParams } from '@mui/x-data-grid';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import PaginationComponent from '../../../../shared/components/pagination-control';
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
-import ShapPlot from '../../../Tasks/ModelAnalysisTask/plots/shap-plot-new';
+import InstanceShapPlot from '../../../Tasks/ModelAnalysisTask/plots/instance-shap-plot';
 
 const CustomNoRowsOverlay = () => {
   return (
@@ -463,7 +463,7 @@ const InstanceView = () => {
       ) : null}
       {shapPoint && workflow && (
         <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
-          <ShapPlot 
+          <InstanceShapPlot 
             shapPoint={shapPoint.data}
             onClose={() => setShapPoint(null)}
           />

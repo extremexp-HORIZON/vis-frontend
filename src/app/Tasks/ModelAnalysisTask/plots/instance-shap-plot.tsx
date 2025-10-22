@@ -28,7 +28,7 @@ const fmtVal = (v: unknown) => {
   return String(v);
 };
 
-const ShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
+const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
   const { tab, isTabInitialized } = useAppSelector((s: RootState) => s.workflowPage);
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
@@ -55,7 +55,6 @@ const ShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
         }),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTabInitialized, tab?.workflowId, experimentId, shapPoint.instanceId]);
 
   const { values, baseValue, fxValue, plotName, plotDescr } = useMemo(() => {
@@ -196,7 +195,7 @@ const spec: VisualizationSpec = useMemo(() => {
         },
       },
 
-      // 4) E[f(X)] label — now ABOVE the axis (like f(x))
+      // 4) E[f(X)] label
       {
         data: { values: [{}] },
         mark: { type: "text", dy: -10, baseline: "bottom" },
@@ -221,7 +220,7 @@ const spec: VisualizationSpec = useMemo(() => {
         },
       },
 
-      // 6) f(x) label — stays ABOVE the axis
+      // 6) f(x) label
       {
         data: { values: [{}] },
         mark: { type: "text", dy: -10, baseline: "bottom" },
@@ -270,4 +269,4 @@ const spec: VisualizationSpec = useMemo(() => {
   );
 };
 
-export default ShapPlot;
+export default InstanceShapPlot;

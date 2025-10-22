@@ -6,7 +6,6 @@ import Contourplot from '../../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
 import FeatureImportancePlot from '../../../Tasks/ModelAnalysisTask/plots/feature-importance-plot';
 import AttributionHeatmaps from '../../../Tasks/ModelAnalysisTask/plots/attribution-heatmap';
 import ShapPlot from '../../../Tasks/ModelAnalysisTask/plots/shap-plot';
-import ShapPlotNew from '../../../Tasks/ModelAnalysisTask/plots/shap-plot-new';
 
 const FeatureExplainability = () => {
   const [isMosaic, setIsMosaic] = useState(true);
