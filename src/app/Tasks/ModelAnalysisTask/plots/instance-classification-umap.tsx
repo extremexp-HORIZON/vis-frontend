@@ -203,17 +203,15 @@ const InstanceClassificationUmap = (props: Umapi) => {
 
         const id = hashRow(originalRow);
         const { actual, predicted, ...rest } = originalRow;
-        if(item.datum?.isMisclassified) {
-          setPoint({
-            id,
-            data: {
-              ...rest,
-              'label': actual,
-              predicted,
-            // index: clickedIndex,
-            },
-          });
-        }
+        setPoint({
+          id,
+          data: {
+            ...rest,
+            actual,
+            predicted,
+          // index: clickedIndex,
+          },
+        });
         setShapPoint(null);
       }
     });

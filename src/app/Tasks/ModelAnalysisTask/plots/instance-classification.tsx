@@ -244,7 +244,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
       };
     });
 
-    const counterfactualPoints = showMisclassifiedOnly ? getCounterfactualsData(
+    const counterfactualPoints = showMisclassifiedOnly &&  point?.data?.predicted !== point?.data?.actual ? getCounterfactualsData(
       tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents,
       point
     )?.map((cfRow) => {
@@ -281,13 +281,11 @@ const InstanceClassification = (props: IInstanceClassification) => {
 
       if (datum) {
         const { id, ...dataWithoutId } = datum;
-        if(datum?.isMisclassified) {
-          const cleanedData = Object.fromEntries(
-            Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
-          ) as TestInstance;
-
-          setPoint({ id, data: cleanedData });
-        }
+        const cleanedData = Object.fromEntries(
+          Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
+        ) as TestInstance;
+        console.log(cleanedData)
+        setPoint({ id, data: cleanedData });
         setShapPoint(null);
       }
     });
