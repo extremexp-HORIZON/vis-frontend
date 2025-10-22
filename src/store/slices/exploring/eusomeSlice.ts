@@ -16,6 +16,8 @@ import {
   type TrainingConfig,
   type FinetuneConfig,
   type InferenceInput,
+  type TaskCreateResponse,
+  type TaskStatusResponse,
 } from '../../../shared/models/eusome-api.model';
 import { showError, showSuccess } from '../../../shared/utils/toast';
 import type { AppStartListening } from '../../listenerMiddleware';
@@ -35,6 +37,8 @@ export interface IEusomeState {
   processedDataList: ProcessedDataResponse | null;
   dataSummary: DataSummaryResponse | null;
   systemStatus: SystemStatusResponse | null;
+  createdTasks: TaskCreateResponse[] | null;
+  taskStatus: TaskStatusResponse | null;
 
   // Loading states
   loading: {
@@ -47,6 +51,8 @@ export interface IEusomeState {
     listProcessedData: boolean;
     dataSummary: boolean;
     systemStatus: boolean;
+    createTask: boolean;
+    getTaskStatus: boolean;
   };
 
   // Error states
@@ -60,6 +66,8 @@ export interface IEusomeState {
     listProcessedData: string | null;
     dataSummary: string | null;
     systemStatus: string | null;
+    createTask: string | null;
+    getTaskStatus: string | null;
   };
 }
 
@@ -73,6 +81,8 @@ const initialState: IEusomeState = {
   processedDataList: null,
   dataSummary: null,
   systemStatus: null,
+  createdTasks: null,
+  taskStatus: null,
   loading: {
     uploadData: false,
     trainModel: false,
@@ -83,6 +93,8 @@ const initialState: IEusomeState = {
     listProcessedData: false,
     dataSummary: false,
     systemStatus: false,
+    createTask: false,
+    getTaskStatus: false,
   },
   error: {
     uploadData: null,
@@ -94,6 +106,8 @@ const initialState: IEusomeState = {
     listProcessedData: null,
     dataSummary: null,
     systemStatus: null,
+    createTask: null,
+    getTaskStatus: null,
   },
 };
 
@@ -381,6 +395,64 @@ export const getSystemStatus = createAsyncThunk<
 });
 
 // =============================================================================
+// Async Thunks - Create Task
+// =============================================================================
+
+export const createTask = createAsyncThunk<
+  TaskCreateResponse,
+  {
+    task_type: string;
+    task_data: TrainingConfig | FinetuneConfig | InferenceInput;
+  },
+  { rejectValue: string }
+>(
+  'eusome/createTask',
+  async ({ task_type, task_data }, { rejectWithValue }) => {
+    try {
+      const response = await eusomeApi.post<TaskCreateResponse>(
+        `/tasks/${task_type}`,
+        task_data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+
+      return rejectWithValue(errorMessage);
+    }
+  },
+);
+
+// =============================================================================
+// Async Thunks - Get Task Status
+// =============================================================================
+
+export const getTaskStatus = createAsyncThunk<
+  TaskStatusResponse,
+  { task_id: string },
+  { rejectValue: string }
+>('eusome/getTaskStatus', async ({ task_id }, { rejectWithValue }) => {
+  try {
+    const response = await eusomeApi.get<TaskStatusResponse>(
+      `/tasks/${task_id}`,
+    );
+
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
+  }
+});
+
+// =============================================================================
 // Slice
 // =============================================================================
 
@@ -399,6 +471,9 @@ export const eusomeSlice = createSlice({
     },
     clearTrainedModel: state => {
       state.trainedModel = null;
+    },
+    clearCreatedTasks: state => {
+      state.createdTasks = null;
     },
   },
   extraReducers: builder => {
@@ -604,6 +679,51 @@ export const eusomeSlice = createSlice({
           showError(action.payload || 'Failed to get system status');
         },
       );
+
+    // ==========================================================================
+    // Create Task
+    // ==========================================================================
+    builder
+      .addCase(createTask.pending, state => {
+        state.loading.createTask = true;
+        state.error.createTask = null;
+      })
+      .addCase(createTask.fulfilled, (state, action) => {
+        state.loading.createTask = false;
+        state.createdTasks = [...(state.createdTasks || []), action.payload];
+        showSuccess('Task created successfully!');
+      })
+      .addCase(
+        createTask.rejected,
+        (state, action: PayloadAction<string | undefined>) => {
+          state.loading.createTask = false;
+          state.error.createTask = action.payload || 'Failed to create task';
+          showError(action.payload || 'Failed to create task');
+        },
+      );
+
+    // ==========================================================================
+    // Get Task Status
+    // ==========================================================================
+    builder
+      .addCase(getTaskStatus.pending, state => {
+        state.loading.getTaskStatus = true;
+        state.error.getTaskStatus = null;
+      })
+      .addCase(getTaskStatus.fulfilled, (state, action) => {
+        state.loading.getTaskStatus = false;
+        state.taskStatus = action.payload;
+        showSuccess('Task status loaded!');
+      })
+      .addCase(
+        getTaskStatus.rejected,
+        (state, action: PayloadAction<string | undefined>) => {
+          state.loading.getTaskStatus = false;
+          state.error.getTaskStatus =
+            action.payload || 'Failed to get task status';
+          showError(action.payload || 'Failed to get task status');
+        },
+      );
   },
 });
 
@@ -626,4 +746,5 @@ export const {
   clearPredictions,
   clearUploadedData,
   clearTrainedModel,
+  clearCreatedTasks,
 } = eusomeSlice.actions;

@@ -282,3 +282,119 @@ export interface SystemStatusResponse {
   models_available: number;
   data_summary: Record<string, number>;
 }
+
+// =============================================================================
+// Task Management (/tasks, /tasks/train, /tasks/predict, /tasks/finetune)
+// =============================================================================
+
+export interface TaskProgress {
+  task_id: string;
+  status: TaskStatus;
+  percent: number;
+  step: string;
+  message: string;
+  error?: string;
+  isConnected: boolean;
+}
+
+export type TaskStatus =
+  | 'queued'
+  | 'running'
+  | 'succeeded'
+  | 'failed'
+  | 'cancelled';
+
+export interface TaskCreateResponse {
+  task_id: string;
+  message: string;
+}
+
+export interface TaskStatusResponse {
+  task_id: string;
+  status: TaskStatus;
+  percent: number;
+  step: string;
+  message: string;
+  created_at: string;
+  updated_at: string;
+  error?: string;
+  success?: string;
+  result_model_filename?: string;
+  metrics_json?: string;
+}
+
+export interface TaskEventData {
+  task_id: string;
+  ts: string; // ISO timestamp
+  status: TaskStatus;
+  percent: string; // Note: Redis stores as string
+  step: string;
+  message: string;
+  error?: string;
+  success?: string; // "1" or "0" as string
+  result_model_filename?: string;
+  metrics_json?: string;
+}
+
+// ============================================================================
+// WebSocket Message Types for EUSOME-API Task Progress
+// ============================================================================
+
+// Base message structure
+interface BaseWebSocketMessage {
+  type: string;
+}
+
+// ============================================================================
+// MESSAGE TYPES
+// ============================================================================
+
+// 1. TASK STATUS (Initial status when connecting)
+export interface TaskStatusMessage extends BaseWebSocketMessage {
+  type: 'task_status';
+  data: {
+    task_id: string;
+    status: TaskStatus;
+    percent: number;
+    step: string;
+    message: string;
+    created_at: string;
+    updated_at: string;
+    error?: string | null;
+    success?: string | null;
+    result_model_filename?: string | null;
+    metrics_json?: string | null;
+  };
+}
+
+// 2. HISTORICAL EVENT (Past events from Redis Stream)
+export interface HistoricalEventMessage extends BaseWebSocketMessage {
+  type: 'historical_event';
+  event_id: string;
+  data: TaskEventData;
+}
+
+// 3. LIVE EVENT (Real-time progress updates)
+export interface LiveEventMessage extends BaseWebSocketMessage {
+  type: 'live_event';
+  data: TaskEventData;
+}
+
+// 4. HEARTBEAT (Keep-alive messages every 30 seconds)
+export interface HeartbeatMessage extends BaseWebSocketMessage {
+  type: 'heartbeat';
+  timestamp: string; // ISO timestamp
+}
+
+// 5. ERROR (Error messages)
+export interface ErrorMessage extends BaseWebSocketMessage {
+  type: 'error';
+  message: string;
+}
+
+export type WebSocketMessage =
+  | TaskStatusMessage
+  | HistoricalEventMessage
+  | LiveEventMessage
+  | HeartbeatMessage
+  | ErrorMessage;
