@@ -514,7 +514,7 @@ const InstanceView = () => {
         <Box sx={{ pt: 2, height: '40%', minHeight: 300 }}>
           <InstanceShapPlot
             shapPoint={shapPoint.data}
-            onClose={() => setShapPoint(null)}
+            onClose={() => {setShapPoint(null); setPoint(null);}}
           />
         </Box>
       )}
