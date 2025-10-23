@@ -1,15 +1,16 @@
-import { useParams } from "react-router-dom";
-import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { fetchModelAnalysisExplainabilityPlot } from "../../../../store/slices/explainabilitySlice";
-import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model";
-import { Box } from "@mui/material";
-import ClosableCardTable from "../../../../shared/components/closable-card-table";
-import { TestInstance } from "../../../../shared/models/tasks/model-analysis.model";
-import Loader from "../../../../shared/components/loader";
-import { VegaLite } from "react-vega";
-import type { TopLevelSpec as VisualizationSpec } from "vega-lite/build/src/spec";
-import InfoMessage from "../../../../shared/components/InfoMessage";
+import { useParams } from 'react-router-dom';
+import type { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/store';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { fetchModelAnalysisExplainabilityPlot } from '../../../../store/slices/explainabilitySlice';
+import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
+import { Box } from '@mui/material';
+import ClosableCardTable from '../../../../shared/components/closable-card-table';
+import type { TestInstance } from '../../../../shared/models/tasks/model-analysis.model';
+import Loader from '../../../../shared/components/loader';
+import { VegaLite } from 'react-vega';
+import type { TopLevelSpec as VisualizationSpec } from 'vega-lite/build/src/spec';
+import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
 interface ShpaPlotProps {
@@ -45,17 +46,21 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
 
   useEffect(() => {
     const el = plotWrapRef.current;
+
     if (!el) return;
 
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         const h = Math.floor(entry.contentRect.height);
         const w = Math.floor(entry.contentRect.width);
+
         if (h !== containerHeight) setContainerHeight(h);
         if (w !== containerWidth) setContainerWidth(w);
       }
     });
+
     resizeObserver.observe(el);
+
     return () => resizeObserver.disconnect();
   }, []);
 
@@ -150,13 +155,13 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
     const baseLabel = `E[f(X)] = ${Number.isFinite(baseValue) ? baseValue.toFixed(3) : '—'}`;
     const fxLabel = `f(x) = ${Number.isFinite(fxValue) ? fxValue.toFixed(3) : '—'}`;
 
-  return {
-    width: containerWidth,
-    height: containerHeight,
-    autosize: { type: "fit", contains: "padding", resize: true },
-    data: { values },
-    transform: [{ calculate: "abs(datum.SHAP)", as: "absSHAP" }],
-    layer: [
+    return {
+      width: containerWidth,
+      height: containerHeight,
+      autosize: { type: 'fit', contains: 'padding', resize: true },
+      data: { values },
+      transform: [{ calculate: 'abs(datum.SHAP)', as: 'absSHAP' }],
+      layer: [
       // 1) Waterfall bars
         {
           mark: { type: 'bar' },
@@ -247,29 +252,29 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
           },
         },
 
-      // 6) f(x) label
-      {
-        data: { values: [{}] },
-        mark: { type: "text", dy: -10, baseline: "bottom" },
-        encoding: {
-          x: { datum: fxValue },
-          y: { value: 0 },
-          text: { value: fxLabel },
-          color: { value: "#616161" },
-          align: { value: "left" },
-          dx: { value: 6 },
+        // 6) f(x) label
+        {
+          data: { values: [{}] },
+          mark: { type: 'text', dy: -10, baseline: 'bottom' },
+          encoding: {
+            x: { datum: fxValue },
+            y: { value: 0 },
+            text: { value: fxLabel },
+            color: { value: '#616161' },
+            align: { value: 'left' },
+            dx: { value: 6 },
+          },
         },
+      ],
+      config: {
+        axis: { labelLimit: 260 },
+        view: { stroke: null },
       },
-    ],
-    config: {
-      axis: { labelLimit: 260 },
-      view: { stroke: null },
-    },
-  };
-}, [values, baseValue, fxValue, xDomain, containerHeight, containerWidth]);
+    };
+  }, [values, baseValue, fxValue, xDomain, containerHeight, containerWidth]);
 
   return (
-    <Box sx={{ height: "100%", minHeight: 250, width: "100%"}}>
+    <Box sx={{ height: '100%', minHeight: 250, width: '100%' }}>
       <ClosableCardTable
         details={plotDescr}
         title={plotName || 'SHAP'}
@@ -277,21 +282,21 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
         noPadding
       >
         <Box ref={plotWrapRef} sx={{ flex: 1, minHeight: 250 }}>
-        {error ? (
-          <InfoMessage
-            message="Error fetching shap plot."
-            type="info"
-            icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-            fullHeight
-          />
-        ) : loading ? (
-          <Loader />
-        ) : (
-          <VegaLite
-            spec={spec}
-            actions={false}
-          />
-        )}
+          {error ? (
+            <InfoMessage
+              message="Error fetching shap plot."
+              type="info"
+              icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+              fullHeight
+            />
+          ) : loading ? (
+            <Loader />
+          ) : (
+            <VegaLite
+              spec={spec}
+              actions={false}
+            />
+          )}
         </Box>
       </ClosableCardTable>
     </Box>

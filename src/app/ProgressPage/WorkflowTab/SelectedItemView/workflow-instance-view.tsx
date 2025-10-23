@@ -347,7 +347,7 @@ const InstanceView = () => {
       </Box>
 
       {chartType === 'scatter' && (
-        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) ? '60%' : shapPoint ? '50%' :'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) ? '60%' : shapPoint ? '50%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
