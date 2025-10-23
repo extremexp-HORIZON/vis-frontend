@@ -59,10 +59,10 @@ export function createTooltipHandler(opts: {
           const run = workflowsData.filter(workflow => workflow.id === row.id)[0];
           const params = run?.params ?? [];
 
-          console.log(params);
+          // console.log(params);
           const pmap = new Map<string, string>(params.map(p => [p.name, p.value]));
 
-          console.log(pmap);
+          // console.log(pmap);
           const paramTds = paramNames
             .map(n => `<td style="padding:4px; vertical-align:top;">${sanitize(pmap.get(n) ?? '')}</td>`)
             .join('');

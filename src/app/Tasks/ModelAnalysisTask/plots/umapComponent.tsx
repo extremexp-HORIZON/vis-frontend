@@ -108,72 +108,72 @@ const UmapComponent = ({ data1, data2, colorField }: UmapComponentProps) => {
     })) || [];
 
   // Shared legend spec generator
-  const sharedLegendSpec = (data1: any[], data2: any[]) => ({
-    description: 'Two scatter plots with a shared legend',
-    hconcat: [
-      {
-        title: 'Action Selection',
-        width: 450,
-        height: 450,
-        data: { values: data1 },
-        mark: { type: 'point', opacity: 0.8 },
-        params: [
-          {
-            name: 'industry',
-            select: { type: 'point', fields: ['action'] },
-            bind: 'legend',
-          },
-        ],
-        encoding: {
-          x: { field: 'x', type: 'quantitative', title: 'UMAP Dimension 1' },
-          y: { field: 'y', type: 'quantitative', title: 'UMAP Dimension 2' },
-          color: { field: 'action', type: 'nominal', title: 'Chosen Action' },
-          tooltip: [
-            { field: 'action', type: 'nominal', title: 'Chosen Action' },
-            { field: 'x', type: 'quantitative' },
-            { field: 'y', type: 'quantitative' },
-          ],
-          opacity: {
-            condition: { param: 'industry', value: 1 },
-            value: 0.01,
-          },
-        },
-      },
-      {
-        title: 'Post-Action Selection',
-        data: { values: data2 },
-        width: 450,
-        height: 450,
-        mark: { type: 'point', opacity: 0.8 },
-        params: [
-          {
-            name: 'industry',
-            select: { type: 'point', fields: ['action'] },
-            bind: 'legend',
-          },
-        ],
-        encoding: {
-          x: { field: 'x', type: 'quantitative', title: 'UMAP Dimension 1' },
-          y: { field: 'y', type: 'quantitative', title: 'UMAP Dimension 2' },
-          color: { field: 'action', type: 'nominal', title: 'Chosen Action' },
-          tooltip: [
-            { field: 'action', type: 'nominal', title: 'Chosen Action' },
-            { field: 'x', type: 'quantitative' },
-            { field: 'y', type: 'quantitative' },
-          ],
-          opacity: {
-            condition: { param: 'industry', value: 1 },
-            value: 0.01,
-          },
-        },
-      },
-    ],
-  });
+  // const sharedLegendSpec = (data1: any[], data2: any[]) => ({
+  //   description: 'Two scatter plots with a shared legend',
+  //   hconcat: [
+  //     {
+  //       title: 'Action Selection',
+  //       width: 450,
+  //       height: 450,
+  //       data: { values: data1 },
+  //       mark: { type: 'point', opacity: 0.8 },
+  //       params: [
+  //         {
+  //           name: 'industry',
+  //           select: { type: 'point', fields: ['action'] },
+  //           bind: 'legend',
+  //         },
+  //       ],
+  //       encoding: {
+  //         x: { field: 'x', type: 'quantitative', title: 'UMAP Dimension 1' },
+  //         y: { field: 'y', type: 'quantitative', title: 'UMAP Dimension 2' },
+  //         color: { field: 'action', type: 'nominal', title: 'Chosen Action' },
+  //         tooltip: [
+  //           { field: 'action', type: 'nominal', title: 'Chosen Action' },
+  //           { field: 'x', type: 'quantitative' },
+  //           { field: 'y', type: 'quantitative' },
+  //         ],
+  //         opacity: {
+  //           condition: { param: 'industry', value: 1 },
+  //           value: 0.01,
+  //         },
+  //       },
+  //     },
+  //     {
+  //       title: 'Post-Action Selection',
+  //       data: { values: data2 },
+  //       width: 450,
+  //       height: 450,
+  //       mark: { type: 'point', opacity: 0.8 },
+  //       params: [
+  //         {
+  //           name: 'industry',
+  //           select: { type: 'point', fields: ['action'] },
+  //           bind: 'legend',
+  //         },
+  //       ],
+  //       encoding: {
+  //         x: { field: 'x', type: 'quantitative', title: 'UMAP Dimension 1' },
+  //         y: { field: 'y', type: 'quantitative', title: 'UMAP Dimension 2' },
+  //         color: { field: 'action', type: 'nominal', title: 'Chosen Action' },
+  //         tooltip: [
+  //           { field: 'action', type: 'nominal', title: 'Chosen Action' },
+  //           { field: 'x', type: 'quantitative' },
+  //           { field: 'y', type: 'quantitative' },
+  //         ],
+  //         opacity: {
+  //           condition: { param: 'industry', value: 1 },
+  //           value: 0.01,
+  //         },
+  //       },
+  //     },
+  //   ],
+  // });
 
-  const specShared = sharedLegendSpec(
-    createScatterData(umapResults.umap1),
-    createScatterData(umapResults.umap2),
-  );
+  // const specShared = sharedLegendSpec(
+  //   createScatterData(umapResults.umap1),
+  //   createScatterData(umapResults.umap2),
+  // );
   const predictionSpec = (umapResult: number[][] | null, colorData: any[]) => ({
 
     width: 450,

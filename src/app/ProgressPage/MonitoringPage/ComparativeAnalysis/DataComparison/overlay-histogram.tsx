@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import InfoMessage from '../../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import Loader from '../../../../../shared/components/loader';
@@ -10,7 +10,6 @@ import type { IDataAsset } from '../../../../../shared/models/experiment/data-as
 import { Handler } from 'vega-tooltip';
 import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 import type { IRun } from '../../../../../shared/models/experiment/run.model';
-import { fetchDataExplorationData } from '../../../../../store/slices/dataExplorationSlice';
 
 export interface OverlayHistogramProps {
   assetName: string;

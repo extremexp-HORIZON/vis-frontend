@@ -171,99 +171,99 @@ const GlovesScatter = ({
     };
   };
 
-  const getEffCostForColorField = (field: string) => {
-    const match = field.match(/^Action(\d+)_Prediction$/); // Extract the number from "ActionX_Prediction"
+  // const getEffCostForColorField = (field: string) => {
+  //   const match = field.match(/^Action(\d+)_Prediction$/); // Extract the number from "ActionX_Prediction"
 
-    if (match) {
-      const actionNumber = match[1]; // Extracted number as a string
+  //   if (match) {
+  //     const actionNumber = match[1]; // Extracted number as a string
 
-      return eff_cost_actions[actionNumber]; // Return the corresponding eff_cost_action
-    }
+  //     return eff_cost_actions[actionNumber]; // Return the corresponding eff_cost_action
+  //   }
 
-    return null; // Return null if no match
-  };
+  //   return null; // Return null if no match
+  // };
 
   // Fetch the corresponding eff_cost_actions for the selected colorField
-  const selectedEffCost = getEffCostForColorField(colorField);
+  // const selectedEffCost = getEffCostForColorField(colorField);
 
-  const sharedLegendSpec = (data1: any[], data2: any[]) =>
-    ({
-      description: 'Two scatter plots with a shared legend',
-      hconcat: [
-        {
-          title: 'Action Selection',
-          width: 450,
-          height: 450,
-          data: { values: data1 },
-          mark: { type: 'point', opacity: 0.8 },
-          params: [
-            {
-              name: 'industry',
-              select: { type: 'point', fields: ['Chosen_Action'] },
-              bind: 'legend',
-            },
-          ],
-          encoding: {
-            x: { field: xAxis, type: determineType(xAxis, data1) },
-            y: { field: yAxis, type: determineType(yAxis, data1) },
-            color: {
-              field: 'Chosen_Action',
-              type: 'nominal',
-              title: 'Chosen Action',
-            },
-            tooltip: [
-              {
-                field: 'Chosen_Action',
-                type: 'nominal',
-                title: 'Chosen Action',
-              },
-              { field: xAxis, type: determineType(xAxis, data1) },
-              { field: yAxis, type: determineType(yAxis, data1) },
-            ],
-            opacity: {
-              condition: { param: 'industry', value: 1 },
-              value: 0.01,
-            },
-          },
-        },
-        {
-          title: 'Post-Action Selection',
-          data: { values: data2 },
-          width: 450,
-          height: 450,
-          mark: { type: 'point', opacity: 0.8 },
-          params: [
-            {
-              name: 'industry',
-              select: { type: 'point', fields: ['Chosen_Action'] },
-              bind: 'legend',
-            },
-          ],
-          encoding: {
-            x: { field: xAxis, type: determineType(xAxis, data2) },
-            y: { field: yAxis, type: determineType(yAxis, data2) },
-            color: {
-              field: 'Chosen_Action',
-              type: 'nominal',
-              title: 'Chosen Action',
-            }, // Shared legend
-            tooltip: [
-              {
-                field: 'Chosen_Action',
-                type: 'nominal',
-                title: 'Chosen Action',
-              },
-              { field: xAxis, type: determineType(xAxis, data2) },
-              { field: yAxis, type: determineType(yAxis, data2) },
-            ],
-            opacity: {
-              condition: { param: 'industry', value: 1 },
-              value: 0.01,
-            },
-          },
-        },
-      ],
-    });
+  // const sharedLegendSpec = (data1: any[], data2: any[]) =>
+  //   ({
+  //     description: 'Two scatter plots with a shared legend',
+  //     hconcat: [
+  //       {
+  //         title: 'Action Selection',
+  //         width: 450,
+  //         height: 450,
+  //         data: { values: data1 },
+  //         mark: { type: 'point', opacity: 0.8 },
+  //         params: [
+  //           {
+  //             name: 'industry',
+  //             select: { type: 'point', fields: ['Chosen_Action'] },
+  //             bind: 'legend',
+  //           },
+  //         ],
+  //         encoding: {
+  //           x: { field: xAxis, type: determineType(xAxis, data1) },
+  //           y: { field: yAxis, type: determineType(yAxis, data1) },
+  //           color: {
+  //             field: 'Chosen_Action',
+  //             type: 'nominal',
+  //             title: 'Chosen Action',
+  //           },
+  //           tooltip: [
+  //             {
+  //               field: 'Chosen_Action',
+  //               type: 'nominal',
+  //               title: 'Chosen Action',
+  //             },
+  //             { field: xAxis, type: determineType(xAxis, data1) },
+  //             { field: yAxis, type: determineType(yAxis, data1) },
+  //           ],
+  //           opacity: {
+  //             condition: { param: 'industry', value: 1 },
+  //             value: 0.01,
+  //           },
+  //         },
+  //       },
+  //       {
+  //         title: 'Post-Action Selection',
+  //         data: { values: data2 },
+  //         width: 450,
+  //         height: 450,
+  //         mark: { type: 'point', opacity: 0.8 },
+  //         params: [
+  //           {
+  //             name: 'industry',
+  //             select: { type: 'point', fields: ['Chosen_Action'] },
+  //             bind: 'legend',
+  //           },
+  //         ],
+  //         encoding: {
+  //           x: { field: xAxis, type: determineType(xAxis, data2) },
+  //           y: { field: yAxis, type: determineType(yAxis, data2) },
+  //           color: {
+  //             field: 'Chosen_Action',
+  //             type: 'nominal',
+  //             title: 'Chosen Action',
+  //           }, // Shared legend
+  //           tooltip: [
+  //             {
+  //               field: 'Chosen_Action',
+  //               type: 'nominal',
+  //               title: 'Chosen Action',
+  //             },
+  //             { field: xAxis, type: determineType(xAxis, data2) },
+  //             { field: yAxis, type: determineType(yAxis, data2) },
+  //           ],
+  //           opacity: {
+  //             condition: { param: 'industry', value: 1 },
+  //             value: 0.01,
+  //           },
+  //         },
+  //       },
+  //     ],
+  //   });
 
   return (
     <>

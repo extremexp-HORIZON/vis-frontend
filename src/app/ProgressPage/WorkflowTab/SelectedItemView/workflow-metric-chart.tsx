@@ -2,7 +2,7 @@ import ResponsiveCardVegaLite from '../../../../shared/components/responsive-car
 import type { RootState } from '../../../../store/store';
 import { useAppSelector } from '../../../../store/store';
 import type { IMetric } from '../../../../shared/models/experiment/metric.model';
-import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import green from '@mui/material/colors/green';
@@ -25,8 +25,8 @@ interface GroupMetrics {
 export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage);
   const { workflowsTable } = useAppSelector((state: RootState) => state.monitorPage);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
+  // const theme = useTheme();
+  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query

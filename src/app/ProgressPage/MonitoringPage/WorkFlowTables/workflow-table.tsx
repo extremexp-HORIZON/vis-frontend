@@ -26,7 +26,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import WorkflowRating from './workflow-rating';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { logger } from '../../../../shared/utils/logger';
 import type { WorkflowTableRow } from '../../../../store/slices/monitorPageSlice';
 import { setWorkflowsData, stateController } from '../../../../store/slices/progressPageSlice';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';

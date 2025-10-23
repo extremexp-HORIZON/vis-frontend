@@ -46,7 +46,6 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import CategoryIcon from '@mui/icons-material/Category';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
-import AddIcon from '@mui/icons-material/Add';
 import CreateIcon from '@mui/icons-material/Create';
 import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
@@ -159,9 +158,9 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
 
   const handelSpaceOptionsClose = () => setAnchorElSpaces(null);
 
-  const handleCreateWorkflowOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElCreateWorkflow(event.currentTarget);
-  };
+  // const handleCreateWorkflowOpen = (event: React.MouseEvent<HTMLElement>) => {
+  //   setAnchorElCreateWorkflow(event.currentTarget);
+  // };
 
   const handleCreateWokrkflowClose = () => setAnchorElCreateWorkflow(null);
 

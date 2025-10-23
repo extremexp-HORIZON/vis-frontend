@@ -13,7 +13,6 @@ import { fetchWorkflowMetrics, setComparativeVisibleMetrics } from '../../../../
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import { createTooltipHandler } from './comparative-analysis-shared-tooltip';
-import { tooltip } from 'leaflet';
 
 interface BaseMetric {
   id: string
