@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { RootState, useAppDispatch, useAppSelector } from "../../../../store/store";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchModelAnalysisExplainabilityPlot } from "../../../../store/slices/explainabilitySlice";
 import { explainabilityQueryDefault } from "../../../../shared/models/tasks/explainability.model";
 import { Box } from "@mui/material";
@@ -36,6 +36,26 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
   const plotModel = tab?.workflowTasks.modelAnalysis?.shap;
   const loading = Boolean(plotModel?.loading);
   const error = plotModel?.error as string | undefined;
+
+  const plotWrapRef = useRef<HTMLDivElement | null>(null);
+  const [containerHeight, setContainerHeight] = useState<number>(0);
+  const [containerWidth, setContainerWidth] = useState<number>(0);
+
+  useEffect(() => {
+    const el = plotWrapRef.current;
+    if (!el) return;
+
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const h = Math.floor(entry.contentRect.height);
+        const w = Math.floor(entry.contentRect.width);
+        if (h !== containerHeight) setContainerHeight(h);
+        if (w !== containerWidth) setContainerWidth(w);
+      }
+    });
+    resizeObserver.observe(el);
+    return () => resizeObserver.disconnect();
+  }, []);
 
   useEffect(() => {
     if (tab && experimentId && isTabInitialized) {
@@ -125,7 +145,8 @@ const spec: VisualizationSpec = useMemo(() => {
   const fxLabel = `f(x) = ${Number.isFinite(fxValue) ? fxValue.toFixed(3) : "—"}`;
 
   return {
-    width: "container",
+    width: containerWidth,
+    height: containerHeight,
     autosize: { type: "fit", contains: "padding", resize: true },
     data: { values },
     transform: [{ calculate: "abs(datum.SHAP)", as: "absSHAP" }],
@@ -239,16 +260,17 @@ const spec: VisualizationSpec = useMemo(() => {
       view: { stroke: null },
     },
   };
-}, [values, baseValue, fxValue, xDomain]);
+}, [values, baseValue, fxValue, xDomain, containerHeight, containerWidth]);
 
   return (
-    <Box sx={{ height: "100%" }}>
+    <Box sx={{ height: "100%", minHeight: 250, width: "100%"}}>
       <ClosableCardTable
         details={plotDescr}
         title={plotName || "SHAP"}
         onClose={onClose}
         noPadding
       >
+        <Box ref={plotWrapRef} sx={{ flex: 1, minHeight: 250 }}>
         {error ? (
             <InfoMessage
                 message="Error fetching shap plot."
@@ -264,6 +286,7 @@ const spec: VisualizationSpec = useMemo(() => {
                 actions={false}
             />
         )}
+        </Box>
       </ClosableCardTable>
     </Box>
   );

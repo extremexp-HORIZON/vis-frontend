@@ -165,7 +165,7 @@ const InstanceView = () => {
       </Box>
     ),
   };
-  const columns: GridColDef[] = baseColumns ? [...baseColumns, actionColumn] : baseColumns;
+  const columns: GridColDef[] = baseColumns.length > 0 ? [...baseColumns, actionColumn] : [];
 
   const totalRows = showMisclassifiedOnly
     ? rows.filter(r => r.actual !== r.predicted).length
@@ -346,7 +346,7 @@ const InstanceView = () => {
       </Box>
 
       {chartType === 'scatter' && (
-        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) ? '60%' : shapPoint ? '50%' :'calc(100% - 64px)', minHeight: 400 }}>
           <InstanceClassification
             plotData={tab?.workflowTasks.modelAnalysis?.modelInstances ?? null}
             point={point}
@@ -359,7 +359,7 @@ const InstanceView = () => {
       )}
 
       {chartType === 'datatable' && (
-        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) || shapPoint? '60%' : 'calc(100% - 64px)', minHeight: 400 }}>
+        <Box sx={{ height: (point && showMisclassifiedOnly && isMisclassified(point)) ? '60%' : shapPoint ? '50%' : 'calc(100% - 64px)', minHeight: 400 }}>
           <ResponsiveCardTable
             title="Instance Classification Table"
             onDownload={handleExportCsv}
@@ -472,8 +472,8 @@ const InstanceView = () => {
         </Box>
       ) : null}
       {shapPoint && workflow && (
-        <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
-          <InstanceShapPlot 
+        <Box sx={{ pt: 2, height: '40%', minHeight: 300 }}>
+          <InstanceShapPlot
             shapPoint={shapPoint.data}
             onClose={() => setShapPoint(null)}
           />
