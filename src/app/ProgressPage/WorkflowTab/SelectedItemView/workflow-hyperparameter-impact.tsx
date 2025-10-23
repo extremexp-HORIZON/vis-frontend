@@ -1,11 +1,11 @@
-import { useState } from 'react';
 import { Box, Grid } from '@mui/material';
 import PdpPlot from '../../../Tasks/ModelAnalysisTask/plots/pdp-plot';
 import AlePlot from '../../../Tasks/ModelAnalysisTask/plots/ale-plot';
 import Contourplot from '../../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
 
 const HyperparameterImpact = () => {
-  const [isMosaic, setIsMosaic] = useState(true);
+  // const [isMosaic, setIsMosaic] = useState(true);
+  const isMosaic = true;
 
   return (
     <Box>

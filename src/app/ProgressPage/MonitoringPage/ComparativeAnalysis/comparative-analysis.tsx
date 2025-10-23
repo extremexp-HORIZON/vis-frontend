@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import { setIsMosaic, setSelectedComparisonTab } from '../../../../store/slices/monitorPageSlice';
+import { setSelectedComparisonTab } from '../../../../store/slices/monitorPageSlice';
 import ComparisonMetricsCharts from './comparison-metrics-charts';
 import ComparisonModelsCharts from './comparison-models-charts';
 import ComparisonDataCharts from './comparison-data-charts';

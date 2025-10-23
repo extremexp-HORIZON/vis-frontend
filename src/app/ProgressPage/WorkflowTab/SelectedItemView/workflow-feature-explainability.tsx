@@ -1,14 +1,13 @@
 import { Box, Grid } from '@mui/material';
 import PdpPlot from '../../../Tasks/ModelAnalysisTask/plots/pdp-plot';
 import AlePlot from '../../../Tasks/ModelAnalysisTask/plots/ale-plot';
-import { useState } from 'react';
 import Contourplot from '../../../Tasks/ModelAnalysisTask/plots/2dpdp-plot';
 import FeatureImportancePlot from '../../../Tasks/ModelAnalysisTask/plots/feature-importance-plot';
-import AttributionHeatmaps from '../../../Tasks/ModelAnalysisTask/plots/attribution-heatmap';
 import ShapPlot from '../../../Tasks/ModelAnalysisTask/plots/shap-plot';
 
 const FeatureExplainability = () => {
-  const [isMosaic, setIsMosaic] = useState(true);
+  // const [isMosaic, setIsMosaic] = useState(true);
+  const isMosaic = true;
 
   return (
     <Box>
