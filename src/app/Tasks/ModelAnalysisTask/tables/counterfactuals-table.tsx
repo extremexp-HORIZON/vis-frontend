@@ -20,7 +20,6 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import BuildIcon from '@mui/icons-material/Build';
 import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
-import { PanoramaSharp } from '@mui/icons-material';
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -254,7 +253,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
   };
 
   const handleReconfigure = (row: any) => {
-    console.log(row);
     const currentWorkflow = workflows?.data?.find(
       (workflow) => workflow.id === tab?.workflowId
     );
