@@ -461,8 +461,8 @@ const InstanceView = () => {
         </Box>
       )}
       {chartType === 'scatter' && point && workflow && showMisclassifiedOnly && isMisclassified(point) && (
-        //controls to select counterfactuals or shap
-        <Box sx={{pt: 2}} display="flex" justifyContent="space-between" alignItems="center">
+        // controls to select counterfactuals or shap
+        <Box sx={{ pt: 2 }} display="flex" justifyContent="space-between" alignItems="center">
           <ButtonGroup
             size="small"
             aria-label="Small button group"
@@ -478,23 +478,23 @@ const InstanceView = () => {
             }}
           >
 
-          <Tooltip title="Counterfactuals">
-            <Button
-              variant={!shapPoint ? 'contained' : 'outlined'}
-              onClick={() => setShapPoint(null)}
-            >
-              <PsychologyAltRoundedIcon />
-            </Button>
-          </Tooltip>
-          <Tooltip title="Shap">
-            <Button
-              variant={shapPoint ? 'contained' : 'outlined'}
-              onClick={() => setShapPoint(point)}
-            >
-              <ScienceOutlinedIcon />
-            </Button>
-          </Tooltip>
-        </ButtonGroup>
+            <Tooltip title="Counterfactuals">
+              <Button
+                variant={!shapPoint ? 'contained' : 'outlined'}
+                onClick={() => setShapPoint(null)}
+              >
+                <PsychologyAltRoundedIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Shap">
+              <Button
+                variant={shapPoint ? 'contained' : 'outlined'}
+                onClick={() => setShapPoint(point)}
+              >
+                <ScienceOutlinedIcon />
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
 
         </Box>
       )}
