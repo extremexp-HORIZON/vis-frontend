@@ -68,7 +68,7 @@ const InstanceView = () => {
   }), [currentPage]);
 
   const [point, setPoint] = useState<{ id: string; data: TestInstance } | null>(null);
-  const [shapPoint, setShapPoint] = useState<{ id: string; data: TestInstance } | null>(null)
+  const [shapPoint, setShapPoint] = useState<{ id: string; data: TestInstance } | null>(null);
   const rows: TestInstance[] = tab?.workflowTasks.modelAnalysis?.modelInstances?.data ?? [];
 
   useEffect(() => {
@@ -80,10 +80,11 @@ const InstanceView = () => {
     id: string;
     data: TestInstance;
 }
-): Boolean => {
-    if(point?.data?.predicted !== point?.data?.actual) return true
+  ): Boolean => {
+    if(point?.data?.predicted !== point?.data?.actual) return true;
+
     return false;
-  }
+  };
 
   const baseColumns: GridColDef[] = Object.keys(rows[0] || {}).map(key => ({
     field: key,
@@ -151,12 +152,12 @@ const InstanceView = () => {
         }
         <Tooltip title="Shap Values">
           <IconButton
-              onClick={() => {
-                const { id, ...data } = params.row;
+            onClick={() => {
+              const { id, ...data } = params.row;
 
-                setShapPoint({ id, data });
-                setPoint(null);
-              }}
+              setShapPoint({ id, data });
+              setPoint(null);
+            }}
           >
             <ScienceOutlinedIcon fontSize="small" color="primary" />
           </IconButton>

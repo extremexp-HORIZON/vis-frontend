@@ -28,7 +28,6 @@ export type TestInstance = {
   instanceId: number;
 } & Record<string, string | number | boolean | null>;
 
-
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
   data: JSON.parse(payload.data as string),

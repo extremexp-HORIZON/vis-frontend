@@ -284,6 +284,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
         const cleanedData = Object.fromEntries(
           Object.entries(dataWithoutId).filter(([_, v]) => v !== undefined)
         ) as TestInstance;
+
         setPoint({ id, data: cleanedData });
         setShapPoint(null);
       }
@@ -445,7 +446,7 @@ const InstanceClassification = (props: IInstanceClassification) => {
             ]
           },
         }}
-        
+
         title={'Instance Classification Chart'}
         actions={false}
         controlPanel={

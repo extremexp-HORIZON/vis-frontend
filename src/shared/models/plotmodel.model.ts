@@ -1,5 +1,5 @@
 import type { Axis, Features } from './initialization.model';
-import { ShapContributions } from './tasks/explainability.model';
+import type { ShapContributions } from './tasks/explainability.model';
 
 export interface IPlotModel {
     explainabilityType: 'featureExplanation' | 'hyperparameterExplanation';

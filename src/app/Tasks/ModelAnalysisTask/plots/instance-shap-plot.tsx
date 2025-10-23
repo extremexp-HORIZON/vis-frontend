@@ -12,19 +12,21 @@ import type { TopLevelSpec as VisualizationSpec } from "vega-lite/build/src/spec
 import InfoMessage from "../../../../shared/components/InfoMessage";
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
-
 interface ShpaPlotProps {
   shapPoint: TestInstance;
   onClose: () => void;
 }
 
 const fmtVal = (v: unknown) => {
-  if (v === null || v === undefined) return 0; //if no featureValue is retured it means is 0
-  if (typeof v === "number") {
+  if (v === null || v === undefined) return 0; // if no featureValue is retured it means is 0
+  if (typeof v === 'number') {
     // compact numeric formatting without trailing zeros noise
     const abs = Math.abs(v);
-    return abs >= 1000 ? v.toFixed(0) : abs >= 100 ? v.toFixed(1) : abs >= 10 ? v.toFixed(2) : v.toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+
+    return abs >= 1000 ? v.toFixed(0) : abs >= 100 ? v.toFixed(1) : abs >= 10 ? v.toFixed(2) : v.toFixed(3).replace(/0+$/, '')
+      .replace(/\.$/, '');
   }
+
   return String(v);
 };
 
@@ -63,13 +65,13 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
         fetchModelAnalysisExplainabilityPlot({
           query: {
             ...explainabilityQueryDefault,
-            explanation_type: "featureExplanation",
-            explanation_method: "shap",
+            explanation_type: 'featureExplanation',
+            explanation_method: 'shap',
             instance_index: shapPoint.instanceId,
           },
           metadata: {
             workflowId: tab.workflowId,
-            queryCase: "shap",
+            queryCase: 'shap',
             experimentId,
           },
         }),
@@ -87,7 +89,7 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
 
     // Keep incoming order or sort by |shap| if you prefer:
     const contribs = (data?.shapContributions ?? [])?.filter(
-      d => d && typeof d.featureName === "string" && typeof d.shapValue === "number",
+      d => d && typeof d.featureName === 'string' && typeof d.shapValue === 'number',
     );
 
     // Sort by |SHAP| descending to match typical SHAP plots:
@@ -99,15 +101,18 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
     const tempRows = reversed.map(d => {
       const start = cum;
       const end = cum + d.shapValue;
+
       cum = end;
+
       return { ...d, Start: start, End: end };
     });
-    
+
     // Now flip it back to the original order for display
     const rows = contribs.map(d => {
       const r = tempRows.find(t => t.featureName === d.featureName)!;
       const leftLabel = `${fmtVal(d.featureValue)} = ${d.featureName}`;
-      const contribLabel = `${d.shapValue >= 0 ? "+" : ""}${d.shapValue.toFixed(2)}`;
+      const contribLabel = `${d.shapValue >= 0 ? '+' : ''}${d.shapValue.toFixed(2)}`;
+
       return {
         Feature: d.featureName,
         LeftLabel: leftLabel,
@@ -123,26 +128,27 @@ const InstanceShapPlot = ({ shapPoint, onClose }: ShpaPlotProps) => {
       values: rows,
       baseValue,
       fxValue,
-      plotName: data?.plotName ?? "SHAP",
+      plotName: data?.plotName ?? 'SHAP',
       plotDescr: data?.plotDescr,
     };
   }, [plotModel?.data]);
 
-const xDomain = useMemo<[number, number]>(() => {
-  const nums = [
-    baseValue,
-    fxValue,
-    ...values.flatMap(v => [v.Start, v.End]),
-  ].filter(n => Number.isFinite(n)) as number[];
+  const xDomain = useMemo<[number, number]>(() => {
+    const nums = [
+      baseValue,
+      fxValue,
+      ...values.flatMap(v => [v.Start, v.End]),
+    ].filter(n => Number.isFinite(n)) as number[];
 
-  const min = Math.min(...nums);
-  const max = Math.max(...nums);
-  return min === max ? [min - 1, max + 1] : [min, max];
-}, [values, baseValue, fxValue]);
+    const min = Math.min(...nums);
+    const max = Math.max(...nums);
 
-const spec: VisualizationSpec = useMemo(() => {
-  const baseLabel = `E[f(X)] = ${Number.isFinite(baseValue) ? baseValue.toFixed(3) : "—"}`;
-  const fxLabel = `f(x) = ${Number.isFinite(fxValue) ? fxValue.toFixed(3) : "—"}`;
+    return min === max ? [min - 1, max + 1] : [min, max];
+  }, [values, baseValue, fxValue]);
+
+  const spec: VisualizationSpec = useMemo(() => {
+    const baseLabel = `E[f(X)] = ${Number.isFinite(baseValue) ? baseValue.toFixed(3) : '—'}`;
+    const fxLabel = `f(x) = ${Number.isFinite(fxValue) ? fxValue.toFixed(3) : '—'}`;
 
   return {
     width: containerWidth,
@@ -152,94 +158,94 @@ const spec: VisualizationSpec = useMemo(() => {
     transform: [{ calculate: "abs(datum.SHAP)", as: "absSHAP" }],
     layer: [
       // 1) Waterfall bars
-      {
-        mark: { type: "bar" },
-        encoding: {
-          y: {
-            field: "LeftLabel",
-            type: "ordinal",
-            sort: { field: "absSHAP", order: "descending" },
-            title: null,
+        {
+          mark: { type: 'bar' },
+          encoding: {
+            y: {
+              field: 'LeftLabel',
+              type: 'ordinal',
+              sort: { field: 'absSHAP', order: 'descending' },
+              title: null,
+            },
+            x: {
+              field: 'Start',
+              type: 'quantitative',
+              title: 'Model output',
+              scale: { domain: xDomain },
+              axis: { ticks: true, grid: true, labelFlush: true },
+            },
+            x2: { field: 'End' },
+            color: {
+              condition: { test: 'datum.SHAP >= 0', value: '#ef5350' }, // up
+              value: '#42a5f5',                                         // down
+            },
+            tooltip: [
+              { field: 'LeftLabel', type: 'nominal', title: 'Feature' },
+              { field: 'SHAP', type: 'quantitative', title: 'SHAP', format: '.5f' },
+              { field: 'Start', type: 'quantitative', title: 'Start', format: '.5f' },
+              { field: 'End', type: 'quantitative', title: 'End', format: '.5f' },
+            ],
           },
-          x: {
-            field: "Start",
-            type: "quantitative",
-            title: "Model output",
-            scale: { domain: xDomain },
-            axis: { ticks: true, grid: true, labelFlush: true },
-          },
-          x2: { field: "End" },
-          color: {
-            condition: { test: "datum.SHAP >= 0", value: "#ef5350" }, // up
-            value: "#42a5f5",                                         // down
-          },
-          tooltip: [
-            { field: "LeftLabel", type: "nominal", title: "Feature" },
-            { field: "SHAP", type: "quantitative", title: "SHAP", format: ".5f" },
-            { field: "Start", type: "quantitative", title: "Start", format: ".5f" },
-            { field: "End", type: "quantitative", title: "End", format: ".5f" },
-          ],
         },
-      },
 
-      // 2) Contribution labels at bar ends
-      {
-        mark: { type: "text" },
-        encoding: {
-          y: {
-            field: "LeftLabel",
-            type: "ordinal",
-            sort: { field: "absSHAP", order: "descending" },
+        // 2) Contribution labels at bar ends
+        {
+          mark: { type: 'text' },
+          encoding: {
+            y: {
+              field: 'LeftLabel',
+              type: 'ordinal',
+              sort: { field: 'absSHAP', order: 'descending' },
+            },
+            x: { field: 'End', type: 'quantitative', scale: { domain: xDomain } },
+            text: { field: 'ContributionLabel' },
+            align: {
+              condition: { test: 'datum.SHAP > 0', value: 'left' },
+              value: 'right',
+            },
+            dx: {
+              condition: { test: 'datum.SHAP > 0', value: 6 },
+              value: -6,
+            },
+            color: { value: '#111' },
           },
-          x: { field: "End", type: "quantitative", scale: { domain: xDomain } },
-          text: { field: "ContributionLabel" },
-          align: {
-            condition: { test: "datum.SHAP > 0", value: "left" },
-            value: "right",
+        },
+
+        // 3) Vertical dashed rule at E[f(X)]
+        {
+          data: { values: [{ x: baseValue }] },
+          mark: { type: 'rule', strokeDash: [5, 5] },
+          encoding: {
+            x: { field: 'x', type: 'quantitative', scale: { domain: xDomain } },
+            size: { value: 1.5 },
+            color: { value: '#9e9e9e' },
           },
-          dx: {
-            condition: { test: "datum.SHAP > 0", value: 6 },
-            value: -6,
+        },
+
+        // 4) E[f(X)] label
+        {
+          data: { values: [{}] },
+          mark: { type: 'text', dy: -10, baseline: 'bottom' },
+          encoding: {
+            x: { datum: baseValue },
+            y: { value: 0 },
+            text: { value: baseLabel },
+            color: { value: '#616161' },
+            align: { value: 'right' }, // lean right to reduce overlap with f(x)
+            dx: { value: -6 },
           },
-          color: { value: "#111" },
         },
-      },
 
-      // 3) Vertical dashed rule at E[f(X)]
-      {
-        data: { values: [{ x: baseValue }] },
-        mark: { type: "rule", strokeDash: [5, 5] },
-        encoding: {
-          x: { field: "x", type: "quantitative", scale: { domain: xDomain } },
-          size: { value: 1.5 },
-          color: { value: "#9e9e9e" },
+        // 5) Vertical dashed rule at f(x)
+        {
+          data: { values: [{ x: fxValue }] },
+          mark: { type: 'rule', strokeDash: [5, 5] },
+          encoding: {
+            x: { field: 'x', type: 'quantitative', scale: { domain: xDomain } },
+            size: { value: 1.5 },
+            color: { value: '#9e9e9e' },
+          },
         },
-      },
-
-      // 4) E[f(X)] label
-      {
-        data: { values: [{}] },
-        mark: { type: "text", dy: -10, baseline: "bottom" },
-        encoding: {
-          x: { datum: baseValue },
-          y: { value: 0 },
-          text: { value: baseLabel },
-          color: { value: "#616161" },
-          align: { value: "right" }, // lean right to reduce overlap with f(x)
-          dx: { value: -6 },
-        },
-      },
-
-      // 5) Vertical dashed rule at f(x)
-      {
-        data: { values: [{ x: fxValue }] },
-        mark: { type: "rule", strokeDash: [5, 5] },
-        encoding: {
-          x: { field: "x", type: "quantitative", scale: { domain: xDomain } },
-          size: { value: 1.5 },
-          color: { value: "#9e9e9e" },
-        },
-      },
 
       // 6) f(x) label
       {
@@ -266,25 +272,25 @@ const spec: VisualizationSpec = useMemo(() => {
     <Box sx={{ height: "100%", minHeight: 250, width: "100%"}}>
       <ClosableCardTable
         details={plotDescr}
-        title={plotName || "SHAP"}
+        title={plotName || 'SHAP'}
         onClose={onClose}
         noPadding
       >
         <Box ref={plotWrapRef} sx={{ flex: 1, minHeight: 250 }}>
         {error ? (
-            <InfoMessage
-                message="Error fetching shap plot."
-                type="info"
-                icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-                fullHeight
-            />
-        ) : loading ?(
-            <Loader />
-        ) :(
-            <VegaLite
-                spec={spec}
-                actions={false}
-            />
+          <InfoMessage
+            message="Error fetching shap plot."
+            type="info"
+            icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+            fullHeight
+          />
+        ) : loading ? (
+          <Loader />
+        ) : (
+          <VegaLite
+            spec={spec}
+            actions={false}
+          />
         )}
         </Box>
       </ClosableCardTable>

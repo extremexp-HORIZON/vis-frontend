@@ -203,6 +203,7 @@ const InstanceClassificationUmap = (props: Umapi) => {
 
         const id = hashRow(originalRow);
         const { actual, predicted, ...rest } = originalRow;
+
         setPoint({
           id,
           data: {
