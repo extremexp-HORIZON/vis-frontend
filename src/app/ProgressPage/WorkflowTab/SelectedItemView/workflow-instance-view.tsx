@@ -478,7 +478,7 @@ const InstanceView = () => {
             }}
           >
 
-            <Tooltip title="Counterfactuals">
+            <Tooltip title="Explanations">
               <Button
                 variant={!shapPoint ? 'contained' : 'outlined'}
                 onClick={() => setShapPoint(null)}
@@ -486,7 +486,7 @@ const InstanceView = () => {
                 <PsychologyAltRoundedIcon />
               </Button>
             </Tooltip>
-            <Tooltip title="Shap">
+            <Tooltip title="Shap Values">
               <Button
                 variant={shapPoint ? 'contained' : 'outlined'}
                 onClick={() => setShapPoint(point)}
