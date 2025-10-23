@@ -8,14 +8,15 @@ import {
   createTask,
   listModels,
   listProcessedData,
+  setTrainingTask,
 } from '../../../../store/slices/exploring/eusomeSlice';
 import {
   defaultTrainingConfig,
   type ModelInfo,
   type TaskCreateResponse,
 } from '../../../../shared/models/eusome-api.model';
-import { useTaskProgress } from '../../useTaskProgress';
 import { formatTimestampFull } from '../../../../shared/utils/dateUtils';
+import { TaskProgress } from '../../../../shared/components/task-progress';
 import {
   Box,
   Button,
@@ -43,14 +44,12 @@ export const PredictionModels = ({
     modelsList,
     loading: { listModels: loadingListModels, createTask: creatingTask },
     processedDataList,
+    trainingTask,
   } = useAppSelector((state: RootState) => state.eusome);
   const { dataset } = useAppSelector((state: RootState) => state.dataset);
   const [availableModels, setModels] = useState<ModelInfo[]>([]);
   const [filename, setFilename] = useState<string>('');
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-
-  // Use the task progress hook for real-time updates
-  const taskProgress = useTaskProgress(currentTaskId || '');
 
   useEffect(() => {
     if (!modelsList) {
@@ -79,21 +78,24 @@ export const PredictionModels = ({
     }
   }, [processedDataList]);
 
-  // Handle task completion
-  useEffect(() => {
-    if (currentTaskId && taskProgress.status === 'succeeded') {
-      // Refresh the models list when training completes
-      dispatch(listModels());
-      // Clear the current task
-      setCurrentTaskId(null);
-    } else if (currentTaskId && taskProgress.status === 'failed') {
-      // Clear the current task on failure
-      setCurrentTaskId(null);
-    }
-  }, [currentTaskId, taskProgress.status, dispatch]);
+  // Handle task completion callbacks
+  const handleTaskComplete = () => {
+    // Refresh the models list when training completes
+    dispatch(listModels());
+    // Clear the current task
+    setCurrentTaskId(null);
+    dispatch(setTrainingTask(false));
+  };
+
+  const handleTaskFailed = () => {
+    // Clear the current task on failure
+    setCurrentTaskId(null);
+    dispatch(setTrainingTask(false));
+  };
 
   const handleTrainModel = async () => {
     try {
+      dispatch(setTrainingTask(true));
       const result = await dispatch(
         createTask({
           task_type: 'train',
@@ -107,6 +109,7 @@ export const PredictionModels = ({
         setCurrentTaskId(taskResponse.task_id);
       }
     } catch (error) {
+      dispatch(setTrainingTask(false));
       // eslint-disable-next-line no-console
       console.error('Failed to create training task:', error);
     }
@@ -265,83 +268,23 @@ export const PredictionModels = ({
             }}
           >
             {/* Progress display when task is running */}
-            {currentTaskId && taskProgress.isConnected && (
-              <Box sx={{ width: '100%' }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Training Progress
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {taskProgress.percent}%
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    width: '100%',
-                    bgcolor: '#e0e0e0',
-                    borderRadius: 1,
-                    height: 8,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: `${taskProgress.percent}%`,
-                      bgcolor:
-                        taskProgress.status === 'failed'
-                          ? 'error.main'
-                          : 'primary.main',
-                      height: '100%',
-                      borderRadius: 1,
-                      transition: 'width 0.3s ease',
-                    }}
-                  />
-                </Box>
-                {taskProgress.step && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 1, display: 'block' }}
-                  >
-                    {taskProgress.step}
-                  </Typography>
-                )}
-                {taskProgress.message && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 0.5, display: 'block' }}
-                  >
-                    {taskProgress.message}
-                  </Typography>
-                )}
-                {taskProgress.error && (
-                  <Alert severity="error" sx={{ mt: 1 }}>
-                    {taskProgress.error}
-                  </Alert>
-                )}
-              </Box>
-            )}
+            <TaskProgress
+              taskId={currentTaskId}
+              isConnected={true}
+              taskType="train"
+              onTaskComplete={handleTaskComplete}
+              onTaskFailed={handleTaskFailed}
+            />
 
             <Button
               variant="outlined"
               size="small"
               onClick={handleTrainModel}
-              disabled={
-                !filename ||
-                !!creatingTask ||
-                !!(currentTaskId && taskProgress.status === 'running')
-              }
+              disabled={!filename || !!creatingTask || !!currentTaskId}
               startIcon={
-                creatingTask ||
-                (currentTaskId && taskProgress.status === 'running') ? (
-                    <CircularProgress size={10} />
-                  ) : undefined
+                creatingTask || !!currentTaskId ? (
+                  <CircularProgress size={10} />
+                ) : undefined
               }
               sx={{
                 borderRadius: 2,
@@ -350,7 +293,7 @@ export const PredictionModels = ({
             >
               {creatingTask
                 ? 'Creating Task...'
-                : currentTaskId && taskProgress.status === 'running'
+                : currentTaskId
                   ? 'Training Model...'
                   : 'Train New Model'}
             </Button>
@@ -387,68 +330,15 @@ export const PredictionModels = ({
             )}
 
             {/* Progress display when task is running */}
-            {currentTaskId && taskProgress.isConnected && (
-              <Box sx={{ width: '100%', mb: 3 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Training Progress
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {taskProgress.percent}%
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    width: '100%',
-                    bgcolor: '#e0e0e0',
-                    borderRadius: 1,
-                    height: 8,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: `${taskProgress.percent}%`,
-                      bgcolor:
-                        taskProgress.status === 'failed'
-                          ? 'error.main'
-                          : 'primary.main',
-                      height: '100%',
-                      borderRadius: 1,
-                      transition: 'width 0.3s ease',
-                    }}
-                  />
-                </Box>
-                {taskProgress.step && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 1, display: 'block' }}
-                  >
-                    {taskProgress.step}
-                  </Typography>
-                )}
-                {taskProgress.message && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 0.5, display: 'block' }}
-                  >
-                    {taskProgress.message}
-                  </Typography>
-                )}
-                {taskProgress.error && (
-                  <Alert severity="error" sx={{ mt: 1 }}>
-                    {taskProgress.error}
-                  </Alert>
-                )}
-              </Box>
-            )}
+            <Box sx={{ mb: 3 }}>
+              <TaskProgress
+                taskId={currentTaskId}
+                isConnected={true}
+                taskType="train"
+                onTaskComplete={handleTaskComplete}
+                onTaskFailed={handleTaskFailed}
+              />
+            </Box>
 
             <CardActions sx={{ justifyContent: 'center', p: 0 }}>
               <Button
@@ -457,15 +347,12 @@ export const PredictionModels = ({
                 size="large"
                 onClick={handleTrainModel}
                 disabled={
-                  !filename ||
-                  !!creatingTask ||
-                  !!(currentTaskId && taskProgress.status === 'running')
+                  !filename || trainingTask || !!creatingTask || !!currentTaskId
                 }
                 startIcon={
-                  creatingTask ||
-                  (currentTaskId && taskProgress.status === 'running') ? (
-                      <CircularProgress size={20} />
-                    ) : undefined
+                  trainingTask || creatingTask || !!currentTaskId ? (
+                    <CircularProgress size={20} />
+                  ) : undefined
                 }
                 sx={{
                   px: 4,
@@ -477,7 +364,7 @@ export const PredictionModels = ({
               >
                 {creatingTask
                   ? 'Creating Task...'
-                  : currentTaskId && taskProgress.status === 'running'
+                  : currentTaskId
                     ? 'Training Model...'
                     : 'Train New Model'}
               </Button>

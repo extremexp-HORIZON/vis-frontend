@@ -40,6 +40,9 @@ export interface IEusomeState {
   createdTasks: TaskCreateResponse[] | null;
   taskStatus: TaskStatusResponse | null;
 
+  // In progress tasks
+  trainingTask: boolean;
+
   // Loading states
   loading: {
     uploadData: boolean;
@@ -83,6 +86,7 @@ const initialState: IEusomeState = {
   systemStatus: null,
   createdTasks: null,
   taskStatus: null,
+  trainingTask: false,
   loading: {
     uploadData: false,
     trainModel: false,
@@ -460,6 +464,9 @@ export const eusomeSlice = createSlice({
   name: 'eusome',
   initialState,
   reducers: {
+    setTrainingTask: (state, action: PayloadAction<boolean>) => {
+      state.trainingTask = action.payload;
+    },
     resetEusomeState: () => {
       return initialState;
     },
@@ -742,6 +749,7 @@ export const eusomeApiListeners = (startAppListening: AppStartListening) => {
 };
 
 export const {
+  setTrainingTask,
   resetEusomeState,
   clearPredictions,
   clearUploadedData,
