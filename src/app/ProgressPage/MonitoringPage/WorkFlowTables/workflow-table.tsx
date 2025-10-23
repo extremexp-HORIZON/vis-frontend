@@ -253,55 +253,76 @@ const WorkflowActions = (props: {
           component="form"
           onSubmit={handleSubmit}
           sx={{
-            p: 2,
             display: 'flex',
             flexDirection: 'column',
-            gap: 2,
             overflow: 'auto',
             maxHeight: 200
           }}
         >
-          <TextField
-            fullWidth
-            size="small"
-            label="workflow name"
-            value={workflowName}
-            onChange={(e) => setWorkflowName(e.target.value)}
-          />
-
-          {Object.entries(uniqueParameters)
-            .map(([paramName, valuesSet]) => {
-              const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
-              const selected = selectedParams[paramName] ?? '';
-
-              return (
-                <FormControl key={paramName} size="small" fullWidth>
-                  <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
-                  <Select
-                    labelId={`${paramName}-label`}
-                    label={paramName}
-                    value={selected}
-                    onChange={handleParamChange(paramName)}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    {values.map((v) => (
-                      <MenuItem key={v} value={v}>
-                        {v}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              );
-            })}
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!workflowName.trim()}
+          <Box
+            sx={{
+              p: 2,
+              flex: 1,
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+            }}
           >
-              Create
-          </Button>
+
+            <TextField
+              fullWidth
+              size="small"
+              label="workflow name"
+              value={workflowName}
+              onChange={(e) => setWorkflowName(e.target.value)}
+            />
+
+            {Object.entries(uniqueParameters)
+              .map(([paramName, valuesSet]) => {
+                const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
+                const selected = selectedParams[paramName] ?? '';
+
+                return (
+                  <FormControl key={paramName} size="small" fullWidth>
+                    <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
+                    <Select
+                      labelId={`${paramName}-label`}
+                      label={paramName}
+                      value={selected}
+                      onChange={handleParamChange(paramName)}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {values.map((v) => (
+                        <MenuItem key={v} value={v}>
+                          {v}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                );
+              })}
+            </Box>
+            <Box
+              sx={{
+                p: 1,
+                borderTop: '1px solid rgba(0,0,0,0.08)',
+                backgroundColor: 'background.paper',
+                bottom: 0,
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!workflowName.trim()}
+              >
+                  Create
+              </Button>
+          </Box>
         </Box>
       </Popover>
     </span>
