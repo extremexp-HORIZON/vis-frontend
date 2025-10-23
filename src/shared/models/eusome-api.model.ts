@@ -302,7 +302,7 @@ export type TaskStatus =
   | 'running'
   | 'succeeded'
   | 'failed'
-  | 'cancelled';
+  | 'canceled';
 
 export interface TaskCreateResponse {
   task_id: string;
