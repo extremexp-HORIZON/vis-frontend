@@ -213,7 +213,15 @@ const InstanceClassificationUmap = (props: Umapi) => {
           // index: clickedIndex,
           },
         });
-        setShapPoint(null);
+        if(!showMisclassifiedOnly || !item.datum.isMisclassified) setShapPoint({
+          id,
+          data: {
+            ...rest,
+            actual,
+            predicted,
+          },
+        });
+        else setShapPoint(null);
       }
     });
   };

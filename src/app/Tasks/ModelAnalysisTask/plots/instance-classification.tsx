@@ -286,7 +286,8 @@ const InstanceClassification = (props: IInstanceClassification) => {
         ) as TestInstance;
 
         setPoint({ id, data: cleanedData });
-        setShapPoint(null);
+        if(!showMisclassifiedOnly || !datum.isMisclassified) setShapPoint({ id, data: cleanedData });
+        else setShapPoint(null);
       }
     });
   };

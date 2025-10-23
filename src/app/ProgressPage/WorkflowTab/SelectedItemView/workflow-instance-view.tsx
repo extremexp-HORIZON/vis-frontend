@@ -156,7 +156,7 @@ const InstanceView = () => {
               const { id, ...data } = params.row;
 
               setShapPoint({ id, data });
-              setPoint(null);
+              setPoint({ id, data });
             }}
           >
             <ScienceOutlinedIcon fontSize="small" color="primary" />
@@ -460,7 +460,45 @@ const InstanceView = () => {
           </ResponsiveCardTable>
         </Box>
       )}
-      {point && workflow && showMisclassifiedOnly && isMisclassified(point) ? (
+      {chartType === 'scatter' && point && workflow && showMisclassifiedOnly && isMisclassified(point) && (
+        //controls to select counterfactuals or shap
+        <Box sx={{pt: 2}} display="flex" justifyContent="space-between" alignItems="center">
+          <ButtonGroup
+            size="small"
+            aria-label="Small button group"
+            variant="outlined"
+            sx={{
+              marginLeft: 'auto',
+              height: 30, // Adjust this value to your desired height
+              '& .MuiButton-root': {
+                minHeight: 30,
+                padding: '2px 2px',
+                marginTop: 0.5,
+              },
+            }}
+          >
+
+          <Tooltip title="Counterfactuals">
+            <Button
+              variant={!shapPoint ? 'contained' : 'outlined'}
+              onClick={() => setShapPoint(null)}
+            >
+              <PsychologyAltRoundedIcon />
+            </Button>
+          </Tooltip>
+          <Tooltip title="Shap">
+            <Button
+              variant={shapPoint ? 'contained' : 'outlined'}
+              onClick={() => setShapPoint(point)}
+            >
+              <ScienceOutlinedIcon />
+            </Button>
+          </Tooltip>
+        </ButtonGroup>
+
+        </Box>
+      )}
+      {!shapPoint && point && workflow && showMisclassifiedOnly && isMisclassified(point) ? (
         <Box sx={{ pt: 2, height: '30%', minHeight: 300 }}>
           <CounterfactualsTable
             key={'counterfactuals-table'}
