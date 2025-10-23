@@ -304,24 +304,24 @@ const WorkflowActions = (props: {
                   </FormControl>
                 );
               })}
-            </Box>
-            <Box
-              sx={{
-                p: 1,
-                borderTop: '1px solid rgba(0,0,0,0.08)',
-                backgroundColor: 'background.paper',
-                bottom: 0,
-                display: 'flex',
-                justifyContent: 'center',
-              }}
+          </Box>
+          <Box
+            sx={{
+              p: 1,
+              borderTop: '1px solid rgba(0,0,0,0.08)',
+              backgroundColor: 'background.paper',
+              bottom: 0,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!workflowName.trim()}
             >
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={!workflowName.trim()}
-              >
                   Create
-              </Button>
+            </Button>
           </Box>
         </Box>
       </Popover>
