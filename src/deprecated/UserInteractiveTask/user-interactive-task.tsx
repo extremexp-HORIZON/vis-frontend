@@ -1,4 +1,5 @@
 import ResponsiveCardTable from "../../shared/components/responsive-card-table"
+import { Box } from "@mui/material"
 
 interface UserInteractiveTaskProps {
   url: string
@@ -12,9 +13,13 @@ const UserInteractiveTask = (props: UserInteractiveTaskProps) => {
       : `http://${url}`
 
   return (
+    <Box sx={{ height: 500, width: '100%' }}>
     <ResponsiveCardTable title="User Interactive Task">
-      <iframe src={normalizedUrl} width="100%" height="500px" />
+      <Box style={{height: '100%', width: '100%'}}>
+        <iframe src={normalizedUrl} height='100%' width='100%'/>
+      </Box>
     </ResponsiveCardTable>
+    </Box>
   )
 }
 
