@@ -10,7 +10,6 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
-  LinearProgress,
   Alert,
   TextField,
   MenuItem,
@@ -34,10 +33,10 @@ import {
   setSelectedZoneId,
   setSelectedTimeIndex,
 } from '../../../../store/slices/exploring/predictionSlice';
-import { predict as eusomePredict } from '../../../../store/slices/exploring/eusomeSlice';
+import { createTask } from '../../../../store/slices/exploring/eusomeSlice';
 import {
   type InferenceInput,
-  type PredictionResponse,
+  type SinglePrediction,
   defaultInferenceInput,
 } from '../../../../shared/models/eusome-api.model';
 import {
@@ -48,6 +47,7 @@ import {
 import { setModalOpen as setZoneModalOpen } from '../../../../store/slices/exploring/zoneSlice';
 import { exportZoneToJSON } from '../../../../shared/utils/exportUtils';
 import { PredictionModels } from './models';
+import { TaskProgress } from '../../../../shared/components/task-progress';
 
 export interface IPredictionProps {
   zone: IZone;
@@ -82,6 +82,9 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     IPredictionResult[]
   >([]);
   const [error, setError] = useState<string | null>(null);
+  const [currentPredictionTaskId, setCurrentPredictionTaskId] = useState<
+    string | null
+  >(null);
 
   // Wizard state
   const [activeStep, setActiveStep] = useState(0);
@@ -105,6 +108,8 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     setActiveStep(0);
     setSelectedModel(null);
     setPredictionTimestamp(dayjs().add(1, 'hour'));
+    // Reset task state
+    setCurrentPredictionTaskId(null);
   };
 
   // Wizard navigation functions
@@ -118,6 +123,24 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
   const handleModelSelect = (modelFilename: string) => {
     setSelectedModel(modelFilename);
+  };
+
+  // Task completion handlers
+  const handlePredictionComplete = (taskResult?: unknown) => {
+    // Handle the prediction results if provided
+    if (taskResult) {
+      handlePredictionTaskComplete(taskResult);
+    }
+    // Move to results step after successful prediction
+    setActiveStep(2);
+    // Clear the current task
+    setCurrentPredictionTaskId(null);
+  };
+
+  const handlePredictionFailed = () => {
+    // Clear the current task on failure
+    setCurrentPredictionTaskId(null);
+    setError('Prediction task failed. Please try again.');
   };
 
   // Stepper steps
@@ -188,48 +211,34 @@ export const Prediction = ({ zone }: IPredictionProps) => {
           )?.filename || null,
       };
 
-      // Dispatch the EUSOME predict action
-      const result = await dispatch(eusomePredict(inferenceInput));
+      // Create prediction task
+      const result = await dispatch(
+        createTask({
+          task_type: 'predict',
+          task_data: inferenceInput,
+        }),
+      );
 
-      if (eusomePredict.fulfilled.match(result)) {
-        // Convert EUSOME prediction response to our internal format
-        const convertedResults = convertEusomePredictionToInternal(
-          result.payload,
-          zone.id!,
-        );
-
-        setPredictionResults(convertedResults);
-        dispatch(addZoneId(zone.id!));
-        dispatch(
-          addTimestamp({
-            zoneId: zone.id!,
-            timestamp: predictionTimestamp.toISOString(),
-          }),
-        );
-        dispatch(
-          addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }),
-        );
-        dispatch(addResults({ zoneId: zone.id!, results: convertedResults }));
-
-        // Move to results step after successful prediction
-        setActiveStep(2);
+      if (createTask.fulfilled.match(result)) {
+        // Set the task ID for progress tracking
+        setCurrentPredictionTaskId(result.payload.task_id);
       } else {
-        setError('Failed to get prediction from EUSOME API');
+        setError('Failed to create prediction task');
       }
     } catch (err) {
-      setError('Failed to generate prediction results');
+      setError('Failed to create prediction task');
     }
   };
 
   // Convert EUSOME API response to internal prediction format
   const convertEusomePredictionToInternal = (
-    eusomeResponse: PredictionResponse,
+    eusomeResponse: SinglePrediction[],
     zoneId: string,
   ): IPredictionResult[] => {
     const results: IPredictionResult[] = [];
 
     // Process each prediction in the response
-    eusomeResponse.predictions.forEach((prediction, predictionIndex) => {
+    eusomeResponse.forEach((prediction, predictionIndex) => {
       // For each height in the prediction
       prediction.predicted_rsrp_at_heights.forEach(
         (heightData, heightIndex) => {
@@ -250,6 +259,28 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     });
 
     return results;
+  };
+
+  // Handle prediction task completion with results
+  const handlePredictionTaskComplete = (taskResult: unknown) => {
+    if (taskResult && typeof taskResult === 'object' && taskResult !== null) {
+      // Convert EUSOME prediction response to our internal format
+      const convertedResults = convertEusomePredictionToInternal(
+        taskResult as SinglePrediction[],
+        zone.id!,
+      );
+
+      setPredictionResults(convertedResults);
+      dispatch(addZoneId(zone.id!));
+      dispatch(
+        addTimestamp({
+          zoneId: zone.id!,
+          timestamp: predictionTimestamp!.toISOString(),
+        }),
+      );
+      dispatch(addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }));
+      dispatch(addResults({ zoneId: zone.id!, results: convertedResults }));
+    }
   };
 
   useEffect(() => {
@@ -507,18 +538,15 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                     </Alert>
                   )}
 
-                  {eusomeLoading.predict && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        gutterBottom
-                      >
-                        Generating prediction results...
-                      </Typography>
-                      <LinearProgress />
-                    </Box>
-                  )}
+                  {/* Task Progress Display */}
+                  <TaskProgress
+                    taskId={currentPredictionTaskId}
+                    isConnected={true}
+                    taskType="predict"
+                    onTaskComplete={handlePredictionComplete}
+                    onTaskFailed={handlePredictionFailed}
+                    showTitle={true}
+                  />
 
                   <Box
                     sx={{
@@ -534,14 +562,21 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         variant="contained"
                         color="primary"
                         onClick={handlePredict}
-                        disabled={eusomeLoading.predict}
+                        disabled={
+                          eusomeLoading.createTask || !!currentPredictionTaskId
+                        }
                         startIcon={
-                          eusomeLoading.predict ? (
-                            <CircularProgress size={20} />
-                          ) : null
+                          eusomeLoading.createTask ||
+                          !!currentPredictionTaskId ? (
+                              <CircularProgress size={20} />
+                            ) : null
                         }
                       >
-                        {eusomeLoading.predict ? 'Predicting...' : 'Predict'}
+                        {eusomeLoading.createTask
+                          ? 'Creating Task...'
+                          : currentPredictionTaskId
+                            ? 'Predicting...'
+                            : 'Predict'}
                       </Button>
                     ) : (
                       <Button variant="contained" onClick={handleNext}>

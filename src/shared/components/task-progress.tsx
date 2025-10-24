@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Box, Typography, Alert, Chip } from '@mui/material';
 import { useTaskProgress } from '../hooks/useTaskProgress';
 
@@ -10,7 +10,7 @@ interface TaskProgressProps {
   isConnected: boolean;
   taskType?: TaskType;
   showTitle?: boolean;
-  onTaskComplete?: () => void;
+  onTaskComplete?: (taskResult?: unknown) => void;
   onTaskFailed?: () => void;
   onTaskCanceled?: () => void;
 }
@@ -54,20 +54,31 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({
   onTaskFailed,
   onTaskCanceled,
 }) => {
-  const taskProgress = useTaskProgress(taskId || '');
+  const { taskResult, hasCompleted, ...taskProgress } = useTaskProgress(
+    taskId || '',
+  );
+  const hasCalledCompleteRef = useRef(false);
 
   // Handle task completion
   useEffect(() => {
-    if (taskId && taskProgress.status === 'succeeded' && onTaskComplete) {
-      onTaskComplete();
-    } else if (taskId && taskProgress.status === 'failed' && onTaskFailed) {
-      onTaskFailed();
-    } else if (taskId && taskProgress.status === 'canceled' && onTaskCanceled) {
-      onTaskCanceled();
+    if (
+      taskId &&
+      hasCompleted &&
+      !hasCalledCompleteRef.current
+    ) {
+      hasCalledCompleteRef.current = true;
+      if (taskProgress.status === 'succeeded' && onTaskComplete) {
+        onTaskComplete(taskResult);
+      } else if (taskProgress.status === 'failed' && onTaskFailed) {
+        onTaskFailed();
+      } else if (taskProgress.status === 'canceled' && onTaskCanceled) {
+        onTaskCanceled();
+      }
     }
   }, [
     taskId,
     taskProgress.status,
+    hasCompleted,
     onTaskComplete,
     onTaskFailed,
     onTaskCanceled,

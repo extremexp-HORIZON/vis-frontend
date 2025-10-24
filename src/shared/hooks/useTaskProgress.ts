@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   type WebSocketMessage,
   type TaskProgress,
@@ -13,6 +13,8 @@ export const useTaskProgress = (taskId: string) => {
     message: '',
     isConnected: false,
   });
+  const [taskResult, setTaskResult] = useState<unknown>(null);
+  const hasCompletedRef = useRef(false);
 
   useEffect(() => {
     if (taskId.length > 0) {
@@ -35,9 +37,23 @@ export const useTaskProgress = (taskId: string) => {
               error: message.data.error || undefined,
             }));
 
+            // Store task result data if available
+            if (message.data.predictions_json) {
+              try {
+                const predictions = JSON.parse(message.data.predictions_json);
+
+                setTaskResult(predictions);
+              } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error('Failed to parse predictions_json:', error);
+              }
+            }
+
             if (message.data.status === 'succeeded') {
+              hasCompletedRef.current = true;
               ws.close(1000, message.data.message);
             } else if (message.data.status === 'failed') {
+              hasCompletedRef.current = true;
               ws.close(4001, message.data.message);
             }
             break;
@@ -52,9 +68,23 @@ export const useTaskProgress = (taskId: string) => {
               error: message.data.error || undefined,
             }));
 
+            // Store task result data if available
+            if (message.data.predictions_json) {
+              try {
+                const predictions = JSON.parse(message.data.predictions_json);
+
+                setTaskResult(predictions);
+              } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error('Failed to parse predictions_json:', error);
+              }
+            }
+
             if (message.data.status === 'succeeded') {
+              hasCompletedRef.current = true;
               ws.close(1000, message.data.message);
             } else if (message.data.status === 'failed') {
+              hasCompletedRef.current = true;
               ws.close(4001, message.data.message);
             }
             break;
@@ -68,5 +98,5 @@ export const useTaskProgress = (taskId: string) => {
     }
   }, [taskId]);
 
-  return state;
+  return { ...state, taskResult, hasCompleted: hasCompletedRef.current };
 };

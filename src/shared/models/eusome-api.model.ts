@@ -304,6 +304,8 @@ export type TaskStatus =
   | 'failed'
   | 'canceled';
 
+export type TaskType = 'train' | 'predict' | 'finetune' | 'other';
+
 export interface TaskCreateResponse {
   task_id: string;
   message: string;
@@ -311,29 +313,53 @@ export interface TaskCreateResponse {
 
 export interface TaskStatusResponse {
   task_id: string;
+  type: TaskType;
+  owner_id?: string;
   status: TaskStatus;
   percent: number;
   step: string;
   message: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  started_at?: string;
+  finished_at?: string;
+  success?: boolean;
   error?: string;
-  success?: string;
+  schema_version: number;
+
+  // Task-specific fields
   result_model_filename?: string;
   metrics_json?: string;
+  predictions_json?: string;
+  model_used?: string;
+  input_data_json?: string;
+  model_filename?: string;
 }
 
 export interface TaskEventData {
   task_id: string;
+  type: TaskType;
+  owner_id?: string;
   ts: string; // ISO timestamp
   status: TaskStatus;
   percent: string; // Note: Redis stores as string
   step: string;
   message: string;
+  created_at: string;
+  updated_at?: string;
+  started_at?: string;
+  finished_at?: string;
+  success?: boolean;
   error?: string;
-  success?: string; // "1" or "0" as string
+  schema_version: number;
+
+  // Task-specific fields
   result_model_filename?: string;
   metrics_json?: string;
+  predictions_json?: string;
+  model_used?: string;
+  input_data_json?: string;
+  model_filename?: string;
 }
 
 // ============================================================================
@@ -354,16 +380,27 @@ export interface TaskStatusMessage extends BaseWebSocketMessage {
   type: 'task_status';
   data: {
     task_id: string;
+    type: TaskType;
+    owner_id?: string;
     status: TaskStatus;
     percent: number;
     step: string;
     message: string;
     created_at: string;
-    updated_at: string;
+    updated_at?: string;
+    started_at?: string;
+    finished_at?: string;
+    success?: boolean;
     error?: string | null;
-    success?: string | null;
+    schema_version: number;
+
+    // Task-specific fields
     result_model_filename?: string | null;
     metrics_json?: string | null;
+    predictions_json?: string | null;
+    model_used?: string | null;
+    input_data_json?: string | null;
+    model_filename?: string | null;
   };
 }
 
