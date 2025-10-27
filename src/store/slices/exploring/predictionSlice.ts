@@ -10,6 +10,7 @@ interface predictionState {
   zoneIds: string[];
   results: Record<string, SinglePrediction[]>;
   timestamps: Record<string, string>;
+  models: Record<string, string>;
   intervals: Record<string, number>;
   // Timeline control state
   selectedTimeIndex: number; // 0-based index for 10-min intervals
@@ -22,6 +23,7 @@ const initialState: predictionState = {
   zoneIds: [],
   results: {},
   timestamps: {},
+  models: {},
   intervals: {},
   selectedTimeIndex: 0,
   selectedHeight: null,
@@ -58,6 +60,12 @@ export const predictionSlice = createSlice({
     },
     removeTimestamp: (state, action: PayloadAction<string>) => {
       delete state.timestamps[action.payload];
+    },
+    addModel: (state, action: PayloadAction<{ zoneId: string; model: string }>) => {
+      state.models[action.payload.zoneId] = action.payload.model;
+    },
+    removeModel: (state, action: PayloadAction<string>) => {
+      delete state.models[action.payload];
     },
     addIntervals: (
       state,
@@ -108,6 +116,8 @@ export const {
   removeTimestamp,
   addZoneId,
   removeZoneId,
+  addModel,
+  removeModel,
   addIntervals,
   removeIntervals,
   setSelectedTimeIndex,

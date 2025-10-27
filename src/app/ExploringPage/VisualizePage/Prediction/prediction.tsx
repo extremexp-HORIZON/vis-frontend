@@ -31,6 +31,7 @@ import {
   setPredictionDisplay,
   setSelectedZoneId,
   setSelectedTimeIndex,
+  addModel,
 } from '../../../../store/slices/exploring/predictionSlice';
 import { createTask } from '../../../../store/slices/exploring/eusomeSlice';
 import {
@@ -91,7 +92,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const [predictionTimestamp, setPredictionTimestamp] = useState<Dayjs | null>(
     dayjs(),
   );
-  const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
+  const { zoneIds, results, models, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
   );
   const { loading: eusomeLoading, processedDataList } = useAppSelector(
@@ -240,6 +241,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
           timestamp: predictionTimestamp!.toISOString(),
         }),
       );
+      dispatch(addModel({ zoneId: zone.id!, model: selectedModel! }));
       dispatch(addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }));
       dispatch(
         addResults({
@@ -252,7 +254,10 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
   useEffect(() => {
     if (zone.id && zoneIds.includes(zone.id)) {
-      setPredictionResults(results[zone.id]);
+      setActiveStep(2);
+      setSelectedModel(models[zone.id!]);
+      setIntervalsAmount(intervals[zone.id!]);
+      setPredictionResults(results[zone.id!]);
     }
   }, [zone]);
 
