@@ -35,11 +35,10 @@ const DataExplorationComponent = () => {
         ?.chartType || '',
   );
   const selectedDataset = dataset?.source || '';
-  const isImage = selectedDataset?.match(/\.(jpe?g|png|gif|webp|bmp|tiff?|svg)$/i);
+  const isImage = tab?.workflowTasks.dataExploration?.metaData.data?.datasetType?.match("IMAGE");
 
   useEffect(() => {
     if (!selectedDataset || !workflowId) return;
-    if (isImage) return;
     if (selectedDataset && workflowId) {
       dispatch(setControls({ ...dataExplorationDefault.controlPanel }));
       dispatch(

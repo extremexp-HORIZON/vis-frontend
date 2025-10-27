@@ -8,6 +8,7 @@ import { logger } from '../../../../shared/utils/logger';
 import Loader from '../../../../shared/components/loader';
 
 const ImageCard = () => {
+  const { tab } = useAppSelector(state => state.workflowPage);
   const baseApi = 'http://localhost:8080/api/data/file?path=';
 
   const imageRef = useRef<HTMLImageElement>(null);
@@ -91,10 +92,13 @@ const ImageCard = () => {
           >
             {!loaded && <Loader />}
             <img
+              // src={
+              //   selectedImage.source.startsWith('/')
+              //     ? `${baseApi}${(tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || '')}`
+              //     : selectedImage.source
+              // }
               src={
-                selectedImage.source.startsWith('/')
-                  ? `${baseApi}${encodeURIComponent(selectedImage.source)}`
-                  : selectedImage.source
+                `${baseApi}${(tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || '')}`
               }
               alt="Preview"
               onLoad={() => setLoaded(true)}
