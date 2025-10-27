@@ -221,7 +221,7 @@ export const Map = (props: IMapProps) => {
 
     // Get unique timestamps from selected zone's prediction data and sort them
     const uniqueTimestamps = [
-      ...new Set(zoneResults.map(result => result.timestamp)),
+      ...new Set(zoneResults.map(result => result.radio_timestamp)),
     ];
     const sortedTimestamps = uniqueTimestamps.sort(
       (a, b) => new Date(a).getTime() - new Date(b).getTime(),
@@ -234,9 +234,7 @@ export const Map = (props: IMapProps) => {
 
     // Filter results by the selected timestamp and height
     const filtered = zoneResults.filter(
-      result =>
-        result.timestamp === targetTimestamp &&
-        result.height === selectedHeight,
+      result => result.radio_timestamp === targetTimestamp,
     );
 
     return filtered;
@@ -505,6 +503,7 @@ export const Map = (props: IMapProps) => {
             }
             predictionData={filteredPredictionData}
             predictionDisplay={predictionDisplay}
+            selectedHeight={selectedHeight}
           />
         ) : null}
         <MapSearch />

@@ -48,12 +48,7 @@ export const PredictionTimeline = () => {
   });
 
   // Calculate available heights from all prediction results
-  const availableHeights = useMemo(() => {
-    const allResults = Object.values(results).flat();
-    const heights = new Set(allResults.map(r => r.height));
-
-    return Array.from(heights).sort((a, b) => a - b);
-  }, [results]);
+  const availableHeights = results[selectedZoneId!]?.[0]?.predicted_rsrp_at_heights?.map(height => height.height_m || 0) || [];
 
   // Calculate available time slots based on selected zone's prediction data
   const timeSlots = useMemo(() => {
@@ -65,7 +60,7 @@ export const PredictionTimeline = () => {
 
     // Extract unique timestamps from the selected zone's prediction data
     const uniqueTimestamps = [
-      ...new Set(zoneResults.map(result => result.timestamp)),
+      ...new Set(zoneResults.map(result => result.radio_timestamp)),
     ];
 
     // Sort timestamps chronologically

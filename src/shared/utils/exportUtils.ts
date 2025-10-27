@@ -1,4 +1,4 @@
-import type { IPredictionResult } from '../models/exploring/prediction-result.model';
+import type { SinglePrediction } from '../models/eusome-api.model';
 import type { IZone } from '../models/exploring/zone.model';
 
 /**
@@ -32,7 +32,7 @@ export interface IExportData {
   geohashesCount: number;
   intervalsAmount: number;
   exportTimestamp: string;
-  results: IPredictionResult[];
+  results: SinglePrediction[];
 }
 
 export interface IExportAllData {
@@ -43,7 +43,7 @@ export interface IExportAllData {
     zoneId: string;
     geohashesCount: number;
     intervalsAmount: number;
-    results: IPredictionResult[];
+    results: SinglePrediction[];
   }>;
 }
 
@@ -52,7 +52,7 @@ export interface IExportAllData {
  */
 export const exportZoneToJSON = (
   zone: IZone,
-  results: IPredictionResult[],
+  results: SinglePrediction[],
   intervalsAmount: number,
 ): void => {
   if (results.length === 0) {
@@ -81,7 +81,7 @@ export const exportZoneToJSON = (
  */
 export const exportAllZonesToJSON = (
   zones: IZone[],
-  allResults: Record<string, IPredictionResult[]>,
+  allResults: Record<string, SinglePrediction[]>,
   intervalsAmount: Record<string, number>,
 ): void => {
   const zonesWithResults = zones.filter(

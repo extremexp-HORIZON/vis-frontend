@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import type { IPredictionResult } from '../../../../shared/models/exploring/prediction-result.model';
 import {
   Dialog,
   DialogTitle,
@@ -79,7 +78,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     fixedIntervals[0].value,
   );
   const [predictionResults, setPredictionResults] = useState<
-    IPredictionResult[]
+    SinglePrediction[]
   >([]);
   const [error, setError] = useState<string | null>(null);
   const [currentPredictionTaskId, setCurrentPredictionTaskId] = useState<
@@ -230,47 +229,11 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     }
   };
 
-  // Convert EUSOME API response to internal prediction format
-  const convertEusomePredictionToInternal = (
-    eusomeResponse: SinglePrediction[],
-    zoneId: string,
-  ): IPredictionResult[] => {
-    const results: IPredictionResult[] = [];
-
-    // Process each prediction in the response
-    eusomeResponse.forEach((prediction, predictionIndex) => {
-      // For each height in the prediction
-      prediction.predicted_rsrp_at_heights.forEach(
-        (heightData, heightIndex) => {
-          const height =
-            heightData.height_m || fixedHeights[heightIndex]?.value || 0;
-          const rsrp = heightData.predicted_rsrp_dbm || 0;
-
-          results.push({
-            id: `pred-${prediction.geohash}-${predictionIndex + 1}-${height}`,
-            zoneId: zoneId,
-            rsrp: rsrp,
-            timestamp: prediction.radio_timestamp,
-            geohash: prediction.geohash,
-            height: height,
-          });
-        },
-      );
-    });
-
-    return results;
-  };
-
   // Handle prediction task completion with results
   const handlePredictionTaskComplete = (taskResult: unknown) => {
     if (taskResult && typeof taskResult === 'object' && taskResult !== null) {
-      // Convert EUSOME prediction response to our internal format
-      const convertedResults = convertEusomePredictionToInternal(
-        taskResult as SinglePrediction[],
-        zone.id!,
-      );
 
-      setPredictionResults(convertedResults);
+      setPredictionResults(taskResult as SinglePrediction[]);
       dispatch(addZoneId(zone.id!));
       dispatch(
         addTimestamp({
@@ -279,7 +242,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         }),
       );
       dispatch(addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }));
-      dispatch(addResults({ zoneId: zone.id!, results: convertedResults }));
+      dispatch(addResults({ zoneId: zone.id!, results: taskResult as SinglePrediction[] }));
     }
   };
 

@@ -3,7 +3,7 @@ import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import ngeohash from 'ngeohash';
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
-import type { IPredictionResult } from '../../../../shared/models/exploring/prediction-result.model';
+import type { SinglePrediction } from '../../../../shared/models/eusome-api.model';
 import {
   generateRsrpColor,
   MAX_ZOOM,
@@ -132,7 +132,8 @@ export interface GeohashGridLayerProps {
   dataset: IDataset;
   selectedGeohash: string | null;
   setSelectedGeohash: (geohash: string | null) => void;
-  predictionData: IPredictionResult[];
+  predictionData: SinglePrediction[];
+  selectedHeight: number | null;
   predictionDisplay: boolean;
 }
 
@@ -142,6 +143,7 @@ export const GeohashGridLayer = ({
   selectedGeohash,
   setSelectedGeohash,
   predictionData,
+  selectedHeight,
   predictionDisplay,
 }: GeohashGridLayerProps) => {
   const map = useMap();
@@ -341,6 +343,8 @@ export const GeohashGridLayer = ({
           [bbox[2], bbox[3]],
         ];
 
+        const predictedRsrp = predData?.predicted_rsrp_at_heights.find(height => height.height_m === selectedHeight)?.predicted_rsrp_dbm || 0;
+
         const rect = L.rectangle(rectBounds, {
           color: borderColor,
           weight: borderWeight,
@@ -348,15 +352,15 @@ export const GeohashGridLayer = ({
           fill: true,
           fillColor:
             level === 'prediction' && predData
-              ? generateRsrpColor(dataset, predData.rsrp)
+              ? generateRsrpColor(dataset, predictedRsrp)
               : fillColor,
           fillOpacity: opacity,
         });
 
         // Add tooltip
         if (level === 'prediction' && predData) {
-          const timestamp = predData.timestamp
-            ? new Date(predData.timestamp).toLocaleTimeString([], {
+          const timestamp = predData.radio_timestamp
+            ? new Date(predData.radio_timestamp).toLocaleTimeString([], {
               day: '2-digit',
               month: '2-digit',
               year: 'numeric',
@@ -371,8 +375,8 @@ export const GeohashGridLayer = ({
               <div>
                 <div style="font-weight: bold; text-align: center;">Prediction Data</div>
                 <strong>Geohash:</strong> ${hash}<br/>
-                <strong>RSRP:</strong> ${predData.rsrp.toFixed(2)} dBm<br/>
-                <strong>Height:</strong> ${predData.height}m<br/>
+                <strong>RSRP:</strong> ${predictedRsrp.toFixed(2)} dBm<br/>
+                <strong>Height:</strong> ${selectedHeight}m<br/>
                 <strong>Timestamp:</strong> ${timestamp}
               </div>
             `,

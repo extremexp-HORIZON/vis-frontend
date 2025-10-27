@@ -1,14 +1,14 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type { IPredictionResult } from '../../../shared/models/exploring/prediction-result.model';
 import type { AppStartListening } from '../../listenerMiddleware';
 import type { RootState } from '../../store';
 import { setZone } from './zoneSlice';
+import type { SinglePrediction } from '../../../shared/models/eusome-api.model';
 
 interface predictionState {
   predictionDisplay: boolean;
   zoneIds: string[];
-  results: Record<string, IPredictionResult[]>;
+  results: Record<string, SinglePrediction[]>;
   timestamps: Record<string, string>;
   intervals: Record<string, number>;
   // Timeline control state
@@ -43,7 +43,7 @@ export const predictionSlice = createSlice({
     },
     addResults: (
       state,
-      action: PayloadAction<{ zoneId: string; results: IPredictionResult[] }>,
+      action: PayloadAction<{ zoneId: string; results: SinglePrediction[] }>,
     ) => {
       state.results[action.payload.zoneId] = action.payload.results;
     },
