@@ -280,7 +280,7 @@ export const PredictionModels = ({
               variant="outlined"
               size="small"
               onClick={handleTrainModel}
-              disabled={!filename || !!creatingTask || !!currentTaskId}
+              disabled={trainingTask || !filename || !!creatingTask || !!currentTaskId}
               startIcon={
                 creatingTask || !!currentTaskId ? (
                   <CircularProgress size={10} />
