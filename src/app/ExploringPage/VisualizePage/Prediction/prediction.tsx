@@ -89,7 +89,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [predictionTimestamp, setPredictionTimestamp] = useState<Dayjs | null>(
-    dayjs().add(1, 'hour'), // Default to 1 hour from now
+    dayjs(),
   );
   const { zoneIds, results, intervals, predictionDisplay } = useAppSelector(
     (state: RootState) => state.prediction,
@@ -106,7 +106,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
     // Reset wizard state
     setActiveStep(0);
     setSelectedModel(null);
-    setPredictionTimestamp(dayjs().add(1, 'hour'));
+    setPredictionTimestamp(dayjs());
     // Reset task state
     setCurrentPredictionTaskId(null);
   };
@@ -232,7 +232,6 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   // Handle prediction task completion with results
   const handlePredictionTaskComplete = (taskResult: unknown) => {
     if (taskResult && typeof taskResult === 'object' && taskResult !== null) {
-
       setPredictionResults(taskResult as SinglePrediction[]);
       dispatch(addZoneId(zone.id!));
       dispatch(
@@ -242,7 +241,12 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         }),
       );
       dispatch(addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }));
-      dispatch(addResults({ zoneId: zone.id!, results: taskResult as SinglePrediction[] }));
+      dispatch(
+        addResults({
+          zoneId: zone.id!,
+          results: taskResult as SinglePrediction[],
+        }),
+      );
     }
   };
 
@@ -415,7 +419,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                             onChange={newValue =>
                               setPredictionTimestamp(newValue)
                             }
-                            minDateTime={dayjs()}
+                            minDateTime={dayjs().subtract(1, 'hour')}
                             slotProps={{
                               textField: {
                                 size: 'small',
@@ -568,7 +572,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       Prediction Complete!
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {predictionResults.length} predictions generated
+                      {predictionResults.length * predictionResults[0].predicted_rsrp_at_heights.length} predictions generated
                       successfully
                     </Typography>
                   </Box>
@@ -660,7 +664,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       >
                         <Box>
                           <Typography variant="h4" color="primary">
-                            {predictionResults.length}
+                            {predictionResults.length * predictionResults[0].predicted_rsrp_at_heights.length}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             Total Predictions
@@ -668,11 +672,11 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         </Box>
                         <Box sx={{ textAlign: 'right' }}>
                           <Typography variant="body2" color="text.secondary">
-                            Heights: {fixedHeights.map(h => h.value).join(', ')}
+                            Heights: {predictionResults[0].predicted_rsrp_at_heights.map(h => h.height_m).join(', ')}
                             m
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {fixedHeights.length} heights ×{' '}
+                            {predictionResults[0].predicted_rsrp_at_heights.length} heights ×{' '}
                             {zone.geohashes?.length} locations ×{' '}
                             {intervalsAmount} intervals
                           </Typography>
