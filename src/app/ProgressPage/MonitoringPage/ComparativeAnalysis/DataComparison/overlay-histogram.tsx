@@ -26,6 +26,74 @@ type Row = {
   tooltipAll?: string;
 };
 
+function weightedQuantile(sorted: { value: number; count: number }[], q: number): number {
+  const total = sorted.reduce((s, d) => s + d.count, 0);
+  if (total <= 0) return sorted[0]?.value ?? 0;
+  const target = q * total;
+  let acc = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    acc += sorted[i].count;
+    if (acc >= target) return sorted[i].value;
+  }
+  return sorted[sorted.length - 1].value;
+}
+
+function hybridEdgesFromPooled(
+  pooled: { value: number; count: number }[],
+  bins: number,
+  alpha: number
+): number[] {
+  if (pooled.length === 0) return [];
+  const values = [...pooled]
+    .filter(d => Number.isFinite(d.value) && Number.isFinite(d.count) && d.count > 0)
+    .sort((a, b) => a.value - b.value);
+
+  const min = values[0].value;
+  const max = values[values.length - 1].value;
+  if (min === max) return [min, max];
+
+  const B = Math.max(1, bins);
+
+  // Equal-width edges
+  const widthEdges = Array.from({ length: B + 1 }, (_, i) => min + (i * (max - min)) / B);
+
+  // Equal-frequency edges (weighted quantiles)
+  const freqEdges = Array.from({ length: B + 1 }, (_, i) => {
+    if (i === 0) return min;
+    if (i === B) return max;
+    return weightedQuantile(values, i / B);
+  });
+
+  // Interpolate
+  const interp = widthEdges.map((w, i) => (1 - alpha) * w + alpha * freqEdges[i]);
+
+  // --- Deduplicate with a tolerance tied to label precision (2 decimals) ---
+  const decimals = 2;
+  const unit = Math.pow(10, -decimals);        // ~0.01 in data units
+  const tol = Math.max((max - min) * 1e-9, unit / 2); // be generous vs rounding
+
+  const edges: number[] = [];
+  for (let i = 0; i < interp.length; i++) {
+    const x = i === 0 ? min : (i === interp.length - 1 ? max : interp[i]);
+    if (edges.length === 0 || Math.abs(x - edges[edges.length - 1]) > tol) {
+      edges.push(x);
+    }
+  }
+
+  // Ensure at least two edges; otherwise force one bin over [min,max]
+  if (edges.length < 2) return [min, max];
+
+  // Guarantee exact min/max at ends
+  edges[0] = min;
+  edges[edges.length - 1] = max;
+
+  return edges;
+}
+
+function formatRangeLabel(s: number, e: number) {
+  return s === e ? `${s.toFixed(2)}` : `${s.toFixed(2)} – ${e.toFixed(2)}`;
+}
+
 const OverlayHistogram = ({
   assetName,
   columnName,
@@ -228,65 +296,72 @@ const OverlayHistogram = ({
         });
       });
     } else {
-      let min = Infinity, max = -Infinity;
-
-      Object.values(rawByWorkflow).forEach(arr => {
-        arr.forEach(d => {
+      // Pool weighted values from all workflows
+      const pooled: { value: number; count: number }[] = [];
+      workflowIds.forEach(wid => {
+        (rawByWorkflow[wid] || []).forEach(d => {
           const v = d[columnName], c = d[countField];
-
-          if (typeof v === 'number' && typeof c === 'number') {
-            if (v < min) min = v;
-            if (v > max) max = v;
+          if (typeof v === 'number' && typeof c === 'number' && Number.isFinite(v) && Number.isFinite(c)) {
+            pooled.push({ value: v, count: c });
           }
         });
       });
 
-      if (isFinite(min) && isFinite(max)) {
-        const N = 10;
-        const range = max - min;
-        let bins: { start: number; end: number }[];
-
-        if (range === 0) {
-          bins = [{ start: min, end: min }];
-        } else {
-          const size = range / N;
-          const start0 = Math.floor(min / size) * size;
-
-          bins = Array.from({ length: N }, (_, i) => {
-            const s = start0 + i * size;
-
-            return { start: s, end: s + size };
-          });
+      if (pooled.length > 0) {
+        let min = Infinity, max = -Infinity;
+        for (const { value } of pooled) {
+          if (value < min) min = value;
+          if (value > max) max = value;
         }
+        if (isFinite(min) && isFinite(max)) {
+          const N = 10;       // number of bins
+          const alpha = 0.9;  // 0..1 blend (tune if desired)
 
-        const size = bins.length > 1 ? bins[0].end - bins[0].start : 0;
-        const label = (s: number, e: number) => (s === e ? `${s.toFixed(2)}` : `${s.toFixed(2)} – ${e.toFixed(2)}`);
+          const edges = (min === max)
+            ? [min, max]
+            : hybridEdgesFromPooled(pooled, N, alpha);
 
-        workflowIds.forEach(wid => {
-          const arr = rawByWorkflow[wid] || [];
-          const counts = bins.map(b => ({ ...b, count: 0 }));
+          const bins = Array.from({ length: Math.max(1, edges.length - 1) }, (_, i) => ({
+            start: edges[i],
+            end: edges[i + 1],
+            label: formatRangeLabel(edges[i], edges[i + 1]),
+          }));
+          // Count each workflow into the shared bins
+          workflowIds.forEach(wid => {
+            const arr = rawByWorkflow[wid] || [];
+            const counts = bins.map(b => ({ ...b, count: 0 }));
 
-          arr.forEach(d => {
-            const v = d[columnName], c = d[countField];
+            arr.forEach(d => {
+              const v = d[columnName], c = d[countField];
+              if (typeof v !== 'number' || typeof c !== 'number') return;
 
-            if (typeof v !== 'number' || typeof c !== 'number') return;
-            if (bins.length === 1) {
-              counts[0].count += c;
-            } else {
-              const idx = Math.max(0, Math.min(Math.floor((v - bins[0].start) / size), bins.length - 1));
+              if (bins.length === 1) {
+                counts[0].count += c;
+                return;
+              }
+
+              // Initial index guess
+              let idx = Math.floor(((v - edges[0]) / (edges[edges.length - 1] - edges[0])) * (bins.length));
+              if (idx < 0) idx = 0;
+              if (idx >= bins.length) idx = bins.length - 1;
+
+              // Clamp with guards for numerical errors
+              while (idx > 0 && v < bins[idx].start) idx--;
+              while (idx < bins.length - 1 && v >= bins[idx].end) idx++;
 
               counts[idx].count += c;
-            }
-          });
-          counts.forEach(b => {
-            out.push({
-              binLabel: label(b.start, b.end),
-              xStart: b.start,
-              count: b.count,
-              workflowId: wid
+            });
+
+            counts.forEach(b => {
+              out.push({
+                binLabel: b.label,
+                xStart: b.start,
+                count: b.count,
+                workflowId: wid,
+              });
             });
           });
-        });
+        }
       }
     }
 
