@@ -55,6 +55,7 @@ export default function DatasetsSection({ taskId, datasets, experimentId, workfl
           } else {
             acc.noFolder.push(ds);
           }
+
           return acc;
         },
         { folders: {} as Record<string, IDataAsset[]>, noFolder: [] as IDataAsset[] }
@@ -85,6 +86,7 @@ export default function DatasetsSection({ taskId, datasets, experimentId, workfl
               onClick={() => {
                 if (!ds.source) return;
                 const itemId = `${kind}-ds-${taskId}-${folder}-${index}`;
+
                 dispatch(setSelectedId(itemId));
                 dispatch(setSelectedItem({ type: 'DATASET', data: { dataset: ds }, meta: { experimentId, workflowId } }));
               }}
@@ -110,6 +112,7 @@ export default function DatasetsSection({ taskId, datasets, experimentId, workfl
             onClick={() => {
               if (!ds.source) return;
               const itemId = `${kind}-ds-${taskId}-nofolder-${index}`;
+
               dispatch(setSelectedId(itemId));
               dispatch(setSelectedItem({ type: 'DATASET', data: { dataset: ds }, meta: { experimentId, workflowId } }));
             }}
