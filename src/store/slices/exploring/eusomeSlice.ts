@@ -464,6 +464,9 @@ export const eusomeSlice = createSlice({
   name: 'eusome',
   initialState,
   reducers: {
+    removeTask: (state, action: PayloadAction<string>) => {
+      state.createdTasks = state.createdTasks?.filter(task => task.task_id !== action.payload) || null;
+    },
     setTrainingTask: (state, action: PayloadAction<boolean>) => {
       state.trainingTask = action.payload;
     },
@@ -749,6 +752,7 @@ export const eusomeApiListeners = (startAppListening: AppStartListening) => {
 };
 
 export const {
+  removeTask,
   setTrainingTask,
   resetEusomeState,
   clearPredictions,
