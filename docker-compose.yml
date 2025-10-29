@@ -1,4 +1,3 @@
-version: "3"
 name: "xxp"
 services:
   visualization-dashboard:
@@ -10,7 +9,8 @@ services:
       - extremexp_network
 
   proxy-service:
-    image: ghcr.io/yagorezende/extremexp-abacproxy:dev
+    image: ghcr.io/yagorezende/extremexp-abacproxy:latest
+    platform: linux/amd64
     container_name: proxy-service
     stop_signal: SIGINT
     ports:
@@ -41,7 +41,8 @@ services:
       - extremexp_network
 
   access-control-service:
-    image: ghcr.io/yagorezende/extremexp_accesscontrol:dev
+    image: ghcr.io/yagorezende/extremexp_accesscontrol:latest
+    platform: linux/amd64
     container_name: access-control-service
     ports:
       - ${FLASK_AC_APP_PORT}:${FLASK_AC_APP_PORT}
