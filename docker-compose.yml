@@ -1,79 +1,76 @@
-name: "xxp"
+version: "3"
+name: "visualization"
 services:
-  visualization-dashboard:
+  dashboard:
     build:
       dockerfile: ./Dockerfile
     ports:
       - "5173:80"
-    networks:
-      - extremexp_network
 
-  proxy-service:
-    image: ghcr.io/yagorezende/extremexp-abacproxy:latest
-    platform: linux/amd64
-    container_name: proxy-service
-    stop_signal: SIGINT
-    ports:
-      - ${PROXY_APP_PORT}:${PROXY_APP_PORT}
-    environment:
-      - FLASK_APP_HOST=${PROXY_APP_HOST}
-      - FLASK_APP_PORT=${PROXY_APP_PORT}
-      - FLASK_APP_NAME=${PROXY_APP_NAME}
-      - FLASK_APP_DEBUG=${PROXY_APP_DEBUG}
-      - FLASK_APP_ENV=${PROXY_APP_ENV}
-      - FLASK_APP_SECRET_KEY=${PROXY_APP_SECRET_KEY}
-      - FLASK_APP_DATABASE_URI=${PROXY_APP_DATABASE_URI}
-      - KEYCLOAK_SERVER_URL=${KEYCLOAK_SERVER_URL}
-      - KEYCLOAK_USERNAME=${KEYCLOAK_USERNAME}
-      - KEYCLOAK_USER_PASSWORD=${KEYCLOAK_USER_PASSWORD}
-      - OIDC_OP_AUTHORIZATION_ENDPOINT=${OIDC_OP_AUTHORIZATION_ENDPOINT}
-      - OIDC_OP_ENDSESSION_ENDPOINT=${OIDC_OP_ENDSESSION_ENDPOINT}
-      - OIDC_OP_JWKS_ENDPOINT=${OIDC_OP_JWKS_ENDPOINT}
-      - OIDC_OP_LOGOUT_ENDPOINT=${OIDC_OP_LOGOUT_ENDPOINT}
-      - OIDC_OP_LOGOUT_URL_METHOD=${OIDC_OP_LOGOUT_URL_METHOD}
-      - OIDC_OP_TOKEN_ENDPOINT=${OIDC_OP_TOKEN_ENDPOINT}
-      - OIDC_OP_USER_ENDPOINT=${OIDC_OP_USER_ENDPOINT}
-      - OIDC_RP_CLIENT_ID=${OIDC_RP_CLIENT_ID}
-      - OIDC_RP_REALM_ID=${OIDC_RP_REALM_ID}
-      - OIDC_RP_CLIENT_SECRET=${OIDC_RP_CLIENT_SECRET}
-      - OIDC_RP_SIGN_ALGO=${OIDC_RP_SIGN_ALGO}
-    networks:
-      - extremexp_network
+  # proxy-service:
+  #   image: ghcr.io/yagorezende/extremexp-abacproxy:dev
+  #   container_name: proxy-service
+  #   stop_signal: SIGINT
+  #   ports:
+  #     - ${PROXY_APP_PORT}:${PROXY_APP_PORT}
+  #   environment:
+  #     - FLASK_APP_HOST=${PROXY_APP_HOST}
+  #     - FLASK_APP_PORT=${PROXY_APP_PORT}
+  #     - FLASK_APP_NAME=${PROXY_APP_NAME}
+  #     - FLASK_APP_DEBUG=${PROXY_APP_DEBUG}
+  #     - FLASK_APP_ENV=${PROXY_APP_ENV}
+  #     - FLASK_APP_SECRET_KEY=${PROXY_APP_SECRET_KEY}
+  #     - FLASK_APP_DATABASE_URI=${PROXY_APP_DATABASE_URI}
+  #     - KEYCLOAK_SERVER_URL=${KEYCLOAK_SERVER_URL}
+  #     - KEYCLOAK_USERNAME=${KEYCLOAK_USERNAME}
+  #     - KEYCLOAK_USER_PASSWORD=${KEYCLOAK_USER_PASSWORD}
+  #     - OIDC_OP_AUTHORIZATION_ENDPOINT=${OIDC_OP_AUTHORIZATION_ENDPOINT}
+  #     - OIDC_OP_ENDSESSION_ENDPOINT=${OIDC_OP_ENDSESSION_ENDPOINT}
+  #     - OIDC_OP_JWKS_ENDPOINT=${OIDC_OP_JWKS_ENDPOINT}
+  #     - OIDC_OP_LOGOUT_ENDPOINT=${OIDC_OP_LOGOUT_ENDPOINT}
+  #     - OIDC_OP_LOGOUT_URL_METHOD=${OIDC_OP_LOGOUT_URL_METHOD}
+  #     - OIDC_OP_TOKEN_ENDPOINT=${OIDC_OP_TOKEN_ENDPOINT}
+  #     - OIDC_OP_USER_ENDPOINT=${OIDC_OP_USER_ENDPOINT}
+  #     - OIDC_RP_CLIENT_ID=${OIDC_RP_CLIENT_ID}
+  #     - OIDC_RP_REALM_ID=${OIDC_RP_REALM_ID}
+  #     - OIDC_RP_CLIENT_SECRET=${OIDC_RP_CLIENT_SECRET}
+  #     - OIDC_RP_SIGN_ALGO=${OIDC_RP_SIGN_ALGO}
+  #   networks:
+  #     - extremexp_network
 
-  access-control-service:
-    image: ghcr.io/yagorezende/extremexp_accesscontrol:latest
-    platform: linux/amd64
-    container_name: access-control-service
-    ports:
-      - ${FLASK_AC_APP_PORT}:${FLASK_AC_APP_PORT}
-    expose:
-      - ${FLASK_AC_APP_PORT}
-    environment:
-      - FLASK_AC_APP_HOST=${FLASK_AC_APP_HOST}
-      - FLASK_AC_APP_PORT=${FLASK_AC_APP_PORT}
-      - FLASK_AC_APP_NAME=${FLASK_AC_APP_NAME}
-      - FLASK_AC_APP_DEBUG=${FLASK_AC_APP_DEBUG}
-      - FLASK_AC_APP_ENV=${FLASK_AC_APP_ENV}
-      - FLASK_AC_APP_SECRET_KEY=${FLASK_AC_APP_SECRET_KEY}
-      - FLASK_AC_APP_DATABASE_URI=${FLASK_AC_APP_DATABASE_URI}
-      - KEYCLOAK_SERVER_URL=${KEYCLOAK_SERVER_URL}
-      - KEYCLOAK_USERNAME=${KEYCLOAK_USERNAME}
-      - KEYCLOAK_USER_PASSWORD=${KEYCLOAK_USER_PASSWORD}
-      - OIDC_OP_AUTHORIZATION_ENDPOINT=${OIDC_OP_AUTHORIZATION_ENDPOINT}
-      - OIDC_OP_ENDSESSION_ENDPOINT=${OIDC_OP_ENDSESSION_ENDPOINT}
-      - OIDC_OP_JWKS_ENDPOINT=${OIDC_OP_JWKS_ENDPOINT}
-      - OIDC_OP_LOGOUT_ENDPOINT=${OIDC_OP_LOGOUT_ENDPOINT}
-      - OIDC_OP_LOGOUT_URL_METHOD=${OIDC_OP_LOGOUT_URL_METHOD}
-      - OIDC_OP_TOKEN_ENDPOINT=${OIDC_OP_TOKEN_ENDPOINT}
-      - OIDC_OP_USER_ENDPOINT=${OIDC_OP_USER_ENDPOINT}
-      - OIDC_RP_CLIENT_ID=${OIDC_RP_CLIENT_ID}
-      - OIDC_RP_REALM_ID=${OIDC_RP_REALM_ID}
-      - OIDC_RP_CLIENT_SECRET=${OIDC_RP_CLIENT_SECRET}
-      - OIDC_RP_SIGN_ALGO=${OIDC_RP_SIGN_ALGO}
-    command: python app.py
-    networks:
-      - extremexp_network
+  # access-control-service:
+  #   image: ghcr.io/yagorezende/extremexp_accesscontrol:dev
+  #   container_name: access-control-service
+  #   ports:
+  #     - ${FLASK_AC_APP_PORT}:${FLASK_AC_APP_PORT}
+  #   expose:
+  #     - ${FLASK_AC_APP_PORT}
+  #   environment:
+  #     - FLASK_AC_APP_HOST=${FLASK_AC_APP_HOST}
+  #     - FLASK_AC_APP_PORT=${FLASK_AC_APP_PORT}
+  #     - FLASK_AC_APP_NAME=${FLASK_AC_APP_NAME}
+  #     - FLASK_AC_APP_DEBUG=${FLASK_AC_APP_DEBUG}
+  #     - FLASK_AC_APP_ENV=${FLASK_AC_APP_ENV}
+  #     - FLASK_AC_APP_SECRET_KEY=${FLASK_AC_APP_SECRET_KEY}
+  #     - FLASK_AC_APP_DATABASE_URI=${FLASK_AC_APP_DATABASE_URI}
+  #     - KEYCLOAK_SERVER_URL=${KEYCLOAK_SERVER_URL}
+  #     - KEYCLOAK_USERNAME=${KEYCLOAK_USERNAME}
+  #     - KEYCLOAK_USER_PASSWORD=${KEYCLOAK_USER_PASSWORD}
+  #     - OIDC_OP_AUTHORIZATION_ENDPOINT=${OIDC_OP_AUTHORIZATION_ENDPOINT}
+  #     - OIDC_OP_ENDSESSION_ENDPOINT=${OIDC_OP_ENDSESSION_ENDPOINT}
+  #     - OIDC_OP_JWKS_ENDPOINT=${OIDC_OP_JWKS_ENDPOINT}
+  #     - OIDC_OP_LOGOUT_ENDPOINT=${OIDC_OP_LOGOUT_ENDPOINT}
+  #     - OIDC_OP_LOGOUT_URL_METHOD=${OIDC_OP_LOGOUT_URL_METHOD}
+  #     - OIDC_OP_TOKEN_ENDPOINT=${OIDC_OP_TOKEN_ENDPOINT}
+  #     - OIDC_OP_USER_ENDPOINT=${OIDC_OP_USER_ENDPOINT}
+  #     - OIDC_RP_CLIENT_ID=${OIDC_RP_CLIENT_ID}
+  #     - OIDC_RP_REALM_ID=${OIDC_RP_REALM_ID}
+  #     - OIDC_RP_CLIENT_SECRET=${OIDC_RP_CLIENT_SECRET}
+  #     - OIDC_RP_SIGN_ALGO=${OIDC_RP_SIGN_ALGO}
+  #   command: python app.py
+  #   networks:
+  #     - extremexp_network
 
-networks:
-  extremexp_network:
-    driver: bridge
+# networks:
+#   extremexp_network:
+#     driver: bridge
