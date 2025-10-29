@@ -11,18 +11,22 @@ export default function WorkflowDetailsAccordion() {
   const uniqueTasks = useMemo(() => {
     const tasks = tab?.workflowConfiguration.tasks ?? [];
     const seen = new Set<string>();
+
     return tasks.reduce((acc: { id: string; name: string }[], task) => {
       if (task.name && !seen.has(task.id)) { seen.add(task.id); acc.push({ id: task.id, name: task.name }); }
+
       return acc;
     }, []);
   }, [tab?.workflowConfiguration.tasks]);
 
   const expandedTaskItemIds = useMemo(() => {
     const tasks = tab?.workflowConfiguration.tasks ?? [];
+
     return tasks
       .filter(task => {
         const hasParams = tab?.workflowConfiguration.params?.some(p => p.task === task.id) ?? false;
         const hasMetrics = tab?.workflowMetrics.data?.some(m => m.task === task.id && m.name !== 'rating') ?? false;
+
         return hasParams || hasMetrics;
       })
       .map(task => `task-${task.id}`);

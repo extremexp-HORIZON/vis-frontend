@@ -35,7 +35,7 @@ const DataExplorationComponent = () => {
         ?.chartType || '',
   );
   const selectedDataset = dataset?.source || '';
-  const isImage = tab?.workflowTasks.dataExploration?.metaData.data?.datasetType?.match("IMAGE");
+  const isImage = tab?.workflowTasks.dataExploration?.metaData.data?.datasetType?.match('IMAGE');
 
   useEffect(() => {
     if (!selectedDataset || !workflowId) return;

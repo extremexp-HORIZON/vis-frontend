@@ -32,14 +32,17 @@ export default function TaskTreeItem({ taskId, taskName }: Props) {
 
     const seenNames = new Set<string>();
     const uniqueMetrics = [];
+
     for (const m of metricsAll) {
       if (!seenNames.has(m.name)) { seenNames.add(m.name); uniqueMetrics.push(m); }
     }
 
     const datasets = tab?.workflowConfiguration.dataAssets?.filter(d => d.task === taskId) ?? [];
 
-    const variants = (tab?.workflowConfiguration.tasks ?? []).reduce((acc: Record<string,string>, t) => {
-      acc[t.name] = t.id; return acc;
+    const variants = (tab?.workflowConfiguration.tasks ?? []).reduce((acc: Record<string, string>, t) => {
+      acc[t.name] = t.id;
+
+      return acc;
     }, {});
 
     const fullTask = tab?.workflowConfiguration.tasks?.find(t => t.id === taskId);

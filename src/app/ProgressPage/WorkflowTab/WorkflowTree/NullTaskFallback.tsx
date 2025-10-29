@@ -35,6 +35,7 @@ export default function NullTaskFallback() {
             if (!acc.folders[ds.folder]) acc.folders[ds.folder] = [];
             acc.folders[ds.folder].push(ds);
           } else acc.noFolder.push(ds);
+
           return acc;
         },
         { folders: {} as Record<string, typeof datasets>, noFolder: [] as typeof datasets }

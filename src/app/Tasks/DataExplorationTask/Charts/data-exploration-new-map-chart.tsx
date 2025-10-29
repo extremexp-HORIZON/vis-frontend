@@ -16,7 +16,7 @@ const MapChart = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
-  const rendererRef = useRef<L.Renderer | null>(null);
+  const rendererRef = useRef<L.Renderer | undefined>(undefined);
 
   const isNumericField = (values: string[]): boolean => {
     return values.every(v => !isNaN(parseFloat(v)));
@@ -172,7 +172,7 @@ const MapChart = () => {
 
       L.circleMarker([latVal, lonVal], {
         renderer: rendererRef.current, // ✅ use shared renderer
-        radius: 3,
+        radius: 6,
         fillColor: color,
         fillOpacity: 0.8,
         stroke: false, // ✅ no border for speed
