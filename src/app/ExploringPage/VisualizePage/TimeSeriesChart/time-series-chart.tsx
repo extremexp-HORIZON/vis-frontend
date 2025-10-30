@@ -20,7 +20,6 @@ import {
   triggerTimeSeriesUpdate,
 } from '../../../../store/slices/exploring/timeSeriesSlice';
 import { TimeSeriesVisualizer } from './time-series-visualizer';
-import { Forecasting } from '../Forecasting/forecasting';
 import Loader from '../../../../shared/components/loader';
 
 export interface IChartTSProps {
@@ -87,7 +86,7 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
           <CardContent sx={{ pb: 1 }}>
             <Box
               display="flex"
-              justifyContent="space-between"
+              justifyContent="flex-end"
               alignItems="center"
             >
               <Box display="flex" alignItems="center" gap={2}>
@@ -114,7 +113,6 @@ export const TimeSeriesChart = ({ dataset }: IChartTSProps) => {
                   </Select>
                 </FormControl>
               </Box>
-              <Forecasting dataset={dataset} />
             </Box>
 
             <Box
