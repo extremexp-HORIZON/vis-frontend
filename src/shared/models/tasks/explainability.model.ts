@@ -66,6 +66,8 @@ export type ExplainabilityQuery = {
   cfGenerator?: string
   clusterActionChoiceAlgo?: string
   instance_index?: number
+  experiment_configs?: { [key: string]: IHyperparameters }
+ 
 }
 
 export const explainabilityQueryDefault: ExplainabilityQuery = {
@@ -77,7 +79,8 @@ export const explainabilityQueryDefault: ExplainabilityQuery = {
   gcf_size: 0,
   cfGenerator: '',
   clusterActionChoiceAlgo: '',
-  instance_index: 13
+  instance_index: 13,
+  experiment_configs: {}
 };
 
 export type FetchExplainabilityPlotPayload = {
