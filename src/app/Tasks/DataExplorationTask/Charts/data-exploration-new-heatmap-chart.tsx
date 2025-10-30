@@ -12,6 +12,8 @@ const HeatMapChart = () => {
   const heatLayerRef = useRef<L.Layer | null>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dispatch = useAppDispatch();
 
@@ -62,7 +64,8 @@ const HeatMapChart = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || ''
-            , runId: tab?.workflowId || ''
+            , runId: tab?.workflowId || '',
+            experimentId: experimentId || '',
           },
           columns,
           filters,

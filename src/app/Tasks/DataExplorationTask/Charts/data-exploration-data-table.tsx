@@ -19,6 +19,8 @@ const TableExpand: React.FC = () => {
   const tableRef = useRef<HTMLDivElement>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+
   const currentPage = tab?.workflowTasks.dataExploration?.controlPanel?.currentPage || 1;
   const totalPages = tab?.workflowTasks.dataExploration?.controlPanel?.totalPages || 1;
   const filters = tab?.workflowTasks.dataExploration?.controlPanel?.filters || [];
@@ -145,7 +147,8 @@ const TableExpand: React.FC = () => {
                 format: dataset?.format || '',
                 sourceType: dataset?.sourceType || '',
                 fileName: dataset?.name || ''
-                , runId: tab.workflowId || 'dataCache'
+                , runId: tab.workflowId || 'dataCache',
+                experimentId: experimentId || ''
               },
               columns: columns.map((col: VisualColumn) => col.name),
               filters:
