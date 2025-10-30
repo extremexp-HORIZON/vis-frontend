@@ -33,10 +33,14 @@ import {
   setSelectedTimeIndex,
   addModel,
 } from '../../../../store/slices/exploring/predictionSlice';
-import { createTask } from '../../../../store/slices/exploring/eusomeSlice';
+import {
+  createTask,
+  getActiveTasks,
+} from '../../../../store/slices/exploring/eusomeSlice';
 import {
   type InferenceInput,
   type SinglePrediction,
+  type PredictTask,
   defaultInferenceInput,
 } from '../../../../shared/models/eusome-api.model';
 import {
@@ -92,24 +96,20 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   const [predictionTimestamp, setPredictionTimestamp] = useState<Dayjs | null>(
     dayjs(),
   );
-  const { zoneIds, results, models, intervals, predictionDisplay } = useAppSelector(
-    (state: RootState) => state.prediction,
-  );
-  const { loading: eusomeLoading, processedDataList } = useAppSelector(
-    (state: RootState) => state.eusome,
-  );
+  const { zoneIds, results, models, intervals, predictionDisplay } =
+    useAppSelector((state: RootState) => state.prediction);
+  const {
+    loading: eusomeLoading,
+    processedDataList,
+    trainingTask,
+    activeTasks,
+  } = useAppSelector((state: RootState) => state.eusome);
   const dispatch = useAppDispatch();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     setError(null);
-    // Reset wizard state
-    setActiveStep(0);
-    setSelectedModel(null);
-    setPredictionTimestamp(dayjs());
-    // Reset task state
-    setCurrentPredictionTaskId(null);
   };
 
   // Wizard navigation functions
@@ -194,7 +194,6 @@ export const Prediction = ({ zone }: IPredictionProps) => {
 
     setError(null);
     setPredictionResults([]);
-    dispatch(setPredictionDisplay(true));
 
     try {
       // Create inference input for all geohashes
@@ -209,6 +208,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
           processedDataList?.processed_files.find(d =>
             d.filename.includes(zone.fileName || ''),
           )?.filename || null,
+        zone_id: zone.id || null,
       };
 
       // Create prediction task
@@ -222,6 +222,14 @@ export const Prediction = ({ zone }: IPredictionProps) => {
       if (createTask.fulfilled.match(result)) {
         // Set the task ID for progress tracking
         setCurrentPredictionTaskId(result.payload.task_id);
+        dispatch(
+          addTimestamp({
+            zoneId: zone.id!,
+            timestamp: predictionTimestamp!.toISOString(),
+          }),
+        );
+        dispatch(addModel({ zoneId: zone.id!, model: selectedModel! }));
+        dispatch(addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }));
       } else {
         setError('Failed to create prediction task');
       }
@@ -236,14 +244,6 @@ export const Prediction = ({ zone }: IPredictionProps) => {
       setPredictionResults(taskResult as SinglePrediction[]);
       dispatch(addZoneId(zone.id!));
       dispatch(
-        addTimestamp({
-          zoneId: zone.id!,
-          timestamp: predictionTimestamp!.toISOString(),
-        }),
-      );
-      dispatch(addModel({ zoneId: zone.id!, model: selectedModel! }));
-      dispatch(addIntervals({ zoneId: zone.id!, intervals: intervalsAmount }));
-      dispatch(
         addResults({
           zoneId: zone.id!,
           results: taskResult as SinglePrediction[],
@@ -251,6 +251,12 @@ export const Prediction = ({ zone }: IPredictionProps) => {
       );
     }
   };
+
+  useEffect(() => {
+    if (open) {
+      dispatch(getActiveTasks());
+    }
+  }, [open, dispatch]);
 
   useEffect(() => {
     if (zone.id && zoneIds.includes(zone.id)) {
@@ -262,10 +268,33 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   }, [zone]);
 
   useEffect(() => {
+    // Reset the wizard when the results are cleared
     if (Object.keys(results).length === 0) {
+      setActiveStep(0);
+      setSelectedModel(null);
+      setIntervalsAmount(fixedIntervals[0].value);
+      setPredictionTimestamp(dayjs());
+      setCurrentPredictionTaskId(null);
+      setError(null);
       setPredictionResults([]);
     }
   }, [results]);
+
+  useEffect(() => {
+    if (open && activeTasks && activeTasks.length > 0) {
+      const predictionTask: PredictTask | undefined = activeTasks.find(
+        task =>
+          task.type === 'predict' && (task as PredictTask).zone_id === zone.id,
+      );
+
+      if (predictionTask) {
+        setActiveStep(1);
+        setCurrentPredictionTaskId(predictionTask.task_id);
+        setSelectedModel(models[predictionTask.zone_id!]);
+        setIntervalsAmount(intervals[predictionTask.zone_id!]);
+      }
+    }
+  }, [activeTasks, zone.id, open, models, intervals]);
 
   return (
     <>
@@ -360,7 +389,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                     <Button
                       variant="contained"
                       onClick={handleNext}
-                      disabled={!selectedModel}
+                      disabled={trainingTask || !selectedModel}
                     >
                       Next
                     </Button>
@@ -544,11 +573,9 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                             ) : null
                         }
                       >
-                        {eusomeLoading.createTask
-                          ? 'Creating Task...'
-                          : currentPredictionTaskId
-                            ? 'Predicting...'
-                            : 'Predict'}
+                        {currentPredictionTaskId
+                          ? 'Predicting...'
+                          : 'Predict'}
                       </Button>
                     ) : (
                       <Button variant="contained" onClick={handleNext}>
@@ -577,8 +604,11 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       Prediction Complete!
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {predictionResults.length * predictionResults[0].predicted_rsrp_at_heights.length} predictions generated
-                      successfully
+                      {predictionResults.length > 0
+                        ? predictionResults.length *
+                          predictionResults[0].predicted_rsrp_at_heights.length
+                        : 0}{' '}
+                      predictions generated successfully
                     </Typography>
                   </Box>
 
@@ -669,7 +699,11 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       >
                         <Box>
                           <Typography variant="h4" color="primary">
-                            {predictionResults.length * predictionResults[0].predicted_rsrp_at_heights.length}
+                            {predictionResults.length > 0
+                              ? predictionResults.length *
+                                predictionResults[0].predicted_rsrp_at_heights
+                                  .length
+                              : 0}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             Total Predictions
@@ -677,12 +711,19 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         </Box>
                         <Box sx={{ textAlign: 'right' }}>
                           <Typography variant="body2" color="text.secondary">
-                            Heights: {predictionResults[0].predicted_rsrp_at_heights.map(h => h.height_m).join(', ')}
+                            {}
+                            Heights:{' '}
+                            {predictionResults.length > 0 &&
+                              predictionResults[0]?.predicted_rsrp_at_heights
+                                .map(h => h.height_m)
+                                .join(', ')}
                             m
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {predictionResults[0].predicted_rsrp_at_heights.length} heights ×{' '}
-                            {zone.geohashes?.length} locations ×{' '}
+                            {predictionResults.length > 0 &&
+                              predictionResults[0]?.predicted_rsrp_at_heights
+                                .length}{' '}
+                            heights × {zone.geohashes?.length} locations ×{' '}
                             {intervalsAmount} intervals
                           </Typography>
                         </Box>

@@ -2,7 +2,7 @@ import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { Box, Typography, Alert, Chip } from '@mui/material';
 import { useTaskProgress } from '../hooks/useTaskProgress';
-import { removeTask } from '../../store/slices/exploring/eusomeSlice';
+import { removeCreatedTask, removeActiveTask } from '../../store/slices/exploring/eusomeSlice';
 import { useAppDispatch } from '../../store/store';
 
 export type TaskType = 'train' | 'predict' | 'finetune' | 'other';
@@ -70,7 +70,8 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({
       !hasCalledCompleteRef.current
     ) {
       hasCalledCompleteRef.current = true;
-      dispatch(removeTask(taskId));
+      dispatch(removeCreatedTask(taskId));
+      dispatch(removeActiveTask(taskId));
       if (taskProgress.status === 'succeeded' && onTaskComplete) {
         onTaskComplete(taskResult);
       } else if (taskProgress.status === 'failed' && onTaskFailed) {

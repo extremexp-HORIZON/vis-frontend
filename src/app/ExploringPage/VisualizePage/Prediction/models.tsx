@@ -12,6 +12,7 @@ import {
 } from '../../../../store/slices/exploring/eusomeSlice';
 import {
   defaultTrainingConfig,
+  type TrainTask,
   type ModelInfo,
   type TaskCreateResponse,
 } from '../../../../shared/models/eusome-api.model';
@@ -45,6 +46,7 @@ export const PredictionModels = ({
     loading: { listModels: loadingListModels, createTask: creatingTask },
     processedDataList,
     trainingTask,
+    activeTasks,
   } = useAppSelector((state: RootState) => state.eusome);
   const { dataset } = useAppSelector((state: RootState) => state.dataset);
   const [availableModels, setModels] = useState<ModelInfo[]>([]);
@@ -77,6 +79,19 @@ export const PredictionModels = ({
       }
     }
   }, [processedDataList]);
+
+  useEffect(() => {
+    if (activeTasks && activeTasks.length > 0) {
+      const trainTask: TrainTask | undefined = activeTasks.find(task =>
+        task.type === 'train' && (task as TrainTask).filename?.includes(dataset?.id || ''),
+      );
+
+      if (trainTask) {
+        setCurrentTaskId(trainTask.task_id);
+        dispatch(setTrainingTask(true));
+      }
+    }
+  }, [activeTasks]);
 
   // Handle task completion callbacks
   const handleTaskComplete = () => {
