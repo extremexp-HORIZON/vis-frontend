@@ -17,7 +17,7 @@ import {
   type FinetuneConfig,
   type InferenceInput,
   type TaskCreateResponse,
-  type TaskStatusResponse,
+  type TaskBase,
 } from '../../../shared/models/eusome-api.model';
 import { showError, showSuccess } from '../../../shared/utils/toast';
 import type { AppStartListening } from '../../listenerMiddleware';
@@ -38,7 +38,8 @@ export interface IEusomeState {
   dataSummary: DataSummaryResponse | null;
   systemStatus: SystemStatusResponse | null;
   createdTasks: TaskCreateResponse[] | null;
-  taskStatus: TaskStatusResponse | null;
+  taskStatus: TaskBase | null;
+  activeTasks: TaskBase[] | null;
 
   // In progress tasks
   trainingTask: boolean;
@@ -56,6 +57,7 @@ export interface IEusomeState {
     systemStatus: boolean;
     createTask: boolean;
     getTaskStatus: boolean;
+    getActiveTasks: boolean;
   };
 
   // Error states
@@ -71,6 +73,7 @@ export interface IEusomeState {
     systemStatus: string | null;
     createTask: string | null;
     getTaskStatus: string | null;
+    getActiveTasks: string | null;
   };
 }
 
@@ -86,6 +89,7 @@ const initialState: IEusomeState = {
   systemStatus: null,
   createdTasks: null,
   taskStatus: null,
+  activeTasks: null,
   trainingTask: false,
   loading: {
     uploadData: false,
@@ -99,6 +103,7 @@ const initialState: IEusomeState = {
     systemStatus: false,
     createTask: false,
     getTaskStatus: false,
+    getActiveTasks: false,
   },
   error: {
     uploadData: null,
@@ -112,6 +117,7 @@ const initialState: IEusomeState = {
     systemStatus: null,
     createTask: null,
     getTaskStatus: null,
+    getActiveTasks: null,
   },
 };
 
@@ -438,12 +444,12 @@ export const createTask = createAsyncThunk<
 // =============================================================================
 
 export const getTaskStatus = createAsyncThunk<
-  TaskStatusResponse,
+  TaskBase,
   { task_id: string },
   { rejectValue: string }
 >('eusome/getTaskStatus', async ({ task_id }, { rejectWithValue }) => {
   try {
-    const response = await eusomeApi.get<TaskStatusResponse>(
+    const response = await eusomeApi.get<TaskBase>(
       `/tasks/${task_id}`,
     );
 
@@ -456,6 +462,26 @@ export const getTaskStatus = createAsyncThunk<
   }
 });
 
+// =============================================================================
+// Async Thunks - Get Active Tasks
+// =============================================================================
+
+export const getActiveTasks = createAsyncThunk<
+  TaskBase[],
+  void,
+  { rejectValue: string }
+>('eusome/getActiveTasks', async (_, { rejectWithValue }) => {
+  try {
+    const response = await eusomeApi.get<TaskBase[]>('/tasks/active');
+
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
+  }
+});
 // =============================================================================
 // Slice
 // =============================================================================
@@ -732,6 +758,28 @@ export const eusomeSlice = createSlice({
           state.error.getTaskStatus =
             action.payload || 'Failed to get task status';
           showError(action.payload || 'Failed to get task status');
+        },
+      );
+
+    // ==========================================================================
+    // Get Active Tasks
+    // ==========================================================================
+    builder
+      .addCase(getActiveTasks.pending, state => {
+        state.loading.getActiveTasks = true;
+        state.error.getActiveTasks = null;
+      })
+      .addCase(getActiveTasks.fulfilled, (state, action) => {
+        state.loading.getActiveTasks = false;
+        state.activeTasks = action.payload;
+        // showSuccess('Active tasks loaded!');
+      })
+      .addCase(
+        getActiveTasks.rejected,
+        (state, action: PayloadAction<string | undefined>) => {
+          state.loading.getActiveTasks = false;
+          state.error.getActiveTasks = action.payload || 'Failed to get active tasks';
+          showError(action.payload || 'Failed to get active tasks');
         },
       );
   },

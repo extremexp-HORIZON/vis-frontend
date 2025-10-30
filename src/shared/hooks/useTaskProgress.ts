@@ -95,6 +95,10 @@ export const useTaskProgress = (taskId: string) => {
             break;
         }
       };
+
+      return () => {
+        ws.close();
+      };
     }
   }, [taskId]);
 

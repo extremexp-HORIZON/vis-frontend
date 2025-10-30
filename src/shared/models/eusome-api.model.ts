@@ -164,6 +164,7 @@ export interface InferenceInput {
   model_filename: string | null;
   training_csv_filename: string | null;
   location_paths: LocationPaths | null;
+  zone_id: string | null;
 }
 
 export interface SinglePrediction {
@@ -201,6 +202,7 @@ export const defaultInferenceInput: InferenceInput = {
   model_filename: 'AthensModelXGB_20251001_134924.pkl',
   training_csv_filename: null,
   location_paths: defaultLocationPaths,
+  zone_id: 'zone_id',
 };
 
 // =============================================================================
@@ -308,32 +310,69 @@ export type TaskType = 'train' | 'predict' | 'finetune' | 'other';
 
 export interface TaskCreateResponse {
   task_id: string;
+  task_type: TaskType;
   message: string;
+  zone_id?: string;
 }
 
-export interface TaskStatusResponse {
+/**
+ * Base class with common fields for all task types
+ * Matches Python TaskBase model
+ */
+export interface TaskBase {
+  // Identity
   task_id: string;
   type: TaskType;
   owner_id?: string;
+
+  // Lifecycle
   status: TaskStatus;
-  percent: number;
-  step: string;
-  message: string;
   created_at: string;
   updated_at?: string;
   started_at?: string;
   finished_at?: string;
   success?: boolean;
   error?: string;
-  schema_version: number;
 
-  // Task-specific fields
+  // Progress
+  percent?: number; // 0-100
+  step?: string;
+  message?: string;
+
+  // Housekeeping
+  schema_version: number; // Default: 1
+}
+
+/**
+ * Training task model with training-specific inputs and outputs
+ * Matches Python TrainTask model
+ */
+export interface TrainTask extends TaskBase {
+  // Inputs (metadata)
+  filename?: string;
+  model_name?: string;
+  n_splits?: number;
+  hyperparameters_json?: string; // JSON string of hyperparameters
+  custom_model_name?: string;
+
+  // Outputs (results)
   result_model_filename?: string;
-  metrics_json?: string;
-  predictions_json?: string;
-  model_used?: string;
-  input_data_json?: string;
+  metrics_json?: string; // JSON string with final metrics/results
+}
+
+/**
+ * Prediction task model with prediction-specific inputs and outputs
+ * Matches Python PredictTask model
+ */
+export interface PredictTask extends TaskBase {
+  // Inputs (prediction-specific)
+  zone_id?: string;
+  input_data_json?: string; // JSON string of input data for prediction
   model_filename?: string;
+
+  // Outputs (prediction results)
+  predictions_json?: string; // JSON string with prediction results
+  model_used?: string;
 }
 
 export interface TaskEventData {
