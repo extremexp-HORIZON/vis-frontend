@@ -22,6 +22,7 @@ const DataExplorationComponent = () => {
   const dispatch = useAppDispatch();
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
   const dataset = useAppSelector(
     state =>
       state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
@@ -48,7 +49,8 @@ const DataExplorationComponent = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || ''
-            , runId: workflowId || ''
+            , runId: workflowId || '',
+            experimentId: experimentId || ''
           },
           metadata: {
             workflowId: workflowId,

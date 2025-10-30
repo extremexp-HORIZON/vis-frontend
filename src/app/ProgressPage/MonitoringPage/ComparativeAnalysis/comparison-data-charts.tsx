@@ -143,7 +143,8 @@ const ComparisonDataCharts = () => {
               format: dataAsset?.format || '',
               sourceType: dataAsset?.sourceType || '',
               fileName: dataAsset?.name || ''
-              , runId: workflowId || ''
+              , runId: workflowId || '',
+              experimentId: experimentId || ''
             },
             metadata: {
               workflowId,
