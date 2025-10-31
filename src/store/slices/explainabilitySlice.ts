@@ -58,7 +58,14 @@ export const setSelectedTime = createAction<{
 export const setSelectedFeatures2D = createAction<{
   feature1: string;
   feature2: string;
+  targetMetric: string;
 }>('explainability/set_selected_features_2d');
+
+export const setAleOrPdpSelections = createAction<{
+  plotType: 'ale' | 'pdp';
+  feature: string;
+  targetMetric: string;
+}>('explainability/set_ale_selections');
 
 export const setGcfSize = createAction<number>('modelAnalysis/setGcfSize');
 export const setCfMethod = createAction<string>('modelAnalysis/setCfMethod');
@@ -153,13 +160,22 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     })
     .addCase(setSelectedFeatures2D, (state, action) => {
       const task = state.tab?.workflowTasks.modelAnalysis;
-      const { feature1, feature2 } = action.payload;
+      const { feature1, feature2, targetMetric } = action.payload;
 
       const section = task?.['2dpdp'];
 
-      if (section && 'selectedFeature1' in section && 'selectedFeature2' in section) {
+      if (section && 'selectedFeature1' in section && 'selectedFeature2' in section && 'targetMetric' in section) {
         section.selectedFeature1 = feature1;
         section.selectedFeature2 = feature2;
+        section.targetMetric = targetMetric;
+      }
+    })
+    .addCase(setAleOrPdpSelections, (state, action) => {
+      const task = state.tab?.workflowTasks.modelAnalysis;
+      const section = task?.[action.payload.plotType];
+      if (section && 'selectedFeature' in section && 'targetMetric' in section) {
+        section.selectedFeature = action.payload.feature;
+        section.targetMetric = action.payload.targetMetric;
       }
     })
     .addCase(fetchModelAnalysisFeatureImportancePlot.pending, (state, action) => {
@@ -237,7 +253,8 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
           data: null,
           selectedFeature1: '',
           selectedFeature2: '',
-          latestRequestId: undefined
+          latestRequestId: undefined,
+          targetMetric: ''
         };
       }
     })

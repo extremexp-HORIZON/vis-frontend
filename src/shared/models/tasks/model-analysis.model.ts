@@ -53,9 +53,9 @@ export const handleMultiTimeSeriesData = (payload : IDataExplorationResponse) =>
 
 export interface IModelAnalysis {
   featureNames: string[]
-  pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; }
-  ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; }
-  '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null; latestRequestId?: string; }
+  pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; targetMetric?: string | null; }
+  ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; targetMetric?: string | null; }
+  '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null; latestRequestId?: string; targetMetric?: string | null; }
   featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; }
   shap: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
   shapValues: { data: IPlotModel | null; loading: boolean; error: string | null; }
@@ -123,9 +123,9 @@ export interface IModelAnalysis {
 
 export const modelAnalysisDefault: IModelAnalysis = {
   featureNames: [],
-  pdp: { data: null, loading: false, error: null, selectedFeature: null },
-  ale: { data: null, loading: false, error: null, selectedFeature: null },
-  '2dpdp': { data: null, loading: false, error: null, selectedFeature1: null,  selectedFeature2: null },
+  pdp: { data: null, loading: false, error: null, selectedFeature: null, targetMetric: null },
+  ale: { data: null, loading: false, error: null, selectedFeature: null, targetMetric: null },
+  '2dpdp': { data: null, loading: false, error: null, selectedFeature1: null,  selectedFeature2: null, targetMetric: null },
   featureImportance: { data: null, loading: false, error: null },
   shap: { data: null, loading: false, error: null },
   shapValues: { data: null, loading: false, error: null },
