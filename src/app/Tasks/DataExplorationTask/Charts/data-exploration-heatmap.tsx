@@ -11,6 +11,8 @@ import HeatMapControlPanel from '../ChartControls/data-exploration-heatmap-contr
 const HeatMap = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const theme = useTheme();
 
@@ -50,8 +52,9 @@ const HeatMap = () => {
             source: datasetId,
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
-            fileName: dataset?.name || ''
-            , runId: tab?.workflowId || ''
+            fileName: dataset?.name || '',
+            runId: tab?.workflowId || '',
+            experimentId: experimentId || ''
           },
           groupBy,
           aggregations: aggregation,

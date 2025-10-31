@@ -22,6 +22,8 @@ import ViewColumnIcon from "@mui/icons-material/ViewColumn"
 const ColumnsPanel = () => {
   const dispatch = useAppDispatch()
   const { tab } = useAppSelector(state => state.workflowPage)
+    const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const originalColumns =
@@ -60,25 +62,25 @@ const ColumnsPanel = () => {
     // }
   }
 
-  const handleFetchDataExploration = (columns = selectedColumns) => {
-    if (!columns?.length) return
+  // const handleFetchDataExploration = (columns = selectedColumns) => {
+  //   if (!columns?.length) return
 
-    dispatch(
-      fetchDataExplorationData({
-        query: {
-          ...defaultDataExplorationQuery,
-          dataSource: tab?.dataTaskTable.selectedItem?.data?.dataset?.source || "",
-          columns: columns.map(col => col.name),
-          filters:
-            tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
-        },
-        metadata: {
-          workflowId: tab?.workflowId || "",
-          queryCase: "chart",
-        },
-      }),
-    )
-  }
+  //   dispatch(
+  //     fetchDataExplorationData({
+  //       query: {
+  //         ...defaultDataExplorationQuery,
+  //         dataSource: tab?.dataTaskTable.selectedItem?.data?.dataset?.source || "",
+  //         columns: columns.map(col => col.name),
+  //         filters:
+  //           tab?.workflowTasks.dataExploration?.controlPanel?.filters || [],
+  //       },
+  //       metadata: {
+  //         workflowId: tab?.workflowId || "",
+  //         queryCase: "chart",
+  //       },
+  //     }),
+  //   )
+  // }
 
   const SectionHeader = ({
     icon,

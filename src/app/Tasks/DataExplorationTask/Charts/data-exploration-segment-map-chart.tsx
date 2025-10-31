@@ -20,6 +20,8 @@ const SegmentMapChart = () => {
   const [markerMap, setMarkerMap] = useState<Map<string, { start: L.CircleMarker, end: L.CircleMarker }>>(new Map());
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;
   const lon = tab?.workflowTasks.dataExploration?.controlPanel.lon;
@@ -48,7 +50,8 @@ const SegmentMapChart = () => {
           format: dataset?.format || '',
           sourceType: dataset?.sourceType || '',
           fileName: dataset?.name || ''
-          , runId: tab?.workflowId || ''
+          , runId: tab?.workflowId || '',
+          experimentId: experimentId || ''
         },
         columns: [lat, lon, ...(segmentBy.length > 0 ? segmentBy : []), orderBy],
         filters,
