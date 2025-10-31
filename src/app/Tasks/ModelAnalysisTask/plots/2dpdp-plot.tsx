@@ -33,11 +33,13 @@ const Contourplot = (props: IContourplot) => {
     : tab?.workflowTasks.modelAnalysis?.['2dpdp'].data?.featureList || null;
   const plotModel = tab?.workflowTasks.modelAnalysis?.['2dpdp'];
   const { experimentId } = useParams();
-
+  const defaultTargetMetric = tab?.workflowMetrics?.data?.[0]?.name || '';
   const feature1 = plotModel?.selectedFeature1 || '';
   const feature2 = plotModel?.selectedFeature2 || '';
+  const targetMetric = plotModel?.targetMetric || defaultTargetMetric;
   const [pendingFeature1, setPendingFeature1] = useState(feature1);
   const [pendingFeature2, setPendingFeature2] = useState(feature2);
+  const [pendingTargetMetric, setPendingTargetMetric] = useState(defaultTargetMetric);
 
   const [hasInitialized, setHasInitialized] = useState(false);
 
@@ -52,6 +54,9 @@ const Contourplot = (props: IContourplot) => {
             ...explainabilityQueryDefault,
             explanation_type: explanation_type,
             explanation_method: '2dpdp',
+            ...(explanation_type === 'hyperparameterExplanation'
+            ? { target_metric: defaultTargetMetric }
+            : {}),
           },
           metadata: {
             workflowId: tab?.workflowId || '',
@@ -68,7 +73,8 @@ const Contourplot = (props: IContourplot) => {
   useEffect(() => {
     setPendingFeature1(feature1);
     setPendingFeature2(feature2);
-  }, [feature1, feature2]);
+    setPendingTargetMetric(targetMetric);
+  }, [feature1, feature2, targetMetric]);
 
   const handleFeatureChange = (index: number) => (e: { target: { value: string } }) => {
     const newValue = e.target.value;
@@ -82,6 +88,7 @@ const Contourplot = (props: IContourplot) => {
       setSelectedFeatures2D({
         feature1: pendingFeature1,
         feature2: pendingFeature2,
+        targetMetric: pendingTargetMetric,
       })
     );
 
@@ -93,6 +100,9 @@ const Contourplot = (props: IContourplot) => {
           explanation_method: '2dpdp',
           feature1: pendingFeature1,
           feature2: pendingFeature2,
+          ...(explanation_type === 'hyperparameterExplanation'
+          ? { target_metric: pendingTargetMetric }
+          : {}),
         },
         metadata: {
           workflowId: tab?.workflowId || '',
@@ -306,6 +316,29 @@ const Contourplot = (props: IContourplot) => {
             </FormControl>
           );
         })}
+        { explanation_type === 'hyperparameterExplanation' && (
+          <FormControl fullWidth>
+            <InputLabel id={`target-metric-label`}>Target Metric</InputLabel>
+            <Select
+              labelId='target-metric-label'
+              value={pendingTargetMetric}
+              label='Target Metric'
+              onChange={(e: { target: { value: string } }) => setPendingTargetMetric(e.target.value)}
+              disabled={plotModel?.loading || !plotModel?.data}
+              MenuProps={{
+                PaperProps: {
+                  style: { maxHeight: 250, maxWidth: 300 },
+                },
+              }}
+            >
+              {tab?.workflowMetrics?.data?.map(metric => 
+                <MenuItem key={metric.name} value={metric.name}>
+                  {metric.name}
+                </MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        )}
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -317,7 +350,8 @@ const Contourplot = (props: IContourplot) => {
             !plotModel?.data ||
             !pendingFeature1 ||
             !pendingFeature2 ||
-            (pendingFeature1 === feature1 && pendingFeature2 === feature2)
+            (explanation_type === 'hyperparameterExplanation' && !pendingTargetMetric) ||
+            (pendingFeature1 === feature1 && pendingFeature2 === feature2 && pendingTargetMetric === targetMetric)
           }
         >
           Apply Selections
