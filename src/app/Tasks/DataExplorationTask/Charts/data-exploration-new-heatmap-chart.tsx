@@ -12,7 +12,7 @@ const HeatMapChart = () => {
   const heatLayerRef = useRef<L.Layer | null>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
-  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
 
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dispatch = useAppDispatch();
@@ -41,6 +41,7 @@ const HeatMapChart = () => {
       .map(([k, v]) => [parseFloat(k), v] as [number, string])
       .sort((a, b) => a[0] - b[0]);
     const cssStops = entries.map(([p, c]) => `${c} ${Math.round(p * 100)}%`);
+
     return `linear-gradient(to right, ${cssStops.join(', ')})`;
   };
 
@@ -138,6 +139,7 @@ const HeatMapChart = () => {
         .filter((entry): entry is [number, number, number] => entry !== null);
 
       const gradientUsed = DEFAULT_HEAT_GRADIENT;
+
       heatLayerRef.current = L.heatLayer(heatData, {
         radius: radius,
         blur: 15,
@@ -167,10 +169,12 @@ const HeatMapChart = () => {
 
         let wMin: number | null = null;
         let wMax: number | null = null;
+
         if (Array.isArray(data) && weightBy && weightBy !== 'None') {
           const vals = data
             .map(r => parseFloat(String(r[weightBy])))
             .filter(v => !isNaN(v));
+
           if (vals.length) {
             wMin = Math.min(...vals);
             wMax = Math.max(...vals);

@@ -22,7 +22,7 @@ const DataExplorationComponent = () => {
   const dispatch = useAppDispatch();
 
   const { tab } = useAppSelector(state => state.workflowPage);
-  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
   const dataset = useAppSelector(
     state =>
       state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
