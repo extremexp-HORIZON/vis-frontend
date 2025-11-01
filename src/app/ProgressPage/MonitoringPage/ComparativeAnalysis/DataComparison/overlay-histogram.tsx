@@ -28,13 +28,16 @@ type Row = {
 
 function weightedQuantile(sorted: { value: number; count: number }[], q: number): number {
   const total = sorted.reduce((s, d) => s + d.count, 0);
+
   if (total <= 0) return sorted[0]?.value ?? 0;
   const target = q * total;
   let acc = 0;
+
   for (let i = 0; i < sorted.length; i++) {
     acc += sorted[i].count;
     if (acc >= target) return sorted[i].value;
   }
+
   return sorted[sorted.length - 1].value;
 }
 
@@ -50,6 +53,7 @@ function hybridEdgesFromPooled(
 
   const min = values[0].value;
   const max = values[values.length - 1].value;
+
   if (min === max) return [min, max];
 
   const B = Math.max(1, bins);
@@ -61,6 +65,7 @@ function hybridEdgesFromPooled(
   const freqEdges = Array.from({ length: B + 1 }, (_, i) => {
     if (i === 0) return min;
     if (i === B) return max;
+
     return weightedQuantile(values, i / B);
   });
 
@@ -73,8 +78,10 @@ function hybridEdgesFromPooled(
   const tol = Math.max((max - min) * 1e-9, unit / 2); // be generous vs rounding
 
   const edges: number[] = [];
+
   for (let i = 0; i < interp.length; i++) {
     const x = i === 0 ? min : (i === interp.length - 1 ? max : interp[i]);
+
     if (edges.length === 0 || Math.abs(x - edges[edges.length - 1]) > tol) {
       edges.push(x);
     }
@@ -298,9 +305,11 @@ const OverlayHistogram = ({
     } else {
       // Pool weighted values from all workflows
       const pooled: { value: number; count: number }[] = [];
+
       workflowIds.forEach(wid => {
         (rawByWorkflow[wid] || []).forEach(d => {
           const v = d[columnName], c = d[countField];
+
           if (typeof v === 'number' && typeof c === 'number' && Number.isFinite(v) && Number.isFinite(c)) {
             pooled.push({ value: v, count: c });
           }
@@ -309,6 +318,7 @@ const OverlayHistogram = ({
 
       if (pooled.length > 0) {
         let min = Infinity, max = -Infinity;
+
         for (const { value } of pooled) {
           if (value < min) min = value;
           if (value > max) max = value;
@@ -326,6 +336,7 @@ const OverlayHistogram = ({
             end: edges[i + 1],
             label: formatRangeLabel(edges[i], edges[i + 1]),
           }));
+
           // Count each workflow into the shared bins
           workflowIds.forEach(wid => {
             const arr = rawByWorkflow[wid] || [];
@@ -333,15 +344,18 @@ const OverlayHistogram = ({
 
             arr.forEach(d => {
               const v = d[columnName], c = d[countField];
+
               if (typeof v !== 'number' || typeof c !== 'number') return;
 
               if (bins.length === 1) {
                 counts[0].count += c;
+
                 return;
               }
 
               // Initial index guess
               let idx = Math.floor(((v - edges[0]) / (edges[edges.length - 1] - edges[0])) * (bins.length));
+
               if (idx < 0) idx = 0;
               if (idx >= bins.length) idx = bins.length - 1;
 

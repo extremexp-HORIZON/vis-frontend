@@ -20,7 +20,7 @@ const SegmentMapChart = () => {
   const [markerMap, setMarkerMap] = useState<Map<string, { start: L.CircleMarker, end: L.CircleMarker }>>(new Map());
 
   const { tab } = useAppSelector(state => state.workflowPage);
-  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
 
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const lat = tab?.workflowTasks.dataExploration?.controlPanel.lat;

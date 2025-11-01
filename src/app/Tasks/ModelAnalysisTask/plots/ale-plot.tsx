@@ -43,7 +43,6 @@ const AlePlot = (props: AlePlotProps) => {
   const [pendingFeature, setPendingFeature] = useState(selectedFeature);
   const [pendingTargetMetric, setPendingTargetMetric] = useState(selectedTargetMetric);
 
-
   useEffect(() => {
     if (tab && experimentId) {
       dispatch(
@@ -53,8 +52,8 @@ const AlePlot = (props: AlePlotProps) => {
             explanation_type: explanation_type,
             explanation_method: 'ale',
             ...(explanation_type === 'hyperparameterExplanation'
-            ? { target_metric: defaultTargetMetric }
-            : {}),
+              ? { target_metric: defaultTargetMetric }
+              : {}),
           },
           metadata: {
             workflowId: tab.workflowId,
@@ -162,18 +161,18 @@ const AlePlot = (props: AlePlotProps) => {
     }
   };
 
-const handleTargetMetricSelect = (value: string) => {
-  setPendingTargetMetric(value);
-};
+  const handleTargetMetricSelect = (value: string) => {
+    setPendingTargetMetric(value);
+  };
 
-const handleApply = () => {
-  dispatch(setAleOrPdpSelections({
-    plotType: 'ale',
-    feature: pendingFeature,
-    targetMetric: pendingTargetMetric,
-  }));
-  dispatchAleFetch(pendingFeature, pendingTargetMetric);
-};
+  const handleApply = () => {
+    dispatch(setAleOrPdpSelections({
+      plotType: 'ale',
+      feature: pendingFeature,
+      targetMetric: pendingTargetMetric,
+    }));
+    dispatchAleFetch(pendingFeature, pendingTargetMetric);
+  };
 
   const controlPanel =
     featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
@@ -257,7 +256,7 @@ const handleApply = () => {
           </Box>
         )}
       </Box>
-  );
+    );
 
   const loading = (
     <Loader />
