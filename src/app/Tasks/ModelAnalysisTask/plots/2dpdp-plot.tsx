@@ -55,8 +55,8 @@ const Contourplot = (props: IContourplot) => {
             explanation_type: explanation_type,
             explanation_method: '2dpdp',
             ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
-            ? { target_metric: defaultTargetMetric }
-            : {}),
+              ? { target_metric: defaultTargetMetric }
+              : {}),
           },
           metadata: {
             workflowId: tab?.workflowId || '',
@@ -101,8 +101,8 @@ const Contourplot = (props: IContourplot) => {
           feature1: pendingFeature1,
           feature2: pendingFeature2,
           ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
-          ? { target_metric: pendingTargetMetric }
-          : {}),
+            ? { target_metric: pendingTargetMetric }
+            : {}),
         },
         metadata: {
           workflowId: tab?.workflowId || '',
@@ -316,7 +316,7 @@ const Contourplot = (props: IContourplot) => {
             </FormControl>
           );
         })}
-        { (explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation' )&& (
+        { (explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
           <FormControl fullWidth>
             <InputLabel id={'target-metric-label'}>Target Metric</InputLabel>
             <Select

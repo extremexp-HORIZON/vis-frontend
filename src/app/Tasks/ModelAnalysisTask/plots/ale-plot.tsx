@@ -52,8 +52,8 @@ const AlePlot = (props: AlePlotProps) => {
             explanation_type: explanation_type,
             explanation_method: 'ale',
             ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
-            ? { target_metric: defaultTargetMetric }
-            : {}),
+              ? { target_metric: defaultTargetMetric }
+              : {}),
           },
           metadata: {
             workflowId: tab.workflowId,
@@ -236,7 +236,7 @@ const AlePlot = (props: AlePlotProps) => {
           )}
         </Box>
 
-        {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation' )&& (
+        {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="contained"

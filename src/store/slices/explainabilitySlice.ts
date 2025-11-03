@@ -93,6 +93,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     .addCase(fetchModelAnalysisExplainabilityPlot.pending, (state, action) => {
       const task = getTask(state, action.meta.arg.metadata.workflowId);
       const plotType = action.meta.arg.metadata.queryCase as keyof IModelAnalysis;
+
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
         const section = task[plotType] as LoadableSection<IPlotModel>;
 

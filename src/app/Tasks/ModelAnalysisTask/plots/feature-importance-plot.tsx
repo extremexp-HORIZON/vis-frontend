@@ -8,7 +8,7 @@ import Loader from '../../../../shared/components/loader';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import type { RootState } from '../../../../store/store';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
-import { IPlotModel } from '../../../../shared/models/plotmodel.model';
+import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
 
 interface IFeatureImportancePlotProps {
   explanation_type?: string
@@ -34,7 +34,7 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
             query: {
               ...explainabilityQueryDefault,
               explanation_type,
-              explanation_method:'feature_importance'
+              explanation_method: 'feature_importance'
             },
             metadata: {
               workflowId: tab?.workflowId || '',
@@ -42,9 +42,8 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
               experimentId: experimentId || '',
             }
           })
-        )
-      }
-      else {
+        );
+      } else {
         dispatch(
           fetchModelAnalysisFeatureImportancePlot({
             query: {},
@@ -74,8 +73,10 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
       const filtered = rawData.featureImportances.filter(d => {
         if (typeof d.importanceScore !== 'number') {
           missingImportance.push(d.featureName);
+
           return false;
         }
+
         return true;
       });
 
@@ -92,6 +93,7 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
 
       const out = [];
       const len = Math.min(features.length, importances.length);
+
       for (let i = 0; i < len; i++) {
         const f = features[i];
         const vRaw = importances[i];
@@ -104,8 +106,10 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
           out.push({ Feature: f, Importance: v as number });
         }
       }
+
       return out.sort((a, b) => b.Importance - a.Importance);
     }
+
     return [];
   };
 
