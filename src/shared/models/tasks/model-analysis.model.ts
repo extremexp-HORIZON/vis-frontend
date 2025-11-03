@@ -56,7 +56,7 @@ export interface IModelAnalysis {
   pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; targetMetric?: string | null; }
   ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; targetMetric?: string | null; }
   '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null; latestRequestId?: string; targetMetric?: string | null; }
-  featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; }
+  featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
   shap: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
   shapValues: { data: IPlotModel | null; loading: boolean; error: string | null; }
   segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; latestRequestId?: string; }

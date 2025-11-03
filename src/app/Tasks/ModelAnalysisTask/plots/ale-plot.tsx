@@ -29,7 +29,7 @@ const AlePlot = (props: AlePlotProps) => {
     (state: RootState) => state.workflowPage,
   );
   const dispatch = useAppDispatch();
-  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
+  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
     ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
     : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
 
@@ -52,7 +52,7 @@ const AlePlot = (props: AlePlotProps) => {
             ...explainabilityQueryDefault,
             explanation_type: explanation_type,
             explanation_method: 'ale',
-            ...(explanation_type === 'hyperparameterExplanation'
+            ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
             ? { target_metric: defaultTargetMetric }
             : {}),
           },
@@ -140,7 +140,7 @@ const AlePlot = (props: AlePlotProps) => {
           explanation_method: 'ale',
           feature1: feature,
           feature2: plotModel?.data?.features?.feature2 ?? '',
-          ...(explanation_type === 'hyperparameterExplanation' && targetMetric
+          ...((explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && targetMetric
             ? { target_metric: targetMetric }
             : {}),
         },
@@ -156,7 +156,7 @@ const AlePlot = (props: AlePlotProps) => {
   const handleFeatureSelect = (value: string) => {
     setPendingFeature(value);
 
-    if (explanation_type !== 'hyperparameterExplanation') {
+    if (explanation_type !== 'hyperparameterExplanation' && explanation_type !== 'experimentExplanation') {
       dispatch(setSelectedFeature({ plotType: 'ale', feature: value }));
       dispatchAleFetch(value);
     }
@@ -212,7 +212,7 @@ const handleApply = () => {
             </Select>
           </FormControl>
 
-          {explanation_type === 'hyperparameterExplanation' && (
+          {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
             <FormControl fullWidth>
               <InputLabel id="target-metric-label">Target Metric</InputLabel>
               <Select
@@ -237,7 +237,7 @@ const handleApply = () => {
           )}
         </Box>
 
-        {explanation_type === 'hyperparameterExplanation' && (
+        {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation' )&& (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="contained"

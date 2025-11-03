@@ -124,7 +124,7 @@ const CGlanceExecution = () => {
           metadata: {
             experimentId: experimentId || '',
             workflowId: tab?.workflowId || '',
-            queryCase: 'globalCounterfactuals',
+            queryCase: 'global_counterfactuals',
           },
         }),
       );

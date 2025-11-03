@@ -28,7 +28,7 @@ const Contourplot = (props: IContourplot) => {
     (state: RootState) => state.workflowPage,
   );
   const dispatch = useAppDispatch();
-  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
+  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
     ? tab?.workflowTasks.modelAnalysis?.['2dpdp'].data?.hyperparameterList || null
     : tab?.workflowTasks.modelAnalysis?.['2dpdp'].data?.featureList || null;
   const plotModel = tab?.workflowTasks.modelAnalysis?.['2dpdp'];
@@ -54,7 +54,7 @@ const Contourplot = (props: IContourplot) => {
             ...explainabilityQueryDefault,
             explanation_type: explanation_type,
             explanation_method: '2dpdp',
-            ...(explanation_type === 'hyperparameterExplanation'
+            ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
             ? { target_metric: defaultTargetMetric }
             : {}),
           },
@@ -100,7 +100,7 @@ const Contourplot = (props: IContourplot) => {
           explanation_method: '2dpdp',
           feature1: pendingFeature1,
           feature2: pendingFeature2,
-          ...(explanation_type === 'hyperparameterExplanation'
+          ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
           ? { target_metric: pendingTargetMetric }
           : {}),
         },
@@ -316,7 +316,7 @@ const Contourplot = (props: IContourplot) => {
             </FormControl>
           );
         })}
-        { explanation_type === 'hyperparameterExplanation' && (
+        { (explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation' )&& (
           <FormControl fullWidth>
             <InputLabel id={`target-metric-label`}>Target Metric</InputLabel>
             <Select
@@ -350,7 +350,7 @@ const Contourplot = (props: IContourplot) => {
             !plotModel?.data ||
             !pendingFeature1 ||
             !pendingFeature2 ||
-            (explanation_type === 'hyperparameterExplanation' && !pendingTargetMetric) ||
+            ((explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && !pendingTargetMetric) ||
             (pendingFeature1 === feature1 && pendingFeature2 === feature2 && pendingTargetMetric === targetMetric)
           }
         >
