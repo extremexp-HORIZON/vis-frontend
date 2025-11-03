@@ -43,7 +43,6 @@ const PdpPlot = (props: PdpPlotProps) => {
   const [pendingFeature, setPendingFeature] = useState(selectedFeature);
   const [pendingTargetMetric, setPendingTargetMetric] = useState(selectedTargetMetric);
 
-
   useEffect(() => {
     if (tab && experimentId) {
       dispatch(
@@ -70,7 +69,6 @@ const PdpPlot = (props: PdpPlotProps) => {
     setPendingFeature(selectedFeature);
     setPendingTargetMetric(selectedTargetMetric);
   }, [selectedFeature, selectedTargetMetric]);
-
 
   const getVegaliteData = (plmodel: IPlotModel | null) => {
     if (!plmodel) return [];

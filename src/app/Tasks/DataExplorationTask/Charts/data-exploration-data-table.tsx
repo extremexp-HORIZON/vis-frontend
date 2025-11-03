@@ -19,7 +19,7 @@ const TableExpand: React.FC = () => {
   const tableRef = useRef<HTMLDivElement>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
-  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
 
   const currentPage = tab?.workflowTasks.dataExploration?.controlPanel?.currentPage || 1;
   const totalPages = tab?.workflowTasks.dataExploration?.controlPanel?.totalPages || 1;

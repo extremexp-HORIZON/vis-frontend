@@ -318,7 +318,7 @@ const Contourplot = (props: IContourplot) => {
         })}
         { (explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation' )&& (
           <FormControl fullWidth>
-            <InputLabel id={`target-metric-label`}>Target Metric</InputLabel>
+            <InputLabel id={'target-metric-label'}>Target Metric</InputLabel>
             <Select
               labelId='target-metric-label'
               value={pendingTargetMetric}
@@ -331,7 +331,7 @@ const Contourplot = (props: IContourplot) => {
                 },
               }}
             >
-              {tab?.workflowMetrics?.data?.map(metric => 
+              {tab?.workflowMetrics?.data?.map(metric =>
                 <MenuItem key={metric.name} value={metric.name}>
                   {metric.name}
                 </MenuItem>

@@ -172,6 +172,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     .addCase(setAleOrPdpSelections, (state, action) => {
       const task = state.tab?.workflowTasks.modelAnalysis;
       const section = task?.[action.payload.plotType];
+
       if (section && 'selectedFeature' in section && 'targetMetric' in section) {
         section.selectedFeature = action.payload.feature;
         section.targetMetric = action.payload.targetMetric;

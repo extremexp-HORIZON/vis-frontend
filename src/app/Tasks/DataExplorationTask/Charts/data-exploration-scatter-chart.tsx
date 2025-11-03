@@ -359,8 +359,8 @@ const getSingleScatterSpec = ({
 
 const ScatterChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
-  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
-  
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dispatch = useAppDispatch();
   const theme = useTheme();

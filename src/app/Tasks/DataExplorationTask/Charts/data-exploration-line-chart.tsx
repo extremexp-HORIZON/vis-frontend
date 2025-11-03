@@ -67,7 +67,7 @@ const coerceIfNumericLike = (v: unknown): unknown => {
 
 const LineChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
-  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id||'');
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
 
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const theme = useTheme();
