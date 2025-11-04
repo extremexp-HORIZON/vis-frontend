@@ -258,11 +258,12 @@ const Contourplot = (props: IContourplot) => {
       color: {
         field: zField,
         type: 'quantitative',
+        legend: { format: '.4f' }
       },
       tooltip: [
         { field: xField, title: xField },
         { field: yField, title: yField },
-        { field: zField, title: zField },
+        { field: zField, title: zField, type: 'quantitative', format: '.4f' },
       ],
     },
     config: {

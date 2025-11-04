@@ -121,7 +121,7 @@ const AlePlot = (props: AlePlotProps) => {
             ? 'quantitative'
             : 'ordinal',
         axis: {
-          format: '.3f',
+          format: '.4f',
         },
       },
     },

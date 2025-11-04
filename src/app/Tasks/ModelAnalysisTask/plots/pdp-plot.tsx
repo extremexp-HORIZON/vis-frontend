@@ -121,7 +121,7 @@ const PdpPlot = (props: PdpPlotProps) => {
             ? 'quantitative'
             : 'ordinal',
         axis: {
-          format: '.3f',
+          format: '.4f',
         },
       },
     },
