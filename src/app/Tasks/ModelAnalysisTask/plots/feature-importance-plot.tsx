@@ -2,59 +2,115 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useParams } from 'react-router-dom';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
-import { fetchModelAnalysisFeatureImportancePlot } from '../../../../store/slices/explainabilitySlice';
+import { fetchModelAnalysisExplainabilityPlot, fetchModelAnalysisFeatureImportancePlot } from '../../../../store/slices/explainabilitySlice';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import Loader from '../../../../shared/components/loader';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import type { RootState } from '../../../../store/store';
+import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
+import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
 
-const FeatureImportancePlot = () => {
+interface IFeatureImportancePlotProps {
+  explanation_type?: string
+}
+
+type FeatureImportanceResponse = {
+  featureImportances: { featureName: string; importanceScore?: number }[];
+};
+
+const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
+  const { explanation_type }  = props;
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
   const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage);
   const plotModel = tab?.workflowTasks.modelAnalysis?.featureImportance;
-  const rawData = tab?.workflowTasks.modelAnalysis?.featureImportance?.data as unknown as {
-    featureImportances: { featureName: string; importanceScore: number }[];
-  } | null;
+  const rawData = tab?.workflowTasks.modelAnalysis?.featureImportance?.data as unknown as FeatureImportanceResponse | IPlotModel | null;
 
   useEffect(() => {
     if (tab && experimentId && isTabInitialized) {
-      dispatch(
-        fetchModelAnalysisFeatureImportancePlot({
-          query: {},
-          metadata: {
-            workflowId: tab.workflowId,
-            experimentId,
+      if(explanation_type === 'experimentExplanation') {
+        dispatch(
+          fetchModelAnalysisExplainabilityPlot({
+            query: {
+              ...explainabilityQueryDefault,
+              explanation_type,
+              explanation_method: 'feature_importance'
+            },
+            metadata: {
+              workflowId: tab?.workflowId || '',
+              queryCase: 'featureImportance',
+              experimentId: experimentId || '',
+            }
+          })
+        );
+      } else {
+        dispatch(
+          fetchModelAnalysisFeatureImportancePlot({
+            query: {},
+            metadata: {
+              workflowId: tab.workflowId,
+              experimentId,
 
-          },
-        })
-      );
+            },
+          })
+        );
+      }
     }
   }, [isTabInitialized]);
 
+  const hasFeatureImportances = (x: any):x is FeatureImportanceResponse  =>
+    x && Array.isArray(x.featureImportances);
+
+  const hasTableContents = (x: any): x is IPlotModel =>
+    x && x.tableContents && x.tableContents.Feature && x.tableContents.Importance;
+
   const getVegaliteData = () => {
-    if (!rawData?.featureImportances) return [];
+    if (!rawData) return [];
 
-    const missingImportance: string[] = [];
+    // Case 1: workflow feature importance shape
+    if (hasFeatureImportances(rawData)) {
+      const missingImportance: string[] = [];
+      const filtered = rawData.featureImportances.filter(d => {
+        if (typeof d.importanceScore !== 'number') {
+          missingImportance.push(d.featureName);
 
-    const filteredData = rawData.featureImportances.filter(d => {
-      if (typeof d.importanceScore !== 'number') {
-        missingImportance.push(d.featureName);
+          return false;
+        }
 
-        return false;
+        return true;
+      });
+
+      return filtered.map(d => ({
+        Feature: d.featureName,
+        Importance: d.importanceScore as number,
+      }));
+    }
+
+    // Case 2: experimentExplanation shape
+    if (hasTableContents(rawData)) {
+      const features = rawData.tableContents!.Feature!.values || [];
+      const importances = rawData.tableContents!.Importance!.values || [];
+
+      const out = [];
+      const len = Math.min(features.length, importances.length);
+
+      for (let i = 0; i < len; i++) {
+        const f = features[i];
+        const vRaw = importances[i];
+        const v =
+          typeof vRaw === 'number'
+            ? vRaw
+            : Number.parseFloat(String(vRaw).trim());
+
+        if (Number.isFinite(v) && typeof f === 'string' && f.length > 0) {
+          out.push({ Feature: f, Importance: v as number });
+        }
       }
 
-      return true;
-    });
+      return out.sort((a, b) => b.Importance - a.Importance);
+    }
 
-    // if (missingImportance.length > 0) {
-    //   console.log('Features without importanceScore:', missingImportance);
-    // }
-
-    return filteredData.map(d => ({
-      Feature: d.featureName,
-      Importance: d.importanceScore!,
-    }));
+    return [];
   };
 
   const spec = {

@@ -10,6 +10,7 @@ import type { IDataAsset } from '../../../../../shared/models/experiment/data-as
 import { Handler } from 'vega-tooltip';
 import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 import type { IRun } from '../../../../../shared/models/experiment/run.model';
+import { useParams } from 'react-router-dom';
 
 export interface OverlayHistogramProps {
   assetName: string;
@@ -109,7 +110,7 @@ const OverlayHistogram = ({
 }: OverlayHistogramProps) => {
   const dispatch = useAppDispatch();
   const workflowIds = useMemo(() => assets.map(a => a.workflowId), [assets]);
-
+  const { experimentId } = useParams();
   const slices = useAppSelector((state: RootState) =>
     Object.fromEntries(
       assets.map(({ workflowId }) => [
@@ -231,7 +232,8 @@ const OverlayHistogram = ({
             format: dataAsset?.format || '',
             sourceType: dataAsset?.sourceType || '',
             fileName: dataAsset?.name || '',
-            runId: workflowId || ''
+            runId: workflowId || '',
+            experimentId: experimentId || ''
           },
           groupBy: [columnName],
           aggregations: [agg],

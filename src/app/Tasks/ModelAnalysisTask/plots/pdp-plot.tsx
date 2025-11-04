@@ -29,7 +29,7 @@ const PdpPlot = (props: PdpPlotProps) => {
     (state: RootState) => state.workflowPage,
   );
   const dispatch = useAppDispatch();
-  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
+  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
     ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
     : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
 
@@ -51,7 +51,7 @@ const PdpPlot = (props: PdpPlotProps) => {
             ...explainabilityQueryDefault,
             explanation_type: explanation_type,
             explanation_method: 'pdp',
-            ...(explanation_type === 'hyperparameterExplanation'
+            ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
               ? { target_metric: defaultTargetMetric }
               : {}),
           },
@@ -121,7 +121,7 @@ const PdpPlot = (props: PdpPlotProps) => {
             ? 'quantitative'
             : 'ordinal',
         axis: {
-          format: '.3f',
+          format: '.4f',
         },
       },
     },
@@ -136,7 +136,7 @@ const PdpPlot = (props: PdpPlotProps) => {
           explanation_method: 'pdp',
           feature1: feature,
           feature2: plotModel?.data?.features?.feature2 ?? '',
-          ...(explanation_type === 'hyperparameterExplanation' && targetMetric
+          ...((explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && targetMetric
             ? { target_metric: targetMetric }
             : {}),
         },
@@ -151,7 +151,7 @@ const PdpPlot = (props: PdpPlotProps) => {
 
   const handleFeatureSelect = (value: string) => {
     setPendingFeature(value);
-    if (explanation_type !== 'hyperparameterExplanation') {
+    if (explanation_type !== 'hyperparameterExplanation' && explanation_type !== 'experimentExplanation') {
       dispatch(setSelectedFeature({ plotType: 'pdp', feature: value }));
       dispatchPdpFetch(value);
     }
@@ -198,7 +198,7 @@ const PdpPlot = (props: PdpPlotProps) => {
             </Select>
           </FormControl>
 
-          {explanation_type === 'hyperparameterExplanation' && (
+          {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
             <FormControl fullWidth>
               <InputLabel id="target-metric-label">Target Metric</InputLabel>
               <Select
@@ -221,7 +221,7 @@ const PdpPlot = (props: PdpPlotProps) => {
           )}
         </Box>
 
-        {explanation_type === 'hyperparameterExplanation' && (
+        {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="contained"
