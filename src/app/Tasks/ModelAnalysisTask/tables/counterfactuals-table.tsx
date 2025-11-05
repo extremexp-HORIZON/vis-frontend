@@ -20,6 +20,8 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import BuildIcon from '@mui/icons-material/Build';
 import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
+import { Snackbar, Alert } from '@mui/material';
+
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -49,6 +51,11 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const { workflows } = useAppSelector(
     (state: RootState) => state.progressPage,
   );
+  const [snackbar, setSnackbar] = useState<{ open: boolean; text: string }>({
+    open: false,
+    text: '',
+  });
+
 
   function convertToPythonStyleString(obj: TestInstance) {
     const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType', 'instanceId'];
@@ -295,6 +302,11 @@ const CounterfactualsTable = (props: ITableComponent) => {
     const updatedWorkflows = workflows.data.concat(newRun);
 
     dispatch(setWorkflowsData(updatedWorkflows));
+
+    setSnackbar({
+      open: true,
+      text: `New workflow "${newRun.name}" created`,
+    });
   };
 
   const actionColumn: GridColDef = {
@@ -402,6 +414,24 @@ const CounterfactualsTable = (props: ITableComponent) => {
           </Typography>
         )}
       </ClosableCardTable>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={1000}
+        onClose={(_, reason) => {
+          if (reason === 'clickaway') return;
+          setSnackbar((s) => ({ ...s, open: false }));
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.text}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
