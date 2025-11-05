@@ -162,7 +162,7 @@ const ParallelCoordinatePlot = () => {
 
   return (
     <Paper elevation={2} sx={{ height: '100%', width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '10%' }}>
         <Typography/>
         <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5 }}>
           <Tooltip title="Parameters">
@@ -317,7 +317,7 @@ const ParallelCoordinatePlot = () => {
             ></ParallelCoordinateVega>
           </Box>
         ) : (
-          <Box sx={{ width: '100%', px: 1 }}>
+          <Box sx={{ width: '100%', height: '90%' }}>
             <InfoMessage
               message="No Metric Data Available."
               type="info"
