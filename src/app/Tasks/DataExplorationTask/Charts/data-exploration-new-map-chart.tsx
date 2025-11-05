@@ -161,7 +161,7 @@ const MapChart = () => {
 
       if (isNaN(latVal) || isNaN(lonVal)) return;
 
-      let color = '#000';
+      let color = '#1f77b4'; // Default blue color from COLOR_PALETTE
 
       if (colorByMap && colorByMap !== 'None') {
         const value = row[colorByMap];
@@ -169,7 +169,7 @@ const MapChart = () => {
         if (numericMode && min !== undefined && max !== undefined) {
           color = getColorForValue(parseFloat(String(value)), min, max);
         } else {
-          color = colorMap.get(String(value)) || '#000';
+          color = colorMap.get(String(value)) || '#1f77b4'; // Default blue color from COLOR_PALETTE
         }
       }
 
