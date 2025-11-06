@@ -114,7 +114,7 @@ export interface IMetaDataSummary {
 }
 export interface IDataExplorationMetaDataResponse {
   datasetType: string
-  fileNames: string[]
+  fileNames: string[] | string
   originalColumns: VisualColumn[]
   totalItems: number
   uniqueColumnValues: Record<string, unknown[]>

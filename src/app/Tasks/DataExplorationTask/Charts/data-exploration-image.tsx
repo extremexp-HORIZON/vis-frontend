@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import InfoMessage from '../../../../shared/components/InfoMessage';
@@ -19,6 +19,19 @@ const ImageCard = () => {
     state =>
       state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
   );
+  const imageSrc = `${baseApi}${tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || ''}`;
+  
+  useEffect(() => {
+    setLoaded(false);
+    setHasError(false);
+  }, [imageSrc]);
+
+  useEffect(() => {
+    const img = imageRef.current;
+    if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setLoaded(true);
+    }
+  }, [imageSrc]);
 
   const handleDownload = async () => {
     if (!selectedImage?.source) return;
@@ -88,18 +101,11 @@ const ImageCard = () => {
               backgroundColor: '#f9f9f9',
               p: 2,
             }}
-            ref={imageRef}
           >
             {!loaded && <Loader />}
             <img
-              // src={
-              //   selectedImage.source.startsWith('/')
-              //     ? `${baseApi}${(tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || '')}`
-              //     : selectedImage.source
-              // }
-              src={
-                `${baseApi}${(tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || '')}`
-              }
+              ref={imageRef}
+              src={imageSrc}
               alt="Preview"
               onLoad={() => setLoaded(true)}
               onError={() => setHasError(true)}
