@@ -20,6 +20,15 @@ const ImageCard = () => {
       state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
   );
   const imageSrc = `${baseApi}${tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || ''}`;
+  // const normalizePath = (path?: string | string[]): string => {
+  //   if (!path) return '';
+  //   const s = Array.isArray(path) ? path.join(',') : path;
+  //   return s.replace(/\\/g, '/');
+  // };
+
+  // const rawFileNames = tab?.workflowTasks.dataExploration?.metaData?.data?.fileNames;
+  // const fileName = normalizePath(rawFileNames);
+  // const imageSrc = fileName ? `${baseApi}${fileName}` : '';
 
 useEffect(() => {
   setLoaded(false);
