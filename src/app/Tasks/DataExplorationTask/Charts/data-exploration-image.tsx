@@ -20,18 +20,15 @@ const ImageCard = () => {
       state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
   );
   const imageSrc = `${baseApi}${tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || ''}`;
-  
-  useEffect(() => {
-    setLoaded(false);
-    setHasError(false);
-  }, [imageSrc]);
 
-  useEffect(() => {
-    const img = imageRef.current;
-    if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
-      setLoaded(true);
-    }
-  }, [imageSrc]);
+useEffect(() => {
+  setLoaded(false);
+  setHasError(false);
+  const img = imageRef.current;
+  if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+    setLoaded(true);
+  }
+}, [imageSrc]);
 
   const handleDownload = async () => {
     if (!selectedImage?.source) return;
