@@ -60,7 +60,7 @@ export const PredictionModels = ({
     if (dataset) {
       setModels(
         modelsList?.available_models?.filter((model: ModelInfo) =>
-          model.model_path.includes(dataset.id || ''),
+          model.model_path.includes(`_${dataset.id}_`),
         ) || [],
       );
     }
