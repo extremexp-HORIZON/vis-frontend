@@ -1,42 +1,47 @@
-import { Box } from "@mui/material";
-import { useState, useRef, useEffect } from "react";
-import { logger } from "vega";
-import InfoMessage from "../../../../shared/components/InfoMessage";
-import Loader from "../../../../shared/components/loader";
-import ResponsiveCardTable from "../../../../shared/components/responsive-card-table";
-import { getToken } from "../../../../store/slices/authSlice";
-import { useAppSelector } from "../../../../store/store";
+import { useEffect, useRef, useState } from 'react';
+import { Box } from '@mui/material';
+import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
+import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import { useAppSelector } from '../../../../store/store';
+import { logger } from '../../../../shared/utils/logger';
+import Loader from '../../../../shared/components/loader';
+import { getToken } from '../../../../store/slices/authSlice';
 
 const ImageCard = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const baseApi = '/api/data/file?path=';
 
   const imageRef = useRef<HTMLImageElement>(null);
 
   const selectedImage = useAppSelector(
     state =>
-      state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset
+      state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
   );
 
-  const baseApi = '/api/data/file?path=';
+  const rawFileNames = tab?.workflowTasks.dataExploration?.metaData?.data?.fileNames;
+  const filePath = Array.isArray(rawFileNames) ? rawFileNames[0] : rawFileNames;
 
-  // Fetch the image with Bearer token
   useEffect(() => {
-    if (!selectedImage?.source) return;
+    setLoaded(false);
+    setHasError(false);
+
+    // cleanup previous blob URL
+    setImageUrl(prev => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+
+    if (!filePath) return;
 
     const fetchImage = async () => {
-      const token = getToken();
-      const filePath = tab?.workflowTasks.dataExploration?.metaData.data?.fileNames;
-
-      if (!filePath) return;
-
       try {
-        const response = await fetch(`${baseApi}${(tab?.workflowTasks.dataExploration?.metaData.data?.fileNames || '')}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const token = getToken();
+        const response = await fetch(`${baseApi}${filePath}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
 
         if (!response.ok) throw new Error(`Failed to load image: ${response.status}`);
@@ -44,6 +49,11 @@ const ImageCard = () => {
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
         setImageUrl(blobUrl);
+
+        const img = imageRef.current;
+        if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+          setLoaded(true);
+        }
       } catch (error) {
         logger.error('Image fetch failed:', error);
         setHasError(true);
@@ -52,11 +62,13 @@ const ImageCard = () => {
 
     fetchImage();
 
-    // cleanup blob URL on unmount
     return () => {
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
+      setImageUrl(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
     };
-  }, [selectedImage, tab]);
+  }, [filePath]);
 
   const handleDownload = async () => {
     if (!selectedImage?.source) return;
@@ -85,7 +97,7 @@ const ImageCard = () => {
       <InfoMessage
         message="Failed to load image. Please check the source or format."
         type="error"
-      
+        icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
         fullHeight
       />
     );
@@ -124,24 +136,22 @@ const ImageCard = () => {
               backgroundColor: '#f9f9f9',
               p: 2,
             }}
-            ref={imageRef}
           >
             {!loaded && <Loader />}
-            {imageUrl && (
-              <img
-                src={imageUrl}
-                alt="Preview"
-                onLoad={() => setLoaded(true)}
-                onError={() => setHasError(true)}
-                style={{
-                  display: loaded ? 'block' : 'none',
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'contain',
-                  borderRadius: 8,
-                }}
-              />
-            )}
+            <img
+              ref={imageRef}
+              src={imageUrl || ''}
+              alt="Preview"
+              onLoad={() => setLoaded(true)}
+              onError={() => setHasError(true)}
+              style={{
+                display: loaded ? 'block' : 'none',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                objectFit: 'contain',
+                borderRadius: 8,
+              }}
+            />
           </Box>
         </Box>
       </ResponsiveCardTable>
