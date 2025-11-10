@@ -11,11 +11,13 @@ import { RootState, useAppSelector } from '../../../../store/store';
 
 const FeatureExplainability = () => {
     const { tab } = useAppSelector((state: RootState) => state.workflowPage);
-    console.log("Current tab:", tab.workflowId); // Debugging line to check the value of tab
 
-  const isSpecialExperiment = tab.workflowId === "KvJ97JkBYAWZyMn0wGW2";
-  console.log("isSpecialExperiment:", isSpecialExperiment);
-
+  // Check if any data asset has name "model.pt"
+  const hasModelPt = tab?.workflowConfiguration.dataAssets?.some(
+    (asset: any) => asset.name === "model.pt"
+  );
+  
+  const isSpecialExperiment = hasModelPt || tab?.workflowId === "KvJ97JkBYAWZyMn0wGW2";
   const [isMosaic, setIsMosaic] = useState(true);
 
  return (

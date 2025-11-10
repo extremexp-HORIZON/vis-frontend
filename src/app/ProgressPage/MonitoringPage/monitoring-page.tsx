@@ -1,6 +1,6 @@
 import { Box, Tab, Tabs, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import ParallelCoordinatePlot from './ParalleleCoodrinates/parallel-coordinate-plot';
 import WorkflowTable from './WorkFlowTables/workflow-table';
 import ScheduleTable from './WorkFlowTables/schedule-table';
@@ -19,6 +19,7 @@ const MonitoringPage = () => {
   const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
+  const { workflows } = useAppSelector((state: RootState) =>  state.progressPage)
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -27,6 +28,16 @@ const MonitoringPage = () => {
   const compareId = queryParams.get('compareId');
   const tabParam = queryParams.get('tab');
   const compareWorkflowsRef = useRef<string[] | null>(null);
+
+  const hasExplainability = useMemo(() => {
+    const firstWorkflow = workflows.data?.[0];
+    const tasks = firstWorkflow?.tasks;
+
+    if (!tasks) return true;
+
+    return tasks.some(t => typeof t.name === 'string' && /explainability/i.test(t.name));
+  }, [workflows]);
+
 
   useEffect(() => {
     if (compareId) {
@@ -87,7 +98,7 @@ const MonitoringPage = () => {
         >
           <Tab label="OVERVIEW" />
           <Tab label="COMPARATIVE ANALYSIS" />
-          <Tab label="EXPLAINABILITY" />
+          <Tab label="EXPLAINABILITY" disabled={!hasExplainability}/>
         </Tabs>
       </Box>
       <Box

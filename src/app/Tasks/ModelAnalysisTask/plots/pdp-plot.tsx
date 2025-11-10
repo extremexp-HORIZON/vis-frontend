@@ -18,6 +18,7 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
 import { fetchModelAnalysisExplainabilityPlot, setAleOrPdpSelections, setSelectedFeature } from '../../../../store/slices/explainabilitySlice';
+import { useExperimentExplainabilityTooltip } from '../../../ProgressPage/MonitoringPage/useExperimentExplainabilityTooltip';
 
 interface PdpPlotProps {
   explanation_type: string
@@ -42,6 +43,13 @@ const PdpPlot = (props: PdpPlotProps) => {
 
   const [pendingFeature, setPendingFeature] = useState(selectedFeature);
   const [pendingTargetMetric, setPendingTargetMetric] = useState(selectedTargetMetric);
+
+  const tooltipHandler = useExperimentExplainabilityTooltip(
+    plotModel?.data?.xAxis.axisName || 'xAxis default',
+    plotModel?.data?.yAxis.axisName || 'yAxis default',
+    plotModel?.data?.xAxis.axisType,
+    pendingFeature
+  );
 
   useEffect(() => {
     if (tab && experimentId) {
@@ -83,6 +91,10 @@ const PdpPlot = (props: PdpPlotProps) => {
 
     return data;
   };
+
+  const xField = tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisName || 'xAxis default';
+  const yField = tab?.workflowTasks.modelAnalysis?.pdp?.data?.yAxis.axisName || 'yAxis default';
+
   const spec = {
     width: 'container',
     autosize: { type: 'fit', contains: 'padding', resize: true },
@@ -93,8 +105,8 @@ const PdpPlot = (props: PdpPlotProps) => {
     },
     mark: {
       type: 'line',
-      tooltip: true,
-      point: { size: 20, color: theme.palette.primary.main },
+      tooltip: { content: 'data' },
+      point: { size: 20, color: theme.palette.primary.main, tooltip: { content: 'data' } },
     },
     encoding: {
       x: {
@@ -123,6 +135,19 @@ const PdpPlot = (props: PdpPlotProps) => {
         axis: {
           format: '.4f',
         },
+        tooltip: [
+          { 
+            field: xField, 
+            type: tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType === 'numerical' ? 'quantitative' : 'ordinal',
+            title: 'Feature Value'
+          },
+          { 
+            field: yField, 
+            type: 'quantitative',
+            title: 'Average Prediction',
+            format: '.4f'
+          }
+        ]
       },
     },
   };
@@ -274,6 +299,7 @@ const PdpPlot = (props: PdpPlotProps) => {
       }
       isStatic={false}
       details={plotModel?.data?.plotDescr || null}
+      tooltip={explanation_type === 'experimentExplanation' ? tooltipHandler : undefined}
     />
   );
 };

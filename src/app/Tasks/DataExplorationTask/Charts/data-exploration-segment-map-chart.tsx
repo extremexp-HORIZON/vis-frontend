@@ -68,8 +68,12 @@ const SegmentMapChart = () => {
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current || !lat || !lon) return;
 
-    leafletMapRef.current = L.map(mapRef.current).setView([38.015, 23.834], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMapRef.current);
+    leafletMapRef.current = L.map(mapRef.current, {
+      attributionControl: false,
+    }).setView([38.015, 23.834], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '',
+    }).addTo(leafletMapRef.current);
     layerGroupRef.current = L.layerGroup().addTo(leafletMapRef.current);
   }, []);
 

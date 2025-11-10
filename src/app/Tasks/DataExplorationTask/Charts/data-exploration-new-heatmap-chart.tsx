@@ -104,8 +104,12 @@ const HeatMapChart = () => {
     const avgLat = coords.reduce((sum, [lat]) => sum + lat, 0) / coords.length;
     const avgLon = coords.reduce((sum, [, lon]) => sum + lon, 0) / coords.length;
 
-    leafletMapRef.current = L.map(mapRef.current).setView([avgLat, avgLon], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
+    leafletMapRef.current = L.map(mapRef.current, {
+      attributionControl: false,
+    }).setView([avgLat, avgLon], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '',
+    }).addTo(
       leafletMapRef.current,
     );
   }, [lat, lon, data]);
