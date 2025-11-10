@@ -17,6 +17,7 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
 import { clear2DPDPPlot, fetchModelAnalysisExplainabilityPlot, setSelectedFeatures2D } from '../../../../store/slices/explainabilitySlice';
+import { useExperimentExplainabilityTooltip } from '../../../ProgressPage/MonitoringPage/useExperimentExplainabilityTooltip';
 
 interface IContourplot {
   explanation_type: string
@@ -42,6 +43,14 @@ const Contourplot = (props: IContourplot) => {
   const [pendingTargetMetric, setPendingTargetMetric] = useState(defaultTargetMetric);
 
   const [hasInitialized, setHasInitialized] = useState(false);
+
+  const tooltipHandler = useExperimentExplainabilityTooltip(
+    plotModel?.data?.xAxis.axisName || 'x',
+    plotModel?.data?.yAxis.axisName || 'y',
+    plotModel?.data?.xAxis.axisType,
+    feature2,
+    feature1
+  );
 
   useEffect(() => {
 
@@ -225,6 +234,7 @@ const Contourplot = (props: IContourplot) => {
     },
     mark: {
       type: 'rect',
+      tooltip: { content: 'data' },
     },
     encoding: {
       ...(xIsNumeric
@@ -373,6 +383,7 @@ const Contourplot = (props: IContourplot) => {
       infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
       isStatic={false}
       details={plotModel?.data?.plotDescr || null}
+      tooltip={explanation_type === 'experimentExplanation' ? tooltipHandler : undefined}
     />
   );
 };
