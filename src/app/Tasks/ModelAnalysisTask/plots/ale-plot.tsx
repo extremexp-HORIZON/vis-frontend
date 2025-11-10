@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
@@ -6,6 +6,8 @@ import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
 import theme from '../../../../mui-theme';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import {
+  Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -15,7 +17,7 @@ import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
-import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature } from '../../../../store/slices/explainabilitySlice';
+import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature, setAleOrPdpSelections } from '../../../../store/slices/explainabilitySlice';
 
 interface AlePlotProps {
   explanation_type: string
@@ -27,12 +29,19 @@ const AlePlot = (props: AlePlotProps) => {
     (state: RootState) => state.workflowPage,
   );
   const dispatch = useAppDispatch();
-  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation'
+  const featureOrHyperparameterList = explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
     ? tab?.workflowTasks.modelAnalysis?.pdp.data?.hyperparameterList || null
     : tab?.workflowTasks.modelAnalysis?.pdp.data?.featureList || null;
 
   const plotModel = tab?.workflowTasks.modelAnalysis?.ale;
   const { experimentId } = useParams();
+  const defaultTargetMetric = tab?.workflowMetrics?.data?.[0]?.name ?? '';
+
+  const selectedFeature = plotModel?.selectedFeature ?? '';
+  const selectedTargetMetric = plotModel?.targetMetric ?? defaultTargetMetric;
+
+  const [pendingFeature, setPendingFeature] = useState(selectedFeature);
+  const [pendingTargetMetric, setPendingTargetMetric] = useState(selectedTargetMetric);
 
   useEffect(() => {
     if (tab && experimentId) {
@@ -42,6 +51,9 @@ const AlePlot = (props: AlePlotProps) => {
             ...explainabilityQueryDefault,
             explanation_type: explanation_type,
             explanation_method: 'ale',
+            ...(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation'
+              ? { target_metric: defaultTargetMetric }
+              : {}),
           },
           metadata: {
             workflowId: tab.workflowId,
@@ -66,6 +78,11 @@ const AlePlot = (props: AlePlotProps) => {
 
     return data;
   };
+
+  useEffect(() => {
+    setPendingFeature(selectedFeature);
+    setPendingTargetMetric(selectedTargetMetric);
+  }, [selectedFeature, selectedTargetMetric]);
 
   const spec = {
     width: 'container',
@@ -103,62 +120,143 @@ const AlePlot = (props: AlePlotProps) => {
           'numerical'
             ? 'quantitative'
             : 'ordinal',
+        axis: {
+          format: '.4f',
+        },
       },
     },
   };
 
-  const handleFeatureSelection =
-    (plmodel: IPlotModel | null) => (e: { target: { value: string } }) => {
-      dispatch(
-        fetchModelAnalysisExplainabilityPlot({
-          query: {
-            ...explainabilityQueryDefault,
-            explanation_type: plmodel?.explainabilityType || '',
-            explanation_method: plmodel?.explanationMethod || '',
-            feature1: e.target.value || '',
-            feature2: plmodel?.features.feature2 || '',
-          },
-          metadata: {
-            workflowId: tab?.workflowId || '',
-            queryCase: plmodel?.explanationMethod,
-            experimentId: experimentId || '',
-          },
-        }),
-      );
-      dispatch(setSelectedFeature({ plotType: 'ale', feature: e.target.value }));
-    };
+  const dispatchAleFetch = (
+    feature: string,
+    targetMetric?: string
+  ) => {
+    dispatch(
+      fetchModelAnalysisExplainabilityPlot({
+        query: {
+          ...explainabilityQueryDefault,
+          explanation_type,
+          explanation_method: 'ale',
+          feature1: feature,
+          feature2: plotModel?.data?.features?.feature2 ?? '',
+          ...((explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && targetMetric
+            ? { target_metric: targetMetric }
+            : {}),
+        },
+        metadata: {
+          workflowId: tab?.workflowId || '',
+          queryCase: 'ale',
+          experimentId: experimentId || '',
+        },
+      })
+    );
+  };
 
-  const controlPanel = featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
-    <FormControl fullWidth>
-      <InputLabel id="feature-select-label">
-        {explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-      </InputLabel>
-      <Select
-        labelId="feature-select-label"
-        value={plotModel?.selectedFeature || ''}
-        label={explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-        onChange={handleFeatureSelection(plotModel?.data || null)}
-        disabled={plotModel?.loading || !plotModel?.data}
-        MenuProps={{
-          PaperProps: {
-            style: {
-              maxHeight: 250,
-              maxWidth: 300,
-            },
-          },
-        }}
-      >
-        {featureOrHyperparameterList && featureOrHyperparameterList.map(feature => (
-          <MenuItem
-            key={`${plotModel?.data?.plotName}-${feature}`}
-            value={feature}
-          >
-            {feature}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
+  const handleFeatureSelect = (value: string) => {
+    setPendingFeature(value);
+
+    if (explanation_type !== 'hyperparameterExplanation' && explanation_type !== 'experimentExplanation') {
+      dispatch(setSelectedFeature({ plotType: 'ale', feature: value }));
+      dispatchAleFetch(value);
+    }
+  };
+
+  const handleTargetMetricSelect = (value: string) => {
+    setPendingTargetMetric(value);
+  };
+
+  const handleApply = () => {
+    dispatch(setAleOrPdpSelections({
+      plotType: 'ale',
+      feature: pendingFeature,
+      targetMetric: pendingTargetMetric,
+    }));
+    dispatchAleFetch(pendingFeature, pendingTargetMetric);
+  };
+
+  const controlPanel =
+    featureOrHyperparameterList && featureOrHyperparameterList.length > 0 && (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel id="feature-select-label">
+              {explanation_type === 'hyperparameterExplanation'
+                ? 'Hyperparameter'
+                : 'Feature'}
+            </InputLabel>
+            <Select
+              labelId="feature-select-label"
+              value={pendingFeature}
+              label={
+                explanation_type === 'hyperparameterExplanation'
+                  ? 'Hyperparameter'
+                  : 'Feature'
+              }
+              onChange={(e) => handleFeatureSelect(e.target.value)}
+              disabled={plotModel?.loading || !plotModel?.data}
+              MenuProps={{
+                PaperProps: {
+                  style: { maxHeight: 250, maxWidth: 300 },
+                },
+              }}
+            >
+              {featureOrHyperparameterList.map((feature) => (
+                <MenuItem
+                  key={`${plotModel?.data?.plotName}-${feature}`}
+                  value={feature}
+                >
+                  {feature}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
+            <FormControl fullWidth>
+              <InputLabel id="target-metric-label">Target Metric</InputLabel>
+              <Select
+                labelId="target-metric-label"
+                value={pendingTargetMetric}
+                label="Target Metric"
+                onChange={(e) => handleTargetMetricSelect(e.target.value)}
+                disabled={plotModel?.loading || !plotModel?.data}
+                MenuProps={{
+                  PaperProps: {
+                    style: { maxHeight: 250, maxWidth: 300 },
+                  },
+                }}
+              >
+                {tab?.workflowMetrics?.data?.map((metric) => (
+                  <MenuItem key={metric.name} value={metric.name}>
+                    {metric.name}
+                  </MenuItem>
+                )) ?? null}
+              </Select>
+            </FormControl>
+          )}
+        </Box>
+
+        {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Button
+              variant="contained"
+              onClick={handleApply}
+              disabled={
+                !!plotModel?.loading ||
+                !plotModel?.data ||
+                !pendingFeature ||
+                !pendingTargetMetric ||
+                (pendingFeature === (plotModel?.selectedFeature ?? '') &&
+                  pendingTargetMetric ===
+                    (plotModel?.targetMetric ?? defaultTargetMetric))
+              }
+            >
+              Apply Selections
+            </Button>
+          </Box>
+        )}
+      </Box>
+    );
 
   const loading = (
     <Loader />

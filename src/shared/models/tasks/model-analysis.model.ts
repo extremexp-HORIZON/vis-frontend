@@ -24,7 +24,9 @@ export interface ConfusionMatrixResult {
   matrix: number[][];
 }
 
-export type TestInstance = Record<string, string | number | boolean | null>;
+export type TestInstance = {
+  instanceId: number;
+} & Record<string, string | number | boolean | null>;
 
 export const prepareDataExplorationResponse = (payload: IDataExplorationResponse) => ({
   ...payload,
@@ -51,10 +53,13 @@ export const handleMultiTimeSeriesData = (payload : IDataExplorationResponse) =>
 
 export interface IModelAnalysis {
   featureNames: string[]
-  pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
-  ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; }
-  '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null;}
-  featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; }
+  pdp: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; targetMetric?: string | null; }
+  ale: { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; latestRequestId?: string; targetMetric?: string | null; }
+  '2dpdp': { data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature1: string | null; selectedFeature2: string | null; latestRequestId?: string; targetMetric?: string | null; }
+  featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
+  shap: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
+  shapValues: { data: IPlotModel | null; loading: boolean; error: string | null; }
+  segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; latestRequestId?: string; }
   counterfactuals: {
     data: IPlotModel | null
     loading: boolean
@@ -64,6 +69,7 @@ export interface IModelAnalysis {
     data: IPlotModel | null
     loading: boolean
     error: string | null
+    latestRequestId?: string
   }
   global_counterfactuals_control_panel: {
     cfMethod: string
@@ -117,10 +123,13 @@ export interface IModelAnalysis {
 
 export const modelAnalysisDefault: IModelAnalysis = {
   featureNames: [],
-  pdp: { data: null, loading: false, error: null, selectedFeature: null },
-  ale: { data: null, loading: false, error: null, selectedFeature: null },
-  '2dpdp': { data: null, loading: false, error: null, selectedFeature1: null,  selectedFeature2: null },
+  pdp: { data: null, loading: false, error: null, selectedFeature: null, targetMetric: null },
+  ale: { data: null, loading: false, error: null, selectedFeature: null, targetMetric: null },
+  '2dpdp': { data: null, loading: false, error: null, selectedFeature1: null,  selectedFeature2: null, targetMetric: null },
   featureImportance: { data: null, loading: false, error: null },
+  shap: { data: null, loading: false, error: null },
+  shapValues: { data: null, loading: false, error: null },
+  segmentation: { data: null, loading: false, error: null, selectedFeature: null, selectedTime: null },
   counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals_control_panel: { cfMethod: 'Dice', actionChoiceStrategy: 'max-eff', gcfSize: 3 },

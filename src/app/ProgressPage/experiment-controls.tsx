@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from '../../store/store';
 import Rating from '@mui/material/Rating';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useEffect, useState } from 'react';
-import { fetchUserEvaluation, setProgressBarData, stateController } from '../../store/slices/progressPageSlice';
+import { fetchUserEvaluation, setExperimentStatus, setProgressBarData, stateController } from '../../store/slices/progressPageSlice';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
@@ -17,17 +17,18 @@ import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import StaticDirectedGraph from './WorkflowTab/worfklow-flow-chart';
 import CloseIcon from '@mui/icons-material/Close';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 const ExperimentControls = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const workflowId = searchParams.get('workflowId');
-  const { progressBar, workflows } = useAppSelector(
+  const { progressBar, workflows, experiment } = useAppSelector(
     (state: RootState) => state.progressPage
   );
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
-  const workflow = workflows.data.find(workflow => workflow.id === workflowId);
+  const workflow = workflows.data?.find(workflow => workflow.id === workflowId);
   const workflowStatus = workflow?.status;
   const completedTasks = workflow?.tasks?.filter(task => task.endTime).length;
   const taskLength = workflow?.tasks?.length;
@@ -88,6 +89,38 @@ const ExperimentControls = () => {
     setLocalRating(null);
     setPolling(false);
   };
+  const handlePausePlay = () => {
+    if (experiment?.data?.status === 'paused') {
+      dispatch(setExperimentStatus('resumed'));
+      dispatch(
+        stateController({
+          experimentId: experimentId || '',
+          runId: null,
+          action: 'resume',
+        })
+      );
+    } else {
+      dispatch(setExperimentStatus('paused'));
+      dispatch(
+        stateController({
+          experimentId: experimentId || '',
+          runId: null,
+          action: 'pause',
+        })
+      );
+    }
+  };
+
+  const handleStop = () => {
+    dispatch(setExperimentStatus('killed'));
+    dispatch(
+      stateController({
+        experimentId: experimentId || '',
+        runId: null,
+        action: 'kill',
+      })
+    );
+  };
 
   useEffect(() => {
     if (workflows.data.length > 0) {
@@ -147,12 +180,16 @@ const ExperimentControls = () => {
             <Box className={'progress-page-bar'} sx={{ flex: 1, pr: 2 }}>
               <ProgressPageBar />
             </Box>
-            { progressBar.progress !== 100 && (
+            { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
               <Box className={'progress-page-actions'} >
-                <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'pause' }))} color="primary">
-                  <PauseIcon fontSize="large" />
+                <IconButton onClick={handlePausePlay} color="primary">
+                  {experiment?.data?.status === 'paused' ? (
+                    <PlayArrowIcon fontSize="large" />
+                  ) : (
+                    <PauseIcon fontSize="large" />
+                  )}
                 </IconButton>
-                <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'stop' }))} color="primary">
+                <IconButton onClick={handleStop} color="primary">
                   <StopIcon fontSize="large" />
                 </IconButton>
               </Box>
@@ -248,15 +285,19 @@ const ExperimentControls = () => {
                   {`${Math.round(progressBar.progress)}%`}
                 </Box>
               </Box>
-              {progressBar.progress !== 100 && (
-                <>
-                  <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'pause' }))} color="primary">
-                    <PauseIcon fontSize="large" />
+              { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
+                <Box className={'progress-page-actions'} >
+                  <IconButton onClick={handlePausePlay} color="primary">
+                    {experiment?.data?.status === 'paused' ? (
+                      <PlayArrowIcon fontSize="large" />
+                    ) : (
+                      <PauseIcon fontSize="large" />
+                    )}
                   </IconButton>
-                  <IconButton onClick={() => dispatch(stateController({ experimentId: experimentId || '', runId: workflowId || '', action: 'stop' }))} color="primary">
+                  <IconButton onClick={handleStop} color="primary">
                     <StopIcon fontSize="large" />
                   </IconButton>
-                </>
+                </Box>
               )}
             </Box>
 

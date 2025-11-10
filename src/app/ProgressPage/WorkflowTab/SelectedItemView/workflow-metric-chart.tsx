@@ -2,7 +2,7 @@ import ResponsiveCardVegaLite from '../../../../shared/components/responsive-car
 import type { RootState } from '../../../../store/store';
 import { useAppSelector } from '../../../../store/store';
 import type { IMetric } from '../../../../shared/models/experiment/metric.model';
-import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import green from '@mui/material/colors/green';
@@ -25,8 +25,8 @@ interface GroupMetrics {
 export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
   const { workflows } = useAppSelector((state: RootState) => state.progressPage);
   const { workflowsTable } = useAppSelector((state: RootState) => state.monitorPage);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
+  // const theme = useTheme();
+  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const workflowId = queryParams.get('workflowId'); // Get the workflowId from the query
@@ -38,6 +38,17 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
     color: workflowColorMap[wf.id] || '#000000', // Default to black if not found
   }));
   const isSingleStep = new Set(metrics.map(d => d.step ?? d.timestamp)).size === 1;
+
+  const values = metrics.map(d => d.value);
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const range = maxVal - minVal;
+
+  // If all values equal, pad based on magnitude (or 1 if zero)
+  const base = range === 0 ? Math.max(Math.abs(maxVal), 1) : range;
+  const pad = base * 0.05;
+
+  const domain: [number, number] = [minVal - pad, maxVal + pad];
 
   const chartSpec = {
     mark: isSingleStep ? 'point'
@@ -58,15 +69,7 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
         field: 'value', // Use the 'value' field for the y-axis (metric values like CPU Load)
         type: 'quantitative',
         axis: { title: metrics[0].metricName }, // Title the y-axis based on the metric name
-        scale: {
-          domain: [
-            0, // Min value is 0 (or any other value you'd like)
-            metrics.reduce(
-              (max, d) => Math.max(max, d.value),
-              -Infinity
-            ) * 1.05, // Max value with 5% padding
-          ],
-        },
+        scale: { domain },
       },
       color: {
         field: 'id',
@@ -91,7 +94,6 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
         spec={chartSpec}
         actions={false}
         title={metrics[0].task ? `${metrics[0].task}／${metrics[0].metricName}` : metrics[0].metricName}
-        aspectRatio={isSmallScreen ? 4 : 2}
         maxHeight={500}
       />
     </Box>

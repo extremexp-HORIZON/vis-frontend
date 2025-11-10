@@ -7,7 +7,6 @@ import { prepareDataExplorationResponse, type ConfusionMatrixResult, type TestIn
 import type { AxiosError } from 'axios';
 import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
 import type { IDataExplorationMetaDataResponse, IDataExplorationRequest, IDataExplorationResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
-import { stateController } from './progressPageSlice';
 
 export interface WorkflowTableRow {
   id: string;

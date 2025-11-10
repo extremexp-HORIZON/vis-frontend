@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
@@ -8,10 +8,10 @@ import {
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { fetchMetaData, setCommonDataAssets, setDataAssetsControlPanel, setSelectedDataset, type CommonDataAssets } from '../../../../store/slices/monitorPageSlice';
-import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import type { VisualColumn } from '../../../../shared/models/dataexploration.model';
 import OverlayHistogram from './DataComparison/overlay-histogram';
 import Loader from '../../../../shared/components/loader';
+import PreviewImageCard from './DataComparison/preview-image-card';
 
 const ComparisonDataCharts = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(
@@ -48,7 +48,7 @@ const ComparisonDataCharts = () => {
     (state) => state.monitorPage.workflowsTable.workflowColors
   );
 
-  const { anyMetaLoading, anyMetaError } = useAppSelector((state: RootState) => {
+  const { anyMetaLoading, anyMetaError, areAllImages } = useAppSelector((state: RootState) => {
     const metaRoot =
       state.monitorPage.comparativeDataExploration.dataAssetsMetaData ?? {};
 
@@ -58,6 +58,7 @@ const ComparisonDataCharts = () => {
 
     let loading = false;
     let error = false;
+    let allImages = true;
 
     assetsForSelectedDataset.forEach(({ workflowId }) => {
       const meta = metaRoot?.[selectedDataset]?.[workflowId]?.meta;
@@ -67,9 +68,10 @@ const ComparisonDataCharts = () => {
       } else if (meta?.error) {
         error = true;
       }
+      if(!meta?.data?.datasetType?.match('IMAGE')) allImages = false;
     });
 
-    return { anyMetaLoading: loading, anyMetaError: error };
+    return { anyMetaLoading: loading, anyMetaError: error, areAllImages: allImages };
   });
 
   const getCommonDataAssets = () => {
@@ -144,7 +146,8 @@ const ComparisonDataCharts = () => {
               format: dataAsset?.format || '',
               sourceType: dataAsset?.sourceType || '',
               fileName: dataAsset?.name || ''
-              , runId: workflowId || ''
+              , runId: workflowId || '',
+              experimentId: experimentId || ''
             },
             metadata: {
               workflowId,
@@ -202,23 +205,15 @@ const ComparisonDataCharts = () => {
     selectedDataset && assetsForSelectedDataset.length && selectedColumns.length
       ? selectedColumns.map((col) => (
         <Grid item xs={6} key={col}>
-          <ResponsiveCardTable
-            title={`${selectedDataset} — ${col}`}
-            minHeight={300}
-            showSettings={false}
-            noPadding
-            showFullScreenButton={false}
-          >
-            <OverlayHistogram
-              assetName={selectedDataset!}
-              columnName={col}
-              assets={assetsForSelectedDataset}
-              colorScale={(ids: string[]) => ({
-                domain: ids,
-                range: ids.map(id => workflowColors[id] || '#3f51b5'),
-              })}
-            />
-          </ResponsiveCardTable>
+          <OverlayHistogram
+            assetName={selectedDataset!}
+            columnName={col}
+            assets={assetsForSelectedDataset}
+            colorScale={(ids: string[]) => ({
+              domain: ids,
+              range: ids.map(id => workflowColors[id] || '#3f51b5'),
+            })}
+          />
         </Grid>
       ))
       : [];
@@ -259,6 +254,33 @@ const ComparisonDataCharts = () => {
         icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
         fullHeight
       />
+    );
+  }
+
+  if(areAllImages) {
+    return (
+      <Container maxWidth={false} sx={{ p: 2 }}>
+        <Grid container spacing={2}>
+          {assetsForSelectedDataset.map(({ workflowId, dataAsset }) => {
+            const meta = dataAssetsMetaData?.[selectedDataset!]?.[workflowId]?.meta;
+            const fileNames = meta?.data?.fileNames; // string | string[] | undefined
+
+            const title =
+              dataAsset?.name
+                ? `${dataAsset.name} — ${workflowId}`
+                : `Workflow ${workflowId}`;
+
+            return (
+              <Grid item xs={6} key={`${selectedDataset}-${workflowId}`}>
+                <PreviewImageCard
+                  title={title}
+                  fileNames={fileNames}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Container>
     );
   }
 

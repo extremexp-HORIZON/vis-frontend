@@ -65,6 +65,9 @@ export type ExplainabilityQuery = {
   gcf_size?: number
   cfGenerator?: string
   clusterActionChoiceAlgo?: string
+  instance_index?: number
+  experiment_configs?: { [key: string]: IHyperparameters }
+  target_metric?: string
 }
 
 export const explainabilityQueryDefault: ExplainabilityQuery = {
@@ -76,6 +79,9 @@ export const explainabilityQueryDefault: ExplainabilityQuery = {
   gcf_size: 0,
   cfGenerator: '',
   clusterActionChoiceAlgo: '',
+  instance_index: 13,
+  experiment_configs: {},
+  target_metric: ''
 };
 
 export type FetchExplainabilityPlotPayload = {
@@ -107,4 +113,10 @@ export type FetchFeatureImportancePlotPayload = {
     workflowId: string
     experimentId: string
   }
+}
+
+export type ShapContributions = {
+  featureName: number
+  featureValue: number
+  shapValue: number
 }

@@ -22,6 +22,7 @@ const DataExplorationComponent = () => {
   const dispatch = useAppDispatch();
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
   const dataset = useAppSelector(
     state =>
       state.workflowPage?.tab?.dataTaskTable?.selectedItem?.data?.dataset,
@@ -35,11 +36,10 @@ const DataExplorationComponent = () => {
         ?.chartType || '',
   );
   const selectedDataset = dataset?.source || '';
-  const isImage = selectedDataset?.match(/\.(jpe?g|png|gif|webp|bmp|tiff?|svg)$/i);
+  const isImage = tab?.workflowTasks.dataExploration?.metaData.data?.datasetType?.match('IMAGE');
 
   useEffect(() => {
     if (!selectedDataset || !workflowId) return;
-    if (isImage) return;
     if (selectedDataset && workflowId) {
       dispatch(setControls({ ...dataExplorationDefault.controlPanel }));
       dispatch(
@@ -49,7 +49,8 @@ const DataExplorationComponent = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || ''
-            , runId: workflowId || ''
+            , runId: workflowId || '',
+            experimentId: experimentId || ''
           },
           metadata: {
             workflowId: workflowId,

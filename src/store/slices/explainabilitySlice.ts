@@ -10,6 +10,7 @@ interface LoadableSection<T = unknown> {
   data?: T;
   loading: boolean;
   error: string | null;
+  latestRequestId?: string;
 }
 
 // Thunk
@@ -33,16 +34,38 @@ export const fetchModelAnalysisFeatureImportancePlot = createAsyncThunk(
   }
 );
 
+export const fetchModelAnalysisShapPlot = createAsyncThunk(
+  'explainability/fetch_shap_plot',
+  async (payload: FetchFeatureImportancePlotPayload) => {
+    const requestUrl = `explainability/${payload.metadata.experimentId}/${payload.metadata.workflowId}/feature-importance`;
+    const response = await api.post<IPlotModel>(requestUrl, payload.query);
+
+    return response.data;
+  }
+);
+
 // Action
 export const setSelectedFeature = createAction<{
   plotType: keyof IModelAnalysis;
   feature: string;
 }>('explainability/set_selected_feature');
 
+export const setSelectedTime = createAction<{
+  plotType: keyof IModelAnalysis;
+  time: string;
+}>('explainability/set_selected_time');
+
 export const setSelectedFeatures2D = createAction<{
   feature1: string;
   feature2: string;
+  targetMetric: string;
 }>('explainability/set_selected_features_2d');
+
+export const setAleOrPdpSelections = createAction<{
+  plotType: 'ale' | 'pdp';
+  feature: string;
+  targetMetric: string;
+}>('explainability/set_ale_selections');
 
 export const setGcfSize = createAction<number>('modelAnalysis/setGcfSize');
 export const setCfMethod = createAction<string>('modelAnalysis/setCfMethod');
@@ -69,33 +92,57 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
   builder
     .addCase(fetchModelAnalysisExplainabilityPlot.pending, (state, action) => {
       const task = getTask(state, action.meta.arg.metadata.workflowId);
-      const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
+      const plotType = action.meta.arg.metadata.queryCase as keyof IModelAnalysis;
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
-        task[plotType].loading = true;
+        const section = task[plotType] as LoadableSection<IPlotModel>;
+
+        section.loading = true;
+        section.error = null;
+        section.latestRequestId = action.meta.requestId;
       }
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.fulfilled, (state, action) => {
       const task = getTask(state, action.meta.arg.metadata.workflowId);
-      const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
+      const plotType = action.meta.arg.metadata.queryCase as keyof IModelAnalysis;
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
-        const section = task[plotType];
+        const section = task[plotType] as LoadableSection<IPlotModel>;
+
+        if (section.latestRequestId && section.latestRequestId !== action.meta.requestId) return;
 
         if ('selectedFeature' in section) {
-          section.selectedFeature = action.payload.features.feature1;
+          const feature = action.payload?.features?.feature1 ??
+            action.payload?.featuresTableColumns?.find(
+              (c: string) => !['x', 'y', 'time'].includes(c)
+            ) ??
+            action.payload?.attributionsTableColumns?.find(
+              (c: string) => !['x', 'y', 'time'].includes(c)
+            ) ??
+          null;
+
+          section.selectedFeature = feature;
         } else if ('selectedFeature1' in section && 'selectedFeature2' in section) {
           section.selectedFeature1 = action.payload.features.feature1;
           section.selectedFeature2 = action.payload.features.feature2;
+        }
+        if ('selectedTime' in section && !section.selectedTime) {
+          const times = action.payload.featuresTable?.time?.values ?? action.payload.attributionsTable?.time?.values ?? [];
+
+          section.selectedTime = times.length ? String(times[0]) : null;
         }
         assignResult(section, action.payload);
       }
     })
     .addCase(fetchModelAnalysisExplainabilityPlot.rejected, (state, action) => {
       const task = getTask(state, action.meta.arg.metadata.workflowId);
-      const plotType = action.meta.arg.query.explanation_method as keyof IModelAnalysis;
+      const plotType = action.meta.arg.metadata.queryCase as keyof IModelAnalysis;
 
       if (task && plotType !== 'featureNames' && plotType !== 'global_counterfactuals_control_panel') {
+        const section = task[plotType] as LoadableSection;
+
+        if (section.latestRequestId && section.latestRequestId !== action.meta.requestId) return;
+
         assignError(task[plotType], 'Failed to fetch data');
       }
     })
@@ -113,13 +160,23 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
     })
     .addCase(setSelectedFeatures2D, (state, action) => {
       const task = state.tab?.workflowTasks.modelAnalysis;
-      const { feature1, feature2 } = action.payload;
+      const { feature1, feature2, targetMetric } = action.payload;
 
       const section = task?.['2dpdp'];
 
-      if (section && 'selectedFeature1' in section && 'selectedFeature2' in section) {
+      if (section && 'selectedFeature1' in section && 'selectedFeature2' in section && 'targetMetric' in section) {
         section.selectedFeature1 = feature1;
         section.selectedFeature2 = feature2;
+        section.targetMetric = targetMetric;
+      }
+    })
+    .addCase(setAleOrPdpSelections, (state, action) => {
+      const task = state.tab?.workflowTasks.modelAnalysis;
+      const section = task?.[action.payload.plotType];
+
+      if (section && 'selectedFeature' in section && 'targetMetric' in section) {
+        section.selectedFeature = action.payload.feature;
+        section.targetMetric = action.payload.targetMetric;
       }
     })
     .addCase(fetchModelAnalysisFeatureImportancePlot.pending, (state, action) => {
@@ -142,6 +199,28 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
       if (task) {
         assignError(task.featureImportance, 'Failed to fetch feature importance data');
+      }
+    })
+    .addCase(fetchModelAnalysisShapPlot.pending, (state, action) => {
+      const task = getTask(state, action.meta.arg.metadata.workflowId);
+
+      if (task) {
+        task.shapValues.loading = true;
+        task.shapValues.error = null;
+      }
+    })
+    .addCase(fetchModelAnalysisShapPlot.fulfilled, (state, action) => {
+      const task = getTask(state, action.meta.arg.metadata.workflowId);
+
+      if (task) {
+        assignResult(task.shapValues, action.payload);
+      }
+    })
+    .addCase(fetchModelAnalysisShapPlot.rejected, (state, action) => {
+      const task = getTask(state, action.meta.arg.metadata.workflowId);
+
+      if (task) {
+        assignError(task.shapValues, 'Failed to fetch feature importance data');
       }
     })
     .addCase(setGcfSize, (state, action) => {
@@ -175,7 +254,21 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
           data: null,
           selectedFeature1: '',
           selectedFeature2: '',
+          latestRequestId: undefined,
+          targetMetric: ''
         };
+      }
+    })
+    .addCase(setSelectedTime, (state, action) => {
+      const task = state.tab?.workflowTasks.modelAnalysis;
+      const { plotType, time } = action.payload;
+
+      if (task && plotType !== 'featureNames' && plotType in task) {
+        const section = task[plotType];
+
+        if ('selectedTime' in section) {
+          section.selectedTime = time;
+        }
       }
     });
 };

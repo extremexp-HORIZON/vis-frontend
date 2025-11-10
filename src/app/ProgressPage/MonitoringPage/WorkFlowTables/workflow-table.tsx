@@ -15,18 +15,23 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredW
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useRef, useState } from 'react';
-import { Badge,  IconButton, Popover, styled } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
+import { Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, styled, TextField, Tooltip } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
 import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
-import { debounce, set } from 'lodash';
+import { debounce } from 'lodash';
 import type { CustomGridColDef } from '../../../../shared/types/table-types';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import WorkflowRating from './workflow-rating';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { logger } from '../../../../shared/utils/logger';
 import type { WorkflowTableRow } from '../../../../store/slices/monitorPageSlice';
+import { setWorkflowsData, stateController } from '../../../../store/slices/progressPageSlice';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ControlPointDuplicateIcon from '@mui/icons-material/ControlPointDuplicate';
+import type { IRun } from '../../../../shared/models/experiment/run.model';
+import { SectionHeader } from '../../../../shared/components/responsive-card-table';
 
 export interface Data {
   [key: string]: string | number | boolean | null | undefined;
@@ -40,37 +45,285 @@ const WorkflowActions = (props: {
   experimentId: string | undefined,
 }) => {
   const { currentStatus, workflowId, experimentId } = props;
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
+  const dispatch = useAppDispatch();
+  const [anchorElCreateWorkflow, setAnchorElCreateWorkflow] = useState<null | HTMLElement>(null);
+
+  const uniqueParameters = workflows.data.reduce(
+    (acc: Record<string, Set<string>>, workflow) => {
+      if (workflow.params) {
+        workflow.params.forEach(param => {
+          if (!acc[param.name]) {
+            acc[param.name] = new Set();
+          }
+          acc[param.name].add(param.value);
+        });
+      }
+
+      return acc;
+    },
+    {}
+  );
+
+  const [workflowName, setWorkflowName] = useState('');
+  const [selectedParams, setSelectedParams] = useState<Record<string, string>>({});
+
+  const currentWorkflow = workflows.data?.find(w => w.id === workflowId);
+
+  useEffect(() => {
+    if (anchorElCreateWorkflow && currentWorkflow) {
+      const initialParams =
+        (currentWorkflow.params ?? []).reduce((acc, p) => {
+          acc[p.name] = String(p.value ?? '');
+
+          return acc;
+        }, {} as Record<string, string>);
+
+      setSelectedParams(initialParams);
+
+      const baseName = currentWorkflow.name?.trim() || currentWorkflow.id;
+
+      setWorkflowName(baseName ? `${baseName} (copy)` : '');
+    }
+  }, [anchorElCreateWorkflow]);
+
+  const handleCreateWorkflowOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElCreateWorkflow(event.currentTarget);
+  };
+
+  const handleCreateWokrkflowClose = () => setAnchorElCreateWorkflow(null);
+
+  const handleParamChange = (paramName: string) => (e: SelectChangeEvent<string>) => {
+    const value = e.target.value;
+
+    setSelectedParams((prev) => ({ ...prev, [paramName]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = Object.entries(selectedParams)
+      .filter(([, v]) => v !== '' && v !== undefined)
+      .map(([name, value]) => ({ name, value }));
+
+    // for now create a new dummy scheduled workflow
+    const newRun: IRun = {
+      id: workflowName.trim(),
+      name: workflowName.trim(),
+      experimentId: experimentId || '',
+      status: 'SCHEDULED',
+      startTime: undefined,
+      endTime: undefined,
+      params,
+      metrics: [],
+      dataAssets: [],
+      tags: {},
+    };
+    const updatedWorkflows = workflows.data.concat(newRun);
+
+    dispatch(setWorkflowsData(updatedWorkflows));
+
+    handleCreateWokrkflowClose();
+  };
+
+  const handlePausePlay = () => {
+    if(currentStatus === 'PAUSED') {
+      const updatedWorkflows = workflows.data?.map(workflow =>
+        workflow.id === workflowId
+          ? { ...workflow, status: 'RUNNING' }
+          : workflow
+      );
+
+      dispatch(setWorkflowsData(updatedWorkflows));
+      dispatch(
+        stateController({
+          experimentId: null,
+          runId: workflowId,
+          action: 'resume',
+        })
+      );
+    } else {
+      const updatedWorkflows = workflows.data?.map(workflow =>
+        workflow.id === workflowId
+          ? { ...workflow, status: 'PAUSED' }
+          : workflow
+      );
+
+      dispatch(setWorkflowsData(updatedWorkflows));
+      dispatch(
+        stateController({
+          experimentId: null,
+          runId: workflowId,
+          action: 'pause',
+        })
+      );
+    }
+  };
+
+  const handleStop = () => {
+    const updatedWorkflows = workflows.data?.map(workflow =>
+      workflow.id === workflowId
+        ? { ...workflow, status: 'KILLED' }
+        : workflow
+    );
+
+    dispatch(setWorkflowsData(updatedWorkflows));
+    dispatch(
+      stateController({
+        experimentId: null,
+        runId: workflowId,
+        action: 'kill',
+      })
+    );
+  };
 
   return (
     <span onClick={event => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
       <Link
         to={`/${experimentId}/workflow?workflowId=${workflowId}`}
       >
-        <IconButton>
-          <Badge color="warning" badgeContent="" variant="dot" invisible={currentStatus !== 'PENDING_INPUT'}>
-            <LaunchIcon
-              style={{
-                cursor: 'pointer',
-                color: theme.palette.primary.main,
-              }}
-            />
-          </Badge>
-        </IconButton>
-      </Link>
-      {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && (
-        <>
-          <IconButton onClick={() => logger.log('Pause clicked')} >
-            <PauseIcon
-              style={{ cursor: 'pointer', color: theme.palette.primary.main }}
-            />
+        <Tooltip title="Open">
+          <IconButton>
+            <Badge color="warning" badgeContent="" variant="dot" invisible={currentStatus !== 'PENDING_INPUT'}>
+              <LaunchIcon
+                style={{
+                  cursor: 'pointer',
+                  color: theme.palette.primary.main,
+                }}
+              />
+            </Badge>
           </IconButton>
-          <IconButton onClick={() => logger.log('Stop clicked')}>
+        </Tooltip>
+      </Link>
+      {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && currentStatus !== 'KILLED' && (
+        <>
+          <IconButton onClick={handlePausePlay} >
+            { currentStatus === 'PAUSED' ? (
+              <PlayArrowIcon style={{ cursor: 'pointer', color: theme.palette.primary.main }} />
+            ) : (
+              <PauseIcon
+                style={{ cursor: 'pointer', color: theme.palette.primary.main }}
+              />
+            )
+            }
+          </IconButton>
+          <IconButton onClick={handleStop}>
             <StopIcon
               style={{ cursor: 'pointer', color: theme.palette.primary.main }}
             />
           </IconButton>
         </>
       )}
+      { currentStatus === 'COMPLETED' &&
+        <Tooltip title="Duplicate">
+          <IconButton onClick={handleCreateWorkflowOpen}>
+            <ControlPointDuplicateIcon
+              style={{ cursor: 'pointer', color: theme.palette.primary.main }}
+            />
+          </IconButton>
+        </Tooltip>
+      }
+      <Popover
+        open={Boolean(anchorElCreateWorkflow)}
+        anchorEl={anchorElCreateWorkflow}
+        onClose={handleCreateWokrkflowClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        PaperProps={{
+          elevation: 3,
+          sx: {
+            width: 300,
+            maxHeight: 300,
+            overflow: 'hidden',
+            padding: 0,
+            borderRadius: '12px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+            border: '1px solid rgba(0,0,0,0.04)',
+            mt: 1,
+            '& .MuiList-root': {
+              padding: 0,
+            }
+          },
+        }}
+      >
+        <SectionHeader icon={<ControlPointDuplicateIcon fontSize="small" />} title="Create New Workflow" />
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'auto',
+            maxHeight: 200
+          }}
+        >
+          <Box
+            sx={{
+              p: 2,
+              flex: 1,
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+            }}
+          >
+
+            <TextField
+              fullWidth
+              size="small"
+              label="workflow name"
+              value={workflowName}
+              onChange={(e) => setWorkflowName(e.target.value)}
+            />
+
+            {Object.entries(uniqueParameters)
+              .map(([paramName, valuesSet]) => {
+                const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
+                const selected = selectedParams[paramName] ?? '';
+
+                return (
+                  <FormControl key={paramName} size="small" fullWidth>
+                    <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
+                    <Select
+                      labelId={`${paramName}-label`}
+                      label={paramName}
+                      value={selected}
+                      onChange={handleParamChange(paramName)}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {values.map((v) => (
+                        <MenuItem key={v} value={v}>
+                          {v}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                );
+              })}
+          </Box>
+          <Box
+            sx={{
+              p: 1,
+              borderTop: '1px solid rgba(0,0,0,0.08)',
+              backgroundColor: 'background.paper',
+              bottom: 0,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!workflowName.trim()}
+            >
+                  Create
+            </Button>
+          </Box>
+        </Box>
+      </Popover>
     </span>
   );
 };
@@ -282,11 +535,13 @@ export default function WorkflowTable() {
     Object.keys(rows[0]).forEach(column => {
       if (HIDDEN_INTERNAL_FIELDS.has(column) || column === 'id' || column === 'workflowId' || column === 'status' || column === 'action' || column === 'rating') {
         columnsWithData.add(column);
+
         return;
       }
 
       const hasData = rows.some(row => {
         const value = row[column];
+
         return value !== 'n/a' && value !== null && value !== undefined && value !== '';
       });
 
@@ -680,7 +935,7 @@ export default function WorkflowTable() {
       const newVisibilityModel = { ...workflowsTable.columnsVisibilityModel };
 
       workflowsTable.columns.forEach(column => {
-        const shouldBeVisible = columnsWithData.includes(column.field) || 
+        const shouldBeVisible = columnsWithData.includes(column.field) ||
                                ['workflowId', 'status', 'action', 'rating'].includes(column.field);
 
         newVisibilityModel[column.field] = shouldBeVisible;
@@ -689,12 +944,13 @@ export default function WorkflowTable() {
       const hasChanged = workflowsTable.columns.some(column => {
         const currentVisibility = workflowsTable.columnsVisibilityModel[column.field] ?? true;
         const newVisibility = newVisibilityModel[column.field] ?? true;
+
         return currentVisibility !== newVisibility;
       });
 
       if (hasChanged) {
-        dispatch(setWorkflowsTable({ 
-          columnsVisibilityModel: newVisibilityModel 
+        dispatch(setWorkflowsTable({
+          columnsVisibilityModel: newVisibilityModel
         }));
       }
     }

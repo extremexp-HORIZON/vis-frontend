@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
+import type {
+  SelectChangeEvent } from '@mui/material';
 import {
   Button,
   Stack,
@@ -16,6 +18,11 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import type {
   RootState } from '../../../../store/store';
@@ -39,6 +46,9 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import CategoryIcon from '@mui/icons-material/Category';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
+import CreateIcon from '@mui/icons-material/Create';
+import type { IRun } from '../../../../shared/models/experiment/run.model';
+import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
 
 interface ToolBarWorkflowProps {
   filterNumbers: number
@@ -70,10 +80,67 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
   } = props;
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
     useAppSelector((state: RootState) => state.monitorPage);
+  const { workflows, experiment } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [anchorElGroup, setAnchorElGroup] = useState<null | HTMLElement>(null);
   const [anchorElSpaces, setAnchorElSpaces] = useState<null | HTMLElement>(null);
+  const [anchorElCreateWorkflow, setAnchorElCreateWorkflow] = useState<null | HTMLElement>(null);
+
+  const uniqueParameters = workflows.data.reduce(
+    (acc: Record<string, Set<string>>, workflow) => {
+      if (workflow.params) {
+        workflow.params.forEach(param => {
+          if (!acc[param.name]) {
+            acc[param.name] = new Set();
+          }
+          acc[param.name].add(param.value);
+        });
+      }
+
+      return acc;
+    },
+    {}
+  );
+
+  const [workflowName, setWorkflowName] = useState('');
+  const [selectedParams, setSelectedParams] = useState<Record<string, string>>({});
+
+  const handleParamChange = (paramName: string) => (e: SelectChangeEvent<string>) => {
+    const value = e.target.value;
+
+    setSelectedParams((prev) => ({ ...prev, [paramName]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = Object.entries(selectedParams)
+      .filter(([, v]) => v !== '' && v !== undefined)
+      .map(([name, value]) => ({ name, value }));
+
+    // for now create a new dummy scheduled workflow
+    const newRun: IRun = {
+      id: workflowName.trim(),
+      name: workflowName.trim(),
+      experimentId: experiment.data?.id || '',
+      status: 'SCHEDULED',
+      startTime: undefined,
+      endTime: undefined,
+      params,
+      metrics: [],
+      dataAssets: [],
+      tags: {},
+    };
+    const updatedWorkflows = workflows.data.concat(newRun);
+
+    dispatch(setWorkflowsData(updatedWorkflows));
+
+    setWorkflowName('');
+    setSelectedParams({});
+    handleCreateWokrkflowClose();
+  };
 
   const handleGroupClick = (e: React.MouseEvent<HTMLElement>) =>
     setAnchorElGroup(e.currentTarget);
@@ -90,6 +157,12 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
   };
 
   const handelSpaceOptionsClose = () => setAnchorElSpaces(null);
+
+  // const handleCreateWorkflowOpen = (event: React.MouseEvent<HTMLElement>) => {
+  //   setAnchorElCreateWorkflow(event.currentTarget);
+  // };
+
+  const handleCreateWokrkflowClose = () => setAnchorElCreateWorkflow(null);
 
   const open = Boolean(anchorEl);
 
@@ -233,6 +306,11 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
           }}
         >
           <Box sx={{ gap: 0.2, marginLeft: 'auto' }}>
+            {/* <Tooltip title='Create new workflow'>
+              <IconButton onClick={handleCreateWorkflowOpen}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip> */}
             {showSpaceButton && (
               <Tooltip title="Spaces">
                 <IconButton onClick={handleSpaceOptionsOpen}>
@@ -268,6 +346,86 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 </IconButton>
               </Tooltip>
             )}
+            <Popover
+              open={Boolean(anchorElCreateWorkflow)}
+              anchorEl={anchorElCreateWorkflow}
+              onClose={handleCreateWokrkflowClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  width: 300,
+                  maxHeight: 300,
+                  overflow: 'hidden',
+                  padding: 0,
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  mt: 1,
+                  '& .MuiList-root': {
+                    padding: 0,
+                  }
+                },
+              }}
+            >
+              <SectionHeader icon={<CreateIcon fontSize="small" />} title="Create New Workflow" />
+
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  overflow: 'auto',
+                  maxHeight: 200
+                }}
+              >
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="workflow name"
+                  value={workflowName}
+                  onChange={(e) => setWorkflowName(e.target.value)}
+                />
+
+                {Object.entries(uniqueParameters)
+                  .map(([paramName, valuesSet]) => {
+                    const values = Array.from(valuesSet).sort((a, b) => a.localeCompare(b));
+                    const selected = selectedParams[paramName] ?? '';
+
+                    return (
+                      <FormControl key={paramName} size="small" fullWidth>
+                        <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
+                        <Select
+                          labelId={`${paramName}-label`}
+                          label={paramName}
+                          value={selected}
+                          onChange={handleParamChange(paramName)}
+                        >
+                          <MenuItem value="">
+                            <em>None</em>
+                          </MenuItem>
+                          {values.map((v) => (
+                            <MenuItem key={v} value={v}>
+                              {v}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    );
+                  })}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={!workflowName.trim()}
+                >
+                  Create
+                </Button>
+              </Box>
+            </Popover>
+
             <Popover
               open={Boolean(anchorElSpaces)}
               anchorEl={anchorElSpaces}

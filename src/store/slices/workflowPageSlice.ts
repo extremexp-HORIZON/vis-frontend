@@ -191,6 +191,30 @@ const initializeTab = ({
     error: string | null
   }
 }): IWorkflowPageModel => {
+  if(workflowId === 'none') {
+    const uniqueMetricNames = Array.from(
+      new Set(
+        workflows.data.flatMap(w =>
+          Array.isArray(w.metrics) ? w.metrics.map(m => m?.name).filter(Boolean) as string[] : []
+        )
+      )
+    );
+    const nameOnlyMetrics = uniqueMetricNames.map(name => ({ name }));
+
+    return {
+      ...defaultWorkflowPageModel,
+      workflowId: workflowId,
+      workflowMetrics: {
+        data: nameOnlyMetrics,
+        loading: false
+      },
+      workflowTasks: {
+        modelAnalysis: modelAnalysisDefault,
+        dataExploration: null,
+        userInteraction: null,
+      },
+    };
+  }
   const workflow = workflows.data.find(w => w.id === workflowId);
 
   const workflowName = workflow?.name ?? '';

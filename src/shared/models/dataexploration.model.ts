@@ -39,6 +39,7 @@ export interface IDataSource {
   sourceType: string
   fileName: string
   runId: string
+  experimentId: string
   measure0?: string
   measure1?: string
 }
@@ -69,6 +70,7 @@ export interface IMetaDataQuery{
   sourceType: string
   fileName: string
   runId: string
+  experimentId: string
 }
 export interface IMetaDataRequest {
   query: IMetaDataQuery
@@ -114,7 +116,7 @@ export interface IMetaDataSummary {
 }
 export interface IDataExplorationMetaDataResponse {
   datasetType: string
-  fileNames: string[]
+  fileNames: string[] | string
   originalColumns: VisualColumn[]
   totalItems: number
   uniqueColumnValues: Record<string, unknown[]>
@@ -137,6 +139,7 @@ export const defaultDataExplorationQuery: IDataExplorationQuery = {
     sourceType: '',
     fileName: '',
     runId: 'dataCache',
+    experimentId: 'unknown',
   },
   // limit: 0,
   columns: [],

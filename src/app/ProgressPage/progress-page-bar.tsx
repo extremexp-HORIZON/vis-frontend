@@ -8,10 +8,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
 import Chip from '@mui/material/Chip';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const ProgressPageBar = () => {
   const { experimentId } = useParams();
-  const { progressBar } = useAppSelector((state: RootState) => state.progressPage);
+  const { progressBar, experiment } = useAppSelector((state: RootState) => state.progressPage);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -61,11 +62,28 @@ const ProgressPageBar = () => {
             <Typography
               variant="body2"
               fontWeight="bold"
-              color="secondary"
+              color= {experiment?.data?.status === 'killed' ? 'error' : 'secondary'}
             >
               {`${progressBar.progress}%`}
             </Typography>
           </Box>
+          { experiment.data?.status === 'killed' &&
+            <Box sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              backgroundColor: theme.palette.background.paper,
+              gap: 0.5
+            }}>
+              <ErrorIcon fontSize="small" color="error" />
+              <Typography
+                variant="body2"
+                fontWeight="medium"
+                color="error"
+              >
+                killed
+              </Typography>
+            </Box>
+          }
         </Box>
 
         {matches && (
@@ -96,7 +114,8 @@ const ProgressPageBar = () => {
             borderRadius: 10,
             backgroundColor: grey[300],
             '& .MuiLinearProgress-bar': {
-              background:
+              background: experiment?.data?.status === 'killed' ?
+                'linear-gradient(90deg, #d17b0f, #b32d00)' :
                 theme => theme.palette.customGradient.main,
             },
           }}

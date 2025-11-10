@@ -13,6 +13,7 @@ import { useTheme } from '@mui/material/styles';
 import { getCache } from '../../../shared/utils/localStorageCache';
 import { useLocation } from 'react-router-dom';
 import ComparativeAnalysis from './ComparativeAnalysis/comparative-analysis';
+import ExperimentExplainability from './ExperimentExplainability';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
@@ -86,6 +87,7 @@ const MonitoringPage = () => {
         >
           <Tab label="OVERVIEW" />
           <Tab label="COMPARATIVE ANALYSIS" />
+          <Tab label="EXPLAINABILITY" />
         </Tabs>
       </Box>
       <Box
@@ -173,6 +175,7 @@ const MonitoringPage = () => {
             </Paper>
           </Box>
         )}
+        {selectedTab === 2 && <ExperimentExplainability />}
       </Box>
     </>
   );

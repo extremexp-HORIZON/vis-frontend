@@ -6,7 +6,7 @@ import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
-import { Tab, Tabs } from '@mui/material';
+import { IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -17,6 +17,11 @@ import type { TestInstance } from '../../../../shared/models/tasks/model-analysi
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import BuildIcon from '@mui/icons-material/Build';
+import type { IRun } from '../../../../shared/models/experiment/run.model';
+import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
+import { Snackbar, Alert } from '@mui/material';
+
 
 interface ITableComponent {
   children?: React.ReactNode
@@ -43,9 +48,17 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,
   );
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
+  const [snackbar, setSnackbar] = useState<{ open: boolean; text: string }>({
+    open: false,
+    text: '',
+  });
+
 
   function convertToPythonStyleString(obj: TestInstance) {
-    const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType'];
+    const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType', 'instanceId'];
 
     return (
       '{' +
@@ -184,8 +197,14 @@ const CounterfactualsTable = (props: ITableComponent) => {
     tab?.workflowTasks.modelAnalysis?.counterfactuals?.data?.tableContents || {},
   );
 
-  const columns: GridColDef[] = Object.entries(filteredTableContents).map(([key, column]) => {
+  const baseColumns: GridColDef[] = Object.entries(filteredTableContents).map(([key, column]) => {
     const referenceValue = parseFloat(column.values[0]);
+
+    // Reusable formatter for numbers: up to 3 decimals, but avoid trailing zeros if possible
+    const numberFormatter = new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+    });
 
     return {
       field: key,
@@ -195,10 +214,12 @@ const CounterfactualsTable = (props: ITableComponent) => {
       headerAlign: 'center',
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        const currentValue = parseFloat(params.value);
+        const raw = params.value;
+        const currentValue = parseFloat(String(raw));
 
+        // If either value isn't numeric, render the raw value
         if (isNaN(referenceValue) || isNaN(currentValue)) {
-          return params.value;
+          return <Typography variant="body2">{String(raw)}</Typography>;
         }
 
         let icon = null;
@@ -219,15 +240,105 @@ const CounterfactualsTable = (props: ITableComponent) => {
           );
         }
 
+        const formatted = numberFormatter.format(currentValue);
+
         return (
           <Box display="flex" alignItems="center" justifyContent="center">
-            <Typography variant="body2">{params.value}</Typography>
+            <Typography variant="body2">{formatted}</Typography>
             {icon}
           </Box>
         );
       },
     };
   });
+
+  const isNumericLike = (v: unknown) => {
+    if (v === null || v === undefined) return false;
+    const n = Number(v);
+
+    return !isNaN(n) && isFinite(n);
+  };
+
+  const handleReconfigure = (row: any) => {
+    const currentWorkflow = workflows?.data?.find(
+      (workflow) => workflow.id === tab?.workflowId
+    );
+
+    if (!currentWorkflow) return;
+
+    const updatedParams = (currentWorkflow.params ?? []).map((p) => {
+      const rowValue = row?.[p.name];
+
+      if (rowValue === undefined || rowValue === null || rowValue === '-') return p;
+
+      const pVal = p.value;
+
+      const trimmed = String(rowValue).trim();
+
+      if (isNumericLike(trimmed) && isNumericLike(pVal)) {
+        const tableNumber = Number(trimmed);
+        const baseNumber = Number(pVal);
+        const next = baseNumber + tableNumber;
+
+        return { ...p, value: String(next) };
+      }
+
+      return { ...p, value: String(rowValue) };
+    });
+
+    // for now create a new dummy scheduled workflow
+    const newRun: IRun = {
+      id: `${tab?.workflowName} (copy ${String(row?.id)})`.trim(),
+      name: `${tab?.workflowName} (copy ${String(row?.id)})`.trim(),
+      experimentId: experimentId || '',
+      status: 'SCHEDULED',
+      startTime: undefined,
+      endTime: undefined,
+      params: updatedParams,
+      metrics: [],
+      dataAssets: [],
+      tags: {},
+    };
+    const updatedWorkflows = workflows.data.concat(newRun);
+
+    dispatch(setWorkflowsData(updatedWorkflows));
+
+    setSnackbar({
+      open: true,
+      text: `New workflow "${newRun.name}" created`,
+    });
+  };
+
+  const actionColumn: GridColDef = {
+    field: 'action',
+    headerName: 'actions',
+    headerAlign: 'center',
+    align: 'center',
+    sortable: false,
+    filterable: false,
+    headerClassName: 'datagrid-header-fixed',
+    minWidth: 100,
+    renderCell: (params: GridRenderCellParams) => (
+      <Box
+        onClick={(e) => e.stopPropagation()}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        height="100%"
+      >
+        <Tooltip title="Reconfigure">
+          <IconButton
+            onClick={() => { handleReconfigure(params.row); }}
+          >
+            <BuildIcon fontSize="small" color="primary" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+  };
+
+  const columns =  activeTab === 0 ? baseColumns : [...baseColumns, actionColumn];
 
   const rowCount =
     filteredTableContents[Object.keys(filteredTableContents)[0]]?.values
@@ -303,6 +414,24 @@ const CounterfactualsTable = (props: ITableComponent) => {
           </Typography>
         )}
       </ClosableCardTable>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={1000}
+        onClose={(_, reason) => {
+          if (reason === 'clickaway') return;
+          setSnackbar((s) => ({ ...s, open: false }));
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.text}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

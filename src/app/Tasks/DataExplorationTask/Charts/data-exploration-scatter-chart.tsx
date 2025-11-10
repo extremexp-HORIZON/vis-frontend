@@ -359,6 +359,8 @@ const getSingleScatterSpec = ({
 
 const ScatterChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -407,10 +409,13 @@ const ScatterChart = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || '',
-            runId: tab?.workflowId || ''
+            runId: tab?.workflowId || '',
+            experimentId: experimentId || ''
+
           },
           columns: cols,
           filters,
+          limit: 10000
         },
         metadata: {
           workflowId: tab?.workflowId || '',

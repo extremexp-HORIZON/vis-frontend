@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react';
-import { Box } from '@mui/material';
 import InfoMessage from '../../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import Loader from '../../../../../shared/components/loader';
@@ -8,9 +7,10 @@ import type { RootState } from '../../../../../store/store';
 import { fetchComparisonData } from '../../../../../store/slices/monitorPageSlice';
 import type { IAggregation } from '../../../../../shared/models/dataexploration.model';
 import type { IDataAsset } from '../../../../../shared/models/experiment/data-asset.model';
-import type { VisualizationSpec } from 'react-vega';
-import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
+import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
+import type { IRun } from '../../../../../shared/models/experiment/run.model';
+import { useParams } from 'react-router-dom';
 
 export interface OverlayHistogramProps {
   assetName: string;
@@ -27,6 +27,81 @@ type Row = {
   tooltipAll?: string;
 };
 
+function weightedQuantile(sorted: { value: number; count: number }[], q: number): number {
+  const total = sorted.reduce((s, d) => s + d.count, 0);
+
+  if (total <= 0) return sorted[0]?.value ?? 0;
+  const target = q * total;
+  let acc = 0;
+
+  for (let i = 0; i < sorted.length; i++) {
+    acc += sorted[i].count;
+    if (acc >= target) return sorted[i].value;
+  }
+
+  return sorted[sorted.length - 1].value;
+}
+
+function hybridEdgesFromPooled(
+  pooled: { value: number; count: number }[],
+  bins: number,
+  alpha: number
+): number[] {
+  if (pooled.length === 0) return [];
+  const values = [...pooled]
+    .filter(d => Number.isFinite(d.value) && Number.isFinite(d.count) && d.count > 0)
+    .sort((a, b) => a.value - b.value);
+
+  const min = values[0].value;
+  const max = values[values.length - 1].value;
+
+  if (min === max) return [min, max];
+
+  const B = Math.max(1, bins);
+
+  // Equal-width edges
+  const widthEdges = Array.from({ length: B + 1 }, (_, i) => min + (i * (max - min)) / B);
+
+  // Equal-frequency edges (weighted quantiles)
+  const freqEdges = Array.from({ length: B + 1 }, (_, i) => {
+    if (i === 0) return min;
+    if (i === B) return max;
+
+    return weightedQuantile(values, i / B);
+  });
+
+  // Interpolate
+  const interp = widthEdges.map((w, i) => (1 - alpha) * w + alpha * freqEdges[i]);
+
+  // --- Deduplicate with a tolerance tied to label precision (2 decimals) ---
+  const decimals = 2;
+  const unit = Math.pow(10, -decimals);        // ~0.01 in data units
+  const tol = Math.max((max - min) * 1e-9, unit / 2); // be generous vs rounding
+
+  const edges: number[] = [];
+
+  for (let i = 0; i < interp.length; i++) {
+    const x = i === 0 ? min : (i === interp.length - 1 ? max : interp[i]);
+
+    if (edges.length === 0 || Math.abs(x - edges[edges.length - 1]) > tol) {
+      edges.push(x);
+    }
+  }
+
+  // Ensure at least two edges; otherwise force one bin over [min,max]
+  if (edges.length < 2) return [min, max];
+
+  // Guarantee exact min/max at ends
+  edges[0] = min;
+  edges[edges.length - 1] = max;
+
+  return edges;
+}
+
+function formatRangeLabel(s: number, e: number) {
+  return s === e ? `${s.toFixed(2)}` : `${s.toFixed(2)} – ${e.toFixed(2)}`;
+}
+
 const OverlayHistogram = ({
   assetName,
   columnName,
@@ -35,7 +110,7 @@ const OverlayHistogram = ({
 }: OverlayHistogramProps) => {
   const dispatch = useAppDispatch();
   const workflowIds = useMemo(() => assets.map(a => a.workflowId), [assets]);
-
+  const { experimentId } = useParams();
   const slices = useAppSelector((state: RootState) =>
     Object.fromEntries(
       assets.map(({ workflowId }) => [
@@ -58,55 +133,132 @@ const OverlayHistogram = ({
 
   const agg: IAggregation = { column: columnName, function: 'COUNT' };
 
+  const runs = useAppSelector((state: RootState) => state.progressPage.workflows.data);
+
+  const { runById, allParamNames } = useMemo(() => {
+    const map = new Map<string, IRun>();
+
+    runs.forEach(r => map.set(r.id, r));
+
+    const names = new Set<string>();
+
+    workflowIds.forEach(wid => {
+      const ps = map.get(wid)?.params ?? [];
+
+      ps.forEach(p => names.add(p.name));
+    });
+
+    return { runById: map, allParamNames: Array.from(names).sort() };
+  }, [runs, workflowIds]);
+
+  // Create color mapping for tooltip
+  const colorMapping = useMemo(() => {
+    const { domain, range } = colorScale(workflowIds);
+
+    return Object.fromEntries(domain.map((id, index) => [id, range[index]]));
+  }, [workflowIds, colorScale]);
+
   const tooltipHandler = new Handler({
-    sanitize: (value: any) => String(value), // identity sanitizer
+    sanitize: (v: any) => String(v),
+    formatTooltip: (value: Record<string, any>, sanitize) => {
+      const bin = value[columnName] ?? value['binLabel'];
+
+      const rowsInBin = rows.filter(r => r.binLabel === bin);
+      const countByWf = new Map<string, number>();
+
+      rowsInBin.forEach(r => countByWf.set(r.workflowId, r.count));
+
+      const headerCells = [
+        '<th style="text-align:left; padding:4px;">Workflow</th>',
+        '<th style="text-align:right; padding:4px;">Count</th>',
+        ...allParamNames.map(
+          n => `<th style="text-align:left; padding:4px;">${sanitize(n)}</th>`
+        ),
+      ].join('');
+
+      const body = workflowIds.map(wid => {
+        const color = colorMapping[wid] || '#999';
+        const cnt = countByWf.get(wid) ?? 0;
+
+        const params = runById.get(wid)?.params ?? [];
+        const pmap = new Map<string, string>(params.map(p => [p.name, p.value]));
+
+        const paramTds = allParamNames
+          .map(n => `<td style="padding:4px; vertical-align:top;">${sanitize(pmap.get(n) ?? '')}</td>`)
+          .join('');
+
+        return `
+          <tr>
+            <td style="white-space:nowrap; vertical-align:top; padding:4px;">
+              <span style="display:inline-block;width:12px;height:12px;background-color:${sanitize(color)};border-radius:2px;margin-right:6px;"></span>
+              ${sanitize(wid)}
+            </td>
+            <td style="text-align:right; vertical-align:top; padding:4px;">
+              ${sanitize(cnt)}
+            </td>
+            ${paramTds}
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div style="white-space: normal;">
+          <div><strong>${sanitize(columnName)}:</strong> ${sanitize(bin ?? '')}</div>
+          <table style="border-collapse:collapse; margin-top:6px; font-size:12px;">
+            <thead><tr>${headerCells}</tr></thead>
+            <tbody>${body}</tbody>
+          </table>
+        </div>
+      `;
+    }
   }).call;
 
-
   useEffect(() => {
-    assets.forEach(({ workflowId, dataAsset }) => {
-      const hist = slices[workflowId];
-      const source = dataAsset?.source || '';
+    const pendingFetches = assets
+      .filter(({ workflowId, dataAsset }) => {
+        const hist = slices[workflowId];
+        const source = dataAsset?.source;
+        const meta = metas[workflowId];
+        const metaReady = Boolean(meta?.data) && !meta?.loading && !meta?.error;
+        const alreadyHasData = Array.isArray(hist?.data?.data) && hist!.data!.data.length > 0;
 
-      if (!source) return;
+        return source && metaReady && !hist?.loading && !alreadyHasData;
+      })
+      .map(({ workflowId, dataAsset }) => ({
+        workflowId,
+        query: {
+          dataSource: {
+            source: dataAsset.source,
+            format: dataAsset?.format || '',
+            sourceType: dataAsset?.sourceType || '',
+            fileName: dataAsset?.name || '',
+            runId: workflowId || '',
+            experimentId: experimentId || ''
+          },
+          groupBy: [columnName],
+          aggregations: [agg],
+          filters: [],
+          columns: [columnName],
+        }
+      }));
 
-      const meta = metas[workflowId];
-      const metaReady = Boolean(meta?.data) && !meta?.loading && !meta?.error;
-
-      if (!metaReady) return;
-
-      const alreadyHasData =
-        Array.isArray(hist?.data?.data) && hist!.data!.data.length > 0;
-
-      if (hist?.loading || alreadyHasData) return;
-
-      dispatch(
-        fetchComparisonData({
-          query: {
-            dataSource: {
-              source,
-              format: dataAsset?.format || '',
-              sourceType: dataAsset?.sourceType || '',
-              fileName: dataAsset?.name || '',
-              runId: workflowId || ''
+    if (pendingFetches.length > 0) {
+    // Dispatch all fetches at once
+      Promise.all(
+        pendingFetches.map(({ workflowId, query }) =>
+          dispatch(fetchComparisonData({
+            query,
+            metadata: {
+              workflowId,
+              queryCase: 'barChart',
+              assetName,
+              columnName,
             },
-            groupBy: [columnName],
-            aggregations: [agg],
-            filters: [],
-            columns: [columnName],
-            limit: 1000,
-          },
-          metadata: {
-            workflowId,
-            queryCase: 'barChart',
-            assetName,
-            columnName,
-          },
-        })
+          }))
+        )
       );
-    });
+    }
   }, [assetName, columnName, assets, metas, slices]);
-
   const norm = (s: string) => (s || '').replace(/-/g, '_');
 
   const {
@@ -153,65 +305,79 @@ const OverlayHistogram = ({
         });
       });
     } else {
-      let min = Infinity, max = -Infinity;
+      // Pool weighted values from all workflows
+      const pooled: { value: number; count: number }[] = [];
 
-      Object.values(rawByWorkflow).forEach(arr => {
-        arr.forEach(d => {
+      workflowIds.forEach(wid => {
+        (rawByWorkflow[wid] || []).forEach(d => {
           const v = d[columnName], c = d[countField];
 
-          if (typeof v === 'number' && typeof c === 'number') {
-            if (v < min) min = v;
-            if (v > max) max = v;
+          if (typeof v === 'number' && typeof c === 'number' && Number.isFinite(v) && Number.isFinite(c)) {
+            pooled.push({ value: v, count: c });
           }
         });
       });
 
-      if (isFinite(min) && isFinite(max)) {
-        const N = 10;
-        const range = max - min;
-        let bins: { start: number; end: number }[];
+      if (pooled.length > 0) {
+        let min = Infinity, max = -Infinity;
 
-        if (range === 0) {
-          bins = [{ start: min, end: min }];
-        } else {
-          const size = range / N;
-          const start0 = Math.floor(min / size) * size;
-
-          bins = Array.from({ length: N }, (_, i) => {
-            const s = start0 + i * size;
-
-            return { start: s, end: s + size };
-          });
+        for (const { value } of pooled) {
+          if (value < min) min = value;
+          if (value > max) max = value;
         }
+        if (isFinite(min) && isFinite(max)) {
+          const N = 10;       // number of bins
+          const alpha = 0.9;  // 0..1 blend (tune if desired)
 
-        const size = bins.length > 1 ? bins[0].end - bins[0].start : 0;
-        const label = (s: number, e: number) => (s === e ? `${s.toFixed(2)}` : `${s.toFixed(2)} – ${e.toFixed(2)}`);
+          const edges = (min === max)
+            ? [min, max]
+            : hybridEdgesFromPooled(pooled, N, alpha);
 
-        workflowIds.forEach(wid => {
-          const arr = rawByWorkflow[wid] || [];
-          const counts = bins.map(b => ({ ...b, count: 0 }));
+          const bins = Array.from({ length: Math.max(1, edges.length - 1) }, (_, i) => ({
+            start: edges[i],
+            end: edges[i + 1],
+            label: formatRangeLabel(edges[i], edges[i + 1]),
+          }));
 
-          arr.forEach(d => {
-            const v = d[columnName], c = d[countField];
+          // Count each workflow into the shared bins
+          workflowIds.forEach(wid => {
+            const arr = rawByWorkflow[wid] || [];
+            const counts = bins.map(b => ({ ...b, count: 0 }));
 
-            if (typeof v !== 'number' || typeof c !== 'number') return;
-            if (bins.length === 1) {
-              counts[0].count += c;
-            } else {
-              const idx = Math.max(0, Math.min(Math.floor((v - bins[0].start) / size), bins.length - 1));
+            arr.forEach(d => {
+              const v = d[columnName], c = d[countField];
+
+              if (typeof v !== 'number' || typeof c !== 'number') return;
+
+              if (bins.length === 1) {
+                counts[0].count += c;
+
+                return;
+              }
+
+              // Initial index guess
+              let idx = Math.floor(((v - edges[0]) / (edges[edges.length - 1] - edges[0])) * (bins.length));
+
+              if (idx < 0) idx = 0;
+              if (idx >= bins.length) idx = bins.length - 1;
+
+              // Clamp with guards for numerical errors
+              while (idx > 0 && v < bins[idx].start) idx--;
+              while (idx < bins.length - 1 && v >= bins[idx].end) idx++;
 
               counts[idx].count += c;
-            }
-          });
-          counts.forEach(b => {
-            out.push({
-              binLabel: label(b.start, b.end),
-              xStart: b.start,
-              count: b.count,
-              workflowId: wid
+            });
+
+            counts.forEach(b => {
+              out.push({
+                binLabel: b.label,
+                xStart: b.start,
+                count: b.count,
+                workflowId: wid,
+              });
             });
           });
-        });
+        }
       }
     }
 
@@ -240,22 +406,19 @@ const OverlayHistogram = ({
   const loading = anyLoading;
   const showInfo = (!loading && (!hasData || anyError));
 
-  const spec: VisualizationSpec = useMemo(() => {
+  const spec = useMemo(() => {
     const ids = workflowIds;
     const { domain, range } = colorScale(ids);
 
     const layers = ids.map(wid => ({
-      mark: { type: 'bar', opacity: 0.45, size: 15 },
+      mark: { type: 'bar', opacity: 0.45 },
       transform: [{ filter: { field: 'workflowId', equal: wid } }],
       encoding: {
         color: {
           field: 'workflowId',
           type: 'nominal',
           scale: { domain, range },
-          legend: {
-            title: 'Workflow',
-            labelExpr: 'length(datum.label) > 10 ? substring(datum.label, 0, 10) + \'…\' : datum.label'
-          }
+          legend: null // Remove the legend
         }
       }
     }));
@@ -263,8 +426,6 @@ const OverlayHistogram = ({
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
       description: `Overlay distribution of ${columnName} across per-workflow datasets`,
-      width: 150,
-      height: 180,
       data: { values: rows },
       encoding: {
         x: {
@@ -272,7 +433,8 @@ const OverlayHistogram = ({
           type: 'ordinal',
           title: null,
           sort: isNumeric ? { field: 'xStart', op: 'min' } : 'ascending',
-          axis: { labels: false, ticks: false, domain: false }
+          axis: { labels: false, ticks: false, domain: false },
+          scale: { paddingInner: 0, paddingOuter: 0 }
         },
         y: { field: 'count', type: 'quantitative', title: 'Count' },
         tooltip: [
@@ -281,32 +443,31 @@ const OverlayHistogram = ({
         ]
       },
       layer: layers
-    } as VisualizationSpec;
+    };
   }, [rows, isNumeric, workflowIds, colorScale, columnName]);
 
+  const loader = <Loader />;
+
+  const errorMessage =
+    <InfoMessage
+      message={!hasData ? 'No data available.' : 'Error fetching the data.'}
+      type="info"
+      icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+      fullHeight
+    />;
+
   return (
-    loading ? (
-      <Loader />
-    ) : showInfo ? (
-      <InfoMessage
-        message={!hasData ? 'No data available.' : 'Error fetching the data.'}
-        type="info"
-        icon={<AssessmentIcon sx={{ fontSize: 40, color: 'info.main' }} />}
-        fullHeight
-      />
-    ) : (
-      <Box
-        sx={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <VegaLite spec={spec} actions={false} tooltip={tooltipHandler} />
-      </Box>
-    )
+    <ResponsiveCardVegaLite
+      spec={spec}
+      actions={false}
+      isStatic={false}
+      title={`${assetName} — ${columnName}`}
+      sx={{ width: '100%', maxWidth: '100%' }}
+      showInfoMessage={loading || showInfo}
+      infoMessage={loading ? loader : showInfo ? errorMessage : <></>}
+      showSettings={false}
+      tooltip={tooltipHandler}
+    />
   );
 };
 

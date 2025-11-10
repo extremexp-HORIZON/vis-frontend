@@ -124,7 +124,7 @@ const CGlanceExecution = () => {
           metadata: {
             experimentId: experimentId || '',
             workflowId: tab?.workflowId || '',
-            queryCase: 'globalCounterfactuals',
+            queryCase: 'global_counterfactuals',
           },
         }),
       );
@@ -160,97 +160,97 @@ const CGlanceExecution = () => {
         }}
       >
         {/* GCF Size Dropdown */}
-        <Tooltip
-          title="The number of actions to be generated in the end of the algorithm"
-          style={{ width: '100%' }}
-        >
-          <Box flex={1}>
-            <FormControl fullWidth>
+        <Box flex={1}>
+          <FormControl fullWidth>
+            <Tooltip
+              title="The number of actions to be generated in the end of the algorithm"
+              style={{ width: '100%' }}
+            >
               <InputLabel id="gcf-size-select-label">
-                Number of CounterFactual Actions
+                  Number of CounterFactual Actions
               </InputLabel>
-              <Select
-                MenuProps={{
-                  PaperProps: { style: { maxHeight: 224, width: 250 } },
-                }}
-                labelId="gcf-size-select-label"
-                input={
-                  <OutlinedInput label="Number of CounterFactual Actions" />
-                }
-                value={gcfSize}
-                onChange={(event: SelectChangeEvent<number | string>) =>
-                  dispatch(setGcfSize(Number(event.target.value)))
-                }
-              >
-                {Array.from({ length: 10 }, (_, i) => i + 1).map(value => (
-                  <MenuItem key={value} value={value}>
-                    {value}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </Tooltip>
+            </Tooltip>
+            <Select
+              MenuProps={{
+                PaperProps: { style: { maxHeight: 224, width: 250 } },
+              }}
+              labelId="gcf-size-select-label"
+              input={
+                <OutlinedInput label="Number of CounterFactual Actions" />
+              }
+              value={gcfSize}
+              onChange={(event: SelectChangeEvent<number | string>) =>
+                dispatch(setGcfSize(Number(event.target.value)))
+              }
+            >
+              {Array.from({ length: 10 }, (_, i) => i + 1).map(value => (
+                <MenuItem key={value} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
 
         {/* CF Method Dropdown */}
-        <Tooltip
-          title="Methods that generate candidate counterfactual explanations"
-          style={{ width: '100%' }}
-        >
-          <Box flex={1}>
-            <FormControl fullWidth>
+        <Box flex={1}>
+          <FormControl fullWidth>
+            <Tooltip
+              title="Methods that generate candidate counterfactual explanations"
+              style={{ width: '100%' }}
+            >
               <InputLabel id="cf-method-select-label">
-                Local Counterfactual Method
+                  Local Counterfactual Method
               </InputLabel>
-              <Select
-                labelId="cf-method-select-label"
-                input={<OutlinedInput label="Local Counterfactual Method" />}
-                value={cfMethod}
-                onChange={e => dispatch(setCfMethod(e.target.value as string))}
-                MenuProps={{
-                  PaperProps: { style: { maxHeight: 224, width: 250 } },
-                }}
-              >
-                {availableCfMethods.map(method => (
-                  <MenuItem key={method} value={method}>
-                    {method}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </Tooltip>
+            </Tooltip>
+            <Select
+              labelId="cf-method-select-label"
+              input={<OutlinedInput label="Local Counterfactual Method" />}
+              value={cfMethod}
+              onChange={e => dispatch(setCfMethod(e.target.value as string))}
+              MenuProps={{
+                PaperProps: { style: { maxHeight: 224, width: 250 } },
+              }}
+            >
+              {availableCfMethods.map(method => (
+                <MenuItem key={method} value={method}>
+                  {method}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
 
         {/* Action Strategy Dropdown */}
-        <Tooltip
-          title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria"
-          style={{ width: '100%' }}
-        >
-          <Box flex={1}>
-            <FormControl fullWidth>
+        <Box flex={1}>
+          <FormControl fullWidth>
+            <Tooltip
+              title="Different strategies for selecting the best actions from the generated counterfactuals based on different criteria"
+              style={{ width: '100%' }}
+            >
               <InputLabel id="action-choice-strategy-select-label">
-                Action Choice Strategy
+                  Action Choice Strategy
               </InputLabel>
-              <Select
-                MenuProps={{
-                  PaperProps: { style: { maxHeight: 224, width: 250 } },
-                }}
-                labelId="action-choice-strategy-select-label"
-                input={<OutlinedInput label="Action Choice Strategy" />}
-                value={actionChoiceStrategy}
-                onChange={e =>
-                  dispatch(setActionChoiceStrategy(e.target.value as string))
-                }
-              >
-                {availableActionStrategies.map(strategy => (
-                  <MenuItem key={strategy} value={strategy}>
-                    {strategy}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </Tooltip>
+            </Tooltip>
+            <Select
+              MenuProps={{
+                PaperProps: { style: { maxHeight: 224, width: 250 } },
+              }}
+              labelId="action-choice-strategy-select-label"
+              input={<OutlinedInput label="Action Choice Strategy" />}
+              value={actionChoiceStrategy}
+              onChange={e =>
+                dispatch(setActionChoiceStrategy(e.target.value as string))
+              }
+            >
+              {availableActionStrategies.map(strategy => (
+                <MenuItem key={strategy} value={strategy}>
+                  {strategy}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
 
         {/* Run Button */}
         <Box>

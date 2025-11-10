@@ -126,6 +126,7 @@ interface Umapi {
   point: { id: string; data: TestInstance } | null
   showMisclassifiedOnly: boolean
   setPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
+  setShapPoint: Dispatch<SetStateAction<{ id: string; data: TestInstance } | null>>
   hashRow: (row: TestInstance) => string
   useUmap: boolean
   setuseUmap: Dispatch<SetStateAction<boolean>>
@@ -133,7 +134,7 @@ interface Umapi {
 
 const InstanceClassificationUmap = (props: Umapi) => {
   const theme = useTheme();
-  const { point, setPoint, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props;
+  const { point, setPoint, setShapPoint, showMisclassifiedOnly, hashRow, useUmap, setuseUmap } = props;
   const tab = useAppSelector((state: RootState) => state.workflowPage.tab);
   const raw = tab?.workflowTasks.modelAnalysis?.modelInstances.data;
   const parsedData = typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -196,7 +197,7 @@ const InstanceClassificationUmap = (props: Umapi) => {
 
   const handleNewView = (view: View) => {
     view.addEventListener('click', (event: ScenegraphEvent, item: Item | null | undefined) => {
-      if (item && item.datum?.isMisclassified) {
+      if (item) {
         const clickedIndex = item.datum.index;
         const originalRow = parsedData[clickedIndex]; // This is the row you want
 
@@ -207,11 +208,20 @@ const InstanceClassificationUmap = (props: Umapi) => {
           id,
           data: {
             ...rest,
-            'label': actual,
+            actual,
             predicted,
           // index: clickedIndex,
           },
         });
+        if(!showMisclassifiedOnly || !item.datum.isMisclassified) setShapPoint({
+          id,
+          data: {
+            ...rest,
+            actual,
+            predicted,
+          },
+        });
+        else setShapPoint(null);
       }
     });
   };
@@ -338,7 +348,7 @@ const InstanceClassificationUmap = (props: Umapi) => {
       infoMessage={info}
       showInfoMessage={shouldShowInfoMessage}
       aspectRatio={isSmallScreen ? 2.8 : 1.8}
-      maxHeight={480}
+      maxHeight={1200}
       isStatic={true}
       controlPanel={
         <ControlPanel

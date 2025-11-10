@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { fetchDataExplorationData } from '../../../../store/slices/dataExplorationSlice';
@@ -12,6 +12,8 @@ const HeatMapChart = () => {
   const heatLayerRef = useRef<L.Layer | null>(null);
 
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const dispatch = useAppDispatch();
 
@@ -23,6 +25,25 @@ const HeatMapChart = () => {
   const rawData = tab?.workflowTasks.dataExploration?.mapChart.data?.data;
   const loading = tab?.workflowTasks.dataExploration?.mapChart.loading;
   const data: Record<string, string | number>[] = Array.isArray(rawData) ? rawData : [];
+
+  const legendGradientRef = useRef<Record<number, string> | null>(null);
+
+  const DEFAULT_HEAT_GRADIENT: Record<number, string> = useMemo(() => ({
+    0.0: '#0000ff',
+    0.25: '#00ffff',
+    0.5: '#00ff00',
+    0.75: '#ffff00',
+    1.0: '#ff0000',
+  }), []);
+
+  const gradientToCss = (stops: Record<number, string>) => {
+    const entries = Object.entries(stops)
+      .map(([k, v]) => [parseFloat(k), v] as [number, string])
+      .sort((a, b) => a[0] - b[0]);
+    const cssStops = entries.map(([p, c]) => `${c} ${Math.round(p * 100)}%`);
+
+    return `linear-gradient(to right, ${cssStops.join(', ')})`;
+  };
 
   // Fetch data
   useEffect(() => {
@@ -44,11 +65,12 @@ const HeatMapChart = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || ''
-            , runId: tab?.workflowId || ''
+            , runId: tab?.workflowId || '',
+            experimentId: experimentId || '',
           },
           columns,
           filters,
-          // limit: 0,
+          limit: 10000,
         },
         metadata: {
           workflowId: tab?.workflowId || '',
@@ -116,11 +138,16 @@ const HeatMapChart = () => {
         })
         .filter((entry): entry is [number, number, number] => entry !== null);
 
+      const gradientUsed = DEFAULT_HEAT_GRADIENT;
+
       heatLayerRef.current = L.heatLayer(heatData, {
         radius: radius,
         blur: 15,
         maxZoom: 17,
+        gradient: gradientUsed,
       });
+
+      legendGradientRef.current = gradientUsed;
 
       heatLayerRef.current.addTo(leafletMapRef.current);
     }
@@ -135,13 +162,52 @@ const HeatMapChart = () => {
 
         div.style.background = 'white';
         div.style.padding = '8px';
-        div.style.borderRadius = '8px';
+        div.style.borderRadius = '4px';
         div.style.boxShadow = '0 0 6px rgba(0,0,0,0.3)';
         div.style.fontSize = '12px';
+        div.style.minWidth = '200px';
+
+        let wMin: number | null = null;
+        let wMax: number | null = null;
+
+        if (Array.isArray(data) && weightBy && weightBy !== 'None') {
+          const vals = data
+            .map(r => parseFloat(String(r[weightBy])))
+            .filter(v => !isNaN(v));
+
+          if (vals.length) {
+            wMin = Math.min(...vals);
+            wMax = Math.max(...vals);
+          }
+        }
+        const hasWeights = weightBy && weightBy !== 'None' && wMin !== null && wMax !== null;
+
+        const cssGradient = gradientToCss(legendGradientRef.current || DEFAULT_HEAT_GRADIENT);
+
         div.innerHTML = `
-      <div><b>Weight by:</b> ${weightBy || 'None'}</div>
-      <div><b>Radius:</b> ${radius || 'Default'}</div>
-    `;
+          <div><b>Weight by:</b> ${weightBy || 'None'}</div>          
+          <div><b>Radius:</b> ${radius || 'Default'}</div>
+        `;
+
+        if (hasWeights) {
+          if (wMin === wMax) {
+            div.innerHTML += `
+              <div style="color: gray;">Unique value</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                <div style="width:24px;height:12px;background:${cssGradient};border-radius:2px;"></div>
+                <span>${wMin?.toFixed(2)}</span>
+              </div>
+            `;
+          } else {
+            div.innerHTML += `
+              <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>${wMin?.toFixed(2)}</span>
+                <span>${wMax?.toFixed(2)}</span>
+              </div>
+            `;
+          }
+        }
 
         return div;
       },

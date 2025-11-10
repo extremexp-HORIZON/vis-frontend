@@ -11,6 +11,7 @@ import { fetchDataExplorationData } from '../../../../store/slices/dataExplorati
 const BarChart = () => {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const theme = useTheme();
 
@@ -52,12 +53,15 @@ const BarChart = () => {
             format: dataset?.format || '',
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || ''
-            , runId: tab?.workflowId || ''
+            , runId: tab?.workflowId || '',
+            experimentId: experimentId || ''
+
           },
           groupBy,
           aggregations: aggregation,
           filters,
-          columns: cols
+          columns: cols,
+          limit: 10000
         },
         metadata: {
           workflowId: tab?.workflowId || '',

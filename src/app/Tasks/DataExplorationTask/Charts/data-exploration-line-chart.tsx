@@ -67,6 +67,8 @@ const coerceIfNumericLike = (v: unknown): unknown => {
 
 const LineChart = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
+  const experimentId = useAppSelector(state => state.progressPage?.experiment.data?.id || '');
+
   const meta = tab?.workflowTasks.dataExploration?.metaData;
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
@@ -99,10 +101,11 @@ const LineChart = () => {
             sourceType: dataset?.sourceType || '',
             fileName: dataset?.name || ''
             , runId: tab?.workflowId || ''
+            , experimentId: experimentId || ''
           },
           columns: cols,
           filters,
-          // limit: 5000,
+          limit: 10000,
         },
         metadata: {
           workflowId: tab?.workflowId || '',

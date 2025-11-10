@@ -11,6 +11,11 @@ interface IUserEvaluationResponse {
 
 interface IProgressPage {
   initialization: boolean
+  experiments: {
+    data: IExperiment[]
+    loading: boolean
+    error: string | null
+  }
   experiment: {
     data: IExperiment | null
     loading: boolean
@@ -41,11 +46,12 @@ interface IProgressPage {
 workflowEvaluation: {
   loading: boolean
   error: string | null
-}
+},
 }
 
 const initialState: IProgressPage = {
   initialization: false,
+  experiments: { data: [], loading: false, error: null },
   experiment: { data: null, loading: false, error: null },
   workflows: { data: [], loading: false, error: null, requested: false },
   progressBar: { total: 0, completed: 0, running: 0, failed: 0, progress: 0 },
@@ -61,7 +67,7 @@ const initialState: IProgressPage = {
   workflowEvaluation: {
     loading: false,
     error: null
-  }
+  },
 };
 
 export const progressPageSlice = createSlice({
@@ -76,6 +82,14 @@ export const progressPageSlice = createSlice({
     },
     setMenuOptions: (state, action) => {
       state.menuOptions = action.payload;
+    },
+    // dummy for now
+    setWorkflowsData: (state, action) => {
+      state.workflows.data = action.payload;
+    },
+    setExperimentStatus: (state, action) => {
+      if(state.experiment.data)
+        state.experiment.data.status = action.payload;
     }
   },
   extraReducers: builder => {
@@ -180,11 +194,33 @@ export const progressPageSlice = createSlice({
       .addCase(fetchUserEvaluation.rejected, (state, action) => {
         state.workflowEvaluation.loading = false;
         state.workflowEvaluation.error = action.error.message || 'Error while fetching data';
+      })
+      .addCase(fetchAllExperiments.fulfilled, (state, action) => {
+        state.experiments.data = action.payload;
+        state.experiments.loading = false;
+        state.experiments.error = null;
+      })
+      .addCase(fetchAllExperiments.pending, state => {
+        state.experiments.loading = true;
+      })
+      .addCase(fetchAllExperiments.rejected, (state, action) => {
+        state.experiments.loading = false;
+        state.experiments.error =
+          action.error.message || 'Error while fetching data';
       });
   },
 });
 
 // Thunk Calls for Experiment/Workflows fetching
+
+export const fetchAllExperiments = createAsyncThunk(
+  'progressPage/fetch_all_experiments',
+  async () => {
+    const res = await experimentApi.get('');
+
+    return res.data;
+  }
+);
 
 export const fetchExperiment = createAsyncThunk(
   'progressPage/fetch_experiment',
@@ -227,7 +263,7 @@ export const workflowsReordering = createAsyncThunk(
 // TODO: create this once state changes done
 export const stateController = createAsyncThunk(
   'progressPage/state_controller',
-  async (payload: { experimentId: string; runId: string; action: string }) => {
+  async (payload: { experimentId: string | null; runId: string | null; action: string }) => {
     return experimentApi
       .post<string>('/life-cycle', payload)
       .then(response => response.data);
@@ -252,7 +288,9 @@ export const fetchUserEvaluation = createAsyncThunk(
 export const {
   setProgressBarData,
   setIntialization,
-  setMenuOptions
+  setMenuOptions,
+  setWorkflowsData,
+  setExperimentStatus
 } = progressPageSlice.actions;
 
 export default progressPageSlice.reducer;
