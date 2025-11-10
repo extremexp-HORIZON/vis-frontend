@@ -141,10 +141,15 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    mapRef.current = L.map(containerRef.current, { zoomControl: true });
+    mapRef.current = L.map(containerRef.current, { 
+      zoomControl: true,
+      attributionControl: false,
+    });
 
     // base tiles
-    L.tileLayer(tilesUrl).addTo(mapRef.current);
+    L.tileLayer(tilesUrl, {
+      attribution: '',
+    }).addTo(mapRef.current);
 
     // title badge (use class-style control to satisfy TS)
     if (title) {

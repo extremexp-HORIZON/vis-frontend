@@ -100,10 +100,14 @@ const MapChart = () => {
 
     leafletMapRef.current = L.map(mapRef.current, {
       preferCanvas: true,
+      attributionControl: false,
     }).setView([38.015, 23.834], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '',
+    }).addTo(
       leafletMapRef.current,
     );
+
 
     markerLayerRef.current = L.layerGroup().addTo(leafletMapRef.current);
     rendererRef.current = L.canvas({ padding: 0.5 }); // shared canvas renderer
