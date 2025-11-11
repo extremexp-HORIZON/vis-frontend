@@ -1,6 +1,5 @@
 import { Handler } from 'vega-tooltip';
 import type { IRun } from '../../../shared/models/experiment/run.model';
-import type { RootState } from '../../../store/store';
 
 interface ExperimentExplainabilityTooltipProps {
   workflowIds: string[];
@@ -156,7 +155,8 @@ export const createExperimentExplainabilityTooltipHandler = ({
         <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">
           ${selectedFeature ? `<div><strong>${sanitize(selectedFeature)}:</strong> ${sanitize(xValue)}</div>` : ''}
           ${selectedFeature2 ? `<div><strong>${sanitize(selectedFeature2)}:</strong> ${sanitize(yValue)}</div>` : ''}
-          ${zValue ? `<div><strong>Average Prediction:</strong> ${sanitize(zValue)}</div>` : ''}
+          ${!selectedFeature2 && yValue ? `<div><strong>${sanitize(yAxisName)}</strong> ${sanitize(Number(yValue).toFixed(4))}</div>` : ''}
+          ${zValue ? `<div><strong>Value:</strong> ${sanitize(zValue)}</div>` : ''}
         </div>
       `;
 
@@ -238,57 +238,57 @@ export const createExperimentExplainabilityTooltipHandler = ({
         titleText = `All Workflows (${workflowIds.length}):`;
       }
 
-    const compareButton = filteredWorkflowIds.length > 0 ? `
-      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0; text-align: center;">
-        <a 
-          href="${compareLink}"
-          target="_blank"
-          rel="noopener noreferrer"
-          style="
-            display: inline-block;
-            background-color: #1976d2;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-          "
-          onclick='
-            (function(event) {
-              event.preventDefault(); // ensure we save before navigating
-              const DEFAULT_TTL = 10 * 60 * 1000; // 10 minutes
-              function setCache(key, data, ttl = DEFAULT_TTL) {
-                const payload = { data: data, expires: Date.now() + ttl };
-                localStorage.setItem(key, JSON.stringify(payload));
-              }
-              const compareData = ${JSON.stringify({ workflowIds: filteredWorkflowIds })};
-              setCache("${compareKey}", compareData);
-    
-              // open after saving
-              window.open("${compareLink}", "_blank", "noopener,noreferrer");
-            })(event);
-          '
-        >
-          Compare ${filteredWorkflowIds.length} Workflow${filteredWorkflowIds.length > 1 ? 's' : ''}
-        </a>
-      </div>
-    ` : '';
-
       return `
-        <div style="max-width: 800px; max-height: 400px; overflow: auto; white-space: normal;">
+        <div style="max-width: 800px; max-height: 400px; white-space: normal; display:flex; flex-direction:column;">
           ${header}
           <div style="font-size: 12px; margin-top: 8px;">
             <strong>${titleText}</strong>
           </div>
-          <table style="border-collapse:collapse; margin-top:6px; font-size:11px; width:100%;">
-            <thead>
-              <tr style="border-bottom: 1px solid #e0e0e0;">${headerCells}</tr>
-            </thead>
-            <tbody>${body}</tbody>
-          </table>
-          ${compareButton}
+
+          <div style="margin-top:6px; flex:1 1 auto; overflow:auto; border:1px solid #e0e0e0; border-radius:4px;">
+            <table style="border-collapse:collapse; font-size:11px; width:max-content; min-width:100%;">
+              <thead>
+                <tr style="border-bottom: 1px solid #e0e0e0;">${headerCells}</tr>
+              </thead>
+              <tbody>${body}</tbody>
+            </table>
+          </div>
+
+          ${filteredWorkflowIds.length > 0 ? `
+            <div style="flex:0 0 auto; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0; text-align: center;">
+              <a 
+                href="${compareLink}"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display: inline-block;
+                  background-color: #1976d2;
+                  color: white;
+                  padding: 6px 12px;
+                  border-radius: 4px;
+                  text-decoration: none;
+                  font-size: 12px;
+                  font-weight: 500;
+                  cursor: pointer;
+                "
+                onclick='
+                  (function(event) {
+                    event.preventDefault(); // ensure we save before navigating
+                    const DEFAULT_TTL = 10 * 60 * 1000; // 10 minutes
+                    function setCache(key, data, ttl = DEFAULT_TTL) {
+                      const payload = { data: data, expires: Date.now() + ttl };
+                      localStorage.setItem(key, JSON.stringify(payload));
+                    }
+                    const compareData = ${JSON.stringify({ workflowIds: filteredWorkflowIds })};
+                    setCache("${compareKey}", compareData);
+                    window.open("${compareLink}", "_blank", "noopener,noreferrer");
+                  })(event);
+                '
+              >
+                Compare ${filteredWorkflowIds.length} Workflow${filteredWorkflowIds.length > 1 ? 's' : ''}
+              </a>
+            </div>
+          ` : ''}
         </div>
       `;
     }

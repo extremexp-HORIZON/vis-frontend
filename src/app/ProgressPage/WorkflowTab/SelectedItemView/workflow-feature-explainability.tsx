@@ -8,13 +8,14 @@ import FeatureImportancePlot from '../../../Tasks/ModelAnalysisTask/plots/featur
 import AttributionHeatmaps from '../../../Tasks/ModelAnalysisTask/plots/attribution-heatmap';
 import ShapPlot from '../../../Tasks/ModelAnalysisTask/plots/shap-plot';
 import { RootState, useAppSelector } from '../../../../store/store';
+import { IDataAsset } from '../../../../shared/models/experiment/data-asset.model';
 
 const FeatureExplainability = () => {
     const { tab } = useAppSelector((state: RootState) => state.workflowPage);
 
   // Check if any data asset has name "model.pt"
   const hasModelPt = tab?.workflowConfiguration.dataAssets?.some(
-    (asset: any) => asset.name === "model.pt"
+    asset => asset.name === "model.pt"
   );
   
   const isSpecialExperiment = hasModelPt || tab?.workflowId === "KvJ97JkBYAWZyMn0wGW2";
