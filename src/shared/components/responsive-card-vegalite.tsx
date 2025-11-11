@@ -46,7 +46,7 @@ interface ResponsiveCardVegaLiteProps {
   isStatic?: boolean // If true, means the chart will be inside a static panel
   details?: string | null
   loading?: boolean
-  title?: string
+  title?: React.ReactNode;
   showSettings?: boolean;
   tooltip?: Parameters<typeof VegaLite>[0]['tooltip'];
 }

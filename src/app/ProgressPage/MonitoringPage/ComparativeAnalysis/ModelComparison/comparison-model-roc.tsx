@@ -8,6 +8,7 @@ import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { fetchComparativeRocCurve } from '../../../../../store/slices/monitorPageSlice';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
   const { workflowsTable, comparativeModelRocCurve } = useAppSelector(
@@ -29,14 +30,19 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
     });
   }, [selectedWorkflowIds, experimentId]);
 
+
   const renderCharts = selectedWorkflowIds.map((runId) => {
     const rocState = comparativeModelRocCurve[runId];
+
+    const titleNode = (
+      <Link to={`/${experimentId}/workflow?workflowId=${runId}`}>{runId}</Link>
+    );
 
     // Handle loading and error states
     if (!rocState || rocState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <Loader />
           </ResponsiveCardTable>
         </Grid>
@@ -46,7 +52,7 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
     if (rocState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <InfoMessage
               message={rocState.error}
               type="info"
@@ -65,7 +71,7 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
     if (!dataRaw || !dataRaw.fpr || !dataRaw.tpr) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <InfoMessage
               message={'No roc curve data available'}
               type="info"
@@ -176,7 +182,7 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
           isStatic={false}
           showSettings={false}
 
-          title={runId}
+          title={titleNode}
           sx={{ width: '100%', maxWidth: '100%' }}
         />
       </Grid>

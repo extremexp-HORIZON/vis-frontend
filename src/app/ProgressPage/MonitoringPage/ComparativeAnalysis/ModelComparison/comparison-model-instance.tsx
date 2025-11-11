@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { fetchComparativeModelInstances, setComparativeModelInstanceControlPanel } from '../../../../../store/slices/monitorPageSlice';
 import type { TestInstance } from '../../../../../shared/models/tasks/model-analysis.model';
 import { getClassColorMap } from '../../../../../shared/utils/colorUtils';
+import { Link } from 'react-router-dom';
 
 const ComparisonModelInstance = ({
   isMosaic,
@@ -102,11 +103,15 @@ const ComparisonModelInstance = ({
   const renderCharts = selectedWorkflowIds.map((runId) => {
     const instanceState = comparativeModelInstance[runId];
 
+    const titleNode = (
+        <Link to={`/${experimentId}/workflow?workflowId=${runId}`}>{runId}</Link>
+    );
+
     // Handle loading and error states
     if (!instanceState || instanceState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <Loader />
           </ResponsiveCardTable>
         </Grid>
@@ -116,7 +121,7 @@ const ComparisonModelInstance = ({
     if (instanceState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <InfoMessage
               message={instanceState.error}
               type="info"
@@ -135,7 +140,7 @@ const ComparisonModelInstance = ({
     if (!dataRaw) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <InfoMessage
               message={'No instance data available'}
               type="info"
@@ -283,7 +288,7 @@ const ComparisonModelInstance = ({
           spec={confusionMatrixSpec}
           actions={false}
           isStatic={false}
-          title={runId}
+          title={titleNode}
           sx={{ width: '100%', maxWidth: '100%' }}
           showSettings={false}
         />

@@ -12,7 +12,7 @@ import Loader from '../../../../../shared/components/loader';
 // };
 
 type PreviewImageCardProps = {
-  title: string;
+  title: React.ReactNode;
   fileNames: string | string[] | undefined;
 };
 
@@ -99,7 +99,7 @@ export default function PreviewImageCard({ title, fileNames }: PreviewImageCardP
               key={imageSrc}
               ref={imageRef}
               src={imageSrc}
-              alt={title || 'Preview'}
+              alt={'Preview'}
               onLoad={() => setLoaded(true)}
               onError={() => setHasError(true)}
               style={{
