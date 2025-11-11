@@ -12,6 +12,7 @@ import type { VisualColumn } from '../../../../shared/models/dataexploration.mod
 import OverlayHistogram from './DataComparison/overlay-histogram';
 import Loader from '../../../../shared/components/loader';
 import PreviewImageCard from './DataComparison/preview-image-card';
+import { Link } from 'react-router-dom';
 
 const ComparisonDataCharts = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(
@@ -265,15 +266,17 @@ const ComparisonDataCharts = () => {
             const meta = dataAssetsMetaData?.[selectedDataset!]?.[workflowId]?.meta;
             const fileNames = meta?.data?.fileNames; // string | string[] | undefined
 
-            const title =
-              dataAsset?.name
-                ? `${dataAsset.name} — ${workflowId}`
-                : `Workflow ${workflowId}`;
+            const titleNode = (
+              <>
+                {dataAsset?.name ? dataAsset.name : 'Workflow'} —{' '}
+                <Link to={`/${experimentId}/workflow?workflowId=${workflowId}`}>{workflowId}</Link>
+              </>
+            );
 
             return (
               <Grid item xs={6} key={`${selectedDataset}-${workflowId}`}>
                 <PreviewImageCard
-                  title={title}
+                  title={titleNode}
                   fileNames={fileNames}
                 />
               </Grid>

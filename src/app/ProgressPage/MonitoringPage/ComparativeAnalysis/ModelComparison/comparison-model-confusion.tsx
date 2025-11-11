@@ -8,6 +8,7 @@ import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useEffect } from 'react';
 import { fetchComparativeConfusionMatrix } from '../../../../../store/slices/monitorPageSlice';
+import { Link } from 'react-router-dom';
 
 const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
   const { workflowsTable, comparativeModelConfusionMatrix } = useAppSelector(
@@ -50,11 +51,15 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
   const renderCharts = selectedWorkflowIds.map((runId) => {
     const matrixState = comparativeModelConfusionMatrix[runId];
 
+    const titleNode = (
+        <Link to={`/${experimentId}/workflow?workflowId=${runId}`}>{runId}</Link>
+    );
+
     // Handle loading and error states
     if (!matrixState || matrixState.loading) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <Loader />
           </ResponsiveCardTable>
         </Grid>
@@ -64,7 +69,7 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
     if (matrixState.error) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <InfoMessage
               message={matrixState.error}
               type="info"
@@ -83,7 +88,7 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
     if (!dataRaw || !dataRaw.labels || !dataRaw.matrix) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
-          <ResponsiveCardTable title={runId} minHeight={400} showSettings={false}>
+          <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
             <InfoMessage
               message={'No confusion matrix data available'}
               type="info"
@@ -142,7 +147,7 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
           spec={confusionMatrixSpec}
           actions={false}
           isStatic={false}
-          title={runId}
+          title={titleNode}
           sx={{ width: '100%', maxWidth: '100%' }}
           showSettings={false}
         />
