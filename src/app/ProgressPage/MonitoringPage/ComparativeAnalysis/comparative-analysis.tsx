@@ -24,7 +24,8 @@ const ComparativeAnalysis = () => {
   const hasExplainability = useMemo(() => {
     if(workflows.data.every(workflow => !workflow.tasks)) return true;
 
-    return workflows.data.some(workflow => workflow.tasks?.some(t => typeof t.name === 'string' && /explainability/i.test(t.name)));
+    return workflows.data.some(workflow => workflow.tasks?.some(t => typeof t.name === 'string' && /explainability/i.test(t.name)))
+    && !workflows.data.some(workflow => workflow.dataAssets?.some(asset => asset.name === "model.pt"));
   }, [workflows]);
 
   useEffect(() => {
