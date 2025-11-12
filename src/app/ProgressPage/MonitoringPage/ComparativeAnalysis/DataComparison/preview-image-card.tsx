@@ -5,11 +5,11 @@ import ResponsiveCardTable from '../../../../../shared/components/responsive-car
 import InfoMessage from '../../../../../shared/components/InfoMessage';
 import Loader from '../../../../../shared/components/loader';
 
-// const normalizePath = (path?: string | string[]): string => {
-//   if (!path) return '';
-//   const s = Array.isArray(path) ? path.join(',') : path;
-//   return s.replace(/\\/g, '/');
-// };
+const normalizePath = (path?: string | string[]): string => {
+  if (!path) return '';
+  const s = Array.isArray(path) ? path.join(',') : path;
+  return s.replace(/\\/g, '/');
+};
 
 type PreviewImageCardProps = {
   title: React.ReactNode;
@@ -22,8 +22,8 @@ export default function PreviewImageCard({ title, fileNames }: PreviewImageCardP
   const [hasError, setHasError] = useState(false);
   const baseApi = 'http://localhost:8080/api/data/file?path=';
 
-  // const fileName = normalizePath(fileNames);
-  const imageSrc = fileNames ? `${baseApi}${fileNames}` : '';
+  const fileName = normalizePath(fileNames);
+  const imageSrc = fileName ? `${baseApi}${fileName}` : '';
 
   useEffect(() => {
     setLoaded(false);
