@@ -59,7 +59,7 @@ export interface IModelAnalysis {
   featureImportance: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
   shap: { data: IPlotModel | null; loading: boolean; error: string | null; latestRequestId?: string;}
   shapValues: { data: IPlotModel | null; loading: boolean; error: string | null; }
-  segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; latestRequestId?: string; }
+  segmentation: {data: IPlotModel | null; loading: boolean; error: string | null; selectedFeature: string | null; selectedTime: string | null; latestRequestId?: string; selectedInstance: string | null; }
   counterfactuals: {
     data: IPlotModel | null
     loading: boolean
@@ -129,7 +129,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   featureImportance: { data: null, loading: false, error: null },
   shap: { data: null, loading: false, error: null },
   shapValues: { data: null, loading: false, error: null },
-  segmentation: { data: null, loading: false, error: null, selectedFeature: null, selectedTime: null },
+  segmentation: { data: null, loading: false, error: null, selectedFeature: null, selectedTime: null, selectedInstance:  null },
   counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals_control_panel: { cfMethod: 'Dice', actionChoiceStrategy: 'max-eff', gcfSize: 3 },

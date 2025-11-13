@@ -387,7 +387,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     const onWindowClick = (e: MouseEvent) => {
       if (performance.now() < suppressUntil) return;
       if (pinnedWrap && pinnedWrap.contains(e.target as Node)) return; // ignore clicks in pinned
-      if (!container.contains(e.target as Node)) return;               // only clicks in chart area
+      if (!container.contains(e.target as Node)) closePinned();
 
       const tip = pickLiveTip();
 

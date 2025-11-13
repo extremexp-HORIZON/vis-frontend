@@ -45,7 +45,7 @@ export interface HeatMapLeafletProps {
 const DEFAULT_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 // ----- helpers: legend control (class-style, TS-safe) -----
-const createLegendControl = (position: L.ControlPosition = 'topright') => {
+const createLegendControl = (position: L.ControlPosition = 'topright', cssGradient: string) => {
   const legend = new L.Control({ position });
 
   (legend as any).onAdd = function () {
@@ -56,6 +56,7 @@ const createLegendControl = (position: L.ControlPosition = 'topright') => {
     div.style.borderRadius = '8px';
     div.style.boxShadow = '0 0 6px rgba(0,0,0,0.25)';
     div.style.fontSize = '12px';
+    div.style.minWidth = '150px'
     div.innerHTML = `
       <div class="legend-title" style="font-weight:600"></div>
       <div class="legend-range"></div>
@@ -64,7 +65,7 @@ const createLegendControl = (position: L.ControlPosition = 'topright') => {
     return div;
   };
 
-  (legend as any).update = (label: string, min: number, max: number, decimals = 5) => {
+  (legend as any).update = (label: string, min: number, max: number, cssGradient: string, decimals = 5) => {
     const container = (legend as any)._container as HTMLElement | undefined;
 
     if (!container) return;
@@ -72,10 +73,25 @@ const createLegendControl = (position: L.ControlPosition = 'topright') => {
     const range = container.querySelector('.legend-range') as HTMLElement | null;
 
     if (title) title.textContent = label;
-    if (range) range.textContent = `min: ${min.toFixed(decimals)}  |  max: ${max.toFixed(decimals)}`;
+    if (range && min === max)
+      range.innerHTML = `
+              <div style="color: gray;">Unique value</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                <div style="width:24px;height:12px;background:${cssGradient};border-radius:2px;"></div>
+                <span>${min?.toFixed(decimals)}</span>
+              </div>
+            `;
+    else if (range)
+      range.innerHTML = `
+        <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>${min?.toFixed(decimals)}</span>
+          <span>${max?.toFixed(decimals)}</span>
+        </div>
+      `;
   };
 
-  return legend as L.Control & { update: (label: string, min: number, max: number, decimals?: number) => void };
+  return legend as L.Control & { update: (label: string, min: number, max: number, cssGradient: string, decimals?: number) => void };
 };
 
 // ----- helpers: intensity scaling to make near-zero visible -----
@@ -125,7 +141,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const heatRef = useRef<L.Layer | null>(null);
-  const legendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, d?: number) => void }) | null>(null);
+  const legendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
 
   // Precompute heat data + bounds
   const { heatData, vMin, vMax, bounds } = useMemo(() => {
@@ -136,6 +152,25 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
     return { heatData: heat, vMin: min, vMax: max, bounds: b };
   }, [points, minIntensity, gamma]);
+
+  const legendGradientRef = useRef<Record<number, string> | null>(null);
+
+  const DEFAULT_HEAT_GRADIENT: Record<number, string> = useMemo(() => ({
+    0.0: '#0000ff',
+    0.25: '#00ffff',
+    0.5: '#00ff00',
+    0.75: '#ffff00',
+    1.0: '#ff0000',
+  }), []);
+
+  const gradientToCss = (stops: Record<number, string>) => {
+    const entries = Object.entries(stops)
+      .map(([k, v]) => [parseFloat(k), v] as [number, string])
+      .sort((a, b) => a[0] - b[0]);
+    const cssStops = entries.map(([p, c]) => `${c} ${Math.round(p * 100)}%`);
+
+    return `linear-gradient(to right, ${cssStops.join(', ')})`;
+  };
 
   // init map once
   useEffect(() => {
@@ -186,6 +221,8 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
     if (!m) return;
 
+    const gradientUsed = DEFAULT_HEAT_GRADIENT;
+
     // heat
     if (heatRef.current) {
       heatRef.current.remove();
@@ -195,8 +232,9 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       radius,
       blur,
       maxZoom,
-      ...(gradient ? { gradient } : {}),
+      gradient: gradientUsed
     });
+    legendGradientRef.current = gradientUsed;
     heatRef.current?.addTo(m);
 
     // legend
@@ -204,10 +242,11 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       legendRef.current.remove();
       legendRef.current = null;
     }
-    const lg = createLegendControl('topright');
+    const cssGradient = gradientToCss(legendGradientRef.current || DEFAULT_HEAT_GRADIENT);
+    const lg = createLegendControl('topright', cssGradient);
 
     lg.addTo(m);
-    lg.update(legendLabel, vMin, vMax, decimals);
+    lg.update(legendLabel, vMin, vMax, cssGradient, decimals);
     legendRef.current = lg;
 
     // fit bounds to data

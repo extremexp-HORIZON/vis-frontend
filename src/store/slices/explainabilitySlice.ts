@@ -54,6 +54,10 @@ export const setSelectedTime = createAction<{
   plotType: keyof IModelAnalysis;
   time: string;
 }>('explainability/set_selected_time');
+export const setSelectedInstance = createAction<{
+  plotType: keyof IModelAnalysis;
+  instance: string;
+}>('explainability/set_selected_insatnce');
 
 export const setSelectedFeatures2D = createAction<{
   feature1: string;
@@ -126,10 +130,15 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
           section.selectedFeature1 = action.payload.features.feature1;
           section.selectedFeature2 = action.payload.features.feature2;
         }
-        if ('selectedTime' in section && !section.selectedTime) {
+        if ('selectedTime' in section) {
           const times = action.payload.featuresTable?.time?.values ?? action.payload.attributionsTable?.time?.values ?? [];
 
           section.selectedTime = times.length ? String(times[0]) : null;
+        }
+        if('selectedInstance' in section && !section.selectedInstance) {
+          const instances = action.payload.availableIndices ?? [];
+
+          section.selectedInstance = instances.length ? String(instances[0]) : null;
         }
         assignResult(section, action.payload);
       }
@@ -268,6 +277,18 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
         if ('selectedTime' in section) {
           section.selectedTime = time;
+        }
+      }
+    })
+    .addCase(setSelectedInstance, (state, action) => {
+      const task = state.tab?.workflowTasks.modelAnalysis;
+      const { plotType, instance } = action.payload;
+
+      if (task && plotType !== 'featureNames' && plotType in task) {
+        const section = task[plotType];
+
+        if ('selectedInstance' in section) {
+          section.selectedInstance = instance;
         }
       }
     });

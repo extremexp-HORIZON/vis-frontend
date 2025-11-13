@@ -79,7 +79,7 @@ export const explainabilityQueryDefault: ExplainabilityQuery = {
   gcf_size: 0,
   cfGenerator: '',
   clusterActionChoiceAlgo: '',
-  instance_index: 13,
+  instance_index: 0,
   experiment_configs: {},
   target_metric: ''
 };

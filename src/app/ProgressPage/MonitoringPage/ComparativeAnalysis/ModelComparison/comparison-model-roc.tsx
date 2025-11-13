@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Grid, Tooltip } from '@mui/material';
 import type { RootState } from '../../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../../store/store';
 import Loader from '../../../../../shared/components/loader';
@@ -9,6 +9,7 @@ import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { fetchComparativeRocCurve } from '../../../../../store/slices/monitorPageSlice';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import TitleTooltip from '../title-tooltip';
 
 const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
   const { workflowsTable, comparativeModelRocCurve } = useAppSelector(
@@ -34,8 +35,22 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
   const renderCharts = selectedWorkflowIds.map((runId) => {
     const rocState = comparativeModelRocCurve[runId];
 
+    const titleTooltip = <TitleTooltip workflowId={runId} />
+
     const titleNode = (
-      <Link to={`/${experimentId}/workflow?workflowId=${runId}`}>{runId}</Link>
+      <Tooltip 
+        title={titleTooltip}
+        slotProps={{
+          tooltip: {
+            sx: {
+              backgroundColor: "#ffff",
+              maxWidth:'2000px'
+            },
+          },
+        }}
+      >
+        <Link to={`/${experimentId}/workflow?workflowId=${runId}`}>{runId}</Link>
+      </Tooltip>
     );
 
     // Handle loading and error states

@@ -6,6 +6,12 @@ import InfoMessage from '../../../../../shared/components/InfoMessage';
 import Loader from '../../../../../shared/components/loader';
 import { getToken } from '../../../../../store/slices/authSlice';
 
+const normalizePath = (path?: string | string[]): string => {
+  if (!path) return '';
+  const s = Array.isArray(path) ? path.join(',') : path;
+  return s.replace(/\\/g, '/');
+};
+
 type PreviewImageCardProps = {
   title: string;
   fileNames: string | string[] | undefined;
@@ -19,6 +25,8 @@ export default function PreviewImageCard({ title, fileNames }: PreviewImageCardP
   const baseApi = '/api/data/file?path=';
 
   const path = Array.isArray(fileNames) ? fileNames[0] : fileNames;
+  const fileName = normalizePath(fileNames);
+  const imageSrc = fileName ? `${baseApi}${fileName}` : '';
 
   useEffect(() => {
     setLoaded(false);

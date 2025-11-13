@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import type { IPlotModel, ITableContents } from '../../../../shared/models/plotmodel.model';
-import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature, setSelectedTime } from '../../../../store/slices/explainabilitySlice';
+import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature, setSelectedInstance, setSelectedTime } from '../../../../store/slices/explainabilitySlice';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import { ThemeProvider } from '@emotion/react';
 
@@ -79,6 +79,7 @@ const AttributionHeatmaps: React.FC = () => {
   const plotSlice = tab?.workflowTasks.modelAnalysis?.segmentation;
   const selectedFeature = plotSlice?.selectedFeature ?? '';
   const selectedTime = plotSlice?.selectedTime ?? '';
+  const selectedInstance = plotSlice?.selectedInstance ?? '';
 
   useEffect(() => {
     if (!tab || !experimentId || !isTabInitialized) return;
@@ -108,8 +109,28 @@ const AttributionHeatmaps: React.FC = () => {
     dispatch(setSelectedTime({ plotType: 'segmentation', time: val }));
   };
 
+  const handleInstanceChange = (val: string) => {
+    dispatch(setSelectedInstance({plotType: 'segmentation', instance: val}));
+    dispatch(
+      fetchModelAnalysisExplainabilityPlot({
+        query: {
+          ...explainabilityQueryDefault,
+          explanation_type: 'featureExplanation',
+          explanation_method: 'segmentation',
+          instance_index: Number(val)
+        },
+        metadata: {
+          workflowId: tab?.workflowId || '',
+          queryCase: 'segmentation',
+          experimentId: experimentId || '',
+        },
+      })
+    );
+  };
+
   const featureOptions = useMemo(() => featureCandidates(plotModel), [plotModel]);
   const timeOptions = useMemo(() => distinctTimes(plotModel?.featuresTable), [plotModel]);
+  const instanceOptions = useMemo(() => plotModel?.availableIndices ?? [], [plotModel]);
   const [radius, setRadius] = useState<number>(18);
 
   // map points (lat=y, lon=x)
@@ -127,6 +148,19 @@ const AttributionHeatmaps: React.FC = () => {
   const controlPanel = (
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
       <FormControl fullWidth>
+        <InputLabel id='instace-select-label'>Instance</InputLabel>
+        <Select
+          labelId="instace-select-label"
+          label='Instance'
+          value={selectedInstance}
+          onChange={e => handleInstanceChange(e.target.value)}
+          MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
+          disabled={!!plotSlice?.loading}
+        >
+          {instanceOptions.map(instance =>(<MenuItem key={`instance-${instance}`} value={instance}>{String(instance)}</MenuItem>))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth >
         <InputLabel id="feature-select-label">Feature</InputLabel>
         <Select
           labelId="feature-select-label"
@@ -171,6 +205,7 @@ const AttributionHeatmaps: React.FC = () => {
             min={10}
             step={1}
             max={50}
+            disabled={!timeOptions.length || !!plotSlice?.loading}
           />
         </ThemeProvider>
       </FormControl>
@@ -225,7 +260,7 @@ const AttributionHeatmaps: React.FC = () => {
           <ResponsiveCardTable
             title="Feature"
             details={plotModel?.plotDescr || null}
-            controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
+            controlPanel={controlPanel}
             showDownloadButton
             showFullScreenButton
             minHeight={400}
@@ -243,7 +278,7 @@ const AttributionHeatmaps: React.FC = () => {
           <ResponsiveCardTable
             title="Attribution"
             details={plotModel?.plotDescr || null}
-            controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
+            controlPanel={controlPanel}
             showDownloadButton
             showFullScreenButton
             minHeight={400}
