@@ -265,7 +265,7 @@ const GlovesScatter = ({
   //     ],
   //   });
 
-  const controlPanel = (
+  const ControlPanel = ({chartType}: {chartType: string | null}) => (
     <Box
       className="panel"
       sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}
@@ -324,35 +324,37 @@ const GlovesScatter = ({
           ))}
         </Select>
       </FormControl>
-      <FormControl
-        variant="outlined"
-        fullWidth
-      >
-        <InputLabel>Apply</InputLabel>
-        <Select
-          value={colorField}
-          onChange={e => setColorField(e.target.value)}
-          label="Apply"
-          MenuProps={{
-            PaperProps: {
-              style: {
-                maxHeight: 250,
-                maxWidth: 300,
-              },
-            },
-          }}
+      {chartType === 'affectedClusters' && (
+        <FormControl
+          variant="outlined"
+          fullWidth
         >
-          {colorOptions.map(option => {
-            // Extract the part before "_Prediction"
-            const displayText = option.replace(/_Prediction$/, '');
-            return (
-              <MenuItem key={option} value={option}>
-                {displayText}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </FormControl>
+          <InputLabel>Apply</InputLabel>
+          <Select
+            value={colorField}
+            onChange={e => setColorField(e.target.value)}
+            label="Apply"
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 250,
+                  maxWidth: 300,
+                },
+              },
+            }}
+          >
+            {colorOptions.map(option => {
+              // Extract the part before "_Prediction"
+              const displayText = option.replace(/_Prediction$/, '');
+              return (
+                <MenuItem key={option} value={option}>
+                  {displayText}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+      )}
       <Box display="flex" alignItems="center">
         <Typography
           variant="caption"
@@ -374,7 +376,7 @@ const GlovesScatter = ({
     <>
       {dimensionalityReduction ? (
         <Box  sx={{ alignItems: 'center', justifyContent: 'center', mt: 2 }} >
-          <UmapComponent data1={data1} data2={data2} colorField={colorField} controlPanel={controlPanel} />
+          <UmapComponent data1={data1} data2={data2} colorField={colorField} controlPanel={ControlPanel} />
         </Box>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -388,7 +390,7 @@ const GlovesScatter = ({
                   spec={spec(transformData(data1))}
                   isStatic={false}
                   maxHeight={400}
-                  controlPanel={controlPanel}
+                  controlPanel={<ControlPanel chartType={null} />}
                 />
               </Grid>
 
@@ -400,7 +402,7 @@ const GlovesScatter = ({
                   spec={spec(transformData(data2.appliedAffectedActions))}
                   isStatic={false}
                   maxHeight={400}
-                  controlPanel={controlPanel}
+                  controlPanel={<ControlPanel chartType={null} />}
                 />
               </Grid>
             </Grid>
@@ -415,7 +417,7 @@ const GlovesScatter = ({
                 spec={Colorspec(transformData(data1))}
                 isStatic={false}
                 maxHeight={400}
-                controlPanel={controlPanel}
+                controlPanel={<ControlPanel chartType='affectedClusters' />}
               />
             </Box>
           )}

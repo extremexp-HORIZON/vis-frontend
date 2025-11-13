@@ -14,10 +14,10 @@ interface UmapComponentProps {
   data1: Record<string, DataField>
   data2: { appliedAffectedActions: Record<string, DataField> }
   colorField: string
-  controlPanel: React.ReactNode
+  controlPanel: React.ComponentType<{ chartType: string | null }> 
 }
 
-const UmapComponent = ({ data1, data2, colorField, controlPanel }: UmapComponentProps) => {
+const UmapComponent = ({ data1, data2, colorField, controlPanel: ControlPanel }: UmapComponentProps) => {
   logger.log('colorField', colorField);
   const [umapResults, setUmapResults] = useState<{
     umap1: number[][] | null
@@ -277,7 +277,7 @@ const UmapComponent = ({ data1, data2, colorField, controlPanel }: UmapComponent
               spec={spec(createScatterData(umapResults.umap1))}
               isStatic={false}
               maxHeight={400}
-              controlPanel={controlPanel}
+              controlPanel={<ControlPanel chartType={null} />}
             />
           </Grid>
 
@@ -289,7 +289,7 @@ const UmapComponent = ({ data1, data2, colorField, controlPanel }: UmapComponent
               spec={spec(createScatterData(umapResults.umap2))}
               isStatic={false}
               maxHeight={400}
-              controlPanel={controlPanel}
+              controlPanel={<ControlPanel chartType={null} />}
             />
           </Grid>
         </Grid>
@@ -303,7 +303,7 @@ const UmapComponent = ({ data1, data2, colorField, controlPanel }: UmapComponent
             details={'UMAP plot colored by prediction values'}
             isStatic={false}
             maxHeight={400}
-            controlPanel={controlPanel}
+            controlPanel={<ControlPanel chartType='affectedClusters' />}
           />
         </Box>
       }
