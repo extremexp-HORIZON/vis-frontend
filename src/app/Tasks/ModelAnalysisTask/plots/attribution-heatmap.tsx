@@ -278,7 +278,7 @@ const AttributionHeatmaps: React.FC = () => {
           <ResponsiveCardTable
             title="Attribution"
             details={plotModel?.plotDescr || null}
-            controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
+            controlPanel={controlPanel}
             showDownloadButton
             showFullScreenButton
             minHeight={400}
