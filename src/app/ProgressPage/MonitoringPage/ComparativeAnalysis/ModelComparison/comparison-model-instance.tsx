@@ -1,4 +1,4 @@
-import {  Box, Grid } from '@mui/material';
+import {  Box, Grid, Tooltip } from '@mui/material';
 import type { RootState } from '../../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../../store/store';
 import Loader from '../../../../../shared/components/loader';
@@ -11,6 +11,7 @@ import { fetchComparativeModelInstances, setComparativeModelInstanceControlPanel
 import type { TestInstance } from '../../../../../shared/models/tasks/model-analysis.model';
 import { getClassColorMap } from '../../../../../shared/utils/colorUtils';
 import { Link } from 'react-router-dom';
+import TitleTooltip from '../title-tooltip';
 
 const ComparisonModelInstance = ({
   isMosaic,
@@ -103,8 +104,22 @@ const ComparisonModelInstance = ({
   const renderCharts = selectedWorkflowIds.map((runId) => {
     const instanceState = comparativeModelInstance[runId];
 
+    const titleTooltip = <TitleTooltip workflowId={runId} />
+
     const titleNode = (
+      <Tooltip 
+        title={titleTooltip}
+        slotProps={{
+          tooltip: {
+            sx: {
+              backgroundColor: "#ffff",
+              maxWidth:'2000px'
+            },
+          },
+        }}
+      >
         <Link to={`/${experimentId}/workflow?workflowId=${runId}`}>{runId}</Link>
+      </Tooltip>
     );
 
     // Handle loading and error states

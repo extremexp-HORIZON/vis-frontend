@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
   Grid,
   Container,
+  Tooltip,
 } from '@mui/material';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -13,6 +14,7 @@ import OverlayHistogram from './DataComparison/overlay-histogram';
 import Loader from '../../../../shared/components/loader';
 import PreviewImageCard from './DataComparison/preview-image-card';
 import { Link } from 'react-router-dom';
+import TitleTooltip from './title-tooltip';
 
 const ComparisonDataCharts = () => {
   const { workflowsTable, comparativeDataExploration } = useAppSelector(
@@ -266,10 +268,24 @@ const ComparisonDataCharts = () => {
             const meta = dataAssetsMetaData?.[selectedDataset!]?.[workflowId]?.meta;
             const fileNames = meta?.data?.fileNames; // string | string[] | undefined
 
+            const titleTooltip = <TitleTooltip workflowId={workflowId} />
+
             const titleNode = (
               <>
                 {dataAsset?.name ? dataAsset.name : 'Workflow'} —{' '}
-                <Link to={`/${experimentId}/workflow?workflowId=${workflowId}`}>{workflowId}</Link>
+                <Tooltip 
+                  title={titleTooltip}
+                  slotProps={{
+                    tooltip: {
+                      sx: {
+                        backgroundColor: "#ffff",
+                        maxWidth:'2000px'
+                      },
+                    },
+                  }}
+                >
+                  <Link to={`/${experimentId}/workflow?workflowId=${workflowId}`}>{workflowId}</Link>
+                </Tooltip>
               </>
             );
 
