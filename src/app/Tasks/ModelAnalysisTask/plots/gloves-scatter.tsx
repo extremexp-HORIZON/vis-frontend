@@ -7,10 +7,10 @@ import {
   Box,
   Switch,
   Grid,
+  Typography,
 } from '@mui/material';
 import UmapComponent from './umapComponent';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
-import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 
 interface DataField {
   values: any[]
@@ -265,118 +265,119 @@ const GlovesScatter = ({
   //     ],
   //   });
 
+  const controlPanel = (
+    <Box
+      className="panel"
+      sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}
+    >
+      <FormControl
+        variant="outlined"
+        fullWidth
+        disabled={dimensionalityReduction}
+      >
+        <InputLabel>X-Axis</InputLabel>
+        <Select
+          value={xAxis}
+          title={xAxis}
+          onChange={e => setXAxis(e.target.value)}
+          label="X-Axis"
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 250,
+                maxWidth: 300,
+              },
+            },
+          }}
+        >
+          {options.map(option => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl
+        variant="outlined"
+        fullWidth
+        disabled={dimensionalityReduction}
+      >
+        <InputLabel>Y-Axis</InputLabel>
+        <Select
+          value={yAxis}
+          title={yAxis}
+          onChange={e => setYAxis(e.target.value)}
+          label="Y-Axis"
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 250,
+                maxWidth: 300,
+              },
+            },
+          }}
+        >
+          {options.map(option => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl
+        variant="outlined"
+        fullWidth
+      >
+        <InputLabel>Apply</InputLabel>
+        <Select
+          value={colorField}
+          onChange={e => setColorField(e.target.value)}
+          label="Apply"
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 250,
+                maxWidth: 300,
+              },
+            },
+          }}
+        >
+          {colorOptions.map(option => {
+            // Extract the part before "_Prediction"
+            const displayText = option.replace(/_Prediction$/, '');
+            return (
+              <MenuItem key={option} value={option}>
+                {displayText}
+              </MenuItem>
+            );
+          })}
+        </Select>
+      </FormControl>
+      <Box display="flex" alignItems="center">
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 500,
+          }}
+        >
+          UMAP
+        </Typography>
+        <Switch
+          checked={dimensionalityReduction}
+          onChange={() => setDimensionalityReduction(prev => !prev)}
+        />
+      </Box>
+    </Box>
+  );
+
   return (
     <>
-      <Box
-        className="panel"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginBottom: '20px',
-          flexWrap: 'wrap',
-          marginTop: '20px',
-        }}
-      >
-        <FormControl
-          variant="outlined"
-          style={{ minWidth: 200, marginRight: '20px' }}
-          disabled={dimensionalityReduction}
-        >
-          <InputLabel>X-Axis</InputLabel>
-          <Select
-            value={xAxis}
-            onChange={e => setXAxis(e.target.value)}
-            label="X-Axis"
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                  maxWidth: 300,
-                },
-              },
-            }}
-          >
-            {options.map(option => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl
-          variant="outlined"
-          style={{ minWidth: 200, marginRight: '20px' }}
-          disabled={dimensionalityReduction}
-        >
-          <InputLabel>Y-Axis</InputLabel>
-          <Select
-            value={yAxis}
-            onChange={e => setYAxis(e.target.value)}
-            label="Y-Axis"
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                  maxWidth: 300,
-                },
-              },
-            }}
-          >
-            {options.map(option => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl
-          variant="outlined"
-          style={{ minWidth: 200, marginRight: '20px' }}
-        >
-          <InputLabel>Apply</InputLabel>
-          <Select
-            value={colorField}
-            onChange={e => setColorField(e.target.value)}
-            label="Apply"
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                  maxWidth: 300,
-                },
-              },
-            }}
-          >
-            {colorOptions.map(option => {
-              // Extract the part before "_Prediction"
-              const displayText = option.replace(/_Prediction$/, '');
-
-              return (
-                <MenuItem key={option} value={option}>
-                  {displayText}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-
-        <Box display="flex" alignItems="center">
-          <ReduceCapacityIcon />
-
-          <Switch
-            checked={dimensionalityReduction}
-            onChange={() => setDimensionalityReduction(prev => !prev)}
-          />
-        </Box>
-      </Box>
       {dimensionalityReduction ? (
-        <Box  sx={{ alignItems: 'center', justifyContent: 'center' }} >
-          <UmapComponent data1={data1} data2={data2} colorField={colorField} />
+        <Box  sx={{ alignItems: 'center', justifyContent: 'center', mt: 2 }} >
+          <UmapComponent data1={data1} data2={data2} colorField={colorField} controlPanel={controlPanel} />
         </Box>
       ) : (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
           {data1 && data2 && (
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -387,6 +388,7 @@ const GlovesScatter = ({
                   spec={spec(transformData(data1))}
                   isStatic={false}
                   maxHeight={400}
+                  controlPanel={controlPanel}
                 />
               </Grid>
 
@@ -398,6 +400,7 @@ const GlovesScatter = ({
                   spec={spec(transformData(data2.appliedAffectedActions))}
                   isStatic={false}
                   maxHeight={400}
+                  controlPanel={controlPanel}
                 />
               </Grid>
             </Grid>
@@ -412,6 +415,7 @@ const GlovesScatter = ({
                 spec={Colorspec(transformData(data1))}
                 isStatic={false}
                 maxHeight={400}
+                controlPanel={controlPanel}
               />
             </Box>
           )}
