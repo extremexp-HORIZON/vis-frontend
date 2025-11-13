@@ -10,18 +10,18 @@ export default defineConfig({
     proxy: {
       // "/api": "http://pulsar.imsi.athenarc.gr:9680",
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://vis-api:8080',
       },
       '/experiments': {
-        target: 'http://localhost:8080',
+        target: 'http://vis-api:8080',
       },
       '/auth': {
-        target: 'http://localhost:5521',
+        target: 'http://vis-api:5521',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/auth/, '')
       },
       '/eusome': {
-        target: 'http://localhost:8000',
+        target: 'http://app:8000',
         rewrite: (path) => path.replace(/^\/eusome/, '')
       },
     },
