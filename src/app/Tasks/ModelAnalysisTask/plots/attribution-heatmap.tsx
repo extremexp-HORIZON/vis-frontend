@@ -155,12 +155,12 @@ const AttributionHeatmaps: React.FC = () => {
           value={selectedInstance}
           onChange={e => handleInstanceChange(e.target.value)}
           MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
-          disabled={!featureOptions.length || !!plotSlice?.loading}
+          disabled={!!plotSlice?.loading}
         >
           {instanceOptions.map(instance =>(<MenuItem key={`instance-${instance}`} value={instance}>{String(instance)}</MenuItem>))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+      <FormControl fullWidth >
         <InputLabel id="feature-select-label">Feature</InputLabel>
         <Select
           labelId="feature-select-label"
@@ -205,6 +205,7 @@ const AttributionHeatmaps: React.FC = () => {
             min={10}
             step={1}
             max={50}
+            disabled={!timeOptions.length || !!plotSlice?.loading}
           />
         </ThemeProvider>
       </FormControl>
@@ -259,7 +260,7 @@ const AttributionHeatmaps: React.FC = () => {
           <ResponsiveCardTable
             title="Feature"
             details={plotModel?.plotDescr || null}
-            controlPanel={!plotSlice?.loading && !plotSlice?.error && plotSlice?.data && controlPanel}
+            controlPanel={controlPanel}
             showDownloadButton
             showFullScreenButton
             minHeight={400}

@@ -135,7 +135,7 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
 
           section.selectedTime = times.length ? String(times[0]) : null;
         }
-        if('selectedInstance' in section) {
+        if('selectedInstance' in section && !section.selectedInstance) {
           const instances = action.payload.availableIndices ?? [];
 
           section.selectedInstance = instances.length ? String(instances[0]) : null;
