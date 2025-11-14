@@ -8,7 +8,7 @@ import FilterBar from '../../../../shared/components/filter-bar';
 import { Popover, styled } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { setScheduledTable } from '../../../../store/slices/monitorPageSlice';
 import type { GridColumnNode } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
@@ -455,6 +455,53 @@ export default function ScheduleTable() {
     );
   }, [scheduledTable.filters, scheduledTable.selectedSpaces]);
 
+  const valueSuggestions = useMemo(() => {
+    const valueSets: Record<string, Set<string>> = {};
+    const valueCounts: Record<string, number> = {};
+
+    scheduledTable.rows.forEach((row) => {
+      Object.entries(row).forEach(([field, value]) => {
+        if (
+          HIDDEN_INTERNAL_FIELDS.has(field) ||
+          field === 'id' ||
+          field === 'workflowId' ||
+          field === 'status' ||
+          field === 'action'
+        ) {
+          return;
+        }
+
+        if (value === null || value === undefined || value === 'n/a') return;
+
+        const str = String(value).trim();
+        if (!str) return;
+
+        if (!valueSets[field]) {
+          valueSets[field] = new Set<string>();
+          valueCounts[field] = 0;
+        }
+
+        valueSets[field].add(str);
+        valueCounts[field] += 1;
+      });
+    });
+
+    const result: Record<string, string[]> = {};
+
+    const MAX_DISTINCT_VALUES = 10;
+
+    Object.entries(valueSets).forEach(([field, set]) => {
+      const distinctCount = set.size;
+
+      if (distinctCount > 0 && distinctCount <= MAX_DISTINCT_VALUES) {
+        result[field] = Array.from(set).sort((a, b) => a.localeCompare(b));
+      }
+    });
+
+    return result;
+  }, [scheduledTable.rows]);
+
+
   return (
     <Box sx={{ height: '100%' }} >
       <Paper sx={{ height: '100%', width: '100%', mb: 2 }} elevation={2}>
@@ -495,6 +542,7 @@ export default function ScheduleTable() {
               onFilterChange={handleFilterChange}
               onAddFilter={handleAddFilter}
               onRemoveFilter={handleRemoveFilter}
+              valueSuggestions={valueSuggestions}
             />
           </Box>
         </Popover>
