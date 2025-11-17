@@ -332,12 +332,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         closePinned();
         suppressFor(200);
       };
-      const onCloseDown = (e: MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-      };
 
-      btn.addEventListener('mousedown', onCloseDown);
       btn.addEventListener('click', onCloseClick);
 
       // drag to reposition (ignore clicks on the close button)
@@ -433,8 +428,6 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
       closePinned();
 
-      document.querySelectorAll<HTMLDivElement>('.vega-tooltip-pinned')
-        .forEach(el => el.remove());
     };
   }, []);
 
