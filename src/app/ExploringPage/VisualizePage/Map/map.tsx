@@ -36,6 +36,7 @@ import {
   Spoke as ClusterIcon,
 } from '@mui/icons-material';
 import { LatLngBounds, type LatLngBoundsExpression } from 'leaflet';
+import { Zones } from '../Zones/zones';
 
 export interface IMapProps {
   id: string;
@@ -507,6 +508,7 @@ export const Map = (props: IMapProps) => {
           />
         ) : null}
         <MapSearch />
+        <Zones dataset={dataset} />
       </MapContainer>
     );
   }

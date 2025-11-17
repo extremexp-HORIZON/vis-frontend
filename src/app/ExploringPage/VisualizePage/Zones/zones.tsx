@@ -135,10 +135,22 @@ export const Zones = ({ dataset }: IZonesProps) => {
       {/* Zones Button */}
       <Button
         variant="text"
-        color="primary"
         size="medium"
         onClick={handleOpenZonesModal}
-        sx={{ borderRadius: 1, textTransform: 'none' }}
+        sx={{
+          position: 'absolute',
+          backgroundColor: 'white',
+          top: '8vh',
+          right: '50%',
+          transform: 'translateX(50%)',
+          borderRadius: 1,
+          textTransform: 'none',
+          zIndex: 1000,
+          '&:hover': {
+            backgroundColor: 'primary.main',
+            color: 'white',
+          },
+        }}
       >
         Zones
       </Button>

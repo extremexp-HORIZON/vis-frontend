@@ -29,7 +29,6 @@ import {
 } from '../../../store/slices/exploring/predictionSlice';
 import { PredictionTimeline } from './Map/PredictionTimeline/prediction-timeline';
 import CloseIcon from '@mui/icons-material/Close';
-import { Zones } from './Zones/zones';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
@@ -122,19 +121,6 @@ const VisualizePage = () => {
         </Box>
       )}
       <Map id={datasetId} dataset={dataset} />
-      <Box
-        sx={{
-          position: 'absolute',
-          zIndex: 999,
-          top: predictionDisplay ? 242 : 210,
-          right: 55,
-          backgroundColor: 'white',
-          borderRadius: 1,
-          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <Zones dataset={dataset} />
-      </Box>
       {predictionDisplay ? (
         <PredictionTimeline />
       ) : (
