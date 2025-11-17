@@ -4,6 +4,10 @@ import {
   type TaskProgress,
 } from '../../shared/models/eusome-api.model';
 
+const isDev =
+  import.meta.env.MODE === 'development' ||
+  process.env.NODE_ENV === 'development';
+
 export const useTaskProgress = (taskId: string) => {
   const [state, setState] = useState<TaskProgress>({
     task_id: taskId,
@@ -18,7 +22,12 @@ export const useTaskProgress = (taskId: string) => {
 
   useEffect(() => {
     if (taskId.length > 0) {
-      const ws = new WebSocket(`ws://localhost:8000/ws/tasks/${taskId}`);
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      const wsUrl = isDev
+        ? `ws://localhost:8000/ws/tasks/${taskId}`
+        : `${protocol}//${host}/eusome/ws/tasks/${taskId}`;
+      const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => setState(prev => ({ ...prev, isConnected: true }));
       ws.onclose = () => setState(prev => ({ ...prev, isConnected: false }));
