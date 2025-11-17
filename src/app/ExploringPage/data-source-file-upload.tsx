@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useAppDispatch } from '../../store/store';
 import { uploadDataSource } from '../../store/slices/exploring/datasourceSlice';
 import type { IDataSource } from '../../shared/models/dataexploration.model';
-import { uploadData } from '../../store/slices/exploring/eusomeSlice';
+import { uploadData, listProcessedData } from '../../store/slices/exploring/eusomeSlice';
 import {
   FileUpload,
   type AdditionalField,
@@ -76,6 +76,8 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
           },
         }),
       ).unwrap();
+
+      dispatch(listProcessedData());
 
       const result = await dispatch(
         uploadDataSource({
