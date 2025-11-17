@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material';
 import { LatLngBounds, type LatLngBoundsExpression } from 'leaflet';
 import { Zones } from '../Zones/zones';
+import { PredictionTimeline } from './PredictionTimeline/prediction-timeline';
 
 export interface IMapProps {
   id: string;
@@ -509,6 +510,7 @@ export const Map = (props: IMapProps) => {
         ) : null}
         <MapSearch />
         <Zones dataset={dataset} />
+        {predictionDisplay && <PredictionTimeline />}
       </MapContainer>
     );
   }

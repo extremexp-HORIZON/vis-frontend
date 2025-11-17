@@ -27,7 +27,6 @@ import {
   resetPredictionState,
   setPredictionDisplay,
 } from '../../../store/slices/exploring/predictionSlice';
-import { PredictionTimeline } from './Map/PredictionTimeline/prediction-timeline';
 import CloseIcon from '@mui/icons-material/Close';
 
 const VisualizePage = () => {
@@ -121,44 +120,39 @@ const VisualizePage = () => {
         </Box>
       )}
       <Map id={datasetId} dataset={dataset} />
-      {predictionDisplay ? (
-        <PredictionTimeline />
+      <Box
+        position="absolute"
+        zIndex={999}
+        bottom={0}
+        sx={{ p: 2, minWidth: 200 }}
+      >
+        <Stats dataset={dataset} />
+      </Box>
+      {isChartFullscreen ? (
+        <Chart
+          dataset={dataset}
+          isFullscreen={isChartFullscreen}
+          onToggleFullscreen={toggleChartFullscreen}
+        />
       ) : (
-        <>
-          <Box
-            position="absolute"
-            zIndex={999}
-            bottom={0}
-            sx={{ p: 2, minWidth: 200 }}
-          >
-            <Stats dataset={dataset} />
-          </Box>
-          {isChartFullscreen ? (
-            <Chart
-              dataset={dataset}
-              isFullscreen={isChartFullscreen}
-              onToggleFullscreen={toggleChartFullscreen}
-            />
-          ) : (
-            <Box
-              position="absolute"
-              zIndex={999}
-              bottom={0}
-              right={0}
-              sx={{ p: 1, minWidth: 311, maxWidth: 1 / 4 }}
-            >
-              <Chart
-                dataset={dataset}
-                isFullscreen={isChartFullscreen}
-                onToggleFullscreen={toggleChartFullscreen}
-              />
-              {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && (
-                <TimeSeriesChart dataset={dataset} />
-              )}
-            </Box>
+        <Box
+          position="absolute"
+          zIndex={999}
+          bottom={0}
+          right={0}
+          sx={{ p: 1, minWidth: 311, maxWidth: 1 / 4 }}
+        >
+          <Chart
+            dataset={dataset}
+            isFullscreen={isChartFullscreen}
+            onToggleFullscreen={toggleChartFullscreen}
+          />
+          {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && (
+            <TimeSeriesChart dataset={dataset} />
           )}
-        </>
+        </Box>
       )}
+
     </>
   );
 };
