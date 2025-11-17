@@ -7,10 +7,10 @@ import {
   Box,
   Switch,
   Grid,
+  Typography,
 } from '@mui/material';
 import UmapComponent from './umapComponent';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
-import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 
 interface DataField {
   values: any[]
@@ -265,75 +265,69 @@ const GlovesScatter = ({
   //     ],
   //   });
 
-  return (
-    <>
-      <Box
-        className="panel"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginBottom: '20px',
-          flexWrap: 'wrap',
-          marginTop: '20px',
-        }}
+  const ControlPanel = ({chartType}: {chartType: string | null}) => (
+    <Box
+      className="panel"
+      sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}
+    >
+      <FormControl
+        variant="outlined"
+        fullWidth
+        disabled={dimensionalityReduction}
       >
-        <FormControl
-          variant="outlined"
-          style={{ minWidth: 200, marginRight: '20px' }}
-          disabled={dimensionalityReduction}
-        >
-          <InputLabel>X-Axis</InputLabel>
-          <Select
-            value={xAxis}
-            onChange={e => setXAxis(e.target.value)}
-            label="X-Axis"
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                  maxWidth: 300,
-                },
+        <InputLabel>X-Axis</InputLabel>
+        <Select
+          value={xAxis}
+          title={xAxis}
+          onChange={e => setXAxis(e.target.value)}
+          label="X-Axis"
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 250,
+                maxWidth: 300,
               },
-            }}
-          >
-            {options.map(option => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl
-          variant="outlined"
-          style={{ minWidth: 200, marginRight: '20px' }}
-          disabled={dimensionalityReduction}
+            },
+          }}
         >
-          <InputLabel>Y-Axis</InputLabel>
-          <Select
-            value={yAxis}
-            onChange={e => setYAxis(e.target.value)}
-            label="Y-Axis"
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                  maxWidth: 300,
-                },
+          {options.map(option => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl
+        variant="outlined"
+        fullWidth
+        disabled={dimensionalityReduction}
+      >
+        <InputLabel>Y-Axis</InputLabel>
+        <Select
+          value={yAxis}
+          title={yAxis}
+          onChange={e => setYAxis(e.target.value)}
+          label="Y-Axis"
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 250,
+                maxWidth: 300,
               },
-            }}
-          >
-            {options.map(option => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
+            },
+          }}
+        >
+          {options.map(option => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {chartType === 'affectedClusters' && (
         <FormControl
           variant="outlined"
-          style={{ minWidth: 200, marginRight: '20px' }}
+          fullWidth
         >
           <InputLabel>Apply</InputLabel>
           <Select
@@ -352,7 +346,6 @@ const GlovesScatter = ({
             {colorOptions.map(option => {
               // Extract the part before "_Prediction"
               const displayText = option.replace(/_Prediction$/, '');
-
               return (
                 <MenuItem key={option} value={option}>
                   {displayText}
@@ -361,22 +354,32 @@ const GlovesScatter = ({
             })}
           </Select>
         </FormControl>
-
-        <Box display="flex" alignItems="center">
-          <ReduceCapacityIcon />
-
-          <Switch
-            checked={dimensionalityReduction}
-            onChange={() => setDimensionalityReduction(prev => !prev)}
-          />
-        </Box>
+      )}
+      <Box display="flex" alignItems="center">
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 500,
+          }}
+        >
+          UMAP
+        </Typography>
+        <Switch
+          checked={dimensionalityReduction}
+          onChange={() => setDimensionalityReduction(prev => !prev)}
+        />
       </Box>
+    </Box>
+  );
+
+  return (
+    <>
       {dimensionalityReduction ? (
-        <Box  sx={{ alignItems: 'center', justifyContent: 'center' }} >
-          <UmapComponent data1={data1} data2={data2} colorField={colorField} />
+        <Box  sx={{ alignItems: 'center', justifyContent: 'center', mt: 2 }} >
+          <UmapComponent data1={data1} data2={data2} colorField={colorField} controlPanel={ControlPanel} />
         </Box>
       ) : (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
           {data1 && data2 && (
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -387,6 +390,7 @@ const GlovesScatter = ({
                   spec={spec(transformData(data1))}
                   isStatic={false}
                   maxHeight={400}
+                  controlPanel={<ControlPanel chartType={null} />}
                 />
               </Grid>
 
@@ -398,6 +402,7 @@ const GlovesScatter = ({
                   spec={spec(transformData(data2.appliedAffectedActions))}
                   isStatic={false}
                   maxHeight={400}
+                  controlPanel={<ControlPanel chartType={null} />}
                 />
               </Grid>
             </Grid>
@@ -412,6 +417,7 @@ const GlovesScatter = ({
                 spec={Colorspec(transformData(data1))}
                 isStatic={false}
                 maxHeight={400}
+                controlPanel={<ControlPanel chartType='affectedClusters' />}
               />
             </Box>
           )}

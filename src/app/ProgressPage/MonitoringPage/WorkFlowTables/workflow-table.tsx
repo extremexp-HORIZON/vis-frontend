@@ -14,7 +14,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable, setExpandedGroup } from '../../../../store/slices/monitorPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material';
 import { Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, styled, TextField, Tooltip } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
@@ -968,6 +968,54 @@ export default function WorkflowTable() {
     );
   };
 
+  const valueSuggestions = useMemo(() => {
+    const valueSets: Record<string, Set<string>> = {};
+    const valueCounts: Record<string, number> = {};
+
+    workflowsTable.rows.forEach((row) => {
+      Object.entries(row).forEach(([field, value]) => {
+        if (
+          HIDDEN_INTERNAL_FIELDS.has(field) ||
+          field === 'id' ||
+          field === 'workflowId' ||
+          field === 'status' ||
+          field === 'action' ||
+          field === 'rating'
+        ) {
+          return;
+        }
+
+        if (value === null || value === undefined || value === 'n/a') return;
+
+        const str = String(value).trim();
+        if (!str) return;
+
+        if (!valueSets[field]) {
+          valueSets[field] = new Set<string>();
+          valueCounts[field] = 0;
+        }
+
+        valueSets[field].add(str);
+        valueCounts[field] += 1;
+      });
+    });
+
+    const result: Record<string, string[]> = {};
+
+    // how else to not show 'continous' numerical data??
+    const MAX_DISTINCT_VALUES = 10;
+
+    Object.entries(valueSets).forEach(([field, set]) => {
+      const distinctCount = set.size;
+
+      if (distinctCount > 0 && distinctCount <= MAX_DISTINCT_VALUES) {
+        result[field] = Array.from(set).sort((a, b) => a.localeCompare(b));
+      }
+    });
+
+    return result;
+  }, [workflowsTable.rows]);
+
   return (
     <Box sx={{ height: '100%' }}>
       <Paper elevation={2} sx={{ height: '100%', width: '100%', mb: 2 }}>
@@ -1020,6 +1068,7 @@ export default function WorkflowTable() {
             onFilterChange={handleFilterChange}
             onAddFilter={handleAddFilter}
             onRemoveFilter={handleRemoveFilter}
+            valueSuggestions={valueSuggestions}
           />
         </Popover>
 

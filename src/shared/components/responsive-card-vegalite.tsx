@@ -235,11 +235,15 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     const PINNED_CLASS = 'vega-tooltip-pinned';
     let pinnedWrap: HTMLDivElement | null = null;
 
+    const removeAllPinned = () => {
+      document
+      .querySelectorAll<HTMLDivElement>(`.${PINNED_CLASS}`)
+      .forEach(el => el.remove());
+    };
+
     const closePinned = () => {
-      if (pinnedWrap) {
-        pinnedWrap.remove();
-        pinnedWrap = null;
-      }
+      removeAllPinned();
+      pinnedWrap = null;
     };
 
     // suppress re-pin briefly after close
@@ -250,7 +254,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       const src = pickLiveTip();
 
       if (!src) return;
-      closePinned();
+      removeAllPinned();
 
       const wrap = document.createElement('div');
 
@@ -328,12 +332,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         closePinned();
         suppressFor(200);
       };
-      const onCloseDown = (e: MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-      };
 
-      btn.addEventListener('mousedown', onCloseDown);
       btn.addEventListener('click', onCloseClick);
 
       // drag to reposition (ignore clicks on the close button)
@@ -387,7 +386,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     const onWindowClick = (e: MouseEvent) => {
       if (performance.now() < suppressUntil) return;
       if (pinnedWrap && pinnedWrap.contains(e.target as Node)) return; // ignore clicks in pinned
-      if (!container.contains(e.target as Node)) closePinned();
+      if (!container.contains(e.target as Node)) return;
 
       const tip = pickLiveTip();
 
@@ -429,8 +428,6 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
       closePinned();
 
-      document.querySelectorAll<HTMLDivElement>('.vega-tooltip-pinned')
-        .forEach(el => el.remove());
     };
   }, []);
 

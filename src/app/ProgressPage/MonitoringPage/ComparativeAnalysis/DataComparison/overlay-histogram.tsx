@@ -269,7 +269,6 @@ const OverlayHistogram = ({
     hasData,
   } = useMemo(() => {
     const normalized = norm(columnName);
-    const countField = `count_${normalized}`;
 
     const rawByWorkflow: Record<string, any[]> = {};
 
@@ -278,6 +277,25 @@ const OverlayHistogram = ({
         ? slices[wid]!.data!.data
         : [];
     });
+
+    let countField = `count_${normalized}`;
+    const expectedLower = countField.toLowerCase();
+
+    const sampleRow = workflowIds
+      .map(wid => rawByWorkflow[wid]?.[0])
+      .find(r => r && typeof r === 'object') as Record<string, any> | undefined;
+
+    if (sampleRow) {
+      const keys = Object.keys(sampleRow);
+
+      const exact = keys.find(k => k === countField);
+      if(!exact) {
+        const key = keys.find(k => k.toLowerCase() === expectedLower);
+        if (key) {
+          countField = key;
+        }
+      }
+    }
 
     const anyLoading = workflowIds.some(
       wid => Boolean(slices[wid]?.loading) || Boolean(metas[wid]?.loading)

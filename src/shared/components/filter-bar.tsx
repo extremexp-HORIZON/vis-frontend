@@ -54,6 +54,7 @@ interface FilterBarProps {
   ) => void
   onAddFilter: () => void
   onRemoveFilter: (index: number) => void
+  valueSuggestions?: Record<string, string[]>
 }
 
 export type FilterStep = 'idle' | 'column' | 'operator' | 'value';
@@ -73,6 +74,7 @@ export default function FilterBar({
   onFilterChange,
   onAddFilter,
   onRemoveFilter,
+  valueSuggestions
 }: FilterBarProps) {
   const [inputValue, setInputValue] = useState('');
   const [currentStep, setCurrentStep] = useState<FilterStep>(FilterStep.IDLE);
@@ -82,13 +84,16 @@ export default function FilterBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const [showAvailableColumns, setShowAvailableColumns] = useState<boolean>(true);
   const [showAvailableOperators, setShowAvailableOperators] = useState<boolean>(false);
+  const [showAvailableValues, setShowAvailableValues] = useState<boolean>(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number>(0);
   const [showAllColumns, setShowAllColumns] = useState<boolean>(false);
+  const [showAllValues, setShowAllValues] = useState<boolean>(false);
   const selectedItemRef = useRef<HTMLDivElement | null>(null);
   const suggestionsContainerRef = useRef<HTMLDivElement | null>(null);
   const prevSuggestions = useRef<Suggestion[]>([]);
   const prevStep = useRef<FilterStep>(FilterStep.IDLE);
   const [availableOperators, setAvailableOperators] = useState<typeof stringOperators | typeof numberOperators>(stringOperators);
+  const [currentColumnType, setCurrentColumnType] = useState<string | undefined>(undefined);
 
   const validColumns = columns.filter(col =>
     col.field !== 'rating' && col.field !== 'status' && col.field !== 'action'
@@ -114,6 +119,7 @@ export default function FilterBar({
       setSuggestions(filtered);
       setShowAvailableColumns(inputValue.length === 0);
       setShowAvailableOperators(false);
+      setShowAvailableValues(false);
     } else if (currentStep === FilterStep.OPERATOR) {
       const filtered = availableOperators.filter(op =>
         op.label.toLowerCase().includes(inputValue.toLowerCase())
@@ -122,12 +128,41 @@ export default function FilterBar({
       setSuggestions(filtered);
       setShowAvailableColumns(false);
       setShowAvailableOperators(inputValue.length === 0);
+      setShowAvailableValues(false);
+    } else if (currentStep === FilterStep.VALUE) {
+      const allValues =
+        tempColumn && valueSuggestions ? valueSuggestions[tempColumn] : undefined;
+
+      if (!allValues || allValues.length === 0) {
+        setSuggestions([]);
+        setShowAvailableColumns(false);
+        setShowAvailableOperators(false);
+        setShowAvailableValues(false);
+        return;
+      }
+
+      if (inputValue.length === 0) {
+        setSuggestions([]);
+        setShowAvailableColumns(false);
+        setShowAvailableOperators(false);
+        setShowAvailableValues(true);
+      } else {
+        const filtered = allValues.filter(v =>
+          v.toLowerCase().includes(inputValue.toLowerCase())
+        );
+
+        setSuggestions(filtered.map(v => ({ value: v, label: v })));
+        setShowAvailableColumns(false);
+        setShowAvailableOperators(false);
+        setShowAvailableValues(false);
+      }
     } else {
       setSuggestions([]);
       setShowAvailableColumns(currentStep === FilterStep.IDLE);
       setShowAvailableOperators(false);
+      setShowAvailableValues(false);
     }
-  }, [currentStep, inputValue, validColumns, availableOperators]);
+  }, [currentStep, inputValue, validColumns, availableOperators, valueSuggestions, tempColumn]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -142,15 +177,21 @@ export default function FilterBar({
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === 'Tab') {
       event.preventDefault();
-
-      if ((currentStep === FilterStep.COLUMN || currentStep === FilterStep.OPERATOR) &&
-          suggestions.length > 0) {
+    
+      if (
+        (currentStep === FilterStep.COLUMN ||
+          currentStep === FilterStep.OPERATOR ||
+          currentStep === FilterStep.VALUE) &&
+        suggestions.length > 0
+      ) {
         const selectedItem = suggestions[selectedSuggestionIndex];
-
+      
         if (currentStep === FilterStep.COLUMN) {
           selectedItem.value && selectColumn(selectedItem.value);
-        } else {
+        } else if (currentStep === FilterStep.OPERATOR) {
           selectedItem.id && selectOperator(selectedItem.id);
+        } else if (currentStep === FilterStep.VALUE) {
+          selectedItem.value && addFilter(selectedItem.value);
         }
       } else if (currentStep === FilterStep.VALUE && inputValue) {
         addFilter(inputValue);
@@ -167,7 +208,7 @@ export default function FilterBar({
       );
     } else if (event.key === 'ArrowUp' && suggestions.length > 0) {
       event.preventDefault();
-      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : 0);
+      setSelectedSuggestionIndex(prev => (prev > 0 ? prev - 1 : 0));
     }
   };
 
@@ -216,17 +257,16 @@ export default function FilterBar({
 
     // Set available operators based on column type
     const selectedColumn = columns.find(col => col.field === columnValue);
-    const columnType = selectedColumn?.originalType;
+    const columnType = selectedColumn?.originalType ?? selectedColumn?.type;
 
-    if (columnType === 'INTEGER' || columnType === 'DOUBLE') {
+    setCurrentColumnType(columnType);
+
+    if (columnType === 'INTEGER' || columnType === 'DOUBLE' || columnType === 'number') {
       setAvailableOperators(numberOperators);
-    } else if (columnType === 'BOOLEAN') {
+    } else if (columnType === 'BOOLEAN' || columnType === 'boolean') {
       setAvailableOperators(booleanOperators);
-    } else if (columnType === 'STRING') {
-      setAvailableOperators(stringOperators);
     } else {
-      // Default to all operators if there's no column type
-      setAvailableOperators([...stringOperators, ...numberOperators.filter(op => op.id !== '=')]);
+      setAvailableOperators(stringOperators);
     }
   };
 
@@ -250,6 +290,7 @@ export default function FilterBar({
     setCurrentStep(FilterStep.IDLE);
     setTempColumn('');
     setTempOperator('');
+    setCurrentColumnType(undefined);
     setInputValue('');
     setShowAvailableColumns(true);
     setShowAvailableOperators(false);
@@ -425,6 +466,55 @@ export default function FilterBar({
     );
   };
 
+  const renderAvailableValues = () => {
+    if (!showAvailableValues || !tempColumn || !valueSuggestions) return null;
+
+    const allValues = valueSuggestions[tempColumn] ?? [];
+    if (allValues.length === 0) return null;
+
+    const valuesToShow = showAllValues ? allValues : allValues.slice(0, 10);
+    const hasMore = allValues.length > 10;
+
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          Available values for {tempColumn}
+        </Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          {valuesToShow.map((val, index) => (
+            <Chip
+              key={index}
+              size="small"
+              label={val}
+              clickable
+              onClick={() => {
+                addFilter(val);  // ⬅️ directly add filter on click
+              }}
+            />
+          ))}
+          {hasMore && !showAllValues && (
+            <Button
+              size="small"
+              onClick={() => setShowAllValues(true)}
+              sx={{ fontSize: '0.75rem', ml: 1 }}
+            >
+              Show More ({allValues.length - 10})
+            </Button>
+          )}
+          {showAllValues && (
+            <Button
+              size="small"
+              onClick={() => setShowAllValues(false)}
+              sx={{ fontSize: '0.75rem', ml: 1 }}
+            >
+              Show Less
+            </Button>
+          )}
+        </Box>
+      </Box>
+    );
+  };
+
   return (
     <Box sx={{ width: '100%', overflow: 'visible' }}>
       {/* Search input */}
@@ -432,7 +522,7 @@ export default function FilterBar({
         {renderInputWithPills()}
 
         {/* Suggestions dropdown */}
-        {suggestions.length > 0 && currentStep !== FilterStep.VALUE && !showAvailableColumns && !showAvailableOperators && (
+        {suggestions.length > 0 && !showAvailableColumns && !showAvailableOperators && !showAvailableValues && (
           <Paper
             elevation={3}
             sx={{
@@ -463,6 +553,8 @@ export default function FilterBar({
                       item.value && selectColumn(item.value);
                     } else if (currentStep === FilterStep.OPERATOR) {
                       item.id && selectOperator(item.id);
+                    } else if (currentStep === FilterStep.VALUE) {
+                      item.value && addFilter(item.value);
                     }
                   }}
                 >
@@ -481,6 +573,9 @@ export default function FilterBar({
 
       {/* Available operators section */}
       {renderAvailableOperators()}
+
+      {/* Available values section */}
+      {renderAvailableValues()}
 
       {/* Remove the filter preview since we now show pills in the input */}
 
