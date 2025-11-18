@@ -16,7 +16,7 @@ export default defineConfig({
         target: 'http://vis-api:8080',
       },
       '/auth': {
-        target: 'http://vis-api:5521',
+        target: 'http://access-control-service:5521',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/auth/, '')
       },
