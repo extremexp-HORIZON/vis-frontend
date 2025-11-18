@@ -140,9 +140,9 @@ export const Zones = ({ dataset }: IZonesProps) => {
         sx={{
           position: 'absolute',
           backgroundColor: 'white',
-          top: '8vh',
-          right: '50%',
-          transform: 'translateX(50%)',
+          top: '70px',
+          left: '50%',
+          transform: 'translateX(-50%)',
           borderRadius: 1,
           textTransform: 'none',
           zIndex: 1000,

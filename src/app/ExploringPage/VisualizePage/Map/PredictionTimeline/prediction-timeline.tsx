@@ -5,7 +5,8 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-  Paper,
+  Card,
+  CardContent,
   ThemeProvider,
   createTheme,
   FormControl,
@@ -48,7 +49,10 @@ export const PredictionTimeline = () => {
   });
 
   // Calculate available heights from all prediction results
-  const availableHeights = results[selectedZoneId!]?.[0]?.predicted_rsrp_at_heights?.map(height => height.height_m || 0) || [];
+  const availableHeights =
+    results[selectedZoneId!]?.[0]?.predicted_rsrp_at_heights?.map(
+      height => height.height_m || 0,
+    ) || [];
 
   // Calculate available time slots based on selected zone's prediction data
   const timeSlots = useMemo(() => {
@@ -123,7 +127,11 @@ export const PredictionTimeline = () => {
     const date = new Date(timestamp);
 
     if (hourOnly) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
     }
 
     return date.toLocaleTimeString([], {
@@ -163,125 +171,121 @@ export const PredictionTimeline = () => {
   }
 
   return (
-    <Paper
-      elevation={4}
+    <Card
       sx={{
-        position: 'absolute',
-        bottom: 20,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 1000,
-        backgroundColor: 'rgba(255, 255, 255, 0.98)',
         borderRadius: 2,
-        paddingX: 5,
-        paddingY: 1,
+        boxShadow: 4,
         minWidth: 600,
         maxWidth: 800,
       }}
     >
-      {/* Zone Selector */}
-      {availableZones.length > 1 && <Box sx={{ mb: 2 }}>
-        <Typography
-          variant="caption"
-          textAlign="center"
-          sx={{ fontWeight: 'bold', mb: 0.5, display: 'block' }}
-        >
-          Zone
-        </Typography>
-        <FormControl fullWidth size="small">
-          <InputLabel>Select Zone</InputLabel>
-          <Select
-            value={selectedZoneId || ''}
-            onChange={handleZoneChange}
-            label="Select Zone"
-          >
-            {availableZones.map(zone => (
-              <MenuItem key={zone.id} value={zone.id}>
-                {zone.id}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>}
+      <CardContent sx={{ px: 5, py: 1 }}>
+        {/* Zone Selector */}
+        {availableZones.length > 1 && (
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              variant="caption"
+              textAlign="center"
+              sx={{ fontWeight: 'bold', mb: 0.5, display: 'block' }}
+            >
+              Zone
+            </Typography>
+            <FormControl fullWidth size="small">
+              <InputLabel>Select Zone</InputLabel>
+              <Select
+                value={selectedZoneId || ''}
+                onChange={handleZoneChange}
+                label="Select Zone"
+              >
+                {availableZones.map(zone => (
+                  <MenuItem key={zone.id} value={zone.id}>
+                    {zone.id}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        )}
 
-      {/* Height Selector */}
-      <Box sx={{ mb: 2 }}>
-        <Typography
-          variant="caption"
-          textAlign="center"
-          sx={{ fontWeight: 'bold', mb: 0.5, display: 'block' }}
-        >
-          Height (meters)
-        </Typography>
-        <ToggleButtonGroup
-          value={selectedHeight}
-          exclusive
-          onChange={handleHeightChange}
-          size="small"
-          fullWidth
-        >
-          {availableHeights.map(height => (
-            <ToggleButton key={height} value={height}>
-              {height}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
-      </Box>
-
-      {/* Timeline Scrubber */}
-      <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            mb: 1,
-          }}
-        >
+        {/* Height Selector */}
+        <Box sx={{ mb: 2 }}>
           <Typography
             variant="caption"
             textAlign="center"
-            sx={{ fontWeight: 'bold' }}
+            sx={{ fontWeight: 'bold', mb: 0.5, display: 'block' }}
           >
-            Timestamp
+            Height (meters)
+          </Typography>
+          <ToggleButtonGroup
+            value={selectedHeight}
+            exclusive
+            onChange={handleHeightChange}
+            size="small"
+            fullWidth
+          >
+            {availableHeights.map(height => (
+              <ToggleButton key={height} value={height}>
+                {height}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
+
+        {/* Timeline Scrubber */}
+        <Box>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              mb: 1,
+            }}
+          >
             <Typography
-              variant="body2"
-              color="primary"
+              variant="caption"
+              textAlign="center"
               sx={{ fontWeight: 'bold' }}
             >
-              {formatTimestamp(timeSlots[selectedTimeIndex])}
+              Timestamp
+              <Typography
+                variant="body2"
+                color="primary"
+                sx={{ fontWeight: 'bold' }}
+              >
+                {formatTimestamp(timeSlots[selectedTimeIndex])}
+              </Typography>
             </Typography>
-          </Typography>
-        </Box>
+          </Box>
 
-        {timeSlots.length > 1 && (
-          <ThemeProvider theme={sliderTheme}>
-            <Slider
-              value={selectedTimeIndex}
-              min={0}
-              max={Math.max(0, timeSlots.length - 1)}
-              step={1}
-              marks={generateMarks()}
-              onChange={handleTimeChange}
-              valueLabelDisplay="auto"
-              valueLabelFormat={value => formatTimestamp(timeSlots[value])}
-              color="primary"
-              sx={{ mb: 1 }}
-            />
-          </ThemeProvider>
-        )}
+          {timeSlots.length > 1 && (
+            <ThemeProvider theme={sliderTheme}>
+              <Slider
+                value={selectedTimeIndex}
+                min={0}
+                max={Math.max(0, timeSlots.length - 1)}
+                step={1}
+                marks={generateMarks()}
+                onChange={handleTimeChange}
+                valueLabelDisplay="auto"
+                valueLabelFormat={value => formatTimestamp(timeSlots[value])}
+                color="primary"
+                sx={{ mb: 1 }}
+              />
+            </ThemeProvider>
+          )}
 
-        {/* Time Counter and Zone Info */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-          <Typography variant="caption">
-            {selectedTimeIndex + 1} / {timeSlots.length}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {availableZones.length} zone{availableZones.length !== 1 ? 's' : ''}{' '}
-            available
-          </Typography>
+          {/* Time Counter and Zone Info */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+            <Typography variant="caption">
+              {selectedTimeIndex + 1} / {timeSlots.length}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {availableZones.length} zone{availableZones.length !== 1 ? 's' : ''}{' '}
+              available
+            </Typography>
+          </Box>
         </Box>
-      </Box>
-    </Paper>
+      </CardContent>
+    </Card>
   );
 };

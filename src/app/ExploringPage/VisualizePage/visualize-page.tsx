@@ -19,20 +19,28 @@ import { Chart } from './Chart/chart';
 import { TimeSeriesChart } from './TimeSeriesChart/time-series-chart';
 import { getDataSource } from '../../../store/slices/exploring/datasourceSlice';
 import { resetChartState } from '../../../store/slices/exploring/chartSlice';
-import { resetMapState, setDrawnRect } from '../../../store/slices/exploring/mapSlice';
+import {
+  resetMapState,
+  setDrawnRect,
+} from '../../../store/slices/exploring/mapSlice';
 import { resetStatsState } from '../../../store/slices/exploring/statsSlice';
 import { resetTimeSeriesState } from '../../../store/slices/exploring/timeSeriesSlice';
-import { resetZoneState, setZone } from '../../../store/slices/exploring/zoneSlice';
+import {
+  resetZoneState,
+  setZone,
+} from '../../../store/slices/exploring/zoneSlice';
 import {
   resetPredictionState,
   setPredictionDisplay,
 } from '../../../store/slices/exploring/predictionSlice';
 import CloseIcon from '@mui/icons-material/Close';
+import { PredictionTimeline } from './Map/PredictionTimeline/prediction-timeline';
 
 const VisualizePage = () => {
   const { datasetId } = useParams();
   const dispatch = useAppDispatch();
   const [isChartFullscreen, setIsChartFullscreen] = useState(false);
+  const { menuOptions } = useAppSelector((state: RootState) => state.progressPage);
   const { dataset, loading } = useAppSelector(
     (state: RootState) => state.dataset,
   );
@@ -90,25 +98,38 @@ const VisualizePage = () => {
   return (
     <>
       {predictionDisplay ? (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: 'secondary.main',
-            position: 'relative',
-          }}
-        >
-          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-            <Typography variant="h6" textAlign="center">
-              Prediction Display
-            </Typography>
+        <>
+          <Box
+            position="absolute"
+            bottom={20}
+            zIndex={999}
+            sx={{
+              left: menuOptions.collapsed ? 'calc(56px + (100vw - 56px) / 2)' : 'calc(calc(15% + 16px) + (100vw - calc(15% + 16px)) / 2)',
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <PredictionTimeline />
           </Box>
-          <Box sx={{ position: 'absolute', right: 16 }}>
-            <Button onClick={handleClosePredictionDisplay}>
-              <CloseIcon />
-            </Button>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'secondary.main',
+              position: 'relative',
+            }}
+          >
+            <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+              <Typography variant="h6" textAlign="center">
+                Prediction Display
+              </Typography>
+            </Box>
+            <Box sx={{ position: 'absolute', right: 16 }}>
+              <Button onClick={handleClosePredictionDisplay}>
+                <CloseIcon />
+              </Button>
+            </Box>
           </Box>
-        </Box>
+        </>
       ) : (
         <Box
           position="absolute"
@@ -152,7 +173,6 @@ const VisualizePage = () => {
           )}
         </Box>
       )}
-
     </>
   );
 };
