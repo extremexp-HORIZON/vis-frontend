@@ -284,7 +284,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>
                           {z.createdAt
-                            ? new Date(z.createdAt).toLocaleString()
+                            ? new Date(Date.parse(z.createdAt + 'Z')).toLocaleString()
                             : '-'}
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>

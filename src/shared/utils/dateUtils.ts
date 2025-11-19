@@ -6,7 +6,8 @@ import { logger } from './logger';
 
 /**
  * Parses a timestamp in YYYYMMDD_HHMMSS format to a Date object
- * @param timestamp - Timestamp string in format "20251014_134745"
+ * The timestamp is assumed to be in UTC timezone
+ * @param timestamp - Timestamp string in format "20251014_134745" (UTC)
  * @returns Date object or null if parsing fails
  */
 export const parseTimestamp = (timestamp: string): Date | null => {
@@ -30,7 +31,8 @@ export const parseTimestamp = (timestamp: string): Date | null => {
     const minutes = parseInt(timePart.substring(2, 4), 10);
     const seconds = parseInt(timePart.substring(4, 6), 10);
 
-    const date = new Date(year, month, day, hours, minutes, seconds);
+    // Create date in UTC timezone since the backend sends UTC timestamps
+    const date = new Date(Date.UTC(year, month, day, hours, minutes, seconds));
 
     // Validate the date is valid
     if (isNaN(date.getTime())) {
