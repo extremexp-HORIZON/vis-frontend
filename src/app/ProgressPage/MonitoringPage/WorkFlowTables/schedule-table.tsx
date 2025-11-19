@@ -9,7 +9,7 @@ import { Popover, styled } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { setScheduledTable } from '../../../../store/slices/monitorPageSlice';
+import { ScheduleTableRow, setScheduledTable } from '../../../../store/slices/monitorPageSlice';
 import type { GridColumnNode } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
 import theme from '../../../../mui-theme';
@@ -225,7 +225,7 @@ export default function ScheduleTable() {
         }, {})).filter(([_, variants]) => variants.size > 1)
         .map(([name]) => name);
 
-      const rows = workflows.data
+      const rows: ScheduleTableRow[] = workflows.data
         .filter(workflow => workflow.status === 'SCHEDULED')
         .map(workflow => {
           const params = workflow.params;
@@ -233,7 +233,7 @@ export default function ScheduleTable() {
 
           return {
             id: idCounter++,
-            workflowId: workflow.name,
+            workflowId: workflow.name || '',
             space: workflow.space,
             ...Array.from(uniqueTasks).reduce((acc, variant) => {
               acc[variant] =
@@ -317,11 +317,18 @@ export default function ScheduleTable() {
         return acc;
       }, {} as Record<string, boolean>);
 
+      const { filteredRows, filtersCounter } = applyScheduledFilters(
+        rows,
+        scheduledTable.filters,
+        scheduledTable.selectedSpaces,
+      );
+
+
       dispatch(
         setScheduledTable({
           rows,
-          filteredRows: rows,
-          visibleRows: rows.slice(0, scheduledTable.rowsPerPage),
+          filteredRows,
+          visibleRows: filteredRows,
           columns: columns,
           columnsVisibilityModel: visibilityModel,
           uniqueParameters: Array.from(uniqueParameters),
@@ -388,69 +395,91 @@ export default function ScheduleTable() {
 
     dispatch(setScheduledTable({ filters: newFilters }));
   };
+const applyScheduledFilters = (
+  rows: typeof scheduledTable.rows,
+  filters: typeof scheduledTable.filters,
+  selectedSpaces: typeof scheduledTable.selectedSpaces,
+) => {
+  let counter = 0;
+  let filteredRows = rows;
+
+  // spaces filter
+  if (Array.isArray(selectedSpaces) && selectedSpaces.length > 0) {
+    const selSpaces = new Set(
+      selectedSpaces
+        .map(s => s?.trim().toLowerCase())
+        .filter(Boolean) as string[]
+    );
+
+    filteredRows = filteredRows.filter(row => {
+      const space = (row.space ?? '').toString().trim().toLowerCase();
+
+      return selSpaces.has(space);
+    });
+  }
+
+  // column filters
+  if (filters.length > 0) {
+    for (let i = 0; i < filters.length; i++) {
+      if (filters[i].value !== '') {
+        counter++;
+      }
+    }
+
+    filteredRows = filteredRows.filter(row => {
+      return filters.every(filter => {
+        if (filter.value === '') return true;
+
+        const cellValue = row[filter.column as keyof Data]
+          ?.toString()
+          .toLowerCase();
+        const filterValue = filter.value.toLowerCase();
+
+        if (!cellValue) return false;
+
+        switch (filter.operator) {
+          case 'contains':
+            return cellValue.includes(filterValue);
+          case '=':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) === Number(filterValue)
+              : cellValue === filterValue;
+          case 'startsWith':
+            return cellValue.startsWith(filterValue);
+          case 'endsWith':
+            return cellValue.endsWith(filterValue);
+          case '>':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) > Number(filterValue)
+              : false;
+          case '<':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) < Number(filterValue)
+              : false;
+          case '>=':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) >= Number(filterValue)
+              : false;
+          case '<=':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) <= Number(filterValue)
+              : false;
+          default:
+            return true;
+        }
+      });
+    });
+  }
+
+  return { filteredRows, filtersCounter: counter };
+};
 
   useEffect(() => {
-    let counter = 0;
-    let newRows = scheduledTable.rows;
-
-    if (Array.isArray(scheduledTable.selectedSpaces) && scheduledTable.selectedSpaces.length > 0) {
-      const selSpaces = new Set(
-        scheduledTable.selectedSpaces
-          .map(s => s?.trim().toLowerCase())
-          .filter(Boolean) as string[]
-      );
-
-      newRows = newRows.filter(row => {
-        const space = (row.space ?? '').toString().trim()
-          .toLowerCase();
-
-        return selSpaces.has(space);
-      });
-    }
-
-    if(scheduledTable.filters.length > 0) {
-      for (let i = 0; i < scheduledTable.filters.length; i++) {
-        if (scheduledTable.filters[i].value !== '') {
-          counter++;
-        }
-      }
-      newRows = scheduledTable.rows.filter(row => {
-        return scheduledTable.filters.every(filter => {
-          if (filter.value === '') return true;
-          const cellValue = row[filter.column as keyof Data]
-            ?.toString()
-            .toLowerCase();
-          const filterValue = filter.value.toLowerCase();
-
-          if (!cellValue) return false;
-
-          switch (filter.operator) {
-            case 'contains':
-              return cellValue.includes(filterValue);
-            case '=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue;
-            case 'startsWith':
-              return cellValue.startsWith(filterValue);
-            case 'endsWith':
-              return cellValue.endsWith(filterValue);
-            case '>':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : false;
-            case '<':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : false;
-            case '>=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : false;
-            case '<=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : false;
-            default:
-              return true;
-          }
-        });
-      });
-    }
+    const {filteredRows, filtersCounter} = applyScheduledFilters(scheduledTable.rows, scheduledTable.filters, scheduledTable.selectedSpaces);
     dispatch(
       setScheduledTable({
-        filtersCounter: counter,
-        filteredRows: newRows,
+        filtersCounter,
+        filteredRows,
       }),
     );
   }, [scheduledTable.filters, scheduledTable.selectedSpaces]);

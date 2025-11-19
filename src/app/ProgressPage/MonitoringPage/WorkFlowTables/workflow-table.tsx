@@ -409,6 +409,7 @@ export default function WorkflowTable() {
   const prevGroupByRef = useRef<string[]>([]);
 
   const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
+    if (newSelection === workflowsTable.selectedWorkflows) return;
     newSelection.forEach(workflowId => {
       dispatch(toggleWorkflowSelection(workflowId));
     });
@@ -553,71 +554,92 @@ export default function WorkflowTable() {
     return Array.from(columnsWithData);
   };
 
+  const applyWorkflowFilters = (
+    rows: WorkflowTableRow[],
+    filters: typeof workflowsTable.filters,
+    selectedSpaces: typeof workflowsTable.selectedSpaces,
+  ): { filteredRows: WorkflowTableRow[]; filtersCounter: number } => {
+    let counter = 0;
+
+    for (let i = 0; i < filters.length; i++) {
+      if (filters[i].value !== '') {
+        counter++;
+      }
+    }
+
+    let filteredRows = rows;
+
+    // spaces filter
+    if (Array.isArray(selectedSpaces) && selectedSpaces.length > 0) {
+      const selSpaces = new Set(
+        selectedSpaces
+          .map(s => s?.trim().toLowerCase())
+          .filter(Boolean) as string[]
+      );
+
+      filteredRows = filteredRows.filter(row => {
+        const space = (row.space ?? '').toString().trim().toLowerCase();
+
+        return selSpaces.has(space);
+      });
+    }
+
+    // column filters
+    filteredRows = filteredRows.filter(row => {
+      return filters.every(filter => {
+        if (filter.value === '') return true;
+
+        const cellValue = row[filter.column as keyof Data]
+          ?.toString()
+          .toLowerCase();
+        const filterValue = filter.value.toLowerCase();
+
+        if (!cellValue) return false;
+
+        switch (filter.operator) {
+          case 'contains':
+            return cellValue.includes(filterValue);
+          case '=':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) === Number(filterValue)
+              : cellValue === filterValue;
+          case 'startsWith':
+            return cellValue.startsWith(filterValue);
+          case 'endsWith':
+            return cellValue.endsWith(filterValue);
+          case '>':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) > Number(filterValue)
+              : false;
+          case '<':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) < Number(filterValue)
+              : false;
+          case '>=':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) >= Number(filterValue)
+              : false;
+          case '<=':
+            return !Number.isNaN(Number(cellValue))
+              ? Number(cellValue) <= Number(filterValue)
+              : false;
+          default:
+            return true;
+        }
+      });
+    });
+
+    return { filteredRows, filtersCounter: counter };
+  };
+
+
   useEffect(() => {
     if(workflowsTable.initialized) {
-      let counter = 0;
+      const {filteredRows, filtersCounter} = applyWorkflowFilters(workflowsTable.rows, workflowsTable.filters, workflowsTable.selectedSpaces)
 
-      for (let i = 0; i < workflowsTable.filters.length; i++) {
-        if (workflowsTable.filters[i].value !== '') {
-          counter++;
-        }
-      }
-
-      let filteredRows = workflowsTable.rows;
-
-      // spaces filter
-      if (Array.isArray(workflowsTable.selectedSpaces) && workflowsTable.selectedSpaces.length > 0) {
-        const selSpaces = new Set(
-          workflowsTable.selectedSpaces
-            .map(s => s?.trim().toLowerCase())
-            .filter(Boolean) as string[]
-        );
-
-        filteredRows = filteredRows.filter(row => {
-          const space = (row.space ?? '').toString().trim()
-            .toLowerCase();
-
-          return selSpaces.has(space);
-        });
-      }
-
-      // Apply column filters
-      filteredRows = filteredRows.filter(row => {
-        return workflowsTable.filters.every(filter => {
-          if (filter.value === '') return true;
-          const cellValue = row[filter.column as keyof Data]
-            ?.toString()
-            .toLowerCase();
-          const filterValue = filter.value.toLowerCase();
-
-          if (!cellValue) return false;
-
-          switch (filter.operator) {
-            case 'contains':
-              return cellValue.includes(filterValue);
-            case '=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) === Number(filterValue) : cellValue === filterValue;
-            case 'startsWith':
-              return cellValue.startsWith(filterValue);
-            case 'endsWith':
-              return cellValue.endsWith(filterValue);
-            case '>':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) > Number(filterValue) : false;
-            case '<':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) < Number(filterValue) : false;
-            case '>=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) >= Number(filterValue) : false;
-            case '<=':
-              return !Number.isNaN(Number(cellValue)) ? Number(cellValue) <= Number(filterValue) : false;
-            default:
-              return true;
-          }
-        });
-      });
-
-      dispatch(setWorkflowsTable({ filteredRows, filtersCounter: counter }));
+      dispatch(setWorkflowsTable({ filteredRows, filtersCounter: filtersCounter }));
     }
-  }, [workflowsTable.filters, workflowsTable.rows, workflowsTable.rows, workflowsTable.selectedSpaces]);
+  }, [workflowsTable.filters, workflowsTable.rows, workflowsTable.selectedSpaces]);
 
   useEffect(() => {
     if(workflowsTable.initialized) {
@@ -899,6 +921,12 @@ export default function WorkflowTable() {
           }),
         }));
 
+      const { filteredRows, filtersCounter } = applyWorkflowFilters(
+        rows,
+        workflowsTable.filters,
+        workflowsTable.selectedSpaces,
+      );
+
       const showActionColumn = !workflowsTable.groupBy.length || workflowsTable.expandedGroups.length > 0;
 
       const visibilityModel = columns.reduce((acc, col) => {
@@ -914,8 +942,8 @@ export default function WorkflowTable() {
       dispatch(
         setWorkflowsTable({
           rows,
-          filteredRows: rows,
-          visibleRows: rows.slice(0, workflowsTable.rowsPerPage),
+          filteredRows: filteredRows,
+          visibleRows: filteredRows,
           columns: columns,
           visibleColumns: columns,
           columnsVisibilityModel: visibilityModel,
