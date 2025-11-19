@@ -132,7 +132,7 @@ export const PredictionModels = ({
       const result = await dispatch(
         createTask({
           task_type: 'train',
-          task_data: { ...defaultTrainingConfig, filename },
+          task_data: { ...defaultTrainingConfig, target_column: dataset?.measure0 || '', filename },
         }),
       );
 
