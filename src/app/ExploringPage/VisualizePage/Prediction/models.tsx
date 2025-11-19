@@ -6,6 +6,7 @@ import {
 } from '../../../../store/store';
 import {
   createTask,
+  deleteModel,
   listModels,
   listProcessedData,
   setTrainingTask,
@@ -29,7 +30,11 @@ import {
   Alert,
   CircularProgress,
   Divider,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import { Delete as DeleteIcon } from '@mui/icons-material';
+import { ConfirmationModal } from '../../../../shared/components/confirmation-modal';
 
 interface PredictionModelsProps {
   onModelSelect?: (modelFilename: string) => void;
@@ -43,7 +48,11 @@ export const PredictionModels = ({
   const dispatch = useAppDispatch();
   const {
     modelsList,
-    loading: { listModels: loadingListModels, createTask: creatingTask },
+    loading: {
+      listModels: loadingListModels,
+      createTask: creatingTask,
+      deleteModel: deletingModel,
+    },
     processedDataList,
     trainingTask,
     activeTasks,
@@ -52,6 +61,13 @@ export const PredictionModels = ({
   const [availableModels, setModels] = useState<ModelInfo[]>([]);
   const [filename, setFilename] = useState<string>('');
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    open: boolean;
+    modelFilename: string | null;
+  }>({
+    open: false,
+    modelFilename: null,
+  });
 
   useEffect(() => {
     if (!modelsList) {
@@ -82,8 +98,10 @@ export const PredictionModels = ({
 
   useEffect(() => {
     if (activeTasks && activeTasks.length > 0) {
-      const trainTask: TrainTask | undefined = activeTasks.find(task =>
-        task.type === 'train' && (task as TrainTask).filename?.includes(dataset?.id || ''),
+      const trainTask: TrainTask | undefined = activeTasks.find(
+        task =>
+          task.type === 'train' &&
+          (task as TrainTask).filename?.includes(dataset?.id || ''),
       );
 
       if (trainTask) {
@@ -134,6 +152,24 @@ export const PredictionModels = ({
     if (onModelSelect) {
       onModelSelect(modelFilename);
     }
+  };
+
+  const handleDeleteClick = async (modelFilename: string) => {
+    setDeleteConfirmation({
+      open: true,
+      modelFilename,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmation.modelFilename) {
+      dispatch(deleteModel(deleteConfirmation.modelFilename));
+      setDeleteConfirmation({ open: false, modelFilename: null });
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ open: false, modelFilename: null });
   };
 
   if (loadingListModels) {
@@ -243,7 +279,15 @@ export const PredictionModels = ({
                       >
                         {model.model_filename}
                       </Typography>
-                      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 2,
+                          flexWrap: 'wrap',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
                         <Chip
                           label={`${model.features_count} features`}
                           size="small"
@@ -253,16 +297,26 @@ export const PredictionModels = ({
                         <Typography variant="body2" color="text.secondary">
                           Created: {formatTimestampFull(model.timestamp)}
                         </Typography>
+                        <Tooltip title="Delete" placement="top">
+                          <IconButton
+                            onClick={() =>
+                              handleDeleteClick(
+                                model.model_filename.substring(
+                                  0,
+                                  model.model_filename.lastIndexOf('.'),
+                                ),
+                              )
+                            }
+                            disabled={deletingModel}
+                            color="error"
+                            size="small"
+                            aria-label="delete model"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
                       </Box>
                     </Box>
-                    {selectedModel === model.model_filename && (
-                      <Chip
-                        label="Selected"
-                        size="small"
-                        color="primary"
-                        sx={{ ml: 1 }}
-                      />
-                    )}
                   </Box>
                 </CardContent>
               </Card>
@@ -295,7 +349,9 @@ export const PredictionModels = ({
               variant="outlined"
               size="small"
               onClick={handleTrainModel}
-              disabled={trainingTask || !filename || !!creatingTask || !!currentTaskId}
+              disabled={
+                trainingTask || !filename || !!creatingTask || !!currentTaskId
+              }
               startIcon={
                 creatingTask || !!currentTaskId ? (
                   <CircularProgress size={10} />
@@ -396,6 +452,20 @@ export const PredictionModels = ({
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        open={deleteConfirmation.open}
+        title="Delete Model"
+        message={`Are you sure you want to delete model with filename: "${deleteConfirmation.modelFilename}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmColor="error"
+        severity="warning"
+        loading={deletingModel}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </Box>
   );
 };

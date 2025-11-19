@@ -206,7 +206,7 @@ export const defaultInferenceInput: InferenceInput = {
 };
 
 // =============================================================================
-// Models Management (/list_models)
+// Models Management (/list_models, /delete_model)
 // =============================================================================
 
 export interface ModelInfo {
@@ -223,8 +223,12 @@ export interface ModelsListResponse {
   message: string;
 }
 
+export interface DeleteModelResponse {
+  message: string;
+}
+
 // =============================================================================
-// Data Management (/list_uploaded_data, /list_processed_data, /data_summary)
+// Data Management (/list_uploaded_data, /list_processed_data, /data_summary, /delete_data)
 // =============================================================================
 
 // Uploaded data
@@ -270,6 +274,11 @@ export interface DataSummaryResponse {
   numeric_summary: Record<string, Record<string, number>>;
   categorical_summary: Record<string, Record<string, unknown>>;
   sample_data: Array<Record<string, unknown>>;
+}
+
+export interface DeleteDataResponse {
+  message: string;
+  count: number;
 }
 
 // =============================================================================

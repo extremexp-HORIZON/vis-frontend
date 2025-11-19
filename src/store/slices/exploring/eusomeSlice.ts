@@ -18,6 +18,8 @@ import {
   type InferenceInput,
   type TaskCreateResponse,
   type TaskBase,
+  type DeleteModelResponse,
+  type DeleteDataResponse,
 } from '../../../shared/models/eusome-api.model';
 import { showError, showSuccess } from '../../../shared/utils/toast';
 import type { AppStartListening } from '../../listenerMiddleware';
@@ -53,6 +55,8 @@ export interface IEusomeState {
     listModels: boolean;
     listUploadedData: boolean;
     listProcessedData: boolean;
+    deleteModel: boolean;
+    deleteData: boolean;
     dataSummary: boolean;
     systemStatus: boolean;
     createTask: boolean;
@@ -69,6 +73,8 @@ export interface IEusomeState {
     listModels: string | null;
     listUploadedData: string | null;
     listProcessedData: string | null;
+    deleteModel: string | null;
+    deleteData: string | null;
     dataSummary: string | null;
     systemStatus: string | null;
     createTask: string | null;
@@ -99,6 +105,8 @@ const initialState: IEusomeState = {
     listModels: false,
     listUploadedData: false,
     listProcessedData: false,
+    deleteModel: false,
+    deleteData: false,
     dataSummary: false,
     systemStatus: false,
     createTask: false,
@@ -113,6 +121,8 @@ const initialState: IEusomeState = {
     listModels: null,
     listUploadedData: null,
     listProcessedData: null,
+    deleteModel: null,
+    deleteData: null,
     dataSummary: null,
     systemStatus: null,
     createTask: null,
@@ -349,6 +359,48 @@ export const listProcessedData = createAsyncThunk<
     const response = await eusomeApi.get<ProcessedDataResponse>(
       '/list_processed_data',
     );
+
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
+  }
+});
+
+// =============================================================================
+// Async Thunks - Delete Model
+// =============================================================================
+
+export const deleteModel = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>('eusome/deleteModel', async (modelName, { rejectWithValue }) => {
+  try {
+    const response = await eusomeApi.delete<DeleteModelResponse>(`/delete_model/${modelName}`);
+
+    return response.data.message;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
+    return rejectWithValue(errorMessage);
+  }
+});
+
+// =============================================================================
+// Async Thunks - Delete Data
+// =============================================================================
+
+export const deleteData = createAsyncThunk<
+  DeleteDataResponse,
+  string,
+  { rejectValue: string }
+>('eusome/deleteData', async (filename, { rejectWithValue }) => {
+  try {
+    const response = await eusomeApi.delete<DeleteDataResponse>(`/delete_data/${filename}`);
 
     return response.data;
   } catch (error: unknown) {
@@ -674,6 +726,42 @@ export const eusomeSlice = createSlice({
       );
 
     // ==========================================================================
+    // Delete Model
+    // ==========================================================================
+    builder
+      .addCase(deleteModel.pending, state => {
+        state.loading.deleteModel = true;
+        state.error.deleteModel = null;
+      })
+      .addCase(deleteModel.fulfilled, (state, action) => {
+        state.loading.deleteModel = false;
+        showSuccess(action.payload);
+      })
+      .addCase(deleteModel.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading.deleteModel = false;
+        state.error.deleteModel = action.payload || 'Failed to delete model';
+        showError(action.payload || 'Failed to delete model');
+      });
+
+    // ==========================================================================
+    // Delete Data
+    // ==========================================================================
+    builder
+      .addCase(deleteData.pending, state => {
+        state.loading.deleteData = true;
+        state.error.deleteData = null;
+      })
+      .addCase(deleteData.fulfilled, (state, action) => {
+        state.loading.deleteData = false;
+        showSuccess(`${action.payload.message} Total: ${action.payload.count}`);
+      })
+      .addCase(deleteData.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading.deleteData = false;
+        state.error.deleteData = action.payload || 'Failed to delete data';
+        showError(action.payload || 'Failed to delete data');
+      });
+
+    // ==========================================================================
     // Get Data Summary
     // ==========================================================================
     builder
@@ -796,6 +884,14 @@ export const eusomeApiListeners = (startAppListening: AppStartListening) => {
   // trainModelListener
   startAppListening({
     actionCreator: trainModel.fulfilled,
+    effect: async (_, listenerApi) => {
+      await listenerApi.dispatch(listModels());
+    },
+  });
+
+  // deleteModelListener
+  startAppListening({
+    actionCreator: deleteModel.fulfilled,
     effect: async (_, listenerApi) => {
       await listenerApi.dispatch(listModels());
     },

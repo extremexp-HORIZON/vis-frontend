@@ -26,7 +26,12 @@ import { useEffect, useState } from 'react';
 import Loader from '../../shared/components/loader';
 import { DataSourceFileUpload } from './data-source-file-upload';
 import { ConfirmationModal } from '../../shared/components/confirmation-modal';
-import { listModels, listProcessedData } from '../../store/slices/exploring/eusomeSlice';
+import {
+  deleteData,
+  deleteModel,
+  listModels,
+  listProcessedData,
+} from '../../store/slices/exploring/eusomeSlice';
 
 const ExploringPage = () => {
   const navigate = useNavigate();
@@ -34,15 +39,17 @@ const ExploringPage = () => {
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     open: boolean;
-    fileName: string | null;
+    fileName: string;
   }>({
     open: false,
-    fileName: null,
+    fileName: '',
   });
   const { dataSources, loading, error } = useAppSelector(
     state => state.dataSource,
   );
-  const { modelsList, processedDataList } = useAppSelector(state => state.eusome);
+  const { modelsList, processedDataList } = useAppSelector(
+    state => state.eusome,
+  );
 
   useEffect(() => {
     if (dataSources.length === 0) {
@@ -73,14 +80,31 @@ const ExploringPage = () => {
   };
 
   const handleConfirmDelete = () => {
-    if (deleteConfirmation.fileName) {
+    if (deleteConfirmation.fileName.length > 0) {
+      const modelFilenames = modelsList?.available_models.map(
+        model =>
+          model.model_filename.includes(deleteConfirmation.fileName) &&
+          model.model_filename.substring(
+            0,
+            model.model_filename.lastIndexOf('.'),
+          ),
+      );
+
       dispatch(deleteDataSource(deleteConfirmation.fileName));
-      setDeleteConfirmation({ open: false, fileName: null });
+      dispatch(deleteData(deleteConfirmation.fileName));
+      if (modelFilenames && modelFilenames.length > 0) {
+        modelFilenames.forEach(modelFilename => {
+          if (modelFilename && modelFilename.length > 0) {
+            dispatch(deleteModel(modelFilename));
+          }
+        });
+      }
+      setDeleteConfirmation({ open: false, fileName: '' });
     }
   };
 
   const handleCancelDelete = () => {
-    setDeleteConfirmation({ open: false, fileName: null });
+    setDeleteConfirmation({ open: false, fileName: '' });
   };
 
   return (
@@ -170,7 +194,7 @@ const ExploringPage = () => {
           <ConfirmationModal
             open={deleteConfirmation.open}
             title="Delete Data Source"
-            message={`Are you sure you want to delete data source with id: "${deleteConfirmation.fileName}"?`}
+            message={`Are you sure you want to delete data source with id: "${deleteConfirmation.fileName}"?<br>This will delete all models and data associated with this data source.`}
             confirmText="Delete"
             cancelText="Cancel"
             onConfirm={handleConfirmDelete}

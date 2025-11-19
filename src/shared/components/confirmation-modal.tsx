@@ -133,7 +133,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             color="text.primary"
             sx={{ mb: 1, fontWeight: 500 }}
           >
-            {message}
+            <div dangerouslySetInnerHTML={{ __html: message }} />
           </Typography>
           <Typography variant="body2" color="text.secondary">
             This action cannot be undone.
