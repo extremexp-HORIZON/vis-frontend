@@ -1,20 +1,39 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Box, Grid, FormControl, InputLabel, MenuItem, Select, Typography, Slider, createTheme } from '@mui/material';
+import {
+  Box,
+  Grid,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+  Slider,
+  Checkbox,
+  FormControlLabel,
+  createTheme,
+} from '@mui/material';
+import { ThemeProvider } from '@emotion/react';
+import { useParams } from 'react-router-dom';
+
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
-import { useParams } from 'react-router-dom';
 
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import type { IPlotModel, ITableContents } from '../../../../shared/models/plotmodel.model';
-import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature, setSelectedInstance, setSelectedTime } from '../../../../store/slices/explainabilitySlice';
+import {
+  fetchModelAnalysisExplainabilityPlot,
+  setSelectedFeature,
+  setSelectedInstance,
+  setSelectedTime,
+} from '../../../../store/slices/explainabilitySlice';
+
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import { ThemeProvider } from '@emotion/react';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 import HeatMapLeaflet from '../../../../shared/components/HeatMapLeaflet';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import Loader from '../../../../shared/components/loader';
 import InfoMessage from '../../../../shared/components/InfoMessage';
-import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 type HeatPoint = { x: number; y: number; time: string | number; value: number };
 
@@ -80,6 +99,8 @@ const AttributionHeatmaps: React.FC = () => {
   const selectedFeature = plotSlice?.selectedFeature ?? '';
   const selectedTime = plotSlice?.selectedTime ?? '';
   const selectedInstance = plotSlice?.selectedInstance ?? '';
+
+  const [showAttribution, setShowAttribution] = useState<boolean>(false);
 
   useEffect(() => {
     if (!tab || !experimentId || !isTabInitialized) return;
@@ -160,7 +181,8 @@ const AttributionHeatmaps: React.FC = () => {
           {instanceOptions.map(instance =>(<MenuItem key={`instance-${instance}`} value={instance}>{String(instance)}</MenuItem>))}
         </Select>
       </FormControl>
-      <FormControl fullWidth >
+
+      <FormControl fullWidth>
         <InputLabel id="feature-select-label">Feature</InputLabel>
         <Select
           labelId="feature-select-label"
@@ -190,6 +212,7 @@ const AttributionHeatmaps: React.FC = () => {
           }
         </Select>
       </FormControl>
+
       <FormControl fullWidth disabled={!timeOptions.length || !!plotSlice?.loading}>
         <ThemeProvider theme={theme}>
           <Box display="flex" alignItems="center" gap={1}>
@@ -198,9 +221,7 @@ const AttributionHeatmaps: React.FC = () => {
           </Box>
           <Slider
             value={radius}
-            onChange={(e, newValue) =>
-              setRadius(newValue as number)
-            }
+            onChange={(_, newValue) => setRadius(newValue as number)}
             valueLabelDisplay="auto"
             min={10}
             step={1}
@@ -209,6 +230,19 @@ const AttributionHeatmaps: React.FC = () => {
           />
         </ThemeProvider>
       </FormControl>
+
+      <Box sx={{ gridColumn: '1 / -1' }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showAttribution}
+              onChange={e => setShowAttribution(e.target.checked)}
+              disabled={!attribPts.length || !!plotSlice?.loading}
+            />
+          }
+          label="Attribution"
+        />
+      </Box>
     </Box>
   );
 
@@ -227,7 +261,7 @@ const AttributionHeatmaps: React.FC = () => {
     />
   );
 
-  const featureHeatmap = (
+  const mapContent = (
     <HeatMapLeaflet
       points={featurePts}
       legendLabel={selectedFeature}
@@ -237,28 +271,16 @@ const AttributionHeatmaps: React.FC = () => {
       decimals={5}
       minIntensity={0.35}
       gamma={0.5}
-    />
-  );
-
-  const attributionHeatmap = (
-    <HeatMapLeaflet
-      points={attribPts}
-      legendLabel={selectedFeature}
-      radius={radius}
-      blur={15}
-      maxZoom={18}
-      decimals={5}
-      minIntensity={0.35}
-      gamma={0.5}
+      attributionPoints={showAttribution ? attribPts : []}
     />
   );
 
   return (
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <ResponsiveCardTable
-            title="Feature"
+            title="Feature / Attribution"
             details={plotModel?.plotDescr || null}
             controlPanel={controlPanel}
             showDownloadButton
@@ -266,30 +288,11 @@ const AttributionHeatmaps: React.FC = () => {
             minHeight={400}
             noPadding
           >
-            {plotSlice?.loading ?
-              loading :
-              plotSlice?.error || !plotSlice?.data ?
-                error :
-                featureHeatmap
-            }
-          </ResponsiveCardTable>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <ResponsiveCardTable
-            title="Attribution"
-            details={plotModel?.plotDescr || null}
-            controlPanel={controlPanel}
-            showDownloadButton
-            showFullScreenButton
-            minHeight={400}
-            noPadding
-          >
-            {plotSlice?.loading ?
-              loading :
-              plotSlice?.error || !plotSlice?.data ?
-                error :
-                attributionHeatmap
-            }
+            {plotSlice?.loading
+              ? loading
+              : plotSlice?.error || !plotSlice?.data
+              ? error
+              : mapContent}
           </ResponsiveCardTable>
         </Grid>
       </Grid>

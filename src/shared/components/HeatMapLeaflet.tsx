@@ -10,6 +10,8 @@ export interface HeatMapLeafletProps {
   /** Array of {lat, lon, value} points */
   points: HeatPointLL[];
 
+  attributionPoints?: HeatPointLL[];
+
   /** Title badge shown on map (top-left) */
   title?: string;
 
@@ -124,6 +126,7 @@ const scaleValuesTo01 = (vals: number[], minI = 0.35, gamma = 0.5) => {
 
 const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   points,
+  attributionPoints = [],
   title,
   legendLabel = 'Value',
   height = 420,
@@ -142,6 +145,8 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   const mapRef = useRef<L.Map | null>(null);
   const heatRef = useRef<L.Layer | null>(null);
   const legendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
+
+  const attributionLayerRef = useRef<L.LayerGroup | null>(null);
 
   // Precompute heat data + bounds
   const { heatData, vMin, vMax, bounds } = useMemo(() => {
@@ -237,24 +242,60 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     legendGradientRef.current = gradientUsed;
     heatRef.current?.addTo(m);
 
+    if (attributionLayerRef.current) {
+      attributionLayerRef.current.remove();
+      attributionLayerRef.current = null;
+    }
+    if (attributionPoints && attributionPoints.length > 0) {
+      const lg = L.layerGroup();
+      attributionPoints.forEach(p => {
+        const marker = L.circleMarker([p.lat, p.lon], {
+          radius: 4,
+          color: '#000000',
+          weight: 1,
+          fillColor: '#ff0000',
+          fillOpacity: 0.9,
+        });
+
+        marker.bindTooltip(p.value.toFixed(decimals));
+        lg.addLayer(marker);
+      });
+      lg.addTo(m);
+      attributionLayerRef.current = lg;
+    }
+
     // legend
     if (legendRef.current) {
       legendRef.current.remove();
       legendRef.current = null;
     }
     const cssGradient = gradientToCss(legendGradientRef.current || DEFAULT_HEAT_GRADIENT);
-    const lg = createLegendControl('topright', cssGradient);
+    const lgLegend = createLegendControl('topright', cssGradient);
 
-    lg.addTo(m);
-    lg.update(legendLabel, vMin, vMax, cssGradient, decimals);
-    legendRef.current = lg;
+    lgLegend.addTo(m);
+    lgLegend.update(legendLabel, vMin, vMax, cssGradient, decimals);
+    legendRef.current = lgLegend;
 
     // fit bounds to data
     if (bounds && bounds.isValid()) m.fitBounds(bounds.pad(padding));
 
     // keep size fresh
     setTimeout(() => m.invalidateSize(), 60);
-  }, [heatData, vMin, vMax, legendLabel, decimals, radius, blur, maxZoom, padding, gradient, bounds]);
+  }, [
+    heatData,
+    vMin,
+    vMax,
+    legendLabel,
+    decimals,
+    radius,
+    blur,
+    maxZoom,
+    padding,
+    gradient,
+    bounds,
+    attributionPoints,
+    DEFAULT_HEAT_GRADIENT,
+  ]);
 
   return (
     <div
