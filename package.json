@@ -52,7 +52,8 @@
     "ts-node": "^10.9.2",
     "vega": "^5.29.0",
     "vega-lite": "^5.18.1",
-    "vite-plugin-svgr": "^4.2.0"
+    "vite-plugin-svgr": "^4.2.0",
+    "vega-tooltip": "^0.35.2"
   },
   "devDependencies": {
     "@testing-library/dom": "^9.3.4",
