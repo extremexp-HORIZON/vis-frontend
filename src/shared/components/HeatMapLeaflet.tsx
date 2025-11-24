@@ -330,7 +330,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
           fillOpacity: 0.9,
         });
 
-        marker.bindTooltip(p.value.toFixed(decimals));
+        marker.bindTooltip(`Attribution: ${p.value.toFixed(decimals)}`);
         lgAttr.addLayer(marker);
       });
       lgAttr.addTo(m);
