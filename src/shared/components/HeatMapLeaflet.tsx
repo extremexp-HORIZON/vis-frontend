@@ -64,7 +64,7 @@ const createLegendControl = (position: L.ControlPosition = 'topright', cssGradie
     div.style.borderRadius = '8px';
     div.style.boxShadow = '0 0 6px rgba(0,0,0,0.25)';
     div.style.fontSize = '12px';
-    div.style.minWidth = '150px'
+    div.style.minWidth = '150px';
     div.innerHTML = `
       <div class="legend-title" style="font-weight:600"></div>
       <div class="legend-range"></div>
@@ -73,42 +73,12 @@ const createLegendControl = (position: L.ControlPosition = 'topright', cssGradie
     return div;
   };
 
-  (legend as any).update = (label: string, min: number, max: number, cssGradient: string, decimals = 5) => {
-    const container = (legend as any)._container as HTMLElement | undefined;
-
-    if (!container) return;
-    const title = container.querySelector('.legend-title') as HTMLElement | null;
-    const range = container.querySelector('.legend-range') as HTMLElement | null;
-
-    if (title) title.textContent = label;
-    if (range && min === max)
-      range.innerHTML = `
-              <div style="color: gray;">Unique value</div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-                <div style="width:24px;height:12px;background:${cssGradient};border-radius:2px;"></div>
-                <span>${min?.toFixed(decimals)}</span>
-              </div>
-            `;
-    else if (range)
-      range.innerHTML = `
-        <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
-        <div style="display: flex; justify-content: space-between;">
-          <span>${min?.toFixed(decimals)}</span>
-          <span>${max?.toFixed(decimals)}</span>
-        </div>
-      `;
-  };
-
-  return legend as L.Control & { update: (label: string, min: number, max: number, cssGradient: string, decimals?: number) => void };
+  return legend as L.Control;
 };
 
 // ----- helpers: intensity scaling to make near-zero visible -----
 const EPS = 1e-9;
 
-/**
- * Normalize values to [0..1], boost lows with gamma (<1), and clamp with floor
- * so that very small values remain visible in the heat layer.
- */
 const scaleValuesTo01 = (vals: number[], minI = 0.35, gamma = 0.5) => {
   if (!vals.length) return { scaled: vals, min: 0, max: 1 };
   const min = Math.min(...vals);
@@ -188,16 +158,13 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   className,
   syncedView,
   onViewChange,
-
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const heatRef = useRef<L.Layer | null>(null);
-  const legendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
+  const legendRef = useRef<L.Control | null>(null);
 
   const attributionLayerRef = useRef<L.LayerGroup | null>(null);
-  const attributionLegendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
-
   const programmaticMoveRef = useRef(false);
 
   // Precompute heat data + bounds
@@ -212,13 +179,16 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
   const legendGradientRef = useRef<Record<number, string> | null>(null);
 
-  const DEFAULT_HEAT_GRADIENT: Record<number, string> = useMemo(() => ({
-    0.0: '#0000ff',
-    0.25: '#00ffff',
-    0.5: '#00ff00',
-    0.75: '#ffff00',
-    1.0: '#ff0000',
-  }), []);
+  const DEFAULT_HEAT_GRADIENT: Record<number, string> = useMemo(
+    () => ({
+      0.0: '#0000ff',
+      0.25: '#00ffff',
+      0.5: '#00ff00',
+      0.75: '#ffff00',
+      1.0: '#ff0000',
+    }),
+    []
+  );
 
   const gradientToCss = (stops: Record<number, string>) => {
     const entries = Object.entries(stops)
@@ -233,7 +203,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    const m = L.map(containerRef.current, { 
+    const m = L.map(containerRef.current, {
       zoomControl: true,
       attributionControl: false,
     });
@@ -285,41 +255,30 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       radius,
       blur,
       maxZoom,
-      gradient: gradientUsed
+      gradient: gradientUsed,
     });
     legendGradientRef.current = gradientUsed;
     heatRef.current?.addTo(m);
 
-    // legend for feature heatmap
-    if (legendRef.current) {
-      legendRef.current.remove();
-      legendRef.current = null;
-    }
-    const cssGradient = gradientToCss(legendGradientRef.current || DEFAULT_HEAT_GRADIENT);
-    const lg = createLegendControl('topright', cssGradient);
-    lg.addTo(m);
-    lg.update(legendLabel || 'Feature', vMin, vMax, cssGradient, decimals);
-    legendRef.current = lg;
-
+    // clear old attribution markers
     if (attributionLayerRef.current) {
       attributionLayerRef.current.remove();
       attributionLayerRef.current = null;
     }
 
-    if (attributionLegendRef.current) {
-      attributionLegendRef.current.remove();
-      attributionLegendRef.current = null;
-    }
+    // build attribution markers and compute min/max
+    let minA: number | null = null;
+    let maxA: number | null = null;
 
     if (attributionPoints && attributionPoints.length > 0) {
       const valuesA = attributionPoints.map(p => p.value);
-      const minA = Math.min(...valuesA);
-      const maxA = Math.max(...valuesA);
+      minA = Math.min(...valuesA);
+      maxA = Math.max(...valuesA);
       const spanA = maxA - minA || 1;
 
       const lgAttr = L.layerGroup();
       attributionPoints.forEach(p => {
-        const t = (p.value - minA) / spanA; // 0..1
+        const t = (p.value - minA!) / spanA; // 0..1
         const color = getColorFromGradient(gradientUsed, t);
 
         const marker = L.circleMarker([p.lat, p.lon], {
@@ -335,15 +294,69 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       });
       lgAttr.addTo(m);
       attributionLayerRef.current = lgAttr;
-
-      const cssGradientAttr = gradientToCss(gradientUsed);
-      const lgAttrLegend = createLegendControl('bottomright', cssGradientAttr);
-      lgAttrLegend.addTo(m);
-      lgAttrLegend.update('Attribution', minA, maxA, cssGradientAttr, decimals);
-      attributionLegendRef.current = lgAttrLegend;
     }
 
-    // fit bounds to data (feature points)
+    // combined legend (Feature + Attribution in the same box)
+    if (legendRef.current) {
+      legendRef.current.remove();
+      legendRef.current = null;
+    }
+    const cssGradient = gradientToCss(gradientUsed);
+    const lg = createLegendControl('topright', cssGradient);
+    lg.addTo(m);
+    legendRef.current = lg;
+
+    const container = (lg as any)._container as HTMLElement | undefined;
+    if (container) {
+      const titleEl = container.querySelector('.legend-title') as HTMLElement | null;
+      const rangeEl = container.querySelector('.legend-range') as HTMLElement | null;
+    
+      const hasOverlay = !!(attributionPoints && attributionPoints.length > 0);
+    
+      if (titleEl) {
+        // If we have overlay, show generic combined title, otherwise just use legendLabel
+        titleEl.textContent = hasOverlay
+          ? legendLabel || 'Feature / Attribution'
+          : legendLabel || 'Value';
+      }
+    
+      if (rangeEl) {
+        if (hasOverlay) {
+          //Overlay mode: Feature + Attribution sections
+          let html = `
+            <div style="font-weight: 600; margin-bottom: 2px;">Feature</div>
+            <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 0 0 4px 0;"></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span>${vMin.toFixed(decimals)}</span>
+              <span>${vMax.toFixed(decimals)}</span>
+            </div>
+          `;
+        
+          if (minA != null && maxA != null) {
+            html += `
+              <div style="font-weight: 600; margin-bottom: 2px;">Attribution</div>
+              <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 0 0 4px 0;"></div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>${minA.toFixed(decimals)}</span>
+                <span>${maxA.toFixed(decimals)}</span>
+              </div>
+            `;
+          }
+        
+          rangeEl.innerHTML = html;
+        } else {
+          //Simple mode: just this layer (feature OR attribution map in split mode)
+          rangeEl.innerHTML = `
+            <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>${vMin.toFixed(decimals)}</span>
+              <span>${vMax.toFixed(decimals)}</span>
+            </div>
+          `;
+        }
+      }
+    }
+
     if (!syncedView && bounds && bounds.isValid()) {
       m.fitBounds(bounds.pad(padding));
     }
@@ -413,7 +426,6 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     programmaticMoveRef.current = true;
     m.setView([lat, lng], syncedView.zoom, { animate: false });
   }, [syncedView?.center[0], syncedView?.center[1], syncedView?.zoom]);
-
 
   return (
     <div

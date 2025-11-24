@@ -189,7 +189,7 @@ const AttributionHeatmaps: React.FC = () => {
         if (tVal != null) handleTimeChange(tVal);
         return next;
       });
-    }, 3000);
+    }, 1500);
 
     return () => clearInterval(id);
   }, [isPlaying, timeOptions]);
