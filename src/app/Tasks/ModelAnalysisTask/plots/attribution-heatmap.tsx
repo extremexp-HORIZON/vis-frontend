@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Box,
   Grid,
@@ -10,13 +10,12 @@ import {
   Slider,
   Checkbox,
   FormControlLabel,
+  IconButton,
   createTheme,
 } from '@mui/material';
-import { ThemeProvider } from '@emotion/react';
-import { useParams } from 'react-router-dom';
-
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
+import { useParams } from 'react-router-dom';
 
 import { explainabilityQueryDefault } from '../../../../shared/models/tasks/explainability.model';
 import type { IPlotModel, ITableContents } from '../../../../shared/models/plotmodel.model';
@@ -26,14 +25,16 @@ import {
   setSelectedInstance,
   setSelectedTime,
 } from '../../../../store/slices/explainabilitySlice';
-
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import { ThemeProvider } from '@emotion/react';
 
 import HeatMapLeaflet from '../../../../shared/components/HeatMapLeaflet';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import Loader from '../../../../shared/components/loader';
 import InfoMessage from '../../../../shared/components/InfoMessage';
+import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 
 type HeatPoint = { x: number; y: number; time: string | number; value: number };
 
@@ -101,6 +102,10 @@ const AttributionHeatmaps: React.FC = () => {
   const selectedInstance = plotSlice?.selectedInstance ?? '';
 
   const [showAttribution, setShowAttribution] = useState<boolean>(false);
+  const [radius, setRadius] = useState<number>(18);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timeIndex, setTimeIndex] = useState(0);
 
   useEffect(() => {
     if (!tab || !experimentId || !isTabInitialized) return;
@@ -126,9 +131,12 @@ const AttributionHeatmaps: React.FC = () => {
     dispatch(setSelectedFeature({ plotType: 'segmentation', feature: val }));
   };
 
-  const handleTimeChange = (val: string) => {
-    dispatch(setSelectedTime({ plotType: 'segmentation', time: val }));
-  };
+  const handleTimeChange = useCallback(
+    (val: string) => {
+      dispatch(setSelectedTime({ plotType: 'segmentation', time: val }));
+    },
+    []
+  );
 
   const handleInstanceChange = (val: string) => {
     dispatch(setSelectedInstance({plotType: 'segmentation', instance: val}));
@@ -152,9 +160,31 @@ const AttributionHeatmaps: React.FC = () => {
   const featureOptions = useMemo(() => featureCandidates(plotModel), [plotModel]);
   const timeOptions = useMemo(() => distinctTimes(plotModel?.featuresTable), [plotModel]);
   const instanceOptions = useMemo(() => plotModel?.availableIndices ?? [], [plotModel]);
-  const [radius, setRadius] = useState<number>(18);
 
-  // map points (lat=y, lon=x)
+  useEffect(() => {
+    if (!timeOptions.length) {
+      setTimeIndex(0);
+      return;
+    }
+    const idx = selectedTime ? timeOptions.indexOf(selectedTime) : 0;
+    setTimeIndex(idx === -1 ? 0 : idx);
+  }, [timeOptions, selectedTime]);
+
+  useEffect(() => {
+    if (!isPlaying || !timeOptions.length) return;
+
+    const id = setInterval(() => {
+      setTimeIndex(prev => {
+        const next = (prev + 1) % timeOptions.length;
+        const tVal = timeOptions[next];
+        if (tVal != null) handleTimeChange(tVal);
+        return next;
+      });
+    }, 3000);
+
+    return () => clearInterval(id);
+  }, [isPlaying, timeOptions]);
+
   const featurePts = useMemo(
     () => makeHeatmapValues(plotModel?.featuresTable, selectedFeature, selectedTime)
       .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
@@ -230,19 +260,16 @@ const AttributionHeatmaps: React.FC = () => {
           />
         </ThemeProvider>
       </FormControl>
-
-      <Box sx={{ gridColumn: '1 / -1' }}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={showAttribution}
-              onChange={e => setShowAttribution(e.target.checked)}
-              disabled={!attribPts.length || !!plotSlice?.loading}
-            />
-          }
-          label="Attribution"
-        />
-      </Box>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={showAttribution}
+            onChange={e => setShowAttribution(e.target.checked)}
+            disabled={!attribPts.length || !!plotSlice?.loading}
+          />
+        }
+        label="Attribution"
+      />
     </Box>
   );
 
@@ -275,6 +302,62 @@ const AttributionHeatmaps: React.FC = () => {
     />
   );
 
+  const timelineBar =
+    timeOptions.length > 0 && !plotSlice?.loading ? (
+      <Box
+        sx={{
+          borderTop: theme => `1px solid ${theme.palette.divider}`,
+          px: 1,
+          py: 1,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+        }}
+      >
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+        }}>
+        <Typography variant="body2">
+          Time
+        </Typography>
+        <IconButton
+          size="small"
+          onClick={() => setIsPlaying(p => !p)}
+          disabled={!!plotSlice?.loading || !timeOptions.length}
+        >
+          {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+        </IconButton>
+        </Box>
+        <ThemeProvider theme={theme}>
+          <Box sx={{ flex: 1 }}>
+            <Slider
+              min={0}
+              max={timeOptions.length - 1}
+              step={1}
+              value={timeIndex}
+              onChange={(_, newValue) => {
+                const idx = newValue as number;
+                setIsPlaying(false);
+                setTimeIndex(idx);
+                const tVal = timeOptions[idx];
+                if (tVal != null) handleTimeChange(tVal);
+              }}
+              marks={
+                timeOptions.length <= 10
+                  ? timeOptions.map((t, idx) => ({
+                      value: idx,
+                    }))
+                  : undefined
+              }
+              valueLabelDisplay="off"
+              disabled={!!plotSlice?.loading || !timeOptions.length}
+            />
+          </Box>
+        </ThemeProvider>
+      </Box>
+    ) : null;
+
   return (
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={2}>
@@ -288,11 +371,14 @@ const AttributionHeatmaps: React.FC = () => {
             minHeight={400}
             noPadding
           >
-            {plotSlice?.loading
-              ? loading
-              : plotSlice?.error || !plotSlice?.data
-              ? error
-              : mapContent}
+            <>
+              {plotSlice?.loading
+                ? loading
+                : plotSlice?.error || !plotSlice?.data
+                ? error
+                : mapContent}
+              {timelineBar}
+            </>
           </ResponsiveCardTable>
         </Grid>
       </Grid>

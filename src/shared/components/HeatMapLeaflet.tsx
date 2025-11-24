@@ -124,6 +124,46 @@ const scaleValuesTo01 = (vals: number[], minI = 0.35, gamma = 0.5) => {
   return { scaled, min, max };
 };
 
+const getColorFromGradient = (stops: Record<number, string>, t: number) => {
+  const entries = Object.entries(stops)
+    .map(([k, v]) => [parseFloat(k), v] as [number, string])
+    .sort((a, b) => a[0] - b[0]);
+
+  if (!entries.length) return '#ff0000';
+
+  if (t <= entries[0][0]) return entries[0][1];
+  if (t >= entries[entries.length - 1][0]) return entries[entries.length - 1][1];
+
+  let i = 1;
+  while (i < entries.length && t > entries[i][0]) i++;
+  const [p0, c0] = entries[i - 1];
+  const [p1, c1] = entries[i];
+
+  const f = (t - p0) / (p1 - p0);
+
+  const hexToRgb = (hex: string) => {
+    const h = hex.replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return { r, g, b };
+  };
+
+  const rgbToHex = (r: number, g: number, b: number) =>
+    `#${r.toString(16).padStart(2, '0')}${g
+      .toString(16)
+      .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+  const { r: r0, g: g0, b: b0 } = hexToRgb(c0);
+  const { r: r1, g: g1, b: b1 } = hexToRgb(c1);
+
+  const r = Math.round(r0 + (r1 - r0) * f);
+  const g = Math.round(g0 + (g1 - g0) * f);
+  const b = Math.round(b0 + (b1 - b0) * f);
+
+  return rgbToHex(r, g, b);
+};
+
 const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   points,
   attributionPoints = [],
@@ -147,6 +187,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   const legendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
 
   const attributionLayerRef = useRef<L.LayerGroup | null>(null);
+  const attributionLegendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
 
   // Precompute heat data + bounds
   const { heatData, vMin, vMax, bounds } = useMemo(() => {
@@ -220,10 +261,8 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     };
   }, [tilesUrl, title]);
 
-  // update heat layer + legend + fit bounds when inputs change
   useEffect(() => {
     const m = mapRef.current;
-
     if (!m) return;
 
     const gradientUsed = DEFAULT_HEAT_GRADIENT;
@@ -242,41 +281,60 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     legendGradientRef.current = gradientUsed;
     heatRef.current?.addTo(m);
 
-    if (attributionLayerRef.current) {
-      attributionLayerRef.current.remove();
-      attributionLayerRef.current = null;
-    }
-    if (attributionPoints && attributionPoints.length > 0) {
-      const lg = L.layerGroup();
-      attributionPoints.forEach(p => {
-        const marker = L.circleMarker([p.lat, p.lon], {
-          radius: 4,
-          color: '#000000',
-          weight: 1,
-          fillColor: '#ff0000',
-          fillOpacity: 0.9,
-        });
-
-        marker.bindTooltip(p.value.toFixed(decimals));
-        lg.addLayer(marker);
-      });
-      lg.addTo(m);
-      attributionLayerRef.current = lg;
-    }
-
-    // legend
+    // legend for feature heatmap
     if (legendRef.current) {
       legendRef.current.remove();
       legendRef.current = null;
     }
     const cssGradient = gradientToCss(legendGradientRef.current || DEFAULT_HEAT_GRADIENT);
-    const lgLegend = createLegendControl('topright', cssGradient);
+    const lg = createLegendControl('topright', cssGradient);
+    lg.addTo(m);
+    lg.update(legendLabel || 'Feature', vMin, vMax, cssGradient, decimals);
+    legendRef.current = lg;
 
-    lgLegend.addTo(m);
-    lgLegend.update(legendLabel, vMin, vMax, cssGradient, decimals);
-    legendRef.current = lgLegend;
+    if (attributionLayerRef.current) {
+      attributionLayerRef.current.remove();
+      attributionLayerRef.current = null;
+    }
 
-    // fit bounds to data
+    if (attributionLegendRef.current) {
+      attributionLegendRef.current.remove();
+      attributionLegendRef.current = null;
+    }
+
+    if (attributionPoints && attributionPoints.length > 0) {
+      const valuesA = attributionPoints.map(p => p.value);
+      const minA = Math.min(...valuesA);
+      const maxA = Math.max(...valuesA);
+      const spanA = maxA - minA || 1;
+
+      const lgAttr = L.layerGroup();
+      attributionPoints.forEach(p => {
+        const t = (p.value - minA) / spanA; // 0..1
+        const color = getColorFromGradient(gradientUsed, t);
+
+        const marker = L.circleMarker([p.lat, p.lon], {
+          radius: 3,
+          color: '#000000',
+          weight: 1,
+          fillColor: color,
+          fillOpacity: 0.9,
+        });
+
+        marker.bindTooltip(p.value.toFixed(decimals));
+        lgAttr.addLayer(marker);
+      });
+      lgAttr.addTo(m);
+      attributionLayerRef.current = lgAttr;
+
+      const cssGradientAttr = gradientToCss(gradientUsed);
+      const lgAttrLegend = createLegendControl('bottomright', cssGradientAttr);
+      lgAttrLegend.addTo(m);
+      lgAttrLegend.update('Attribution', minA, maxA, cssGradientAttr, decimals);
+      attributionLegendRef.current = lgAttrLegend;
+    }
+
+    // fit bounds to data (feature points)
     if (bounds && bounds.isValid()) m.fitBounds(bounds.pad(padding));
 
     // keep size fresh
