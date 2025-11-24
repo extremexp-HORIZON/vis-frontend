@@ -102,6 +102,7 @@ const AttributionHeatmaps: React.FC = () => {
   const selectedInstance = plotSlice?.selectedInstance ?? '';
 
   const [showAttribution, setShowAttribution] = useState<boolean>(false);
+  const [showAttributionMap, setShowAttributionMap] = useState<boolean>(false);
   const [radius, setRadius] = useState<number>(18);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -160,6 +161,12 @@ const AttributionHeatmaps: React.FC = () => {
   const featureOptions = useMemo(() => featureCandidates(plotModel), [plotModel]);
   const timeOptions = useMemo(() => distinctTimes(plotModel?.featuresTable), [plotModel]);
   const instanceOptions = useMemo(() => plotModel?.availableIndices ?? [], [plotModel]);
+
+  useEffect(() => {
+    if (!showAttribution) {
+      setShowAttributionMap(false);
+    }
+  }, [showAttribution]);
 
   useEffect(() => {
     if (!timeOptions.length) {
@@ -270,6 +277,16 @@ const AttributionHeatmaps: React.FC = () => {
         }
         label="Attribution"
       />
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={showAttributionMap}
+            onChange={e => setShowAttributionMap(e.target.checked)}
+            disabled={!showAttribution || !attribPts.length || !!plotSlice?.loading}
+          />
+        }
+        label="Split Map"
+      />
     </Box>
   );
 
@@ -288,7 +305,7 @@ const AttributionHeatmaps: React.FC = () => {
     />
   );
 
-  const mapContent = (
+  const singleMapContent = (
     <HeatMapLeaflet
       points={featurePts}
       legendLabel={selectedFeature}
@@ -301,6 +318,41 @@ const AttributionHeatmaps: React.FC = () => {
       attributionPoints={showAttribution ? attribPts : []}
     />
   );
+
+  const splitMapsContent = (
+    <Grid container spacing={1} sx={{ p: 1 }}>
+      <Grid item xs={12} md={6}>
+        <Box sx={{ width: '100%', height: '100%' }}>
+          <HeatMapLeaflet
+            points={featurePts}
+            legendLabel={selectedFeature || 'Feature'}
+            radius={radius}
+            blur={15}
+            maxZoom={18}
+            decimals={5}
+            minIntensity={0.35}
+            gamma={0.5}
+          />
+        </Box>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <Box sx={{ width: '100%', height: '100%' }}>
+          <HeatMapLeaflet
+            points={attribPts}
+            legendLabel={selectedFeature ? `${selectedFeature} attribution` : 'Attribution'}
+            radius={radius}
+            blur={15}
+            maxZoom={18}
+            decimals={5}
+            minIntensity={0.35}
+            gamma={0.5}
+          />
+        </Box>
+      </Grid>
+    </Grid>
+  );
+
+  const mapContent = showAttribution && showAttributionMap ? splitMapsContent : singleMapContent;
 
   const timelineBar =
     timeOptions.length > 0 && !plotSlice?.loading ? (
@@ -318,16 +370,16 @@ const AttributionHeatmaps: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
         }}>
-        <Typography variant="body2">
-          Time
-        </Typography>
-        <IconButton
-          size="small"
-          onClick={() => setIsPlaying(p => !p)}
-          disabled={!!plotSlice?.loading || !timeOptions.length}
-        >
-          {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-        </IconButton>
+          <Typography variant="body2">
+            Time
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={() => setIsPlaying(p => !p)}
+            disabled={!!plotSlice?.loading || !timeOptions.length}
+          >
+            {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+          </IconButton>
         </Box>
         <ThemeProvider theme={theme}>
           <Box sx={{ flex: 1 }}>
@@ -345,7 +397,7 @@ const AttributionHeatmaps: React.FC = () => {
               }}
               marks={
                 timeOptions.length <= 10
-                  ? timeOptions.map((t, idx) => ({
+                  ? timeOptions.map((_, idx) => ({
                       value: idx,
                     }))
                   : undefined
