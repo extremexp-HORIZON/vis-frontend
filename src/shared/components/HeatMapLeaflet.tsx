@@ -42,6 +42,12 @@ export interface HeatMapLeafletProps {
 
   /** Optional className for container */
   className?: string;
+
+  /** Optional external view state to sync multiple maps */
+  syncedView?: { center: [number, number]; zoom: number };
+
+  /** Callback when this map's view changes (pan/zoom) */
+  onViewChange?: (view: { center: [number, number]; zoom: number }) => void;
 }
 
 const DEFAULT_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -180,6 +186,9 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   gamma = 0.5,
   tilesUrl = DEFAULT_TILES,
   className,
+  syncedView,
+  onViewChange,
+
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -188,6 +197,8 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
   const attributionLayerRef = useRef<L.LayerGroup | null>(null);
   const attributionLegendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
+
+  const programmaticMoveRef = useRef(false);
 
   // Precompute heat data + bounds
   const { heatData, vMin, vMax, bounds } = useMemo(() => {
@@ -222,23 +233,23 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    mapRef.current = L.map(containerRef.current, { 
+    const m = L.map(containerRef.current, { 
       zoomControl: true,
       attributionControl: false,
     });
+    mapRef.current = m;
+
+    m.setView([0, 0], 1);
 
     // base tiles
     L.tileLayer(tilesUrl, {
       attribution: '',
-    }).addTo(mapRef.current);
+    }).addTo(m);
 
-    // title badge (use class-style control to satisfy TS)
     if (title) {
       const badge = new L.Control({ position: 'topleft' });
-
       (badge as any).onAdd = function () {
         const div = L.DomUtil.create('div', 'leaflet-badge');
-
         div.style.background = 'rgba(255,255,255,0.9)';
         div.style.padding = '4px 8px';
         div.style.borderRadius = '6px';
@@ -246,17 +257,15 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
         div.style.fontWeight = '600';
         div.style.boxShadow = '0 0 4px rgba(0,0,0,0.15)';
         div.textContent = title!;
-
         return div;
       };
-      badge.addTo(mapRef.current);
+      badge.addTo(m);
     }
 
-    // ensure layout
-    setTimeout(() => mapRef.current?.invalidateSize(), 120);
+    setTimeout(() => m.invalidateSize(), 120);
 
     return () => {
-      mapRef.current?.remove();
+      m.remove();
       mapRef.current = null;
     };
   }, [tilesUrl, title]);
@@ -335,7 +344,9 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     }
 
     // fit bounds to data (feature points)
-    if (bounds && bounds.isValid()) m.fitBounds(bounds.pad(padding));
+    if (!syncedView && bounds && bounds.isValid()) {
+      m.fitBounds(bounds.pad(padding));
+    }
 
     // keep size fresh
     setTimeout(() => m.invalidateSize(), 60);
@@ -353,7 +364,56 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     bounds,
     attributionPoints,
     DEFAULT_HEAT_GRADIENT,
+    syncedView,
   ]);
+
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m || !onViewChange) return;
+
+    const handleViewChange = () => {
+      if (programmaticMoveRef.current) {
+        programmaticMoveRef.current = false;
+        return;
+      }
+
+      const center = m.getCenter();
+      const zoom = m.getZoom();
+      onViewChange({
+        center: [center.lat, center.lng],
+        zoom,
+      });
+    };
+
+    m.on('moveend', handleViewChange);
+    m.on('zoomend', handleViewChange);
+
+    return () => {
+      m.off('moveend', handleViewChange);
+      m.off('zoomend', handleViewChange);
+    };
+  }, [onViewChange]);
+
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m || !syncedView) return;
+
+    const currentCenter = m.getCenter();
+    const currentZoom = m.getZoom();
+    const [lat, lng] = syncedView.center;
+
+    if (
+      Math.abs(currentCenter.lat - lat) < 1e-9 &&
+      Math.abs(currentCenter.lng - lng) < 1e-9 &&
+      currentZoom === syncedView.zoom
+    ) {
+      return;
+    }
+
+    programmaticMoveRef.current = true;
+    m.setView([lat, lng], syncedView.zoom, { animate: false });
+  }, [syncedView?.center[0], syncedView?.center[1], syncedView?.zoom]);
+
 
   return (
     <div

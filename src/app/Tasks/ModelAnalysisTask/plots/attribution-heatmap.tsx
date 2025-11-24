@@ -108,6 +108,8 @@ const AttributionHeatmaps: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeIndex, setTimeIndex] = useState(0);
 
+  const [mapView, setMapView] = useState<{ center: [number, number]; zoom: number } | null>(null);
+
   useEffect(() => {
     if (!tab || !experimentId || !isTabInitialized) return;
     dispatch(
@@ -191,6 +193,11 @@ const AttributionHeatmaps: React.FC = () => {
 
     return () => clearInterval(id);
   }, [isPlaying, timeOptions]);
+
+  useEffect(() => {
+    if (!showAttributionMap) return;
+    setMapView(null);
+  }, [selectedFeature, selectedInstance, selectedTime]);
 
   const featurePts = useMemo(
     () => makeHeatmapValues(plotModel?.featuresTable, selectedFeature, selectedTime)
@@ -332,6 +339,17 @@ const AttributionHeatmaps: React.FC = () => {
             decimals={5}
             minIntensity={0.35}
             gamma={0.5}
+            syncedView={mapView || undefined}
+            onViewChange={view =>
+              setMapView(prev =>
+                !prev ||
+                prev.zoom !== view.zoom ||
+                prev.center[0] !== view.center[0] ||
+                prev.center[1] !== view.center[1]
+                  ? view
+                  : prev
+              )
+            }
           />
         </Box>
       </Grid>
@@ -346,6 +364,17 @@ const AttributionHeatmaps: React.FC = () => {
             decimals={5}
             minIntensity={0.35}
             gamma={0.5}
+            syncedView={mapView || undefined}
+            onViewChange={view =>
+              setMapView(prev =>
+                !prev ||
+                prev.zoom !== view.zoom ||
+                prev.center[0] !== view.center[0] ||
+                prev.center[1] !== view.center[1]
+                  ? view
+                  : prev
+              )
+            }
           />
         </Box>
       </Grid>
