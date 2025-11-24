@@ -27,11 +27,11 @@ const FeatureExplainability = () => {
 
         {isSpecialExperiment ? (
           <>
-           <Grid item xs={12}>
-            <FeatureImportancePlot />
-          </Grid>
           <Grid item xs={12}>
             <AttributionHeatmaps />
+          </Grid>
+           <Grid item xs={12}>
+            <FeatureImportancePlot max_height={250}/>
           </Grid>
           </>
         ) : (
