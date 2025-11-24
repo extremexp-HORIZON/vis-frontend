@@ -209,6 +209,11 @@ const AttributionHeatmaps: React.FC = () => {
       .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
     [plotModel, selectedFeature, selectedTime]
   );
+  useEffect(() => {
+    if (showAttribution && attribPts.length === 0) {
+      setShowAttribution(false);
+    }
+  }, [showAttribution, attribPts.length]);
 
   const controlPanel = (
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
