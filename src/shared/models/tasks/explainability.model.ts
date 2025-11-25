@@ -68,6 +68,7 @@ export type ExplainabilityQuery = {
   instance_index?: number
   experiment_configs?: { [key: string]: IHyperparameters }
   target_metric?: string
+  segmentation_process_step?: string
 }
 
 export const explainabilityQueryDefault: ExplainabilityQuery = {

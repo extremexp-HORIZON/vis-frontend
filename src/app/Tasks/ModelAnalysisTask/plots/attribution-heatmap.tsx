@@ -51,11 +51,6 @@ const theme = createTheme({
   },
 });
 
-const featureCandidates = (pl: IPlotModel | null) =>
-  pl?.featuresTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ??
-  pl?.attributionsTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ??
-  [];
-
 const distinctTimes = (table?: ITableContents) => {
   if (!table?.time?.values) return [];
   const uniq = Array.from(new Set(table.time.values.map(v => String(v))));
@@ -69,23 +64,28 @@ const makeHeatmapValues = (
   feature: string,
   timeValue?: string | number
 ): HeatPoint[] => {
-  if (!table || !table['x'] || !table['y'] || !table['time'] || !table[feature]) return [];
+  if (!table || !table['x'] || !table['y'] || !table[feature]) return [];
+
   const xs = table['x'].values;
   const ys = table['y'].values;
-  const ts = table['time'].values;
   const vs = table[feature].values;
-  const N = Math.min(xs.length, ys.length, ts.length, vs.length);
+  const ts = table['time']?.values;
+
+  const N = Math.min(xs.length, ys.length, vs.length, ts ? ts.length : Infinity);
   const out: HeatPoint[] = [];
 
   for (let i = 0; i < N; i++) {
-    const t = ts[i] as string | number;
+    const t = ts ? (ts[i] as string | number) : null;
 
-    if (timeValue != null && String(t) !== String(timeValue)) continue;
+    if (timeValue != null && ts && String(t) !== String(timeValue)) continue;
+
     const x = numeric(xs[i]);
     const y = numeric(ys[i]);
     const v = numeric(vs[i]);
 
-    if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(v)) out.push({ x, y, time: t, value: v });
+    if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(v)) {
+      out.push({ x, y, time: t ?? '', value: v });
+    }
   }
 
   return out;
@@ -160,9 +160,22 @@ const AttributionHeatmaps: React.FC = () => {
     );
   };
 
-  const featureOptions = useMemo(() => featureCandidates(plotModel), [plotModel]);
+  const featureOptions = useMemo(() => {
+    if (!plotModel) return [];
+    const featureCols =
+      plotModel.featuresTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ?? [];
+    const targetCols =
+      plotModel.targetsTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ?? [];
+    return [...featureCols, ...targetCols];
+  }, [plotModel]);
+
   const timeOptions = useMemo(() => distinctTimes(plotModel?.featuresTable), [plotModel]);
   const instanceOptions = useMemo(() => plotModel?.availableIndices ?? [], [plotModel]);
+
+  const isTargetFeature = useMemo(
+    () => !!plotModel?.targetsTableColumns?.includes(selectedFeature),
+    [plotModel, selectedFeature]
+  );
 
   useEffect(() => {
     if (!showAttribution) {
@@ -180,7 +193,7 @@ const AttributionHeatmaps: React.FC = () => {
   }, [timeOptions, selectedTime]);
 
   useEffect(() => {
-    if (!isPlaying || !timeOptions.length) return;
+    if (!isPlaying || !timeOptions.length || isTargetFeature) return;
 
     const id = setInterval(() => {
       setTimeIndex(prev => {
@@ -199,15 +212,24 @@ const AttributionHeatmaps: React.FC = () => {
     setMapView(null);
   }, [selectedFeature, selectedInstance, selectedTime]);
 
+  const sourceTable = isTargetFeature ? plotModel?.targetsTable : plotModel?.featuresTable;
+  const effectiveTime = isTargetFeature ? undefined : selectedTime;
+
   const featurePts = useMemo(
-    () => makeHeatmapValues(plotModel?.featuresTable, selectedFeature, selectedTime)
+    () => makeHeatmapValues(sourceTable, selectedFeature, effectiveTime)
       .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
-    [plotModel, selectedFeature, selectedTime]
+    [sourceTable, selectedFeature, effectiveTime]
   );
   const attribPts = useMemo(
-    () => makeHeatmapValues(plotModel?.attributionsTable, selectedFeature, selectedTime)
-      .map(p => ({ lat: p.y, lon: p.x, value: p.value })),
-    [plotModel, selectedFeature, selectedTime]
+    () =>
+      isTargetFeature
+        ? []
+        : makeHeatmapValues(plotModel?.attributionsTable, selectedFeature, selectedTime).map(p => ({
+            lat: p.y,
+            lon: p.x,
+            value: p.value,
+          })),
+    [plotModel, selectedFeature, selectedTime, isTargetFeature]
   );
   useEffect(() => {
     if (showAttribution && attribPts.length === 0) {
@@ -245,7 +267,7 @@ const AttributionHeatmaps: React.FC = () => {
         </Select>
       </FormControl>
 
-      <FormControl fullWidth disabled={!timeOptions.length || !!plotSlice?.loading}>
+      <FormControl fullWidth disabled={!timeOptions.length || !!plotSlice?.loading || isTargetFeature}>
         <InputLabel id="time-select-label">Time</InputLabel>
         <Select
           labelId="time-select-label"
@@ -254,6 +276,7 @@ const AttributionHeatmaps: React.FC = () => {
           onChange={e => handleTimeChange(e.target.value)}
           displayEmpty
           MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
+          disabled={!timeOptions.length || !!plotSlice?.loading || isTargetFeature}
         >
           {timeOptions.length === 0
             ? <MenuItem value=""><em>No time</em></MenuItem>
@@ -284,7 +307,7 @@ const AttributionHeatmaps: React.FC = () => {
           <Checkbox
             checked={showAttribution}
             onChange={e => setShowAttribution(e.target.checked)}
-            disabled={!attribPts.length || !!plotSlice?.loading}
+            disabled={!attribPts.length || !!plotSlice?.loading || isTargetFeature}
           />
         }
         label="Attribution"
@@ -294,7 +317,7 @@ const AttributionHeatmaps: React.FC = () => {
           <Checkbox
             checked={showAttributionMap}
             onChange={e => setShowAttributionMap(e.target.checked)}
-            disabled={!showAttribution || !attribPts.length || !!plotSlice?.loading}
+            disabled={!showAttribution || !attribPts.length || !!plotSlice?.loading || isTargetFeature}
           />
         }
         label="Split Map"
@@ -389,7 +412,7 @@ const AttributionHeatmaps: React.FC = () => {
   const mapContent = showAttribution && showAttributionMap ? splitMapsContent : singleMapContent;
 
   const timelineBar =
-    timeOptions.length > 0 && !plotSlice?.loading ? (
+    timeOptions.length > 0 && !plotSlice?.loading && !isTargetFeature ? (
       <Box
         sx={{
           borderTop: theme => `1px solid ${theme.palette.divider}`,
@@ -449,7 +472,7 @@ const AttributionHeatmaps: React.FC = () => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <ResponsiveCardTable
-            title="Feature / Attribution"
+            title="Feature / Attribution Map"
             details={plotModel?.plotDescr || null}
             controlPanel={controlPanel}
             showDownloadButton
