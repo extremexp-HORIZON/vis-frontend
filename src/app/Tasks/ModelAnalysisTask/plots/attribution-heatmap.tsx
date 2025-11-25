@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import {
   Box,
   Grid,
@@ -110,6 +110,9 @@ const AttributionHeatmaps: React.FC = () => {
 
   const [mapView, setMapView] = useState<{ center: [number, number]; zoom: number } | null>(null);
 
+  const prevShowAttributionRef = useRef(showAttribution);
+  const lastAttributionInstanceRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!tab || !experimentId || !isTabInitialized) return;
     dispatch(
@@ -118,6 +121,7 @@ const AttributionHeatmaps: React.FC = () => {
           ...explainabilityQueryDefault,
           explanation_type: 'featureExplanation',
           explanation_method: 'segmentation',
+          segmentation_process_step: 'return_instance',
         },
         metadata: {
           workflowId: tab.workflowId,
@@ -142,23 +146,70 @@ const AttributionHeatmaps: React.FC = () => {
   );
 
   const handleInstanceChange = (val: string) => {
-    dispatch(setSelectedInstance({plotType: 'segmentation', instance: val}));
+    dispatch(setSelectedInstance({ plotType: 'segmentation', instance: val }));
+
+    if (!tab || !experimentId) return;
+
+    const segmentation_process_step = showAttribution ? 'attribution' : 'return_instance';
+
     dispatch(
       fetchModelAnalysisExplainabilityPlot({
         query: {
           ...explainabilityQueryDefault,
           explanation_type: 'featureExplanation',
           explanation_method: 'segmentation',
-          instance_index: Number(val)
+          segmentation_process_step,
+          instance_index: Number(val),
         },
         metadata: {
-          workflowId: tab?.workflowId || '',
+          workflowId: tab.workflowId,
           queryCase: 'segmentation',
-          experimentId: experimentId || '',
+          experimentId,
         },
       })
     );
+
+    if (showAttribution) {
+      lastAttributionInstanceRef.current = val;
+    }
   };
+
+  useEffect(() => {
+    if (!tab || !experimentId || !isTabInitialized) return;
+
+    const prev = prevShowAttributionRef.current;
+    prevShowAttributionRef.current = showAttribution;
+
+    const turnedOn = !prev && showAttribution;
+    if (!turnedOn) return;
+
+    const currentInstance = selectedInstance || '';
+
+    if (currentInstance && lastAttributionInstanceRef.current === currentInstance) {
+      return;
+    }
+
+    dispatch(
+      fetchModelAnalysisExplainabilityPlot({
+        query: {
+          ...explainabilityQueryDefault,
+          explanation_type: 'featureExplanation',
+          explanation_method: 'segmentation',
+          segmentation_process_step: 'attribution',
+          ...(currentInstance ? { instance_index: Number(currentInstance) } : {}),
+        },
+        metadata: {
+          workflowId: tab.workflowId,
+          queryCase: 'segmentation',
+          experimentId,
+        },
+      })
+    );
+
+    if (currentInstance) {
+      lastAttributionInstanceRef.current = currentInstance;
+    }
+  }, [showAttribution, selectedInstance, isTabInitialized]);
 
   const featureOptions = useMemo(() => {
     if (!plotModel) return [];
@@ -212,6 +263,12 @@ const AttributionHeatmaps: React.FC = () => {
     setMapView(null);
   }, [selectedFeature, selectedInstance, selectedTime]);
 
+  useEffect(() => {
+    if (isTargetFeature && showAttribution) {
+      setShowAttribution(false);
+    }
+  }, [isTargetFeature, showAttribution]);
+
   const sourceTable = isTargetFeature ? plotModel?.targetsTable : plotModel?.featuresTable;
   const effectiveTime = isTargetFeature ? undefined : selectedTime;
 
@@ -231,11 +288,6 @@ const AttributionHeatmaps: React.FC = () => {
           })),
     [plotModel, selectedFeature, selectedTime, isTargetFeature]
   );
-  useEffect(() => {
-    if (showAttribution && attribPts.length === 0) {
-      setShowAttribution(false);
-    }
-  }, [showAttribution, attribPts.length]);
 
   const controlPanel = (
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
@@ -307,7 +359,7 @@ const AttributionHeatmaps: React.FC = () => {
           <Checkbox
             checked={showAttribution}
             onChange={e => setShowAttribution(e.target.checked)}
-            disabled={!attribPts.length || !!plotSlice?.loading || isTargetFeature}
+            disabled={!!plotSlice?.loading || isTargetFeature}
           />
         }
         label="Attribution"
