@@ -324,7 +324,6 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
         if (hasOverlay) {
           //Overlay mode: Feature + Attribution sections
           let html = `
-            <div style="font-weight: 600; margin-bottom: 2px;">Feature</div>
             <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 0 0 4px 0;"></div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
               <span>${vMin.toFixed(decimals)}</span>
