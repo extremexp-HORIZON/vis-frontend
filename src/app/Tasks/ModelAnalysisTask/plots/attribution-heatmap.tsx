@@ -209,7 +209,7 @@ const AttributionHeatmaps: React.FC = () => {
     if (currentInstance) {
       lastAttributionInstanceRef.current = currentInstance;
     }
-  }, [showAttribution, selectedInstance, isTabInitialized]);
+  }, [showAttribution]);
 
   const featureOptions = useMemo(() => {
     if (!plotModel) return [];
