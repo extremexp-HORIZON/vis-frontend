@@ -131,9 +131,25 @@ export const explainabilityReducers = (builder: ActionReducerMapBuilder<IWorkflo
           section.selectedFeature2 = action.payload.features.feature2;
         }
         if ('selectedTime' in section) {
-          const times = action.payload.featuresTable?.time?.values ?? action.payload.attributionsTable?.time?.values ?? [];
-
-          section.selectedTime = times.length ? String(times[0]) : null;
+          const rawTimes =
+            action.payload.featuresTable?.time?.values ??
+            action.payload.attributionsTable?.time?.values ??
+            [];
+        
+          let selectedTime: string | null = null;
+        
+          if (rawTimes.length) {
+            const asStrings = rawTimes.map(v => String(v));
+            const allNumeric = asStrings.every(v => !Number.isNaN(Number(v)));
+          
+            const sorted = [...asStrings].sort((a, b) =>
+              allNumeric ? Number(a) - Number(b) : a.localeCompare(b)
+            );
+          
+            selectedTime = sorted[0];
+          }
+        
+          section.selectedTime = selectedTime;
         }
         if('selectedInstance' in section && !section.selectedInstance) {
           const instances = action.payload.availableIndices ?? [];

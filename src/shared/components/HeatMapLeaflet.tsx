@@ -10,6 +10,8 @@ export interface HeatMapLeafletProps {
   /** Array of {lat, lon, value} points */
   points: HeatPointLL[];
 
+  attributionPoints?: HeatPointLL[];
+
   /** Title badge shown on map (top-left) */
   title?: string;
 
@@ -40,6 +42,12 @@ export interface HeatMapLeafletProps {
 
   /** Optional className for container */
   className?: string;
+
+  /** Optional external view state to sync multiple maps */
+  syncedView?: { center: [number, number]; zoom: number };
+
+  /** Callback when this map's view changes (pan/zoom) */
+  onViewChange?: (view: { center: [number, number]; zoom: number }) => void;
 }
 
 const DEFAULT_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -56,7 +64,7 @@ const createLegendControl = (position: L.ControlPosition = 'topright', cssGradie
     div.style.borderRadius = '8px';
     div.style.boxShadow = '0 0 6px rgba(0,0,0,0.25)';
     div.style.fontSize = '12px';
-    div.style.minWidth = '150px'
+    div.style.minWidth = '150px';
     div.innerHTML = `
       <div class="legend-title" style="font-weight:600"></div>
       <div class="legend-range"></div>
@@ -65,42 +73,12 @@ const createLegendControl = (position: L.ControlPosition = 'topright', cssGradie
     return div;
   };
 
-  (legend as any).update = (label: string, min: number, max: number, cssGradient: string, decimals = 5) => {
-    const container = (legend as any)._container as HTMLElement | undefined;
-
-    if (!container) return;
-    const title = container.querySelector('.legend-title') as HTMLElement | null;
-    const range = container.querySelector('.legend-range') as HTMLElement | null;
-
-    if (title) title.textContent = label;
-    if (range && min === max)
-      range.innerHTML = `
-              <div style="color: gray;">Unique value</div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-                <div style="width:24px;height:12px;background:${cssGradient};border-radius:2px;"></div>
-                <span>${min?.toFixed(decimals)}</span>
-              </div>
-            `;
-    else if (range)
-      range.innerHTML = `
-        <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
-        <div style="display: flex; justify-content: space-between;">
-          <span>${min?.toFixed(decimals)}</span>
-          <span>${max?.toFixed(decimals)}</span>
-        </div>
-      `;
-  };
-
-  return legend as L.Control & { update: (label: string, min: number, max: number, cssGradient: string, decimals?: number) => void };
+  return legend as L.Control;
 };
 
 // ----- helpers: intensity scaling to make near-zero visible -----
 const EPS = 1e-9;
 
-/**
- * Normalize values to [0..1], boost lows with gamma (<1), and clamp with floor
- * so that very small values remain visible in the heat layer.
- */
 const scaleValuesTo01 = (vals: number[], minI = 0.35, gamma = 0.5) => {
   if (!vals.length) return { scaled: vals, min: 0, max: 1 };
   const min = Math.min(...vals);
@@ -122,8 +100,49 @@ const scaleValuesTo01 = (vals: number[], minI = 0.35, gamma = 0.5) => {
   return { scaled, min, max };
 };
 
+const getColorFromGradient = (stops: Record<number, string>, t: number) => {
+  const entries = Object.entries(stops)
+    .map(([k, v]) => [parseFloat(k), v] as [number, string])
+    .sort((a, b) => a[0] - b[0]);
+
+  if (!entries.length) return '#ff0000';
+
+  if (t <= entries[0][0]) return entries[0][1];
+  if (t >= entries[entries.length - 1][0]) return entries[entries.length - 1][1];
+
+  let i = 1;
+  while (i < entries.length && t > entries[i][0]) i++;
+  const [p0, c0] = entries[i - 1];
+  const [p1, c1] = entries[i];
+
+  const f = (t - p0) / (p1 - p0);
+
+  const hexToRgb = (hex: string) => {
+    const h = hex.replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return { r, g, b };
+  };
+
+  const rgbToHex = (r: number, g: number, b: number) =>
+    `#${r.toString(16).padStart(2, '0')}${g
+      .toString(16)
+      .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+  const { r: r0, g: g0, b: b0 } = hexToRgb(c0);
+  const { r: r1, g: g1, b: b1 } = hexToRgb(c1);
+
+  const r = Math.round(r0 + (r1 - r0) * f);
+  const g = Math.round(g0 + (g1 - g0) * f);
+  const b = Math.round(b0 + (b1 - b0) * f);
+
+  return rgbToHex(r, g, b);
+};
+
 const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   points,
+  attributionPoints = [],
   title,
   legendLabel = 'Value',
   height = 420,
@@ -137,11 +156,16 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   gamma = 0.5,
   tilesUrl = DEFAULT_TILES,
   className,
+  syncedView,
+  onViewChange,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const heatRef = useRef<L.Layer | null>(null);
-  const legendRef = useRef<(L.Control & { update: (s: string, a: number, b: number, cssGradient: string, d?: number) => void }) | null>(null);
+  const legendRef = useRef<L.Control | null>(null);
+
+  const attributionLayerRef = useRef<L.LayerGroup | null>(null);
+  const programmaticMoveRef = useRef(false);
 
   // Precompute heat data + bounds
   const { heatData, vMin, vMax, bounds } = useMemo(() => {
@@ -155,13 +179,16 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
   const legendGradientRef = useRef<Record<number, string> | null>(null);
 
-  const DEFAULT_HEAT_GRADIENT: Record<number, string> = useMemo(() => ({
-    0.0: '#0000ff',
-    0.25: '#00ffff',
-    0.5: '#00ff00',
-    0.75: '#ffff00',
-    1.0: '#ff0000',
-  }), []);
+  const DEFAULT_HEAT_GRADIENT: Record<number, string> = useMemo(
+    () => ({
+      0.0: '#0000ff',
+      0.25: '#00ffff',
+      0.5: '#00ff00',
+      0.75: '#ffff00',
+      1.0: '#ff0000',
+    }),
+    []
+  );
 
   const gradientToCss = (stops: Record<number, string>) => {
     const entries = Object.entries(stops)
@@ -176,23 +203,23 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    mapRef.current = L.map(containerRef.current, { 
+    const m = L.map(containerRef.current, {
       zoomControl: true,
       attributionControl: false,
     });
+    mapRef.current = m;
+
+    m.setView([0, 0], 1);
 
     // base tiles
     L.tileLayer(tilesUrl, {
       attribution: '',
-    }).addTo(mapRef.current);
+    }).addTo(m);
 
-    // title badge (use class-style control to satisfy TS)
     if (title) {
       const badge = new L.Control({ position: 'topleft' });
-
       (badge as any).onAdd = function () {
         const div = L.DomUtil.create('div', 'leaflet-badge');
-
         div.style.background = 'rgba(255,255,255,0.9)';
         div.style.padding = '4px 8px';
         div.style.borderRadius = '6px';
@@ -200,25 +227,21 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
         div.style.fontWeight = '600';
         div.style.boxShadow = '0 0 4px rgba(0,0,0,0.15)';
         div.textContent = title!;
-
         return div;
       };
-      badge.addTo(mapRef.current);
+      badge.addTo(m);
     }
 
-    // ensure layout
-    setTimeout(() => mapRef.current?.invalidateSize(), 120);
+    setTimeout(() => m.invalidateSize(), 120);
 
     return () => {
-      mapRef.current?.remove();
+      m.remove();
       mapRef.current = null;
     };
   }, [tilesUrl, title]);
 
-  // update heat layer + legend + fit bounds when inputs change
   useEffect(() => {
     const m = mapRef.current;
-
     if (!m) return;
 
     const gradientUsed = DEFAULT_HEAT_GRADIENT;
@@ -232,29 +255,176 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       radius,
       blur,
       maxZoom,
-      gradient: gradientUsed
+      gradient: gradientUsed,
     });
     legendGradientRef.current = gradientUsed;
     heatRef.current?.addTo(m);
 
-    // legend
+    // clear old attribution markers
+    if (attributionLayerRef.current) {
+      attributionLayerRef.current.remove();
+      attributionLayerRef.current = null;
+    }
+
+    // build attribution markers and compute min/max
+    let minA: number | null = null;
+    let maxA: number | null = null;
+
+    if (attributionPoints && attributionPoints.length > 0) {
+      const valuesA = attributionPoints.map(p => p.value);
+      minA = Math.min(...valuesA);
+      maxA = Math.max(...valuesA);
+      const spanA = maxA - minA || 1;
+
+      const lgAttr = L.layerGroup();
+      attributionPoints.forEach(p => {
+        const t = (p.value - minA!) / spanA; // 0..1
+        const color = getColorFromGradient(gradientUsed, t);
+
+        const marker = L.circleMarker([p.lat, p.lon], {
+          radius: 3,
+          color: '#000000',
+          weight: 1,
+          fillColor: color,
+          fillOpacity: 0.9,
+        });
+
+        marker.bindTooltip(`Attribution: ${p.value.toFixed(decimals)}`);
+        lgAttr.addLayer(marker);
+      });
+      lgAttr.addTo(m);
+      attributionLayerRef.current = lgAttr;
+    }
+
+    // combined legend (Feature + Attribution in the same box)
     if (legendRef.current) {
       legendRef.current.remove();
       legendRef.current = null;
     }
-    const cssGradient = gradientToCss(legendGradientRef.current || DEFAULT_HEAT_GRADIENT);
+    const cssGradient = gradientToCss(gradientUsed);
     const lg = createLegendControl('topright', cssGradient);
-
     lg.addTo(m);
-    lg.update(legendLabel, vMin, vMax, cssGradient, decimals);
     legendRef.current = lg;
 
-    // fit bounds to data
-    if (bounds && bounds.isValid()) m.fitBounds(bounds.pad(padding));
+    const container = (lg as any)._container as HTMLElement | undefined;
+    if (container) {
+      const titleEl = container.querySelector('.legend-title') as HTMLElement | null;
+      const rangeEl = container.querySelector('.legend-range') as HTMLElement | null;
+    
+      const hasOverlay = !!(attributionPoints && attributionPoints.length > 0);
+    
+      if (titleEl) {
+        // If we have overlay, show generic combined title, otherwise just use legendLabel
+        titleEl.textContent = hasOverlay
+          ? legendLabel || 'Feature / Attribution'
+          : legendLabel || 'Value';
+      }
+    
+      if (rangeEl) {
+        if (hasOverlay) {
+          //Overlay mode: Feature + Attribution sections
+          let html = `
+            <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 0 0 4px 0;"></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span>${vMin.toFixed(decimals)}</span>
+              <span>${vMax.toFixed(decimals)}</span>
+            </div>
+          `;
+        
+          if (minA != null && maxA != null) {
+            html += `
+              <div style="font-weight: 600; margin-bottom: 2px;">Attribution</div>
+              <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 0 0 4px 0;"></div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>${minA.toFixed(decimals)}</span>
+                <span>${maxA.toFixed(decimals)}</span>
+              </div>
+            `;
+          }
+        
+          rangeEl.innerHTML = html;
+        } else {
+          //Simple mode: just this layer (feature OR attribution map in split mode)
+          rangeEl.innerHTML = `
+            <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>${vMin.toFixed(decimals)}</span>
+              <span>${vMax.toFixed(decimals)}</span>
+            </div>
+          `;
+        }
+      }
+    }
+
+    if (!syncedView && bounds && bounds.isValid()) {
+      m.fitBounds(bounds.pad(padding));
+    }
 
     // keep size fresh
     setTimeout(() => m.invalidateSize(), 60);
-  }, [heatData, vMin, vMax, legendLabel, decimals, radius, blur, maxZoom, padding, gradient, bounds]);
+  }, [
+    heatData,
+    vMin,
+    vMax,
+    legendLabel,
+    decimals,
+    radius,
+    blur,
+    maxZoom,
+    padding,
+    gradient,
+    bounds,
+    attributionPoints,
+    DEFAULT_HEAT_GRADIENT,
+    syncedView,
+  ]);
+
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m || !onViewChange) return;
+
+    const handleViewChange = () => {
+      if (programmaticMoveRef.current) {
+        programmaticMoveRef.current = false;
+        return;
+      }
+
+      const center = m.getCenter();
+      const zoom = m.getZoom();
+      onViewChange({
+        center: [center.lat, center.lng],
+        zoom,
+      });
+    };
+
+    m.on('moveend', handleViewChange);
+    m.on('zoomend', handleViewChange);
+
+    return () => {
+      m.off('moveend', handleViewChange);
+      m.off('zoomend', handleViewChange);
+    };
+  }, [onViewChange]);
+
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m || !syncedView) return;
+
+    const currentCenter = m.getCenter();
+    const currentZoom = m.getZoom();
+    const [lat, lng] = syncedView.center;
+
+    if (
+      Math.abs(currentCenter.lat - lat) < 1e-9 &&
+      Math.abs(currentCenter.lng - lng) < 1e-9 &&
+      currentZoom === syncedView.zoom
+    ) {
+      return;
+    }
+
+    programmaticMoveRef.current = true;
+    m.setView([lat, lng], syncedView.zoom, { animate: false });
+  }, [syncedView?.center[0], syncedView?.center[1], syncedView?.zoom]);
 
   return (
     <div

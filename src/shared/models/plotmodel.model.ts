@@ -22,8 +22,10 @@ export interface IPlotModel {
     effCostActions: IEffCostActions;
     featuresTable: ITableContents;
     attributionsTable: ITableContents;
+    targetsTable: ITableContents;
     featuresTableColumns: string[];
     attributionsTableColumns: string[];
+    targetsTableColumns: string[];
     shapContributions: ShapContributions[];
     availableIndices: number[];
   }

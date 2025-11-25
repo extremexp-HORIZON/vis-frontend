@@ -12,6 +12,7 @@ import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
 
 interface IFeatureImportancePlotProps {
   explanation_type?: string
+  max_height?: number
 }
 
 type FeatureImportanceResponse = {
@@ -19,7 +20,7 @@ type FeatureImportanceResponse = {
 };
 
 const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
-  const { explanation_type }  = props;
+  const { explanation_type, max_height }  = props;
   const { experimentId } = useParams();
   const dispatch = useAppDispatch();
   const { tab, isTabInitialized } = useAppSelector((state: RootState) => state.workflowPage);
@@ -161,7 +162,7 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
       spec={spec}
       actions={false}
       title={plotModel?.data?.plotName || 'Feature Importance'}
-      maxHeight={400}
+      maxHeight={max_height ? max_height : 400}
       showInfoMessage={shouldShowLoading || shouldShowError}
       infoMessage={shouldShowLoading ? loading : shouldShowError ? error : <></>}
       isStatic={false}
