@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   IconButton,
   createTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
@@ -288,6 +289,11 @@ const AttributionHeatmaps: React.FC = () => {
           })),
     [plotModel, selectedFeature, selectedTime, isTargetFeature]
   );
+  const createPredictionPoints = () => {
+    if (!plotModel?.targetsTable || !plotModel.targetsTable['Prediction']) return [];
+    return makeHeatmapValues(plotModel.targetsTable, 'Prediction', effectiveTime)
+      .map(p => ({ lat: p.y, lon: p.x, value: p.value }));
+  };
 
   const controlPanel = (
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
@@ -318,24 +324,29 @@ const AttributionHeatmaps: React.FC = () => {
           {featureOptions.map(f => (<MenuItem key={`feature-${f}`} value={f}>{f}</MenuItem>))}
         </Select>
       </FormControl>
-
-      <FormControl fullWidth disabled={!timeOptions.length || !!plotSlice?.loading || isTargetFeature}>
-        <InputLabel id="time-select-label">Time</InputLabel>
-        <Select
-          labelId="time-select-label"
-          label="Time"
-          value={selectedTime ?? ''}
-          onChange={e => handleTimeChange(e.target.value)}
-          displayEmpty
-          MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
-          disabled={!timeOptions.length || !!plotSlice?.loading || isTargetFeature}
-        >
-          {timeOptions.length === 0
-            ? <MenuItem value=""><em>No time</em></MenuItem>
-            : timeOptions.map(t => <MenuItem key={`time-${t}`} value={t}>{t}</MenuItem>)
-          }
-        </Select>
-      </FormControl>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={showAttribution}
+            onChange={e => {
+              setShowAttribution(e.target.checked)
+              setShowAttributionMap(e.target.checked)
+            }}
+            disabled={!!plotSlice?.loading || isTargetFeature}
+          />
+        }
+        label="Attribution"
+      />
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={showAttributionMap}
+            onChange={e => setShowAttributionMap(e.target.checked)}
+            disabled={!showAttribution || !attribPts.length || !!plotSlice?.loading || isTargetFeature}
+          />
+        }
+        label="Split Map"
+      />
 
       <FormControl fullWidth disabled={!timeOptions.length || !!plotSlice?.loading}>
         <ThemeProvider theme={theme}>
@@ -354,26 +365,6 @@ const AttributionHeatmaps: React.FC = () => {
           />
         </ThemeProvider>
       </FormControl>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={showAttribution}
-            onChange={e => setShowAttribution(e.target.checked)}
-            disabled={!!plotSlice?.loading || isTargetFeature}
-          />
-        }
-        label="Attribution"
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={showAttributionMap}
-            onChange={e => setShowAttributionMap(e.target.checked)}
-            disabled={!showAttribution || !attribPts.length || !!plotSlice?.loading || isTargetFeature}
-          />
-        }
-        label="Split Map"
-      />
     </Box>
   );
 
@@ -436,8 +427,8 @@ const AttributionHeatmaps: React.FC = () => {
       <Grid item xs={12} md={6}>
         <Box sx={{ width: '100%', height: '100%' }}>
           <HeatMapLeaflet
-            points={attribPts}
-            legendLabel={selectedFeature ? `${selectedFeature} attribution` : 'Attribution'}
+            points={createPredictionPoints()}
+            legendLabel={'Prediction'}
             radius={radius}
             blur={15}
             maxZoom={18}
@@ -455,6 +446,7 @@ const AttributionHeatmaps: React.FC = () => {
                   : prev
               )
             }
+            attributionPoints={showAttribution ? attribPts : []}
           />
         </Box>
       </Grid>
@@ -464,7 +456,7 @@ const AttributionHeatmaps: React.FC = () => {
   const mapContent = showAttribution && showAttributionMap ? splitMapsContent : singleMapContent;
 
   const timelineBar =
-    timeOptions.length > 0 && !plotSlice?.loading && !isTargetFeature ? (
+    timeOptions.length > 0 && !plotSlice?.loading && !isTargetFeature && !plotSlice?.error ? (
       <Box
         sx={{
           borderTop: theme => `1px solid ${theme.palette.divider}`,
@@ -529,17 +521,17 @@ const AttributionHeatmaps: React.FC = () => {
             controlPanel={controlPanel}
             showDownloadButton
             showFullScreenButton
-            minHeight={400}
+            minHeight={useMediaQuery(theme.breakpoints.down('xl')) ? 400 : 650}
             noPadding
           >
-            <>
+            <Box display='flex' flexDirection='column' width='100%'>
               {plotSlice?.loading
                 ? loading
                 : plotSlice?.error || !plotSlice?.data
                 ? error
                 : mapContent}
               {timelineBar}
-            </>
+            </Box>
           </ResponsiveCardTable>
         </Grid>
       </Grid>
