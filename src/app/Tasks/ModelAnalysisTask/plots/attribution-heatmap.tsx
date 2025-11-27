@@ -524,7 +524,7 @@ const AttributionHeatmaps: React.FC = () => {
             minHeight={useMediaQuery(theme.breakpoints.down('xl')) ? 400 : 650}
             noPadding
           >
-            <Box display='flex' flexDirection='column' width='100%'>
+            <Box display='flex' flexDirection='column' width='100%' height='100%'>
               {plotSlice?.loading
                 ? loading
                 : plotSlice?.error || !plotSlice?.data
