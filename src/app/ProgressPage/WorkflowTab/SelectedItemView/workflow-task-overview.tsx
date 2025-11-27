@@ -4,6 +4,60 @@ import type { RootState } from '../../../../store/store';
 import { useAppSelector } from '../../../../store/store';
 import { DetailsCard, DetailsCardItem } from '../../../../shared/components/details-card';
 import UserInteractiveTask from '../../../../deprecated/UserInteractiveTask/user-interactive-task';
+import { IRun } from '../../../../shared/models/experiment/run.model';
+
+type ParamStats =
+  | { type: 'numeric'; min: number; max: number }
+  | { type: 'categorical'; values: string[] };
+
+const getParamStats = (
+  workflows: IRun[],
+  paramName: string,
+  taskId?: string,
+): ParamStats | null => {
+  const allValues: string[] = [];
+
+  workflows.forEach(run => {
+    run.params
+      .filter(p => p.name === paramName && (!taskId || p.task === taskId))
+      .forEach(p => allValues.push(p.value));
+  });
+
+  if (allValues.length === 0) return null;
+
+  const meaningfulValues = allValues.filter(v =>
+    v !== null &&
+    v !== undefined &&
+    v.trim() !== ""
+  );
+
+  if (meaningfulValues.length === 0) {
+    return {
+      type: 'categorical',
+      values: [],
+    };
+  }
+
+  const numericValues: number[] = [];
+
+  for (const v of meaningfulValues) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) {
+      return {
+        type: 'categorical',
+        values: Array.from(new Set(meaningfulValues)),
+      };
+    }
+    numericValues.push(n);
+  }
+
+  return {
+    type: 'numeric',
+    min: Math.min(...numericValues),
+    max: Math.max(...numericValues),
+  };
+};
+
 const StatusIndicator = ({ completed }: {completed: boolean}) => (
   <Box
     sx={{
@@ -58,6 +112,9 @@ const WorkflowTaskOverview = () => {
         selectedTask: null,
       },
   );
+  const { workflows } = useAppSelector(
+    (state: RootState) => state.progressPage
+  );
 
   const task = tab?.workflowConfiguration.tasks?.find(task => task.name === selectedTask?.task);
 
@@ -92,13 +149,53 @@ const WorkflowTaskOverview = () => {
 
         <DetailsCard title="Task Parameters">
           {parameters?.length ? (
-            parameters.map(param => (
-              <DetailsCardItem
-                key={`param-${param.name}`}
-                label={param.name}
-                value={param.value}
-              />
-            ))
+            parameters.map(param => {
+              const stats = getParamStats(
+                workflows?.data,
+                param.name,
+              );
+            
+              let extraInfo: React.ReactNode = null;
+            
+              if (stats?.type === 'numeric') {
+                extraInfo = (
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{ ml: 1, color: 'text.secondary' }}
+                  >
+                    (range: {stats.min} – {stats.max})
+                  </Typography>
+                );
+              } else if (stats?.type === 'categorical') {
+                const displayValues = stats.values.slice(0, 5);
+                const moreCount = stats.values.length - displayValues.length;
+              
+                extraInfo = (
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{ ml: 1, color: 'text.secondary' }}
+                  >
+                    (values: {displayValues.join(', ')}
+                    {moreCount > 0 && `, +${moreCount} more`})
+                  </Typography>
+                );
+              }
+            
+              return (
+                <DetailsCardItem
+                  key={`param-${param.name}`}
+                  label={param.name}
+                  value={
+                    <>
+                      {param.value}
+                      {extraInfo}
+                    </>
+                  }
+                />
+              );
+            })
           ) : (
             <EmptyState />
           )}
