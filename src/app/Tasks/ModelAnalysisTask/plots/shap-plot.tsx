@@ -51,10 +51,15 @@ const ShapPlot = () => {
     //   console.log('Features without importanceScore:', missingImportance);
     // }
 
-    return filteredData.map(d => ({
+    const shap = filteredData.map(d => ({
       Feature: d.featureName,
       Importance: d.importanceScore!,
     }));
+
+    return shap
+      .sort((a, b) => b.Importance - a.Importance)
+      .slice(0, 10);
+
   };
 
   const spec = {

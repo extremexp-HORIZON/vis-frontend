@@ -81,10 +81,15 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
         return true;
       });
 
-      return filtered.map(d => ({
+      const importances = filtered.map(d => ({
         Feature: d.featureName,
         Importance: d.importanceScore as number,
       }));
+
+      return importances
+      .sort((a, b) => b.Importance - a.Importance)
+      .slice(0, 10);
+
     }
 
     // Case 2: experimentExplanation shape
@@ -108,7 +113,7 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
         }
       }
 
-      return out.sort((a, b) => b.Importance - a.Importance);
+      return out.sort((a, b) => b.Importance - a.Importance).slice(0, 10);
     }
 
     return [];
