@@ -24,6 +24,15 @@ interface PdpPlotProps {
   explanation_type: string
 }
 
+const canArrayBeNumeric = (values: unknown[]): boolean =>
+  values.length > 0 &&
+  values.every((v) => {
+    if (v === null || v === undefined) return false;
+    const s = String(v).trim();
+    if (!s) return false;
+    return !Number.isNaN(Number(s));
+  });
+
 const PdpPlot = (props: PdpPlotProps) => {
   const { explanation_type } = props;
   const { tab, isTabInitialized } = useAppSelector(
@@ -79,78 +88,137 @@ const PdpPlot = (props: PdpPlotProps) => {
   }, [selectedFeature, selectedTargetMetric]);
 
   const getVegaliteData = (plmodel: IPlotModel | null) => {
-    if (!plmodel) return [];
-    const data: { [x: string]: string }[] = [];
+    if (!plmodel) {
+      return { data: [] as Array<Record<string, string | number | null>>, xIsNumeric: false, yIsNumeric: false };
+    }
 
-    plmodel.xAxis.axisValues.forEach((val, idx) => {
-      data.push({
-        [plmodel.xAxis.axisName]: val,
-        [plmodel.yAxis.axisName]: plmodel.yAxis.axisValues[idx],
-      });
+    const xVals = plmodel.xAxis.axisValues;
+    const yVals = plmodel.yAxis.axisValues;
+
+    const xIsNumeric = canArrayBeNumeric(xVals);
+    const yIsNumeric = canArrayBeNumeric(yVals);
+
+    const data: Array<Record<string, string | number | null>> = xVals.map((xVal, idx) => {
+      const yVal = yVals[idx];
+
+      return {
+        [plmodel.xAxis.axisName]: xIsNumeric ? Number(xVal) : xVal,
+        [plmodel.yAxis.axisName]: yIsNumeric ? Number(yVal) : yVal,
+      };
     });
 
-    return data;
+    return { data, xIsNumeric, yIsNumeric };
   };
 
-  const xField = tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisName || 'xAxis default';
-  const yField = tab?.workflowTasks.modelAnalysis?.pdp?.data?.yAxis.axisName || 'yAxis default';
+  const plmodelData = tab?.workflowTasks.modelAnalysis?.pdp?.data || null;
+  const { data: vegaData, xIsNumeric, yIsNumeric } = getVegaliteData(plmodelData);
 
-  const spec = {
-    width: 'container',
-    autosize: { type: 'fit', contains: 'padding', resize: true },
-    data: {
-      values: getVegaliteData(
-        tab?.workflowTasks.modelAnalysis?.pdp?.data || null,
-      ),
-    },
-    mark: {
-      type: 'line',
-      tooltip: { content: 'data' },
-      point: { size: 20, color: theme.palette.primary.main, tooltip: { content: 'data' } },
-    },
-    encoding: {
-      x: {
-        field:
-          tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisName ||
-          'xAxis default',
+  const xField = plmodelData?.xAxis.axisName || 'xAxis default';
+  const yField = plmodelData?.yAxis.axisName || 'yAxis default';
 
-        type:
-          tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
-          'numerical'
-            ? 'quantitative'
-            : 'ordinal',
-        // aggregate: "mean"
-      },
-      y: {
-        field:
-          tab?.workflowTasks.modelAnalysis?.pdp?.data?.yAxis.axisName ||
-          'yAxis default',
-        title: 'Average Predicted Value',
+  const hasCategoricalBars = !xIsNumeric && yIsNumeric;
 
-        type:
-          tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType ===
-          'numerical'
-            ? 'quantitative'
-            : 'ordinal',
-        axis: {
-          format: '.4f',
+  const spec = hasCategoricalBars
+    ? {
+        width: 'container',
+        autosize: { type: 'fit', contains: 'padding', resize: true },
+        data: {
+          values: vegaData,
         },
-        tooltip: [
-          { 
-            field: xField, 
-            type: tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType === 'numerical' ? 'quantitative' : 'ordinal',
-            title: 'Feature Value'
+        layer: [
+          // Zero reference line at y = 0
+          {
+            mark: {
+              type: 'rule',
+              color: '#777',
+              strokeWidth: 1,
+            },
+            encoding: {
+              y: { datum: 0 },
+            },
           },
-          { 
-            field: yField, 
-            type: 'quantitative',
-            title: 'Average Prediction',
-            format: '.4f'
-          }
-        ]
-      },
-    },
-  };
+          // Vertical bars
+          {
+            mark: {
+              type: 'bar',
+            },
+            encoding: {
+              x: {
+                field: xField,
+                type: 'ordinal',
+                title: xField,
+              },
+              y: {
+                field: yField,
+                title: 'Average Predicted Value',
+                type: 'quantitative',
+                axis: { format: '.4f' },
+                scale: { zero: true },
+              },
+              color: {
+                value: theme.palette.primary.main,
+              },
+              tooltip: [
+                {
+                  field: xField,
+                  type: 'ordinal',
+                  title: 'Feature Value',
+                },
+                {
+                  field: yField,
+                  type: 'quantitative',
+                  title: 'Average Prediction',
+                  format: '.4f',
+                },
+              ],
+            },
+          },
+        ],
+      }
+    : {
+        width: 'container',
+        autosize: { type: 'fit', contains: 'padding', resize: true },
+        data: {
+          values: vegaData,
+        },
+        mark: xIsNumeric
+          ? {
+              type: 'line',
+              point: { size: 20, color: theme.palette.primary.main },
+            }
+          : {
+              type: 'bar',
+            },
+        encoding: {
+          x: {
+            field: xField,
+            type: xIsNumeric ? 'quantitative' : 'ordinal',
+          },
+          y: {
+            field: yField,
+            title: 'Average Predicted Value',
+            type: yIsNumeric ? 'quantitative' : 'ordinal',
+            ...(yIsNumeric
+              ? {
+                  axis: { format: '.4f' },
+                }
+              : {}),
+          },
+          tooltip: [
+            {
+              field: xField,
+              type: xIsNumeric ? 'quantitative' : 'ordinal',
+              title: 'Feature Value',
+            },
+            {
+              field: yField,
+              type: yIsNumeric ? 'quantitative' : 'ordinal',
+              title: 'Average Prediction',
+              ...(yIsNumeric ? { format: '.4f' } : {}),
+            },
+          ],
+        },
+      };
 
   const dispatchPdpFetch = (feature: string, targetMetric?: string) => {
     dispatch(

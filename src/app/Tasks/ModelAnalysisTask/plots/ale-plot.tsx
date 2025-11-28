@@ -24,6 +24,15 @@ interface AlePlotProps {
   explanation_type: string
 }
 
+const canArrayBeNumeric = (values: unknown[]): boolean =>
+  values.length > 0 &&
+  values.every((v) => {
+    if (v === null || v === undefined) return false;
+    const s = String(v).trim();
+    if (!s) return false;
+    return !Number.isNaN(Number(s));
+  });
+
 const AlePlot = (props: AlePlotProps) => {
   const { explanation_type } = props;
   const { tab, isTabInitialized } = useAppSelector(
@@ -74,17 +83,32 @@ const AlePlot = (props: AlePlotProps) => {
   }, [isTabInitialized]);
 
   const getVegaliteData = (plmodel: IPlotModel | null) => {
-    if (!plmodel) return [];
-    const data: { [x: string]: string }[] = [];
+    if (!plmodel) {
+      return {
+        data: [] as Array<Record<string, string | number | null>>,
+        xIsNumeric: false,
+        yIsNumeric: false,
+      };
+    }
 
-    plmodel.xAxis.axisValues.forEach((val, idx) => {
-      data.push({
-        [plmodel.xAxis.axisName]: val,
-        [plmodel.yAxis.axisName]: plmodel.yAxis.axisValues[idx],
-      });
-    });
+    const xVals = plmodel.xAxis.axisValues;
+    const yVals = plmodel.yAxis.axisValues;
 
-    return data;
+    const xIsNumeric = canArrayBeNumeric(xVals);
+    const yIsNumeric = canArrayBeNumeric(yVals);
+
+    const data: Array<Record<string, string | number | null>> = xVals.map(
+      (xVal, idx) => {
+        const yVal = yVals[idx];
+
+        return {
+          [plmodel.xAxis.axisName]: xIsNumeric ? Number(xVal) : xVal,
+          [plmodel.yAxis.axisName]: yIsNumeric ? Number(yVal) : yVal,
+        };
+      },
+    );
+
+    return { data, xIsNumeric, yIsNumeric };
   };
 
   useEffect(() => {
@@ -92,64 +116,117 @@ const AlePlot = (props: AlePlotProps) => {
     setPendingTargetMetric(selectedTargetMetric);
   }, [selectedFeature, selectedTargetMetric]);
 
-  const xField = tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisName || 'xAxis default';
-  const yField = tab?.workflowTasks.modelAnalysis?.pdp?.data?.yAxis.axisName || 'yAxis default';
+  const aleData = tab?.workflowTasks.modelAnalysis?.ale?.data || null;
+  const { data: vegaData, xIsNumeric, yIsNumeric } = getVegaliteData(aleData);
 
-  const spec = {
-    width: 'container',
-    autosize: { type: 'fit', contains: 'padding', resize: true },
-    data: {
-      values: getVegaliteData(
-        tab?.workflowTasks.modelAnalysis?.ale?.data || null,
-      ),
-    },
-    mark: {
-      type: 'line',
-      tooltip: { content: 'data' },
-      point: { size: 20, color: theme.palette.primary.main, tooltip: { content: 'data' }, },
-    },
-    encoding: {
-      x: {
-        field:
-          tab?.workflowTasks.modelAnalysis?.ale?.data?.xAxis.axisName ||
-          'xAxis default',
-        type:
-          tab?.workflowTasks.modelAnalysis?.ale?.data?.xAxis.axisType ===
-          'numerical'
-            ? 'quantitative'
-            : 'ordinal',
-        // aggregate: "mean"
-      },
-      y: {
-        field:
-          tab?.workflowTasks.modelAnalysis?.ale?.data?.yAxis.axisName ||
-          'yAxis default',
-        title: 'Average Predicted Effect',
+  const xField = aleData?.xAxis.axisName || 'xAxis default';
+  const yField = aleData?.yAxis.axisName || 'yAxis default';
 
-        type:
-          tab?.workflowTasks.modelAnalysis?.ale?.data?.xAxis.axisType ===
-          'numerical'
-            ? 'quantitative'
-            : 'ordinal',
-        axis: {
-          format: '.4f',
+  const hasCategoricalBars = !xIsNumeric && yIsNumeric;
+
+  const spec = hasCategoricalBars
+    ? {
+        width: 'container',
+        autosize: { type: 'fit', contains: 'padding', resize: true },
+        data: {
+          values: vegaData,
         },
-        tooltip: [
-          { 
-            field: xField, 
-            type: tab?.workflowTasks.modelAnalysis?.pdp?.data?.xAxis.axisType === 'numerical' ? 'quantitative' : 'ordinal',
-            title: 'Feature Value'
+        layer: [
+          {
+            mark: {
+              type: 'rule',
+              color: '#777',
+              size: 1,
+            },
+            encoding: {
+              y: { datum: 0 },
+            },
           },
-          { 
-            field: yField, 
-            type: 'quantitative',
+          {
+            mark: {
+              type: 'bar',
+            },
+            encoding: {
+              x: {
+                field: xField,
+                type: 'ordinal',
+                title: xField,
+              },
+              y: {
+                field: yField,
+                title: 'Average Predicted Effect',
+                type: 'quantitative',
+                axis: {
+                  format: '.4f',
+                },
+                scale: { zero: true },
+              },
+              color: {
+                value: theme.palette.primary.main,
+              },
+              tooltip: [
+                {
+                  field: xField,
+                  type: 'ordinal',
+                  title: 'Feature Value',
+                },
+                {
+                  field: yField,
+                  type: 'quantitative',
+                  title: 'Average Predicted Effect',
+                  format: '.4f',
+                },
+              ],
+            },
+          },
+        ],
+      }
+    : {
+        width: 'container',
+        autosize: { type: 'fit', contains: 'padding', resize: true },
+        data: {
+          values: vegaData,
+        },
+        mark: xIsNumeric
+          ? {
+              type: 'line',
+              point: { size: 20, color: theme.palette.primary.main },
+            }
+          : {
+              type: 'bar',
+            },
+        encoding: {
+          x: {
+            field: xField,
+            type: xIsNumeric ? 'quantitative' : 'ordinal',
+          },
+          y: {
+            field: yField,
             title: 'Average Predicted Effect',
-            format: '.4f'
-          }
-        ]
-      },
-    },
-  };
+            type: yIsNumeric ? 'quantitative' : 'ordinal',
+            ...(yIsNumeric
+              ? {
+                  axis: {
+                    format: '.4f',
+                  },
+                }
+              : {}),
+          },
+          tooltip: [
+            {
+              field: xField,
+              type: xIsNumeric ? 'quantitative' : 'ordinal',
+              title: 'Feature Value',
+            },
+            {
+              field: yField,
+              type: yIsNumeric ? 'quantitative' : 'ordinal',
+              title: 'Average Predicted Effect',
+              ...(yIsNumeric ? { format: '.4f' } : {}),
+            },
+          ],
+        },
+      };
 
   const dispatchAleFetch = (
     feature: string,

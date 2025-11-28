@@ -3,6 +3,19 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
+import { createTheme, useMediaQuery } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    primary: { main: '#1976d2' },
+    secondary: { main: '#dc004e' },
+  },
+  typography: {
+    fontFamily: 'Arial',
+    h6: { fontWeight: 600 },
+  },
+});
+
 
 export type HeatPointLL = { lat: number; lon: number; value: number };
 
@@ -145,7 +158,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
   attributionPoints = [],
   title,
   legendLabel = 'Value',
-  height = 420,
+  height = useMediaQuery(theme.breakpoints.down('xl')) ? 400 : 650,
   radius = 18,
   blur = 15,
   maxZoom = 18,
@@ -260,38 +273,51 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     legendGradientRef.current = gradientUsed;
     heatRef.current?.addTo(m);
 
-    // clear old attribution markers
+    // clear old attribution layer
     if (attributionLayerRef.current) {
       attributionLayerRef.current.remove();
       attributionLayerRef.current = null;
     }
 
-    // build attribution markers and compute min/max
-    let minA: number | null = null;
-    let maxA: number | null = null;
-
     if (attributionPoints && attributionPoints.length > 0) {
-      const valuesA = attributionPoints.map(p => p.value);
-      minA = Math.min(...valuesA);
-      maxA = Math.max(...valuesA);
-      const spanA = maxA - minA || 1;
-
       const lgAttr = L.layerGroup();
+    
+      const size = 0.00001;
+    
       attributionPoints.forEach(p => {
-        const t = (p.value - minA!) / spanA; // 0..1
-        const color = getColorFromGradient(gradientUsed, t);
-
-        const marker = L.circleMarker([p.lat, p.lon], {
-          radius: 3,
-          color: '#000000',
-          weight: 1,
-          fillColor: color,
-          fillOpacity: 0.9,
-        });
-
-        marker.bindTooltip(`Attribution: ${p.value.toFixed(decimals)}`);
-        lgAttr.addLayer(marker);
+        const { lat, lon, value } = p;
+      
+        const h = L.polyline(
+          [
+            [lat, lon - size],
+            [lat, lon + size],
+          ],
+          {
+            color: '#000000',
+            weight: 2,
+          }
+        );
+      
+        const v = L.polyline(
+          [
+            [lat - size, lon],
+            [lat + size, lon],
+          ],
+          {
+            color: '#000000',
+            weight: 2,
+          }
+        );
+      
+        const tooltipText = `Attribution: ${value.toFixed(decimals)}`;
+      
+        h.bindTooltip(tooltipText, { sticky: true });
+        v.bindTooltip(tooltipText, { sticky: true });
+      
+        lgAttr.addLayer(h);
+        lgAttr.addLayer(v);
       });
+    
       lgAttr.addTo(m);
       attributionLayerRef.current = lgAttr;
     }
@@ -321,38 +347,27 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       }
     
       if (rangeEl) {
-        if (hasOverlay) {
-          //Overlay mode: Feature + Attribution sections
-          let html = `
-            <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 0 0 4px 0;"></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-              <span>${vMin.toFixed(decimals)}</span>
-              <span>${vMax.toFixed(decimals)}</span>
+        let html = `
+          <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>${vMin.toFixed(decimals)}</span>
+            <span>${vMax.toFixed(decimals)}</span>
+          </div>
+        `;
+      
+      if (attributionPoints && attributionPoints.length > 0) {
+        html += `
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+            <div style="position:relative;width:10px;height:10px;">
+              <div style="position:absolute;left:0;top:50%;width:100%;height:1px;background:#000;transform:translateY(-50%);"></div>
+              <div style="position:absolute;top:0;left:50%;height:100%;width:1px;background:#000;transform:translateX(-50%);"></div>
             </div>
-          `;
-        
-          if (minA != null && maxA != null) {
-            html += `
-              <div style="font-weight: 600; margin-bottom: 2px;">Attribution</div>
-              <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 0 0 4px 0;"></div>
-              <div style="display: flex; justify-content: space-between;">
-                <span>${minA.toFixed(decimals)}</span>
-                <span>${maxA.toFixed(decimals)}</span>
-              </div>
-            `;
-          }
-        
-          rangeEl.innerHTML = html;
-        } else {
-          //Simple mode: just this layer (feature OR attribution map in split mode)
-          rangeEl.innerHTML = `
-            <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
-            <div style="display: flex; justify-content: space-between;">
-              <span>${vMin.toFixed(decimals)}</span>
-              <span>${vMax.toFixed(decimals)}</span>
-            </div>
-          `;
-        }
+            <span>Attribution</span>
+          </div>
+        `;
+      }
+
+        rangeEl.innerHTML = html;
       }
     }
 
