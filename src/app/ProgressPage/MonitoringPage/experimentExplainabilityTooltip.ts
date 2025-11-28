@@ -50,56 +50,29 @@ export const createExperimentExplainabilityTooltipHandler = ({
       return String(v);
     },
     formatTooltip: (value: Record<string, any>, sanitize) => {
-      let xValue = '';
-      let yValue = '';
-      let zValue = '';
-
-      if (value[xAxisName]) {
-        xValue = value[xAxisName];
-      } else if (value.x !== undefined) {
-        xValue = value.x;
-      } else if (value.feature1 !== undefined) {
-        xValue = value.feature1;
-      } else {
-        const keys = Object.keys(value).filter(key => 
-          key !== yAxisName &&
-          key !== 'y' && 
-          key !== 'value' &&
-          key !== 'Average Predicted Value' &&
-          key !== 'z'
-        );
-        if (keys.length > 0) {
-          xValue = value[keys[0]];
+      const getField = (
+        obj: Record<string, any>,
+        primaryKey?: string,
+        fallbackKeys: string[] = []
+      ) => {
+        if (primaryKey && Object.prototype.hasOwnProperty.call(obj, primaryKey)) {
+          return obj[primaryKey];
         }
-      }
-
-      if (value[yAxisName]) {
-        yValue = value[yAxisName];
-      } else if (value.y !== undefined) {
-        yValue = value.y;
-      } else if (value.feature2 !== undefined) {
-        yValue = value.feature2;
-      } else {
-        const keys = Object.keys(value).filter(key => 
-          key !== xAxisName &&
-          key !== 'x' && 
-          key !== 'value' &&
-          key !== 'Average Predicted Value' &&
-          key !== 'z' &&
-          key !== xValue
-        );
-        if (keys.length > 0) {
-          yValue = value[keys[0]];
+        for (const k of fallbackKeys) {
+          if (Object.prototype.hasOwnProperty.call(obj, k)) {
+            return obj[k];
+          }
         }
-      }
-
-      if (value.z !== undefined) {
-        zValue = value.z;
-      } else if (value.value !== undefined) {
-        zValue = value.value;
-      } else if (value['Average Predicted Value'] !== undefined) {
-        zValue = value['Average Predicted Value'];
-      }
+        return undefined;
+      };
+    
+      const xValueRaw = getField(value, xAxisName, ['x', 'feature1']);
+      const yValueRaw = getField(value, yAxisName, ['y', 'feature2']);
+      const zValueRaw = getField(value, undefined, ['z', 'value', 'Average Predicted Value']);
+    
+      const xValue = xValueRaw ?? '';
+      const yValue = yValueRaw ?? '';
+      const zValue = zValueRaw ?? '';
 
       if (!xValue && !yValue) {
         const availableData = Object.entries(value)
