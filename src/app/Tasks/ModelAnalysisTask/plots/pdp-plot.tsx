@@ -55,7 +55,7 @@ const PdpPlot = (props: PdpPlotProps) => {
 
   const tooltipHandler = useExperimentExplainabilityTooltip(
     plotModel?.data?.xAxis.axisName || 'xAxis default',
-    plotModel?.data?.yAxis.axisName || 'yAxis default',
+    'Average Predicted Value',
     plotModel?.data?.xAxis.axisType,
     pendingFeature
   );
@@ -213,7 +213,7 @@ const PdpPlot = (props: PdpPlotProps) => {
             {
               field: yField,
               type: yIsNumeric ? 'quantitative' : 'ordinal',
-              title: 'Average Prediction',
+              title: 'Average Predicted Value',
               ...(yIsNumeric ? { format: '.4f' } : {}),
             },
           ],

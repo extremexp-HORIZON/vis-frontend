@@ -50,29 +50,56 @@ export const createExperimentExplainabilityTooltipHandler = ({
       return String(v);
     },
     formatTooltip: (value: Record<string, any>, sanitize) => {
-      const getField = (
-        obj: Record<string, any>,
-        primaryKey?: string,
-        fallbackKeys: string[] = []
-      ) => {
-        if (primaryKey && Object.prototype.hasOwnProperty.call(obj, primaryKey)) {
-          return obj[primaryKey];
+      let xValue = '';
+      let yValue = '';
+      let zValue = '';
+      console.log(value)
+      if (value[xAxisName]) {
+        xValue = value[xAxisName];
+      } else if (value.x !== undefined) {
+        xValue = value.x;
+      } else if (value.feature1 !== undefined) {
+        xValue = value.feature1;
+      } else {
+        const keys = Object.keys(value).filter(key => 
+          key !== yAxisName &&
+          key !== 'y' && 
+          key !== 'value' &&
+          key !== 'Average Predicted Value' &&
+          key !== 'z'
+        );
+        if (keys.length > 0) {
+          xValue = value[keys[0]];
         }
-        for (const k of fallbackKeys) {
-          if (Object.prototype.hasOwnProperty.call(obj, k)) {
-            return obj[k];
-          }
+      }
+
+      if (value[yAxisName]) {
+        yValue = value[yAxisName];
+      } else if (value.y !== undefined) {
+        yValue = value.y;
+      } else if (value.feature2 !== undefined) {
+        yValue = value.feature2;
+      } else {
+        const keys = Object.keys(value).filter(key => 
+          key !== xAxisName &&
+          key !== 'x' && 
+          key !== 'value' &&
+          key !== 'Average Predicted Value' &&
+          key !== 'z' &&
+          key !== xValue
+        );
+        if (keys.length > 0) {
+          yValue = value[keys[0]];
         }
-        return undefined;
-      };
-    
-      const xValueRaw = getField(value, xAxisName, ['x', 'feature1']);
-      const yValueRaw = getField(value, yAxisName, ['y', 'feature2']);
-      const zValueRaw = getField(value, undefined, ['z', 'value', 'Average Predicted Value']);
-    
-      const xValue = xValueRaw ?? '';
-      const yValue = yValueRaw ?? '';
-      const zValue = zValueRaw ?? '';
+      }
+
+      if (value.z !== undefined) {
+        zValue = value.z;
+      } else if (value.value !== undefined) {
+        zValue = value.value;
+      } else if (value['Average Predicted Value'] !== undefined) {
+        zValue = value['Average Predicted Value'];
+      }
 
       if (!xValue && !yValue) {
         const availableData = Object.entries(value)
@@ -128,7 +155,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
         <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">
           ${selectedFeature ? `<div><strong>${sanitize(selectedFeature)}:</strong> ${sanitize(xValue)}</div>` : ''}
           ${selectedFeature2 ? `<div><strong>${sanitize(selectedFeature2)}:</strong> ${sanitize(yValue)}</div>` : ''}
-          ${!selectedFeature2 && yValue ? `<div><strong>${sanitize(yAxisName)}</strong> ${sanitize(Number(yValue).toFixed(4))}</div>` : ''}
+          ${!selectedFeature2 && yValue ? `<div><strong>${sanitize(yAxisName)}</strong> ${sanitize(yValue)}</div>` : ''}
           ${zValue ? `<div><strong>Value:</strong> ${sanitize(zValue)}</div>` : ''}
         </div>
       `;
