@@ -55,7 +55,7 @@ const AlePlot = (props: AlePlotProps) => {
 
   const tooltipHandler = useExperimentExplainabilityTooltip(
     plotModel?.data?.xAxis.axisName || 'xAxis default',
-    plotModel?.data?.yAxis.axisName || 'yAxis default',
+    'Average Predicted Effect',
     plotModel?.data?.xAxis.axisType,
     selectedFeature
   );

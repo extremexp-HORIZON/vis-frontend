@@ -53,7 +53,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
       let xValue = '';
       let yValue = '';
       let zValue = '';
-
+      console.log(value)
       if (value[xAxisName]) {
         xValue = value[xAxisName];
       } else if (value.x !== undefined) {
@@ -155,7 +155,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
         <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">
           ${selectedFeature ? `<div><strong>${sanitize(selectedFeature)}:</strong> ${sanitize(xValue)}</div>` : ''}
           ${selectedFeature2 ? `<div><strong>${sanitize(selectedFeature2)}:</strong> ${sanitize(yValue)}</div>` : ''}
-          ${!selectedFeature2 && yValue ? `<div><strong>${sanitize(yAxisName)}</strong> ${sanitize(Number(yValue).toFixed(4))}</div>` : ''}
+          ${!selectedFeature2 && yValue ? `<div><strong>${sanitize(yAxisName)}</strong> ${sanitize(yValue)}</div>` : ''}
           ${zValue ? `<div><strong>Value:</strong> ${sanitize(zValue)}</div>` : ''}
         </div>
       `;
