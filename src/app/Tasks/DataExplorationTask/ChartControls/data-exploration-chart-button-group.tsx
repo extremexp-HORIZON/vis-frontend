@@ -16,8 +16,11 @@ const ChartButtonGroup: React.FC = () => {
   const { tab } = useAppSelector(state => state.workflowPage);
   const chartType = tab?.workflowTasks.dataExploration?.controlPanel.chartType;
   const columns = tab?.workflowTasks?.dataExploration?.metaData?.data?.originalColumns;
+  const hasBarGroupBy = tab?.workflowTasks.dataExploration?.controlPanel?.barGroupBy &&
+    tab?.workflowTasks.dataExploration?.controlPanel?.barGroupBy.length > 0
   const stringColumnsCount = columns?.filter((col: VisualColumn) => col?.type === 'STRING').length || 0;
   const disableHeatmap = stringColumnsCount < 2;
+  const disableBarChart = !hasBarGroupBy
 
   return (
     <ButtonGroup
@@ -53,6 +56,7 @@ const ChartButtonGroup: React.FC = () => {
         <Button
           variant={chartType === 'bar' ? 'contained' : 'outlined'}
           onClick={() => dispatch(setControls({ chartType: 'bar' }))}
+          disabled={disableBarChart}
         >
           <BarChartIcon />
         </Button>
