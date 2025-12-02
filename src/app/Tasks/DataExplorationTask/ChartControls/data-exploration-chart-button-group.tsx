@@ -17,10 +17,10 @@ const ChartButtonGroup: React.FC = () => {
   const chartType = tab?.workflowTasks.dataExploration?.controlPanel.chartType;
   const columns = tab?.workflowTasks?.dataExploration?.metaData?.data?.originalColumns;
   const hasBarGroupBy = tab?.workflowTasks.dataExploration?.controlPanel?.barGroupBy &&
-    tab?.workflowTasks.dataExploration?.controlPanel?.barGroupBy.length > 0
+    tab?.workflowTasks.dataExploration?.controlPanel?.barGroupBy.length > 0;
   const stringColumnsCount = columns?.filter((col: VisualColumn) => col?.type === 'STRING').length || 0;
   const disableHeatmap = stringColumnsCount < 2;
-  const disableBarChart = !hasBarGroupBy
+  const disableBarChart = !hasBarGroupBy;
 
   return (
     <ButtonGroup
