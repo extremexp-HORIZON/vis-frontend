@@ -138,6 +138,7 @@ export default function FilterBar({
         setShowAvailableColumns(false);
         setShowAvailableOperators(false);
         setShowAvailableValues(false);
+
         return;
       }
 
@@ -177,7 +178,7 @@ export default function FilterBar({
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === 'Tab') {
       event.preventDefault();
-    
+
       if (
         (currentStep === FilterStep.COLUMN ||
           currentStep === FilterStep.OPERATOR ||
@@ -185,7 +186,7 @@ export default function FilterBar({
         suggestions.length > 0
       ) {
         const selectedItem = suggestions[selectedSuggestionIndex];
-      
+
         if (currentStep === FilterStep.COLUMN) {
           selectedItem.value && selectColumn(selectedItem.value);
         } else if (currentStep === FilterStep.OPERATOR) {
@@ -470,6 +471,7 @@ export default function FilterBar({
     if (!showAvailableValues || !tempColumn || !valueSuggestions) return null;
 
     const allValues = valueSuggestions[tempColumn] ?? [];
+
     if (allValues.length === 0) return null;
 
     const valuesToShow = showAllValues ? allValues : allValues.slice(0, 10);

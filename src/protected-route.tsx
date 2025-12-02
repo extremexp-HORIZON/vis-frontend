@@ -1,6 +1,7 @@
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { jwtDecode, JwtPayload } from 'jwt-decode';
+import type { JwtPayload } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { getToken } from './store/slices/authSlice';
 
 interface ProtectedRouteProps {
@@ -22,6 +23,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     try {
       decoded = jwtDecode<JwtPayload>(token);
       const now = Date.now() / 1000;
+
       if (decoded.exp && decoded.exp < now) {
         expired = true;
       }
@@ -30,39 +32,41 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }
 
-useEffect(() => {
-  if (!token || !decoded || invalidOrMissing || expired) {
-    return;
-  }
+  useEffect(() => {
+    if (!token || !decoded || invalidOrMissing || expired) {
+      return;
+    }
 
-  if (!decoded.exp) return;
+    if (!decoded.exp) return;
 
-  const nowMs = Date.now();
-  const expiryMs = decoded.exp * 1000;
-  const msLeft = expiryMs - nowMs;
+    const nowMs = Date.now();
+    const expiryMs = decoded.exp * 1000;
+    const msLeft = expiryMs - nowMs;
 
-  if (msLeft <= 0) {
-    localStorage.removeItem('auth_token');
-    navigate('/login', {
-      replace: true,
-      state: { from: location.pathname },
-    });
-    return;
-  }
+    if (msLeft <= 0) {
+      localStorage.removeItem('auth_token');
+      navigate('/login', {
+        replace: true,
+        state: { from: location.pathname },
+      });
 
-  const timeoutId = window.setTimeout(() => {
-    localStorage.removeItem('auth_token');
-    navigate('/login', {
-      replace: true,
-      state: { from: location.pathname },
-    });
-  }, msLeft);
+      return;
+    }
 
-  return () => clearTimeout(timeoutId);
-}, [token, location.pathname]);
+    const timeoutId = window.setTimeout(() => {
+      localStorage.removeItem('auth_token');
+      navigate('/login', {
+        replace: true,
+        state: { from: location.pathname },
+      });
+    }, msLeft);
+
+    return () => clearTimeout(timeoutId);
+  }, [token, location.pathname]);
 
   if (!token || invalidOrMissing || expired) {
     localStorage.removeItem('auth_token');
+
     return (
       <Navigate
         to="/login"

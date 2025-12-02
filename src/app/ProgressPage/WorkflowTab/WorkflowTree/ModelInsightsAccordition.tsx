@@ -15,7 +15,7 @@ export default function ModelInsightsAccordion() {
   const dispatch = useAppDispatch();
   const { tab } = useAppSelector((s: RootState) => s.workflowPage);
   const hasModelpt = tab?.workflowConfiguration.dataAssets?.some(
-    asset => asset.name === "model.pt"
+    asset => asset.name === 'model.pt'
   );
 
   return (
@@ -27,14 +27,14 @@ export default function ModelInsightsAccordion() {
         aria-disabled={hasModelpt}
         label={
           <Box
-            sx={{ 
+            sx={{
               px: 1,
-              py: 0.5, 
-              borderRadius: 1, 
+              py: 0.5,
+              borderRadius: 1,
               cursor: hasModelpt ? 'not-allowed' : 'pointer',
               opacity: hasModelpt ? 0.5 : 1,
               pointerEvents: hasModelpt ? 'none' : 'auto',
-              }}
+            }}
             onClick={(e) => {
               if(hasModelpt) return;
               e.stopPropagation();
@@ -57,6 +57,7 @@ export default function ModelInsightsAccordion() {
           { id: 'global-counterfactuals', icon: <TravelExploreIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />, label: 'Global Counterfactuals' },
         ].map(({ id, icon, label }) => {
           const disabled = id !== 'feature-effects' && hasModelpt;
+
           return (
             <TreeItem2
               key={id}
@@ -64,10 +65,10 @@ export default function ModelInsightsAccordion() {
               aria-disabled={disabled}
               label={
                 <Box
-                  sx={{ 
+                  sx={{
                     px: 1,
-                    py: 0.5, 
-                    borderRadius: 1, 
+                    py: 0.5,
+                    borderRadius: 1,
                     cursor: disabled ? 'not-allowed' : 'pointer',
                     opacity: disabled ? 0.5 : 1,
                     pointerEvents: disabled ? 'none' : 'auto',
@@ -85,7 +86,7 @@ export default function ModelInsightsAccordion() {
                 </Box>
               }
             />
-          )
+          );
         })}
       </TreeItem2>
     </SimpleTreeView>

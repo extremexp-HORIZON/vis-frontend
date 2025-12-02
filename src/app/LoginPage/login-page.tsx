@@ -54,6 +54,7 @@ const LoginPage = () => {
   useEffect(() => {
     // Only navigate if token exists AND it's still in localStorage
     const storedToken = localStorage.getItem('auth_token');
+
     if (token && storedToken === token) {
       // Redirect to the main page or dashboard after successful login
       setTimeout(() => {

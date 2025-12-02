@@ -179,9 +179,11 @@ const AttributionHeatmaps: React.FC = () => {
     if (!tab || !experimentId || !isTabInitialized) return;
 
     const prev = prevShowAttributionRef.current;
+
     prevShowAttributionRef.current = showAttribution;
 
     const turnedOn = !prev && showAttribution;
+
     if (!turnedOn) return;
 
     const currentInstance = selectedInstance || '';
@@ -218,6 +220,7 @@ const AttributionHeatmaps: React.FC = () => {
       plotModel.featuresTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ?? [];
     const targetCols =
       plotModel.targetsTableColumns?.filter(c => !['x', 'y', 'time'].includes(c)) ?? [];
+
     return [...featureCols, ...targetCols];
   }, [plotModel]);
 
@@ -238,9 +241,11 @@ const AttributionHeatmaps: React.FC = () => {
   useEffect(() => {
     if (!timeOptions.length) {
       setTimeIndex(0);
+
       return;
     }
     const idx = selectedTime ? timeOptions.indexOf(selectedTime) : 0;
+
     setTimeIndex(idx === -1 ? 0 : idx);
   }, [timeOptions, selectedTime]);
 
@@ -251,7 +256,9 @@ const AttributionHeatmaps: React.FC = () => {
       setTimeIndex(prev => {
         const next = (prev + 1) % timeOptions.length;
         const tVal = timeOptions[next];
+
         if (tVal != null) handleTimeChange(tVal);
+
         return next;
       });
     }, 1500);
@@ -283,14 +290,15 @@ const AttributionHeatmaps: React.FC = () => {
       isTargetFeature
         ? []
         : makeHeatmapValues(plotModel?.attributionsTable, selectedFeature, selectedTime).map(p => ({
-            lat: p.y,
-            lon: p.x,
-            value: p.value,
-          })),
+          lat: p.y,
+          lon: p.x,
+          value: p.value,
+        })),
     [plotModel, selectedFeature, selectedTime, isTargetFeature]
   );
   const createPredictionPoints = () => {
     if (!plotModel?.targetsTable || !plotModel.targetsTable['Prediction']) return [];
+
     return makeHeatmapValues(plotModel.targetsTable, 'Prediction', effectiveTime)
       .map(p => ({ lat: p.y, lon: p.x, value: p.value }));
   };
@@ -329,8 +337,8 @@ const AttributionHeatmaps: React.FC = () => {
           <Checkbox
             checked={showAttribution}
             onChange={e => {
-              setShowAttribution(e.target.checked)
-              setShowAttributionMap(e.target.checked)
+              setShowAttribution(e.target.checked);
+              setShowAttributionMap(e.target.checked);
             }}
             disabled={!!plotSlice?.loading || isTargetFeature}
           />
@@ -491,16 +499,18 @@ const AttributionHeatmaps: React.FC = () => {
               value={timeIndex}
               onChange={(_, newValue) => {
                 const idx = newValue as number;
+
                 setIsPlaying(false);
                 setTimeIndex(idx);
                 const tVal = timeOptions[idx];
+
                 if (tVal != null) handleTimeChange(tVal);
               }}
               marks={
                 timeOptions.length <= 10
                   ? timeOptions.map((_, idx) => ({
-                      value: idx,
-                    }))
+                    value: idx,
+                  }))
                   : undefined
               }
               valueLabelDisplay="off"
@@ -528,8 +538,8 @@ const AttributionHeatmaps: React.FC = () => {
               {plotSlice?.loading
                 ? loading
                 : plotSlice?.error || !plotSlice?.data
-                ? error
-                : mapContent}
+                  ? error
+                  : mapContent}
               {timelineBar}
             </Box>
           </ResponsiveCardTable>

@@ -14,13 +14,13 @@ import { getCache } from '../../../shared/utils/localStorageCache';
 import { useLocation } from 'react-router-dom';
 import ComparativeAnalysis from './ComparativeAnalysis/comparative-analysis';
 import ExperimentExplainability from './ExperimentExplainability';
-import { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
+import type { IDataAsset } from '../../../shared/models/experiment/data-asset.model';
 
 const MonitoringPage = () => {
   const { visibleTable, selectedTab, workflowsTable } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
-  const { workflows } = useAppSelector((state: RootState) =>  state.progressPage)
+  const { workflows } = useAppSelector((state: RootState) =>  state.progressPage);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -38,9 +38,8 @@ const MonitoringPage = () => {
     if (!tasks) return true;
 
     return tasks.some(t => typeof t.name === 'string' && /explainability/i.test(t.name)) &&
-      !dataAssets?.some((asset: IDataAsset) => asset.name === "model.pt");
+      !dataAssets?.some((asset: IDataAsset) => asset.name === 'model.pt');
   }, [workflows]);
-
 
   useEffect(() => {
     if (compareId) {

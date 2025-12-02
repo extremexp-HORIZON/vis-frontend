@@ -22,7 +22,6 @@ import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
 import { Snackbar, Alert } from '@mui/material';
 
-
 interface ITableComponent {
   children?: React.ReactNode
   point: TestInstance
@@ -55,7 +54,6 @@ const CounterfactualsTable = (props: ITableComponent) => {
     open: false,
     text: '',
   });
-
 
   function convertToPythonStyleString(obj: TestInstance) {
     const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType', 'instanceId'];

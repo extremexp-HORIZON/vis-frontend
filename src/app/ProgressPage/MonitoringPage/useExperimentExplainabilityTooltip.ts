@@ -4,7 +4,7 @@ import type { RootState } from '../../../store/store';
 import { createExperimentExplainabilityTooltipHandler } from './experimentExplainabilityTooltip';
 
 export const useExperimentExplainabilityTooltip = (
-  xAxisName?: string, 
+  xAxisName?: string,
   yAxisName?: string,
   axisType?: string,
   selectedFeature?: string,
@@ -14,6 +14,7 @@ export const useExperimentExplainabilityTooltip = (
   const workflowIds = runs.map(wf => wf.id);
   const workflowColors = useAppSelector((state: RootState) => state.monitorPage.workflowsTable.workflowColors);
   const experimentId = useAppSelector((state: RootState) => state.progressPage.experiment.data?.id);
+
   return useMemo(() => {
     return createExperimentExplainabilityTooltipHandler({
       workflowIds,

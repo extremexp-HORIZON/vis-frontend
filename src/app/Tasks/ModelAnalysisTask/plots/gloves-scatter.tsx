@@ -265,7 +265,7 @@ const GlovesScatter = ({
   //     ],
   //   });
 
-  const ControlPanel = ({chartType}: {chartType: string | null}) => (
+  const ControlPanel = ({ chartType }: {chartType: string | null}) => (
     <Box
       className="panel"
       sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}
@@ -346,6 +346,7 @@ const GlovesScatter = ({
             {colorOptions.map(option => {
               // Extract the part before "_Prediction"
               const displayText = option.replace(/_Prediction$/, '');
+
               return (
                 <MenuItem key={option} value={option}>
                   {displayText}

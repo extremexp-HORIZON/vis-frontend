@@ -129,7 +129,7 @@ export const modelAnalysisDefault: IModelAnalysis = {
   featureImportance: { data: null, loading: false, error: null },
   shap: { data: null, loading: false, error: null },
   shapValues: { data: null, loading: false, error: null },
-  segmentation: { data: null, loading: false, error: null, selectedFeature: null, selectedTime: null, selectedInstance:  null },
+  segmentation: { data: null, loading: false, error: null, selectedFeature: null, selectedTime: null, selectedInstance: null },
   counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals: { data: null, loading: false, error: null },
   global_counterfactuals_control_panel: { cfMethod: 'Dice', actionChoiceStrategy: 'max-eff', gcfSize: 3 },

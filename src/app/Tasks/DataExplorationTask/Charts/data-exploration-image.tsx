@@ -30,14 +30,15 @@ const ImageCard = () => {
   // const fileName = normalizePath(rawFileNames);
   // const imageSrc = fileName ? `${baseApi}${fileName}` : '';
 
-useEffect(() => {
-  setLoaded(false);
-  setHasError(false);
-  const img = imageRef.current;
-  if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
-    setLoaded(true);
-  }
-}, [imageSrc]);
+  useEffect(() => {
+    setLoaded(false);
+    setHasError(false);
+    const img = imageRef.current;
+
+    if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setLoaded(true);
+    }
+  }, [imageSrc]);
 
   const handleDownload = async () => {
     if (!selectedImage?.source) return;

@@ -268,18 +268,18 @@ const ComparisonDataCharts = () => {
             const meta = dataAssetsMetaData?.[selectedDataset!]?.[workflowId]?.meta;
             const fileNames = meta?.data?.fileNames; // string | string[] | undefined
 
-            const titleTooltip = <TitleTooltip workflowId={workflowId} />
+            const titleTooltip = <TitleTooltip workflowId={workflowId} />;
 
             const titleNode = (
               <>
                 {dataAsset?.name ? dataAsset.name : 'Workflow'} —{' '}
-                <Tooltip 
+                <Tooltip
                   title={titleTooltip}
                   slotProps={{
                     tooltip: {
                       sx: {
-                        backgroundColor: "#ffff",
-                        maxWidth:'2000px'
+                        backgroundColor: '#ffff',
+                        maxWidth: '2000px'
                       },
                     },
                   }}

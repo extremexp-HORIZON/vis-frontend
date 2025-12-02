@@ -237,8 +237,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
     const removeAllPinned = () => {
       document
-      .querySelectorAll<HTMLDivElement>(`.${PINNED_CLASS}`)
-      .forEach(el => el.remove());
+        .querySelectorAll<HTMLDivElement>(`.${PINNED_CLASS}`)
+        .forEach(el => el.remove());
     };
 
     const closePinned = () => {

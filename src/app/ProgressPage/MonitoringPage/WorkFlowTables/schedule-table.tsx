@@ -9,7 +9,8 @@ import { Popover, styled } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ScheduleTableRow, setScheduledTable } from '../../../../store/slices/monitorPageSlice';
+import type { ScheduleTableRow } from '../../../../store/slices/monitorPageSlice';
+import { setScheduledTable } from '../../../../store/slices/monitorPageSlice';
 import type { GridColumnNode } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
 import theme from '../../../../mui-theme';
@@ -323,7 +324,6 @@ export default function ScheduleTable() {
         scheduledTable.selectedSpaces,
       );
 
-
       dispatch(
         setScheduledTable({
           rows,
@@ -395,87 +395,89 @@ export default function ScheduleTable() {
 
     dispatch(setScheduledTable({ filters: newFilters }));
   };
-const applyScheduledFilters = (
-  rows: typeof scheduledTable.rows,
-  filters: typeof scheduledTable.filters,
-  selectedSpaces: typeof scheduledTable.selectedSpaces,
-) => {
-  let counter = 0;
-  let filteredRows = rows;
+  const applyScheduledFilters = (
+    rows: typeof scheduledTable.rows,
+    filters: typeof scheduledTable.filters,
+    selectedSpaces: typeof scheduledTable.selectedSpaces,
+  ) => {
+    let counter = 0;
+    let filteredRows = rows;
 
-  // spaces filter
-  if (Array.isArray(selectedSpaces) && selectedSpaces.length > 0) {
-    const selSpaces = new Set(
+    // spaces filter
+    if (Array.isArray(selectedSpaces) && selectedSpaces.length > 0) {
+      const selSpaces = new Set(
       selectedSpaces
         .map(s => s?.trim().toLowerCase())
         .filter(Boolean) as string[]
-    );
+      );
 
-    filteredRows = filteredRows.filter(row => {
-      const space = (row.space ?? '').toString().trim().toLowerCase();
+      filteredRows = filteredRows.filter(row => {
+        const space = (row.space ?? '').toString().trim()
+          .toLowerCase();
 
-      return selSpaces.has(space);
-    });
-  }
-
-  // column filters
-  if (filters.length > 0) {
-    for (let i = 0; i < filters.length; i++) {
-      if (filters[i].value !== '') {
-        counter++;
-      }
+        return selSpaces.has(space);
+      });
     }
 
-    filteredRows = filteredRows.filter(row => {
-      return filters.every(filter => {
-        if (filter.value === '') return true;
-
-        const cellValue = row[filter.column as keyof Data]
-          ?.toString()
-          .toLowerCase();
-        const filterValue = filter.value.toLowerCase();
-
-        if (!cellValue) return false;
-
-        switch (filter.operator) {
-          case 'contains':
-            return cellValue.includes(filterValue);
-          case '=':
-            return !Number.isNaN(Number(cellValue))
-              ? Number(cellValue) === Number(filterValue)
-              : cellValue === filterValue;
-          case 'startsWith':
-            return cellValue.startsWith(filterValue);
-          case 'endsWith':
-            return cellValue.endsWith(filterValue);
-          case '>':
-            return !Number.isNaN(Number(cellValue))
-              ? Number(cellValue) > Number(filterValue)
-              : false;
-          case '<':
-            return !Number.isNaN(Number(cellValue))
-              ? Number(cellValue) < Number(filterValue)
-              : false;
-          case '>=':
-            return !Number.isNaN(Number(cellValue))
-              ? Number(cellValue) >= Number(filterValue)
-              : false;
-          case '<=':
-            return !Number.isNaN(Number(cellValue))
-              ? Number(cellValue) <= Number(filterValue)
-              : false;
-          default:
-            return true;
+    // column filters
+    if (filters.length > 0) {
+      for (let i = 0; i < filters.length; i++) {
+        if (filters[i].value !== '') {
+          counter++;
         }
-      });
-    });
-  }
+      }
 
-  return { filteredRows, filtersCounter: counter };
-};
+      filteredRows = filteredRows.filter(row => {
+        return filters.every(filter => {
+          if (filter.value === '') return true;
+
+          const cellValue = row[filter.column as keyof Data]
+            ?.toString()
+            .toLowerCase();
+          const filterValue = filter.value.toLowerCase();
+
+          if (!cellValue) return false;
+
+          switch (filter.operator) {
+            case 'contains':
+              return cellValue.includes(filterValue);
+            case '=':
+              return !Number.isNaN(Number(cellValue))
+                ? Number(cellValue) === Number(filterValue)
+                : cellValue === filterValue;
+            case 'startsWith':
+              return cellValue.startsWith(filterValue);
+            case 'endsWith':
+              return cellValue.endsWith(filterValue);
+            case '>':
+              return !Number.isNaN(Number(cellValue))
+                ? Number(cellValue) > Number(filterValue)
+                : false;
+            case '<':
+              return !Number.isNaN(Number(cellValue))
+                ? Number(cellValue) < Number(filterValue)
+                : false;
+            case '>=':
+              return !Number.isNaN(Number(cellValue))
+                ? Number(cellValue) >= Number(filterValue)
+                : false;
+            case '<=':
+              return !Number.isNaN(Number(cellValue))
+                ? Number(cellValue) <= Number(filterValue)
+                : false;
+            default:
+              return true;
+          }
+        });
+      });
+    }
+
+    return { filteredRows, filtersCounter: counter };
+  };
 
   useEffect(() => {
-    const {filteredRows, filtersCounter} = applyScheduledFilters(scheduledTable.rows, scheduledTable.filters, scheduledTable.selectedSpaces);
+    const { filteredRows, filtersCounter } = applyScheduledFilters(scheduledTable.rows, scheduledTable.filters, scheduledTable.selectedSpaces);
+
     dispatch(
       setScheduledTable({
         filtersCounter,
@@ -503,6 +505,7 @@ const applyScheduledFilters = (
         if (value === null || value === undefined || value === 'n/a') return;
 
         const str = String(value).trim();
+
         if (!str) return;
 
         if (!valueSets[field]) {
@@ -529,7 +532,6 @@ const applyScheduledFilters = (
 
     return result;
   }, [scheduledTable.rows]);
-
 
   return (
     <Box sx={{ height: '100%' }} >

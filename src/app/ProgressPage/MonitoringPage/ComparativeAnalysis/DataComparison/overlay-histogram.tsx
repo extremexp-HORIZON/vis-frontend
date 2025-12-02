@@ -289,8 +289,10 @@ const OverlayHistogram = ({
       const keys = Object.keys(sampleRow);
 
       const exact = keys.find(k => k === countField);
+
       if(!exact) {
         const key = keys.find(k => k.toLowerCase() === expectedLower);
+
         if (key) {
           countField = key;
         }

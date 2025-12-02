@@ -578,7 +578,8 @@ export default function WorkflowTable() {
       );
 
       filteredRows = filteredRows.filter(row => {
-        const space = (row.space ?? '').toString().trim().toLowerCase();
+        const space = (row.space ?? '').toString().trim()
+          .toLowerCase();
 
         return selSpaces.has(space);
       });
@@ -632,10 +633,9 @@ export default function WorkflowTable() {
     return { filteredRows, filtersCounter: counter };
   };
 
-
   useEffect(() => {
     if(workflowsTable.initialized) {
-      const {filteredRows, filtersCounter} = applyWorkflowFilters(workflowsTable.rows, workflowsTable.filters, workflowsTable.selectedSpaces)
+      const { filteredRows, filtersCounter } = applyWorkflowFilters(workflowsTable.rows, workflowsTable.filters, workflowsTable.selectedSpaces);
 
       dispatch(setWorkflowsTable({ filteredRows, filtersCounter: filtersCounter }));
     }
@@ -1016,6 +1016,7 @@ export default function WorkflowTable() {
         if (value === null || value === undefined || value === 'n/a') return;
 
         const str = String(value).trim();
+
         if (!str) return;
 
         if (!valueSets[field]) {
