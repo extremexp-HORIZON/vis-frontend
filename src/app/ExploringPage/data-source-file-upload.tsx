@@ -3,7 +3,10 @@ import { useCallback } from 'react';
 import { useAppDispatch } from '../../store/store';
 import { uploadDataSource } from '../../store/slices/exploring/datasourceSlice';
 import type { IDataSource } from '../../shared/models/dataexploration.model';
-import { uploadData, listProcessedData } from '../../store/slices/exploring/eusomeSlice';
+import {
+  uploadData,
+  listProcessedData,
+} from '../../store/slices/exploring/eusomeSlice';
 import {
   FileUpload,
   type AdditionalField,
@@ -60,24 +63,27 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
 
   const handleUpload = useCallback(
     async (params: UploadParams): Promise<IDataSource> => {
-      await dispatch(
-        uploadData({
-          file: params.file,
-          columnMapping: {
-            ...defaultColumnMapping,
-            target: params.additionalFields?.target || '',
-            latitude: params.additionalFields?.latitude || '',
-            longitude: params.additionalFields?.longitude || '',
-          },
-          // temporary disable augmentation
-          augmentationOptions: {
-            ...defaultAugmentationOptions,
-            enable_augmentation: false,
-          },
-        }),
-      ).unwrap();
+      // TODO: Remove this when EUSOME-API is updated for parquet files
+      if (params.file.name.split('.').pop() === 'csv') {
+        await dispatch(
+          uploadData({
+            file: params.file,
+            columnMapping: {
+              ...defaultColumnMapping,
+              target: params.additionalFields?.target || '',
+              latitude: params.additionalFields?.latitude || '',
+              longitude: params.additionalFields?.longitude || '',
+            },
+            // temporary disable augmentation
+            augmentationOptions: {
+              ...defaultAugmentationOptions,
+              enable_augmentation: false,
+            },
+          }),
+        ).unwrap();
 
-      dispatch(listProcessedData());
+        dispatch(listProcessedData());
+      }
 
       const result = await dispatch(
         uploadDataSource({
@@ -99,7 +105,7 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
       onUpload={handleUpload}
       onUploadSuccess={onUploadSuccess}
       onUploadError={onUploadError}
-      acceptedFileTypes={['.csv']}
+      acceptedFileTypes={['.csv', '.parquet']}
       maxFileSize={100 * 1024 * 1024}
       additionalFields={additionalFields}
       title="Upload Data Source"
