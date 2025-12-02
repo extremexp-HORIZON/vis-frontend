@@ -53,7 +53,7 @@ export default function ModelInsightsAccordion() {
         {[
           { id: 'instance-view', icon: <QueryStatsIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />, label: 'Instance View' },
           { id: 'feature-effects', icon: <InsightsIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />, label: 'Feature Explainability' },
-          { id: 'hyperparameters', icon: <PermDataSettingIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />, label: 'Hyperparameter Explanability' },
+          { id: 'hyperparameters', icon: <PermDataSettingIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />, label: 'Hyperparameter Explainability' },
           { id: 'global-counterfactuals', icon: <TravelExploreIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />, label: 'Global Counterfactuals' },
         ].map(({ id, icon, label }) => {
           const disabled = id !== 'feature-effects' && hasModelpt;
