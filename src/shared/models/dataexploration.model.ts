@@ -42,6 +42,7 @@ export interface IDataSource {
   experimentId: string
   measure0?: string
   measure1?: string
+  isRawVis?: boolean
 }
 
 export interface IDataExplorationQuery {

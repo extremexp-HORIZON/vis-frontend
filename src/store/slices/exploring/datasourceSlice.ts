@@ -77,6 +77,7 @@ export interface UploadDataSourceParams {
   sourceType?: string;
   measure0?: string;
   measure1?: string;
+  isRawVis?: boolean;
 }
 
 export const uploadDataSource = createAsyncThunk<
@@ -86,7 +87,7 @@ export const uploadDataSource = createAsyncThunk<
 >(
   'api/uploadDataSource',
   async (
-    { file, fileName, source, format = 'csv', sourceType = 'local', measure0, measure1 },
+    { file, fileName, source, format = 'csv', sourceType = 'local', measure0, measure1, isRawVis = false },
     { rejectWithValue },
   ) => {
     try {
@@ -112,6 +113,10 @@ export const uploadDataSource = createAsyncThunk<
 
       if (measure1) {
         formData.append('measure1', measure1);
+      }
+
+      if (isRawVis) {
+        formData.append('isRawVis', 'true');
       }
 
       const response = await api.post<IDataSource>(

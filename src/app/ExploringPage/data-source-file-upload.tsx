@@ -82,9 +82,10 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
       const result = await dispatch(
         uploadDataSource({
           file: params.file,
-          format: 'rawvis',
+          format: params.file.name.split('.').pop() || '',
           measure0: params.additionalFields?.measure0,
           measure1: params.additionalFields?.measure1,
+          isRawVis: true,
         }),
       ).unwrap();
 
