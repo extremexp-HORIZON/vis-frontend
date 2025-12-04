@@ -7,6 +7,7 @@ import { prepareDataExplorationResponse, type ConfusionMatrixResult, type TestIn
 import type { AxiosError } from 'axios';
 import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
 import type { IDataExplorationMetaDataResponse, IDataExplorationRequest, IDataExplorationResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
+import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 
 export interface WorkflowTableRow {
   id: string;
@@ -99,6 +100,8 @@ interface IMonitoringPageSlice {
         uniqueTasks: string[]
         initialized: boolean
         selectedSpaces: string[]
+        sortModel: GridSortModel | undefined
+        paginationModel: GridPaginationModel | undefined
       }
       scheduledTable: {
         order: 'asc' | 'desc'
@@ -116,6 +119,8 @@ interface IMonitoringPageSlice {
         uniqueParameters: string[]
         uniqueTasks: string[]
         selectedSpaces: string[]
+        sortModel: GridSortModel | undefined
+        paginationModel: GridPaginationModel | undefined
       }
       visibleTable: string
       selectedTab: number
@@ -218,7 +223,9 @@ const initialState: IMonitoringPageSlice = {
     uniqueParameters: [],
     uniqueTasks: [],
     initialized: false,
-    selectedSpaces: []
+    selectedSpaces: [],
+    sortModel: undefined,
+    paginationModel: { page: 0, pageSize: 50}
   },
   scheduledTable: {
     order: 'asc',
@@ -235,7 +242,9 @@ const initialState: IMonitoringPageSlice = {
     columnsVisibilityModel: {},
     uniqueParameters: [],
     uniqueTasks: [],
-    selectedSpaces: []
+    selectedSpaces: [],
+    sortModel: undefined,
+    paginationModel: { page: 0, pageSize: 50}
   },
   visibleTable: 'workflows',
   selectedTab: 0,

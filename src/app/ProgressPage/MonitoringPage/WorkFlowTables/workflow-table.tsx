@@ -1106,6 +1106,8 @@ export default function WorkflowTable() {
             disableVirtualization
             density="compact"
             rows={workflowsTable.visibleRows}
+            sortModel={workflowsTable.sortModel}
+            onSortModelChange={(newSortModel) => dispatch(setWorkflowsTable({sortModel: newSortModel}))}
             columns={workflowsTable.visibleColumns as CustomGridColDef[]}
             columnVisibilityModel={workflowsTable.columnsVisibilityModel}
             disableColumnFilter
@@ -1180,11 +1182,8 @@ export default function WorkflowTable() {
               }
             }}
             pageSizeOptions={[10, 25, 50]}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 50 },
-              },
-            }}
+            paginationModel={workflowsTable.paginationModel}
+            onPaginationModelChange={(paginationModel) => dispatch(setWorkflowsTable({paginationModel}))}
             columnGroupingModel={[
               {
                 groupId: 'Parameters',
