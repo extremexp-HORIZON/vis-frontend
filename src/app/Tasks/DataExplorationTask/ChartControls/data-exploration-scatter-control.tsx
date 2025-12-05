@@ -18,6 +18,8 @@ import { setControls } from '../../../../store/slices/workflowPageSlice';
 import PaletteIcon from '@mui/icons-material/Palette';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import type { SelectChangeEvent } from '@mui/material';
+import SearchableSelect from '../../../../shared/components/searchable-select';
+import SearchableMultiSelect from '../../../../shared/components/searchable-select-multiple';
 
 const ScatterChartControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -125,55 +127,44 @@ const ScatterChartControlPanel = () => {
         >
           {/* X-Axis Selector */}
           <FormControl fullWidth disabled={tab?.workflowTasks.dataExploration?.controlPanel.umap}>
-            <InputLabel id="x-axis-select-label">
-              <Box display="flex" alignItems="center" gap={1}>
-                <ShowChartIcon fontSize="small" />
-                X-Axis
-              </Box>
-            </InputLabel>
-            <Select
+            <SearchableSelect
               labelId="x-axis-select-label"
-              value={xAxis?.name || ''}
-              onChange={handleXAxisChange}
+              inputLabel={
+                <Box display="flex" alignItems="center" gap={1}>
+                  <ShowChartIcon fontSize="small" />
+                  X-Axis
+                </Box>
+              }
               label="X-Axis-----"
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {columns.map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-            </Select>
+              value={xAxis?.name || ''}
+              options={columns.map(col => col.name)}
+              onChange={(value) => handleXAxisChange({ target: { value } })}
+              menuMaxHeight={224}
+              menuWidth={250}
+            />
           </FormControl>
 
           {/* Y-Axis Multi-Selector */}
           <FormControl fullWidth disabled={tab?.workflowTasks.dataExploration?.controlPanel.umap}>
-            <InputLabel id="y-axis-multi-select-label">
-              <Box display="flex" alignItems="center" gap={1}>
-                <ShowChartIcon fontSize="small" />
-                Y-Axis
-              </Box>
-            </InputLabel>
-            <Select
+            <SearchableMultiSelect
               labelId="y-axis-multi-select-label"
-              multiple
+              inputLabel={
+                <Box display="flex" alignItems="center" gap={1}>
+                  <ShowChartIcon fontSize="small" />
+                  Y-Axis
+                </Box>
+              }
+              label="Y-Axis-----"
               value={yAxis.map(col => col.name)}
-              onChange={handleYAxisChange}
-              input={<OutlinedInput label="Y-Axis-----" />}
-              renderValue={selected => (selected as string[]).join(', ')}
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
+              options={columns.map(col => col.name)}
+              onChange={(selected) => {
+                handleYAxisChange({
+                  target: { value: selected },
+                } as any);
               }}
-            >
-              {columns.map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  <Checkbox checked={yAxis.some(yCol => yCol.name === col.name)} />
-                  {col.name}
-                </MenuItem>
-              ))}
-            </Select>
+              menuMaxHeight={224}
+              menuWidth={250}
+            />
           </FormControl>
         </Box>
 
@@ -186,27 +177,25 @@ const ScatterChartControlPanel = () => {
           }}
         >
           <FormControl fullWidth disabled={tab?.workflowTasks.dataExploration?.controlPanel.umap}>
-            <InputLabel id="color-by-select-label">
-              <Box display="flex" alignItems="center" gap={1}>
-                <PaletteIcon fontSize="small" />
-                Color By
-              </Box>
-            </InputLabel>
-            <Select
+            <SearchableSelect
               labelId="color-by-select-label"
-              value={colorBy?.name || ''}
-              onChange={handleColorByChange}
+              inputLabel={
+                <Box display="flex" alignItems="center" gap={1}>
+                  <PaletteIcon fontSize="small" />
+                  Color By
+                </Box>
+              }
               label="Color By-----"
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {columns.map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-            </Select>
+              value={colorBy?.name || ''}
+              options={columns.map(col => col.name)}
+              onChange={value =>
+                handleColorByChange({
+                  target: { value },
+                } as any)
+              }
+              menuMaxHeight={224}
+              menuWidth={250}
+            />
           </FormControl>
         </Box>
 

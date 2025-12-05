@@ -36,6 +36,7 @@ import ResponsiveCardTable from '../../../../shared/components/responsive-card-t
 import Loader from '../../../../shared/components/loader';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 type HeatPoint = { x: number; y: number; time: string | number; value: number };
 
@@ -306,31 +307,31 @@ const AttributionHeatmaps: React.FC = () => {
   const controlPanel = (
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
       <FormControl fullWidth>
-        <InputLabel id='instace-select-label'>Instance</InputLabel>
-        <Select
+        <SearchableSelect
           labelId="instace-select-label"
-          label='Instance'
+          inputLabel="Instance"
+          label="Instance"
           value={selectedInstance}
-          onChange={e => handleInstanceChange(e.target.value)}
-          MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
+          options={instanceOptions.map(i => String(i))}
+          onChange={(value) => handleInstanceChange(value)}
+          menuMaxHeight={300}
+          menuWidth={320}
           disabled={!!plotSlice?.loading}
-        >
-          {instanceOptions.map(instance =>(<MenuItem key={`instance-${instance}`} value={instance}>{String(instance)}</MenuItem>))}
-        </Select>
+        />
       </FormControl>
 
       <FormControl fullWidth>
-        <InputLabel id="feature-select-label">Feature</InputLabel>
-        <Select
+        <SearchableSelect
           labelId="feature-select-label"
+          inputLabel="Feature"
           label="Feature"
           value={selectedFeature || ''}
-          onChange={e => handleFeatureChange(e.target.value)}
-          MenuProps={{ PaperProps: { style: { maxHeight: 300, maxWidth: 320 } } }}
+          options={featureOptions}
+          onChange={(value) => handleFeatureChange(value)}
+          menuMaxHeight={300}
+          menuWidth={320}
           disabled={!featureOptions.length || !!plotSlice?.loading}
-        >
-          {featureOptions.map(f => (<MenuItem key={`feature-${f}`} value={f}>{f}</MenuItem>))}
-        </Select>
+        />
       </FormControl>
       <FormControlLabel
         control={

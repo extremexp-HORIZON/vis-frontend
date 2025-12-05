@@ -18,6 +18,7 @@ import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
 import { clear2DPDPPlot, fetchModelAnalysisExplainabilityPlot, setSelectedFeatures2D } from '../../../../store/slices/explainabilitySlice';
 import { useExperimentExplainabilityTooltip } from '../../../ProgressPage/MonitoringPage/useExperimentExplainabilityTooltip';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 interface IContourplot {
   explanation_type: string
@@ -85,11 +86,9 @@ const Contourplot = (props: IContourplot) => {
     setPendingTargetMetric(targetMetric);
   }, [feature1, feature2, targetMetric]);
 
-  const handleFeatureChange = (index: number) => (e: { target: { value: string } }) => {
-    const newValue = e.target.value;
-
-    if (index === 1) setPendingFeature1(newValue);
-    else setPendingFeature2(newValue);
+  const handleFeatureChange = (index: number) => (value: string) => {
+    if (index === 1) setPendingFeature1(value);
+    else setPendingFeature2(value);
   };
 
   const handleApply = () => {
@@ -303,51 +302,46 @@ const Contourplot = (props: IContourplot) => {
 
           return (
             <FormControl fullWidth key={i}>
-              <InputLabel id={`feature${i}-label`}>{explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}</InputLabel>
-              <Select
+              <SearchableSelect
                 labelId={`feature${i}-label`}
+                inputLabel={
+                  explanation_type === 'hyperparameterExplanation'
+                    ? `Hyperparameter ${i}`
+                    : `Feature ${i}`
+                }
+                label={
+                  explanation_type === 'hyperparameterExplanation'
+                    ? `Hyperparameter ${i}`
+                    : `Feature ${i}`
+                }
                 value={selected}
-                label={explanation_type === 'hyperparameterExplanation' ? `Hyperparameter ${i}` : `Feature ${i}`}
-                onChange={handleFeatureChange(i)}
+                options={
+                  featureOrHyperparameterList
+                    .filter(f => f !== other)  // same filtering as before
+                }
+                onChange={(value) => handleFeatureChange(i)(value)}
                 disabled={plotModel?.loading || !plotModel?.data}
-                MenuProps={{
-                  PaperProps: {
-                    style: { maxHeight: 250, maxWidth: 300 },
-                  },
-                }}
-              >
-                {featureOrHyperparameterList
-                  .filter(f => f !== other)
-                  .map(f => (
-                    <MenuItem key={f} value={f}>
-                      {f}
-                    </MenuItem>
-                  ))}
-              </Select>
+                menuMaxHeight={250}
+                menuWidth={300}
+              />
             </FormControl>
           );
         })}
         { (explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
           <FormControl fullWidth>
-            <InputLabel id={'target-metric-label'}>Target Metric</InputLabel>
-            <Select
-              labelId='target-metric-label'
+            <SearchableSelect
+              labelId="target-metric-label"
+              inputLabel="Target Metric"
+              label="Target Metric"
               value={pendingTargetMetric}
-              label='Target Metric'
-              onChange={(e: { target: { value: string } }) => setPendingTargetMetric(e.target.value)}
+              options={
+                tab?.workflowMetrics?.data?.map(metric => metric.name) || []
+              }
+              onChange={(value) => setPendingTargetMetric(value)}
               disabled={plotModel?.loading || !plotModel?.data}
-              MenuProps={{
-                PaperProps: {
-                  style: { maxHeight: 250, maxWidth: 300 },
-                },
-              }}
-            >
-              {tab?.workflowMetrics?.data?.map(metric =>
-                <MenuItem key={metric.name} value={metric.name}>
-                  {metric.name}
-                </MenuItem>
-              )}
-            </Select>
+              menuMaxHeight={250}
+              menuWidth={300}
+            />
           </FormControl>
         )}
       </Box>

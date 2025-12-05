@@ -22,6 +22,8 @@ import { ThemeProvider } from '@emotion/react';
 import PaletteIcon from '@mui/icons-material/Palette';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import SearchableSelect from '../../../../shared/components/searchable-select';
+import SearchableMultiSelect from '../../../../shared/components/searchable-select-multiple';
 
 const MapControls = () => {
   const dispatch = useAppDispatch();
@@ -60,9 +62,7 @@ const MapControls = () => {
     { value: 'trajectory', label: 'Trajectory' },
   ];
 
-  const handleSegmentByChange = (e: SelectChangeEvent<string[]>) => {
-    const value = e.target.value as string[];
-
+  const handleSegmentByChange = (value: string[]) => {
     handleChange('segmentBy', value);
   };
 
@@ -154,81 +154,60 @@ const MapControls = () => {
         {/* Color By Selector */}
         {mapType === 'point' && (
           <FormControl fullWidth>
-            <InputLabel id="color by ">
-              <Box display="flex" alignItems="center" gap={1}>
-                <PaletteIcon fontSize="small" />
-                Color
-              </Box>
-            </InputLabel>
-            <Select
+            <SearchableSelect
+              labelId="color-by-label"
+              inputLabel={
+                <Box display="flex" alignItems="center" gap={1}>
+                  <PaletteIcon fontSize="small" />
+                  Color
+                </Box>
+              }
+              label="Color-----"
               value={colorByMap}
-              onChange={e => {
-                const value = e.target.value;
-
+              options={[
+                'None',
+                ...selectedColumns
+                  .filter(
+                    col =>
+                      col.name !== lat &&
+                      col.name !== lon &&
+                      !timestampField?.includes(col.name),
+                  )
+                  .map(col => col.name),
+              ]}
+              onChange={value => {
                 handleChange('colorByMap', value);
               }}
-              input={<OutlinedInput label="Color-----" />}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 150,
-                    maxWidth: 150,
-                  },
-                },
-              }}
-            >
-              <MenuItem value="None">None</MenuItem>
-              {selectedColumns
-                .filter(
-                  col =>
-                    col.name !== lat &&
-                    col.name !== lon &&
-                    !timestampField?.includes(col.name),
-                )
-                .map(col => (
-                  <MenuItem key={col.name} value={col.name}>
-                    {col.name}
-                  </MenuItem>
-                ))}
-            </Select>
+              menuMaxHeight={150}
+              menuWidth={150}
+            />
           </FormControl>
         )}
 
         {mapType === 'heatmap' && (
           <>
             <FormControl sx={{ width: '50%' }}>
-              <InputLabel>Weight By</InputLabel>
-              <Select
+              <SearchableSelect
+                labelId="weight-by-label"
+                inputLabel="Weight By"
+                label="Weight By"
                 value={
-                  tab?.workflowTasks?.dataExploration?.controlPanel.weightBy ||
-                  ''
+                  tab?.workflowTasks?.dataExploration?.controlPanel.weightBy || ''
                 }
-                onChange={e => {
-                  const value = e.target.value;
-
+                options={[
+                  "None",
+                  ...doubleColumns
+                    .filter(col => col.name !== lat && col.name !== lon)
+                    .map(col => col.name),
+                ]}
+                onChange={(value) => {
                   handleChange('weightBy', value);
-
+                
                   // If colorByMap is set to something other than 'None', reset segmentBy
                 }}
-                input={<OutlinedInput label="Weight By" />}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 150,
-                      maxWidth: 150,
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="None">None</MenuItem>
-                {doubleColumns
-                  .filter(col => col.name !== lat && col.name !== lon)
-                  .map(col => (
-                    <MenuItem key={col.name} value={col.name}>
-                      {col.name}
-                    </MenuItem>
-                  ))}
-              </Select>
+                menuMaxHeight={150}
+                menuWidth={150}
+              />
             </FormControl>
             <FormControl sx={{ width: '40%' }}>
               <ThemeProvider theme={theme}>
@@ -260,42 +239,30 @@ const MapControls = () => {
               fullWidth
               // disabled={timestampField === null || timestampField === ''}
             >
-              <InputLabel id="color by ">
-                <Box display="flex" alignItems="center" gap={1}>
-                  <PaletteIcon fontSize="small" />
-                  Segment
-                </Box>
-              </InputLabel>
-              <Select
-                // disabled={true}
-                multiple
+              <SearchableMultiSelect
+                labelId="segment-by-label"
+                inputLabel={
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <PaletteIcon fontSize="small" />
+                    Segment
+                  </Box>
+                }
+                label="Segment By"
                 value={segmentBy}
+                options={
+                  stringColumns
+                    .filter(
+                      col =>
+                        col.name !== lat &&
+                        col.name !== lon &&
+                        !timestampField?.includes(col.name),
+                    )
+                    .map(col => col.name) || []
+                }
                 onChange={handleSegmentByChange}
-                input={<OutlinedInput label="Segment By" />}
-                renderValue={selected => (selected as string[]).join(', ')}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 150,
-                      maxWidth: 200,
-                    },
-                  },
-                }}
-              >
-                {stringColumns
-                  .filter(
-                    col =>
-                      col.name !== lat &&
-                      col.name !== lon &&
-                      !timestampField?.includes(col.name),
-                  )
-                  .map(col => (
-                    <MenuItem key={col.name} value={col.name}>
-                      <Checkbox checked={segmentBy.includes(col.name)} />
-                      <ListItemText primary={col.name} />
-                    </MenuItem>
-                  ))}
-              </Select>
+                menuMaxHeight={150}
+                menuWidth={200}
+              />
             </FormControl>
             <FormControl
               fullWidth

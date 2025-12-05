@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
 import { fetchModelAnalysisExplainabilityPlot, setAleOrPdpSelections, setSelectedFeature } from '../../../../store/slices/explainabilitySlice';
 import { useExperimentExplainabilityTooltip } from '../../../ProgressPage/MonitoringPage/useExperimentExplainabilityTooltip';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 interface PdpPlotProps {
   explanation_type: string
@@ -272,46 +273,42 @@ const PdpPlot = (props: PdpPlotProps) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           <FormControl fullWidth>
-            <InputLabel id="feature-select-label">
-              {explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-            </InputLabel>
-            <Select
+            <SearchableSelect
               labelId="feature-select-label"
+              inputLabel={
+                explanation_type === 'hyperparameterExplanation'
+                  ? 'Hyperparameter'
+                  : 'Feature'
+              }
+              label={
+                explanation_type === 'hyperparameterExplanation'
+                  ? 'Hyperparameter'
+                  : 'Feature'
+              }
               value={pendingFeature}
-              label={explanation_type === 'hyperparameterExplanation' ? 'Hyperparameter' : 'Feature'}
-              onChange={(e) => handleFeatureSelect(e.target.value)}
+              options={featureOrHyperparameterList}
+              onChange={(value) => handleFeatureSelect(value)}
               disabled={plotModel?.loading || !plotModel?.data}
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 250, maxWidth: 300 } },
-              }}
-            >
-              {featureOrHyperparameterList.map((feature) => (
-                <MenuItem key={`${plotModel?.data?.plotName}-${feature}`} value={feature}>
-                  {feature}
-                </MenuItem>
-              ))}
-            </Select>
+              menuMaxHeight={250}
+              menuWidth={300}
+            />
           </FormControl>
 
           {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
             <FormControl fullWidth>
-              <InputLabel id="target-metric-label">Target Metric</InputLabel>
-              <Select
+              <SearchableSelect
                 labelId="target-metric-label"
-                value={pendingTargetMetric}
+                inputLabel="Target Metric"
                 label="Target Metric"
-                onChange={(e) => handleTargetMetricSelect(e.target.value)}
+                value={pendingTargetMetric}
+                options={
+                  tab?.workflowMetrics?.data?.map(metric => metric.name) || []
+                }
+                onChange={(value) => handleTargetMetricSelect(value)}
                 disabled={plotModel?.loading || !plotModel?.data}
-                MenuProps={{
-                  PaperProps: { style: { maxHeight: 250, maxWidth: 300 } },
-                }}
-              >
-                {tab?.workflowMetrics?.data?.map((metric) => (
-                  <MenuItem key={metric.name} value={metric.name}>
-                    {metric.name}
-                  </MenuItem>
-                )) ?? null}
-              </Select>
+                menuMaxHeight={250}
+                menuWidth={300}
+              />
             </FormControl>
           )}
         </Box>

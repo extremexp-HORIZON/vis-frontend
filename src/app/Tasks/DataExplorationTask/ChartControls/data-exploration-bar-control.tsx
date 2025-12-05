@@ -15,6 +15,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import { AggregationFunction } from '../../../../shared/models/dataexploration.model';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 const BarChartControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -75,64 +76,54 @@ const BarChartControlPanel = () => {
       >
         {/* Group By Selection */}
         <FormControl fullWidth>
-          <InputLabel>
-            <Box display="flex" alignItems="center" gap={1}>
-              <CategoryIcon fontSize="small" />
-              Group By (Category)
-            </Box>
-          </InputLabel>
-          <Select
-            label="Group By (Category) okkk    "
+          <SearchableSelect
+            labelId="group-by-category-label"
+            inputLabel={
+              <Box display="flex" alignItems="center" gap={1}>
+                <CategoryIcon fontSize="small" />
+                Group By (Category)
+              </Box>
+            }
+            label="Group By (Category) ----"
             value={
-              tab?.workflowTasks.dataExploration?.controlPanel
-                .barGroupBy?.[0] || ''
+              tab?.workflowTasks.dataExploration?.controlPanel.barGroupBy?.[0] || ''
             }
-            onChange={e =>
-              dispatch(setControls({ barGroupBy: [e.target.value] }))
+            options={
+              tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+                .filter(col => col.type === 'STRING')
+                .map(col => col.name) || []
             }
-            MenuProps={{
-              PaperProps: {
-                style: { maxHeight: 224, width: 250 },
-              },
-            }}
-          >
-            {/* <MenuItem value="Not Group">Not Group</MenuItem> */}
-            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type === 'STRING')
-              .map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-          </Select>
+            onChange={value =>
+              dispatch(setControls({ barGroupBy: [value] }))
+            }
+            menuMaxHeight={224}
+            menuWidth={250}
+          />
         </FormControl>
 
         {/* Value Selection */}
         <FormControl fullWidth>
-          <InputLabel>
-            <Box display="flex" alignItems="center" gap={1}>
-              <BarChartIcon fontSize="small" />
-              Measure (Value Column)
-            </Box>
-          </InputLabel>
-          <Select
-            label="Measure (Value Column)ooo"
-            value={selectedColumn || ''}
-            onChange={e =>
-              dispatch(setControls({ selectedMeasureColumn: e.target.value }))
+          <SearchableSelect
+            labelId="measure-value-column-label"
+            inputLabel={
+              <Box display="flex" alignItems="center" gap={1}>
+                <BarChartIcon fontSize="small" />
+                Measure (Value Column)
+              </Box>
             }
-            MenuProps={{
-              PaperProps: { style: { maxHeight: 224, width: 250 } },
-            }}
-          >
-            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type !== 'LOCAL_DATE_TIME')
-              .map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-          </Select>
+            label="Measure (Value Column)-----"
+            value={selectedColumn || ''}
+            options={
+              tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+                .filter(col => col.type !== 'LOCAL_DATE_TIME')
+                .map(col => col.name) || []
+            }
+            onChange={value =>
+              dispatch(setControls({ selectedMeasureColumn: value }))
+            }
+            menuMaxHeight={224}
+            menuWidth={250}
+          />
         </FormControl>
 
         {/* Aggregation Selection */}

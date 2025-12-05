@@ -19,6 +19,7 @@ import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { GridTableRowsIcon } from '@mui/x-data-grid';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 const ComparativeAnalysisControls = ()=> {
   const isMosaic = useAppSelector((state: RootState) => state.monitorPage.isMosaic);
@@ -375,67 +376,48 @@ const ComparativeAnalysisControls = ()=> {
                 <Box sx={{ mt: 2 }} />
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, px: 1.5 }}>
 
-                  {/* X-Axis Selector */}
                   <FormControl fullWidth>
-                    <InputLabel id="x-axis-select-label">
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <ShowChartIcon fontSize="small" />
-                X-Axis
-                      </Box>
-                    </InputLabel>
-                    <Select
+                    <SearchableSelect
                       labelId="x-axis-select-label"
-                      label="X-Axis-----"
-                      // disabled={plotData?.loading || !plotData?.data}
-                      value={xAxisOption}
-                      onChange={(e) =>
-                        dispatch(setComparativeModelInstanceControlPanel({ xAxisOption: e.target.value }))
+                      inputLabel={
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <ShowChartIcon fontSize="small" />
+                          X-Axis
+                        </Box>
                       }
-                      MenuProps={{
-                        PaperProps: { style: { maxHeight: 224, width: 250 } },
-                      }}
-                    >
-                      {options
-                        .filter(option => option !== yAxisOption)
-                        .map((feature, idx) => (
-                          <MenuItem key={`xAxis-${feature}-${idx}`} value={feature}>
-                            {feature}
-                          </MenuItem>
-                        ))}
-                    </Select>
+                      label="X-Axis-----"
+                      value={xAxisOption}
+                      options={options.filter(option => option !== yAxisOption)}
+                      onChange={value =>
+                        dispatch(
+                          setComparativeModelInstanceControlPanel({ xAxisOption: value }),
+                        )
+                      }
+                      menuMaxHeight={224}
+                      menuWidth={250}
+                    />
                   </FormControl>
+                    
                   <FormControl fullWidth>
-                    <InputLabel id="y-axis-select-label">
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <ShowChartIcon fontSize="small" />
-                Y-Axis
-                      </Box>
-                    </InputLabel>
-                    <Select
+                    <SearchableSelect
                       labelId="y-axis-select-label"
+                      inputLabel={
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <ShowChartIcon fontSize="small" />
+                          Y-Axis
+                        </Box>
+                      }
                       label="Y-Axis-----"
-                      // disabled={plotData?.loading || !plotData?.data}
                       value={yAxisOption}
-                      onChange={(e) =>
-                        dispatch(setComparativeModelInstanceControlPanel({ yAxisOption: e.target.value }))
-                      }            MenuProps={{
-                        PaperProps: { style: { maxHeight: 224, width: 250 } },
-                      }}
-                    >
-                      {options
-                        .filter(option => option !== xAxisOption)
-                        .map((feature, idx) => (
-                          <MenuItem key={`yAxis-${feature}-${idx}`} value={feature}>
-                            {feature}
-                          </MenuItem>
-                        ))}
-
-                      {options.filter(option => option !== xAxisOption).length === 0 && (
-                        <MenuItem disabled value="">
-                No available options
-                        </MenuItem>
-                      )}
-                    </Select>
+                      options={options.filter(option => option !== xAxisOption)}
+                      onChange={value =>
+                        dispatch(
+                          setComparativeModelInstanceControlPanel({ yAxisOption: value }),
+                        )
+                      }
+                      menuMaxHeight={224}
+                      menuWidth={250}
+                    />
                   </FormControl>
                 </Box>
                 <Divider sx={{ mt: 1, opacity: 0.6 }} />

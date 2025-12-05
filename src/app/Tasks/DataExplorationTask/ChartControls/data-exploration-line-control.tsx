@@ -15,6 +15,8 @@ import { setControls } from '../../../../store/slices/workflowPageSlice';
 
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import type { SelectChangeEvent } from '@mui/material';
+import SearchableSelect from '../../../../shared/components/searchable-select';
+import SearchableMultiSelect from '../../../../shared/components/searchable-select-multiple';
 
 const LineChartControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -42,16 +44,16 @@ const LineChartControlPanel = () => {
     }
   }, [columns, yAxis]);
 
-  const handleXAxisChange = (event: { target: { value: string } }) => {
-    const selected = columns.find(col => col.name === event.target.value);
+  const handleXAxisChange = (value: string) => {
+    const selected = columns.find(col => col.name === value);
 
     if (selected) {
       dispatch(setControls({ xAxis: selected }));
     }
   };
 
-  const handleYAxisChange = (event: SelectChangeEvent<string[]>) => {
-    const selectedNames = event.target.value as string[];
+  const handleYAxisChange = (value: string[]) => {
+    const selectedNames = value as string[];
     const selectedCols = selectedNames
       .map((name: string) => columns.find(col => col.name === name))
       .filter(Boolean);
@@ -89,6 +91,15 @@ const LineChartControlPanel = () => {
     }
   }, [columns, yAxis, xAxis]);
 
+  const xAxisOptions = columns.map(col => col.name);
+  const yAxisOptions = columns.filter(
+    col =>
+      col.type === 'BIGINT' ||
+      col.type === 'DOUBLE' ||
+      col.type === 'FLOAT' ||
+      col.type === 'INTEGER',
+  ).map(col => col.name)
+
   return (
     columns.length > 0 && (
       <Box>
@@ -101,66 +112,35 @@ const LineChartControlPanel = () => {
         >
           {/* X-Axis Selector */}
           <FormControl fullWidth>
-            <InputLabel id="x-axis-select-label">
-              <Box display="flex" alignItems="center" gap={1}>
-                <ShowChartIcon fontSize="small" />
-                X-Axis
-              </Box>
-            </InputLabel>
-            <Select
+            <SearchableSelect
               labelId="x-axis-select-label"
+              inputLabel={
+                <Box display="flex" alignItems="center" gap={1}>
+                  <ShowChartIcon fontSize="small" />
+                  X-Axis
+                </Box>
+              }
+              label='X-Axis-----'
               value={xAxis?.name || ''}
+              options={xAxisOptions}
               onChange={handleXAxisChange}
-              label="X-Axis-----"
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {columns.map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-            </Select>
+            />
           </FormControl>
 
           {/* Y-Axis Multi-Selector */}
-          <FormControl fullWidth>
-            <InputLabel id="y-axis-multi-select-label">
+          <SearchableMultiSelect
+            labelId="y-axis-multi-select-label"
+            inputLabel={
               <Box display="flex" alignItems="center" gap={1}>
                 <ShowChartIcon fontSize="small" />
                 Y-Axis
               </Box>
-            </InputLabel>
-            <Select
-              labelId="y-axis-multi-select-label"
-              multiple
-              value={yAxis.map(col => col.name)}
-              onChange={handleYAxisChange}
-              input={<OutlinedInput label="Y-Axis-----" />}
-              renderValue={selected => selected.join(', ')}
-              MenuProps={{
-                PaperProps: { style: { maxHeight: 224, width: 250 } },
-              }}
-            >
-              {columns
-                .filter(
-                  col =>
-                    col.type === 'BIGINT' ||
-                    col.type === 'DOUBLE' ||
-                    col.type === 'FLOAT' ||
-                    col.type === 'INTEGER',
-                )
-                .map(col => (
-                  <MenuItem key={col.name} value={col.name}>
-                    <Checkbox
-                      checked={yAxis.some(yCol => yCol.name === col.name)}
-                    />
-                    {col.name}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
+            }
+            label="Y-Axis-----"
+            value={yAxis.map(col => col.name)}
+            options={yAxisOptions}
+            onChange={handleYAxisChange}
+          />
         </Box>
         <Box
           sx={{
