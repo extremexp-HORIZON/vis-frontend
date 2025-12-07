@@ -4,7 +4,7 @@ import type { RootState } from '../../../../store/store';
 import { useAppSelector } from '../../../../store/store';
 import { DetailsCard, DetailsCardItem } from '../../../../shared/components/details-card';
 import UserInteractiveTask from '../../../../deprecated/UserInteractiveTask/user-interactive-task';
-import { IRun } from '../../../../shared/models/experiment/run.model';
+import type { IRun } from '../../../../shared/models/experiment/run.model';
 
 type ParamStats =
   | { type: 'numeric'; min: number; max: number }
@@ -28,7 +28,7 @@ const getParamStats = (
   const meaningfulValues = allValues.filter(v =>
     v !== null &&
     v !== undefined &&
-    v.trim() !== ""
+    v.trim() !== ''
   );
 
   if (meaningfulValues.length === 0) {
@@ -42,6 +42,7 @@ const getParamStats = (
 
   for (const v of meaningfulValues) {
     const n = Number(v);
+
     if (!Number.isFinite(n)) {
       return {
         type: 'categorical',
@@ -154,9 +155,9 @@ const WorkflowTaskOverview = () => {
                 workflows?.data,
                 param.name,
               );
-            
+
               let extraInfo: React.ReactNode = null;
-            
+
               if (stats?.type === 'numeric') {
                 extraInfo = (
                   <Typography
@@ -170,7 +171,7 @@ const WorkflowTaskOverview = () => {
               } else if (stats?.type === 'categorical') {
                 const displayValues = stats.values.slice(0, 5);
                 const moreCount = stats.values.length - displayValues.length;
-              
+
                 extraInfo = (
                   <Typography
                     component="span"
@@ -182,7 +183,7 @@ const WorkflowTaskOverview = () => {
                   </Typography>
                 );
               }
-            
+
               return (
                 <DetailsCardItem
                   key={`param-${param.name}`}

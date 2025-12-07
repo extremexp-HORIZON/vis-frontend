@@ -32,6 +32,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ControlPointDuplicateIcon from '@mui/icons-material/ControlPointDuplicate';
 import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { SectionHeader } from '../../../../shared/components/responsive-card-table';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 export interface Data {
   [key: string]: string | number | boolean | null | undefined;
@@ -95,9 +96,7 @@ const WorkflowActions = (props: {
 
   const handleCreateWokrkflowClose = () => setAnchorElCreateWorkflow(null);
 
-  const handleParamChange = (paramName: string) => (e: SelectChangeEvent<string>) => {
-    const value = e.target.value;
-
+  const handleParamChange = (paramName: string) => (value: string) => {
     setSelectedParams((prev) => ({ ...prev, [paramName]: value }));
   };
 
@@ -284,22 +283,16 @@ const WorkflowActions = (props: {
 
                 return (
                   <FormControl key={paramName} size="small" fullWidth>
-                    <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
-                    <Select
+                    <SearchableSelect
                       labelId={`${paramName}-label`}
+                      inputLabel={paramName}
                       label={paramName}
                       value={selected}
-                      onChange={handleParamChange(paramName)}
-                    >
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
-                      {values.map((v) => (
-                        <MenuItem key={v} value={v}>
-                          {v}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                      options={["None", ...values]}
+                      onChange={(value) => handleParamChange(paramName)(value)}
+                      menuMaxHeight={224}
+                      menuWidth={250}
+                    />
                   </FormControl>
                 );
               })}
@@ -578,7 +571,8 @@ export default function WorkflowTable() {
       );
 
       filteredRows = filteredRows.filter(row => {
-        const space = (row.space ?? '').toString().trim().toLowerCase();
+        const space = (row.space ?? '').toString().trim()
+          .toLowerCase();
 
         return selSpaces.has(space);
       });
@@ -632,10 +626,9 @@ export default function WorkflowTable() {
     return { filteredRows, filtersCounter: counter };
   };
 
-
   useEffect(() => {
     if(workflowsTable.initialized) {
-      const {filteredRows, filtersCounter} = applyWorkflowFilters(workflowsTable.rows, workflowsTable.filters, workflowsTable.selectedSpaces)
+      const { filteredRows, filtersCounter } = applyWorkflowFilters(workflowsTable.rows, workflowsTable.filters, workflowsTable.selectedSpaces);
 
       dispatch(setWorkflowsTable({ filteredRows, filtersCounter: filtersCounter }));
     }
@@ -1016,6 +1009,7 @@ export default function WorkflowTable() {
         if (value === null || value === undefined || value === 'n/a') return;
 
         const str = String(value).trim();
+
         if (!str) return;
 
         if (!valueSets[field]) {
@@ -1105,6 +1099,8 @@ export default function WorkflowTable() {
             disableVirtualization
             density="compact"
             rows={workflowsTable.visibleRows}
+            sortModel={workflowsTable.sortModel}
+            onSortModelChange={(newSortModel) => dispatch(setWorkflowsTable({sortModel: newSortModel}))}
             columns={workflowsTable.visibleColumns as CustomGridColDef[]}
             columnVisibilityModel={workflowsTable.columnsVisibilityModel}
             disableColumnFilter
@@ -1179,11 +1175,8 @@ export default function WorkflowTable() {
               }
             }}
             pageSizeOptions={[10, 25, 50]}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 50 },
-              },
-            }}
+            paginationModel={workflowsTable.paginationModel}
+            onPaginationModelChange={(paginationModel) => dispatch(setWorkflowsTable({paginationModel}))}
             columnGroupingModel={[
               {
                 groupId: 'Parameters',

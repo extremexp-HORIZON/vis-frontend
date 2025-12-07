@@ -25,11 +25,12 @@ export const createExperimentExplainabilityTooltipHandler = ({
   experimentId
 }: ExperimentExplainabilityTooltipProps) => {
   const runById = new Map<string, IRun>();
+
   runs.forEach(r => runById.set(r.id, r));
 
   const allParamNames = Array.from(
     new Set(
-      workflowIds.flatMap(wid => 
+      workflowIds.flatMap(wid =>
         runById.get(wid)?.params?.map(p => p.name) || []
       )
     )
@@ -37,7 +38,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
 
   const allMetricNames = Array.from(
     new Set(
-      workflowIds.flatMap(wid => 
+      workflowIds.flatMap(wid =>
         runById.get(wid)?.metrics?.map(m => m.name) || []
       )
     )
@@ -47,13 +48,15 @@ export const createExperimentExplainabilityTooltipHandler = ({
     sanitize: (v: any) => {
       if (v == null) return '';
       if (typeof v === 'number') return v.toFixed(4);
+
       return String(v);
     },
     formatTooltip: (value: Record<string, any>, sanitize) => {
       let xValue = '';
       let yValue = '';
       let zValue = '';
-      console.log(value)
+
+      console.log(value);
       if (value[xAxisName]) {
         xValue = value[xAxisName];
       } else if (value.x !== undefined) {
@@ -61,13 +64,14 @@ export const createExperimentExplainabilityTooltipHandler = ({
       } else if (value.feature1 !== undefined) {
         xValue = value.feature1;
       } else {
-        const keys = Object.keys(value).filter(key => 
+        const keys = Object.keys(value).filter(key =>
           key !== yAxisName &&
-          key !== 'y' && 
+          key !== 'y' &&
           key !== 'value' &&
           key !== 'Average Predicted Value' &&
           key !== 'z'
         );
+
         if (keys.length > 0) {
           xValue = value[keys[0]];
         }
@@ -80,14 +84,15 @@ export const createExperimentExplainabilityTooltipHandler = ({
       } else if (value.feature2 !== undefined) {
         yValue = value.feature2;
       } else {
-        const keys = Object.keys(value).filter(key => 
+        const keys = Object.keys(value).filter(key =>
           key !== xAxisName &&
-          key !== 'x' && 
+          key !== 'x' &&
           key !== 'value' &&
           key !== 'Average Predicted Value' &&
           key !== 'z' &&
           key !== xValue
         );
+
         if (keys.length > 0) {
           yValue = value[keys[0]];
         }
@@ -105,7 +110,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
         const availableData = Object.entries(value)
           .map(([key, val]) => `<div><strong>${sanitize(key)}:</strong> ${sanitize(val)}</div>`)
           .join('');
-        
+
         return `
           <div style="max-width: 400px;">
             <div style="margin-bottom: 8px; font-weight: bold;">Available Data:</div>
@@ -114,40 +119,43 @@ export const createExperimentExplainabilityTooltipHandler = ({
         `;
       }
 
-      const filteredWorkflowIds = (selectedFeature && selectedFeature2) 
+      const filteredWorkflowIds = (selectedFeature && selectedFeature2)
         ? workflowIds.filter(wid => {
-            const run = runById.get(wid);
-            if (!run) return false;
-            
-            const param1 = run.params?.find(p => p.name === selectedFeature);
-            const param2 = run.params?.find(p => p.name === selectedFeature2);
-            
-            if (!param1 || !param2) return false;
-            
-            const param1Value = String(param1.value);
-            const param2Value = String(param2.value);
-            const hoveredXValue = String(xValue);
-            const hoveredYValue = String(yValue);
-            
-            return param1Value === hoveredXValue && param2Value === hoveredYValue;
-          })
-        : selectedFeature 
+          const run = runById.get(wid);
+
+          if (!run) return false;
+
+          const param1 = run.params?.find(p => p.name === selectedFeature);
+          const param2 = run.params?.find(p => p.name === selectedFeature2);
+
+          if (!param1 || !param2) return false;
+
+          const param1Value = String(param1.value);
+          const param2Value = String(param2.value);
+          const hoveredXValue = String(xValue);
+          const hoveredYValue = String(yValue);
+
+          return param1Value === hoveredXValue && param2Value === hoveredYValue;
+        })
+        : selectedFeature
           ? workflowIds.filter(wid => {
-              const run = runById.get(wid);
-              if (!run) return false;
-              
-              const param = run.params?.find(p => p.name === selectedFeature);
-              if (!param) return false;
-              
-              const paramValue = String(param.value);
-              const hoveredValue = String(xValue);
-              
-              return paramValue === hoveredValue;
-            })
+            const run = runById.get(wid);
+
+            if (!run) return false;
+
+            const param = run.params?.find(p => p.name === selectedFeature);
+
+            if (!param) return false;
+
+            const paramValue = String(param.value);
+            const hoveredValue = String(xValue);
+
+            return paramValue === hoveredValue;
+          })
           : workflowIds;
       const compareKey = `compare-${Date.now()}`;
 
-      const compareLink = experimentId 
+      const compareLink = experimentId
         ? `/${experimentId}/monitoring?tab=1&compareId=${compareKey}`
         : '#';
 
@@ -172,10 +180,10 @@ export const createExperimentExplainabilityTooltipHandler = ({
 
       const body = filteredWorkflowIds.map(wid => {
         const color = workflowColors[wid] || '#3f51b5';
-        
+
         const params = runById.get(wid)?.params ?? [];
         const paramMap = new Map(params.map(p => [p.name, p.value]));
-        
+
         const metrics = runById.get(wid)?.metrics ?? [];
         const metricMap = new Map(metrics.map(m => [m.name, m.value]));
 
@@ -184,6 +192,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
             const paramValue = paramMap.get(name);
             const isSelectedFeature = name === selectedFeature || name === selectedFeature2;
             const style = isSelectedFeature ? 'font-weight: bold; background-color: #f0f0f0;' : '';
+
             return `<td style="padding:4px 8px; vertical-align:top; ${style}">${sanitize(paramValue ?? '')}</td>`;
           })
           .join('');
@@ -191,6 +200,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
         const metricCells = allMetricNames
           .map(name => {
             const metricValue = metricMap.get(name);
+
             return `<td style="text-align:right; padding:4px 8px; vertical-align:top;">${
               typeof metricValue === 'number' ? metricValue.toFixed(4) : sanitize(metricValue ?? '')
             }</td>`;
@@ -211,6 +221,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
 
       if (filteredWorkflowIds.length === 0) {
         let filterMessage = '';
+
         if (selectedFeature && selectedFeature2) {
           filterMessage = `No workflows found with ${selectedFeature} = ${sanitize(xValue)} and ${selectedFeature2} = ${sanitize(yValue)}`;
         } else if (selectedFeature) {
@@ -218,7 +229,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
         } else {
           filterMessage = 'No workflows found';
         }
-        
+
         return `
           <div style="max-width: 600px; white-space: normal;">
             ${header}
@@ -230,6 +241,7 @@ export const createExperimentExplainabilityTooltipHandler = ({
       }
 
       let titleText = '';
+
       if (selectedFeature && selectedFeature2) {
         titleText = `Workflows with ${selectedFeature} = ${sanitize(xValue)} and ${selectedFeature2} = ${sanitize(yValue)} (${filteredWorkflowIds.length} of ${workflowIds.length}):`;
       } else if (selectedFeature) {

@@ -104,16 +104,16 @@ const ComparisonModelInstance = ({
   const renderCharts = selectedWorkflowIds.map((runId) => {
     const instanceState = comparativeModelInstance[runId];
 
-    const titleTooltip = <TitleTooltip workflowId={runId} />
+    const titleTooltip = <TitleTooltip workflowId={runId} />;
 
     const titleNode = (
-      <Tooltip 
+      <Tooltip
         title={titleTooltip}
         slotProps={{
           tooltip: {
             sx: {
-              backgroundColor: "#ffff",
-              maxWidth:'2000px'
+              backgroundColor: '#ffff',
+              maxWidth: '2000px'
             },
           },
         }}

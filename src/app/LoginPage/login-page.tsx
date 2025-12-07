@@ -3,7 +3,7 @@ import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import TextField from '@mui/material/TextField';
@@ -24,7 +24,7 @@ const LoginPage = () => {
   const location = useLocation();
 
   // Redirect to previous location from state, or default to home
-  const from = location.state?.from || '/';
+  const from = useMemo(() => location.state?.from || '/', [location.state?.from]);
 
   const handleLoginInfoChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -52,13 +52,16 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    // Only navigate if token exists AND it's still in localStorage
+    const storedToken = localStorage.getItem('auth_token');
+
+    if (token && storedToken === token) {
       // Redirect to the main page or dashboard after successful login
       setTimeout(() => {
         navigate(from, { replace: true });
       }, 500);
     }
-  }, [token, from, navigate]);
+  }, [token, navigate, from]);
 
   return (
     <div id="error-page">

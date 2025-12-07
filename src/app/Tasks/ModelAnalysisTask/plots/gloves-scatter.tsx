@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import UmapComponent from './umapComponent';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 interface DataField {
   values: any[]
@@ -265,7 +266,7 @@ const GlovesScatter = ({
   //     ],
   //   });
 
-  const ControlPanel = ({chartType}: {chartType: string | null}) => (
+  const ControlPanel = ({ chartType }: {chartType: string | null}) => (
     <Box
       className="panel"
       sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}
@@ -275,54 +276,34 @@ const GlovesScatter = ({
         fullWidth
         disabled={dimensionalityReduction}
       >
-        <InputLabel>X-Axis</InputLabel>
-        <Select
-          value={xAxis}
-          title={xAxis}
-          onChange={e => setXAxis(e.target.value)}
+        <SearchableSelect
+          labelId="simple-x-axis-label"
+          inputLabel="X-Axis"
           label="X-Axis"
-          MenuProps={{
-            PaperProps: {
-              style: {
-                maxHeight: 250,
-                maxWidth: 300,
-              },
-            },
-          }}
-        >
-          {options.map(option => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </Select>
+          value={xAxis}
+          options={options}
+          onChange={(value) => setXAxis(value)}
+          menuMaxHeight={250}
+          menuWidth={300}
+          disabled={dimensionalityReduction}
+        />
       </FormControl>
       <FormControl
         variant="outlined"
         fullWidth
         disabled={dimensionalityReduction}
       >
-        <InputLabel>Y-Axis</InputLabel>
-        <Select
-          value={yAxis}
-          title={yAxis}
-          onChange={e => setYAxis(e.target.value)}
+        <SearchableSelect
+          labelId="y-axis-simple-label"
+          inputLabel="Y-Axis"
           label="Y-Axis"
-          MenuProps={{
-            PaperProps: {
-              style: {
-                maxHeight: 250,
-                maxWidth: 300,
-              },
-            },
-          }}
-        >
-          {options.map(option => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </Select>
+          value={yAxis}
+          options={options}
+          onChange={(value) => setYAxis(value)}
+          menuMaxHeight={250}
+          menuWidth={300}
+          disabled={dimensionalityReduction}
+        />
       </FormControl>
       {chartType === 'affectedClusters' && (
         <FormControl
@@ -346,6 +327,7 @@ const GlovesScatter = ({
             {colorOptions.map(option => {
               // Extract the part before "_Prediction"
               const displayText = option.replace(/_Prediction$/, '');
+
               return (
                 <MenuItem key={option} value={option}>
                   {displayText}

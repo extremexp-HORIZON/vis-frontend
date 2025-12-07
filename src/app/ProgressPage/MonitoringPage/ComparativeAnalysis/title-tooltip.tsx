@@ -1,4 +1,5 @@
-import { RootState, useAppSelector } from '../../../../store/store';
+import type { RootState } from '../../../../store/store';
+import { useAppSelector } from '../../../../store/store';
 import {
   Box,
   TableContainer,
@@ -9,8 +10,7 @@ import {
   TableBody,
 } from '@mui/material';
 
-
-const TitleTooltip = ({workflowId}: {workflowId: string}) => {
+const TitleTooltip = ({ workflowId }: {workflowId: string}) => {
   const { workflows } =
       useAppSelector((state: RootState) => state.progressPage);
   const workflowColors = useAppSelector(
@@ -21,7 +21,7 @@ const TitleTooltip = ({workflowId}: {workflowId: string}) => {
   if(!workflow) return;
 
   return (
-    <TableContainer sx={{width: '100%', height: '100%'}}>
+    <TableContainer sx={{ width: '100%', height: '100%' }}>
       <Table>
         <TableHead>
           <TableRow>
@@ -50,6 +50,6 @@ const TitleTooltip = ({workflowId}: {workflowId: string}) => {
       </Table>
     </TableContainer>
   );
-}
+};
 
 export default TitleTooltip;

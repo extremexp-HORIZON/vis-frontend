@@ -7,6 +7,7 @@ import { prepareDataExplorationResponse, type ConfusionMatrixResult, type TestIn
 import type { AxiosError } from 'axios';
 import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
 import type { IDataExplorationMetaDataResponse, IDataExplorationRequest, IDataExplorationResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
+import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 
 export interface WorkflowTableRow {
   id: string;
@@ -99,6 +100,8 @@ interface IMonitoringPageSlice {
         uniqueTasks: string[]
         initialized: boolean
         selectedSpaces: string[]
+        sortModel: GridSortModel | undefined
+        paginationModel: GridPaginationModel | undefined
       }
       scheduledTable: {
         order: 'asc' | 'desc'
@@ -116,6 +119,8 @@ interface IMonitoringPageSlice {
         uniqueParameters: string[]
         uniqueTasks: string[]
         selectedSpaces: string[]
+        sortModel: GridSortModel | undefined
+        paginationModel: GridPaginationModel | undefined
       }
       visibleTable: string
       selectedTab: number
@@ -218,7 +223,9 @@ const initialState: IMonitoringPageSlice = {
     uniqueParameters: [],
     uniqueTasks: [],
     initialized: false,
-    selectedSpaces: []
+    selectedSpaces: [],
+    sortModel: undefined,
+    paginationModel: { page: 0, pageSize: 50}
   },
   scheduledTable: {
     order: 'asc',
@@ -235,7 +242,9 @@ const initialState: IMonitoringPageSlice = {
     columnsVisibilityModel: {},
     uniqueParameters: [],
     uniqueTasks: [],
-    selectedSpaces: []
+    selectedSpaces: [],
+    sortModel: undefined,
+    paginationModel: { page: 0, pageSize: 50}
   },
   visibleTable: 'workflows',
   selectedTab: 0,
@@ -329,8 +338,10 @@ function parseRocCsv(csv: string): {
 
   const parseNum = (value: string): number => {
     const v = value.trim();
+
     if (v === 'Infinity') return 1e9;
     if (v === '-Infinity') return -1e9;
+
     return Number(v);
   };
 
@@ -344,9 +355,11 @@ function parseRocCsv(csv: string): {
   });
 
   let auc: number | undefined;
+
   if (aucIdx >= 0 && dataLines.length > 0) {
     const firstCols = dataLines[0].split(',').map((c) => c.trim());
     const aucVal = Number(firstCols[aucIdx]);
+
     if (!Number.isNaN(aucVal)) {
       auc = aucVal;
     }
@@ -661,12 +674,12 @@ export const monitoringPageSlice = createSlice({
       })
       .addCase(fetchComparativeRocCurve.fulfilled, (state, action) => {
         const runId = action.meta.arg.runId;
-      
+
         let rawData: any;
-      
+
         if (typeof action.payload === 'string') {
           const trimmed = action.payload.trim();
-        
+
           // Heuristic: JSON if starts with { or [
           if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
             rawData = JSON.parse(
@@ -686,11 +699,12 @@ export const monitoringPageSlice = createSlice({
             (t): number => {
               if (t === Infinity || t === 'Infinity') return 1e9;
               if (t === -Infinity || t === '-Infinity') return -1e9;
+
               return Number(t);
             }
           );
         }
-      
+
         state.comparativeModelRocCurve[runId] = {
           data: rawData,
           loading: false,

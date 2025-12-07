@@ -9,6 +9,7 @@ import { getToken } from '../../../../../store/slices/authSlice';
 const normalizePath = (path?: string | string[]): string => {
   if (!path) return '';
   const s = Array.isArray(path) ? path.join(',') : path;
+
   return s.replace(/\\/g, '/');
 };
 

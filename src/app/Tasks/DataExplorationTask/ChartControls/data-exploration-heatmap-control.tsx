@@ -13,6 +13,8 @@ import CategoryIcon from '@mui/icons-material/Category';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import { AggregationFunction } from '../../../../shared/models/dataexploration.model';
+import SearchableMultiSelect from '../../../../shared/components/searchable-select-multiple';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 const HeatMapControlPanel = () => {
   const dispatch = useAppDispatch();
@@ -71,86 +73,63 @@ const HeatMapControlPanel = () => {
       >
         {/* Group By Selection */}
         <FormControl fullWidth>
-          <InputLabel>
-            <Box display="flex" alignItems="center" gap={1}>
-              <CategoryIcon fontSize="small" />
-              Group By (Category)
-            </Box>
-          </InputLabel>
-          <Select
-            label="Group By (Category) okkk    "
-            multiple
-            value={
-              tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat ||
-              []
+          <SearchableMultiSelect
+            labelId="group-by-heat-label"
+            inputLabel={
+              <Box display="flex" alignItems="center" gap={1}>
+                <CategoryIcon fontSize="small" />
+                Group By (Category)
+              </Box>
             }
-            onChange={e => {
-              const selected = e.target.value as string[];
-
+            label="Group By (Category)-----"
+            value={
+              tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat || []
+            }
+            options={
+              tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+                .filter(col => col.type === 'STRING')
+                .map(col => col.name) || []
+            }
+            onChange={(selected: string[]) => {
               if (selected.length <= 2) {
                 dispatch(setControls({ barGroupByHeat: selected }));
               }
             }}
-            renderValue={(selected) => selected.join(', ')}
-            MenuProps={{
-              PaperProps: {
-                style: { maxHeight: 224, width: 250 },
-              },
-            }}
-          >
-            {/* <MenuItem value="Not Group">Not Group</MenuItem> */}
-            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type === 'STRING')
-              .map(col => (
-                <MenuItem
-                  key={col.name}
-                  value={col.name}
-                  disabled={
-                    (tab?.workflowTasks.dataExploration?.controlPanel
-                      .barGroupByHeat?.length ?? 0) >= 2 &&
-                    !tab?.workflowTasks.dataExploration?.controlPanel.barGroupByHeat?.includes(
-                      col.name,
-                    )
-                  }
-                >
-                  {col.name}
-                </MenuItem>
-              ))}
-          </Select>
+            isOptionDisabled={(option, selected) =>
+              selected.length >= 2 && !selected.includes(option)
+            }
+            menuMaxHeight={224}
+            menuWidth={250}
+          />
         </FormControl>
 
         {/* Value Selection */}
         <FormControl fullWidth>
-          <InputLabel>
-            <Box display="flex" alignItems="center" gap={1}>
-              <BarChartIcon fontSize="small" />
-              Measure (Value Column)
-            </Box>
-          </InputLabel>
-          <Select
+          <SearchableSelect
+            labelId="measure-value-column-heat-label"
+            inputLabel={
+              <Box display="flex" alignItems="center" gap={1}>
+                <BarChartIcon fontSize="small" />
+                Measure (Value Column)
+              </Box>
+            }
             label="Measure (Value Column)-----"
             value={selectedColumn || ''}
-            onChange={e => {
-              const newColumn = e.target.value as string;
-
+            options={
+              tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
+                .filter(col => col.type !== 'LOCAL_DATE_TIME')
+                .map(col => col.name) || []
+            }
+            onChange={newColumn =>
               dispatch(
                 setControls({
                   selectedMeasureColumnHeat: newColumn,
-                })
-              );
-            }}
-            MenuProps={{
-              PaperProps: { style: { maxHeight: 224, width: 250 } },
-            }}
-          >
-            {tab?.workflowTasks.dataExploration?.metaData.data?.originalColumns
-              .filter(col => col.type !== 'LOCAL_DATE_TIME')
-              .map(col => (
-                <MenuItem key={col.name} value={col.name}>
-                  {col.name}
-                </MenuItem>
-              ))}
-          </Select>
+                }),
+              )
+            }
+            menuMaxHeight={224}
+            menuWidth={250}
+          />
         </FormControl>
 
         {/* Aggregation Selection */}

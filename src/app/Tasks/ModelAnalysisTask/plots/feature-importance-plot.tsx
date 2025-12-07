@@ -87,8 +87,8 @@ const FeatureImportancePlot = (props: IFeatureImportancePlotProps) => {
       }));
 
       return importances
-      .sort((a, b) => b.Importance - a.Importance)
-      .slice(0, 10);
+        .sort((a, b) => b.Importance - a.Importance)
+        .slice(0, 10);
 
     }
 

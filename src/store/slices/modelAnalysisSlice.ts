@@ -33,9 +33,11 @@ function parseRocCsv(csv: string): {
 
   const parseNum = (value: string): number => {
     const v = value.trim();
+
     if (v === 'Infinity') return 1e9;
     if (v === '-Infinity') return -1e9;
     const n = Number(v);
+
     return n;
   };
 
@@ -49,9 +51,11 @@ function parseRocCsv(csv: string): {
   });
 
   let auc: number | undefined;
+
   if (aucIdx >= 0 && dataLines.length > 0) {
     const firstCols = dataLines[0].split(',').map((c) => c.trim());
     const aucVal = Number(firstCols[aucIdx]);
+
     if (!Number.isNaN(aucVal)) {
       auc = aucVal;
     }
@@ -64,7 +68,6 @@ function parseRocCsv(csv: string): {
     ...(auc !== undefined ? { auc } : {})
   };
 };
-
 
 // Thunks
 export const fetchAffected = createAsyncThunk(
@@ -209,13 +212,13 @@ export const modelAnalysisReducers = (builder: ActionReducerMapBuilder<IWorkflow
     })
     .addCase(fetchRocCurve.fulfilled, (state, action) => {
       const task = getTask(state, action.meta.arg.runId);
-    
+
       if (task) {
         let rawData: any;
-      
+
         if (typeof action.payload === 'string') {
           const trimmed = action.payload.trim();
-        
+
           // Heuristic: JSON if starts with { or [
           if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
             rawData = JSON.parse(
@@ -235,11 +238,12 @@ export const modelAnalysisReducers = (builder: ActionReducerMapBuilder<IWorkflow
             (t): number => {
               if (t === Infinity || t === 'Infinity') return 1e9;
               if (t === -Infinity || t === '-Infinity') return -1e9;
+
               return Number(t);
             }
           );
         }
-      
+
         assignResult(task.modelRocCurve, rawData);
       }
     })

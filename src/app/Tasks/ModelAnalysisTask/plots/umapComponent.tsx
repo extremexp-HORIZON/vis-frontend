@@ -14,7 +14,7 @@ interface UmapComponentProps {
   data1: Record<string, DataField>
   data2: { appliedAffectedActions: Record<string, DataField> }
   colorField: string
-  controlPanel: React.ComponentType<{ chartType: string | null }> 
+  controlPanel: React.ComponentType<{ chartType: string | null }>
 }
 
 const UmapComponent = ({ data1, data2, colorField, controlPanel: ControlPanel }: UmapComponentProps) => {

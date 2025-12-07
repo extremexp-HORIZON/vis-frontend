@@ -108,7 +108,6 @@ const MapChart = () => {
       leafletMapRef.current,
     );
 
-
     markerLayerRef.current = L.layerGroup().addTo(leafletMapRef.current);
     rendererRef.current = L.canvas({ padding: 0.5 }); // shared canvas renderer
   }, [lat, lon]);

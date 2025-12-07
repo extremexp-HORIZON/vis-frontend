@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom';
 import Loader from '../../../../shared/components/loader';
 import { fetchModelAnalysisExplainabilityPlot, setSelectedFeature, setAleOrPdpSelections } from '../../../../store/slices/explainabilitySlice';
 import { useExperimentExplainabilityTooltip } from '../../../ProgressPage/MonitoringPage/useExperimentExplainabilityTooltip';
+import SearchableSelect from '../../../../shared/components/searchable-select';
 
 interface AlePlotProps {
   explanation_type: string
@@ -29,7 +30,9 @@ const canArrayBeNumeric = (values: unknown[]): boolean =>
   values.every((v) => {
     if (v === null || v === undefined) return false;
     const s = String(v).trim();
+
     if (!s) return false;
+
     return !Number.isNaN(Number(s));
   });
 
@@ -126,107 +129,107 @@ const AlePlot = (props: AlePlotProps) => {
 
   const spec = hasCategoricalBars
     ? {
-        width: 'container',
-        autosize: { type: 'fit', contains: 'padding', resize: true },
-        data: {
-          values: vegaData,
-        },
-        layer: [
-          {
-            mark: {
-              type: 'rule',
-              color: '#777',
-              size: 1,
-            },
-            encoding: {
-              y: { datum: 0 },
-            },
+      width: 'container',
+      autosize: { type: 'fit', contains: 'padding', resize: true },
+      data: {
+        values: vegaData,
+      },
+      layer: [
+        {
+          mark: {
+            type: 'rule',
+            color: '#777',
+            size: 1,
           },
-          {
-            mark: {
-              type: 'bar',
+          encoding: {
+            y: { datum: 0 },
+          },
+        },
+        {
+          mark: {
+            type: 'bar',
+          },
+          encoding: {
+            x: {
+              field: xField,
+              type: 'ordinal',
+              title: xField,
             },
-            encoding: {
-              x: {
+            y: {
+              field: yField,
+              title: 'Average Predicted Effect',
+              type: 'quantitative',
+              axis: {
+                format: '.4f',
+              },
+              scale: { zero: true },
+            },
+            color: {
+              value: theme.palette.primary.main,
+            },
+            tooltip: [
+              {
                 field: xField,
                 type: 'ordinal',
-                title: xField,
+                title: 'Feature Value',
               },
-              y: {
+              {
                 field: yField,
-                title: 'Average Predicted Effect',
                 type: 'quantitative',
-                axis: {
-                  format: '.4f',
-                },
-                scale: { zero: true },
+                title: 'Average Predicted Effect',
+                format: '.4f',
               },
-              color: {
-                value: theme.palette.primary.main,
-              },
-              tooltip: [
-                {
-                  field: xField,
-                  type: 'ordinal',
-                  title: 'Feature Value',
-                },
-                {
-                  field: yField,
-                  type: 'quantitative',
-                  title: 'Average Predicted Effect',
-                  format: '.4f',
-                },
-              ],
-            },
+            ],
           },
-        ],
-      }
-    : {
-        width: 'container',
-        autosize: { type: 'fit', contains: 'padding', resize: true },
-        data: {
-          values: vegaData,
         },
-        mark: xIsNumeric
-          ? {
-              type: 'line',
-              point: { size: 20, color: theme.palette.primary.main },
+      ],
+    }
+    : {
+      width: 'container',
+      autosize: { type: 'fit', contains: 'padding', resize: true },
+      data: {
+        values: vegaData,
+      },
+      mark: xIsNumeric
+        ? {
+          type: 'line',
+          point: { size: 20, color: theme.palette.primary.main },
+        }
+        : {
+          type: 'bar',
+        },
+      encoding: {
+        x: {
+          field: xField,
+          type: xIsNumeric ? 'quantitative' : 'ordinal',
+        },
+        y: {
+          field: yField,
+          title: 'Average Predicted Effect',
+          type: yIsNumeric ? 'quantitative' : 'ordinal',
+          ...(yIsNumeric
+            ? {
+              axis: {
+                format: '.4f',
+              },
             }
-          : {
-              type: 'bar',
-            },
-        encoding: {
-          x: {
+            : {}),
+        },
+        tooltip: [
+          {
             field: xField,
             type: xIsNumeric ? 'quantitative' : 'ordinal',
+            title: 'Feature Value',
           },
-          y: {
+          {
             field: yField,
-            title: 'Average Predicted Effect',
             type: yIsNumeric ? 'quantitative' : 'ordinal',
-            ...(yIsNumeric
-              ? {
-                  axis: {
-                    format: '.4f',
-                  },
-                }
-              : {}),
+            title: 'Average Predicted Effect',
+            ...(yIsNumeric ? { format: '.4f' } : {}),
           },
-          tooltip: [
-            {
-              field: xField,
-              type: xIsNumeric ? 'quantitative' : 'ordinal',
-              title: 'Feature Value',
-            },
-            {
-              field: yField,
-              type: yIsNumeric ? 'quantitative' : 'ordinal',
-              title: 'Average Predicted Effect',
-              ...(yIsNumeric ? { format: '.4f' } : {}),
-            },
-          ],
-        },
-      };
+        ],
+      },
+    };
 
   const dispatchAleFetch = (
     feature: string,
@@ -280,59 +283,42 @@ const AlePlot = (props: AlePlotProps) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           <FormControl fullWidth>
-            <InputLabel id="feature-select-label">
-              {explanation_type === 'hyperparameterExplanation'
-                ? 'Hyperparameter'
-                : 'Feature'}
-            </InputLabel>
-            <Select
+            <SearchableSelect
               labelId="feature-select-label"
-              value={pendingFeature}
+              inputLabel={
+                explanation_type === 'hyperparameterExplanation'
+                  ? 'Hyperparameter'
+                  : 'Feature'
+              }
               label={
                 explanation_type === 'hyperparameterExplanation'
                   ? 'Hyperparameter'
                   : 'Feature'
               }
-              onChange={(e) => handleFeatureSelect(e.target.value)}
+              value={pendingFeature}
+              options={featureOrHyperparameterList}
+              onChange={(value) => handleFeatureSelect(value)}
               disabled={plotModel?.loading || !plotModel?.data}
-              MenuProps={{
-                PaperProps: {
-                  style: { maxHeight: 250, maxWidth: 300 },
-                },
-              }}
-            >
-              {featureOrHyperparameterList.map((feature) => (
-                <MenuItem
-                  key={`${plotModel?.data?.plotName}-${feature}`}
-                  value={feature}
-                >
-                  {feature}
-                </MenuItem>
-              ))}
-            </Select>
+              menuMaxHeight={250}
+              menuWidth={300}
+            />
           </FormControl>
 
           {(explanation_type === 'hyperparameterExplanation' || explanation_type === 'experimentExplanation') && (
             <FormControl fullWidth>
-              <InputLabel id="target-metric-label">Target Metric</InputLabel>
-              <Select
+              <SearchableSelect
                 labelId="target-metric-label"
-                value={pendingTargetMetric}
+                inputLabel="Target Metric"
                 label="Target Metric"
-                onChange={(e) => handleTargetMetricSelect(e.target.value)}
+                value={pendingTargetMetric}
+                options={
+                  tab?.workflowMetrics?.data?.map(metric => metric.name) || []
+                }
+                onChange={value => handleTargetMetricSelect(value)}
                 disabled={plotModel?.loading || !plotModel?.data}
-                MenuProps={{
-                  PaperProps: {
-                    style: { maxHeight: 250, maxWidth: 300 },
-                  },
-                }}
-              >
-                {tab?.workflowMetrics?.data?.map((metric) => (
-                  <MenuItem key={metric.name} value={metric.name}>
-                    {metric.name}
-                  </MenuItem>
-                )) ?? null}
-              </Select>
+                menuMaxHeight={250}
+                menuWidth={300}
+              />
             </FormControl>
           )}
         </Box>

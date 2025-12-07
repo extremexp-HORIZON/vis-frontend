@@ -16,7 +16,6 @@ const theme = createTheme({
   },
 });
 
-
 export type HeatPointLL = { lat: number; lon: number; value: number };
 
 export interface HeatMapLeafletProps {
@@ -124,6 +123,7 @@ const getColorFromGradient = (stops: Record<number, string>, t: number) => {
   if (t >= entries[entries.length - 1][0]) return entries[entries.length - 1][1];
 
   let i = 1;
+
   while (i < entries.length && t > entries[i][0]) i++;
   const [p0, c0] = entries[i - 1];
   const [p1, c1] = entries[i];
@@ -135,6 +135,7 @@ const getColorFromGradient = (stops: Record<number, string>, t: number) => {
     const r = parseInt(h.slice(0, 2), 16);
     const g = parseInt(h.slice(2, 4), 16);
     const b = parseInt(h.slice(4, 6), 16);
+
     return { r, g, b };
   };
 
@@ -220,6 +221,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
       zoomControl: true,
       attributionControl: false,
     });
+
     mapRef.current = m;
 
     m.setView([0, 0], 1);
@@ -231,8 +233,10 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
     if (title) {
       const badge = new L.Control({ position: 'topleft' });
+
       (badge as any).onAdd = function () {
         const div = L.DomUtil.create('div', 'leaflet-badge');
+
         div.style.background = 'rgba(255,255,255,0.9)';
         div.style.padding = '4px 8px';
         div.style.borderRadius = '6px';
@@ -240,6 +244,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
         div.style.fontWeight = '600';
         div.style.boxShadow = '0 0 4px rgba(0,0,0,0.15)';
         div.textContent = title!;
+
         return div;
       };
       badge.addTo(m);
@@ -255,6 +260,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
   useEffect(() => {
     const m = mapRef.current;
+
     if (!m) return;
 
     const gradientUsed = DEFAULT_HEAT_GRADIENT;
@@ -281,12 +287,12 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
     if (attributionPoints && attributionPoints.length > 0) {
       const lgAttr = L.layerGroup();
-    
+
       const size = 0.00001;
-    
+
       attributionPoints.forEach(p => {
         const { lat, lon, value } = p;
-      
+
         const h = L.polyline(
           [
             [lat, lon - size],
@@ -297,7 +303,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
             weight: 2,
           }
         );
-      
+
         const v = L.polyline(
           [
             [lat - size, lon],
@@ -308,16 +314,16 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
             weight: 2,
           }
         );
-      
+
         const tooltipText = `Attribution: ${value.toFixed(decimals)}`;
-      
+
         h.bindTooltip(tooltipText, { sticky: true });
         v.bindTooltip(tooltipText, { sticky: true });
-      
+
         lgAttr.addLayer(h);
         lgAttr.addLayer(v);
       });
-    
+
       lgAttr.addTo(m);
       attributionLayerRef.current = lgAttr;
     }
@@ -329,23 +335,25 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
     }
     const cssGradient = gradientToCss(gradientUsed);
     const lg = createLegendControl('topright', cssGradient);
+
     lg.addTo(m);
     legendRef.current = lg;
 
     const container = (lg as any)._container as HTMLElement | undefined;
+
     if (container) {
       const titleEl = container.querySelector('.legend-title') as HTMLElement | null;
       const rangeEl = container.querySelector('.legend-range') as HTMLElement | null;
-    
+
       const hasOverlay = !!(attributionPoints && attributionPoints.length > 0);
-    
+
       if (titleEl) {
         // If we have overlay, show generic combined title, otherwise just use legendLabel
         titleEl.textContent = hasOverlay
           ? legendLabel || 'Feature / Attribution'
           : legendLabel || 'Value';
       }
-    
+
       if (rangeEl) {
         let html = `
           <div style="width: 100%; height: 12px; background: ${cssGradient}; border-radius: 3px; margin: 4px 0 6px 0;"></div>
@@ -354,9 +362,9 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
             <span>${vMax.toFixed(decimals)}</span>
           </div>
         `;
-      
-      if (attributionPoints && attributionPoints.length > 0) {
-        html += `
+
+        if (attributionPoints && attributionPoints.length > 0) {
+          html += `
           <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
             <div style="position:relative;width:10px;height:10px;">
               <div style="position:absolute;left:0;top:50%;width:100%;height:1px;background:#000;transform:translateY(-50%);"></div>
@@ -365,7 +373,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
             <span>Attribution</span>
           </div>
         `;
-      }
+        }
 
         rangeEl.innerHTML = html;
       }
@@ -396,16 +404,19 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
   useEffect(() => {
     const m = mapRef.current;
+
     if (!m || !onViewChange) return;
 
     const handleViewChange = () => {
       if (programmaticMoveRef.current) {
         programmaticMoveRef.current = false;
+
         return;
       }
 
       const center = m.getCenter();
       const zoom = m.getZoom();
+
       onViewChange({
         center: [center.lat, center.lng],
         zoom,
@@ -423,6 +434,7 @@ const HeatMapLeaflet: React.FC<HeatMapLeafletProps> = ({
 
   useEffect(() => {
     const m = mapRef.current;
+
     if (!m || !syncedView) return;
 
     const currentCenter = m.getCenter();
