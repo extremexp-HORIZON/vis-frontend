@@ -370,6 +370,7 @@ const ComparisonMetricsCharts: React.FC = () => {
       isLineChart,
       xField: xField,
       workflowsData: workflows.data,
+      experimentId,
       colorMapping: workflowsTable.workflowColors
     })
       : undefined;

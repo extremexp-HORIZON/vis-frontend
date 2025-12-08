@@ -191,7 +191,9 @@ const OverlayHistogram = ({
           <tr>
             <td style="white-space:nowrap; vertical-align:top; padding:4px;">
               <span style="display:inline-block;width:12px;height:12px;background-color:${sanitize(color)};border-radius:2px;margin-right:6px;"></span>
-              ${sanitize(wid)}
+                <a href="/${sanitize(experimentId)}/workflow?workflowId=${encodeURIComponent(wid)}">
+                  ${sanitize(wid)}
+                </a>
             </td>
             <td style="text-align:right; vertical-align:top; padding:4px;">
               ${sanitize(cnt)}

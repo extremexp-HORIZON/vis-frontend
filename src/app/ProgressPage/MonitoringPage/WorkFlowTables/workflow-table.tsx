@@ -1,4 +1,5 @@
 import type {
+  GridAlignment,
   GridColumnNode,
   GridRowSelectionModel,
 } from '@mui/x-data-grid';
@@ -321,6 +322,9 @@ const WorkflowActions = (props: {
   );
 };
 
+const ACTION_COL_WIDTH = 120;
+const STATUS_COL_WIDTH = 120;
+
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   '& .MuiDataGrid-scrollbarFiller': {
     backgroundColor: theme.palette.customGrey.main,
@@ -350,7 +354,32 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     zIndex: 9999,
     borderLeft: '1px solid #ddd',
   },
-  // Add pagination styling
+  '& .datagrid-header-fixed-status': {
+    position: 'sticky',
+    right: ACTION_COL_WIDTH,
+    zIndex: 9999,
+    backgroundColor: theme.palette.customGrey.main,
+    borderLeft: '1px solid #ddd',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  '&.status-sticky-mode .MuiDataGrid-columnHeader[data-field="status"]': {
+    position: 'sticky',
+    right: ACTION_COL_WIDTH,
+    zIndex: 9998,
+    backgroundColor: theme.palette.customGrey.main,
+    borderLeft: '1px solid #ddd',
+  },
+  '&.status-sticky-mode .MuiDataGrid-cell[data-field="status"]': {
+    position: 'sticky',
+    right: ACTION_COL_WIDTH,
+    zIndex: 9998,
+    backgroundColor: theme.palette.customGrey.light,
+    borderLeft: '1px solid #ddd',
+  },
+
+  // pagination
   '& .MuiDataGrid-footerContainer': {
     minHeight: '56px',
     borderTop: '1px solid rgba(224, 224, 224, 1)',
@@ -366,8 +395,8 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     backgroundColor: theme.palette.customGrey.main,
     borderLeft: '1px solid #ddd',
     display: 'flex',
-    justifyContent: 'center', // Center the header content
-    alignItems: 'center', // Vertically center
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }));
 
@@ -832,87 +861,124 @@ export default function WorkflowTable() {
         return;
       }
 
-      const columns: CustomGridColDef[] = Object.keys(rows[0])
-        .filter(key => key !== 'id' && !HIDDEN_INTERNAL_FIELDS.has(key))
-        .map(key => ({
-          field: key,
-          headerName: key === 'action' ? '' : key.replace('_', ' '),
-          headerClassName:
-            key === 'action' ? 'datagrid-header-fixed' : 'datagrid-header',
-          minWidth: key === 'action' ? 120 : key === 'status' ? key.length * 10 + 40 : key.length * 10,
-          flex: 1,
-          align: 'center',
-          headerAlign: 'center',
-          sortable: key !== 'action' && !workflowsTable.groupBy.length,
-          type: (rows.length > 0 && typeof (rows[0] as Record<string, string | number | boolean | undefined>)[key] === 'number') ? 'number' : 'string',
-          ...(key === 'status' && {
-            renderCell: params => (
-              <ProgressBar
-                workflowStatus={params.value}
-                workflowId={params.row.workflowId}
-              />
-            ),
-          }),
-          ...(key === 'action' && {
-            renderCell: params => {
-              if (params.row.isGroupSummary) return null;
+const isStatusSticky = selectedTab === 0;
 
-              const currentStatus = params.row.status;
+const columns: CustomGridColDef[] = Object.keys(rows[0])
+  .filter(key => key !== 'id' && !HIDDEN_INTERNAL_FIELDS.has(key))
+  .map(key => {
+    const base: CustomGridColDef = {
+      field: key,
+      headerName: key === 'action' ? '' : key === 'status' && isStatusSticky ? '' : key.replace('_', ' '),
+      headerClassName:
+        key === 'action'
+          ? 'datagrid-header-fixed'
+          : 'datagrid-header',
 
-              return (
-                <WorkflowActions
-                  currentStatus={currentStatus}
-                  workflowId={params.row.workflowId}
-                  experimentId={experimentId}
-                />
-              );
-            },
-          }),
-          ...(key === 'rating' && {
-            renderCell: params => {
-              const currentRating = params.row.rating;
+      minWidth:
+        key === 'action'
+          ? ACTION_COL_WIDTH
+          : key === 'status'
+            ? STATUS_COL_WIDTH
+            : key === 'rating'
+            ? 120
+            : key.length * 10,
 
-              return (
-                <WorkflowRating
-                  currentRating={currentRating} experimentId={experimentId || ''} workflowId={params.row.id} />
-              );
-            },
-          }),
-          ...(key === 'workflowId' && {
-            renderCell: (params) => {
-              if (params.row.isGroupSummary) {
-                const groupId = params.row.id;
-                const isExpanded = workflowsTable.expandedGroups.includes(groupId);
+      flex:
+        key === 'action' || key === 'status'
+          ? 0
+          : 1,
 
-                return (
-                  <Box
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      dispatch(setExpandedGroup(groupId));
-                    }}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '100%',
-                      height: '100%',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {isExpanded ? (
-                      <ExpandMoreIcon fontSize="small" />
-                    ) : (
-                      <ChevronRightIcon fontSize="small" />
-                    )}
-                    <span>{params.value}</span>
-                  </Box>
-                );
-              }
+      align: 'center',
+      headerAlign: 'center',
 
-              return <span>{params.value}</span>;
-            }
-          }),
-        }));
+      sortable: key !== 'action' && !workflowsTable.groupBy.length,
+
+      type:
+        typeof (rows[0] as Record<string, any>)[key] === 'number'
+          ? 'number'
+          : 'string',
+    };
+    if (key === 'status') {
+      return {
+        ...base,
+        renderCell: params => (
+          <ProgressBar
+            workflowStatus={params.value}
+            workflowId={params.row.workflowId}
+          />
+        ),
+      };
+    }
+    if (key === 'action') {
+      return {
+        ...base,
+        renderCell: params => {
+          if (params.row.isGroupSummary) return null;
+
+          const currentStatus = params.row.status;
+
+          return (
+            <WorkflowActions
+              currentStatus={currentStatus}
+              workflowId={params.row.workflowId}
+              experimentId={experimentId}
+            />
+          );
+        },
+      };
+    }
+    if (key === 'rating') {
+      return {
+        ...base,
+        renderCell: params => (
+          <WorkflowRating
+            currentRating={params.row.rating}
+            experimentId={experimentId || ''}
+            workflowId={params.row.id}
+          />
+        ),
+      };
+    }
+    if (key === 'workflowId') {
+      return {
+        ...base,
+        renderCell: (params) => {
+          if (params.row.isGroupSummary) {
+            const groupId = params.row.id;
+            const isExpanded = workflowsTable.expandedGroups.includes(groupId);
+
+            return (
+              <Box
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(setExpandedGroup(groupId));
+                }}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '100%',
+                  cursor: 'pointer',
+                }}
+              >
+                {isExpanded ? (
+                  <ExpandMoreIcon fontSize="small" />
+                ) : (
+                  <ChevronRightIcon fontSize="small" />
+                )}
+                <span>{params.value}</span>
+              </Box>
+            );
+          }
+
+          return <span>{params.value}</span>;
+        },
+      };
+    }
+
+    return base;
+  });
 
       const { filteredRows, filtersCounter } = applyWorkflowFilters(
         rows,
@@ -1038,6 +1104,16 @@ export default function WorkflowTable() {
     return result;
   }, [workflowsTable.rows]);
 
+  const showActionColumn =
+    workflowsTable.groupBy.length === 0 ||
+    workflowsTable.expandedGroups.length > 0;
+
+  const effectiveColumnVisibilityModel = {
+    ...workflowsTable.columnsVisibilityModel,
+    action: showActionColumn, 
+  };
+
+
   return (
     <Box sx={{ height: '100%' }}>
       <Paper elevation={2} sx={{ height: '100%', width: '100%', mb: 2 }}>
@@ -1096,17 +1172,24 @@ export default function WorkflowTable() {
 
         <div style={{ height: 'calc(100% - 48px)', width: '100%' }}>
           <StyledDataGrid
+            className={selectedTab === 0 ? 'status-sticky-mode' : undefined}
             disableVirtualization
+            disableColumnMenu
             density="compact"
             rows={workflowsTable.visibleRows}
             sortModel={workflowsTable.sortModel}
             onSortModelChange={(newSortModel) => dispatch(setWorkflowsTable({sortModel: newSortModel}))}
-            columns={workflowsTable.visibleColumns as CustomGridColDef[]}
-            columnVisibilityModel={workflowsTable.columnsVisibilityModel}
             disableColumnFilter
-            onColumnVisibilityModelChange={(model) =>
-              dispatch(setWorkflowsTable({ columnsVisibilityModel: model }))
-            }
+            columns={workflowsTable.visibleColumns as CustomGridColDef[]}
+            columnVisibilityModel={effectiveColumnVisibilityModel}
+            onColumnVisibilityModelChange={(model) => {
+              const nextModel = {
+                ...model,
+                action: showActionColumn,
+              };
+            
+              dispatch(setWorkflowsTable({ columnsVisibilityModel: nextModel }));
+            }}
             isRowSelectable={(params) => {
               if (workflowsTable.groupBy.length === 0) return true;
 
@@ -1172,7 +1255,13 @@ export default function WorkflowTable() {
                   bottom: 0,
                   left: 0,
                 },
-              }
+              },
+              ...(selectedTab === 0 && {
+                '& .MuiDataGrid-virtualScrollerContent': {
+                  marginRight: ACTION_COL_WIDTH + STATUS_COL_WIDTH,
+                },
+              }),
+
             }}
             pageSizeOptions={[10, 25, 50]}
             paginationModel={workflowsTable.paginationModel}
@@ -1211,6 +1300,17 @@ export default function WorkflowTable() {
                   ) as GridColumnNode[]
                 ) : []
               },
+              ...( selectedTab === 0 ? 
+                [
+                  {
+                    groupId: 'Status',
+                    headerClassName: 'datagrid-header-fixed-status',
+                    headerAlign: 'center' as GridAlignment,
+                    children: [
+                      { field: 'status' } as GridColumnNode
+                    ]
+                  }
+                ] : []),
               {
                 groupId: 'Actions',
                 headerClassName: 'datagrid-header-fixed',
