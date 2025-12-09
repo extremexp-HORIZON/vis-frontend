@@ -1,3 +1,4 @@
+version: "3"
 name: "xxp"
 services:
   visualization-dashboard:
@@ -5,14 +6,16 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "5173:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - extremexp_network
-
   proxy-service:
-    image: ghcr.io/yagorezende/extremexp-abacproxy:latest
-    platform: linux/amd64
+    image: ghcr.io/yagorezende/extremexp-abacproxy:dev
     container_name: proxy-service
     stop_signal: SIGINT
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - ${PROXY_APP_PORT}:${PROXY_APP_PORT}
     environment:
@@ -41,9 +44,10 @@ services:
       - extremexp_network
 
   access-control-service:
-    image: ghcr.io/yagorezende/extremexp_accesscontrol:latest
-    platform: linux/amd64
+    image: ghcr.io/yagorezende/extremexp_accesscontrol:dev
     container_name: access-control-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - ${FLASK_AC_APP_PORT}:${FLASK_AC_APP_PORT}
     expose:
@@ -77,3 +81,6 @@ services:
 networks:
   extremexp_network:
     driver: bridge
+
+
+
