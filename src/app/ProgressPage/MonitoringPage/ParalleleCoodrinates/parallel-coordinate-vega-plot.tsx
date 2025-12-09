@@ -127,7 +127,7 @@ const ParallelCoordinateVega = ({
   );
 
   const paramColumns = columnNames.filter(name => !metricSet.has(name));
-  const metricColumns = columnNames.filter(name => metricSet.has(name));
+  const metricColumns = foldArray.current.filter(name => metricSet.has(name));
 
   const lastParamName = paramColumns[paramColumns.length - 1] ?? null;
   const firstMetricName = metricColumns[0] ?? null;
