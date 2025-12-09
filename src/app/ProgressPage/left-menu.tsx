@@ -30,11 +30,11 @@ const LeftMenu = () => {
       label: 'Monitoring',
       path: 'monitoring'
     },
-    {
-      icon: <ViewInArIcon />,
-      label: 'Gamification',
-      path: 'gamification'
-    },
+    // {
+    //   icon: <ViewInArIcon />,
+    //   label: 'Gamification',
+    //   path: 'gamification'
+    // },
 
   ];
 
