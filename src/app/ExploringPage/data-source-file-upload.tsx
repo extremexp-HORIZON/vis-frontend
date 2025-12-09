@@ -109,7 +109,7 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
       maxFileSize={100 * 1024 * 1024}
       additionalFields={additionalFields}
       title="Upload Data Source"
-      description="Drag and drop your CSV file here, or click to browse"
+      description="Drag and drop your CSV` or Parquet file here, or click to browse"
     />
   );
 };

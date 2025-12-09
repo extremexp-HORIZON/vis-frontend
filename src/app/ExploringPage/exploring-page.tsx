@@ -145,41 +145,56 @@ const ExploringPage = () => {
                       <TableCell align="center">Name</TableCell>
                       <TableCell align="center">Source</TableCell>
                       <TableCell align="center">Measures</TableCell>
+                      <TableCell align="center">Format</TableCell>
+                      <TableCell align="center">Source Type</TableCell>
                       <TableCell align="center">Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {dataSources.map(dataSource => (
-                      <TableRow key={`dataSource-row-${dataSource.fileName}`}>
-                        <TableCell sx={{ textAlign: 'center' }}>
-                          {dataSource.fileName}
-                        </TableCell>
-                        <TableCell sx={{ textAlign: 'center' }}>
-                          {dataSource.source}
-                        </TableCell>
-                        <TableCell sx={{ textAlign: 'center' }}>
-                          {dataSource.measure0}, {dataSource.measure1}
-                        </TableCell>
-                        <TableCell sx={{ textAlign: 'center' }}>
-                          <IconButton
-                            color="primary"
-                            size="small"
-                            onClick={() => handleViewClick(dataSource.fileName)}
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            size="small"
-                            onClick={() =>
-                              handleDeleteClick(dataSource.fileName)
-                            }
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {dataSources
+                      .slice()
+                      .sort((a, b) => (a.format < b.format ? -1 : 1))
+                      .map(dataSource => (
+                        <TableRow key={`dataSource-row-${dataSource.fileName}`}>
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            {dataSource.fileName}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            {dataSource.source}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            {dataSource.measure0}, {dataSource.measure1}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            {dataSource.format}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            {dataSource.sourceType}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            <IconButton
+                              color="primary"
+                              size="small"
+                              onClick={() =>
+                                handleViewClick(dataSource.fileName)
+                              }
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                            {dataSource.format !== 'duckdb' && (
+                              <IconButton
+                                color="error"
+                                size="small"
+                                onClick={() =>
+                                  handleDeleteClick(dataSource.fileName)
+                                }
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </TableContainer>
