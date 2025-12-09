@@ -343,6 +343,7 @@ const ParallelCoordinatePlot = () => {
               onOrderChange={() => {
                 dispatch(setParallel({ ...parallel }));
               }}
+              metricIds={parallel.options}
             />
             <ParallelCoordinateVega
               parallelData={parallelData}

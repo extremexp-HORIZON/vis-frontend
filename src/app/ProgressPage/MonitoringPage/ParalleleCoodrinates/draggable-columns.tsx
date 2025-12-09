@@ -39,15 +39,26 @@ const SortableItem = ({ id }: { id: UniqueIdentifier }) => {
 const DraggableColumns = ({
   foldArray,
   onOrderChange,
+  metricIds = [],
 }: {
   foldArray: React.MutableRefObject<UniqueIdentifier[]>
   onOrderChange?: (newOrder: UniqueIdentifier[]) => void
+  metricIds?: UniqueIdentifier[]
 }) => {
+  const metricSet = new Set(metricIds);
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over) return;
     if (active.id !== over?.id) {
+
+      const activeIsMetric = metricSet.has(active.id);
+      const overIsMetric = metricSet.has(over.id);
+
+      if (activeIsMetric !== overIsMetric) {
+        return;
+      }
+
       const oldIndex = foldArray.current.indexOf(active.id);
       const newIndex = foldArray.current.indexOf(over.id);
       const newArray = arrayMove(foldArray.current, oldIndex, newIndex);

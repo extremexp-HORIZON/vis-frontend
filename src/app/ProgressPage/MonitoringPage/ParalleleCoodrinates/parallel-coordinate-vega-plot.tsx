@@ -9,7 +9,7 @@ import type { ParallelDataItem } from '../../../../shared/types/parallel.types';
 
 interface ParallelCoordinateVegaProps {
   parallelData: ParallelDataItem[]
-  progressParallel: { selected: string }
+  progressParallel: { selected: string; options: string[] }
   foldArray: React.MutableRefObject<string[]>
   selectedWorkflows: string[]
   processedData: (ParallelDataItem & { selected: boolean })[]
@@ -120,9 +120,17 @@ const ParallelCoordinateVega = ({
     return { min, max };
   };
 
+  const metricSet = new Set(progressParallel.options);
+
   const columnNames = Array.from(
     new Set([...foldArray.current, progressParallel.selected])
   );
+
+  const paramColumns = columnNames.filter(name => !metricSet.has(name));
+  const metricColumns = columnNames.filter(name => metricSet.has(name));
+
+  const lastParamName = paramColumns[paramColumns.length - 1] ?? null;
+  const firstMetricName = metricColumns[0] ?? null;
 
   const selectedDomain = getNumericDomain(progressParallel.selected);
   const isValidDomain = !!selectedDomain;
@@ -275,6 +283,13 @@ const ParallelCoordinateVega = ({
                 },
               ],
             },
+            {
+              name: 'metricsDivider',
+              values:
+                lastParamName && firstMetricName
+                  ? [{ paramAxis: lastParamName, metricAxis: firstMetricName }]
+                  : [],
+            },
           ],
           signals: [
             {
@@ -370,6 +385,24 @@ const ParallelCoordinateVega = ({
                     scale: 'selectedLastColumnColorScale',
                     field: 'data',
                   },
+                },
+              },
+            },
+            {
+              name: 'metricsSeparator',
+              type: 'rule',
+              from: { data: 'metricsDivider' },
+              encode: {
+                enter: {
+                  x: {
+                    signal:
+                      '(scale(\'ord\', datum.paramAxis) + scale(\'ord\', datum.metricAxis)) / 2',
+                  },
+                  y: { value: 0 },
+                  y2: { field: { group: 'height' } },
+                  strokeDash: { value: [4, 4] },
+                  strokeWidth: { value: 1 },
+                  strokeOpacity: { value: 0.8 },
                 },
               },
             },
