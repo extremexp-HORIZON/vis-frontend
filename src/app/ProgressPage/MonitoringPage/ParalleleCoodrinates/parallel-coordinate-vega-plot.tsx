@@ -100,25 +100,34 @@ const ParallelCoordinateVega = ({
     });
   };
 
-  const columnNames = [...foldArray.current, progressParallel.selected];
+  const getNumericDomain = (col: string) => {
+    const nums = processedData
+      .map(row => Number((row as any)[col]))
+      .filter(v => !Number.isNaN(v));
 
-  // generate scales:
-  const numericValues = processedData
-    .map(d => d[progressParallel.selected])
-    .filter((v): v is number => typeof v === 'number' && !isNaN(v));
+    if (nums.length === 0) return null;
 
-  let selectedLastColumnMin = Math.min(...numericValues);
-  let selectedLastColumnMax = Math.max(...numericValues);
+    let min = Math.min(...nums);
+    let max = Math.max(...nums);
 
-  // fallback to avoid breaking Vega when data is empty
-  const isValidDomain = numericValues.length > 0;
+    if (min === max) {
+      const padding = min === 0 ? 1 : Math.abs(min * 0.5);
 
-  if (isValidDomain && selectedLastColumnMin === selectedLastColumnMax) {
-    const padding = selectedLastColumnMin === 0 ? 1 : Math.abs(selectedLastColumnMin * 0.5);
+      min -= padding;
+      max += padding;
+    }
 
-    selectedLastColumnMin -= padding;
-    selectedLastColumnMax += padding;
-  }
+    return { min, max };
+  };
+
+  const columnNames = Array.from(
+    new Set([...foldArray.current, progressParallel.selected])
+  );
+
+  const selectedDomain = getNumericDomain(progressParallel.selected);
+  const isValidDomain = !!selectedDomain;
+  const selectedMin = selectedDomain?.min ?? 0;
+  const selectedMax = selectedDomain?.max ?? 1;
 
   const generatedScales: Scale[] = [
     {
@@ -137,8 +146,8 @@ const ParallelCoordinateVega = ({
         field: progressParallel.selected,
       },
       ...(isValidDomain && {
-        domainMin: selectedLastColumnMin,
-        domainMax: selectedLastColumnMax,
+        domainMin: selectedMin,
+        domainMax: selectedMax,
       }),
     },
   ];
@@ -151,8 +160,8 @@ const ParallelCoordinateVega = ({
         data: 'mydata',
         field: progressParallel.selected,
       },
-      domainMin: selectedLastColumnMin,
-      domainMax: selectedLastColumnMax,
+      domainMin: selectedMin,
+      domainMax: selectedMax,
       range: [
         scheme('category20')[2],
         scheme('category20')[5],
@@ -162,25 +171,45 @@ const ParallelCoordinateVega = ({
     });
   }
 
-  for (const columnName of foldArray.current) {
-    generatedScales.push({
-      name: columnName,
-      type: 'point',
-      range: 'height',
-      domain: { data: 'mydata', field: columnName },
-      padding: 0.3,
-    });
+  for (const col of foldArray.current) {
+    if (col === progressParallel.selected) continue;
+
+    const domain = getNumericDomain(col);
+
+    if (domain) {
+      generatedScales.push({
+        name: col,
+        type: 'linear',
+        range: 'height',
+        domain: { data: 'mydata', field: col },
+        domainMin: domain.min,
+        domainMax: domain.max,
+      });
+    } else {
+      generatedScales.push({
+        name: col,
+        type: 'point',
+        range: 'height',
+        domain: { data: 'mydata', field: col },
+        padding: 0.3,
+      });
+    }
   }
 
   const generatedAxes: Axis[] = [];
 
   for (const columnName of columnNames) {
+    const numericDomain = getNumericDomain(columnName);
+    const isNumeric = !!numericDomain;
+    const isColorAxis = columnName === progressParallel.selected;
+
     generatedAxes.push({
       orient: 'left',
       scale: columnName,
-      // only show the last column, other columns are shown as draggable objects
-      title: columnName === progressParallel.selected ? columnName : '',
+      title: isColorAxis ? columnName : '',
       offset: { scale: 'ord', value: columnName, mult: -1 },
+      tickCount: isNumeric && !isColorAxis ? 6 : undefined,
+      labelOverlap: true,
     });
   }
   const numericFilteredData = processedData
@@ -240,9 +269,9 @@ const ParallelCoordinateVega = ({
               transform: [
                 {
                   type: 'sequence',
-                  start: selectedLastColumnMin,
-                  stop: selectedLastColumnMax,
-                  step: (selectedLastColumnMax - selectedLastColumnMin) / 256,
+                  start: selectedMin,
+                  stop: selectedMax,
+                  step: (selectedMax - selectedMin) / 256,
                 },
               ],
             },

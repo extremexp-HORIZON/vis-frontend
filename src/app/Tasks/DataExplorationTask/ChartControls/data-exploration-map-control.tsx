@@ -195,14 +195,14 @@ const MapControls = () => {
                   tab?.workflowTasks?.dataExploration?.controlPanel.weightBy || ''
                 }
                 options={[
-                  "None",
+                  'None',
                   ...doubleColumns
                     .filter(col => col.name !== lat && col.name !== lon)
                     .map(col => col.name),
                 ]}
                 onChange={(value) => {
                   handleChange('weightBy', value);
-                
+
                   // If colorByMap is set to something other than 'None', reset segmentBy
                 }}
                 menuMaxHeight={150}

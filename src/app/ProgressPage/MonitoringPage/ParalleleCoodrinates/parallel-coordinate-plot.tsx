@@ -66,7 +66,28 @@ const ParallelCoordinatePlot = () => {
           }, [] as string[]),
       );
 
-      foldArray.current = Array.from(uniqueParameters);
+      const uniqueMetrics = new Set(
+        workflows.data.filter(workflow => workflow.status !== 'SCHEDULED')
+          .reduce((acc: string[], workflow) => {
+            const metrics = workflow.metrics;
+            let metricNames: string[] = [];
+
+            if(metrics) {
+              metricNames = metrics.map(metric => metric.name);
+
+              return [...acc, ...metricNames];
+            } else {
+              return [...acc];
+            }
+
+          }, [] as string[])
+      );
+
+      const parameterKeys = Array.from(uniqueParameters);
+      const metricKeys = Array.from(uniqueMetrics);
+
+      const allAxes = [...parameterKeys, ...metricKeys];
+
       const data = workflows.data
         .map(workflow => {
           const params = workflow.params;
@@ -110,7 +131,10 @@ const ParallelCoordinatePlot = () => {
         );
         selected = options[0];
       }
+
+      foldArray.current = allAxes.filter(name => name !== selected).slice(0, 10);
       tooltipArray.current = Object.keys(parallelData.at(0) ?? {}).map(key => ({ field: key }));
+
       dispatch(
         setParallel({
           data,
@@ -123,7 +147,18 @@ const ParallelCoordinatePlot = () => {
   }, [workflows.data]);
 
   const handleMetricSelection = (feature: string) => {
-    dispatch(setParallel({ selected: feature }));
+    const cleanedSelectedParams = (parallel.selectedParams ?? []).filter(
+      (p) => p !== feature,
+    );
+
+    foldArray.current = cleanedSelectedParams;
+
+    dispatch(
+      setParallel({
+        selected: feature,
+        selectedParams: cleanedSelectedParams,
+      }),
+    );
   };
 
   const handleParamsSelesction = (params: string[]) => {
@@ -200,9 +235,9 @@ const ParallelCoordinatePlot = () => {
             },
           }}
         >
-          <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Parameters" />
+          <SectionHeader icon={<GridTableRowsIcon fontSize="small" />} title="Axes" />
           <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
-            {Array.from(new Set(parallelData.flatMap(item => Object.keys(item)).filter(k => !['workflowId', 'selected', 'rating', ...parallel.options].includes(k))))
+            {Array.from(new Set(parallelData.flatMap(item => Object.keys(item)).filter(k => !['workflowId', 'selected', 'rating'].includes(k))))
               .map(param => (
                 <ListItem
                   key={param}
@@ -228,6 +263,7 @@ const ParallelCoordinatePlot = () => {
                       handleParamsSelesction(updated);
 
                     }}
+                    disabled={param === parallel.selected ||  (!selectedParams.includes(param) && selectedParams.length >= 10)}
                   >
                     <ListItemIcon>
                       {parallel.selectedParams?.includes(param) ? (

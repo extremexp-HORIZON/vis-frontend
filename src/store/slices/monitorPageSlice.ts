@@ -7,7 +7,7 @@ import { prepareDataExplorationResponse, type ConfusionMatrixResult, type TestIn
 import type { AxiosError } from 'axios';
 import type { IDataAsset } from '../../shared/models/experiment/data-asset.model';
 import type { IDataExplorationMetaDataResponse, IDataExplorationRequest, IDataExplorationResponse, IMetaDataRequest, VisualColumn } from '../../shared/models/dataexploration.model';
-import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 
 export interface WorkflowTableRow {
   id: string;
@@ -225,7 +225,7 @@ const initialState: IMonitoringPageSlice = {
     initialized: false,
     selectedSpaces: [],
     sortModel: undefined,
-    paginationModel: { page: 0, pageSize: 50}
+    paginationModel: { page: 0, pageSize: 50 }
   },
   scheduledTable: {
     order: 'asc',
@@ -244,7 +244,7 @@ const initialState: IMonitoringPageSlice = {
     uniqueTasks: [],
     selectedSpaces: [],
     sortModel: undefined,
-    paginationModel: { page: 0, pageSize: 50}
+    paginationModel: { page: 0, pageSize: 50 }
   },
   visibleTable: 'workflows',
   selectedTab: 0,

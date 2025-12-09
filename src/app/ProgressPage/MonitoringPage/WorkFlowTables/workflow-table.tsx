@@ -289,7 +289,7 @@ const WorkflowActions = (props: {
                       inputLabel={paramName}
                       label={paramName}
                       value={selected}
-                      options={["None", ...values]}
+                      options={['None', ...values]}
                       onChange={(value) => handleParamChange(paramName)(value)}
                       menuMaxHeight={224}
                       menuWidth={250}
@@ -767,7 +767,7 @@ export default function WorkflowTable() {
             let metricNames: string[] = [];
 
             if(metrics) {
-              metricNames = metrics.map(metric => metric.name).filter(name => name !== 'rating');;
+              metricNames = metrics.map(metric => metric.name).filter(name => name !== 'rating');
 
               return [...acc, ...metricNames];
             } else {
@@ -861,124 +861,125 @@ export default function WorkflowTable() {
         return;
       }
 
-const isStatusSticky = selectedTab === 0;
+      const isStatusSticky = selectedTab === 0;
 
-const columns: CustomGridColDef[] = Object.keys(rows[0])
-  .filter(key => key !== 'id' && !HIDDEN_INTERNAL_FIELDS.has(key))
-  .map(key => {
-    const base: CustomGridColDef = {
-      field: key,
-      headerName: key === 'action' ? '' : key === 'status' && isStatusSticky ? '' : key.replace('_', ' '),
-      headerClassName:
+      const columns: CustomGridColDef[] = Object.keys(rows[0])
+        .filter(key => key !== 'id' && !HIDDEN_INTERNAL_FIELDS.has(key))
+        .map(key => {
+          const base: CustomGridColDef = {
+            field: key,
+            headerName: key === 'action' ? '' : key === 'status' && isStatusSticky ? '' : key.replace('_', ' '),
+            headerClassName:
         key === 'action'
           ? 'datagrid-header-fixed'
           : 'datagrid-header',
 
-      minWidth:
+            minWidth:
         key === 'action'
           ? ACTION_COL_WIDTH
           : key === 'status'
             ? STATUS_COL_WIDTH
             : key === 'rating'
-            ? 120
-            : key.length * 10,
+              ? 120
+              : key.length * 10,
 
-      flex:
+            flex:
         key === 'action' || key === 'status'
           ? 0
           : 1,
 
-      align: 'center',
-      headerAlign: 'center',
+            align: 'center',
+            headerAlign: 'center',
 
-      sortable: key !== 'action' && !workflowsTable.groupBy.length,
+            sortable: key !== 'action' && !workflowsTable.groupBy.length,
 
-      type:
+            type:
         typeof (rows[0] as Record<string, any>)[key] === 'number'
           ? 'number'
           : 'string',
-    };
-    if (key === 'status') {
-      return {
-        ...base,
-        renderCell: params => (
-          <ProgressBar
-            workflowStatus={params.value}
-            workflowId={params.row.workflowId}
-          />
-        ),
-      };
-    }
-    if (key === 'action') {
-      return {
-        ...base,
-        renderCell: params => {
-          if (params.row.isGroupSummary) return null;
+          };
 
-          const currentStatus = params.row.status;
+          if (key === 'status') {
+            return {
+              ...base,
+              renderCell: params => (
+                <ProgressBar
+                  workflowStatus={params.value}
+                  workflowId={params.row.workflowId}
+                />
+              ),
+            };
+          }
+          if (key === 'action') {
+            return {
+              ...base,
+              renderCell: params => {
+                if (params.row.isGroupSummary) return null;
 
-          return (
-            <WorkflowActions
-              currentStatus={currentStatus}
-              workflowId={params.row.workflowId}
-              experimentId={experimentId}
-            />
-          );
-        },
-      };
-    }
-    if (key === 'rating') {
-      return {
-        ...base,
-        renderCell: params => (
-          <WorkflowRating
-            currentRating={params.row.rating}
-            experimentId={experimentId || ''}
-            workflowId={params.row.id}
-          />
-        ),
-      };
-    }
-    if (key === 'workflowId') {
-      return {
-        ...base,
-        renderCell: (params) => {
-          if (params.row.isGroupSummary) {
-            const groupId = params.row.id;
-            const isExpanded = workflowsTable.expandedGroups.includes(groupId);
+                const currentStatus = params.row.status;
 
-            return (
-              <Box
-                onClick={(e) => {
-                  e.stopPropagation();
-                  dispatch(setExpandedGroup(groupId));
-                }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                  height: '100%',
-                  cursor: 'pointer',
-                }}
-              >
-                {isExpanded ? (
-                  <ExpandMoreIcon fontSize="small" />
-                ) : (
-                  <ChevronRightIcon fontSize="small" />
-                )}
-                <span>{params.value}</span>
-              </Box>
-            );
+                return (
+                  <WorkflowActions
+                    currentStatus={currentStatus}
+                    workflowId={params.row.workflowId}
+                    experimentId={experimentId}
+                  />
+                );
+              },
+            };
+          }
+          if (key === 'rating') {
+            return {
+              ...base,
+              renderCell: params => (
+                <WorkflowRating
+                  currentRating={params.row.rating}
+                  experimentId={experimentId || ''}
+                  workflowId={params.row.id}
+                />
+              ),
+            };
+          }
+          if (key === 'workflowId') {
+            return {
+              ...base,
+              renderCell: (params) => {
+                if (params.row.isGroupSummary) {
+                  const groupId = params.row.id;
+                  const isExpanded = workflowsTable.expandedGroups.includes(groupId);
+
+                  return (
+                    <Box
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(setExpandedGroup(groupId));
+                      }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        height: '100%',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {isExpanded ? (
+                        <ExpandMoreIcon fontSize="small" />
+                      ) : (
+                        <ChevronRightIcon fontSize="small" />
+                      )}
+                      <span>{params.value}</span>
+                    </Box>
+                  );
+                }
+
+                return <span>{params.value}</span>;
+              },
+            };
           }
 
-          return <span>{params.value}</span>;
-        },
-      };
-    }
-
-    return base;
-  });
+          return base;
+        });
 
       const { filteredRows, filtersCounter } = applyWorkflowFilters(
         rows,
@@ -1110,9 +1111,8 @@ const columns: CustomGridColDef[] = Object.keys(rows[0])
 
   const effectiveColumnVisibilityModel = {
     ...workflowsTable.columnsVisibilityModel,
-    action: showActionColumn, 
+    action: showActionColumn,
   };
-
 
   return (
     <Box sx={{ height: '100%' }}>
@@ -1178,7 +1178,7 @@ const columns: CustomGridColDef[] = Object.keys(rows[0])
             density="compact"
             rows={workflowsTable.visibleRows}
             sortModel={workflowsTable.sortModel}
-            onSortModelChange={(newSortModel) => dispatch(setWorkflowsTable({sortModel: newSortModel}))}
+            onSortModelChange={(newSortModel) => dispatch(setWorkflowsTable({ sortModel: newSortModel }))}
             disableColumnFilter
             columns={workflowsTable.visibleColumns as CustomGridColDef[]}
             columnVisibilityModel={effectiveColumnVisibilityModel}
@@ -1187,7 +1187,7 @@ const columns: CustomGridColDef[] = Object.keys(rows[0])
                 ...model,
                 action: showActionColumn,
               };
-            
+
               dispatch(setWorkflowsTable({ columnsVisibilityModel: nextModel }));
             }}
             isRowSelectable={(params) => {
@@ -1265,7 +1265,7 @@ const columns: CustomGridColDef[] = Object.keys(rows[0])
             }}
             pageSizeOptions={[10, 25, 50]}
             paginationModel={workflowsTable.paginationModel}
-            onPaginationModelChange={(paginationModel) => dispatch(setWorkflowsTable({paginationModel}))}
+            onPaginationModelChange={(paginationModel) => dispatch(setWorkflowsTable({ paginationModel }))}
             columnGroupingModel={[
               {
                 groupId: 'Parameters',
@@ -1300,7 +1300,7 @@ const columns: CustomGridColDef[] = Object.keys(rows[0])
                   ) as GridColumnNode[]
                 ) : []
               },
-              ...( selectedTab === 0 ? 
+              ...(selectedTab === 0 ?
                 [
                   {
                     groupId: 'Status',
