@@ -581,6 +581,7 @@ export default function ScheduleTable() {
         <div style={{ height: 'calc(100% - 48px)', width: '100%' }}>
           <StyledDataGrid
             disableVirtualization
+            disableColumnMenu
             density="compact"
             rows={scheduledTable.visibleRows}
             sortModel={scheduledTable.sortModel}

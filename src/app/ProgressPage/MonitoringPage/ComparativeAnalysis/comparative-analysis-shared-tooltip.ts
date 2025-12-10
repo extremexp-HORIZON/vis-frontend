@@ -15,9 +15,10 @@ export function createTooltipHandler(opts: {
   isLineChart: boolean;
   xField: 'id' | 'step' | 'timestamp';
   workflowsData: IRun[];
+  experimentId: string;
   colorMapping?: Record<string, string>;
 }) {
-  const { metricName, metricSeries, isLineChart, xField, workflowsData, colorMapping = {} } = opts;
+  const { metricName, metricSeries, isLineChart, xField, workflowsData, experimentId, colorMapping = {} } = opts;
 
   const toSeriesPointLike = (v: Record<string, any>): SeriesPoint => ({
     id: v.id ?? v.Workflow ?? v.workflow ?? v.wf ?? '',
@@ -59,10 +60,8 @@ export function createTooltipHandler(opts: {
           const run = workflowsData.filter(workflow => workflow.id === row.id)[0];
           const params = run?.params ?? [];
 
-          // console.log(params);
           const pmap = new Map<string, string>(params.map(p => [p.name, p.value]));
 
-          // console.log(pmap);
           const paramTds = paramNames
             .map(n => `<td style="padding:4px; vertical-align:top;">${sanitize(pmap.get(n) ?? '')}</td>`)
             .join('');
@@ -74,7 +73,9 @@ export function createTooltipHandler(opts: {
             <tr>
               <td style="white-space:nowrap; vertical-align:top; padding:4px;">
                 <span style="display:inline-block;width:12px;height:12px;background-color:${sanitize(color)};border-radius:2px;margin-right:6px;"></span>
-                ${sanitize(row.id)}
+                  <a href="/${sanitize(experimentId)}/workflow?workflowId=${encodeURIComponent(row.id)}">
+                    ${sanitize(row.id)}
+                  </a>
               </td>
               <td style="text-align:right; vertical-align:top; padding:4px;">
                 ${valueCell}

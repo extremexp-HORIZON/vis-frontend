@@ -561,7 +561,7 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
 
               <List sx={{ width: '100%', py: 0, maxHeight: 200, overflow: 'auto' }}>
                 {visibleTable === 'workflows'
-                  ? workflowsTable.visibleColumns.slice(0, -1).map(column => (
+                  ? workflowsTable.visibleColumns.slice(0, -2).map(column => (
                     <ListItem
                       key={column.field}
                       disablePadding
