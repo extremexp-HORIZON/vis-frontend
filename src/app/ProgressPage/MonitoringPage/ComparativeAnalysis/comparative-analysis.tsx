@@ -15,7 +15,7 @@ const ComparativeAnalysis = () => {
   const groupBy = useAppSelector(
     (state: RootState) => state.monitorPage.workflowsTable.groupBy,
   );
-  const { workflows } = useAppSelector(
+  const { workflows, experiment } = useAppSelector(
     (state: RootState) => state.progressPage,
   );
 
@@ -58,7 +58,7 @@ const ComparativeAnalysis = () => {
 
           <Tab
             label="Models Insights"
-            disabled={groupBy.length > 0 || !hasExplainability}
+            disabled={groupBy.length > 0 || !hasExplainability || experiment.data?.name === 'main_BestClassifier'}
           />
 
           <Tab

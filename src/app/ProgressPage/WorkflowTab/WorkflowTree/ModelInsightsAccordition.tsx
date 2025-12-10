@@ -13,6 +13,9 @@ import type { RootState } from '../../../../store/store';
 
 export default function ModelInsightsAccordion() {
   const dispatch = useAppDispatch();
+  const { experiment } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
   const { tab } = useAppSelector((s: RootState) => s.workflowPage);
   const hasModelpt = tab?.workflowConfiguration.dataAssets?.some(
     asset => asset.name === 'model.pt'
@@ -24,19 +27,19 @@ export default function ModelInsightsAccordion() {
         aria-expanded
         itemId="model"
         slotProps={{ content: { style: { paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 } } }}
-        aria-disabled={hasModelpt}
+        aria-disabled={hasModelpt || experiment.data?.name === 'main_BestClassifier'}
         label={
           <Box
             sx={{
               px: 1,
               py: 0.5,
               borderRadius: 1,
-              cursor: hasModelpt ? 'not-allowed' : 'pointer',
-              opacity: hasModelpt ? 0.5 : 1,
-              pointerEvents: hasModelpt ? 'none' : 'auto',
+              cursor: hasModelpt || experiment.data?.name === 'main_BestClassifier' ? 'not-allowed' : 'pointer',
+              opacity: hasModelpt || experiment.data?.name === 'main_BestClassifier' ? 0.5 : 1,
+              pointerEvents: hasModelpt || experiment.data?.name === 'main_BestClassifier' ? 'none' : 'auto',
             }}
             onClick={(e) => {
-              if(hasModelpt) return;
+              if(hasModelpt || experiment.data?.name === 'main_BestClassifier') return;
               e.stopPropagation();
               dispatch(setSelectedId('model'));
               dispatch(setSelectedItem({ type: 'model', data: { model: 'Model.pkl' } }));
@@ -57,24 +60,25 @@ export default function ModelInsightsAccordion() {
           { id: 'global-counterfactuals', icon: <TravelExploreIcon fontSize="small" sx={{ mr: 1, color: theme.palette.primary.main }} />, label: 'Global Counterfactuals' },
         ].map(({ id, icon, label }) => {
           const disabled = id !== 'feature-effects' && hasModelpt;
+          const disabledIdeko = id !== 'hyperparameters' && experiment.data?.name === 'main_BestClassifier';
 
           return (
             <TreeItem2
               key={id}
               itemId={id}
-              aria-disabled={disabled}
+              aria-disabled={disabled || disabledIdeko}
               label={
                 <Box
                   sx={{
                     px: 1,
                     py: 0.5,
                     borderRadius: 1,
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    opacity: disabled ? 0.5 : 1,
-                    pointerEvents: disabled ? 'none' : 'auto',
+                    cursor: disabled || disabledIdeko ? 'not-allowed' : 'pointer',
+                    opacity: disabled || disabledIdeko ? 0.5 : 1,
+                    pointerEvents: disabled || disabledIdeko ? 'none' : 'auto',
                   }}
                   onClick={() => {
-                    if(disabled) return;
+                    if(disabled || disabledIdeko) return;
                     dispatch(setSelectedId(id));
                     dispatch(setSelectedItem({ type: id as any }));
                   }}
