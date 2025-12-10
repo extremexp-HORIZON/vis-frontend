@@ -169,7 +169,9 @@ export const FileUpload = <T = unknown, >({
   };
 
   const handleClickUpload = () => {
-    fileInputRef.current?.click();
+    if (!selectedFile) {
+      fileInputRef.current?.click();
+    }
   };
 
   const formatFileSize = (bytes: number): string => {

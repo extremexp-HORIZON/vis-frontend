@@ -162,7 +162,7 @@ export interface InferenceInput {
   time_intervals: number;
   requested_heights: number[];
   model_filename: string | null;
-  training_csv_filename: string | null;
+  training_filename: string | null;
   location_paths: LocationPaths | null;
   zone_id: string | null;
 }
@@ -200,7 +200,7 @@ export const defaultInferenceInput: InferenceInput = {
   time_intervals: 1,
   requested_heights: [10.0, 30.0, 60.0, 100.0],
   model_filename: 'AthensModelXGB_20251001_134924.pkl',
-  training_csv_filename: null,
+  training_filename: null,
   location_paths: defaultLocationPaths,
   zone_id: 'zone_id',
 };

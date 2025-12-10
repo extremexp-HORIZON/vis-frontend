@@ -63,27 +63,24 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
 
   const handleUpload = useCallback(
     async (params: UploadParams): Promise<IDataSource> => {
-      // TODO: Remove this when EUSOME-API is updated for parquet files
-      if (params.file.name.split('.').pop() === 'csv') {
-        await dispatch(
-          uploadData({
-            file: params.file,
-            columnMapping: {
-              ...defaultColumnMapping,
-              target: params.additionalFields?.target || '',
-              latitude: params.additionalFields?.latitude || '',
-              longitude: params.additionalFields?.longitude || '',
-            },
-            // temporary disable augmentation
-            augmentationOptions: {
-              ...defaultAugmentationOptions,
-              enable_augmentation: false,
-            },
-          }),
-        ).unwrap();
+      await dispatch(
+        uploadData({
+          file: params.file,
+          columnMapping: {
+            ...defaultColumnMapping,
+            target: params.additionalFields?.target || '',
+            latitude: params.additionalFields?.latitude || '',
+            longitude: params.additionalFields?.longitude || '',
+          },
+          // temporary disable augmentation
+          augmentationOptions: {
+            ...defaultAugmentationOptions,
+            enable_augmentation: false,
+          },
+        }),
+      ).unwrap();
 
-        dispatch(listProcessedData());
-      }
+      dispatch(listProcessedData());
 
       const result = await dispatch(
         uploadDataSource({

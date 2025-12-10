@@ -237,7 +237,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         time_intervals: intervalsAmount,
         requested_heights: selectedHeights,
         model_filename: selectedModel,
-        training_csv_filename:
+        training_filename:
           processedDataList?.processed_files.find(d =>
             d.filename.includes(zone.fileName || ''),
           )?.filename || null,
@@ -782,8 +782,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                             variant="body2"
                             sx={{ wordBreak: 'break-all' }}
                           >
-                            {selectedModel?.split('_').slice(0, 2)
-                              .join('_')}...
+                            {selectedModel?.split('_').slice(0, 2).join('_')}...
                           </Typography>
                         </Box>
                         <Box>
