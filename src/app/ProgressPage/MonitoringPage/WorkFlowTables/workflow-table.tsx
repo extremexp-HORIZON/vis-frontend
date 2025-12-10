@@ -1256,12 +1256,6 @@ const columns: CustomGridColDef[] = Object.keys(rows[0])
                   left: 0,
                 },
               },
-              ...(selectedTab === 0 && {
-                '& .MuiDataGrid-virtualScrollerContent': {
-                  marginRight: ACTION_COL_WIDTH + STATUS_COL_WIDTH,
-                },
-              }),
-
             }}
             pageSizeOptions={[10, 25, 50]}
             paginationModel={workflowsTable.paginationModel}
