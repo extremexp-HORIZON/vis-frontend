@@ -67,8 +67,7 @@ const DraggableColumns = ({
       onOrderChange?.(newArray);
     }
   };
-  const minusPercentage = foldArray.current.length > 2 ? 5 : 15;
-  const width = foldArray.current.length / (foldArray.current.length + 1) * 100 - minusPercentage;
+  const width = (foldArray.current.length - 1) / foldArray.current.length * 100;
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>

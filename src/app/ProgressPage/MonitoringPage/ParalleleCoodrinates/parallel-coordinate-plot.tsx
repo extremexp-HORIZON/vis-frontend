@@ -162,8 +162,15 @@ const ParallelCoordinatePlot = () => {
   };
 
   const handleParamsSelesction = (params: string[]) => {
-    foldArray.current = params;
-    dispatch(setParallel({ selectedParams: params }));
+    const metricSet = new Set(parallel.options);
+
+    const ordered = [
+      ...params.filter((p) => !metricSet.has(p)),
+      ...params.filter((p) => metricSet.has(p)),
+    ];
+
+    foldArray.current = ordered;
+    dispatch(setParallel({ selectedParams: ordered }));
   };
 
   const processedData = useMemo(() => {
