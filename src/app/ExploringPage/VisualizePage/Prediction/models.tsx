@@ -16,6 +16,8 @@ import {
   type TrainTask,
   type ModelInfo,
   type TaskCreateResponse,
+  defaultHyperparameters,
+  athensHyperparameters,
 } from '../../../../shared/models/eusome-api.model';
 import { formatTimestampFull } from '../../../../shared/utils/dateUtils';
 import { TaskProgress } from '../../../../shared/components/task-progress';
@@ -132,7 +134,12 @@ export const PredictionModels = ({
       const result = await dispatch(
         createTask({
           task_type: 'train',
-          task_data: { ...defaultTrainingConfig, target_column: dataset?.measure0 || '', filename },
+          task_data: {
+            ...defaultTrainingConfig,
+            hyperparameters: dataset.id?.includes('athens') ? athensHyperparameters : defaultHyperparameters,
+            target_column: dataset?.measure0 || '',
+            filename,
+          },
         }),
       );
 

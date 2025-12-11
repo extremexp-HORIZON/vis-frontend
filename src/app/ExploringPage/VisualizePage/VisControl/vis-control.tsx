@@ -15,7 +15,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { type Dayjs } from 'dayjs';
 
 import type { IDataset } from '../../../../shared/models/exploring/dataset.model';
@@ -43,8 +43,8 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
 
   const [activeDate, setActiveDate] = useState(0);
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([
-    null,
-    null,
+    dayjs(dataset.timeMin!),
+    dayjs(dataset.timeMax!),
   ]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -213,24 +213,26 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
           </Stack>
 
           <Stack direction="row" justifyContent="space-evenly">
-            <DatePicker
+            <DateTimePicker
+              ampm={false}
               label="Start date"
               value={dateRange[0]}
               onChange={newValue => handleDateChange([newValue, dateRange[1]])}
-              minDate={dayjs(dataset.timeMin!)}
-              maxDate={dayjs()}
+              minDateTime={dayjs(dataset.timeMin! - 5 * 60 * 1000)} // 5 minutes before the start of the dataset
+              maxDateTime={dayjs(dataset.timeMax! + 5 * 60 * 1000)} // 5 minutes after the end of the dataset
               slotProps={{
                 textField: {
                   size: 'small',
                 },
               }}
             />
-            <DatePicker
+            <DateTimePicker
+              ampm={false}
               label="End date"
               value={dateRange[1]}
               onChange={newValue => handleDateChange([dateRange[0], newValue])}
-              minDate={dayjs(dataset.timeMin!)}
-              maxDate={dayjs()}
+              minDateTime={dayjs(dataset.timeMin! - 5 * 60 * 1000)} // 5 minutes before the start of the dataset
+              maxDateTime={dayjs(dataset.timeMax! + 5 * 60 * 1000)} // 5 minutes after the end of the dataset
               slotProps={{
                 textField: {
                   size: 'small',

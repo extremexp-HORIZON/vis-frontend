@@ -94,6 +94,17 @@ export interface TrainModelResponse {
   [key: string]: unknown;
 }
 
+// TODO: Consider moving this to a separate file when we have more data
+export const athensHyperparameters: Hyperparameters = {
+  colsample_bytree: 0.7,
+  learning_rate: 0.03,
+  max_depth: 7,
+  n_estimators: 200,
+  reg_alpha: 1,
+  reg_lambda: 10,
+  subsample: 0.8,
+};
+
 // Default training configuration
 export const defaultHyperparameters: Hyperparameters = {
   n_estimators: 200,
