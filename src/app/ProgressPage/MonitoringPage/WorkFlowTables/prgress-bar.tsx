@@ -25,9 +25,9 @@ export default function ProgressBar({ workflowStatus, workflowId } : {workflowSt
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 0.5 }}>
-        <Typography variant="body2">{workflowStatus?.toLowerCase()}</Typography>
-        {workflowStatus === 'RUNNING' && <Typography variant="body2">{progressValue}%</Typography>}
+      <Box sx={{display: 'flex', flexDirection: 'row', gap: 0.5}}>
+      <Typography variant="body2">{workflowStatus?.toLowerCase()}</Typography>
+      {workflowStatus === 'RUNNING' && <Typography variant="body2">{Math.floor(progressValue)}%</Typography>}
       </Box>
       <Box sx={{ width: '100%' }}>
         <LinearProgress sx={{ borderRadius: 4 }} color={color} value={progressValue} variant="determinate"/>
