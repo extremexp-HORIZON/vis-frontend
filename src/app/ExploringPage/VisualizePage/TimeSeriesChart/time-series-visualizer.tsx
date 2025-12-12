@@ -9,10 +9,22 @@ export interface ITSVisualizerProps {
   data: IUnivariateDataPoint[] | null;
   forecasting?: boolean;
   measureCol: string | null;
+  isFullscreen?: boolean;
+  minWidth: number;
+  minHeight: number;
+  maxHeight: number;
 }
 
 export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
-  const { data, forecasting, measureCol } = props;
+  const {
+    data,
+    forecasting,
+    measureCol,
+    isFullscreen,
+    minWidth,
+    minHeight,
+    maxHeight,
+  } = props;
   const { forecastingForm, isInTrainStepper, predictions } = useAppSelector(
     (state: RootState) => state.forecasting,
   );
@@ -138,9 +150,10 @@ export const TimeSeriesVisualizer = (props: ITSVisualizerProps) => {
 
   return vegaSeriesData && vegaSeriesData.length > 0 ? (
     <ResponsiveVegaLite
-      minWidth={100}
-      minHeight={100}
-      aspectRatio={1 / 0.5}
+      minWidth={minWidth}
+      minHeight={minHeight}
+      maxHeight={maxHeight}
+      aspectRatio={isFullscreen ? 16 / 9 : 1 / 0.5}
       actions={false}
       spec={spec}
     />

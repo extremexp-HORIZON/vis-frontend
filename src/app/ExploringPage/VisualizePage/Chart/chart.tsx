@@ -16,7 +16,7 @@ import {
   MenuItem,
   FormControl,
 } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { VisualizationSpec } from 'react-vega';
 import ResponsiveVegaLite from '../../../../shared/components/responsive-vegalite';
 import type { RootState } from '../../../../store/store';
@@ -40,7 +40,7 @@ export interface IChartProps {
   onToggleFullscreen?: () => void;
 }
 
-export const Chart = React.memo((props: IChartProps) => {
+export const Chart = (props: IChartProps) => {
   const { dataset, isFullscreen = false, onToggleFullscreen } = props;
   const dimensions = dataset.dimensions || [];
   const { series } = useAppSelector((state: RootState) => state.stats);
@@ -162,7 +162,7 @@ export const Chart = React.memo((props: IChartProps) => {
         : dataset.measure1;
 
   // Calculate viewport-based dimensions with memoization
-  const chartDimensions = React.useMemo(() => {
+  const chartDimensions = useMemo(() => {
     if (isFullscreen) {
       return {
         minWidth: Math.floor(viewportDimensions.width * 0.6), // 60vw
@@ -430,4 +430,4 @@ export const Chart = React.memo((props: IChartProps) => {
       )}
     </Box>
   );
-});
+};

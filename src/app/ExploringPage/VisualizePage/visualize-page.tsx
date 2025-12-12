@@ -40,7 +40,10 @@ const VisualizePage = () => {
   const { datasetId } = useParams();
   const dispatch = useAppDispatch();
   const [isChartFullscreen, setIsChartFullscreen] = useState(false);
-  const { menuOptions } = useAppSelector((state: RootState) => state.progressPage);
+  const [isTimeSeriesFullscreen, setIsTimeSeriesFullscreen] = useState(false);
+  const { menuOptions } = useAppSelector(
+    (state: RootState) => state.progressPage,
+  );
   const { dataset, loading } = useAppSelector(
     (state: RootState) => state.dataset,
   );
@@ -58,6 +61,10 @@ const VisualizePage = () => {
   const toggleChartFullscreen = React.useCallback(() => {
     setIsChartFullscreen(!isChartFullscreen);
   }, [isChartFullscreen]);
+
+  const toggleTimeSeriesFullscreen = React.useCallback(() => {
+    setIsTimeSeriesFullscreen(!isTimeSeriesFullscreen);
+  }, [isTimeSeriesFullscreen]);
 
   const handleClosePredictionDisplay = () => {
     dispatch(setPredictionDisplay(false));
@@ -104,7 +111,9 @@ const VisualizePage = () => {
             bottom={20}
             zIndex={999}
             sx={{
-              left: menuOptions.collapsed ? 'calc(56px + (100vw - 56px) / 2)' : 'calc(calc(15% + 16px) + (100vw - calc(15% + 16px)) / 2)',
+              left: menuOptions.collapsed
+                ? 'calc(56px + (100vw - 56px) / 2)'
+                : 'calc(calc(15% + 16px) + (100vw - calc(15% + 16px)) / 2)',
               transform: 'translateX(-50%)',
             }}
           >
@@ -155,6 +164,12 @@ const VisualizePage = () => {
           isFullscreen={isChartFullscreen}
           onToggleFullscreen={toggleChartFullscreen}
         />
+      ) : isTimeSeriesFullscreen ? (
+        <TimeSeriesChart
+          dataset={dataset}
+          isFullscreen={isTimeSeriesFullscreen}
+          onToggleFullscreen={toggleTimeSeriesFullscreen}
+        />
       ) : (
         <Box
           position="absolute"
@@ -169,7 +184,11 @@ const VisualizePage = () => {
             onToggleFullscreen={toggleChartFullscreen}
           />
           {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && (
-            <TimeSeriesChart dataset={dataset} />
+            <TimeSeriesChart
+              dataset={dataset}
+              isFullscreen={isTimeSeriesFullscreen}
+              onToggleFullscreen={toggleTimeSeriesFullscreen}
+            />
           )}
         </Box>
       )}
