@@ -54,6 +54,7 @@ interface ResponsiveCardVegaLiteProps {
   tooltip?: Parameters<typeof VegaLite>[0]['tooltip'];
   enableSorting?: boolean;
   initialSortDirection?: 'ascending' | 'descending' | 'none';
+  signalListeners?: Parameters<typeof VegaLite>[0]['signalListeners'];
 }
 const SectionHeader = ({
   icon,
@@ -120,6 +121,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   tooltip = undefined,
   enableSorting = false,
   initialSortDirection = 'none',
+  signalListeners,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth);
@@ -137,7 +139,6 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   const [sortDirection, setSortDirection] = useState<'ascending' | 'descending' | 'none'>(
     initialSortDirection
   );
-
 
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
@@ -173,6 +174,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
 
     // Only for bar charts
     const markType = sortedSpec.mark?.type || sortedSpec.mark;
+
     if (markType !== 'bar' && markType?.type !== 'bar') {
       return sortedSpec;
     }
@@ -188,8 +190,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
         op: 'sum',
         order: sortDirection === 'ascending' ? 'ascending' : 'descending'
       };
-    } 
-    else if (yIsCategorical && encoding.x?.field && encoding.y?.field) {
+    } else if (yIsCategorical && encoding.x?.field && encoding.y?.field) {
       // Horizontal bars: sort Y (categories) by X (values)
       sortedSpec.encoding.y.sort = {
         field: encoding.x.field,
@@ -199,16 +200,15 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
     }
 
     return sortedSpec;
-  }, [spec, sortDirection, enableSorting]);  
+  }, [spec, sortDirection, enableSorting]);
   // Get the display spec with sorting applied
   const displaySpec = getSortedSpec();
-  
+
   // Function to handle sort change
   const handleSortChange = (direction: 'ascending' | 'descending' | 'none') => {
     setSortDirection(direction);
     handleMenuClose();
   };
-
 
   useEffect(() => {
     updateSize();
@@ -746,9 +746,9 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     <Box sx={{ py: 1 }}>
                       {enableSorting && (
                         <>
-                          <MenuItem 
-                            onClick={() => handleSortChange(sortDirection === 'none' ? 'descending' : 
-                                                           sortDirection === 'descending' ? 'ascending' : 'none')}
+                          <MenuItem
+                            onClick={() => handleSortChange(sortDirection === 'none' ? 'descending' :
+                              sortDirection === 'descending' ? 'ascending' : 'none')}
                             sx={{ py: 1.5 }}
                           >
                             <ListItemIcon>
@@ -763,15 +763,15 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                             <ListItemText
                               primary={
                                 sortDirection === 'descending' ? 'Sort: Descending' :
-                                sortDirection === 'ascending' ? 'Sort: Ascending' :
-                                'Sort: None'
+                                  sortDirection === 'ascending' ? 'Sort: Ascending' :
+                                    'Sort: None'
                               }
                               secondary={
                                 sortDirection === 'descending' ? 'Highest first' :
-                                sortDirection === 'ascending' ? 'Lowest first' :
-                                'Click to sort'
+                                  sortDirection === 'ascending' ? 'Lowest first' :
+                                    'Click to sort'
                               }
-                              primaryTypographyProps={{ 
+                              primaryTypographyProps={{
                                 fontWeight: sortDirection !== 'none' ? 600 : 500,
                                 color: sortDirection !== 'none' ? 'primary.main' : 'inherit'
                               }}
@@ -869,6 +869,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 }}
                 {...otherProps}
                 tooltip={tooltip}
+                signalListeners={signalListeners}
               />
             )}
           </Box>
@@ -997,10 +998,10 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     <Box sx={{ py: 1 }}>
                       {enableSorting && (
                         <>
-                          <MenuItem 
+                          <MenuItem
                             onClick={() => {
-                              handleSortChange(sortDirection === 'none' ? 'descending' : 
-                                             sortDirection === 'descending' ? 'ascending' : 'none');
+                              handleSortChange(sortDirection === 'none' ? 'descending' :
+                                sortDirection === 'descending' ? 'ascending' : 'none');
                               handleFullscreenMenuClose();
                             }}
                             sx={{ py: 1.5 }}
@@ -1017,15 +1018,15 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                             <ListItemText
                               primary={
                                 sortDirection === 'descending' ? 'Sort: Descending' :
-                                sortDirection === 'ascending' ? 'Sort: Ascending' :
-                                'Sort: None'
+                                  sortDirection === 'ascending' ? 'Sort: Ascending' :
+                                    'Sort: None'
                               }
                               secondary={
                                 sortDirection === 'descending' ? 'Highest first' :
-                                sortDirection === 'ascending' ? 'Lowest first' :
-                                'Click to sort'
+                                  sortDirection === 'ascending' ? 'Lowest first' :
+                                    'Click to sort'
                               }
-                              primaryTypographyProps={{ 
+                              primaryTypographyProps={{
                                 fontWeight: sortDirection !== 'none' ? 600 : 500,
                                 color: sortDirection !== 'none' ? 'primary.main' : 'inherit'
                               }}

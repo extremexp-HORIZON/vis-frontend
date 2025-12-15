@@ -397,7 +397,7 @@ const ComparativeAnalysisControls = ()=> {
                       menuWidth={250}
                     />
                   </FormControl>
-                    
+
                   <FormControl fullWidth>
                     <SearchableSelect
                       labelId="y-axis-select-label"

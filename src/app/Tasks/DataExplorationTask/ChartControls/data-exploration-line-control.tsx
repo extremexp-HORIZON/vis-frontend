@@ -98,7 +98,7 @@ const LineChartControlPanel = () => {
       col.type === 'DOUBLE' ||
       col.type === 'FLOAT' ||
       col.type === 'INTEGER',
-  ).map(col => col.name)
+  ).map(col => col.name);
 
   return (
     columns.length > 0 && (

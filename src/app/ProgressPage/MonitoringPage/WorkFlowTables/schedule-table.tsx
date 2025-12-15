@@ -585,7 +585,7 @@ export default function ScheduleTable() {
             density="compact"
             rows={scheduledTable.visibleRows}
             sortModel={scheduledTable.sortModel}
-            onSortModelChange={(newSortModel) => dispatch(setScheduledTable({sortModel: newSortModel}))}
+            onSortModelChange={(newSortModel) => dispatch(setScheduledTable({ sortModel: newSortModel }))}
             disableColumnFilter
             columns={scheduledTable.columns as CustomGridColDef[]}
             columnVisibilityModel={scheduledTable.columnsVisibilityModel}
@@ -637,7 +637,7 @@ export default function ScheduleTable() {
             }}
             pageSizeOptions={[10, 25, 50]}
             paginationModel={scheduledTable.paginationModel}
-            onPaginationModelChange={(paginationModel) => dispatch(setScheduledTable({paginationModel}))}
+            onPaginationModelChange={(paginationModel) => dispatch(setScheduledTable({ paginationModel }))}
             columnGroupingModel={[
               {
                 groupId: 'Parameters',

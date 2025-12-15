@@ -6,7 +6,7 @@ const GamificationPage = () => {
   const gamificationUrl = useMemo(() => {
     const token = getToken();
     const baseUrl = 'https://i4dxp.eu/game/iframe/';
-    
+
     // Append token after # sign as agreed with the gamification team
     return token ? `${baseUrl}#${token}` : baseUrl;
   }, []);
