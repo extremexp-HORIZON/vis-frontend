@@ -388,8 +388,9 @@ const ComparisonMetricsCharts: React.FC = () => {
           isStatic={false}
           title={metricName}
           sx={{ width: '100%', maxWidth: '100%' }}
-          showSettings={false}
+          showSettings={true}
           tooltip={tooltipHandler}
+          enableSorting={!isLineChart}
         />
       </Grid>
     );

@@ -31,6 +31,9 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import CodeIcon from '@mui/icons-material/Code';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Loader from './loader';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import SortIcon from '@mui/icons-material/Sort';
 
 interface ResponsiveCardVegaLiteProps {
   spec: Record<string, unknown>; // VegaLite specification
@@ -49,6 +52,8 @@ interface ResponsiveCardVegaLiteProps {
   title?: React.ReactNode;
   showSettings?: boolean;
   tooltip?: Parameters<typeof VegaLite>[0]['tooltip'];
+  enableSorting?: boolean;
+  initialSortDirection?: 'ascending' | 'descending' | 'none';
 }
 const SectionHeader = ({
   icon,
@@ -113,6 +118,8 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   loading = false,
   showSettings = true,
   tooltip = undefined,
+  enableSorting = false,
+  initialSortDirection = 'none',
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth);
@@ -127,6 +134,10 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   const [fullscreenAnchorEl, setFullscreenAnchorEl] =
     useState<null | HTMLElement>(null);
   const fullscreenMenuOpen = Boolean(fullscreenAnchorEl);
+  const [sortDirection, setSortDirection] = useState<'ascending' | 'descending' | 'none'>(
+    initialSortDirection
+  );
+
 
   // Function to update the chart dimensions based on the container's size
   const updateSize = useCallback(() => {
@@ -150,6 +161,54 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
       setHeight(newHeight);
     }
   }, [minWidth, maxWidth, minHeight, maxHeight, aspectRatio, isStatic]);
+
+  // Function to get the sorted spec
+  const getSortedSpec = useCallback(() => {
+    if (!enableSorting || sortDirection === 'none') {
+      return spec;
+    }
+
+    const sortedSpec = JSON.parse(JSON.stringify(spec));
+    const encoding = sortedSpec.encoding || {};
+
+    // Only for bar charts
+    const markType = sortedSpec.mark?.type || sortedSpec.mark;
+    if (markType !== 'bar' && markType?.type !== 'bar') {
+      return sortedSpec;
+    }
+
+    // Check which axis should be sorted (the categorical one)
+    const xIsCategorical = encoding.x?.type === 'nominal' || encoding.x?.type === 'ordinal';
+    const yIsCategorical = encoding.y?.type === 'nominal' || encoding.y?.type === 'ordinal';
+
+    if (xIsCategorical && encoding.x?.field && encoding.y?.field) {
+      // Vertical bars: sort X (categories) by Y (values)
+      sortedSpec.encoding.x.sort = {
+        field: encoding.y.field,
+        op: 'sum',
+        order: sortDirection === 'ascending' ? 'ascending' : 'descending'
+      };
+    } 
+    else if (yIsCategorical && encoding.x?.field && encoding.y?.field) {
+      // Horizontal bars: sort Y (categories) by X (values)
+      sortedSpec.encoding.y.sort = {
+        field: encoding.x.field,
+        op: 'sum',
+        order: sortDirection === 'ascending' ? 'ascending' : 'descending'
+      };
+    }
+
+    return sortedSpec;
+  }, [spec, sortDirection, enableSorting]);  
+  // Get the display spec with sorting applied
+  const displaySpec = getSortedSpec();
+  
+  // Function to handle sort change
+  const handleSortChange = (direction: 'ascending' | 'descending' | 'none') => {
+    setSortDirection(direction);
+    handleMenuClose();
+  };
+
 
   useEffect(() => {
     updateSize();
@@ -685,6 +744,42 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                       </>
                     )}
                     <Box sx={{ py: 1 }}>
+                      {enableSorting && (
+                        <>
+                          <MenuItem 
+                            onClick={() => handleSortChange(sortDirection === 'none' ? 'descending' : 
+                                                           sortDirection === 'descending' ? 'ascending' : 'none')}
+                            sx={{ py: 1.5 }}
+                          >
+                            <ListItemIcon>
+                              {sortDirection === 'descending' ? (
+                                <ArrowDownwardIcon fontSize="small" color="primary" />
+                              ) : sortDirection === 'ascending' ? (
+                                <ArrowUpwardIcon fontSize="small" color="primary" />
+                              ) : (
+                                <SortIcon fontSize="small" />
+                              )}
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                sortDirection === 'descending' ? 'Sort: Descending' :
+                                sortDirection === 'ascending' ? 'Sort: Ascending' :
+                                'Sort: None'
+                              }
+                              secondary={
+                                sortDirection === 'descending' ? 'Highest first' :
+                                sortDirection === 'ascending' ? 'Lowest first' :
+                                'Click to sort'
+                              }
+                              primaryTypographyProps={{ 
+                                fontWeight: sortDirection !== 'none' ? 600 : 500,
+                                color: sortDirection !== 'none' ? 'primary.main' : 'inherit'
+                              }}
+                              secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                            />
+                          </MenuItem>
+                        </>
+                      )}
                       <MenuItem onClick={handleDownloadChart} sx={{ py: 1.5 }}>
                         <ListItemIcon>
                           <DownloadIcon fontSize="small" color="primary" />
@@ -763,7 +858,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             ) : (
               <VegaLite
                 spec={{
-                  ...spec,
+                  ...displaySpec,
                   autosize: {
                     type: 'fit',
                     contains: 'padding',
@@ -832,7 +927,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             )}
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {controlPanel && (
+            {(controlPanel || (enableSorting && showSettings)) && (
               <>
                 <IconButton
                   aria-label="settings"
@@ -886,7 +981,61 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                     icon={<SettingsSuggestIcon fontSize="small" />}
                     title="Chart Options"
                   />
-                  <Box sx={{ p: 2 }}>{controlPanel}</Box>
+                  <Box
+                    sx={{
+                      overflowY: 'auto',
+                      maxHeight: 400,
+                    }}
+                  >
+                    {controlPanel && (
+                      <>
+                        <Box sx={{ p: 2 }}>{controlPanel}</Box>
+                        <Divider sx={{ mt: 1, opacity: 0.6 }} />
+                      </>
+                    )}
+
+                    <Box sx={{ py: 1 }}>
+                      {enableSorting && (
+                        <>
+                          <MenuItem 
+                            onClick={() => {
+                              handleSortChange(sortDirection === 'none' ? 'descending' : 
+                                             sortDirection === 'descending' ? 'ascending' : 'none');
+                              handleFullscreenMenuClose();
+                            }}
+                            sx={{ py: 1.5 }}
+                          >
+                            <ListItemIcon>
+                              {sortDirection === 'descending' ? (
+                                <ArrowDownwardIcon fontSize="small" color="primary" />
+                              ) : sortDirection === 'ascending' ? (
+                                <ArrowUpwardIcon fontSize="small" color="primary" />
+                              ) : (
+                                <SortIcon fontSize="small" />
+                              )}
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                sortDirection === 'descending' ? 'Sort: Descending' :
+                                sortDirection === 'ascending' ? 'Sort: Ascending' :
+                                'Sort: None'
+                              }
+                              secondary={
+                                sortDirection === 'descending' ? 'Highest first' :
+                                sortDirection === 'ascending' ? 'Lowest first' :
+                                'Click to sort'
+                              }
+                              primaryTypographyProps={{ 
+                                fontWeight: sortDirection !== 'none' ? 600 : 500,
+                                color: sortDirection !== 'none' ? 'primary.main' : 'inherit'
+                              }}
+                              secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                            />
+                          </MenuItem>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
                 </Menu>
               </>
             )}
@@ -917,7 +1066,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             ) : (
               <VegaLite
                 spec={{
-                  ...spec,
+                  ...displaySpec,
                   autosize: { type: 'fit', contains: 'padding' },
                   width: fullScreen
                     ? window.innerWidth * 0.9
