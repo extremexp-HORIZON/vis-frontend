@@ -89,7 +89,7 @@ export const PredictionModels = ({
       dispatch(listProcessedData());
     } else {
       let processedFilename = processedDataList.processed_files.find(pFile =>
-        pFile.filename.includes(dataset?.id || ''),
+        pFile.filename.includes(dataset?.id ? `${dataset.id}_` : ''),
       );
 
       if (processedFilename) {
@@ -103,7 +103,7 @@ export const PredictionModels = ({
       const trainTask: TrainTask | undefined = activeTasks.find(
         task =>
           task.type === 'train' &&
-          (task as TrainTask).filename?.includes(dataset?.id || ''),
+          (task as TrainTask).filename?.includes(dataset?.id ? `${dataset.id}_` : ''),
       );
 
       if (trainTask) {
