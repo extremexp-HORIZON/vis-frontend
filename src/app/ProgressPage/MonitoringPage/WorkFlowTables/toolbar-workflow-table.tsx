@@ -349,13 +349,13 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 </IconButton>
               </Tooltip>
             )}
-            {props.onDownloadCsv && (
+            {/* {props.onDownloadCsv && (
               <Tooltip title="Export to CSV">
                 <IconButton onClick={props.onDownloadCsv}>
                   <DownloadIcon />
                 </IconButton>
               </Tooltip>
-            )}
+            )} */}
             <Popover
               open={Boolean(anchorElCreateWorkflow)}
               anchorEl={anchorElCreateWorkflow}
