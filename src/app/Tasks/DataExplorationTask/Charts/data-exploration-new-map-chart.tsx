@@ -176,13 +176,30 @@ const MapChart = () => {
         }
       }
 
-      L.circleMarker([latVal, lonVal], {
-        renderer: rendererRef.current, // ✅ use shared renderer
+      const marker = L.circleMarker([latVal, lonVal], {
+        renderer: rendererRef.current,
         radius: 6,
         fillColor: color,
         fillOpacity: 0.8,
-        stroke: false, // ✅ no border for speed
+        stroke: false,
       }).addTo(markerLayerRef.current!);
+
+      marker.bindTooltip(
+        `
+        <div>
+          <div><strong>${lat}</strong>: ${latVal.toFixed(5)}</div>
+          <div><strong>${lon}</strong>: ${lonVal.toFixed(5)}</div>
+          ${colorByMap && colorByMap !== 'None'
+            ? `<div><strong>${colorByMap}</strong>: ${row[colorByMap]}</div>`
+            : ''
+          }
+        </div>
+        `,
+        {
+          direction: 'top',
+          sticky: true,
+        }
+      );
     });
 
     if (data.length) {
