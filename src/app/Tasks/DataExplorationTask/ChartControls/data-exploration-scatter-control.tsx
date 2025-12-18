@@ -2,11 +2,6 @@ import { useEffect } from 'react';
 import {
   Box,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  OutlinedInput,
-  Checkbox,
   Button,
   ButtonGroup,
   Switch,

@@ -47,6 +47,7 @@ const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
 
   const handleChange = (event: SelectChangeEvent<string[]>) => {
     const newValue = event.target.value as string[];
+
     onChange(newValue);
   };
 
@@ -62,7 +63,7 @@ const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
         input={<OutlinedInput label={label} />}
         renderValue={selected => (selected as string[]).join(', ')}
         MenuProps={{
-          PaperProps: { 
+          PaperProps: {
             style: { maxHeight: menuMaxHeight, width: menuWidth },
             sx: {
               '& .MuiMenuItem-root:hover': {
@@ -93,25 +94,25 @@ const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
                   <SearchIcon fontSize="small" sx={{ opacity: 0.6 }} />
                 </Box>
               ),
-                endAdornment: (
-                    search ? (
-                      <Box
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSearch('');
-                        }}
-                        sx={{
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          opacity: 0.6,
-                          '&:hover': { opacity: 1 },
-                        }}
-                      >
-                        <CloseIcon fontSize="small" />
-                      </Box>
-                    ) : null
-                ),
+              endAdornment: (
+                search ? (
+                  <Box
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSearch('');
+                    }}
+                    sx={{
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      opacity: 0.6,
+                      '&:hover': { opacity: 1 },
+                    }}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </Box>
+                ) : null
+              ),
             }}
           />
         </ListSubheader>
@@ -121,6 +122,7 @@ const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
           const disabled = isOptionDisabled
             ? isOptionDisabled(option, value)
             : false;
+
           return (
             <MenuItem key={option} value={option} disabled={disabled}>
               <Checkbox checked={checked} />
@@ -129,9 +131,9 @@ const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
           );
         })}
         {filteredOptions.length === 0 && (
-            <MenuItem disabled sx={{ opacity: 0.6, fontStyle: 'italic' }}>
+          <MenuItem disabled sx={{ opacity: 0.6, fontStyle: 'italic' }}>
               No results found
-            </MenuItem>
+          </MenuItem>
         )}
       </Select>
     </FormControl>

@@ -49,6 +49,7 @@ import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CreateIcon from '@mui/icons-material/Create';
 import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
+import DownloadIcon from '@mui/icons-material/Download';
 
 interface ToolBarWorkflowProps {
   filterNumbers: number
@@ -63,6 +64,7 @@ interface ToolBarWorkflowProps {
   showFilterButton?: boolean;
   showSpaceButton?: boolean;
   spaceOptions?: string[]
+  onDownloadCsv?: () => void
 }
 
 export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
@@ -76,7 +78,8 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     groupByOptions,
     showFilterButton = false,
     showSpaceButton = false,
-    spaceOptions
+    spaceOptions,
+    onDownloadCsv,
   } = props;
   const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
     useAppSelector((state: RootState) => state.monitorPage);
@@ -346,6 +349,13 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                 </IconButton>
               </Tooltip>
             )}
+            {/* {props.onDownloadCsv && (
+              <Tooltip title="Export to CSV">
+                <IconButton onClick={props.onDownloadCsv}>
+                  <DownloadIcon />
+                </IconButton>
+              </Tooltip>
+            )} */}
             <Popover
               open={Boolean(anchorElCreateWorkflow)}
               anchorEl={anchorElCreateWorkflow}
