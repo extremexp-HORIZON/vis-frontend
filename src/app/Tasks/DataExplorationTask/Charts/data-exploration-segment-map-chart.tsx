@@ -236,7 +236,8 @@ ${segmentBy.length > 0
             padding: '8px',
             borderRadius: '4px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
-            maxHeight: '50%',
+            maxHeight: '200px',
+            maxWidth: '400px',
             overflowY: 'auto',
             zIndex: 1000,
           }}
@@ -266,6 +267,7 @@ ${segmentBy.length > 0
                   height: '14px',
                   backgroundColor: color,
                   marginRight: '6px',
+                  flexShrink: 0,
                 }}
               />
               <span style={{ fontSize: '12px' }}>
