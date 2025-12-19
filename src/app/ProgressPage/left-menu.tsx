@@ -8,14 +8,14 @@ import {
   IconButton,
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
-import ListRoundedIcon from '@mui/icons-material/ListRounded';
+// import ListRoundedIcon from '@mui/icons-material/ListRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import type { RootState } from '../../store/store';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { setMenuOptions } from '../../store/slices/progressPageSlice';
-import ViewInArIcon from '@mui/icons-material/ViewInAr';
+// import ViewInArIcon from '@mui/icons-material/ViewInAr';
 
 const LeftMenu = () => {
   const { experimentId } = useParams();
@@ -127,7 +127,7 @@ const LeftMenu = () => {
               justifyContent: 'flex-start',
               gap: 1,
               padding: 1,
-              height: '80px', // Fixed height to match experiment controls
+              height: '100px',
               boxSizing: 'border-box',
               borderBottom: '1px solid #ddd',
             }}
