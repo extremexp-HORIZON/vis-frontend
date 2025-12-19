@@ -127,7 +127,6 @@ const LeftMenu = () => {
               justifyContent: 'flex-start',
               gap: 1,
               padding: 1,
-              height: '100px',
               boxSizing: 'border-box',
               borderBottom: '1px solid #ddd',
             }}
