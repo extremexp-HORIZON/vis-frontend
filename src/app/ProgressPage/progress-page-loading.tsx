@@ -82,10 +82,10 @@ const ProgressPageLoading = () => {
       >
         <Grid sx={{ display: 'flex', rowGap: 2, flexDirection: 'column' }}>
           <img
-            src="/images/extremexp-logo.png"
+            src="/images/eusome-logo.png"
             height={130}
             style={{ objectFit: 'contain' }}
-            alt="extremexp logo"
+            alt="EUSOME logo"
           />
           <Typography variant="h4">Initializing Progress Page</Typography>
           {!experiment.data && experiment.loading && (

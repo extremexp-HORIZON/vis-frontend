@@ -237,7 +237,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
         model_filename: selectedModel,
         training_filename:
           processedDataList?.processed_files.find(d =>
-            d.filename.includes(zone.fileName || ''),
+            d.filename.includes(zone.fileName ? `${zone.fileName}_` : ''),
           )?.filename || null,
         zone_id: zone.id || null,
       };
