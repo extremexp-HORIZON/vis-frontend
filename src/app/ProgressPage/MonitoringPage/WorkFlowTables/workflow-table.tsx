@@ -1142,25 +1142,27 @@ export default function WorkflowTable() {
     action: showActionColumn,
   };
 
-  // Download CSV handler
   const handleDownloadCsv = () => {
-    const visibleColumns = workflowsTable.visibleColumns
+    const rows = workflowsTable.visibleRows ?? [];
 
-    const header = visibleColumns
-      .map((col) => getCsvHeader(col))
-      .join(',');
+    const exportableCols = (workflowsTable.visibleColumns ?? [])
+      .filter((c) => c.field !== 'action')
+      .filter((c) => c.field !== 'id')
+      .filter((c) => workflowsTable.columnsVisibilityModel?.[c.field] !== false);
 
-    const csvRows = workflowsTable.visibleRows.map((row) => {
-      const values = visibleColumns.map((col) =>
-        csvEscape(row[col.field as keyof WorkflowTableRow]),
+    const headers = exportableCols.map((c) => csvEscape(getCsvHeader(c))).join(',');
+
+    const dataLines = rows
+      .filter((r) => !r.isGroupSummary)
+      .map((r) =>
+        exportableCols
+          .map((c) => csvEscape((r as any)[c.field]))
+          .join(',')
       );
 
-      return values.join(',');
-    });
+    const csv = [headers, ...dataLines].join('\n');
 
-    const csvContent = [header, ...csvRows].join('\n');
-
-    downloadTextFile('workflows.csv', csvContent);
+    downloadTextFile(`${experimentId}_workflows.csv`, csv);
   };
 
 
