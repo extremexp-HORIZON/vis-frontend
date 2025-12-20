@@ -16,7 +16,6 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredW
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { SelectChangeEvent } from '@mui/material';
 import { Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, styled, TextField, Tooltip } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
 import ProgressBar from './prgress-bar';
@@ -412,6 +411,35 @@ const CustomNoRowsOverlay = () => {
 };
 
 const HIDDEN_INTERNAL_FIELDS = new Set(['space']);
+
+// Download CSV helpers
+const csvEscape = (value: unknown) => {
+  if (value === null || value === undefined) return '';
+  const s = String(value);
+  const needsQuotes = /[",\n\r]/.test(s);
+  const escaped = s.replace(/"/g, '""');
+
+  return needsQuotes ? `"${escaped}"` : escaped;
+};
+
+const downloadTextFile = (filename: string, content: string) => {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+const getCsvHeader = (c: { headerName?: string; field: string }) => {
+  const headerName = (c.headerName ?? '').trim();
+
+  if (!headerName && c.field === 'status') return 'status';
+
+  return headerName || c.field;
+};
 
 export default function WorkflowTable() {
   const { workflows } = useAppSelector(
@@ -1114,6 +1142,28 @@ export default function WorkflowTable() {
     action: showActionColumn,
   };
 
+  // Download CSV handler
+  const handleDownloadCsv = () => {
+    const visibleColumns = workflowsTable.visibleColumns
+
+    const header = visibleColumns
+      .map((col) => getCsvHeader(col))
+      .join(',');
+
+    const csvRows = workflowsTable.visibleRows.map((row) => {
+      const values = visibleColumns.map((col) =>
+        csvEscape(row[col.field as keyof WorkflowTableRow]),
+      );
+
+      return values.join(',');
+    });
+
+    const csvContent = [header, ...csvRows].join('\n');
+
+    downloadTextFile('workflows.csv', csvContent);
+  };
+
+
   return (
     <Box sx={{ height: '100%' }}>
       <Paper elevation={2} sx={{ height: '100%', width: '100%', mb: 2 }}>
@@ -1136,6 +1186,7 @@ export default function WorkflowTable() {
                   .filter((space): space is string => Boolean(space && space !== ''))
               )
             )}
+            onDownloadCsv={workflowsTable.groupBy.length === 0 ? handleDownloadCsv : undefined}
           />
         </Box>
         <Popover
@@ -1218,6 +1269,11 @@ export default function WorkflowTable() {
             checkboxSelection
             onRowSelectionModelChange={handleSelectionChange}
             rowSelectionModel={workflowsTable.selectedWorkflows}
+            getRowClassName={(params) =>
+              selectedTab === 1 && workflowsTable.hoveredWorkflowId && params.id === workflowsTable.hoveredWorkflowId
+                ? 'workflow-hovered-row'
+                : ''
+            }
             sx={{
               '& .MuiDataGrid-selectedRowCount': {
                 visibility: 'hidden', // Remove the selection count text on the bottom because we implement it in the header
@@ -1255,6 +1311,10 @@ export default function WorkflowTable() {
                   bottom: 0,
                   left: 0,
                 },
+              },
+              '& .workflow-hovered-row': {
+                outline: `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: -2,
               },
             }}
             pageSizeOptions={[10, 25, 50]}

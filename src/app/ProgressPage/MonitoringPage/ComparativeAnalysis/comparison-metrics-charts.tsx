@@ -9,7 +9,7 @@ import {
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { fetchWorkflowMetrics, setComparativeVisibleMetrics } from '../../../../store/slices/monitorPageSlice';
+import { fetchWorkflowMetrics, setComparativeVisibleMetrics, setHoveredWorkflow } from '../../../../store/slices/monitorPageSlice';
 import Loader from '../../../../shared/components/loader';
 import ResponsiveCardTable from '../../../../shared/components/responsive-card-table';
 import { createTooltipHandler } from './comparative-analysis-shared-tooltip';
@@ -39,6 +39,7 @@ const ComparisonMetricsCharts: React.FC = () => {
   const comparativeVisibleMetrics = useAppSelector((state: RootState) => state.monitorPage.comparativeVisibleMetrics);
   const previousSelectedRef = useRef<string[]>([]);
   const hasFetchedOnInit = useRef(false);
+  const lastHoverRef = useRef<string | null>(null);
 
   const isMosaic = useAppSelector(
     (state: RootState) => state.monitorPage.isMosaic,
@@ -231,6 +232,20 @@ const ComparisonMetricsCharts: React.FC = () => {
     }
     const isGrouped = workflowsTable.groupBy.length > 0;
 
+    const signalListeners = {
+      hover: (_name: string, value: any) => {
+        const next =
+          value && typeof value === 'object'
+            ? (Array.isArray(value.id) ? value.id[0] : value.id) ?? null
+            : null;
+
+        if (next !== lastHoverRef.current) {
+          lastHoverRef.current = next;
+          dispatch(setHoveredWorkflow(next));
+        }
+      },
+    };
+
     // Determine if line chart is needed: any workflow with multiple values for this metric
     const isLineChart = (() => {
       if (isGrouped) return false;
@@ -303,14 +318,22 @@ const ComparisonMetricsCharts: React.FC = () => {
 
     // Vega-Lite spec
     const chartSpec = {
-      params: isLineChart ? [
-        {
-          name: 'panZoom',
-          select: 'interval',
-          bind: 'scales',
-          clear: 'dblclick',
-        }
-      ] : [],
+      params: [
+        ...(isLineChart
+          ? [{
+            name: 'panZoom',
+            select: 'interval',
+            bind: 'scales',
+            clear: 'dblclick',
+          }]
+          : []),
+        ...([
+          {
+            name: 'hover',
+            select: { type: 'point', fields: ['id'], on: 'mouseover', clear: 'mouseout' },
+          },
+        ]),
+      ],
       mark,
       encoding: {
         x: {
@@ -388,8 +411,10 @@ const ComparisonMetricsCharts: React.FC = () => {
           isStatic={false}
           title={metricName}
           sx={{ width: '100%', maxWidth: '100%' }}
-          showSettings={false}
+          showSettings={true}
           tooltip={tooltipHandler}
+          enableSorting={!isLineChart}
+          signalListeners={signalListeners}
         />
       </Grid>
     );
