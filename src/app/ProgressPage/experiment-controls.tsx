@@ -177,7 +177,7 @@ const ExperimentControls = () => {
             <Box className={'progress-page-bar'} sx={{ flex: 1, pr: 2 }}>
               <ProgressPageBar />
             </Box>
-            { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
+            {/* { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
               <Box className={'progress-page-actions'} >
                 <IconButton onClick={handlePausePlay} color="primary">
                   {experiment?.data?.status === 'paused' ? (
@@ -190,7 +190,7 @@ const ExperimentControls = () => {
                   <StopIcon fontSize="large" />
                 </IconButton>
               </Box>
-            )}
+            )} */}
           </>
         ) : (
           <>
@@ -282,7 +282,7 @@ const ExperimentControls = () => {
                   {`${Math.round(progressBar.progress)}%`}
                 </Box>
               </Box>
-              { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
+              {/* { progressBar.progress !== 100 && experiment?.data?.status !== 'killed' && (
                 <Box className={'progress-page-actions'} >
                   <IconButton onClick={handlePausePlay} color="primary">
                     {experiment?.data?.status === 'paused' ? (
@@ -295,7 +295,7 @@ const ExperimentControls = () => {
                     <StopIcon fontSize="large" />
                   </IconButton>
                 </Box>
-              )}
+              )} */}
             </Box>
 
             {/* Non-fullscreen Dialog for Workflow Diagram */}

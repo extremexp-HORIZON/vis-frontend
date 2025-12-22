@@ -47,6 +47,11 @@ workflowEvaluation: {
   loading: boolean
   error: string | null
 },
+createdWorkflow: {
+  data: ICreateRunResponse | null
+  loading: boolean
+  error: string | null
+}
 }
 
 const initialState: IProgressPage = {
@@ -68,6 +73,11 @@ const initialState: IProgressPage = {
     loading: false,
     error: null
   },
+  createdWorkflow: {
+    data: null,
+    loading: false,
+    error: null
+  }
 };
 
 export const progressPageSlice = createSlice({
@@ -207,7 +217,23 @@ export const progressPageSlice = createSlice({
         state.experiments.loading = false;
         state.experiments.error =
           action.error.message || 'Error while fetching data';
-      });
+      })
+    .addCase(createWorkflow.pending, (state) => {
+      state.createdWorkflow.loading = true;
+      state.createdWorkflow.error = null;
+    })
+
+    .addCase(createWorkflow.fulfilled, (state, action) => {
+      state.createdWorkflow.data = action.payload;
+      state.createdWorkflow.loading = false;
+      state.createdWorkflow.error = null;
+    })
+
+    .addCase(createWorkflow.rejected, (state, action) => {
+      state.createdWorkflow.loading = false;
+      state.createdWorkflow.error =
+        action.error.message || 'Error while creating new run';
+    });
   },
 });
 
@@ -284,6 +310,19 @@ export const fetchUserEvaluation = createAsyncThunk(
 
   },
 );
+
+export const createWorkflow = createAsyncThunk(
+  'progressPage/create_workflow',
+  async (payload: { experimentId: string; runName: string; params: Record<string, string> }) => {
+    const { experimentId, runName, params } = payload;
+    const requestUrl = `${experimentId}/runs/create`;
+
+    return experimentApi
+      .post<ICreateRunResponse>(requestUrl, { runName, params })
+      .then(res => res.data);
+  }
+);
+
 // Reducer exports
 export const {
   setProgressBarData,

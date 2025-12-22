@@ -73,13 +73,13 @@ const ProgressPage = (props: ProgressPageProps) => {
 
   }, [experiment.data?.id]);
 
-  useEffect(() => {
-    if (workflows.data && workflows.data.length > 0) {
-      workflows.data?.every(workflow => workflow.status === 'COMPLETED' || workflow.status === 'FAILED' || workflow.status === 'KILLED') &&
-        intervalId.current &&
-        clearInterval(intervalId.current);
-    }
-  }, [workflows]);
+  // useEffect(() => {
+  //   if (workflows.data && workflows.data.length > 0) {
+  //     workflows.data?.every(workflow => workflow.status === 'COMPLETED' || workflow.status === 'FAILED' || workflow.status === 'KILLED') &&
+  //       intervalId.current &&
+  //       clearInterval(intervalId.current);
+  //   }
+  // }, [workflows]);
 
   return (
     <>

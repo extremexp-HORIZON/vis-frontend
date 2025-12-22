@@ -16,7 +16,7 @@ import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredW
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, styled, TextField, Tooltip } from '@mui/material';
+import { Alert, Badge,  Button,  FormControl,  IconButton, InputLabel, MenuItem, Popover, Select, Snackbar, styled, TextField, Tooltip } from '@mui/material';
 import FilterBar from '../../../../shared/components/filter-bar';
 import ProgressBar from './prgress-bar';
 import theme from '../../../../mui-theme';
@@ -27,10 +27,9 @@ import WorkflowRating from './workflow-rating';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import type { WorkflowTableRow } from '../../../../store/slices/monitorPageSlice';
-import { setWorkflowsData, stateController } from '../../../../store/slices/progressPageSlice';
+import { createWorkflow, setWorkflowsData, stateController } from '../../../../store/slices/progressPageSlice';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ControlPointDuplicateIcon from '@mui/icons-material/ControlPointDuplicate';
-import type { IRun } from '../../../../shared/models/experiment/run.model';
 import { SectionHeader } from '../../../../shared/components/responsive-card-table';
 import SearchableSelect from '../../../../shared/components/searchable-select';
 
@@ -86,7 +85,7 @@ const WorkflowActions = (props: {
 
       const baseName = currentWorkflow.name?.trim() || currentWorkflow.id;
 
-      setWorkflowName(baseName ? `${baseName} (copy)` : '');
+      setWorkflowName(baseName ? `${baseName}_(copy)` : '');
     }
   }, [anchorElCreateWorkflow]);
 
@@ -100,31 +99,29 @@ const WorkflowActions = (props: {
     setSelectedParams((prev) => ({ ...prev, [paramName]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = Object.entries(selectedParams)
-      .filter(([, v]) => v !== '' && v !== undefined)
-      .map(([name, value]) => ({ name, value }));
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    // for now create a new dummy scheduled workflow
-    const newRun: IRun = {
-      id: workflowName.trim(),
-      name: workflowName.trim(),
-      experimentId: experimentId || '',
-      status: 'SCHEDULED',
-      startTime: undefined,
-      endTime: undefined,
-      params,
-      metrics: [],
-      dataAssets: [],
-      tags: {},
-    };
-    const updatedWorkflows = workflows.data.concat(newRun);
+  if (!experimentId) return;
+  if (!workflowName.trim()) return;
 
-    dispatch(setWorkflowsData(updatedWorkflows));
+  const paramsMap: Record<string, string> = Object.entries(selectedParams)
+    .reduce((acc, [k, v]) => {
+      if (v && v !== 'None') acc[k] = String(v);
+      return acc;
+    }, {} as Record<string, string>);
 
-    handleCreateWokrkflowClose();
-  };
+
+  dispatch(
+    createWorkflow({
+      experimentId,
+      runName: workflowName,
+      params: paramsMap,
+    })
+  );
+
+  handleCreateWokrkflowClose();
+};
 
   const handlePausePlay = () => {
     if(currentStatus === 'PAUSED') {
@@ -197,7 +194,7 @@ const WorkflowActions = (props: {
       </Link>
       {currentStatus !== 'COMPLETED' && currentStatus !== 'FAILED' && currentStatus !== 'KILLED' && (
         <>
-          <IconButton onClick={handlePausePlay} >
+          {/* <IconButton onClick={handlePausePlay} >
             { currentStatus === 'PAUSED' ? (
               <PlayArrowIcon style={{ cursor: 'pointer', color: theme.palette.primary.main }} />
             ) : (
@@ -206,7 +203,7 @@ const WorkflowActions = (props: {
               />
             )
             }
-          </IconButton>
+          </IconButton> */}
           <IconButton onClick={handleStop}>
             <StopIcon
               style={{ cursor: 'pointer', color: theme.palette.primary.main }}
@@ -442,7 +439,7 @@ const getCsvHeader = (c: { headerName?: string; field: string }) => {
 };
 
 export default function WorkflowTable() {
-  const { workflows } = useAppSelector(
+  const { workflows, createdWorkflow } = useAppSelector(
     (state: RootState) => state.progressPage,
   );
   const { workflowsTable, selectedTab } = useAppSelector(
@@ -457,6 +454,14 @@ export default function WorkflowTable() {
 
   const dispatch = useAppDispatch();
   const prevGroupByRef = useRef<string[]>([]);
+
+  const [alert, setAlert] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({ open: false, message: '', severity: 'success' });
+
+  const prevCreateLoadingRef = useRef(false);
 
   const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
     if (newSelection === workflowsTable.selectedWorkflows) return;
@@ -1072,6 +1077,29 @@ export default function WorkflowTable() {
     }
   }, [workflowsTable.visibleRows, workflowsTable.initialized]);
 
+  useEffect(() => {
+    const wasLoading = prevCreateLoadingRef.current;
+    const isLoading = createdWorkflow.loading;
+
+    if (wasLoading && !isLoading) {
+      if (createdWorkflow.data?.kfpRunId) {
+        setAlert({
+          open: true,
+          severity: 'success',
+          message: `New workflow created`,
+        });
+      } else if (createdWorkflow.error) {
+        setAlert({
+          open: true,
+          severity: 'error',
+          message: 'Failed to create new workflow',
+        });
+      }
+    }
+
+    prevCreateLoadingRef.current = isLoading;
+  }, [createdWorkflow]);
+
   const hasVisibleParameterColumns = workflowsTable.visibleColumns.some(
     (col) =>
       workflowsTable.uniqueParameters.includes(col.field) &&
@@ -1380,6 +1408,21 @@ export default function WorkflowTable() {
           />
         </div>
       </Paper>
+
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={4000}
+        onClose={() => setAlert(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setAlert(prev => ({ ...prev, open: false }))}
+          severity={alert.severity}
+          variant="filled"
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
