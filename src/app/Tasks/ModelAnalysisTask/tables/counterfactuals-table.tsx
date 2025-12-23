@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { IPlotModel } from '../../../../shared/models/plotmodel.model';
@@ -18,8 +18,7 @@ import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import InfoMessage from '../../../../shared/components/InfoMessage';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import BuildIcon from '@mui/icons-material/Build';
-import type { IRun } from '../../../../shared/models/experiment/run.model';
-import { setWorkflowsData } from '../../../../store/slices/progressPageSlice';
+import { createWorkflow, setWorkflowsData } from '../../../../store/slices/progressPageSlice';
 import { Snackbar, Alert } from '@mui/material';
 
 interface ITableComponent {
@@ -47,13 +46,15 @@ const CounterfactualsTable = (props: ITableComponent) => {
   const { tab, isTabInitialized } = useAppSelector(
     (state: RootState) => state.workflowPage,
   );
-  const { workflows } = useAppSelector(
+  const { workflows, createdWorkflow } = useAppSelector(
     (state: RootState) => state.progressPage,
   );
-  const [snackbar, setSnackbar] = useState<{ open: boolean; text: string }>({
+  const [snackbar, setSnackbar] = useState<{ open: boolean; text: string; severity: 'success' | 'error'; }>({
     open: false,
     text: '',
+    severity: 'success',
   });
+  const prevCreateLoadingRef = useRef(false);
 
   function convertToPythonStyleString(obj: TestInstance) {
     const excludedKeys = ['isMisclassified', '_vgsid_', 'pointType', 'instanceId'];
@@ -121,6 +122,31 @@ const CounterfactualsTable = (props: ITableComponent) => {
       );
     }
   }, [point, activeTab]);
+
+  useEffect(() => {
+    const wasLoading = prevCreateLoadingRef.current;
+    const isLoading = createdWorkflow.loading;
+
+    // Fire only when a request finishes (true -> false)
+    if (wasLoading && !isLoading) {
+      if (createdWorkflow.data?.kfpRunId) {
+        setSnackbar({
+          open: true,
+          text: `New workflow created`,
+          severity: 'success',
+        });
+
+      } else if (createdWorkflow.error) {
+        setSnackbar({
+          open: true,
+          text: 'Failed to create new workflow',
+          severity: 'error',
+        });
+      }
+    }
+
+    prevCreateLoadingRef.current = isLoading;
+  }, [createdWorkflow]);
 
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-scrollbarFiller': {
@@ -257,7 +283,9 @@ const CounterfactualsTable = (props: ITableComponent) => {
     return !isNaN(n) && isFinite(n);
   };
 
-  const handleReconfigure = (row: any) => {
+  const handleReconfigure = async (row: any) => {
+    if (!experimentId) return;
+
     const currentWorkflow = workflows?.data?.find(
       (workflow) => workflow.id === tab?.workflowId
     );
@@ -284,27 +312,20 @@ const CounterfactualsTable = (props: ITableComponent) => {
       return { ...p, value: String(rowValue) };
     });
 
-    // for now create a new dummy scheduled workflow
-    const newRun: IRun = {
-      id: `${tab?.workflowName} (copy ${String(row?.id)})`.trim(),
-      name: `${tab?.workflowName} (copy ${String(row?.id)})`.trim(),
-      experimentId: experimentId || '',
-      status: 'SCHEDULED',
-      startTime: undefined,
-      endTime: undefined,
-      params: updatedParams,
-      metrics: [],
-      dataAssets: [],
-      tags: {},
-    };
-    const updatedWorkflows = workflows.data.concat(newRun);
+    const paramsMap = updatedParams.reduce((acc, p) => {
+      if (p?.name) acc[p.name] = String(p.value ?? '');
+      return acc;
+    }, {} as Record<string, string>);
 
-    dispatch(setWorkflowsData(updatedWorkflows));
+    const runName = `${tab?.workflowName ?? currentWorkflow.name ?? currentWorkflow.id} (copy ${String(row?.id)})`.trim();
 
-    setSnackbar({
-      open: true,
-      text: `New workflow "${newRun.name}" created`,
-    });
+    dispatch(
+      createWorkflow({
+        experimentId,
+        runName,
+        params: paramsMap,
+      })
+    );
   };
 
   const actionColumn: GridColDef = {
