@@ -51,6 +51,8 @@ const ExploringPage = () => {
     state => state.eusome,
   );
 
+  const supportedDatabases = ['duckdb', 'postgresql'];
+
   useEffect(() => {
     if (dataSources.length === 0) {
       dispatch(getDataSourceList());
@@ -143,10 +145,9 @@ const ExploringPage = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell align="center">Name</TableCell>
-                      <TableCell align="center">Source</TableCell>
-                      <TableCell align="center">Measures</TableCell>
-                      <TableCell align="center">Format</TableCell>
                       <TableCell align="center">Source Type</TableCell>
+                      <TableCell align="center">Format</TableCell>
+                      <TableCell align="center">Measures</TableCell>
                       <TableCell align="center">Actions</TableCell>
                     </TableRow>
                   </TableHead>
@@ -160,16 +161,13 @@ const ExploringPage = () => {
                             {dataSource.fileName}
                           </TableCell>
                           <TableCell sx={{ textAlign: 'center' }}>
-                            {dataSource.source}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: 'center' }}>
-                            {dataSource.measure0}, {dataSource.measure1}
+                            {dataSource.sourceType}
                           </TableCell>
                           <TableCell sx={{ textAlign: 'center' }}>
                             {dataSource.format}
                           </TableCell>
                           <TableCell sx={{ textAlign: 'center' }}>
-                            {dataSource.sourceType}
+                            {dataSource.measure0}, {dataSource.measure1}
                           </TableCell>
                           <TableCell sx={{ textAlign: 'center' }}>
                             <IconButton
@@ -181,7 +179,7 @@ const ExploringPage = () => {
                             >
                               <VisibilityIcon />
                             </IconButton>
-                            {dataSource.format !== 'duckdb' && (
+                            {!supportedDatabases.includes(dataSource.format) && (
                               <IconButton
                                 color="error"
                                 size="small"
