@@ -319,14 +319,6 @@ const ComparisonMetricsCharts: React.FC = () => {
     // Vega-Lite spec
     const chartSpec = {
       params: [
-        ...(isLineChart
-          ? [{
-            name: 'panZoom',
-            select: 'interval',
-            bind: 'scales',
-            clear: 'dblclick',
-          }]
-          : []),
         ...([
           {
             name: 'hover',
