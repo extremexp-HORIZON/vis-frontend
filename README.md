@@ -1,5 +1,16 @@
 # ExtremeXP Visualization Page
 
+**Important**
+This branch is not the active development branch.
+  
+To run ExtremeXP Visualization Page, switch to:
+**`new-extreme-new-navigation`**
+
+ ```bash
+ git checkout new-extreme-new-navigation
+ ```
+
+
 ## Installation
 
 1. Install nodejs verision 16+
