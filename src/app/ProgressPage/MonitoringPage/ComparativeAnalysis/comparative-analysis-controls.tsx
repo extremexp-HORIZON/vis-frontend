@@ -29,7 +29,9 @@ const ComparativeAnalysisControls = ()=> {
   const comparativeVisibleMetrics = useAppSelector((state: RootState) => state.monitorPage.comparativeVisibleMetrics);
   const [anchorEl, setAnchorEl] = useState <null | HTMLElement>(null);
   const [columnsAnchorEl, setColumnsAnchorEl] = useState <null | HTMLElement>(null);
+  const [datasetAnchorEl, setDatasetAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(columnsAnchorEl);
+  const isDatasetSelectorOpen = Boolean(datasetAnchorEl);
   const [metricsAnchorEl, setMetricsAnchorEl] = useState<null | HTMLElement>(null);
   const isMetricsMenuOpen = Boolean(metricsAnchorEl);
   const comparativeModelInstanceControlPanel = useAppSelector((state: RootState) => state.monitorPage.comparativeModelInstanceControlPanel);
@@ -50,7 +52,6 @@ const ComparativeAnalysisControls = ()=> {
   const menuOpen = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { xAxisOption, yAxisOption, options } = comparativeModelInstanceControlPanel;
-  const [isDatasetSelectorOpen, setDatasetSelector] = useState(false);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setColumnsAnchorEl(event.currentTarget);
@@ -67,8 +68,7 @@ const ComparativeAnalysisControls = ()=> {
   };
 
   const datasetSelectorClicked = (event: React.MouseEvent<HTMLElement>) => {
-    setDatasetSelector(!isDatasetSelectorOpen);
-    !isDatasetSelectorOpen ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
+    setDatasetAnchorEl(prev => (prev ? null : event.currentTarget));
   };
 
   const options1 = [
@@ -205,8 +205,8 @@ const ComparativeAnalysisControls = ()=> {
             <Popover
               id={'Datasets'}
               open={isDatasetSelectorOpen}
-              anchorEl={anchorEl}
-              onClose={() => setDatasetSelector(false)}
+              anchorEl={datasetAnchorEl}
+              onClose={() => setDatasetAnchorEl(null)}
               anchorOrigin={{
                 vertical: 'top',
                 horizontal: 'left',
