@@ -333,7 +333,7 @@ const ComparisonModelInstance = ({
   return(
     <Box display='flex' flexDirection='column' gap={2} width='100%'>
       {legendEntries.length > 0 && (
-        <Box display='flex' justifyContent='flex-end'>
+        <Box display='flex' justifyContent='flex-end' sx={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'background.paper', height: 60, pr: 2 }}>
           <SharedLegend entries={legendEntries} />
         </Box>
       )}
