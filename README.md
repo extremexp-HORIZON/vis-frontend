@@ -6,15 +6,11 @@ This repository contains the ExtremeXP Visualization UI, a web-based dashboard f
 
 The frontend is designed to work with the ExtremeXP Visualization API and renders analytics and explainability results produced by the backend services.
 
----
-
 ## Prerequisites
 
 - **Docker**
 - **Docker Compose**
 - A running **Visualization API** (default: `http://localhost:8080`)
-
----
 
 ## Environment Configuration (Required)
 
@@ -33,10 +29,6 @@ cp .env.example .env
 - Access control service configuration
 - Keycloak / OIDC settings
 
----
-
----
-
 ## Run with Docker Compose
 
 From the root of this repository, run:
@@ -49,8 +41,6 @@ This command will:
 - Build the frontend Docker image
 - Start the frontend container
 
----
-
 ## Access the UI
 
 Once the container is running, open your browser at:
@@ -58,8 +48,6 @@ Once the container is running, open your browser at:
 ```
 http://localhost:5173
 ```
-
----
 
 ## Backend Requirement
 
@@ -72,10 +60,6 @@ http://localhost:8080
 
 Make sure the backend is running before starting the frontend.
 
----
-
----
-
 ## Technology Stack
 
 - React
@@ -84,8 +68,6 @@ Make sure the backend is running before starting the frontend.
 - Vega / Vega-Lite
 - Material UI (MUI)
 
----
-
 ## Related Repositories
 
 - Visualization API:  
@@ -93,8 +75,6 @@ Make sure the backend is running before starting the frontend.
 
 - Explainability Module: 
   https://github.com/extremexp-HORIZON/extremexp-explainability-module
-
----
 
 ## License
 Not available
