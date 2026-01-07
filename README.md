@@ -70,10 +70,10 @@ Make sure the backend is running before starting the frontend.
 
 ## Related Repositories
 
-- Visualization API:  
+- Visualization API:
   https://github.com/extremexp-HORIZON/vis-api
 
-- Explainability Module: 
+- Explainability Module:
   https://github.com/extremexp-HORIZON/extremexp-explainability-module
 
 ## License
