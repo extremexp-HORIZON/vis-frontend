@@ -16,6 +16,7 @@ import { fetchModelSummary } from '../../../../store/slices/modelAnalysisSlice';
 import { useParams } from 'react-router-dom';
 import { InfoOutlined } from '@mui/icons-material';
 import Loader from '../../../../shared/components/loader';
+import { DataSplitsCardContent } from '../../../../shared/components/data-splits-card';
 
 const LoadingOrEmpty = ({ loading, condition, message }: { loading: boolean; condition: boolean; message: string }) => {
   if (loading) {
@@ -78,27 +79,23 @@ const ModelDetails = () => {
           )}
         </DetailsCard>
 
-        {/* Data Splits */}
-        <DetailsCard title="Data Splits">
-          <LoadingOrEmpty
-            loading={isLoading}
-            condition={
-              hasError ||
-              !summary?.data?.dataSplitSizes ||
-              Object.keys(summary.data.dataSplitSizes).length === 0
-            }
-            message="No data split information available"
-          />
-          {!isLoading && !hasError && summary?.data?.dataSplitSizes && (
-            Object.entries(summary.data.dataSplitSizes).map(([split, size]) => (
-              <DetailsCardItem
-                key={split}
-                label={split.charAt(0).toUpperCase() + split.slice(1)}
-                value={size as number}
-              />
-            ))
-          )}
-        </DetailsCard>
+<DetailsCard title="Data Splits">
+  <LoadingOrEmpty
+    loading={isLoading}
+    condition={
+      hasError ||
+      !summary?.data?.dataSplitSizes ||
+      Object.keys(summary.data.dataSplitSizes).length === 0
+    }
+    message="No data split information available"
+  />
+
+  {!isLoading && !hasError && summary?.data?.dataSplitSizes && (
+    <DataSplitsCardContent
+      dataSplitSizes={summary.data.dataSplitSizes}
+    />
+  )}
+</DetailsCard>
       </Box>
 
       <Box paddingTop={2}>
