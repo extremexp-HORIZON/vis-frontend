@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Popover, Select, Tooltip } from '@mui/material';
+import { Box, Button, ButtonGroup, Checkbox, Chip, Divider, FormControl, FormControlLabel, IconButton, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Popover, Select, Switch, Tooltip, Typography } from '@mui/material';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { setComparativeModelInstanceControlPanel, setComparativeVisibleMetrics, setDataComparisonSelectedColumns, setIsMosaic, setSelectedModelComparisonChart, setShowMisclassifiedOnly } from '../../../../store/slices/monitorPageSlice';
@@ -20,6 +20,7 @@ import { GridTableRowsIcon } from '@mui/x-data-grid';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import SearchableSelect from '../../../../shared/components/searchable-select';
+import { useUniqueId } from '@dnd-kit/utilities';
 
 const ComparativeAnalysisControls = ()=> {
   const isMosaic = useAppSelector((state: RootState) => state.monitorPage.isMosaic);
@@ -393,6 +394,7 @@ const ComparativeAnalysisControls = ()=> {
                           setComparativeModelInstanceControlPanel({ xAxisOption: value }),
                         )
                       }
+                      disabled={comparativeModelInstanceControlPanel.useUmap}
                       menuMaxHeight={224}
                       menuWidth={250}
                     />
@@ -415,10 +417,26 @@ const ComparativeAnalysisControls = ()=> {
                           setComparativeModelInstanceControlPanel({ yAxisOption: value }),
                         )
                       }
+                      disabled={comparativeModelInstanceControlPanel.useUmap}
                       menuMaxHeight={224}
                       menuWidth={250}
                     />
                   </FormControl>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                      UMAP
+                    </Typography>
+
+                    <Switch
+                      checked={comparativeModelInstanceControlPanel.useUmap}
+                      onChange={(e) =>
+                        dispatch(
+                          setComparativeModelInstanceControlPanel({ useUmap: e.target.checked })
+                        )
+                      }
+                      color="primary"
+                    />
+                  </Box>
                 </Box>
                 <Divider sx={{ mt: 1, opacity: 0.6 }} />
                 <Box sx={{ py: 1 }}>

@@ -7,7 +7,7 @@ import InfoMessage from '../../../../../shared/components/InfoMessage';
 import ResponsiveCardVegaLite from '../../../../../shared/components/responsive-card-vegalite';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import { useEffect } from 'react';
-import { fetchComparativeModelInstances, setComparativeModelInstanceControlPanel } from '../../../../../store/slices/monitorPageSlice';
+import { fetchComparativeModelInstances, fetchComparativeUmap, setComparativeModelInstanceControlPanel } from '../../../../../store/slices/monitorPageSlice';
 import type { TestInstance } from '../../../../../shared/models/tasks/model-analysis.model';
 import { getClassColorMap } from '../../../../../shared/utils/colorUtils';
 import { Link } from 'react-router-dom';
@@ -22,7 +22,7 @@ const ComparisonModelInstance = ({
   showMisclassifiedOnly: boolean,
 
 }) => {
-  const { workflowsTable, comparativeModelInstance, comparativeModelInstanceControlPanel } = useAppSelector(
+  const { workflowsTable, comparativeModelInstance, comparativeModelInstanceControlPanel, comparativeModelInstanceUmap } = useAppSelector(
     (state: RootState) => state.monitorPage,
   );
   const selectedWorkflowIds = workflowsTable.selectedWorkflows;
@@ -31,7 +31,7 @@ const ComparisonModelInstance = ({
     (state: RootState) => state.progressPage.experiment.data?.id || '',
 
   );
-  const { xAxisOption, yAxisOption } = comparativeModelInstanceControlPanel;
+  const { xAxisOption, yAxisOption, useUmap } = comparativeModelInstanceControlPanel;
 
   const dispatch = useAppDispatch();
 
@@ -62,6 +62,39 @@ const ComparisonModelInstance = ({
       }));
     }
   }, [comparativeModelInstance]);
+
+  useEffect(() => {
+    if (!useUmap) return;
+
+    selectedWorkflowIds.forEach((runId) => {
+      const instanceState = comparativeModelInstance[runId];
+      const umapState = comparativeModelInstanceUmap[runId];
+
+      if (!instanceState?.data?.length) return;
+      if (umapState?.loading) return;
+      if (umapState?.data?.length) return;
+
+      const rows = instanceState.data.slice(0, 2000);
+      //I build the payload like this to match the single instance UMAP in workflow page
+      const payload2d: number[][] = rows.map((row, i) => {
+        const arr = Object.values(row).map((val) => Number.parseFloat(val as any));
+        //we pass this in the worklfow page UMAP why?
+        arr.push(i);
+        return arr;
+      });
+
+      dispatch(
+        fetchComparativeUmap({
+          data: payload2d,
+          metadata: { workflowId: runId, query: 'umap' },
+        }),
+      );
+    });
+  }, [
+    useUmap,
+    selectedWorkflowIds,
+    comparativeModelInstance,
+  ]);
 
   const inferFieldType = (data: TestInstance[], field: string): 'quantitative' | 'nominal' => {
     const sample = data.find(d => d[field] !== undefined)?.[field];
@@ -152,6 +185,8 @@ const ComparisonModelInstance = ({
 
     const dataRaw = instanceState.data;
 
+    const umapState = comparativeModelInstanceUmap[runId];
+
     if (!dataRaw) {
       return (
         <Grid item xs={isMosaic ? 6 : 12} key={runId}>
@@ -165,6 +200,15 @@ const ComparisonModelInstance = ({
         </Grid>
       );
     }
+
+    const predictedValues = !showMisclassifiedOnly
+      ? Array.from(new Set(dataRaw?.map(d => String(d.predicted))))
+      : [];
+
+    const localClassColorMap = !showMisclassifiedOnly
+      ? getClassColorMap(predictedValues)
+      : {};
+
     const hashRow = (row: TestInstance): string => {
       const stringified = JSON.stringify(row, Object.keys(row).sort());
       let hash = 0;
@@ -178,6 +222,127 @@ const ComparisonModelInstance = ({
 
       return `row-${Math.abs(hash)}`;
     };
+
+    if (useUmap) {
+      if (!umapState || umapState.loading) {
+        return (
+          <Grid item xs={isMosaic ? 6 : 12} key={runId}>
+            <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
+              <Loader />
+            </ResponsiveCardTable>
+          </Grid>
+        );
+      }
+    
+      if (umapState.error) {
+        return (
+          <Grid item xs={isMosaic ? 6 : 12} key={runId}>
+            <ResponsiveCardTable title={titleNode} minHeight={400} showSettings={false}>
+              <InfoMessage
+                message={umapState.error}
+                type="info"
+                icon={<ReportProblemRoundedIcon sx={{ fontSize: 40, color: 'info.main' }} />}
+                fullHeight
+              />
+            </ResponsiveCardTable>
+          </Grid>
+        );
+      }
+    
+      const coords = umapState.data ?? [];
+      const n = Math.min(coords.length, dataRaw.length);
+    
+      const combinedPlotData = Array.from({ length: n }, (_, i) => {
+        const original = dataRaw[i];
+        const actual = (original as any)?.actual ?? '?';
+        const predicted = (original as any)?.predicted ?? '?';
+        const id = hashRow(original);
+        const isMisclassified = actual !== predicted;
+      
+        return {
+          x: coords[i][0],
+          y: coords[i][1],
+          ...original,
+          actual,
+          predicted,
+          isMisclassified,
+          id,
+          index: i,
+        };
+      });
+    
+      const umapSpec = {
+        width: 'container',
+        height: 'container',
+        autosize: { type: 'fit', contains: 'padding', resize: true },
+        data: { values: combinedPlotData },
+        params: [
+          { name: 'pts', select: { type: 'point', toggle: false }, bind: 'legend' },
+          {
+            name: 'highlight',
+            select: { type: 'point', on: 'click', clear: 'clickoff', fields: ['isMisclassified'] },
+            value: { isMisclassified: true },
+          },
+          { name: 'panZoom', select: 'interval', bind: 'scales' },
+        ],
+        mark: { type: 'point', filled: true, size: 100 },
+        encoding: {
+          x: { field: 'x', type: 'quantitative', axis: { title: null } },
+          y: { field: 'y', type: 'quantitative', axis: { title: null } },
+        
+          color: showMisclassifiedOnly
+            ? {
+                field: 'isMisclassified',
+                type: 'nominal',
+                scale: { domain: [false, true], range: ['#cccccc', '#ff0000'] },
+                legend: null,
+              }
+            : {
+                field: 'predicted',
+                type: 'nominal',
+                scale: {
+                  domain: Object.keys(localClassColorMap),
+                  range: Object.values(localClassColorMap),
+                },
+                legend: null,
+              },
+            
+          opacity: showMisclassifiedOnly
+            ? {
+                field: 'isMisclassified',
+                type: 'nominal',
+                scale: { domain: [false, true], range: [0.45, 1.0] },
+              }
+            : { value: 0.8 },
+            
+          size: showMisclassifiedOnly
+            ? {
+                field: 'isMisclassified',
+                type: 'nominal',
+                scale: { domain: [false, true], range: [60, 200], legend: false },
+              }
+            : { value: 100 },
+            
+          tooltip: [
+            { field: 'actual', type: 'nominal', title: 'Actual' },
+            { field: 'predicted', type: 'nominal', title: 'Predicted' },
+          ],
+        },
+      };
+    
+      return (
+        <Grid item xs={isMosaic ? 6 : 12} key={runId} sx={{ textAlign: 'left', width: '100%' }}>
+          <ResponsiveCardVegaLite
+            spec={umapSpec}
+            actions={false}
+            isStatic={false}
+            title={titleNode}
+            sx={{ width: '100%', maxWidth: '100%' }}
+          />
+        </Grid>
+      );
+    }
+
     const getVegaData = (data: TestInstance[]) => {
       return data.map((originalRow: TestInstance) => {
         const id = hashRow(originalRow);
