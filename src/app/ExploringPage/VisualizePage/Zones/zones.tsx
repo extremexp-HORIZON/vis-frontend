@@ -21,6 +21,7 @@ import {
   Visibility as VisibilityIcon,
   Download as DownloadIcon,
   Clear as ClearIcon,
+  CropFree as CropFreeIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import {
@@ -58,7 +59,9 @@ export const Zones = ({ dataset }: IZonesProps) => {
     intervals,
     predictionDisplay,
   } = useAppSelector((state: RootState) => state.prediction);
-  const { mapLayer } = useAppSelector((state: RootState) => state.map);
+  const { mapLayer, drawnRect } = useAppSelector(
+    (state: RootState) => state.map,
+  );
   const dispatch = useAppDispatch();
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     open: boolean;
@@ -133,27 +136,28 @@ export const Zones = ({ dataset }: IZonesProps) => {
   return (
     <>
       {/* Zones Button */}
-      <Button
-        variant="text"
-        size="medium"
-        onClick={handleOpenZonesModal}
-        sx={{
-          position: 'absolute',
-          backgroundColor: 'white',
-          top: '70px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          borderRadius: 1,
-          textTransform: 'none',
-          zIndex: 1000,
-          '&:hover': {
-            backgroundColor: 'primary.main',
-            color: 'white',
-          },
-        }}
-      >
-        Zones
-      </Button>
+      <Tooltip title="Zones" placement="left" arrow>
+        <IconButton
+          onClick={handleOpenZonesModal}
+          sx={{
+            position: 'absolute',
+            width: 33,
+            height: 33,
+            backgroundColor: 'white',
+            top: drawnRect == null ? 220 : 300,
+            right: 10,
+            border: '2px solid rgba(0,0,0,0.2)',
+            borderRadius: 2,
+            zIndex: 1000,
+            '&:hover': {
+              backgroundColor: 'rgba(14, 16, 33, 0.08)',
+              boxShadow: 'none',
+            },
+          }}
+        >
+          <CropFreeIcon />
+        </IconButton>
+      </Tooltip>
 
       {/* Zones Dialog */}
       <Dialog
@@ -284,7 +288,9 @@ export const Zones = ({ dataset }: IZonesProps) => {
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>
                           {z.createdAt
-                            ? new Date(Date.parse(z.createdAt + 'Z')).toLocaleString()
+                            ? new Date(
+                              Date.parse(z.createdAt + 'Z'),
+                            ).toLocaleString()
                             : '-'}
                         </TableCell>
                         <TableCell sx={{ textAlign: 'center' }}>

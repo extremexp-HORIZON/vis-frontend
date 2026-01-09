@@ -300,7 +300,7 @@ export const GeohashGridLayer = ({
         if (cellPoints.length > 0) {
           const validVals = cellPoints
             .map(p => p[2])
-            .filter(v => v !== null) as number[];
+            .filter(v => v !== null && v !== undefined) as number[];
 
           if (validVals.length > 0) {
             avgRsrp =
