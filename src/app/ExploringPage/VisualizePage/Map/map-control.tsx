@@ -147,7 +147,7 @@ export const MapControl = ({ id }: { id: string }) => {
       // Clear button
       const clearButton = L.DomUtil.create('a', 'leaflet-control-clear', div);
 
-      clearButton.innerHTML = '🗑️';
+      clearButton.innerHTML = '✖️';
       clearButton.title = 'Clear drawn rectangle';
       clearButton.style.width = '30px';
       clearButton.style.height = '30px';
