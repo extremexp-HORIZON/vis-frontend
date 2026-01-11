@@ -164,7 +164,6 @@ const ComparisonModelConfusion = ({ isMosaic }: {isMosaic: boolean}) => {
           isStatic={false}
           title={titleNode}
           sx={{ width: '100%', maxWidth: '100%' }}
-          showSettings={false}
         />
       </Grid>
     );

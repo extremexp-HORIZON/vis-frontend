@@ -194,8 +194,6 @@ const ComparisonModelRoc = ({ isMosaic }: {isMosaic: boolean}) => {
           spec={rocSpec}
           actions={false}
           isStatic={false}
-          showSettings={false}
-
           title={titleNode}
           sx={{ width: '100%', maxWidth: '100%' }}
         />

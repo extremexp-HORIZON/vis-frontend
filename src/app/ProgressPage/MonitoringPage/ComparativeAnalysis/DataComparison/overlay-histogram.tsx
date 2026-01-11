@@ -487,7 +487,6 @@ const OverlayHistogram = ({
       sx={{ width: '100%', maxWidth: '100%' }}
       showInfoMessage={loading || showInfo}
       infoMessage={loading ? loader : showInfo ? errorMessage : <></>}
-      showSettings={false}
       tooltip={tooltipHandler}
     />
   );
