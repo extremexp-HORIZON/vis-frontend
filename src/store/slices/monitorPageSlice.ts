@@ -162,8 +162,11 @@ interface IMonitoringPageSlice {
       comparativeModelInstanceControlPanel: {
          xAxisOption: string
          yAxisOption: string
-         options: string[]
-
+         options: string[],
+         useUmap: boolean
+      }
+      comparativeModelInstanceUmap: {
+        [workflowId: string]: { data: number[][] | null; loading: boolean; error: string | null }
       }
 }
 
@@ -272,8 +275,10 @@ const initialState: IMonitoringPageSlice = {
   comparativeModelInstanceControlPanel: {
     xAxisOption: '',
     yAxisOption: '',
-    options: []
-  }
+    options: [],
+    useUmap: false,
+  },
+  comparativeModelInstanceUmap: {},
 };
 
 const pruneComparativeMetadata = (state: IMonitoringPageSlice) => {
@@ -494,6 +499,7 @@ export const monitoringPageSlice = createSlice({
       xAxisOption?: string;
       yAxisOption?: string;
       options?: string[];
+      useUmap?: boolean;
     };
   }
     ) => {
@@ -881,7 +887,40 @@ export const monitoringPageSlice = createSlice({
             error: 'Failed to fetch histogram',
           }
         };
-      });
+      })
+      .addCase(fetchComparativeUmap.pending, (state, action) => {
+  const runId = action.meta.arg.metadata.workflowId;
+
+  if (!state.comparativeModelInstanceUmap[runId]) {
+    state.comparativeModelInstanceUmap[runId] = { data: null, loading: true, error: null };
+  } else {
+    state.comparativeModelInstanceUmap[runId].loading = true;
+    state.comparativeModelInstanceUmap[runId].error = null;
+  }
+})
+.addCase(fetchComparativeUmap.fulfilled, (state, action) => {
+  const runId = action.meta.arg.metadata.workflowId;
+
+  state.comparativeModelInstanceUmap[runId] = {
+    data: action.payload,
+    loading: false,
+    error: null,
+  };
+})
+.addCase(fetchComparativeUmap.rejected, (state, action) => {
+  const runId = action.meta.arg.metadata.workflowId;
+
+  if (!state.comparativeModelInstanceUmap[runId]) {
+    state.comparativeModelInstanceUmap[runId] = {
+      data: null,
+      loading: false,
+      error: 'Failed to fetch UMAP',
+    };
+  } else {
+    state.comparativeModelInstanceUmap[runId].loading = false;
+    state.comparativeModelInstanceUmap[runId].error = 'Failed to fetch UMAP';
+  }
+});
   }
 });
 
@@ -967,6 +1006,17 @@ export const fetchComparisonData = createAsyncThunk(
 
     return api
       .post<IDataExplorationResponse>(requestUrl, payload.query)
+      .then(response => response.data);
+  },
+);
+
+export const fetchComparativeUmap = createAsyncThunk(
+  'monitoringPage/fetch_comparative_umap',
+  async (payload: { data: number[][]; metadata: {workflowId: string; query: string;} }) => {
+    const requestUrl = 'data/umap';
+
+    return api
+      .post<number[][]>(requestUrl, payload.data)
       .then(response => response.data);
   },
 );
