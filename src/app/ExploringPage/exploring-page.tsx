@@ -32,6 +32,7 @@ import {
   listModels,
   listProcessedData,
 } from '../../store/slices/exploring/eusomeSlice';
+import { PreprocessPsqlDataDialog } from './preprocess-psql-data-dialog';
 
 const ExploringPage = () => {
   const navigate = useNavigate();
@@ -189,6 +190,9 @@ const ExploringPage = () => {
                               >
                                 <DeleteIcon />
                               </IconButton>
+                            )}
+                            {supportedDatabases.includes(dataSource.format) && (
+                              <PreprocessPsqlDataDialog dataSource={dataSource} />
                             )}
                           </TableCell>
                         </TableRow>

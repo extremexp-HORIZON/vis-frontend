@@ -64,6 +64,28 @@ export const defaultAugmentationOptions: AugmentationOptions = {
 };
 
 // =============================================================================
+// Preprocess Psql Data Endpoint (/preprocess_psql_data)
+// =============================================================================
+
+export interface PreprocessPsqlDataRequest {
+  psql_table_name: string;
+  psql_query: string;
+  col_map_json?: string; // JSON stringified ColumnMapping
+  augmentation_options_json?: string; // JSON stringified AugmentationOptions
+}
+
+export interface PreprocessPsqlDataResponse {
+  message: string;
+  table_name: string;
+  query: string;
+  processed_file_path: string;
+  rows_processed: number;
+  columns_final: string[];
+  nan_count: number;
+  preview_data: string;
+}
+
+// =============================================================================
 // Train Model Endpoint (/train_model)
 // =============================================================================
 

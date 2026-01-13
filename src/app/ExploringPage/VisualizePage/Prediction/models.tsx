@@ -137,7 +137,6 @@ export const PredictionModels = ({
           task_data: {
             ...defaultTrainingConfig,
             hyperparameters: dataset.id?.includes('athens') ? athensHyperparameters : defaultHyperparameters,
-            target_column: dataset?.measure0 || '',
             filename,
           },
         }),

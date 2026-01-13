@@ -4,6 +4,8 @@ import { eusomeApi } from '../../../app/api/api';
 import {
   type UploadDataResponse,
   type TrainModelResponse,
+  type PreprocessPsqlDataResponse,
+  type PreprocessPsqlDataRequest,
   type FinetuneModelResponse,
   type PredictionResponse,
   type ModelsListResponse,
@@ -31,6 +33,7 @@ import type { AppStartListening } from '../../listenerMiddleware';
 export interface IEusomeState {
   // Data
   uploadedData: UploadDataResponse | null;
+  preprocessedPsqlData: PreprocessPsqlDataResponse | null;
   trainedModel: TrainModelResponse | null;
   finetunedModel: FinetuneModelResponse | null;
   predictions: PredictionResponse | null;
@@ -49,6 +52,7 @@ export interface IEusomeState {
   // Loading states
   loading: {
     uploadData: boolean;
+    preprocessPsqlData: boolean;
     trainModel: boolean;
     finetuneModel: boolean;
     predict: boolean;
@@ -67,6 +71,7 @@ export interface IEusomeState {
   // Error states
   error: {
     uploadData: string | null;
+    preprocessPsqlData: string | null;
     trainModel: string | null;
     finetuneModel: string | null;
     predict: string | null;
@@ -85,6 +90,7 @@ export interface IEusomeState {
 
 const initialState: IEusomeState = {
   uploadedData: null,
+  preprocessedPsqlData: null,
   trainedModel: null,
   finetunedModel: null,
   predictions: null,
@@ -99,6 +105,7 @@ const initialState: IEusomeState = {
   trainingTask: false,
   loading: {
     uploadData: false,
+    preprocessPsqlData: false,
     trainModel: false,
     finetuneModel: false,
     predict: false,
@@ -115,6 +122,7 @@ const initialState: IEusomeState = {
   },
   error: {
     uploadData: null,
+    preprocessPsqlData: null,
     trainModel: null,
     finetuneModel: null,
     predict: null,
@@ -172,6 +180,45 @@ export const uploadData = createAsyncThunk<
             'Content-Type': 'multipart/form-data',
           },
         },
+      );
+
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+
+      return rejectWithValue(errorMessage);
+    }
+  },
+);
+
+// =============================================================================
+// Async Thunks - Preprocess Psql Data
+// =============================================================================
+
+export const preprocessPsqlData = createAsyncThunk<
+  PreprocessPsqlDataResponse,
+  PreprocessPsqlDataRequest,
+  { rejectValue: string }
+>(
+  'eusome/preprocessPsqlData',
+  async ({ psql_table_name, psql_query, col_map_json, augmentation_options_json }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+
+      formData.append('psql_table_name', psql_table_name);
+      formData.append('psql_query', psql_query);
+      if (col_map_json) {
+        formData.append('col_map_json', col_map_json);
+      }
+      if (augmentation_options_json) {
+        formData.append('augmentation_options_json', augmentation_options_json);
+      }
+
+      const response = await eusomeApi.post<PreprocessPsqlDataResponse>(
+        '/preprocess_psql_data',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
       return response.data;
@@ -591,6 +638,25 @@ export const eusomeSlice = createSlice({
       );
 
     // ==========================================================================
+    // Preprocess Psql Data
+    // ==========================================================================
+    builder
+      .addCase(preprocessPsqlData.pending, state => {
+        state.loading.preprocessPsqlData = true;
+        state.error.preprocessPsqlData = null;
+      })
+      .addCase(preprocessPsqlData.fulfilled, (state, action) => {
+        state.loading.preprocessPsqlData = false;
+        state.preprocessedPsqlData = action.payload;
+        showSuccess('Psql data preprocessed successfully!');
+      })
+      .addCase(preprocessPsqlData.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading.preprocessPsqlData = false;
+        state.error.preprocessPsqlData = action.payload || 'Failed to preprocess psql data';
+        showError(action.payload || 'Failed to preprocess psql data');
+      });
+
+    // ==========================================================================
     // Train Model
     // ==========================================================================
     builder
@@ -881,6 +947,14 @@ export const eusomeSlice = createSlice({
 // =============================================================================
 
 export const eusomeApiListeners = (startAppListening: AppStartListening) => {
+  // preprocessPsqlDataListener
+  startAppListening({
+    actionCreator: preprocessPsqlData.fulfilled,
+    effect: async (_, listenerApi) => {
+      await listenerApi.dispatch(listProcessedData());
+    },
+  });
+
   // trainModelListener
   startAppListening({
     actionCreator: trainModel.fulfilled,
