@@ -36,6 +36,12 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
       placeholder: 'Enter target column name',
     },
     {
+      name: 'time_column',
+      label: 'Time Column',
+      required: true,
+      placeholder: 'Enter time column name',
+    },
+    {
       name: 'latitude',
       label: 'Latitude',
       required: true,
@@ -69,6 +75,7 @@ export const DataSourceFileUpload: React.FC<DataSourceFileUploadProps> = ({
           columnMapping: {
             ...defaultColumnMapping,
             target: params.additionalFields?.target || '',
+            time_column: params.additionalFields?.time_column || '',
             latitude: params.additionalFields?.latitude || '',
             longitude: params.additionalFields?.longitude || '',
           },
