@@ -144,7 +144,7 @@ export const Zones = ({ dataset }: IZonesProps) => {
             width: 33,
             height: 33,
             backgroundColor: 'white',
-            top: drawnRect == null ? 220 : 300,
+            top: predictionDisplay || drawnRect == null ? 220 : 300,
             right: 10,
             border: '2px solid rgba(0,0,0,0.2)',
             borderRadius: 2,

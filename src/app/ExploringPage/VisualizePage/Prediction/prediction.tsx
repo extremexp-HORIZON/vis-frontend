@@ -274,12 +274,14 @@ export const Prediction = ({ zone }: IPredictionProps) => {
   // Handle prediction task completion with results
   const handlePredictionTaskComplete = (taskResult: unknown) => {
     if (taskResult && typeof taskResult === 'object' && taskResult !== null) {
-      setPredictionResults(taskResult as SinglePrediction[]);
+      const results = taskResult as SinglePrediction[];
+
+      setPredictionResults(results);
       dispatch(addZoneId(zone.id!));
       dispatch(
         addResults({
           zoneId: zone.id!,
-          results: taskResult as SinglePrediction[],
+          results,
         }),
       );
     }
@@ -446,7 +448,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         color="primary"
                         gutterBottom
                       >
-                          Selected Model
+                        Selected Model
                       </Typography>
                       <Typography
                         variant="body2"
@@ -468,7 +470,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         }}
                       >
                         <Typography variant="subtitle2" gutterBottom>
-                            ⏰ Prediction Timing
+                          ⏰ Prediction Timing
                         </Typography>
                         <Box
                           sx={{
@@ -483,7 +485,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                               color="text.secondary"
                               sx={{ mb: 1 }}
                             >
-                                Start Time
+                              Start Time
                             </Typography>
                             <DateTimePicker
                               ampm={false}
@@ -496,8 +498,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                                 textField: {
                                   size: 'small',
                                   fullWidth: true,
-                                  helperText:
-                                      'When should predictions begin?',
+                                  helperText: 'When should predictions begin?',
                                 },
                               }}
                             />
@@ -508,7 +509,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                               color="text.secondary"
                               sx={{ mb: 1 }}
                             >
-                                Time Ahead
+                              Time Ahead
                             </Typography>
                             <TextField
                               select
@@ -544,7 +545,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         }}
                       >
                         <Typography variant="subtitle2" gutterBottom>
-                            📍 Location & Parameters
+                          📍 Location & Parameters
                         </Typography>
 
                         {/* Two-column, two-row layout */}
@@ -563,7 +564,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                               color="text.secondary"
                               sx={{ whiteSpace: 'nowrap' }}
                             >
-                                Geohashes
+                              Geohashes
                             </Typography>
                           </Box>
                           <Box>
@@ -579,7 +580,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                               color="text.secondary"
                               sx={{ whiteSpace: 'nowrap' }}
                             >
-                                Heights (meters)
+                              Heights (meters)
                             </Typography>
                           </Box>
                           <Box>
@@ -590,7 +591,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                                 color="text.secondary"
                                 sx={{ mb: 1, display: 'block' }}
                               >
-                                  Select from fixed heights:
+                                Select from fixed heights:
                               </Typography>
                               <Box
                                 sx={{
@@ -608,9 +609,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                                           height.value,
                                         )}
                                         onChange={() =>
-                                          handleFixedHeightToggle(
-                                            height.value,
-                                          )
+                                          handleFixedHeightToggle(height.value)
                                         }
                                         size="small"
                                       />
@@ -628,7 +627,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                                 color="text.secondary"
                                 sx={{ mb: 1, display: 'block' }}
                               >
-                                  Add custom height:
+                                Add custom height:
                               </Typography>
                               <Box sx={{ display: 'flex', gap: 1 }}>
                                 <TextField
@@ -647,7 +646,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                                   InputProps={{
                                     endAdornment: (
                                       <InputAdornment position="end">
-                                          m
+                                        m
                                       </InputAdornment>
                                     ),
                                   }}
@@ -659,11 +658,11 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                                   onClick={handleAddCustomHeight}
                                   disabled={
                                     !customHeightInput ||
-                                      parseFloat(customHeightInput) <= 0
+                                    parseFloat(customHeightInput) <= 0
                                   }
                                   startIcon={<AddIcon />}
                                 >
-                                    Add
+                                  Add
                                 </Button>
                               </Box>
                             </Box>
@@ -676,7 +675,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                                   color="text.secondary"
                                   sx={{ mb: 1, display: 'block' }}
                                 >
-                                    Selected heights:
+                                  Selected heights:
                                 </Typography>
                                 <Box
                                   sx={{
@@ -703,7 +702,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                             )}
                             {selectedHeights.length === 0 && (
                               <Alert severity="warning" sx={{ mt: 1 }}>
-                                  Please select at least one height
+                                Please select at least one height
                               </Alert>
                             )}
                           </Box>
@@ -736,14 +735,14 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                   }}
                 >
                   <Typography variant="h5" color="success.main" gutterBottom>
-                      Prediction Complete!
+                    Prediction Complete!
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {predictionResults.length > 0
                       ? predictionResults.length *
-                          predictionResults[0].predicted_rsrp_at_heights.length
+                        predictionResults[0].predicted_rsrp_at_heights.length
                       : 0}{' '}
-                      predictions generated successfully
+                    predictions generated successfully
                   </Typography>
                 </Box>
 
@@ -762,7 +761,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       color="primary"
                       gutterBottom
                     >
-                        📊 Prediction Summary
+                      📊 Prediction Summary
                     </Typography>
                     <Box
                       sx={{
@@ -773,7 +772,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                     >
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                            Model
+                          Model
                         </Typography>
                         <Typography
                           variant="body2"
@@ -785,7 +784,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                            Start Time
+                          Start Time
                         </Typography>
                         <Typography variant="body2">
                           {predictionTimestamp?.format('MMM DD, HH:mm')}
@@ -793,7 +792,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                            Time Ahead
+                          Time Ahead
                         </Typography>
                         <Typography variant="body2">
                           {intervalsAmount} × 10 minutes
@@ -801,7 +800,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                            Locations
+                          Locations
                         </Typography>
                         <Typography variant="body2">
                           {zone.geohashes?.length} geohashes
@@ -823,7 +822,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                       color="primary"
                       gutterBottom
                     >
-                        📈 Prediction Details
+                      📈 Prediction Details
                     </Typography>
                     <Box
                       sx={{
@@ -836,29 +835,29 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         <Typography variant="h4" color="primary">
                           {predictionResults.length > 0
                             ? predictionResults.length *
-                                predictionResults[0].predicted_rsrp_at_heights
-                                  .length
+                              predictionResults[0].predicted_rsrp_at_heights
+                                .length
                             : 0}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Total Predictions
+                          Total Predictions
                         </Typography>
                       </Box>
                       <Box sx={{ textAlign: 'right' }}>
                         <Typography variant="body2" color="text.secondary">
                           {}
-                            Heights:{' '}
+                          Heights:{' '}
                           {predictionResults.length > 0 &&
-                              predictionResults[0]?.predicted_rsrp_at_heights
-                                .map(h => h.height_m)
-                                .join(', ')}
-                            m
+                            predictionResults[0]?.predicted_rsrp_at_heights
+                              .map(h => h.height_m)
+                              .join(', ')}
+                          m
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {predictionResults.length > 0 &&
-                              predictionResults[0]?.predicted_rsrp_at_heights
-                                .length}{' '}
-                            heights × {zone.geohashes?.length} locations ×{' '}
+                            predictionResults[0]?.predicted_rsrp_at_heights
+                              .length}{' '}
+                          heights × {zone.geohashes?.length} locations ×{' '}
                           {intervalsAmount} intervals
                         </Typography>
                       </Box>
@@ -877,7 +876,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                     }}
                   >
                     <Typography variant="h6" gutterBottom>
-                        What would you like to do next?
+                      What would you like to do next?
                     </Typography>
                     <Box
                       sx={{
@@ -892,7 +891,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         variant="contained"
                         size="large"
                       >
-                          View Results
+                        View Results
                       </Button>
                       <Button
                         onClick={handleExportToJSON}
@@ -900,7 +899,7 @@ export const Prediction = ({ zone }: IPredictionProps) => {
                         variant="outlined"
                         size="large"
                       >
-                          Export Data
+                        Export Data
                       </Button>
                     </Box>
                   </Box>

@@ -140,58 +140,60 @@ const VisualizePage = () => {
           </Box>
         </>
       ) : (
-        <Box
-          position="absolute"
-          zIndex={999}
-          top={predictionDisplay ? 32 : 0}
-          sx={{ p: 2, minWidth: 200 }}
-        >
-          <VisControl dataset={dataset} />
-        </Box>
-      )}
-      <Map id={datasetId} dataset={dataset} />
-      <Box
-        position="absolute"
-        zIndex={999}
-        bottom={0}
-        sx={{ p: 2, minWidth: 200 }}
-      >
-        <Stats dataset={dataset} />
-      </Box>
-      {isChartFullscreen ? (
-        <Chart
-          dataset={dataset}
-          isFullscreen={isChartFullscreen}
-          onToggleFullscreen={toggleChartFullscreen}
-        />
-      ) : isTimeSeriesFullscreen ? (
-        <TimeSeriesChart
-          dataset={dataset}
-          isFullscreen={isTimeSeriesFullscreen}
-          onToggleFullscreen={toggleTimeSeriesFullscreen}
-        />
-      ) : (
-        <Box
-          position="absolute"
-          zIndex={999}
-          bottom={0}
-          right={0}
-          sx={{ p: 1, minWidth: 311, maxWidth: 1 / 4 }}
-        >
-          <Chart
-            dataset={dataset}
-            isFullscreen={isChartFullscreen}
-            onToggleFullscreen={toggleChartFullscreen}
-          />
-          {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && (
+        <>
+          <Box
+            position="absolute"
+            zIndex={999}
+            top={predictionDisplay ? 32 : 0}
+            sx={{ p: 2, minWidth: 200 }}
+          >
+            <VisControl dataset={dataset} />
+          </Box>
+          <Box
+            position="absolute"
+            zIndex={999}
+            bottom={0}
+            sx={{ p: 2, minWidth: 200 }}
+          >
+            <Stats dataset={dataset} />
+          </Box>
+          {isChartFullscreen ? (
+            <Chart
+              dataset={dataset}
+              isFullscreen={isChartFullscreen}
+              onToggleFullscreen={toggleChartFullscreen}
+            />
+          ) : isTimeSeriesFullscreen ? (
             <TimeSeriesChart
               dataset={dataset}
               isFullscreen={isTimeSeriesFullscreen}
               onToggleFullscreen={toggleTimeSeriesFullscreen}
             />
+          ) : (
+            <Box
+              position="absolute"
+              zIndex={999}
+              bottom={0}
+              right={0}
+              sx={{ p: 1, minWidth: 311, maxWidth: 1 / 4 }}
+            >
+              <Chart
+                dataset={dataset}
+                isFullscreen={isChartFullscreen}
+                onToggleFullscreen={toggleChartFullscreen}
+              />
+              {dataset.timeColumn && (drawnRect || selectedGeohash.rect) && (
+                <TimeSeriesChart
+                  dataset={dataset}
+                  isFullscreen={isTimeSeriesFullscreen}
+                  onToggleFullscreen={toggleTimeSeriesFullscreen}
+                />
+              )}
+            </Box>
           )}
-        </Box>
+        </>
       )}
+      <Map id={datasetId} dataset={dataset} />
     </>
   );
 };
