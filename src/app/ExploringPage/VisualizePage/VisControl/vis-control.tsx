@@ -44,7 +44,7 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
   const [activeDate, setActiveDate] = useState(0);
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([
     dayjs(dataset.timeMin!),
-    dayjs(dataset.timeMax!),
+    null,
   ]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -70,22 +70,22 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
 
     switch (id) {
       case 1:
-        t = { from: now - start, to: now };
+        t = { from: now - start, to: null };
         break;
       case 2:
-        t = { from: now - start / 2, to: now };
+        t = { from: now - start / 2, to: null };
         break;
       case 3:
-        t = { from: now - start / 4, to: now };
+        t = { from: now - start / 4, to: null };
         break;
       case 4:
-        t = { from: now - start / 10, to: now };
+        t = { from: now - start / 10, to: null };
         break;
       case 5:
-        t = { from: now - start / 30, to: now };
+        t = { from: now - start / 30, to: null };
         break;
       default:
-        t = { from: dataset.timeMin!, to: now };
+        t = { from: dataset.timeMin!, to: null };
     }
 
     dispatch(setTimeRange(t));
@@ -232,7 +232,7 @@ export const VisControl = ({ dataset }: IVisControlProps) => {
               value={dateRange[1]}
               onChange={newValue => handleDateChange([dateRange[0], newValue])}
               minDateTime={dayjs(dataset.timeMin! - 5 * 60 * 1000)} // 5 minutes before the start of the dataset
-              maxDateTime={dayjs(dataset.timeMax! + 5 * 60 * 1000)} // 5 minutes after the end of the dataset
+              // maxDateTime={dayjs(dataset.timeMax! + 5 * 60 * 1000)} // 5 minutes after the end of the dataset
               slotProps={{
                 textField: {
                   size: 'small',

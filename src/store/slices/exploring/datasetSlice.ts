@@ -142,7 +142,7 @@ export const postFileMeta = createAsyncThunk<
       }),
     );
     dispatch(setChartType('column'));
-    dispatch(setTimeRange({ from: dataset.timeMin ?? 0, to: Date.now() }));
+    dispatch(setTimeRange({ from: dataset.timeMin ?? 0, to: null }));
 
     return { ...dataset, id: body.fileName };
   } catch (error: unknown) {
