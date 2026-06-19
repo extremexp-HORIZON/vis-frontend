@@ -1,21 +1,22 @@
 import { Box, Stack, Typography, Tooltip, useTheme, alpha } from '@mui/material';
 import type { Observation } from '../../../shared/models/observability/observation';
+import { CHART_NEUTRAL } from '../../../mui-theme';
 
 const MONO = '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 
 export const TYPE_COLORS: Record<string, string> = {
   GENERATION: '#10b981',
-  SPAN: '#64748b',
+  SPAN: CHART_NEUTRAL,
   EVENT: '#f59e0b',
   RETRIEVAL: '#0ea5e9',
   RETRIEVER: '#0ea5e9',
   EMBEDDING: '#8b5cf6',
   TOOL: '#f59e0b',
   AGENT: '#ec4899',
-  CHAIN: '#64748b',
+  CHAIN: CHART_NEUTRAL,
 };
 
-export const colorForType = (type: string) => TYPE_COLORS[(type ?? '').toUpperCase()] ?? '#64748b';
+export const colorForType = (type: string) => TYPE_COLORS[(type ?? '').toUpperCase()] ?? CHART_NEUTRAL;
 
 const formatMs = (ms: number) =>
   ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${Math.round(ms)}ms`;

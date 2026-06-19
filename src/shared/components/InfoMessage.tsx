@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { SvgIconProps } from '@mui/material';
 import { Box, Typography, Paper } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import InfoIcon from '@mui/icons-material/Info';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -36,21 +37,6 @@ const InfoMessage: React.FC<InfoMessageProps> = ({
     }
   };
 
-  // Color based on message type
-  const getBackgroundColor = () => {
-    switch (type) {
-      case 'warning':
-        return 'rgba(255, 193, 7, 0.08)';
-      case 'error':
-        return 'rgba(244, 67, 54, 0.08)';
-      case 'success':
-        return 'rgba(76, 175, 80, 0.08)';
-      case 'info':
-      default:
-        return 'rgba(33, 150, 243, 0.08)';
-    }
-  };
-
   return (
     <Box
       sx={{
@@ -68,7 +54,7 @@ const InfoMessage: React.FC<InfoMessageProps> = ({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          backgroundColor: getBackgroundColor(),
+          backgroundColor: theme => alpha(theme.palette[type].main, 0.08),
           borderRadius: 2,
           maxWidth: '500px',
         }}

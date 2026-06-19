@@ -495,7 +495,7 @@ const ExperimentControls = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   background: theme => theme.palette.customSurface.cardHeader,
-                  borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+                  borderBottom: theme => `1px solid ${theme.palette.divider}`,
                   px: 3,
                   py: 1.5,
                 }}
@@ -533,7 +533,7 @@ const ExperimentControls = () => {
               <DialogActions
                 sx={{
                   p: 2,
-                  borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+                  borderTop: theme => `1px solid ${theme.palette.divider}`,
                   background: theme => theme.palette.customSurface.footer,
                 }}
               >

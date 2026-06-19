@@ -24,6 +24,10 @@ interface SearchableSingleSelectProps {
   menuWidth?: number;
   disabled?: boolean;
   getOptionLabel?: (option: string) => string;
+  /** Render the control in an error state (e.g. unfilled required field). */
+  error?: boolean;
+  /** When true, the field is marked required (asterisk on the label). */
+  required?: boolean;
 }
 
 const SearchableSelect: React.FC<SearchableSingleSelectProps> = ({
@@ -37,6 +41,8 @@ const SearchableSelect: React.FC<SearchableSingleSelectProps> = ({
   menuWidth = 250,
   disabled = false,
   getOptionLabel,
+  error = false,
+  required = false,
 }) => {
   const [search, setSearch] = useState('');
 
@@ -53,7 +59,7 @@ const SearchableSelect: React.FC<SearchableSingleSelectProps> = ({
   };
 
   return (
-    <FormControl fullWidth size="small">
+    <FormControl fullWidth size="small" error={error} required={required}>
       <InputLabel id={labelId}>{inputLabel}</InputLabel>
       <Select
         labelId={labelId}

@@ -38,7 +38,7 @@ const CompactMenuItem = ({
       secondary={secondary}
       primaryTypographyProps={{
         fontSize: '0.8rem',
-        fontWeight: selected ? 700 : 600,
+        fontWeight: selected ? 600 : 500,
         color: selected ? 'primary.main' : 'text.primary',
       }}
       secondaryTypographyProps={{ fontSize: '0.7rem' }}

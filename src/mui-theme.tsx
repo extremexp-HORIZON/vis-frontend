@@ -85,6 +85,15 @@ declare module '@mui/material/styles' {
       /** Subtle border color for cards/panels — soft, never a harsh hairline */
       cardBorder: string
     }
+    /** Categorical / diverging colors for data-viz (charts, splits, waterfalls). */
+    chart: {
+      /** Ordered categorical series palette — index into it for nth series. */
+      categorical: string[]
+      /** Diverging scale `[negative, neutral, positive]` for e.g. correlation. */
+      diverging: [string, string, string]
+      /** Neutral / "other" series color. */
+      neutral: string
+    }
   }
   interface PaletteOptions {
     customPrimary?: {
@@ -118,6 +127,11 @@ declare module '@mui/material/styles' {
       elevated: string
       cardBorder: string
     }
+    chart?: {
+      categorical: string[]
+      diverging: [string, string, string]
+      neutral: string
+    }
   }
 }
 
@@ -144,6 +158,29 @@ declare module '@mui/material/styles' {
 }
 
 export type ThemeMode = 'light' | 'dark';
+
+// Categorical data-viz palette. Tuned to read on both light and dark card
+// surfaces, so the same array is used for either mode (Vega specs can't easily
+// branch on theme). Use `theme.palette.chart.categorical` in components, or the
+// plain `CHART_CATEGORICAL` / `CHART_DIVERGING` exports inside Vega `range`s.
+export const CHART_CATEGORICAL = [
+  '#3766AF', // primary blue
+  '#6BBC8C', // secondary green
+  '#a855f7', // purple
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#06b6d4', // cyan
+  '#ec4899', // pink
+  '#84cc16', // lime
+  '#8b5cf6', // violet
+  '#14b8a6', // teal
+] as const;
+
+/** Diverging scale `[negative, neutral, positive]`. */
+export const CHART_DIVERGING: [string, string, string] = ['#ef4444', '#e8e8e8', '#22c55e'];
+
+/** Neutral / "other" series color. */
+export const CHART_NEUTRAL = '#64748b';
 
 // Build a soft, layered elevation scale. MUI's default shadows are tuned for
 // light surfaces and all but vanish on a dark background — these stay readable
@@ -195,9 +232,9 @@ export const createAppTheme = (mode: ThemeMode) => {
         selected: isDark ? blue[600] : blue[50],
       },
       customSurface: {
-        cardHeader: isDark
-          ? 'linear-gradient(to right, #20202e, #242634)'
-          : 'linear-gradient(to right, #f8f9fa, #edf2f7)',
+        // Flat card header tone (no gradient) — reads as a clean modern card
+        // header rather than a glossy titlebar.
+        cardHeader: isDark ? '#23242f' : '#f4f6f9',
         sectionHeader: isDark
           ? 'linear-gradient(to right, #1a1a2e, #1e2133)'
           : 'linear-gradient(to right, #f1f5f9, #f8fafc)',
@@ -212,6 +249,11 @@ export const createAppTheme = (mode: ThemeMode) => {
         statFailure: isDark ? '#b32d00' : '#fdecea',
         elevated:   isDark ? '#23232c' : '#ffffff',
         cardBorder: isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(15, 23, 42, 0.08)',
+      },
+      chart: {
+        categorical: [...CHART_CATEGORICAL],
+        diverging: isDark ? ['#f87171', '#3a3a44', '#4ade80'] : CHART_DIVERGING,
+        neutral: isDark ? '#94a3b8' : CHART_NEUTRAL,
       },
       background: {
         default: isDark ? '#121212' : '#FFFFFF',
@@ -233,14 +275,14 @@ export const createAppTheme = (mode: ThemeMode) => {
     },
     customShadows: {
       card: isDark
-        ? '0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.34)'
-        : '0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 18px rgba(16, 24, 40, 0.08)',
+        ? '0 1px 2px rgba(0, 0, 0, 0.34), 0 2px 6px rgba(0, 0, 0, 0.26)'
+        : '0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 6px rgba(16, 24, 40, 0.05)',
       cardHover: isDark
-        ? '0 2px 6px rgba(0, 0, 0, 0.45), 0 12px 30px rgba(0, 0, 0, 0.5)'
-        : '0 2px 6px rgba(16, 24, 40, 0.08), 0 14px 32px rgba(16, 24, 40, 0.14)',
+        ? '0 2px 4px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4)'
+        : '0 2px 4px rgba(16, 24, 40, 0.06), 0 6px 16px rgba(16, 24, 40, 0.09)',
       popover: isDark
-        ? '0 10px 36px rgba(0, 0, 0, 0.6)'
-        : '0 10px 36px rgba(16, 24, 40, 0.16)',
+        ? '0 4px 16px rgba(0, 0, 0, 0.46)'
+        : '0 4px 14px rgba(16, 24, 40, 0.10)',
     },
     shadows: buildShadows(isDark),
     typography: {

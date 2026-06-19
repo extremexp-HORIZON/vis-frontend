@@ -1,5 +1,6 @@
 import ChartButtonGroup from '../ChartControls/data-exploration-chart-button-group';
 import { Box, IconButton, Popover, Stack, Tooltip, Badge, Typography } from '@mui/material';
+import { menuPaperSx } from '../../../../shared/styles/card-surface';
 import FilterBar from '../../../../shared/components/filter-bar';
 import { useState } from 'react';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -227,13 +228,11 @@ const LeftPanel = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
         PaperProps={{
-          sx: {
-            width: 380,
-            p: 1.25,
-            borderRadius: 2,
-            border: theme => `1px solid ${theme.palette.customSurface.cardBorder}`,
-            boxShadow: theme => theme.customShadows.popover,
-          }
+          elevation: 0,
+          sx: [
+            menuPaperSx({ width: 380 }),
+            { p: 1.25, maxHeight: 'none', overflowY: 'auto' },
+          ],
         }}
       >
         {activeFilters.length > 0 && (

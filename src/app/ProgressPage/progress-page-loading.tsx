@@ -83,8 +83,12 @@ const ProgressPageLoading = () => {
     <>
       <Grid
         id={'error-page'}
-        sx={{ height: '100vh', width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-        style={{
+        sx={{
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           background: theme.palette.mode === 'dark' ? theme.palette.background.default : '#E6E6E6',
           transition: 'background 0.3s',
         }}

@@ -86,3 +86,31 @@ export const cardHeaderSx =
     background: theme.palette.customSurface.cardHeader,
     borderBottom: `1px solid ${theme.palette.divider}`,
   });
+
+export interface MenuPaperOptions {
+  /** Fixed paper width in px (default 240). */
+  width?: number;
+  /** Max paper height in px before scrolling (default 380). */
+  maxHeight?: number;
+}
+
+/**
+ * Floating-surface styling for `<Menu>` / `<Popover>` Paper. Replaces the
+ * `{ width: 240, maxHeight: 380, borderRadius: 2, popover shadow, cardBorder }`
+ * block that was hand-copied across every settings menu — so every menu and
+ * popover reads with the same radius, elevation and soft border.
+ *
+ *   <Menu PaperProps={{ elevation: 0, sx: menuPaperSx() }} />
+ *   <Popover slotProps={{ paper: { elevation: 0, sx: menuPaperSx({ width: 380 }) } }} />
+ */
+export const menuPaperSx =
+  ({ width = 240, maxHeight = 380 }: MenuPaperOptions = {}) =>
+  (theme: Theme): SystemStyleObject<Theme> => ({
+    width,
+    maxHeight,
+    overflow: 'hidden',
+    borderRadius: `${CARD_RADIUS}px`,
+    mt: 0.5,
+    boxShadow: theme.customShadows.popover,
+    border: `1px solid ${theme.palette.customSurface.cardBorder}`,
+  });

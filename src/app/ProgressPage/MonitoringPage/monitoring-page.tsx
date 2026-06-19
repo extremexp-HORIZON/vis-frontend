@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs, Paper, useTheme } from '@mui/material';
+import { Box, Tab, Tabs, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useRef } from 'react';
 import ParallelCoordinatePlot from './ParalleleCoodrinates/parallel-coordinate-plot';
@@ -33,7 +33,6 @@ const MonitoringPage = () => {
   );
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const theme = useTheme();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const compareId = queryParams.get('compareId');
@@ -210,7 +209,7 @@ const MonitoringPage = () => {
                       cursor: 'ew-resize',
                     }}
                   >
-                    <MoreVertRoundedIcon style={{ color: theme.palette.action.active }} />
+                    <MoreVertRoundedIcon sx={{ color: 'action.active' }} />
                   </Box>
                 )
               }}

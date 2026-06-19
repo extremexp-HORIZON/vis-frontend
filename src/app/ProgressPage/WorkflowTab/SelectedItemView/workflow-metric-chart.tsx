@@ -137,13 +137,7 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
           {/* Card 1: Current + % vs mean */}
           <Card
             elevation={0}
-            sx={{
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'divider',
-              flex: 1,
-              minWidth: 200,
-            }}
+            sx={[cardSurfaceSx(), { flex: 1, minWidth: 200 }]}
           >
             <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.25 }}>
@@ -171,13 +165,7 @@ export const MetricLineChart = ({ metrics }: {metrics: GroupMetrics[]}) => {
           {/* Card 2: Range */}
           <Card
             elevation={0}
-            sx={{
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'divider',
-              flex: 1,
-              minWidth: 200,
-            }}
+            sx={[cardSurfaceSx(), { flex: 1, minWidth: 200 }]}
           >
             <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.25 }}>
@@ -454,7 +442,7 @@ export const MetricCards = () => {
   const sliderMax = typeof maxValue === 'number' ? maxValue : (typeof metricData?.metric?.maxValue === 'number' ? metricData.metric.maxValue : 1);
 
   const MetricStatCard = ({ title, value, helper }: { title: string; value: React.ReactNode; helper?: React.ReactNode }) => (
-    <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', flex: 1, minWidth: 260 }}>
+    <Card elevation={0} sx={[cardSurfaceSx(), { flex: 1, minWidth: 260 }]}>
       <CardContent sx={{ p: 2 }}>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
           {title}
@@ -678,7 +666,7 @@ export const MetricCards = () => {
         <Divider sx={{ my: 2 }} />
 
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', flex: 1, minWidth: 240 }}>
+          <Card elevation={0} sx={[cardSurfaceSx(), { flex: 1, minWidth: 240 }]}>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="caption" color="text.secondary">Minimum</Typography>
               <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5 }}>{format5(minValue)}</Typography>
@@ -697,7 +685,7 @@ export const MetricCards = () => {
             </CardContent>
           </Card>
 
-          <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', flex: 1, minWidth: 240, bgcolor: theme => alpha(theme.palette.primary.main, 0.08) }}>
+          <Card elevation={0} sx={[cardSurfaceSx(), { flex: 1, minWidth: 240, bgcolor: theme => alpha(theme.palette.primary.main, 0.08) }]}>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="caption" color="text.secondary">Average</Typography>
               <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5, color: 'primary.main' }}>{format5(avgValue)}</Typography>
@@ -705,7 +693,7 @@ export const MetricCards = () => {
             </CardContent>
           </Card>
 
-          <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', flex: 1, minWidth: 240 }}>
+          <Card elevation={0} sx={[cardSurfaceSx(), { flex: 1, minWidth: 240 }]}>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="caption" color="text.secondary">Maximum</Typography>
               <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5 }}>{format5(maxValue)}</Typography>

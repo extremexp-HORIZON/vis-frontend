@@ -19,6 +19,7 @@ import type { ClusterInsight, PcaSpacePoint } from '../../../shared/models/exper
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import InfoMessage from '../../../shared/components/InfoMessage';
 import ResponsiveCardVegaLite from '../../../shared/components/responsive-card-vegalite';
+import { cardSurfaceSx } from '../../../shared/styles/card-surface';
 
 const Sparkline = ({ values, color }: { values: number[]; color: string }) => {
   const w = 54;
@@ -60,16 +61,7 @@ const  MetricTile = ({
   const positive = value >= 0;
 
   return (
-    <Box
-      sx={{
-        borderRadius: 2,
-        px: 2,
-        py: 1.25,
-        backgroundColor: theme.palette.background.paper,
-        border: `1px solid ${theme.palette.divider}`,
-        boxShadow: theme.shadows[1],
-      }}
-    >
+    <Box sx={[cardSurfaceSx(), { px: 2, py: 1.25 }]}>
       <Typography variant="caption" color="text.secondary">
         {name}
       </Typography>
@@ -138,14 +130,7 @@ const ClusterCard = ({
   const clusterName = `Cluster ${name}`;
 
   return (
-    <Box
-      sx={{
-        borderRadius: 2,
-        backgroundColor: theme.palette.background.paper,
-        border: `1px solid ${theme.palette.divider}`,
-        boxShadow: theme.shadows[2],
-      }}
-    >
+    <Box sx={cardSurfaceSx()}>
       <Box
         sx={{
           display: 'flex',

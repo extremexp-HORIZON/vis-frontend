@@ -1,4 +1,4 @@
-import { Box, Chip, Divider, IconButton, Menu, Tooltip } from '@mui/material';
+import { Box, Divider, IconButton, Menu, Tooltip } from '@mui/material';
 import CompactMenuItem from '../../../../shared/components/compact-menu-item';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
@@ -10,11 +10,12 @@ import SummarizeRoundedIcon from '@mui/icons-material/SummarizeRounded';
 import TimelineRoundedIcon from '@mui/icons-material/TimelineRounded';
 import GavelRoundedIcon from '@mui/icons-material/GavelRounded';
 import { SectionHeader } from '../../../../shared/components/responsive-card-table';
+import { menuPaperSx } from '../../../../shared/styles/card-surface';
 import MisclassifiedToggle from '../../../../shared/components/misclassified-toggle';
 import SegmentedToggle from '../../../../shared/components/segmented-toggle';
 import InstanceScatterControls from '../../../../shared/components/instance-scatter-controls';
 import SettingsIcon from '@mui/icons-material/Settings';
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import { useMemo, useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
 import CodeIcon from '@mui/icons-material/Code';
@@ -127,15 +128,15 @@ const ComparativeAnalysisControls = ()=> {
   };
 
   const options1 = [
-    { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon /> },
-    { label: 'rocCurve', name: 'Roc\nCurve', icon: <RoundedCornerRoundedIcon /> },
-    { label: 'instanceView', name: 'Instance\nView', icon: <BlurLinearIcon /> }
+    { label: 'confusionMatrix', name: 'Confusion\nMatrix', icon: <WindowRoundedIcon fontSize="small" /> },
+    { label: 'rocCurve', name: 'Roc\nCurve', icon: <RoundedCornerRoundedIcon fontSize="small" /> },
+    { label: 'instanceView', name: 'Instance\nView', icon: <BlurLinearIcon fontSize="small" /> }
   ];
 
   const llmExecutionsOptions = [
-    { label: 'summary' as const, name: 'Summary', icon: <SummarizeRoundedIcon /> },
-    { label: 'timeline' as const, name: 'Timeline', icon: <TimelineRoundedIcon /> },
-    { label: 'verdicts' as const, name: 'Verdicts', icon: <GavelRoundedIcon /> },
+    { label: 'summary' as const, name: 'Summary', icon: <SummarizeRoundedIcon fontSize="small" /> },
+    { label: 'timeline' as const, name: 'Timeline', icon: <TimelineRoundedIcon fontSize="small" /> },
+    { label: 'verdicts' as const, name: 'Verdicts', icon: <GavelRoundedIcon fontSize="small" /> },
   ];
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -187,46 +188,21 @@ const ComparativeAnalysisControls = ()=> {
           </Box>
         )}
         {selectedComparisonTab === 1 ? (
-          <Box display="flex" flexWrap="wrap" gap={0.75}>
-            {(isLlmExperiment ? llmExecutionsOptions : options1).map(option => {
-              const isSelected = isLlmExperiment
-                ? selectedExecutionsView === option.label
-                : selectedModelComparisonChart === option.label;
-
-              return (
-                <Chip
-                  key={option.label}
-                  label={option.name.replace('\n', ' ')}
-                  icon={option.icon}
-                  clickable
-                  size="small"
-                  sx={{
-                    height: 30,
-                    px: 1,
-                    borderRadius: 2,
-                    fontWeight: 600,
-                    fontSize: '0.8rem',
-                    textTransform: 'uppercase',
-                    background: isSelected
-                      ? undefined
-                      : theme => theme.palette.customGrey.light,
-                    '& .MuiChip-icon': {
-                      fontSize: 18,
-                      marginLeft: 0.25,
-                      marginRight: -0.5,
-                    },
-                  }}
-                  color={isSelected ? 'primary' : 'default'}
-                  variant={isSelected ? 'filled' : 'outlined'}
-                  onClick={() =>
-                    isLlmExperiment
-                      ? dispatch(setSelectedExecutionsView(option.label as 'summary' | 'timeline' | 'verdicts'))
-                      : dispatch(setSelectedModelComparisonChart(option.label))
-                  }
-                />
-              );
-            })}
-          </Box>
+          <SegmentedToggle
+            uppercase
+            aria-label={isLlmExperiment ? 'executions view' : 'model comparison chart'}
+            value={isLlmExperiment ? selectedExecutionsView : selectedModelComparisonChart}
+            onChange={(value) =>
+              isLlmExperiment
+                ? dispatch(setSelectedExecutionsView(value as 'summary' | 'timeline' | 'verdicts'))
+                : dispatch(setSelectedModelComparisonChart(value))
+            }
+            options={(isLlmExperiment ? llmExecutionsOptions : options1).map(option => ({
+              value: option.label,
+              label: option.name.replace('\n', ' '),
+              icon: option.icon,
+            }))}
+          />
         ) : selectedComparisonTab === 2 && workflowsTable.selectedWorkflows.length > 0 && (
           <>
             <Box display="flex" flexWrap="wrap" gap={0.2}>
@@ -371,20 +347,12 @@ const ComparativeAnalysisControls = ()=> {
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 PaperProps={{
                   elevation: 0,
-                  sx: {
-                    width: 240,
-                    maxHeight: 380,
-                    overflow: 'hidden',
-                    borderRadius: 2,
-                    mt: 0.5,
-                    boxShadow: theme => theme.customShadows.popover,
-                    border: theme => `1px solid ${theme.palette.customSurface.cardBorder}`,
-                  },
+                  sx: menuPaperSx(),
                 }}
                 MenuListProps={{ sx: { pt: 0, pb: 0 } }}
               >
                 <SectionHeader
-                  icon={<SettingsSuggestIcon fontSize="small" />}
+                  icon={<TuneRoundedIcon fontSize="small" />}
                   title="Chart Options"
                 />
                 <Box sx={{ px: 1.25, pt: 1.25, pb: 0.5 }}>

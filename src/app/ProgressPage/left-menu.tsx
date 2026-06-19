@@ -84,7 +84,7 @@ const LeftMenu = () => {
             padding: 1,
             height: "64px", // Fixed height to match experiment controls
             boxSizing: "border-box",
-            borderBottom: "1px solid #ddd",
+            borderBottom: theme => `1px solid ${theme.palette.divider}`,
           }}
         >
           <Box
@@ -249,11 +249,11 @@ const LeftMenu = () => {
               height: '36px',
               '&:hover': {
                 backgroundColor: theme => theme.palette.error.light,
-                color: '#fff',
+                color: 'common.white',
                 transform: 'translateY(-1px)',
                 boxShadow: theme => theme.customShadows.cardHover,
               },
-              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+              boxShadow: theme => theme.customShadows.card,
             }}
           >
             <LogoutRoundedIcon fontSize="small" />
@@ -272,7 +272,7 @@ const LeftMenu = () => {
                 transform: 'translateY(-1px)',
                 boxShadow: theme => theme.customShadows.cardHover,
               },
-              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+              boxShadow: theme => theme.customShadows.card,
             }}
           >
             {themeMode === 'light'

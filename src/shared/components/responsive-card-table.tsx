@@ -19,9 +19,9 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import CompactMenuItem from './compact-menu-item';
-import { cardSurfaceSx, cardHeaderSx } from '../styles/card-surface';
+import { cardSurfaceSx, cardHeaderSx, menuPaperSx } from '../styles/card-surface';
 import SettingsIcon from '@mui/icons-material/Settings';
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import DownloadIcon from '@mui/icons-material/Download';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import CloseIcon from '@mui/icons-material/Close';
@@ -75,8 +75,9 @@ export const SectionHeader = ({
       px: 1.25,
       py: 0.5,
       background: theme => theme.palette.customSurface.sectionHeader,
-      borderTopLeftRadius: 6,
-      borderTopRightRadius: 6,
+      // Corners are clipped by the parent menu/popover's `overflow: hidden` +
+      // CARD_RADIUS, so the header inherits the container radius instead of
+      // pinning its own (which used to mismatch 12px containers).
       margin: 0,
       width: '100%',
     }}
@@ -87,16 +88,17 @@ export const SectionHeader = ({
         alignItems: 'center',
         justifyContent: 'center',
         color: 'text.secondary',
-        mr: 1,
+        mr: 0.75,
+        '& svg': { fontSize: 18 },
       }}
     >
       {icon}
     </Box>
     <Typography
-      variant="subtitle2"
       sx={{
         display: 'flex',
         alignItems: 'center',
+        fontSize: '0.95rem',
         fontWeight: 600,
         color: 'text.primary',
       }}
@@ -126,7 +128,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
   showControlsInHeader = false,
   showSettings = true,
   optionsLabel = 'Options',
-  optionsIcon = <SettingsSuggestIcon fontSize="small" />,
+  optionsIcon = <TuneRoundedIcon fontSize="small" />,
 
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -255,7 +257,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                fontWeight: 700,
+                fontWeight: 600,
                 color: 'text.primary',
                 maxWidth: '100%',
                 flexShrink: 1,
@@ -317,22 +319,18 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
                   }}
                   PaperProps={{
                     elevation: 0,
-                    sx: {
-                      width: 240,
-                      maxHeight: 380,
-                      overflow: 'hidden',
-                      borderRadius: 2,
-                      mt: 0.5,
-                      boxShadow: theme => theme.customShadows.popover,
-                      border: theme => `1px solid ${theme.palette.customSurface.cardBorder}`,
-                      '& .MuiMenu-list': {
-                        padding: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        height: '100%',
-                        maxHeight: 380,
+                    sx: [
+                      menuPaperSx(),
+                      {
+                        '& .MuiMenu-list': {
+                          padding: 0,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: '100%',
+                          maxHeight: 380,
+                        },
                       },
-                    },
+                    ],
                   }}
                   MenuListProps={{
                     sx: {
@@ -438,7 +436,7 @@ const ResponsiveCardTable: React.FC<ResponsiveCardTableProps> = ({
               maxWidth: 'unset',
               bgcolor: 'background.paper',
               overflow: 'hidden',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+              boxShadow: theme => theme.customShadows.popover,
             },
           }}
         >

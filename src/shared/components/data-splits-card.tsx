@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { Box, Typography } from '@mui/material';
+import { CHART_CATEGORICAL, CHART_NEUTRAL } from '../../mui-theme';
 
 type SplitKey = string;
 
 const DEFAULT_SPLIT_ORDER: SplitKey[] = ['train', 'validation', 'test'];
 
 const SPLIT_META: Record<SplitKey, { label: string; color: string }> = {
-  train: { label: 'Training', color: '#3b82f6' },
-  validation: { label: 'Validation', color: '#a855f7' },
-  test: { label: 'Test', color: '#16a34a' },
+  train: { label: 'Training', color: CHART_CATEGORICAL[0] },
+  validation: { label: 'Validation', color: CHART_CATEGORICAL[2] },
+  test: { label: 'Test', color: CHART_CATEGORICAL[1] },
 };
 
 function normalizeKey(key: string) {
@@ -54,7 +55,7 @@ export function DataSplitsCardContent({ dataSplitSizes }: DataSplitsCardContentP
   const enriched = entries.map((e) => {
     const meta = SPLIT_META[e.key] ?? {
       label: e.rawKey.charAt(0).toUpperCase() + e.rawKey.slice(1),
-      color: '#64748b',
+      color: CHART_NEUTRAL,
     };
     const percent = pct(e.size, total);
 

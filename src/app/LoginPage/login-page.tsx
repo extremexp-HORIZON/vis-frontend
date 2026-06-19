@@ -8,6 +8,8 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useTheme } from '@mui/material';
@@ -63,43 +65,48 @@ const LoginPage = () => {
     }
   }, [token, navigate, from]);
 
+  // Brand login background — a one-off neutral with no theme-token equivalent.
+  const pageBg = theme.palette.mode === 'dark' ? theme.palette.background.default : '#E6E6E6';
+
   return (
-    <div
+    <Box
       id="error-page"
-      style={{
-        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : '#E6E6E6',
+      sx={{
+        backgroundColor: pageBg,
         transition: 'background-color 0.3s',
       }}
     >
-      <div
-        style={{
+      <Box
+        sx={{
           display: 'flex',
           alignItems: 'center',
-          rowGap: 20,
+          rowGap: 2.5,
           userSelect: 'none',
           flexDirection: 'column',
         }}
       >
-        <img
+        <Box
+          component="img"
           src={theme.palette.mode === 'dark' ? '/images/extremexp-logo-removebg-preview.png' : '/images/extremexp-logo.png'}
-          height={130}
           alt="ExtremeXP Logo"
-          style={{ backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : '#E6E6E6' }}
+          sx={{ height: 130, backgroundColor: pageBg }}
         />
-        <div style={{ display: 'flex', flexDirection: 'column', rowGap: 0, textAlign: 'center' }}>
-          <h3 style={{ marginBottom: 2 }}>Login to Your Account</h3>
-          <p style={{ fontSize: '14px', margin: 0, marginBottom: '2rem', color: theme.palette.error.main, height: '17px' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
+          <Typography variant="h6" component="h3" sx={{ mb: '2px', fontWeight: 700 }}>
+            Login to Your Account
+          </Typography>
+          <Typography sx={{ fontSize: 14, m: 0, mb: 4, color: 'error.main', height: 17 }}>
             {typeof error === 'string'
               ? error
               : error instanceof Error
                 ? error.message
                 : ' '
             }
-          </p>
-        </div>
-      </div>
+          </Typography>
+        </Box>
+      </Box>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', rowGap: 20 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2.5 }}>
         <TextField
           id="username"
           name="username"
@@ -152,8 +159,8 @@ const LoginPage = () => {
             'Sign In'
           )}
         </Button>
-      </form>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

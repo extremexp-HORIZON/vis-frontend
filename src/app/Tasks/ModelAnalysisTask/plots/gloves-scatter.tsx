@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import {
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Box,
-  Switch,
   Grid,
-  Typography,
 } from '@mui/material';
 import UmapComponent from './umapComponent';
 import ResponsiveCardVegaLite from '../../../../shared/components/responsive-card-vegalite';
 import SearchableSelect from '../../../../shared/components/searchable-select';
+import PillToggle from '../../../../shared/components/pill-toggle';
 
 interface DataField {
   values: unknown[]
@@ -310,45 +306,25 @@ const GlovesScatter = ({
           variant="outlined"
           fullWidth
         >
-          <InputLabel>Apply</InputLabel>
-          <Select
-            value={colorField}
-            onChange={e => setColorField(e.target.value)}
+          <SearchableSelect
+            labelId="gloves-color-field-label"
+            inputLabel="Apply"
             label="Apply"
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                  maxWidth: 300,
-                },
-              },
-            }}
-          >
-            {colorOptions.map(option => {
-              // Extract the part before "_Prediction"
-              const displayText = option.replace(/_Prediction$/, '');
-
-              return (
-                <MenuItem key={option} value={option}>
-                  {displayText}
-                </MenuItem>
-              );
-            })}
-          </Select>
+            value={colorField}
+            options={colorOptions}
+            onChange={(value) => setColorField(value)}
+            getOptionLabel={(option) => option.replace(/_Prediction$/, '')}
+            menuMaxHeight={250}
+            menuWidth={300}
+          />
         </FormControl>
       )}
       <Box display="flex" alignItems="center">
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 500,
-          }}
-        >
-          UMAP
-        </Typography>
-        <Switch
+        <PillToggle
           checked={dimensionalityReduction}
-          onChange={() => setDimensionalityReduction(prev => !prev)}
+          onChange={(checked) => setDimensionalityReduction(checked)}
+          label="UMAP"
+          tooltip="Reduce dimensionality with UMAP"
         />
       </Box>
     </Box>

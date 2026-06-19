@@ -18,13 +18,13 @@ import {
 } from '@mui/material';
 import CompactMenuItem from './compact-menu-item';
 import { SectionHeader } from './responsive-card-table';
-import { cardSurfaceSx, cardHeaderSx } from '../styles/card-surface';
+import { cardSurfaceSx, cardHeaderSx, menuPaperSx } from '../styles/card-surface';
 import CloseIcon from '@mui/icons-material/Close';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { VegaLite } from 'react-vega';
 import SettingsIcon from '@mui/icons-material/Settings';
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import DownloadIcon from '@mui/icons-material/Download';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import CodeIcon from '@mui/icons-material/Code';
@@ -54,6 +54,8 @@ interface ResponsiveCardVegaLiteProps {
   enableSorting?: boolean;
   initialSortDirection?: 'ascending' | 'descending' | 'none';
   signalListeners?: Parameters<typeof VegaLite>[0]['signalListeners'];
+  /** Receives the live Vega view of the inline chart (for imperative signal updates). */
+  onNewView?: Parameters<typeof VegaLite>[0]['onNewView'];
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type VLSpec = Record<string, any>;
@@ -117,6 +119,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
   enableSorting = false,
   initialSortDirection = 'none',
   signalListeners,
+  onNewView,
   ...otherProps
 }) => {
   const [width, setWidth] = useState(minWidth);
@@ -740,7 +743,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             <Typography
               variant="subtitle2"
               sx={{
-                fontWeight: 700,
+                fontWeight: 600,
                 color: 'text.primary',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -791,16 +794,10 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   }}
                   PaperProps={{
                     elevation: 0,
-                    sx: {
-                      width: 240,
-                      maxHeight: 380,
-                      overflow: 'hidden',
-                      borderRadius: 2,
-                      mt: 0.5,
-                      boxShadow: theme => theme.customShadows.popover,
-                      border: theme => `1px solid ${theme.palette.customSurface.cardBorder}`,
-                      '& .MuiMenu-list': { padding: 0 },
-                    },
+                    sx: [
+                      menuPaperSx(),
+                      { '& .MuiMenu-list': { padding: 0 } },
+                    ],
                   }}
                   MenuListProps={{
                     sx: {
@@ -809,7 +806,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   }}
                 >
                   <SectionHeader
-                    icon={<SettingsSuggestIcon fontSize="small" />}
+                    icon={<TuneRoundedIcon fontSize="small" />}
                     title="Chart Options"
                   />
                   <Box
@@ -929,6 +926,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                 {...otherProps}
                 tooltip={tooltip}
                 signalListeners={signalListeners}
+                onNewView={onNewView}
               />
             )}
           </Box>
@@ -951,7 +949,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
             maxWidth: 'unset',
             bgcolor: 'background.paper',
             overflow: 'hidden',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.16)',
+            boxShadow: theme => theme.customShadows.popover,
           },
         }}
       >
@@ -1016,16 +1014,10 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   }}
                   PaperProps={{
                     elevation: 0,
-                    sx: {
-                      width: 240,
-                      maxHeight: 380,
-                      overflow: 'hidden',
-                      borderRadius: 2,
-                      mt: 0.5,
-                      boxShadow: theme => theme.customShadows.popover,
-                      border: theme => `1px solid ${theme.palette.customSurface.cardBorder}`,
-                      '& .MuiMenu-list': { padding: 0 },
-                    },
+                    sx: [
+                      menuPaperSx(),
+                      { '& .MuiMenu-list': { padding: 0 } },
+                    ],
                   }}
                   MenuListProps={{
                     sx: {
@@ -1034,7 +1026,7 @@ const ResponsiveCardVegaLite: React.FC<ResponsiveCardVegaLiteProps> = ({
                   }}
                 >
                   <SectionHeader
-                    icon={<SettingsSuggestIcon fontSize="small" />}
+                    icon={<TuneRoundedIcon fontSize="small" />}
                     title="Chart Options"
                   />
                   <Box

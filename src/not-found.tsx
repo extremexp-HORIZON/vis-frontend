@@ -1,18 +1,19 @@
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 const NotFound = () => {
 
   return (
-    <div id="error-page">
-      <div style={{ display: 'flex', alignItems: 'center', columnGap: 4, userSelect: 'none' }}>
-        <h1 style={{ fontSize: 130, margin: 0 }}>4</h1>
-        <img src="/images/extremexp-logo.png" height={130} alt='Extremexp logo'/>
-        {/* <h1 style={{fontSize: 130, margin: 0}}>0</h1> */}
-        <h1 style={{ fontSize: 130, margin: 0 }}>4</h1>
-      </div>
+    <Box id="error-page">
+      <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 0.5, userSelect: 'none' }}>
+        <Typography component="h1" sx={{ fontSize: 130, m: 0 }}>4</Typography>
+        <Box component="img" src="/images/extremexp-logo.png" alt="Extremexp logo" sx={{ height: 130 }} />
+        <Typography component="h1" sx={{ fontSize: 130, m: 0 }}>4</Typography>
+      </Box>
 
-      <p style={{ userSelect: 'none' }}>Page not found.</p>
-      <p style={{ userSelect: 'none' }}>It looks like you've been lost.</p>
-    </div>
+      <Typography sx={{ userSelect: 'none' }}>Page not found.</Typography>
+      <Typography sx={{ userSelect: 'none' }}>It looks like you&apos;ve been lost.</Typography>
+    </Box>
   );
 };
 

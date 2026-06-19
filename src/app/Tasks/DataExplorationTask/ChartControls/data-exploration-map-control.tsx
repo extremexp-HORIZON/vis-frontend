@@ -1,10 +1,6 @@
 import {
   Box,
   FormControl,
-  InputLabel,
-  Select,
-  OutlinedInput,
-  MenuItem,
   Slider,
   Typography,
 } from '@mui/material';
@@ -230,43 +226,26 @@ const MapControls = () => {
                 menuWidth={200}
               />
             </FormControl>
-            <FormControl
-              fullWidth
-              required
-              error={!tab?.workflowTasks.dataExploration?.controlPanel.orderBy}
-
-              // disabled={timestampField === null || timestampField === ''}
-            >
-              <InputLabel
-                id="order-by"
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-              >
-                <AccessTimeIcon fontSize="small" />
-                <span>Order</span>
-              </InputLabel>
-              <Select
+            <FormControl fullWidth>
+              <SearchableSelect
+                labelId="order-by"
+                inputLabel={
+                  <Box display="flex" alignItems="center" gap={0.5}>
+                    <AccessTimeIcon fontSize="small" />
+                    <span>Order</span>
+                  </Box>
+                }
+                label="Order By"
+                required
+                error={!tab?.workflowTasks.dataExploration?.controlPanel.orderBy}
                 value={
                   tab?.workflowTasks.dataExploration?.controlPanel.orderBy || ''
                 }
-                onChange={e =>
-                  handleChange('orderBy', e.target.value as string)
-                }
-                input={<OutlinedInput label="Order-----" />}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 150,
-                      maxWidth: 150,
-                    },
-                  },
-                }}
-              >
-                {timestampField?.map(col => (
-                  <MenuItem key={col} value={col}>
-                    {col}
-                  </MenuItem>
-                ))}
-              </Select>
+                options={timestampField ?? []}
+                onChange={(value) => handleChange('orderBy', value)}
+                menuMaxHeight={150}
+                menuWidth={150}
+              />
             </FormControl>
           </>
         )}

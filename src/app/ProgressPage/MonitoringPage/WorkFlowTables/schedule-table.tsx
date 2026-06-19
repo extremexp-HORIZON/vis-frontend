@@ -6,6 +6,7 @@ import Close from '@mui/icons-material/Close';
 import ToolBarWorkflow from './toolbar-workflow-table';
 import FilterBar from '../../../../shared/components/filter-bar';
 import { alpha, Popover, styled } from '@mui/material';
+import { menuPaperSx } from '../../../../shared/styles/card-surface';
 import type { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -598,7 +599,11 @@ export default function ScheduleTable() {
           horizontal: 'left',
         }}
         PaperProps={{
-          sx: { p: 1.5, borderRadius: 1.5, boxShadow: 2 },
+          elevation: 0,
+          sx: [
+            menuPaperSx({ width: 380 }),
+            { p: 1.5, maxHeight: 'none', overflowY: 'auto' },
+          ],
         }}
       >
         <FilterBar

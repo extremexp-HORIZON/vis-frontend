@@ -1,8 +1,9 @@
 import { Box, Typography, Tooltip, useTheme, alpha } from '@mui/material';
 import type { ISpan, SpanType } from './mock-data';
+import { CHART_NEUTRAL } from '../../../mui-theme';
 
 const SPAN_COLORS: Record<SpanType, string> = {
-  CHAIN:     '#64748b',
+  CHAIN:     CHART_NEUTRAL,
   RETRIEVAL: '#0ea5e9',
   EMBEDDING: '#8b5cf6',
   LLM:       '#10b981',

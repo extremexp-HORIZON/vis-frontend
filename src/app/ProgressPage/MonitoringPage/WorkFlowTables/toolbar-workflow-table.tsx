@@ -5,8 +5,6 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
-import type {
-  SelectChangeEvent } from '@mui/material';
 import {
   Button,
   Stack,
@@ -14,10 +12,6 @@ import {
   Popover,
   Badge,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from '@mui/material';
 import type {
   RootState } from '../../../../store/store';
@@ -32,7 +26,7 @@ import {
   setGroupBy,
   setSelectedSpaces,
 } from '../../../../store/slices/monitorPageSlice';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PivotTableChartRoundedIcon from '@mui/icons-material/PivotTableChartRounded';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import GrainIcon from '@mui/icons-material/Grain';
@@ -47,6 +41,8 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { Link } from 'react-router-dom';
 import { SectionHeader } from '../../../../shared/components/responsive-card-table';
 import SelectionPopover from '../../../../shared/components/selection-popover';
+import SearchableSelect from '../../../../shared/components/searchable-select';
+import { menuPaperSx } from '../../../../shared/styles/card-surface';
 
 interface ToolBarWorkflowProps {
   filterNumbers: number
@@ -78,8 +74,38 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
     spaceOptions,
     onDownloadCsv,
   } = props;
-  const { visibleTable, workflowsTable, scheduledTable, selectedTab } =
-    useAppSelector((state: RootState) => state.monitorPage);
+  // Narrow, field-level subscriptions so the toolbar does NOT re-render on every
+  // row hover. `hoveredWorkflowId` lives in monitorPage.workflowsTable, so
+  // subscribing to the whole slice (or the whole workflowsTable) re-rendered the
+  // toolbar on each hover and re-ran the heavy `uniqueParameters` reduce below.
+  const visibleTable = useAppSelector((state: RootState) => state.monitorPage.visibleTable);
+  const selectedTab = useAppSelector((state: RootState) => state.monitorPage.selectedTab);
+  const wfVisibleColumns = useAppSelector((state: RootState) => state.monitorPage.workflowsTable.visibleColumns);
+  const wfColumnsVisibilityModel = useAppSelector((state: RootState) => state.monitorPage.workflowsTable.columnsVisibilityModel);
+  const wfGroupBy = useAppSelector((state: RootState) => state.monitorPage.workflowsTable.groupBy);
+  const wfSelectedSpaces = useAppSelector((state: RootState) => state.monitorPage.workflowsTable.selectedSpaces);
+  const schColumns = useAppSelector((state: RootState) => state.monitorPage.scheduledTable.columns);
+  const schColumnsVisibilityModel = useAppSelector((state: RootState) => state.monitorPage.scheduledTable.columnsVisibilityModel);
+  const schSelectedSpaces = useAppSelector((state: RootState) => state.monitorPage.scheduledTable.selectedSpaces);
+
+  const workflowsTable = useMemo(
+    () => ({
+      visibleColumns: wfVisibleColumns,
+      columnsVisibilityModel: wfColumnsVisibilityModel,
+      groupBy: wfGroupBy,
+      selectedSpaces: wfSelectedSpaces,
+    }),
+    [wfVisibleColumns, wfColumnsVisibilityModel, wfGroupBy, wfSelectedSpaces],
+  );
+  const scheduledTable = useMemo(
+    () => ({
+      columns: schColumns,
+      columnsVisibilityModel: schColumnsVisibilityModel,
+      selectedSpaces: schSelectedSpaces,
+    }),
+    [schColumns, schColumnsVisibilityModel, schSelectedSpaces],
+  );
+
   const { workflows, experiment } = useAppSelector(
     (state: RootState) => state.progressPage,
   );
@@ -89,30 +115,27 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
   const [anchorElSpaces, setAnchorElSpaces] = useState<null | HTMLElement>(null);
   const [anchorElCreateWorkflow, setAnchorElCreateWorkflow] = useState<null | HTMLElement>(null);
 
-  const uniqueParameters = workflows.data.reduce(
-    (acc: Record<string, Set<string>>, workflow) => {
-      if (workflow.params) {
-        workflow.params.forEach(param => {
-          if (!acc[param.name]) {
-            acc[param.name] = new Set();
-          }
-          acc[param.name].add(param.value);
-        });
-      }
+  const uniqueParameters = useMemo(
+    () => workflows.data.reduce(
+      (acc: Record<string, Set<string>>, workflow) => {
+        if (workflow.params) {
+          workflow.params.forEach(param => {
+            if (!acc[param.name]) {
+              acc[param.name] = new Set();
+            }
+            acc[param.name].add(param.value);
+          });
+        }
 
-      return acc;
-    },
-    {}
+        return acc;
+      },
+      {}
+    ),
+    [workflows.data],
   );
 
   const [workflowName, setWorkflowName] = useState('');
   const [selectedParams, setSelectedParams] = useState<Record<string, string>>({});
-
-  const handleParamChange = (paramName: string) => (e: SelectChangeEvent<string>) => {
-    const value = e.target.value;
-
-    setSelectedParams((prev) => ({ ...prev, [paramName]: value }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -338,15 +361,11 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
               onClose={handleCreateWokrkflowClose}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               PaperProps={{
-                elevation: 2,
-                sx: {
-                  width: 300,
-                  maxHeight: 320,
-                  overflow: 'hidden',
-                  borderRadius: 1.5,
-                  mt: 0.5,
-                  '& .MuiList-root': { padding: 0 },
-                },
+                elevation: 0,
+                sx: [
+                  menuPaperSx({ width: 300, maxHeight: 320 }),
+                  { '& .MuiList-root': { padding: 0 } },
+                ],
               }}
             >
               <SectionHeader icon={<CreateIcon fontSize="small" />} title="Create New Workflow" />
@@ -377,24 +396,18 @@ export default function ToolBarWorkflow(props: ToolBarWorkflowProps) {
                     const selected = selectedParams[paramName] ?? '';
 
                     return (
-                      <FormControl key={paramName} size="small" fullWidth>
-                        <InputLabel id={`${paramName}-label`}>{paramName}</InputLabel>
-                        <Select
-                          labelId={`${paramName}-label`}
-                          label={paramName}
-                          value={selected}
-                          onChange={handleParamChange(paramName)}
-                        >
-                          <MenuItem value="">
-                            <em>None</em>
-                          </MenuItem>
-                          {values.map((v) => (
-                            <MenuItem key={v} value={v}>
-                              {v}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <SearchableSelect
+                        key={paramName}
+                        labelId={`${paramName}-label`}
+                        inputLabel={paramName}
+                        label={paramName}
+                        value={selected}
+                        options={['', ...values]}
+                        getOptionLabel={(v) => (v === '' ? 'None' : v)}
+                        onChange={(v) =>
+                          setSelectedParams((prev) => ({ ...prev, [paramName]: v }))
+                        }
+                      />
                     );
                   })}
                 <Button

@@ -12,7 +12,7 @@ import StopIcon from '@mui/icons-material/Stop';
 import LaunchIcon from '@mui/icons-material/Launch';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { setSelectedTab, setWorkflowsTable, toggleWorkflowSelection, setHoveredWorkflow, setVisibleTable, setExpandedGroup } from '../../../../store/slices/monitorPageSlice';
+import { setSelectedTab, setWorkflowsTable, bulkToggleWorkflowSelection, setHoveredWorkflow, setVisibleTable, setExpandedGroup } from '../../../../store/slices/monitorPageSlice';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import type { RootState } from '../../../../store/store';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -30,6 +30,7 @@ import { createWorkflow, setWorkflowsData, stateController } from '../../../../s
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ControlPointDuplicateIcon from '@mui/icons-material/ControlPointDuplicate';
 import { SectionHeader } from '../../../../shared/components/responsive-card-table';
+import { menuPaperSx } from '../../../../shared/styles/card-surface';
 import SearchableSelect from '../../../../shared/components/searchable-select';
 import { getCache } from '../../../../shared/utils/localStorageCache';
 
@@ -231,15 +232,11 @@ const handleSubmit = async (e: React.FormEvent) => {
         onClose={handleCreateWokrkflowClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         PaperProps={{
-          elevation: 2,
-          sx: {
-            width: 300,
-            maxHeight: 320,
-            overflow: 'hidden',
-            borderRadius: 1.5,
-            mt: 0.5,
-            '& .MuiList-root': { padding: 0 },
-          },
+          elevation: 0,
+          sx: [
+            menuPaperSx({ width: 300, maxHeight: 320 }),
+            { '& .MuiList-root': { padding: 0 } },
+          ],
         }}
       >
         <SectionHeader icon={<ControlPointDuplicateIcon fontSize="small" />} title="Create New Workflow" />
@@ -538,9 +535,10 @@ export default function WorkflowTable() {
   const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
     const newIds = Array.from(newSelection.ids) as string[];
 
-    newSelection.ids.forEach(workflowId => {
-      dispatch(toggleWorkflowSelection(workflowId as string));
-    });
+    // One pass to assign colors to any newly-selected ids, then set the exact
+    // selection — instead of dispatching a per-id toggle for every selected row
+    // (which re-ran the reducer N times and scrambled the selection on each click).
+    dispatch(bulkToggleWorkflowSelection(newIds));
     dispatch(setWorkflowsTable({ selectedWorkflows: newIds }));
   };
 
@@ -798,14 +796,10 @@ export default function WorkflowTable() {
         .filter(row => !row.isGroupSummary)
         .map(row => row.workflowId);
         
-      allWorkflowIds.forEach(workflowId => {
-        if (!workflowsTable.selectedWorkflows.includes(workflowId)) {
-          dispatch(toggleWorkflowSelection(workflowId));
-        }
-      });
+      dispatch(bulkToggleWorkflowSelection(allWorkflowIds));
 
-      dispatch(setWorkflowsTable({ 
-        selectedWorkflows: allWorkflowIds 
+      dispatch(setWorkflowsTable({
+        selectedWorkflows: allWorkflowIds
       }));
 
       isApplyingCachedFilters.current = false;
@@ -1327,12 +1321,11 @@ export default function WorkflowTable() {
           horizontal: 'right',
         }}
         PaperProps={{
-          sx: {
-            width: 380,
-            p: 1.25,
-            borderRadius: 1.5,
-            boxShadow: 2,
-          }
+          elevation: 0,
+          sx: [
+            menuPaperSx({ width: 380 }),
+            { p: 1.25, maxHeight: 'none', overflowY: 'auto' },
+          ],
         }}
       >
         <FilterBar

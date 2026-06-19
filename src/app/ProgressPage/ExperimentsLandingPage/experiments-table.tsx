@@ -29,6 +29,7 @@ import ExperimentsTableToolbar, {
 } from './experiment-table-toolbar';
 
 import ProgressBar from '../../../shared/components/prgress-bar';
+import { menuPaperSx } from '../../../shared/styles/card-surface';
 
 export type ExperimentRow = {
   id: string;
@@ -82,7 +83,7 @@ const FilterHeader = () => (
     sx={{
       display: 'flex',
       alignItems: 'center',
-      borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+      borderBottom: theme => `1px solid ${theme.palette.divider}`,
       px: 2,
       py: 1.5,
       background: theme => theme.palette.customSurface.sectionHeader,
@@ -346,17 +347,8 @@ export default function ExperimentsTable(props: ExperimentsTableProps) {
           onClose={() => setFiltersAnchorEl(null)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           PaperProps={{
-            elevation: 3,
-            sx: {
-              width: 420,
-              maxHeight: 380,
-              overflow: 'hidden',
-              padding: 0,
-              borderRadius: '12px',
-              boxShadow: theme => theme.customShadows.popover,
-              border: theme => `1px solid ${theme.palette.divider}`,
-              mt: 1,
-            },
+            elevation: 0,
+            sx: [menuPaperSx({ width: 420 }), { padding: 0 }],
           }}
         >
           <ClickAwayListener
@@ -402,7 +394,7 @@ export default function ExperimentsTable(props: ExperimentsTableProps) {
               <Box
                 sx={{
                   p: 1,
-                  borderTop: '1px solid rgba(0,0,0,0.08)',
+                  borderTop: theme => `1px solid ${theme.palette.divider}`,
                   backgroundColor: 'background.paper',
                   display: 'flex',
                   justifyContent: 'center',
